@@ -41,341 +41,157 @@ object ComponentUtils {
 
     private fun convertMinecraftIdToModern2(id: String, damage: Int): String {
         val strippedId = id.replace("minecraft:", "")
-        if (strippedId == "skull") {
-            return "player_head"
+        return when {
+            strippedId == "skull" -> "player_head"
+            strippedId == "red_flower" -> when (damage) {
+                0 -> "poppy"
+                1 -> "blue_orchid"
+                2 -> "allium"
+                3 -> "azure_bluet"
+                4 -> "red_tulip"
+                5 -> "orange_tulip"
+                6 -> "white_tulip"
+                7 -> "pink_tulip"
+                8 -> "oxeye_daisy"
+                else -> strippedId
+            }
+
+            strippedId == "yellow_flower" -> "dandelion"
+            strippedId == "fireworks" -> "firework_rocket"
+            strippedId == "dye" -> when (damage) {
+                0 -> "ink_sac"
+                1 -> "red_dye"
+                2 -> "green_dye"
+                3 -> "cocoa_beans"
+                4 -> "lapis_lazuli"
+                5 -> "purple_dye"
+                6 -> "cyan_dye"
+                7 -> "light_gray_dye"
+                8 -> "gray_dye"
+                9 -> "pink_dye"
+                10 -> "lime_dye"
+                11 -> "yellow_dye"
+                12 -> "light_blue_dye"
+                13 -> "magenta_dye"
+                14 -> "orange_dye"
+                15 -> "bone_meal"
+                else -> strippedId
+            }
+
+            strippedId == "spawn_egg" -> when (damage) {
+                0 -> "polar_bear_spawn_egg"
+                4 -> "elder_guardian_spawn_egg"
+                52 -> "spider_spawn_egg"
+                54 -> "zombie_spawn_egg"
+                55 -> "slime_spawn_egg"
+                58 -> "enderman_spawn_egg"
+                61 -> "blaze_spawn_egg"
+                67 -> "endermite_spawn_egg"
+                94 -> "squid_spawn_egg"
+                96 -> "mooshroom_spawn_egg"
+                101 -> "rabbit_spawn_egg"
+                120 -> "villager_spawn_egg"
+                else -> strippedId
+            }
+
+            strippedId == "carpet" -> getColor(damage) + "_carpet"
+            strippedId == "leaves" -> getWood(damage) + "_leaves"
+            strippedId == "leaves2" -> when (damage) {
+                0 -> "acacia_leaves"
+                1 -> "dark_oak_leaves"
+                else -> strippedId
+            }
+
+            strippedId == "banner" -> getColor(damage) + "_banner"
+            strippedId.contains("record_") -> strippedId.replace("record_", "music_disc_")
+            strippedId == "cooked_fish" -> when (damage) {
+                0 -> "cooked_cod"
+                1 -> "cooked_salmon"
+                else -> strippedId
+            }
+
+            strippedId == "bed" -> "red_bed"
+            strippedId == "wool" -> getColor(damage) + "_wool"
+            strippedId == "trapdoor" -> "oak_trapdoor"
+            strippedId == "speckled_melon" -> "glistering_melon_slice"
+            strippedId == "melon_block" -> "melon"
+            strippedId == "fish" -> when (damage) {
+                0 -> "cod"
+                1 -> "salmon"
+                2 -> "tropical_fish"
+                3 -> "pufferfish"
+                else -> strippedId
+            }
+
+            strippedId == "log" -> getWood(damage) + "_log"
+            strippedId == "log2" -> when (damage) {
+                0 -> "acacia_log"
+                1 -> "dark_oak_log"
+                else -> strippedId
+            }
+
+            strippedId == "waterlily" -> "lily_pad"
+            strippedId == "web" -> "cobweb"
+            strippedId == "reeds" -> "sugar_cane"
+            strippedId == "double_plant" -> when (damage) {
+                0 -> "sunflower"
+                1 -> "lilac"
+                2 -> "tall_grass"
+                3 -> "large_fern"
+                4 -> "rose_bush"
+                5 -> "peony"
+                else -> strippedId
+            }
+
+            strippedId == "deadbush" -> "dead_bush"
+            strippedId == "firework_charge" -> "firework_star"
+            strippedId == "netherbrick" -> "nether_brick"
+            strippedId == "wooden_button" -> "oak_button"
+            strippedId == "slime" -> "slime_block"
+            strippedId == "boat" -> "oak_boat"
+            strippedId == "brick_block" -> "bricks"
+            strippedId == "stained_glass" -> getColor(damage) + "_stained_glass"
+            strippedId == "stained_glass_pane" -> getColor(damage) + "_stained_glass_pane"
+            strippedId == "hardened_clay" -> "terracotta"
+            strippedId == "stained_hardened_clay" -> getColor(damage) + "_terracotta"
+            strippedId == "fence" -> "oak_fence"
+            strippedId == "fence_gate" -> "oak_fence_gate"
+            strippedId == "grass" -> "grass_block"
+            strippedId == "lit_pumpkin" -> "jack_o_lantern"
+            strippedId == "planks" -> getWood(damage) + "_planks"
+            strippedId == "mob_spawner" -> "spawner"
+            strippedId == "noteblock" -> "note_block"
+            strippedId == "golden_rail" -> "powered_rail"
+            strippedId == "quartz_ore" -> "nether_quartz_ore"
+            strippedId == "sapling" -> getWood(damage) + "_sapling"
+            strippedId == "sign" -> "oak_sign"
+            strippedId == "stonebrick" -> when (damage) {
+                0 -> "stone_bricks"
+                1 -> "mossy_stone_bricks"
+                2 -> "cracked_stone_bricks"
+                3 -> "chiseled_stone_bricks"
+                else -> strippedId
+            }
+
+            strippedId == "snow_layer" -> "snow"
+            strippedId == "wooden_slab" -> getWood(damage) + "_slab"
+            strippedId == "stone_slab2" -> "red_sandstone_slab"
+            strippedId == "wooden_door" -> "oak_door"
+            strippedId == "wooden_pressure_plate" -> "oak_pressure_plate"
+            strippedId == "tallgrass" -> when (damage) {
+                0 -> "dead_bush"
+                1 -> "short_grass"
+                2 -> "fern"
+                else -> strippedId
+            }
+
+            strippedId == "monster_egg" -> when (damage) {
+                0 -> "infested_stone"
+                else -> strippedId
+            }
+
+            else -> strippedId
         }
-        if (strippedId == "red_flower") {
-            if (damage == 0) {
-                return "poppy"
-            }
-            if (damage == 1) {
-                return "blue_orchid"
-            }
-            if (damage == 2) {
-                return "allium"
-            }
-            if (damage == 3) {
-                return "azure_bluet"
-            }
-            if (damage == 4) {
-                return "red_tulip"
-            }
-            if (damage == 5) {
-                return "orange_tulip"
-            }
-            if (damage == 6) {
-                return "white_tulip"
-            }
-            if (damage == 7) {
-                return "pink_tulip"
-            }
-            if (damage == 8) {
-                return "oxeye_daisy"
-            }
-        }
-        if (strippedId == "yellow_flower") {
-            return "dandelion"
-        }
-        if (strippedId == "fireworks") {
-            return "firework_rocket"
-        }
-        if (strippedId == "dye") {
-            if (damage == 0) {
-                return "ink_sac"
-            }
-            if (damage == 1) {
-                return "red_dye"
-            }
-            if (damage == 2) {
-                return "green_dye"
-            }
-            if (damage == 3) {
-                return "cocoa_beans"
-            }
-            if (damage == 4) {
-                return "lapis_lazuli"
-            }
-            if (damage == 5) {
-                return "purple_dye"
-            }
-            if (damage == 6) {
-                return "cyan_dye"
-            }
-            if (damage == 7) {
-                return "light_gray_dye"
-            }
-            if (damage == 8) {
-                return "gray_dye"
-            }
-            if (damage == 9) {
-                return "pink_dye"
-            }
-            if (damage == 10) {
-                return "lime_dye"
-            }
-            if (damage == 11) {
-                return "yellow_dye"
-            }
-            if (damage == 12) {
-                return "light_blue_dye"
-            }
-            if (damage == 13) {
-                return "magenta_dye"
-            }
-            if (damage == 14) {
-                return "orange_dye"
-            }
-            if (damage == 15) {
-                return "bone_meal"
-            }
-        }
-        if (strippedId == "spawn_egg") {
-            if (damage == 0) {
-                return "polar_bear_spawn_egg"
-            }
-            if (damage == 4) {
-                return "elder_guardian_spawn_egg"
-            }
-            if (damage == 52) {
-                return "spider_spawn_egg"
-            }
-            if (damage == 54) {
-                return "zombie_spawn_egg"
-            }
-            if (damage == 55) {
-                return "slime_spawn_egg"
-            }
-            if (damage == 58) {
-                return "enderman_spawn_egg"
-            }
-            if (damage == 61) {
-                return "blaze_spawn_egg"
-            }
-            if (damage == 67) {
-                return "endermite_spawn_egg"
-            }
-            if (damage == 94) {
-                return "squid_spawn_egg"
-            }
-            if (damage == 96) {
-                return "mooshroom_spawn_egg"
-            }
-            if (damage == 101) {
-                return "rabbit_spawn_egg"
-            }
-            if (damage == 120) {
-                return "villager_spawn_egg"
-            }
-        }
-        if (strippedId == "carpet") {
-            return getColor(damage) + "_carpet"
-        }
-        if (strippedId == "leaves") {
-            return getWood(damage) + "_leaves"
-        }
-        if (strippedId == "leaves2") {
-            if (damage == 0) {
-                return "acacia_leaves"
-            }
-            if (damage == 1) {
-                return "dark_oak_leaves"
-            }
-        }
-        if (strippedId == "banner") {
-            return getColor(damage) + "_banner"
-        }
-        if (strippedId.contains("record_")) {
-            return strippedId.replace("record_", "music_disc_")
-        }
-        if (strippedId == "cooked_fish") {
-            if (damage == 0) {
-                return "cooked_cod"
-            }
-            if (damage == 1) {
-                return "cooked_salmon"
-            }
-        }
-        if (strippedId == "bed") {
-            return "red_bed"
-        }
-        if (strippedId == "wool") {
-            return getColor(damage) + "_wool"
-        }
-        if (strippedId == "trapdoor") {
-            return "oak_trapdoor"
-        }
-        if (strippedId == "speckled_melon") {
-            return "glistering_melon_slice"
-        }
-        if (strippedId == "melon_block") {
-            return "melon"
-        }
-        if (strippedId == "fish") {
-            if (damage == 0) {
-                return "cod"
-            }
-            if (damage == 1) {
-                return "salmon"
-            }
-            if (damage == 2) {
-                return "tropical_fish"
-            }
-            if (damage == 3) {
-                return "pufferfish"
-            }
-        }
-        if (strippedId == "log") {
-            return getWood(damage) + "_log"
-        }
-        if (strippedId == "log2") {
-            if (damage == 0) {
-                return "acacia_log"
-            }
-            if (damage == 1) {
-                return "dark_oak_log"
-            }
-        }
-        if (strippedId == "waterlily") {
-            return "lily_pad"
-        }
-        if (strippedId == "web") {
-            return "cobweb"
-        }
-        if (strippedId == "reeds") {
-            return "sugar_cane"
-        }
-        if (strippedId == "double_plant") {
-            if (damage == 0) {
-                return "sunflower"
-            }
-            if (damage == 1) {
-                return "lilac"
-            }
-            if (damage == 2) {
-                return "tall_grass"
-            }
-            if (damage == 3) {
-                return "large_fern"
-            }
-            if (damage == 4) {
-                return "rose_bush"
-            }
-            if (damage == 5) {
-                return "peony"
-            }
-        }
-        if (strippedId == "deadbush") {
-            return "dead_bush"
-        }
-        if (strippedId == "firework_charge") {
-            return "firework_star"
-        }
-        if (strippedId == "netherbrick") {
-            return "nether_brick"
-        }
-        if (strippedId == "wooden_button") {
-            return "oak_button"
-        }
-        if (strippedId == "slime") {
-            return "slime_block"
-        }
-        if (strippedId == "boat") {
-            return "oak_boat"
-        }
-        if (strippedId == "brick_block") {
-            return "bricks"
-        }
-        if (strippedId == "stained_glass") {
-            return getColor(damage) + "_stained_glass"
-        }
-        if (strippedId == "stained_glass_pane") {
-            return getColor(damage) + "_stained_glass_pane"
-        }
-        if (strippedId == "hardened_clay") {
-            return "terracotta"
-        }
-        if (strippedId == "stained_hardened_clay") {
-            return getColor(damage) + "_terracotta"
-        }
-        if (strippedId == "fence") {
-            return "oak_fence"
-        }
-        if (strippedId == "fence_gate") {
-            return "oak_fence_gate"
-        }
-        if (strippedId == "grass") {
-            return "grass_block"
-        }
-        if (strippedId == "lit_pumpkin") {
-            return "jack_o_lantern"
-        }
-        if (strippedId == "planks") {
-            return getWood(damage) + "_planks"
-        }
-        if (strippedId == "mob_spawner") {
-            return "spawner"
-        }
-        if (strippedId == "noteblock") {
-            return "note_block"
-        }
-        if (strippedId == "golden_rail") {
-            return "powered_rail"
-        }
-        if (strippedId == "quartz_ore") {
-            return "nether_quartz_ore"
-        }
-        if (strippedId == "sapling") {
-            return getWood(damage) + "_sapling"
-        }
-        if (strippedId == "sign") {
-            return "oak_sign"
-        }
-        if (strippedId == "stonebrick") {
-            if (damage == 0) {
-                return "stone_bricks"
-            }
-            if (damage == 1) {
-                return "mossy_stone_bricks"
-            }
-            if (damage == 2) {
-                return "cracked_stone_bricks"
-            }
-            if (damage == 3) {
-                return "chiseled_stone_bricks"
-            }
-        }
-        if (strippedId == "snow_layer") {
-            return "snow"
-        }
-        if (strippedId == "wooden_slab") {
-            return getWood(damage) + "_slab"
-        }
-        if (strippedId == "stone_slab2") {
-            return "red_sandstone_slab"
-        }
-        if (strippedId == "wooden_door") {
-            return "oak_door"
-        }
-        if (strippedId == "wooden_pressure_plate") {
-            return "oak_pressure_plate"
-        }
-        if (strippedId == "tallgrass") {
-            if (damage == 0) {
-                return "dead_bush"
-            }
-            if (damage == 1) {
-                return "short_grass"
-            }
-            if (damage == 2) {
-                return "fern"
-            }
-        }
-        if (strippedId == "monster_egg") {
-            if (damage == 0) {
-                return "infested_stone"
-            }
-        }
-        return strippedId
     }
 
     private fun getColor(damage: Int): String {

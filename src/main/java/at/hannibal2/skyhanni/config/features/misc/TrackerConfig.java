@@ -12,6 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class TrackerConfig {
 
     @Expose
     @ConfigOption(name = "Item Warnings", desc = "Item Warnings")
+    @SearchTag("Tracker Title, Drop Title")
     @Accordion
     public TrackerItemWarningsConfig warnings = new TrackerItemWarningsConfig();
 
