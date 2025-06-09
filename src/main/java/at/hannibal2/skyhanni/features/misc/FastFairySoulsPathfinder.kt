@@ -244,7 +244,7 @@ object FastFairySoulsPathfinder {
             return
         }
 
-        data = createEmptyData()
+        data = Data(found = 0, total = allSouls.size, route = mutableListOf(), allSouls = emptySet())
         if (data?.checkHaveAll() ?: false) return
         calculating = true
         calculatingStart = SimpleTimeMark.now()
