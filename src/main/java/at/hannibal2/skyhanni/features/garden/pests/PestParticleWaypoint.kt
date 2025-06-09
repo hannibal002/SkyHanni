@@ -42,6 +42,7 @@ object PestParticleWaypoint {
     private var lastParticle = SimpleTimeMark.farPast()
 
     private var guessPosition: LorenzVec? = null
+    private var isGuessPlotMiddle: Boolean = false
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
@@ -81,6 +82,7 @@ object PestParticleWaypoint {
 
         val solved = bezierFitter.solve() ?: return
         guessPosition = solved
+        isGuessPlotMiddle = solved.getPlot()?.middle?.equalsIgnoreY(solved.ceil()) ?: false
     }
 
     private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
@@ -95,6 +97,7 @@ object PestParticleWaypoint {
     private fun reset() {
         lastPestTrackerUse = SimpleTimeMark.farPast()
         guessPosition = null
+        isGuessPlotMiddle = false
         bezierFitter.reset()
     }
 
@@ -124,8 +127,7 @@ object PestParticleWaypoint {
         val waypoint = guessPosition ?: return
         val distance = waypoint.distance(event.exactPlayerEyeLocation())
         val color: Color
-        val plot = waypoint.getPlot()
-        if (plot != null && waypoint.ceil().equalsIgnoreY(plot.middle)) {
+        if (isGuessPlotMiddle) {
             color = LorenzColor.YELLOW.toColor()
             event.drawDynamicText(waypoint, " §r§e(plot middle)", 1.0, (-0.1 - distance / (12 * 1.7)).toFloat())
         } else {
