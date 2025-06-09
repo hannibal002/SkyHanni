@@ -114,7 +114,7 @@ object FarmingContestApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Your Contests") return
         val bulkClaimStack = event.inventoryItems[50] ?: return

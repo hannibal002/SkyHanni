@@ -842,7 +842,7 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(
-            exactPlayerEyeLocation(),
+            exactPlayerEyeLocation() + MinecraftCompat.localPlayer.rotationVector.toLorenzVec().times(2),
             location,
             color,
             lineWidth,
