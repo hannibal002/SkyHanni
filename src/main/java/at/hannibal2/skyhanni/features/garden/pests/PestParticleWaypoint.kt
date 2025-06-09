@@ -25,6 +25,7 @@ import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.12
 //$$ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
 //#endif
@@ -126,7 +127,7 @@ object PestParticleWaypoint {
         val plot = waypoint.getPlot()
         if (plot != null && waypoint.ceil().equalsIgnoreY(plot.middle)) {
             color = LorenzColor.YELLOW.toColor()
-            event.drawDynamicText(waypoint.add(y = -0.1 - distance / (12 * 1.7)), " §r§e(plot middle)", 1.0)
+            event.drawDynamicText(waypoint, " §r§e(plot middle)", 1.0, (-0.1 - distance / (12 * 1.7)).toFloat())
         } else {
             color = LorenzColor.RED.toColor()
         }
