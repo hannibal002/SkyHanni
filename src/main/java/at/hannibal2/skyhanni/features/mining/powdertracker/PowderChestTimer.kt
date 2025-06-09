@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -132,7 +131,7 @@ object PowderChestTimer {
             val timeLeft = time.timeUntil()
 
             if (config.highlightChests) {
-                val color = if (config.useStaticColor) config.staticColor.toChromaColor().toColor()
+                val color = if (config.useStaticColor) config.staticColor.toColor()
                 else timeLeft.getColorBasedOnTime()
                 event.drawWaypointFilled(loc, color)
             }
