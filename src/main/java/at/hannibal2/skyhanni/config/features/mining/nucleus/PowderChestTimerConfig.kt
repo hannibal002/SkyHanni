@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -37,7 +38,7 @@ class PowderChestTimerConfig {
     @Expose
     @ConfigOption(name = "Static Color", desc = "Static color to use.")
     @ConfigEditorColour
-    var staticColor: String = "0:245:85:255:85"
+    var staticColor: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 85, 245)
 
     @Expose
     @ConfigOption(name = "Draw Timer", desc = "Draw time left until the chest despawns.")
