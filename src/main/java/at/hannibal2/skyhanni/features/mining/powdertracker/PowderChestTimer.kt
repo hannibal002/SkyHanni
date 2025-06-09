@@ -132,7 +132,7 @@ object PowderChestTimer {
             val timeLeft = time.timeUntil()
 
             if (config.highlightChests) {
-                val color = if (config.useStaticColor) config.staticColor.toChromaColor().toColor()
+                val color = if (config.useStaticColor) config.staticColor.toColor()
                 else timeLeft.getColorBasedOnTime()
                 event.drawWaypointFilled(loc, color)
             }
