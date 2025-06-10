@@ -58,12 +58,12 @@ object DarkMonolithFeatures {
     }
 
     // Todo: need chat pattern for rock the fish drop
-    @Suppress("MaxLineLength")
     /**
      * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§650,000 Coins§r§a!
      * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§62,500 Coins §r§aand §r§21,000 ᠅ Mithril Powder§r§a!
      * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§2100 ᠅ Mithril Powder§r§a!
      */
+    @Suppress("MaxLineLength")
     private val dropPattern by patternGroup.pattern(
         "drop",
         "§5§lMONOLITH! §r§aYou.*§r§aand were rewarded ?(?:(?:§.)+(?<coins>[\\d,]+) Coins ?(?:§.)+)?(?:!|and )?(?:(?:§.)+(?<powder>[\\d,]+) ᠅ Mithril Powder§r§a!)?"
