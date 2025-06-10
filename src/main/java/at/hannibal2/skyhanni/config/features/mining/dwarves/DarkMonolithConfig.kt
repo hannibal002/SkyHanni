@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class DarkMonolithConfig {
 
     @Expose
-    @ConfigOption(name = "Tracker", desc = "Track mithril powder, coins, and Rock the Fish drops.")
+    @ConfigOption(name = "Tracker", desc = "Track mithril powder, coins, and Rock the Fish drops obtained from collecting Dark Monoliths.")
     @ConfigEditorBoolean
     var tracker: Boolean = true
 
@@ -33,7 +33,7 @@ class DarkMonolithConfig {
 
     @Expose
     @ConfigOption(
-        name = "Title on LOS",
+        name = "Title when visible",
         desc = "Show a title on coming into line of sight with a dragon egg.\n" +
             "§eClear to disable§7.",
     )
