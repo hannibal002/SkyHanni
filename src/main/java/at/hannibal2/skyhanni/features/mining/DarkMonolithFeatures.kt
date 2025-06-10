@@ -42,7 +42,7 @@ object DarkMonolithFeatures {
         }
 
         override fun getDescription(timesGained: Long) = emptyList<String>()
-        override fun getCoinName(item: TrackedItem) = "§5Dark Monolith §6Coins"
+        override fun getCoinName(item: TrackedItem) = "§6Monolith Coins"
         override fun getCoinDescription(item: TrackedItem) = emptyList<String>()
 
         @Expose
