@@ -1,4 +1,8 @@
 
+at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+
+at.hannibal2.skyhanni.utils.render.ModernGlStateManager com.mojang.blaze3d.systems.RenderSystem
+
 net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext at.hannibal2.skyhanni.utils.compat.WorldRenderContext
 
 net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawContext
@@ -35,6 +39,8 @@ net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket$InteractType
 net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket type.getType() getType()
 
 net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket
+
+net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket entityId() getId()
 
 net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket getEntityId() getId()
 

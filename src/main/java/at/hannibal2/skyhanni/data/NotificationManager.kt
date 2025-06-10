@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#endif
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,12 +13,12 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object NotificationManager {
 
@@ -45,7 +47,7 @@ object NotificationManager {
         val midX = GuiScreenUtils.scaledWindowWidth / 2
         val topY = (GuiScreenUtils.scaledWindowHeight * 0.75 - notification.height / 2).toInt()
 
-        RenderUtils.drawFloatingRectDark(midX - notification.width / 2, topY, notification.width, notification.height)
+        GuiRenderUtils.drawFloatingRectDark(midX - notification.width / 2, topY, notification.width, notification.height)
         val closeTextWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(CLOSE_TEXT)
 
         GuiRenderUtils.drawString(CLOSE_TEXT, midX + notification.width / 2 - 3 - closeTextWidth, topY + 4)
@@ -75,6 +77,7 @@ object NotificationManager {
         notificationQueue.add(notification)
     }
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shtestnotification") {
@@ -86,6 +89,7 @@ object NotificationManager {
             }
         }
     }
+    //#endif
 }
 
 data class SkyHanniNotification(

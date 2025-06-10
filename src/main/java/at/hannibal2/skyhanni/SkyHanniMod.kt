@@ -6,10 +6,14 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+//#if TODO
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.data.OtherInventoryData
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
+//#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
@@ -18,7 +22,9 @@ import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
+//#if TODO
+import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
+//#endif
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.ModVersion
@@ -36,6 +42,7 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object SkyHanniMod {
 
@@ -53,7 +60,9 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        initLogging()
+        //#if TODO
+        MinecraftConsoleFilter.initLogging()
+        //#endif
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
@@ -71,7 +80,9 @@ object SkyHanniMod {
             if (screenTicks == 5) {
                 val title = InventoryUtils.openInventoryName()
                 MinecraftCompat.localPlayer.closeScreen()
+                //#if TODO
                 OtherInventoryData.close(title)
+                //#endif
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null
@@ -89,10 +100,14 @@ object SkyHanniMod {
 
     @JvmField
     var feature: Features = Features()
+    //#if TODO
     lateinit var sackData: SackData
+    //#endif
     lateinit var friendsData: FriendsJson
     lateinit var knownFeaturesData: KnownFeaturesJson
+    //#if TODO
     lateinit var jacobContestsData: JacobContestsJson
+    //#endif
     lateinit var visualWordsData: VisualWordsJson
 
     lateinit var configManager: ConfigManager

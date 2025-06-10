@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
+//#if TODO
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -18,8 +20,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
+// todo 1.21 impl needed
 class GuiConfig {
     @Expose
     @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
@@ -35,12 +39,14 @@ class GuiConfig {
     @Accordion
     var chroma: ChromaConfig = ChromaConfig()
 
+    //#if TODO
     @ConfigOption(
         name = "Edit GUI Locations",
         desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays."
     )
     @ConfigEditorButton(buttonText = "Edit")
     var positions: Runnable = Runnable { openGuiPositionEditor(true) }
+    //#endif
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
@@ -163,6 +169,11 @@ class GuiConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var configButtonOnPause: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Widen Config", desc = "Make SkyHanni's config window wider. (~1.5x)")
+    @ConfigEditorBoolean
+    val widenConfig: Property<Boolean> = Property.of(false)
 
     @Expose
     var titlePosition: Position = Position(0, 160)

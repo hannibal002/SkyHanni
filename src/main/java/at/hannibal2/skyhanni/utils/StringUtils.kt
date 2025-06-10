@@ -28,6 +28,8 @@ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
 //#endif
 
+// todo 1.21 impl needed
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
@@ -167,6 +169,7 @@ object StringUtils {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
+
         } else {
             internalCleanPlayerName()
         }
@@ -196,7 +199,7 @@ object StringUtils {
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
-     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * this = the list of strings to join into a string, containing 0 or more elements.
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
@@ -451,9 +454,11 @@ object StringUtils {
         return message
     }
 
+    //#if TODO
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
+    //#endif
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
         return asComponent { chatStyle = original.chatStyle }
@@ -485,6 +490,17 @@ object StringUtils {
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""
         return if (string[0] in "aeiou") "an" else "a"
+    }
+
+    fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }
+
+    fun String.splitLastWhitespace(): Pair<String, String> {
+        val lastWhitespaceIndex = lastIndexOf(" ")
+        return if (lastWhitespaceIndex == -1) {
+            "" to this
+        } else {
+            substring(0, lastWhitespaceIndex) to substring(lastWhitespaceIndex + 1)
+        }
     }
 
     fun String.addStrikethorugh(strikethorugh: Boolean = true): String {
