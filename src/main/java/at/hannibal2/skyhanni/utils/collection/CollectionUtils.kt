@@ -228,6 +228,18 @@ object CollectionUtils {
         return collection
     }
 
+    fun <T> Iterable<T>.takeIfLimit(limit: Int, predicate: (T) -> Boolean): List<T> {
+        val result = mutableListOf<T>()
+        for (element in this) {
+            if (predicate(element)) {
+                result.add(element)
+                if (result.size == limit) break
+            }
+        }
+        return result
+    }
+
+
     /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
     inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
         this.remove(newValue)

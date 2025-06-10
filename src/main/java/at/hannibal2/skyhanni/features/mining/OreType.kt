@@ -191,6 +191,8 @@ enum class OreType(
 
     val internalName: NeuInternalName = internalName.toInternalName()
 
+    fun isType(oreBlock: OreBlock): Boolean = oreBlock in oreBlocks
+
     fun isGemstone(): Boolean = this in gemstones
 
     companion object {

@@ -174,6 +174,8 @@ data class LorenzVec(
     fun boundingToOffset(offX: Double, offY: Double, offZ: Double) =
         AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
 
+    fun getBlockAABB(): AxisAlignedBB = boundingToOffset(1.0, 1.0, 1.0)
+
     fun scale(scalar: Double): LorenzVec = LorenzVec(scalar * x, scalar * y, scalar * z)
 
     fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)

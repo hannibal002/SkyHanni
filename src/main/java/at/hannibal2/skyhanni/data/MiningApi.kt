@@ -275,8 +275,10 @@ object MiningApi {
         pickobulusEndPattern.matchMatcher(event.message) {
             val amount = group("amount").formatInt()
             resetPickobulusEvent()
-            val blocks = pickobulusMinedBlocks.take(amount).countBy { it.second }
-            if (blocks.isNotEmpty()) OreMinedEvent(null, blocks).post()
+            val limited = pickobulusMinedBlocks.take(amount)
+            val blocks = limited.countBy { it.second }
+            val positions = limited.mapTo(mutableSetOf()) { it.first }
+            if (blocks.isNotEmpty()) OreMinedEvent(null, blocks, positions).post()
             pickobulusMinedBlocks.clear()
             return
         }
@@ -425,15 +427,18 @@ object MiningApi {
             return
         }
 
-        val extraBlocks = surroundingMinedBlocks.filter {
+        val minedBlocks = surroundingMinedBlocks.filter {
             // We can do this because all blocks that don't have an init sound also cannot be mined by
             // efficient miner when other blocks are mined.
             // The more correct way of doing this would be making sure the oretype of the originally mined
             // block matches
             if (ignoreFilter) it.first.ore == originalBlock.ore else it.first.confirmed
-        }.countBy { it.first.ore }
+        }
 
-        OreMinedEvent(originalBlock.ore, extraBlocks).post()
+        val extraBlocks = minedBlocks.countBy { it.first.ore }
+        val positions = minedBlocks.mapTo(mutableSetOf()) { it.second }
+
+        OreMinedEvent(originalBlock.ore, extraBlocks, positions).post()
         lastOreMinedTime = SimpleTimeMark.now()
 
         surroundingMinedBlocks.clear()

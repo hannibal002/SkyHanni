@@ -11,6 +11,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.mining.OreMinedEvent
+import at.hannibal2.skyhanni.features.mining.OreCategory
+import at.hannibal2.skyhanni.features.mining.OreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -27,15 +30,22 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfLimit
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.block.BlockChest
 import net.minecraft.block.state.IBlockState
 import java.awt.Color
+import java.util.Comparator
+import kotlin.comparisons.compareBy
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+
+private typealias LineMode = PowderChestTimerConfig.LineMode
 
 @SkyHanniModule
 object PowderChestTimer {
@@ -43,7 +53,12 @@ object PowderChestTimer {
     private val config get() = SkyHanniMod.feature.mining.powderChestTimer
 
     private var display: String? = null
-    private val chests = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
+    private val chests = TimeLimitedCache<LorenzVec, ChestData>(61.seconds)
+    private var orderedChests = emptyList<ChestData>()
+
+    private val recentlyMinedHardstone = TimeLimitedSet<LorenzVec>(5.seconds)
+    private val recentlyChangedBlocks = TimeLimitedSet<LorenzVec>(5.seconds)
+
     private val maxDuration = 60.seconds
     private const val MAX_CHEST_DISTANCE = 15
     private const val NEAR_PLAYER_DISTANCE = 25
@@ -53,22 +68,57 @@ object PowderChestTimer {
         EntityUtils.getPlayerEntities().any { it.distanceToPlayer() < NEAR_PLAYER_DISTANCE }
     }
 
+    private data class ChestData(
+        val location: LorenzVec,
+        val despawnTime: SimpleTimeMark = maxDuration.fromNow(),
+        var hasSeen: Boolean = false,
+    ) {
+        fun updateHasSeen() {
+            if (hasSeen) return
+            if (!FrustumUtils.isVisible(location.getBlockAABB())) return
+            hasSeen = true
+        }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (event.soundName == "random.levelup" && event.pitch == 1f && event.volume == 1.0f) {
-            lastSound = SimpleTimeMark.now()
-        }
+        if (event.soundName != "random.levelup" || event.pitch != 1f || event.volume != 1.0f) return
+        lastSound = SimpleTimeMark.now()
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onRenderOverlay() {
-        if (isEnabled()) {
-            config.position.renderString(display, posLabel = "Powder Chest Timer")
-        }
+        if (!isEnabled()) return
+        config.position.renderString(display, posLabel = "Powder Chest Timer")
     }
 
     @HandleEvent
-    fun onWorldChange() = chests.clear()
+    fun onWorldChange() {
+        chests.clear()
+        orderedChests = emptyList()
+        recentlyMinedHardstone.clear()
+        recentlyChangedBlocks.clear()
+    }
+
+    private fun OreMinedEvent.isHardstone(): Boolean {
+        if (originalOre != null && OreType.HARD_STONE.isType(originalOre)) return true
+        return extraBlocks.keys.firstOrNull()?.let { OreType.HARD_STONE.isType(it) } ?: false
+    }
+
+    private fun handleChest() {
+        val intersect = recentlyMinedHardstone.intersect(recentlyChangedBlocks)
+        if (intersect.isEmpty()) return
+        recentlyMinedHardstone.removeAll(intersect)
+        recentlyChangedBlocks.removeAll(intersect)
+        for (location in intersect) chests[location] = ChestData(location)
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    fun onOreMine(event: OreMinedEvent) {
+        if (!event.isHardstone()) return
+        recentlyMinedHardstone.addAll(event.positions)
+        handleChest()
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onServerBlockChange(event: ServerBlockChangeEvent) {
@@ -79,7 +129,8 @@ object PowderChestTimer {
 
         if (isNewChest && !isOldChest) {
             if (arePlayersNearby && lastSound.passedSince() > 200.milliseconds) return
-            chests[location] = maxDuration.fromNow()
+            recentlyChangedBlocks.add(location)
+            handleChest()
         } else if (isOldChest && !isNewChest) {
             chests.remove(location)
         }
@@ -102,19 +153,24 @@ object PowderChestTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onTick() {
-        if (isEnabled()) {
-            display = drawDisplay()
+        if (!isEnabled()) return
+
+        val sort: Comparator<ChestData> = when (config.lineMode) {
+            LineMode.OLDEST -> compareBy { it.despawnTime.timeUntil() }
+            LineMode.NEAREST -> compareBy { it.location.distanceToPlayer() }
+            else -> return
         }
+        orderedChests = chests.values.sortedWith(sort).onEach(ChestData::updateHasSeen)
+        display = drawDisplay()
     }
 
     private fun drawDisplay(): String? {
-        if (chests.isEmpty()) return null
+        if (orderedChests.isEmpty()) return null
 
-        val count = chests.size
+        val count = orderedChests.size
         val name = StringUtils.pluralize(count, "chest")
-        val first = chests.values.minByOrNull { it.timeUntil() } ?: return null
+        val timeUntil = orderedChests.minOfOrNull { it.despawnTime.timeUntil() } ?: return null
 
-        val timeUntil = first.timeUntil()
         val color = timeUntil.getColorBasedOnTime().toChatColor()
 
         return "$color${timeUntil.format(TimeUnit.SECOND)} §8(§e$count §b$name§8)"
@@ -123,11 +179,12 @@ object PowderChestTimer {
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        if (chests.isEmpty()) return
+        if (orderedChests.isEmpty()) return
 
         val playerY = LocationUtils.playerLocation().y
 
-        for ((loc, time) in chests) {
+        for ((loc, time, hasSeen) in orderedChests) {
+            if (!hasSeen) continue
             val timeLeft = time.timeUntil()
 
             if (config.highlightChests) {
@@ -143,13 +200,7 @@ object PowderChestTimer {
             }
         }
 
-        val sortedChests = when (config.lineMode) {
-            PowderChestTimerConfig.LineMode.OLDEST -> chests.entries.sortedBy { it.value.timeUntil() }
-            PowderChestTimerConfig.LineMode.NEAREST -> chests.entries.sortedBy { it.key.distanceToPlayer() }
-            else -> return
-        }
-
-        val chestToConnect = sortedChests.take(config.drawLineToChestAmount)
+        val chestToConnect = orderedChests.takeIfLimit(config.drawLineToChestAmount, ChestData::hasSeen)
         val (firstPos, firstTime) = chestToConnect.firstOrNull() ?: return
 
         event.drawLineToEye(
