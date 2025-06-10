@@ -209,6 +209,13 @@ object PestFinder {
         teleportNearestInfestedPlot()
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (config.muteVacuum && event.soundName == "mob.wither.shoot") {
+            event.cancel()
+        }
+    }
+
     fun teleportNearestInfestedPlot() {
         // need to check again for the command
         if (!GardenApi.inGarden()) {
