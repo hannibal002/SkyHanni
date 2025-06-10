@@ -165,19 +165,14 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
-        exclude(module = "log4j")
-        because("Different version conflicts with Minecraft's Log4J")
-        exclude(module = "gson")
-        because("Different version conflicts with Minecraft's Log4j")
-    }
+    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)
 
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
-    val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
+    val mixinVersion = if (target == ProjectTarget.MAIN) "0.7.11-SNAPSHOT" else "0.8.2"
 
     if (!target.isFabric) {
         shadowImpl("org.spongepowered:mixin:$mixinVersion") {
@@ -192,17 +187,26 @@ dependencies {
     } else if (target == ProjectTarget.MODERN) {
         modImplementation("net.fabricmc:fabric-loader:0.16.13")
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
+        // on fabric everyone be using the kotlin language mod so we don't need to bundle kotlin ourselves
+        modImplementation("net.fabricmc:fabric-language-kotlin:1.13.2+kotlin.2.1.20")
 
         modLocalRuntime(libs.modmenu)
     }
 
-    implementation(kotlin("stdlib-jdk8"))
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
-        exclude(group = "org.jetbrains.kotlin")
+    if (target != ProjectTarget.MODERN) {
+        implementation(kotlin("stdlib-jdk8"))
+        shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
+            exclude(group = "org.jetbrains.kotlin")
+        }
     }
 
     if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
     else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+
+    // Brigadier comes bundled with more recent versions of Minecraft
+    if (target.minecraftVersion == MinecraftVersion.MC189) {
+        shadowImpl("com.mojang:brigadier:1.0.18")
+    }
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
@@ -219,12 +223,15 @@ dependencies {
         shadowModImpl(libs.moulconfig)
     } else if (target == ProjectTarget.MODERN) {
         shadowModImpl(libs.moulconfigModern)
+        include(libs.moulconfigModern)
     }
 
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
-    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    if (target != ProjectTarget.MODERN) {
+        shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    }
     implementation(libs.hotswapagentforge)
 
     testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
@@ -235,8 +242,11 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
 
     if (target.minecraftVersion == MinecraftVersion.MC189) {
-        compileOnly(libs.hypixelmodapi)
+        compileOnly(libs.hypixelmodapi.forge)
         shadowImpl(libs.hypixelmodapitweaker)
+    } else if (target == ProjectTarget.MODERN) {
+        modImplementation(libs.hypixelmodapi)
+        include(libs.hypixelmodapi.fabric)
     }
 
     // getting clock offset
