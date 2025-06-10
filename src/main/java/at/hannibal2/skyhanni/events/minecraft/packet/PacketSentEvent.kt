@@ -29,9 +29,9 @@ class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
         private fun startsWithMinecraft(string: String): Boolean {
             //#if MC < 1.21
             return string.startsWith("net.minecraft.")
-        //#else
-        //$$ return string.startsWith("net.minecraft.") || string.startsWith("com.mojang.") || string.startsWith("org.lwjgl.")
-        //#endif
+            //#else
+            //$$ return string.startsWith("net.minecraft.") || string.startsWith("com.mojang.") || string.startsWith("org.lwjgl.")
+            //#endif
         }
     }
 }
