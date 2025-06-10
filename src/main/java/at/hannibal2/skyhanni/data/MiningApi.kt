@@ -222,7 +222,9 @@ object MiningApi {
         }
 
         if (IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
+            var found = false
             heatPattern.firstMatcher(event.new) {
+                found = true
                 val newHeat = group("heat")
                 heatDisplay = group("scoreboard").takeIf { it.isNotEmpty() }
                 if (newHeat == "IMMUNE") {
@@ -230,6 +232,12 @@ object MiningApi {
                 } else if (newHeat.toInt() != heat) {
                     updateHeat(newHeat.toInt())
                 }
+            }
+            if (!found) {
+                if (heat != 0) {
+                    updateHeat(0)
+                }
+                heatDisplay = null
             }
         }
     }
