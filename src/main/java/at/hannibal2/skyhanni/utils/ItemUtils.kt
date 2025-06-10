@@ -295,7 +295,12 @@ object ItemUtils {
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
     // Checks for the enchantment glint as part of the minecraft enchantments
-    fun ItemStack.isEnchanted() = isItemEnchanted
+    fun ItemStack.isEnchanted(): Boolean =
+        //#if MC < 1.21
+        isItemEnchanted
+    //#else
+    //$$ hasEnchantments() || this.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) == true
+    //#endif
 
     // Checks for hypixel enchantments in the attributes
     fun ItemStack.hasHypixelEnchantments() = getHypixelEnchantments()?.isNotEmpty() ?: false
