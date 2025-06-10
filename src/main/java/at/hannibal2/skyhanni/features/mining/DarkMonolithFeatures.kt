@@ -13,8 +13,21 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import kotlin.time.Duration.Companion.seconds
@@ -22,7 +35,40 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object DarkMonolithFeatures {
 
+    class Data : ItemTrackerData() {
+        override fun resetItems() {
+            monolithsLooted = 0
+        }
+
+        override fun getDescription(timesGained: Long) = emptyList<String>()
+        override fun getCoinName(item: TrackedItem) = "§5Dark Monolith §6Coins"
+        override fun getCoinDescription(item: TrackedItem) = emptyList<String>()
+
+        @Expose
+        var monolithsLooted: Long = 0
+    }
+
+    private val mithrilPowderItem = "SKYBLOCK_POWDER_MITHRIL".toInternalName()
+    private val rockTheFishItem = "ROCK_THE_FISH".toInternalName()
+
+    private val patternGroup = RepoPattern.group("mining.dwarves.darkmonolith")
     private val config get() = SkyHanniMod.feature.mining.darkMonolith
+    private val tracker = SkyHanniItemTracker("Dark Monolith Tracker", { Data() }, { it.mining.darkMonolithTracker }) {
+        drawDisplay(it)
+    }
+
+    // Todo: need chat pattern for rock the fish drop
+    @Suppress("MaxLineLength")
+    /**
+     * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§650,000 Coins§r§a!
+     * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§62,500 Coins §r§aand §r§21,000 ᠅ Mithril Powder§r§a!
+     * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§2100 ᠅ Mithril Powder§r§a!
+     */
+    private val dropPattern by patternGroup.pattern(
+        "drop",
+        "§5§lMONOLITH! §r§aYou.*§r§aand were rewarded ?(?:(?:§.)+(?<coins>[\\d,]+) Coins ?(?:§.)+)?(?:!|and )?(?:(?:§.)+(?<powder>[\\d,]+) ᠅ Mithril Powder§r§a!)?"
+    )
+
     private var knownEggs: Set<LorenzVec> = setOf()
     private var foundEggVec: LorenzVec? = null
     private var lastFoundEggVec: LorenzVec? = null
@@ -35,10 +81,31 @@ object DarkMonolithFeatures {
         renderBox = null
     }
 
-    @HandleEvent
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { config.tracker && IslandType.DWARVEN_MINES.isCurrent() },
+            onRender = {
+                tracker.renderDisplay(config.trackerPosition)
+            },
+        )
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onChat(event: SkyHanniChatEvent) {
-        if (event.message.startsWith("§5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith ")) {
+        dropPattern.matchMatcher(event.message) {
             reset()
+            if (!config.tracker) return
+            groupOrNull("coins")?.let {
+                tracker.addCoins(it.formatInt(), false)
+            }
+            groupOrNull("powder")?.let {
+                tracker.addItem(mithrilPowderItem, it.formatInt(), false)
+            }
+            groupOrNull("fish")?.let {
+                tracker.addItem(rockTheFishItem, 1, false)
+            }
         }
     }
 
@@ -73,7 +140,20 @@ object DarkMonolithFeatures {
         TitleManager.sendTitle(titleText, duration = 3.seconds)
     }
 
-    @HandleEvent
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        if (!config.tracker) return@buildList
+        addSearchString("§5§lDark Monolith Tracker")
+        val profit = tracker.drawItems(data, { true }, this)
+        add(
+            RenderableString(
+                "§7Monoliths looted: §d${data.monolithsLooted}"
+            ).toSearchable()
+        )
+        add(tracker.addTotalProfit(profit, data.monolithsLooted, "loot"))
+        tracker.addPriceFromButton(this)
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val knownEggVec = foundEggVec ?: return

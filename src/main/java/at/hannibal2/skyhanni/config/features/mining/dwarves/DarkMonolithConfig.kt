@@ -1,14 +1,25 @@
 package at.hannibal2.skyhanni.config.features.mining.dwarves
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class DarkMonolithConfig {
+
+    @Expose
+    @ConfigOption(name = "Tracker", desc = "Track mithril powder, coins, and Rock the Fish drops.")
+    @ConfigEditorBoolean
+    var tracker: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = DarkMonolithConfig::class, field = "tracker")
+    val trackerPosition: Position = Position(100, 100)
 
     @Expose
     @SearchTag("Monolith, Dark")
