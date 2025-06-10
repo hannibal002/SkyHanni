@@ -116,6 +116,7 @@ object CopyNearbyEntitiesCommand {
                     //#if MC > 1.21
                     //$$ is net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity -> addItemDisplayEntity(entity)
                     //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
+                    //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
                     //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
@@ -243,9 +244,15 @@ object CopyNearbyEntitiesCommand {
     //$$     add("-  patternColor: $patternColor")
     //$$     add("-  baseColor: $baseColor")
     //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addShulker(entity: net.minecraft.entity.mob.ShulkerEntity) {
+    //$$     add("EntityShulker:")
+    //$$     val color = entity.color
+    //$$     val attachedFace = entity.attachedFace
+    //$$     add("-  color: $color")
+    //$$     add("-  attachedFace: $attachedFace")
+    //$$ }
     //#endif
-
-
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {

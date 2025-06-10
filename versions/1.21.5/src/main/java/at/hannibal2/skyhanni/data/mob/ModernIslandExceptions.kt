@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.mob
 
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.entity.mob.ShulkerEntity
 import net.minecraft.entity.passive.AxolotlEntity
 import net.minecraft.entity.passive.CodEntity
 import net.minecraft.entity.passive.FrogEntity
@@ -57,6 +58,11 @@ object ModernIslandExceptions {
         baseEntity is TropicalFishEntity && baseEntity.patternColor == DyeColor.GREEN ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Verdant"),
+            )
+
+        baseEntity is ShulkerEntity && baseEntity.color == DyeColor.GREEN ->
+            MobData.MobResult.found(
+                Mob(baseEntity, Mob.Type.BASIC, name = "Hideonleaf"),
             )
 
         else -> null
