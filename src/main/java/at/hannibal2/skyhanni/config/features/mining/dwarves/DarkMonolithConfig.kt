@@ -26,7 +26,7 @@ class DarkMonolithConfig {
     @ConfigOption(
         name = "Highlight Dragon Egg",
         desc = "Highlight dragon eggs while in the Dwarven Mines. Useful for Dark Monolith hunting.\n" +
-            "§cWill only work when you are in line of sight§7."
+            "§cWill only work when you are in line of sight§7.",
     )
     @ConfigEditorBoolean
     var highlight: Boolean = true
@@ -35,7 +35,7 @@ class DarkMonolithConfig {
     @ConfigOption(
         name = "Title on LOS",
         desc = "Show a title on coming into line of sight with a dragon egg.\n" +
-            "§eClear to disable§7."
+            "§eClear to disable§7.",
     )
     @ConfigEditorText
     var title: String = "§5§lDark Monolith"

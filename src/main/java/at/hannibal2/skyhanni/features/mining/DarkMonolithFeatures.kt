@@ -68,7 +68,7 @@ object DarkMonolithFeatures {
     @Suppress("MaxLineLength")
     private val dropPattern by patternGroup.pattern(
         "drop",
-        "§5§lMONOLITH! §r§aYou.*§r§aand were rewarded ?(?:(?:§.)+(?<coins>[\\d,]+) Coins ?(?:§.)+)?(?:!|and )?(?:(?:§.)+(?<powder>[\\d,]+) ᠅ Mithril Powder§r§a!)?"
+        "§5§lMONOLITH! §r§aYou.*§r§aand were rewarded ?(?:(?:§.)+(?<coins>[\\d,]+) Coins ?(?:§.)+)?(?:!|and )?(?:(?:§.)+(?<powder>[\\d,]+) ᠅ Mithril Powder§r§a!)?",
     )
 
     private var knownEggs: Set<LorenzVec> = setOf()
@@ -154,8 +154,8 @@ object DarkMonolithFeatures {
         val profit = tracker.drawItems(data, { true }, this)
         add(
             RenderableString(
-                "§7Monoliths looted: §d${data.monolithsLooted}"
-            ).toSearchable()
+                "§7Monoliths looted: §d${data.monolithsLooted}",
+            ).toSearchable(),
         )
         add(tracker.addTotalProfit(profit, data.monolithsLooted, "loot"))
         tracker.addPriceFromButton(this)
@@ -169,7 +169,6 @@ object DarkMonolithFeatures {
         val axis = renderBox ?: return
         event.drawFilledBoundingBox(axis, config.highlightColor.toColor())
     }
-
 
     private fun isEnabled() = config.highlight || config.title.isNotEmpty()
 }
