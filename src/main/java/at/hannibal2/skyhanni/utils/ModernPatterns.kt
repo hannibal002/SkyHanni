@@ -9,19 +9,19 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
  */
 @SkyHanniModule
 object ModernPatterns {
-    val currentColorPattern by RepoPattern.pattern(
+    val beaconCurrentColorPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.color",
-        "Current color: (?<color>.+)",
+        "§7Current color: §a(?<color>.+)",
     )
 
-    val currentSpeedPattern by RepoPattern.pattern(
+    val beaconCurrentSpeedPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.speed",
-        "Current speed: (?<speed>\\d)",
+        "§7Current speed: §a(?<speed>\\d)",
     )
 
-    val currentPitchPattern by RepoPattern.pattern(
+    val beaconCurrentPitchPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.pitch",
-        "Current pitch: (?<pitch>.+)",
+        "§7Current pitch: §a(?<pitch>.+)",
     )
 
 }
