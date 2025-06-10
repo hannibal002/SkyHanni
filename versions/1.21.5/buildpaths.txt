@@ -677,5 +677,6 @@ at.hannibal2.skyhanni.utils.InventoryUtils.kt
 at.hannibal2.skyhanni.mixins.transformers.MixinItemStack.java
 at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson.kt
 at.hannibal2.skyhanni.utils.ComponentUtils.kt
+at.hannibal2.skyhanni.config.OnlyLegacy.kt
 
 # \.(?!kt|java|\()
