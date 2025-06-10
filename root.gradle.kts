@@ -20,7 +20,7 @@ allprojects {
      * Beta version
      * Bugfix version
      */
-    version = "3.5.0"
+    version = "3.7.0"
 
     repositories {
         mavenCentral()
@@ -30,6 +30,7 @@ allprojects {
                 artifact() // We love missing POMs
             }
         }
+        maven("https://maven.fabricmc.net/") // prefer for fabricmc, for when sponge dies
         maven("https://repo.spongepowered.org/repository/maven-public/") // mixin
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
         maven("https://jitpack.io") {
