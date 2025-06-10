@@ -743,6 +743,7 @@ at.hannibal2.skyhanni.features.inventory.MinisterInCalendar.kt
 at.hannibal2.skyhanni.features.inventory.PageScrolling.kt
 at.hannibal2.skyhanni.features.inventory.PersonalCompactorOverlay.kt
 at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures.kt
+at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures.kt
 at.hannibal2.skyhanni.features.inventory.ReforgeHelper.kt
 at.hannibal2.skyhanni.features.inventory.RngMeterInventory.kt
 at.hannibal2.skyhanni.features.inventory.SackDisplay.kt
