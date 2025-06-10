@@ -32,6 +32,7 @@ import net.minecraft.world.WorldSettings
 //$$ import net.minecraft.world.level.GameType
 //#endif
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object TabListData {
     private var tablistCache = emptyList<String>()
@@ -171,7 +172,7 @@ object TabListData {
         if (tablistCache != tabList) {
             tablistCache = tabList
             TabListUpdateEvent(getTabList()).post()
-            if (!LorenzUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
         }
@@ -188,7 +189,7 @@ object TabListData {
 
     private fun workaroundDelayedTabListUpdateAgain() {
         DelayedRun.runDelayed(2.seconds) {
-            if (LorenzUtils.onHypixel) {
+            if (SkyBlockUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
                 TabListUpdateEvent(getTabList()).post()
             }
@@ -197,10 +198,10 @@ object TabListData {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtesttablist") {
+        event.registerBrigadier("shtesttablist") {
             description = "Set your clipboard as a fake tab list."
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleDebug() }
+            simpleCallback { toggleDebug() }
         }
     }
 }

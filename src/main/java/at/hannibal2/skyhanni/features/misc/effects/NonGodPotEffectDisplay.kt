@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -35,6 +36,7 @@ object NonGodPotEffectDisplay {
     private val config get() = SkyHanniMod.feature.misc.potionEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
+    private val setRecently: TimeLimitedSet<NonGodPotEffect> = TimeLimitedSet(5.seconds)
     private var display = emptyList<String>()
 
     /**
@@ -62,18 +64,17 @@ object NonGodPotEffectDisplay {
 
     @HandleEvent
     fun onEffectUpdate(event: EffectDurationChangeEvent) {
+        val duration = event.duration ?: Duration.ZERO
         when (event.durationChangeType) {
             EffectDurationChangeType.ADD -> {
-                event.duration?.let {
-                    val existing = effectDuration[event.effect]?.duration ?: Duration.ZERO
-                    effectDuration[event.effect] = Timer(existing + it)
-                }
+                if (setRecently.contains(event.effect)) return
+                val existing = effectDuration[event.effect]?.duration ?: Duration.ZERO
+                effectDuration[event.effect] = Timer(existing + duration)
             }
 
             EffectDurationChangeType.SET -> {
-                event.duration?.let {
-                    effectDuration[event.effect] = Timer(it)
-                }
+                effectDuration[event.effect] = Timer(duration)
+                setRecently.add(event.effect)
             }
 
             EffectDurationChangeType.REMOVE -> {

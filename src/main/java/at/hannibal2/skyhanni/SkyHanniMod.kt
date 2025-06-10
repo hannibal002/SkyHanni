@@ -1,34 +1,30 @@
 package at.hannibal2.skyhanni
 
-//#if TODO
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
-//#endif
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 //#if TODO
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.data.OtherInventoryData
 //#endif
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 //#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-//#if TODO
 import at.hannibal2.skyhanni.data.repo.RepoManager
-//#endif
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-//#if TODO
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
-//#endif
+import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.ModVersion
@@ -56,9 +52,7 @@ object SkyHanniMod {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
-        //#if TODO
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
-        //#endif
 
         PreInitFinishedEvent.post()
     }
@@ -66,19 +60,15 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        //#if TODO
-        initLogging()
-        //#endif
+        MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        //#if TODO
         try {
             RepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
-        //#endif
     }
 
     @HandleEvent
@@ -86,13 +76,9 @@ object SkyHanniMod {
         screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
-                //#if TODO
                 val title = InventoryUtils.openInventoryName()
-                //#endif
                 MinecraftCompat.localPlayer.closeScreen()
-                //#if TODO
                 OtherInventoryData.close(title)
-                //#endif
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null
@@ -155,6 +141,17 @@ object SkyHanniMod {
                     e,
                     e.message ?: "Asynchronous exception caught",
                 )
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("sh") {
+            aliases = listOf("skyhanni")
+            description = "Opens the main SkyHanni config"
+            legacyCallbackArgs {
+                ConfigGuiManager.onCommand(it)
             }
         }
     }
