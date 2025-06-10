@@ -4,22 +4,34 @@ import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import net.minecraft.network.Packet
 
 class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
+
     fun findOriginatingModCall(skipSkyhanni: Boolean = false): StackTraceElement? {
-        val nonMinecraftOriginatingStack = Thread.currentThread().stackTrace
+        return Thread.currentThread().stackTrace
             // Skip calls before the event is being called
-            //#if MC < 1.21
-            .dropWhile { it.className != "net.minecraft.client.network.NetHandlerPlayClient" }
-            //#else
-            //$$ .dropWhile { it.className != "net.minecraft.network.ClientConnection" }
-            //#endif
+            .dropWhile { it.className != NETWORK_HANDLER_CLASS }
             // Limit the remaining callstack until only the main entrypoint to hide the relauncher
             .takeWhile { !it.className.endsWith(".Main") }
             // Drop minecraft or skyhanni call frames
             .dropWhile {
-                it.className.startsWith("net.minecraft.") ||
-                    (skipSkyhanni && it.className.startsWith("at.hannibal2.skyhanni."))
+                startsWithMinecraft(it.className) || (skipSkyhanni && it.className.startsWith("at.hannibal2.skyhanni."))
             }
             .firstOrNull()
-        return nonMinecraftOriginatingStack
+    }
+
+    companion object {
+        private const val NETWORK_HANDLER_CLASS: String =
+            //#if MC < 1.21
+            "net.minecraft.client.network.NetHandlerPlayClient"
+        //#else
+        //$$ "net.minecraft.client.network.ClientPlayNetworkHandler"
+        //#endif
+
+        private fun startsWithMinecraft(string: String): Boolean {
+            //#if MC < 1.21
+            return string.startsWith("net.minecraft.")
+        //#else
+        //$$ return string.startsWith("net.minecraft.") || string.startsWith("com.mojang.") || string.startsWith("org.lwjgl.")
+        //#endif
+        }
     }
 }
