@@ -4,10 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
@@ -25,6 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.LobbyType
 import net.hypixel.data.type.ServerType
+
 //#endif
 
 // todo 1.21 impl needed
@@ -62,7 +61,10 @@ object HypixelLocationApi {
         private set
 
     val inLimbo get() = serverId == "limbo"
+
+    //#if TODO
     val inLobby get() = serverType == LobbyType.MAIN
+    //#endif
 
     val config get() = SkyHanniMod.feature.dev.hypixelModApi
 
@@ -224,15 +226,7 @@ object HypixelLocationApi {
     private fun dataToString(pair: Pair<String, Any?>) = "${pair.first}: ${pair.second}"
 
     var isModApiDetection: Boolean = false
-        get() = field && config && SkyHanniMod.isBetaVersion
+        get() = config && SkyHanniMod.isBetaVersion
         private set
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val constant = event.getConstantOrNull<DisabledFeaturesJson>("DisabledFeatures")
-            ?: DisabledFeaturesJson()
-        val isDisabled = constant.features["hypixel_mod_api"] ?: false
-        isModApiDetection = !isDisabled
-    }
 
 }

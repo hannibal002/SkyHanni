@@ -36,8 +36,12 @@ object SkyBlockUtils {
 
     val inHypixelLobby: Boolean
         get() {
+            //#if TODO
             val inLobby = if (isModApiDetection) HypixelLocationApi.inLobby else HypixelData.inLobby
             return onHypixel && inLobby
+            //#else
+            //$$ return onHypixel && HypixelData.inLobby
+            //#endif
         }
 
     //#if TODO
