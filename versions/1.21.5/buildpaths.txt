@@ -464,6 +464,7 @@ at/hannibal2/skyhanni/config/features/mining/MiningEventConfig.kt
 at/hannibal2/skyhanni/config/features/mining/MiningNotificationsConfig.kt
 at/hannibal2/skyhanni/config/features/mining/caverns/DeepCavernsGuideConfig.kt
 at/hannibal2/skyhanni/config/features/mining/dwarves/KingTalismanConfig.kt
+at/hannibal2/skyhanni/config/features/mining/dwarves/DarkMonolithFeatures.kt
 at/hannibal2/skyhanni/config/features/mining/glacite/ColdOverlayConfig.kt
 at/hannibal2/skyhanni/config/features/mining/glacite/CorpseLocatorConfig.kt
 at/hannibal2/skyhanni/config/features/mining/glacite/CorpseTrackerConfig.kt
