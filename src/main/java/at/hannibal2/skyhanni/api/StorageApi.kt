@@ -60,11 +60,6 @@ object StorageApi {
         "storage.rift",
         "Rift Storage(?: \\((?<page>\\d+)/\\d+\\))?",
     )
-    /**
-     * REGEX-TEST: Chest
-     * REGEX-TEST: Large Chest
-     */
-    private val chestPattern by RepoPattern.pattern("storage.chest", "(?:Large )?Chest")
 
     val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
     val enderchest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
@@ -98,7 +93,7 @@ object StorageApi {
             return
         }
         if (!IslandType.PRIVATE_ISLAND.isCurrent() || !isPrivateIslandStorageEnabled()) return
-        chestPattern.matchMatcher(event.inventoryName) {
+        if(InventoryUtils.isInNormalChest(event.inventoryName)) {
             handlePrivateIslandRead(event.inventoryItemsWithNull.values)
         }
     }
