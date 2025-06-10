@@ -18,7 +18,7 @@ object ScoreboardElementHeat : ScoreboardElement() {
 
     override val configLine = "Heat: §c♨ 14"
 
-    override val elementPatterns = listOf(ScoreboardPattern.heatPattern)
+    override val elementPatterns = listOf(MiningApi.heatPattern)
 
     override fun showIsland() = MiningApi.inCrystalHollows()
 }
