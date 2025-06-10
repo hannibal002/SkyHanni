@@ -86,7 +86,7 @@ abstract class CacheMap<K : Any, V : Any> : MutableMap<K, V> {
 
         /** Sets the removal listener of the CacheBuilder to it, if not null */
         fun <K : Any, V : Any> CacheBuilder<K, V>.setRemovalListener(
-            listener: ((K?, V?, RemovalCause) -> Unit)? = null
+            listener: ((K?, V?, RemovalCause) -> Unit)? = null,
         ): CacheBuilder<K, V> {
             if (listener == null) return this
             return removalListener { notification ->
