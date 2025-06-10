@@ -36,7 +36,10 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.collections.component1
+import kotlin.collections.component2
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FastFairySoulsPathfinder {
     val config get() = SkyHanniMod.feature.misc
@@ -81,7 +84,7 @@ object FastFairySoulsPathfinder {
         val allSouls: Set<LorenzVec>,
         var foundButNotClickedSoul: LorenzVec? = null,
     ) {
-        var disabled = false
+        var disabled = total > 0 && found == total
         var debugState: String? = null
 
         fun foundNearby() {
@@ -106,7 +109,7 @@ object FastFairySoulsPathfinder {
             if (route.remove(nearest)) {
                 found++
             }
-            localFoundSouls().add(nearest)
+            foundSoulsOnCurrentIsland().add(nearest)
         }
 
         fun pathToNext() {
@@ -146,15 +149,25 @@ object FastFairySoulsPathfinder {
 
         fun allFound(state: String) {
             disabled = true
-            localFoundSouls().addAll(route)
+            foundSoulsOnCurrentIsland().addAll(route)
+            found = foundSoulsOnCurrentIsland().size
+            totalFound[SkyBlockUtils.currentIsland] = found
             debugState = state
+        }
+
+        fun checkHaveAll(): Boolean {
+            val haveAll = total > 0 && amountFoundOnCurrentIsland() == total
+            if (haveAll) {
+                allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to hypixel data")
+            }
+            return haveAll
         }
 
         private fun isDataEnabled() = data?.let { !it.disabled } ?: false
     }
 
-    @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    @HandleEvent(WorldChangeEvent::class)
+    fun onWorldChange() {
         data = null
     }
 
@@ -169,8 +182,8 @@ object FastFairySoulsPathfinder {
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
 
         data?.let {
@@ -193,20 +206,11 @@ object FastFairySoulsPathfinder {
                 }
             } ?: continue
 
-
-            if (island.isCurrent()) data?.checkHaveAll(have)
-            else {
-                totalFound[island] = have
+            if (island.isCurrent()) {
+                data?.checkHaveAll()
             }
+            totalFound[island] = have
         }
-    }
-
-    private fun Data.checkHaveAll(have: Int): Boolean {
-        val haveAll = have > 0 && have == total
-        if (haveAll) {
-            allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
-        }
-        return haveAll
     }
 
     private fun createEmptyData(): Data = Data(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
@@ -222,26 +226,26 @@ object FastFairySoulsPathfinder {
             }
             return
         }
-        val foundSouls = localFoundSouls()
+        val foundSouls = foundSoulsOnCurrentIsland()
         val allSouls = getTargetNodes(graph.nodes)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
-        if (missingSouls.isEmpty()) {
 
-            val island = SkyBlockUtils.currentIsland
+        if (missingSouls.isEmpty()) {
             data = if (foundSouls.isEmpty()) {
                 createEmptyData().also {
-                    it.debugState = "There are no fairy souls in the graph network of $island"
+                    it.debugState = "There are no fairy souls in the graph network of ${SkyBlockUtils.currentIsland}"
                 }
             } else {
                 val size = foundSouls.size
                 Data(found = size, total = size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
-                    it.debugState = "found all souls on $island"
+                    it.debugState = "found all souls on ${SkyBlockUtils.currentIsland}"
                 }
             }
             return
         }
 
-        data = createEmptyData()
+        data = Data(found = 0, total = allSouls.size, route = mutableListOf(), allSouls = emptySet())
+        if (data?.checkHaveAll() == true) return
         calculating = true
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
@@ -277,8 +281,8 @@ object FastFairySoulsPathfinder {
         }
     }
 
-    @HandleEvent
-    fun onIslandGraphReload(event: IslandGraphReloadEvent) {
+    @HandleEvent(IslandGraphReloadEvent::class)
+    fun onIslandGraphReload() {
         if (isEnabled()) {
             reload()
         } else {
@@ -301,19 +305,25 @@ object FastFairySoulsPathfinder {
                     add(it)
                     add("")
                 }
-                add("found: $found")
+                add("found with known location: $found")
+                add("actual amount of found souls: ${amountFoundOnCurrentIsland()}")
                 add("total: $total")
                 add("route: ${route.size}")
                 add("foundButNotClickedSoul: $foundButNotClickedSoul")
             } ?: run {
                 add("data is null")
             }
+            add("")
+            add("Amount of Souls found on Islands:")
+            for ((island, amount) in totalFound) {
+                add("  ${island.displayName}: $amount")
+            }
         }
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsoulreset") {
+        event.register("shsoulsreset") {
             description = "Reset known Fairy Souls for the current island."
             category = CommandCategory.USERS_RESET
             callback { onResetCommand() }
@@ -327,10 +337,8 @@ object FastFairySoulsPathfinder {
 
     private fun onResetCommand() {
         if (isDisabledCommand()) return
-        localFoundSouls().clear()
-        val island = SkyBlockUtils.currentIsland
-        totalFound[island] = 0
-        ChatUtils.chat("Reset found Fairy Souls on ${island.displayName}.")
+        resetFoundOnCurrentIsland()
+        ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
         reload()
     }
 
@@ -353,7 +361,17 @@ object FastFairySoulsPathfinder {
         return true
     }
 
-    private fun localFoundSouls(): MutableSet<LorenzVec> = foundSouls.getOrPut(SkyBlockUtils.currentIsland) { mutableSetOf() }
+    fun resetFoundOnCurrentIsland() = resetFoundOnIsland(SkyBlockUtils.currentIsland)
+    fun resetFoundOnIsland(island: IslandType) {
+        totalFound[island] = 0
+        foundSouls[island]?.clear()
+    }
+
+    fun amountFoundOnCurrentIsland(): Int = amountFoundOnIsland(SkyBlockUtils.currentIsland)
+    fun amountFoundOnIsland(island: IslandType): Int = totalFound.getOrDefault(island, 0)
+
+    fun foundSoulsOnCurrentIsland(): MutableSet<LorenzVec> = foundSoulsOnIsland(SkyBlockUtils.currentIsland)
+    fun foundSoulsOnIsland(island: IslandType): MutableSet<LorenzVec> = foundSouls.getOrPut(island) { mutableSetOf() }
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 

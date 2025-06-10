@@ -34,6 +34,7 @@
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>LongMethod:RepoManager.kt$RepoManager$private fun doTheFetching(command: Boolean)</ID>
+    <ID>LongMethod:UpdateKeybinds.kt$UpdateKeybinds$private fun makeMap(): Map&lt;Int, Int&gt;</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
@@ -61,8 +62,6 @@
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
-    <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$pitch</ID>
-    <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$yaw</ID>
     <ID>NoNameShadowing:RenderableUtils.kt$RenderableUtils${ it != null }</ID>
     <ID>NoNameShadowing:ReplaceRomanNumerals.kt$ReplaceRomanNumerals${ it.isValidRomanNumeral() &amp;&amp; it.removeFormatting().romanToDecimal() != 2000 }</ID>
     <ID>NoNameShadowing:RepoManager.kt$RepoManager${ unsuccessfulConstants.add(it) }</ID>
@@ -252,8 +251,6 @@
     <ID>TooManyFunctions:GuiRenderUtils.kt$GuiRenderUtils</ID>
     <ID>TooManyFunctions:HypixelCommands.kt$HypixelCommands</ID>
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
-    <ID>TooManyFunctions:LocationUtils.kt$LocationUtils</ID>
-    <ID>TooManyFunctions:LorenzVec.kt$LorenzVec</ID>
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:OreBlock.kt$at.hannibal2.skyhanni.features.mining.OreBlock.kt</ID>
