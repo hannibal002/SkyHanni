@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
@@ -27,11 +28,23 @@ object DarkMonolithFeatures {
     private var lastFoundEggVec: LorenzVec? = null
     private var renderBox: AxisAlignedBB? = null
 
-    @HandleEvent
-    fun onWorldChange() {
+    private fun reset() {
         knownEggs = setOf()
         foundEggVec = null
+        lastFoundEggVec = null
         renderBox = null
+    }
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (event.message.startsWith("§5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith ")) {
+            reset()
+        }
+    }
+
+    @HandleEvent
+    fun onWorldChange() {
+        reset()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)

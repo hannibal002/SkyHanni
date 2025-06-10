@@ -32,6 +32,6 @@ class DarkMonolithConfig {
     @Expose
     @ConfigOption(name = "Highlight Color", desc = "What color to highlight the egg.")
     @ConfigEditorColour
-    var highlightColor: ChromaColour = ChromaColour.fromStaticRGB(155, 29, 194, 255)
+    var highlightColor: ChromaColour = ChromaColour.fromStaticRGB(155, 29, 194, 75)
 
 }
