@@ -115,6 +115,7 @@ object CopyNearbyEntitiesCommand {
                     is EntityWither -> addWither(entity)
                     //#if MC > 1.21
                     //$$ is net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity -> addItemDisplayEntity(entity)
+                    //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
                     //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
@@ -227,14 +228,24 @@ object CopyNearbyEntitiesCommand {
     //$$     add("EntityItemDisplay:")
     //$$     val stack = entity.itemStack
     //$$     val rotation = entity.rotationVector
-    //$$     val position = entity.pos.toLorenzVec()
     //$$
     //$$     add("-  itemStack:")
     //$$     printItemStackData(stack)
     //$$     add("-  rotation: $rotation")
-    //$$     add("-  position: $position")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addTropicalFish(entity: net.minecraft.entity.passive.TropicalFishEntity) {
+    //$$     add("EntityTropicalFish:")
+    //$$     val variety = entity.variety
+    //$$     val patternColor = entity.patternColor
+    //$$     val baseColor = entity.baseColor
+    //$$     add("-  variety: $variety")
+    //$$     add("-  patternColor: $patternColor")
+    //$$     add("-  baseColor: $baseColor")
     //$$ }
     //#endif
+
+
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {

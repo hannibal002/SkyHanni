@@ -52,6 +52,9 @@ object IslandExceptions {
             IslandType.GARDEN -> garden(baseEntity)
             IslandType.KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
             IslandType.WINTER -> winterIsland(baseEntity)
+            //#if MC > 1.21
+            //$$ IslandType.GALATEA -> ModernIslandExceptions.galatea(baseEntity, armorStand, nextEntity)
+            //#endif
 
             else -> null
         }

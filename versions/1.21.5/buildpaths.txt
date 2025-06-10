@@ -176,6 +176,7 @@ at.hannibal2.skyhanni.data.mob.MobDebug.kt
 at.hannibal2.skyhanni.data.mob.MobDetection.kt
 at.hannibal2.skyhanni.data.mob.MobFactories.kt
 at.hannibal2.skyhanni.data.mob.MobFilter.kt
+at.hannibal2.skyhanni.data.mob.ModernIslandExceptions.kt
 at.hannibal2.skyhanni.data.model.ComposterUpgrade.kt
 at.hannibal2.skyhanni.data.model.Graph.kt
 at.hannibal2.skyhanni.data.model.GraphNode.kt
