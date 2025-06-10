@@ -34,3 +34,23 @@ object RenderEvents {
     }
 
 }
+
+enum class RenderLayer {
+    ALL,
+    HELMET,
+    PORTAL,
+    CROSSHAIRS,
+    BOSSHEALTH,
+    ARMOR,
+    HEALTH,
+    FOOD,
+    AIR,
+    HOTBAR,
+    EXPERIENCE,
+    TEXT,
+    HEALTHMOUNT,
+    JUMPBAR,
+    CHAT,
+    PLAYER_LIST,
+    DEBUG;
+}
