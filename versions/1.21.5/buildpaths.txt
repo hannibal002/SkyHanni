@@ -7,6 +7,10 @@ at/hannibal2/skyhanni/utils/ConditionalUtils.kt
 at/hannibal2/skyhanni/utils/Quad.kt
 at/hannibal2/skyhanni/utils/TimeLimitedSet.kt
 at/hannibal2/skyhanni/utils/TimeLimitedCache.kt
+at/hannibal2/skyhanni/utils/collection/CacheSet.kt
+at/hannibal2/skyhanni/utils/collection/CacheMap.kt
+at/hannibal2/skyhanni/utils/collection/TimeLimitedSet.kt
+at/hannibal2/skyhanni/utils/collection/TimeLimitedCache.kt
 at/hannibal2/skyhanni/utils/ReflectionUtils.kt
 at/hannibal2/skyhanni/config/HasLegacyId.java
 at/hannibal2/skyhanni/utils/compat/TypeAliasCompat.kt
@@ -768,6 +772,29 @@ at.hannibal2.skyhanni.data.MinecraftData.kt
 at.hannibal2.skyhanni.events.ItemInHandChangeEvent.kt
 at.hannibal2.skyhanni.events.PlaySoundEvent.kt
 at.hannibal2.skyhanni.events.minecraft.ServerTickEvent.kt
+
+
+at.hannibal2.skyhanni.config.commands.brigadier.ArgContext.kt
+at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArgument.kt
+at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments.kt
+at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.kt
+at.hannibal2.skyhanni.config.commands.brigadier.CommandData.kt
+at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent.kt
+at.hannibal2.skyhanni.features.commands.HelpCommand.kt
+at/hannibal2/skyhanni/config/commands/brigadier/BrigadierBuilder.kt
+at.hannibal2.skyhanni.config.commands.CommandBuilder.kt
+at.hannibal2.skyhanni.config.commands.CommandsRegistry.kt
+at/hannibal2/skyhanni/utils/CommandUtils.kt
+at.hannibal2.skyhanni.utils.NeuCalculator.kt
+at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.kt
+at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent.kt
+at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent.kt
+at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
+at/hannibal2/skyhanni/events/GuiContainerEvent.kt
+at.hannibal2.skyhanni.config.OnlyLegacy.kt
+
+
+
 
 
 
