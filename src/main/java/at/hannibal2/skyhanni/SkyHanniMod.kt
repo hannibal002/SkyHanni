@@ -11,10 +11,6 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 //#endif
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#if TODO
-import at.hannibal2.skyhanni.data.OtherInventoryData
-//#endif
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 //#if TODO
