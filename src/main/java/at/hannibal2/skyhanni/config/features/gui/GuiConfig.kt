@@ -20,6 +20,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
 // todo 1.21 impl needed
@@ -168,6 +169,11 @@ class GuiConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var configButtonOnPause: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Widen Config", desc = "Make SkyHanni's config window wider. (~1.5x)")
+    @ConfigEditorBoolean
+    val widenConfig: Property<Boolean> = Property.of(false)
 
     @Expose
     var titlePosition: Position = Position(0, 160)
