@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,16 +21,14 @@ object ActionBarData {
 
     fun getActionBar() = actionBar
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestactionbar") {
+        event.registerBrigadier("shtestactionbar") {
             description = "Set your clipboard as a fake action bar."
             category = CommandCategory.DEVELOPER_TEST
             callback { debugCommand() }
         }
     }
-    //#endif
 
     private fun debugCommand() {
         SkyHanniMod.coroutineScope.launch {

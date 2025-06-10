@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TrackerManager
@@ -37,7 +36,6 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -52,7 +50,6 @@ import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
@@ -70,15 +67,9 @@ object Commands {
         usersBugFix(event)
         devTest(event)
         devDebug(event)
-        internalCommands(event)
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
-        event.register("sh") {
-            aliases = listOf("skyhanni")
-            description = "Opens the main SkyHanni config"
-            callback { ConfigGuiManager.onCommand(it) }
-        }
         event.register("ff") {
             description = "Opens the Farming Fortune Guide"
             callback { FFGuideGui.onCommand() }
@@ -267,11 +258,6 @@ object Commands {
     }
 
     private fun devDebug(event: CommandRegistrationEvent) {
-        event.register("shdebug") {
-            description = "Copies SkyHanni debug data in the clipboard."
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { DebugCommand.command(it) }
-        }
         event.register("shconfig") {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
@@ -443,14 +429,6 @@ object Commands {
             description = "Manually saving the config"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
-        }
-    }
-
-    private fun internalCommands(event: CommandRegistrationEvent) {
-        event.register("shaction") {
-            description = "Internal command for chat click actions"
-            category = CommandCategory.INTERNAL
-            callback { ChatClickActionManager.onCommand(it) }
         }
     }
 }

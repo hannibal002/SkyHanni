@@ -12,6 +12,7 @@ import net.minecraftforge.client.ClientCommandHandler
 
 //#else
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+//$$ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 //#endif
 
 @SkyHanniModule
