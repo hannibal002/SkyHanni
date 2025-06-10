@@ -29,6 +29,7 @@ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#endif
 
 // todo 1.21 impl needed
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
@@ -198,7 +199,7 @@ object StringUtils {
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
-     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * this = the list of strings to join into a string, containing 0 or more elements.
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */

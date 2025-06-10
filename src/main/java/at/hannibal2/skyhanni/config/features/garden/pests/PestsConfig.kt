@@ -19,7 +19,7 @@ class PestsConfig {
     @Accordion
     var pestFinder: PestFinderConfig = PestFinderConfig()
 
-    // TODO renmae to waypoint
+    // TODO rename to waypoint
     @Expose
     @ConfigOption(name = "Pest Waypoint", desc = "")
     @Accordion
