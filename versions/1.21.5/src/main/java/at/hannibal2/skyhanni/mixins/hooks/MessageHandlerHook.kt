@@ -13,7 +13,9 @@ fun onGameMessage(message: Text, actionBar: Boolean, original: Operation<Void>) 
     if (actionBar) {
         ActionBarData.onChatReceive(message)?.let { result ->
             original.call(result, actionBar)
+            return
         }
+        original.call(message, actionBar)
         return
     }
     val (result, cancel) = ChatManager.onChatReceive(message)

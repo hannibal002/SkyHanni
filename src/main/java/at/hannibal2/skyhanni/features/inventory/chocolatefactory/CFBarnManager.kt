@@ -15,9 +15,9 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -26,7 +26,7 @@ object CFBarnManager {
     private val config get() = CFApi.config
     private val hoppityChatConfig get() = HoppityEggsManager.config.chat
     private val profileStorage get() = CFApi.profileStorage
-    private val virtualCountHolder: TimeLimitedCache<String, Int> = TimeLimitedCache(5.seconds)
+    private val virtualCountHolder = TimeLimitedCache<String, Int>(5.seconds)
 
     /**
      * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
@@ -114,8 +114,8 @@ object CFBarnManager {
         if (message != changedMessage) chatComponent = changedMessage.asComponent()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         sentBarnFullWarning = false
     }
 
