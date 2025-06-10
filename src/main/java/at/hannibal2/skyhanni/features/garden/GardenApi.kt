@@ -75,7 +75,7 @@ object GardenApi {
                 storage?.experience = it
             }
         }
-    private val cropIconCache: TimeLimitedCache<String, ItemStack> = TimeLimitedCache(10.minutes)
+    private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     // TODO USE SH-REPO
