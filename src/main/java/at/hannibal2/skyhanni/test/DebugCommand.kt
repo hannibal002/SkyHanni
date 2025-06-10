@@ -278,6 +278,15 @@ object DebugCommand {
         }
     }
 
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shdebug") {
+            description = "Copies SkyHanni debug data in the clipboard."
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { command(it) }
+        }
+    }
+
     private fun Long.formatTime(): String = if (this > 999) {
         this.milliseconds.format(showMilliSeconds = true)
     } else this.addSeparators() + "ms"
