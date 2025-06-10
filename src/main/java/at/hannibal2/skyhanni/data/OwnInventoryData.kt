@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
@@ -190,7 +190,7 @@ object OwnInventoryData {
     class IgnoredItem(val condition: (NeuInternalName) -> Boolean, val blockedUntil: SimpleTimeMark)
 
     private fun addItem(internalName: NeuInternalName, add: Int) {
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
         ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }
         if (ignoredItemsUntil.any { it.condition(internalName) }) {
