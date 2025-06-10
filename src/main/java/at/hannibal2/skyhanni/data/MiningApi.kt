@@ -148,7 +148,12 @@ object MiningApi {
 
     val blockStrengths = mutableMapOf<OreBlock, Int>()
 
-    private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
+    private val allowedSoundNames = setOf(
+        "dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb",
+        //#if MC > 1.21
+        //$$ "block.metal.place",
+        //#endif
+    )
 
     var cold: Int = 0
         private set

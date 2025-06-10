@@ -1204,6 +1204,7 @@ at.hannibal2.skyhanni.utils.compat.BlockCompat.kt
 at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.kt
 at.hannibal2.skyhanni.utils.compat.DrawContextUtils.kt
 at.hannibal2.skyhanni.utils.compat.MiscCompat.kt
+at.hannibal2.skyhanni.utils.compat.SoundCompat.kt
 at.hannibal2.skyhanni.utils.guide.GuideGui.kt
 at.hannibal2.skyhanni.utils.guide.GuidePage.kt
 at.hannibal2.skyhanni.utils.guide.GuideRenderablePage.kt
