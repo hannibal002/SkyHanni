@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
-//#if TODO
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-//#endif
 
 object HypixelCommands {
     fun skyblock() {
@@ -32,11 +30,9 @@ object HypixelCommands {
         send("skills")
     }
 
-    //#if TODO
     fun viewRecipe(itemId: NeuInternalName, page: Int = 1) {
         send("viewrecipe ${itemId.skyblockCommandId} $page")
     }
-    //#endif
 
     fun recipe(itemName: String) {
         send("recipe $itemName")

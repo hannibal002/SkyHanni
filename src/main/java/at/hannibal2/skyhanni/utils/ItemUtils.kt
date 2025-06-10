@@ -739,6 +739,7 @@ object ItemUtils {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestitem") {
@@ -754,6 +755,7 @@ object ItemUtils {
             }
         }
     }
+    //#endif
 
     private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
