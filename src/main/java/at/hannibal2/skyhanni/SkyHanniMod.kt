@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.config.Features
 //#if TODO
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.StorageData
-import at.hannibal2.skyhanni.data.OtherInventoryData
 //#endif
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
