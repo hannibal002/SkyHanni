@@ -30,7 +30,7 @@ enum class ItemAbility(
     // TODO add into repo
     WITHER_IMPACT(5, ignoreMageCooldownReduction = true),
     WITHER_SHIELD_SCROLL(10, ignoreMageCooldownReduction = true, alternativePosition = true),
-    SHADOW_WARP_SCROLL(10),
+    SHADOW_WARP_SCROLL(10,),
     IMPLOSION_SCROLL(10),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
     GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
@@ -141,7 +141,12 @@ enum class ItemAbility(
         fun List<NeuInternalName>.getAllAbilityScrolls(): Set<ItemAbility> = WITHER_SCROLLS
             .filter { ability -> ability.internalNames.any { it in this } }
             .toMutableSet()
-            .apply { if (size == 3) add(WITHER_IMPACT) }
+            .apply { if (size == 3)
+            {
+                clear()
+                add(WITHER_IMPACT)}
+            }
+
 
         fun ItemAbility.getMultiplier(): Double {
             return getMageCooldownReduction() ?: 1.0
