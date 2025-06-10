@@ -473,7 +473,6 @@ object EnoughUpdatesManager {
         neuPetNums = event.readConstant<JsonObject>("petnums")
     }
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -509,5 +508,4 @@ object EnoughUpdatesManager {
             }
         }
     }
-    //#endif
 }
