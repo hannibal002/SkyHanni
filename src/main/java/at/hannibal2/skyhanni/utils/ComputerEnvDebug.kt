@@ -115,7 +115,7 @@ object ComputerEnvDebug {
                 return
             }
         }
-        event.addData("Unknwon java version: '$version'")
+        event.addData("Unknown java version: '$version'")
     }
 
     private fun os(event: DebugDataCollectEvent) {
@@ -128,7 +128,7 @@ object ComputerEnvDebug {
                 add("Exact name: $exactName")
             }
         } else {
-            event.addData("Unknwon OS: '$exactName'")
+            event.addData("Unknown OS: '$exactName'")
         }
     }
 

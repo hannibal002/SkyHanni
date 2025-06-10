@@ -26,12 +26,13 @@ import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-//#if MC < 1.12
+//#if MC < 1.16
 import net.minecraft.world.WorldSettings
 //#else
-//$$ import net.minecraft.world.GameType
+//$$ import net.minecraft.world.level.GameType
 //#endif
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object TabListData {
     private var tablistCache = emptyList<String>()
@@ -115,12 +116,12 @@ object TabListData {
             val team1 = o1.playerTeam
             val team2 = o2.playerTeam
             return ComparisonChain.start().compareTrueFirst(
-                //#if MC<1.12
+                //#if MC < 1.16
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
                 o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
-                //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR,
+                //$$ o1.gameMode != GameType.SPECTATOR,
+                //$$ o2.gameMode != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(
@@ -171,7 +172,7 @@ object TabListData {
         if (tablistCache != tabList) {
             tablistCache = tabList
             TabListUpdateEvent(getTabList()).post()
-            if (!LorenzUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
         }
@@ -188,7 +189,7 @@ object TabListData {
 
     private fun workaroundDelayedTabListUpdateAgain() {
         DelayedRun.runDelayed(2.seconds) {
-            if (LorenzUtils.onHypixel) {
+            if (SkyBlockUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
                 TabListUpdateEvent(getTabList()).post()
             }
@@ -197,10 +198,10 @@ object TabListData {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtesttablist") {
+        event.registerBrigadier("shtesttablist") {
             description = "Set your clipboard as a fake tab list."
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleDebug() }
+            simpleCallback { toggleDebug() }
         }
     }
 }

@@ -19,7 +19,7 @@ public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient
     @Inject(method = "addToSendQueue", at = @At("HEAD"), cancellable = true)
     private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
         NetHandlerPlayClient handler = (NetHandlerPlayClient) (Object) this;
-        if (new PacketSentEvent(handler, packet).post()) {
+        if (new PacketSentEvent(packet).post()) {
             ci.cancel();
         }
     }
