@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -62,6 +63,7 @@ object DarkMonolithFeatures {
      * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§650,000 Coins§r§a!
      * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§62,500 Coins §r§aand §r§21,000 ᠅ Mithril Powder§r§a!
      * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§2100 ᠅ Mithril Powder§r§a!
+     * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§23,000 ᠅ Mithril Powder§r§a!
      */
     @Suppress("MaxLineLength")
     private val dropPattern by patternGroup.pattern(
@@ -95,7 +97,7 @@ object DarkMonolithFeatures {
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onChat(event: SkyHanniChatEvent) {
         dropPattern.matchMatcher(event.message) {
-            reset()
+            DarkMonolithFeatures.reset()
             if (!config.tracker) return
             groupOrNull("coins")?.let {
                 tracker.addCoins(it.formatInt(), false)
@@ -106,12 +108,18 @@ object DarkMonolithFeatures {
             groupOrNull("fish")?.let {
                 tracker.addItem(rockTheFishItem, 1, false)
             }
+            tracker.modify {
+                it.monolithsLooted++
+            }
         }
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    fun onWorldChange(event: IslandChangeEvent) {
         reset()
+        if (event.newIsland == IslandType.DWARVEN_MINES) {
+            tracker.firstUpdate()
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
