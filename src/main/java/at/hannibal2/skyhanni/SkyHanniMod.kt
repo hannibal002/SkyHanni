@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni
 
-//#if TODO
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
-//#endif
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -18,16 +16,14 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-//#if TODO
 import at.hannibal2.skyhanni.data.repo.RepoManager
-//#endif
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-//#if TODO
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
+//#if TODO
+import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 //#endif
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -56,9 +52,7 @@ object SkyHanniMod {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
-        //#if TODO
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
-        //#endif
 
         PreInitFinishedEvent.post()
     }
@@ -67,18 +61,16 @@ object SkyHanniMod {
         configManager = ConfigManager()
         configManager.firstLoad()
         //#if TODO
-        initLogging()
+        MinecraftConsoleFilter.initLogging()
         //#endif
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        //#if TODO
         try {
             RepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
-        //#endif
     }
 
     @HandleEvent
@@ -86,9 +78,7 @@ object SkyHanniMod {
         screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
-                //#if TODO
                 val title = InventoryUtils.openInventoryName()
-                //#endif
                 MinecraftCompat.localPlayer.closeScreen()
                 //#if TODO
                 OtherInventoryData.close(title)

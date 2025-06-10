@@ -62,7 +62,7 @@ object KuudraApi {
     var kuudraTier: Int? = null
         private set
 
-    @Deprecated("moved", ReplaceWith("inKuudra"))
+    @Deprecated("moved", ReplaceWith("KuudraApi.inKuudra"))
     fun inKuudra() = kuudraTier != null
 
     val inKuudra get() = SkyBlockUtils.inSkyBlock && kuudraTier != null

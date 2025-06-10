@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.util.Vec3
-
-//#if MC > 1.21
+//#if MC < 1.21
+import net.minecraft.client.renderer.GlStateManager
+//#else
 //$$ import net.minecraft.client.gui.DrawContext
+//$$ import org.joml.Quaternionf
 //#endif
 
 /**
@@ -71,6 +73,14 @@ object DrawContextUtils {
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
         drawContext.matrices.popMatrix()
+    }
+
+    fun rotate(angle: Float, x: Float, y: Float, z: Float) {
+        //#if MC < 1.21
+        GlStateManager.rotate(angle, x, y, z)
+        //#else
+        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
+        //#endif
     }
 
     /**

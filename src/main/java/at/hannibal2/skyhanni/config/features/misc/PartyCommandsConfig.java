@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PartyCommandsConfig {
 
+    // TODO remove "default" from name
     @Expose
     @ConfigEditorDropdown
     @ConfigOption(name = "Party Command Trust Level", desc = "Choose who can run party chat commands.")
