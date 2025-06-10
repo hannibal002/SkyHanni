@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
@@ -124,6 +125,7 @@ class DevConfig {
     @ConfigEditorBoolean
     var numberFormatOverride: Boolean = false
 
+    @OnlyLegacy // TODO: remove when mod api is implemented in 1.21
     @Expose
     @ConfigOption(
         name = "Use Hypixel Mod API",

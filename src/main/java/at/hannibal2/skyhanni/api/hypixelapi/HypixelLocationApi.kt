@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 //#if TODO
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.LobbyType
@@ -225,8 +226,10 @@ object HypixelLocationApi {
 
     private fun dataToString(pair: Pair<String, Any?>) = "${pair.first}: ${pair.second}"
 
-    var isModApiDetection: Boolean = false
-        get() = config && SkyHanniMod.isBetaVersion
-        private set
+    val isModApiDetection: Boolean
+        get() {
+            if (!PlatformUtils.IS_LEGACY) return false // TODO: remove when mod api is implemented in 1.21
+            return config && SkyHanniMod.isBetaVersion
+        }
 
 }
