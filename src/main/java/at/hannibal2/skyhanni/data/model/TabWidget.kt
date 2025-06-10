@@ -333,7 +333,7 @@ enum class TabWidget(
     ),
     SALTS(
         // language=RegExp
-        "(?:§.)*Salts",
+        "(?:§.)*Salts:",
     ),
     FOREST_WHISPERS(
         // language=RegExp
