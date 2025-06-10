@@ -81,7 +81,7 @@ object PartyChatCommands {
                     )
                     return@PartyChatCommand
                 }
-                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms", true)
+                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms", prefix = true)
 
             },
         ),
@@ -91,7 +91,7 @@ object PartyChatCommands {
             requiresPartyLead = false,
             executable = {
                 if (TpsCounter.tps != null) {
-                    HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}", true)
+                    HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}", prefix = true)
                 } else {
                     ChatUtils.chat("TPS Command Sent too early to calculate TPS", true)
                 }
