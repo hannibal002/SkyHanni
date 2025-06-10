@@ -163,7 +163,7 @@ object MiningApi {
 
     var heat: Int = 0
         private set
-    var heatDisplay: String = ""
+    var heatDisplay: String? = null
         private set
     var lastHeatUpdate = SimpleTimeMark.farPast()
         private set
@@ -224,7 +224,7 @@ object MiningApi {
         if (IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
             heatPattern.firstMatcher(event.new) {
                 val newHeat = group("heat")
-                heatDisplay = group("scoreboard")
+                heatDisplay = group("scoreboard").takeIf { it.isNotEmpty() }
                 if (newHeat == "IMMUNE") {
                     updateHeat(0)
                 } else if (newHeat.toInt() != heat) {
