@@ -21,7 +21,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
-
 class MiningConfig {
     @Expose
     @Category(name = "Mining Event Tracker", desc = "Settings for the Mining Event Tracker.")
