@@ -34,7 +34,7 @@ allprojects {
         maven("https://repo.spongepowered.org/repository/maven-public/") // mixin
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
         maven("https://jitpack.io") {
-            // NotEnoughUpdates (compiled against)
+            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
