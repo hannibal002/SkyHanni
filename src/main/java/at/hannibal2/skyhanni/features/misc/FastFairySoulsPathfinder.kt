@@ -220,6 +220,7 @@ object FastFairySoulsPathfinder {
     private var calculatingStart = SimpleTimeMark.farPast()
 
     private fun reload() {
+        val currentIsland = SkyBlockUtils.currentIsland
         val graph = IslandGraphs.currentIslandGraph ?: run {
             data = createEmptyData().also {
                 it.debugState = "island graph is empty"
@@ -256,7 +257,11 @@ object FastFairySoulsPathfinder {
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
                 .send(calculatingMessageId)
             calculating = false
-            setData(foundSouls, allSouls, route)
+            if (currentIsland != SkyBlockUtils.currentIsland) {
+                data = null
+            } else {
+                setData(foundSouls, allSouls, route)
+            }
         }
     }
 
