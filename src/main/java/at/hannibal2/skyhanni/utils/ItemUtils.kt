@@ -72,6 +72,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import com.mojang.authlib.properties.Property
 //$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
+//$$ import net.minecraft.registry.Registries
 //#endif
 
 @SkyHanniModule
@@ -927,4 +928,12 @@ object ItemUtils {
 
         return skull
     }
+
+    //#if MC > 1.21
+    //$$ fun ItemStack.getItemModel(): Item? {
+    //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
+    //$$     val item = Registries.ITEM.get(identifier)
+    //$$     return if (item == Items.AIR) null else item
+    //$$ }
+    //#endif
 }
