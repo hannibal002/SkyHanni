@@ -36,8 +36,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
