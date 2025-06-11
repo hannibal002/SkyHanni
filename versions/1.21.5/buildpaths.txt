@@ -1098,6 +1098,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinPlayerEntityRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRenderManager.java
+at.hannibal2.skyhanni.mixins.transformers.MixinWorldRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiContainer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
