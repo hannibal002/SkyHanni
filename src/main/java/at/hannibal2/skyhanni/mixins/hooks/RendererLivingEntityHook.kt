@@ -43,14 +43,15 @@ object RendererLivingEntityHook {
      * Check if the player should spin and rotate them if the option is on.
      */
     @JvmStatic
-    fun rotatePlayer(player: EntityPlayer) {
-        if (!SkyBlockUtils.inSkyBlock) return
-        if (!config.rotateContributors && !SkyHanniDebugsAndTests.isAprilFoolsDay) return
-        val name = player.name ?: return
-        if (!ContributorManager.shouldSpin(name)) return
+    fun rotatePlayer(player: EntityPlayer): Float {
+        if (!SkyBlockUtils.inSkyBlock) return player.rotationYaw
+        if (!config.rotateContributors && !SkyHanniDebugsAndTests.isAprilFoolsDay) return player.rotationYaw
+        val name = player.name ?: return player.rotationYaw
+        if (!ContributorManager.shouldSpin(name)) return player.rotationYaw
         val rotation = ((player.ticksExisted % 90) * 4).toFloat()
         //#if TODO
         GlStateManager.rotate(rotation, 0f, 1f, 0f)
         //#endif
+        return player.rotationYaw + rotation
     }
 }

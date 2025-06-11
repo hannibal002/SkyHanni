@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers.render;
 
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -17,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntityRenderer.class)
@@ -46,6 +46,13 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
             if (RendererLivingEntityHook.shouldBeUpsideDown(Formatting.strip(entity.getName().getString()))) {
                 cir.setReturnValue(true);
             }
+        }
+    }
+
+    @Inject(method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;F)V", at = @At(value = "TAIL"))
+    public void updateRenderState(LivingEntity livingEntity, LivingEntityRenderState livingEntityRenderState, float f, CallbackInfo ci) {
+        if (livingEntity instanceof PlayerEntity playerEntity) {
+            livingEntityRenderState.bodyYaw = RendererLivingEntityHook.rotatePlayer(playerEntity);
         }
     }
 }
