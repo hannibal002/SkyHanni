@@ -141,55 +141,6 @@ object FastFairySoulsPathfinder {
         private fun isDataEnabled() = islandData?.let { !it.disabled } ?: false
     }
 
-    @HandleEvent(WorldChangeEvent::class)
-    fun onWorldChange() {
-        islandData = null
-    }
-
-    @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent) {
-        if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
-            islandData?.foundNearby()
-        }
-    }
-
-    @HandleEvent(IslandGraphReloadEvent::class)
-    fun onIslandGraphReload() {
-        if (isEnabled()) {
-            reload()
-        } else {
-            islandData = null
-        }
-    }
-
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-        if (event.isMod(5)) {
-            if (calculating) {
-                val duration = calculatingStart.passedSince().format(showMilliSeconds = true)
-                "§e[SkyHanni] Calculating Fairy Soul route §b$duration".asComponent().send(calculatingMessageId)
-            }
-        }
-    }
-
-    @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
-        if (!isEnabled()) return
-
-        islandData?.let {
-            it.checkNextSoul()
-            return
-        }
-
-        reload()
-    }
-
-    @HandleEvent(InventoryCloseEvent::class)
-    fun onInventoryClose() {
-        islandData?.checkHaveAll()
-    }
-
     private fun createEmptyData(debug: String): IslandData = IslandData(0, mutableListOf(), emptySet()).apply {
         disabled = true
         debugState = debug
@@ -252,6 +203,55 @@ object FastFairySoulsPathfinder {
             route,
             allSouls = allSouls.map { it.position }.toSet(),
         ).also { it.pathToNext() }
+    }
+
+    @HandleEvent(WorldChangeEvent::class)
+    fun onWorldChange() {
+        islandData = null
+    }
+
+    @HandleEvent
+    fun onSystemMessage(event: SystemMessageEvent) {
+        if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
+            islandData?.foundNearby()
+        }
+    }
+
+    @HandleEvent(IslandGraphReloadEvent::class)
+    fun onIslandGraphReload() {
+        if (isEnabled()) {
+            reload()
+        } else {
+            islandData = null
+        }
+    }
+
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
+        if (event.isMod(5)) {
+            if (calculating) {
+                val duration = calculatingStart.passedSince().format(showMilliSeconds = true)
+                "§e[SkyHanni] Calculating Fairy Soul route §b$duration".asComponent().send(calculatingMessageId)
+            }
+        }
+    }
+
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
+        if (!isEnabled()) return
+
+        islandData?.let {
+            it.checkNextSoul()
+            return
+        }
+
+        reload()
+    }
+
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
+        islandData?.checkHaveAll()
     }
 
     @HandleEvent
