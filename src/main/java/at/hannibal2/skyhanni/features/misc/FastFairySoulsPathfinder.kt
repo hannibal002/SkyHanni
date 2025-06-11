@@ -255,7 +255,8 @@ object FastFairySoulsPathfinder {
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
                 .send(calculatingMessageId)
             calculating = false
-            if (currentIsland == SkyBlockUtils.currentIsland) {
+            // TODO: fix the root issue of all changes being ignored while calculating (e.g. island change without this check or commands)
+            if (currentIsland == SkyBlockUtils.currentIsland) {  // Only set data if the island has not changed during calculation
                 setData(foundSouls, allSouls, route)
             }
         }
