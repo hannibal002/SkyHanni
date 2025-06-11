@@ -18,3 +18,4 @@ accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractAtHandler
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractHandler
 accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractHandler hand Lnet/minecraft/util/Hand;
+accessible field net/minecraft/world/World blockEntityTickers Ljava/util/List;
