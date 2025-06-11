@@ -27,9 +27,12 @@ object BrigadierUtils {
         }
     }
 
-    fun Collection<String>.toSuggestionProvider(shouldEscape: Boolean = true) = SuggestionProvider<Any?> { _, builder ->
-        if (shouldEscape) builder.addOptionalEscaped(this)
-        else builder.addUnescaped(this)
+    fun Collection<String>.toSuggestionProvider() = SuggestionProvider<Any?> { _, builder ->
+        for (s in this) {
+            if (s.startsWith(builder.remainingLowerCase)) {
+                builder.suggest(s)
+            }
+        }
         builder.buildFuture()
     }
 
@@ -102,6 +105,7 @@ object BrigadierUtils {
         if (collection.isEmpty()) return this
         val input = remainingLowerCase
         val isEscaped = input.firstOrNull() == DOUBLE_QUOTE
+        //#if MC < 1.21
         val escaped = if (isEscaped) input.drop(1) else input
         val lastWhitespace = escaped.lastIndexOf(' ')
         for (string in collection) {
@@ -114,6 +118,12 @@ object BrigadierUtils {
                 else suggest("$suggestion$DOUBLE_QUOTE")
             }
         }
+        //#else
+        //$$ for (string in collection) {
+        //$$     if (isEscaped || string.hasWhitespace()) suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
+        //$$     else suggest(string)
+        //$$ }
+        //#endif
         return this
     }
 
@@ -123,6 +133,7 @@ object BrigadierUtils {
     ): SuggestionsBuilder {
         if (collection.isEmpty()) return this
         val input = remainingLowerCase
+        //#if MC < 1.21
         val escaped = input.drop(1)
         val lastWhitespace = escaped.lastIndexOf(' ')
         for (string in collection) {
@@ -134,6 +145,9 @@ object BrigadierUtils {
                 else suggest("$suggestion$DOUBLE_QUOTE")
             }
         }
+        //#else
+        //$$ for (string in collection) suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
+        //#endif
         return this
     }
 
@@ -143,6 +157,7 @@ object BrigadierUtils {
     ): SuggestionsBuilder {
         if (collection.isEmpty()) return this
         val input = remainingLowerCase
+        //#if MC < 1.21
         val isEscaped = input.firstOrNull() == DOUBLE_QUOTE
         val escaped = if (isEscaped) input.drop(1) else input
         val lastWhitespace = escaped.lastIndexOf(' ')
@@ -155,6 +170,9 @@ object BrigadierUtils {
                 if (suggestion.isNotBlank()) suggest(suggestion)
             }
         }
+        //#else
+        //$$ for (string in collection) suggest(string)
+        //#endif
         return this
     }
 

@@ -685,6 +685,10 @@ at.hannibal2.skyhanni.config.commands.brigadier.CommandData.kt
 at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent.kt
 at.hannibal2.skyhanni.features.commands.HelpCommand.kt
 at/hannibal2/skyhanni/config/commands/brigadier/BrigadierBuilder.kt
+at/hannibal2/skyhanni/config/commands/brigadier/arguments/EnumArgumentType.kt
+at/hannibal2/skyhanni/config/commands/brigadier/arguments/InternalNameArgumentType.kt
+at/hannibal2/skyhanni/config/commands/brigadier/arguments/LorenzVecArgumentType.kt
+at/hannibal2/skyhanni/config/commands/brigadier/arguments/SimpleStringArgumentType.kt
 at.hannibal2.skyhanni.config.commands.CommandBuilder.kt
 at.hannibal2.skyhanni.config.commands.CommandsRegistry.kt
 at/hannibal2/skyhanni/utils/CommandUtils.kt
