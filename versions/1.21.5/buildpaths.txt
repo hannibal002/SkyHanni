@@ -14,6 +14,7 @@ at.hannibal2.skyhanni.api.event.GeneratedEventPrimaryFunctionNames.kt
 at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi.kt
+at.hannibal2.skyhanni.api.minecraftevents.EntityEvents.kt
 at.hannibal2.skyhanni.config.ConfigGuiManager.kt
 at.hannibal2.skyhanni.config.ConfigManager.kt
 at.hannibal2.skyhanni.config.ConfigModMenuInterop.kt
@@ -269,6 +270,7 @@ at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent.kt
+at.hannibal2.skyhanni.events.entity.EntityHurtEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityMoveEvent.kt
