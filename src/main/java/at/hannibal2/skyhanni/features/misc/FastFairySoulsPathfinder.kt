@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.FairySoulsApi
-import at.hannibal2.skyhanni.data.FairySoulsApi.currentIslandData
+import at.hannibal2.skyhanni.data.FairySoulsApi.currentData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -62,14 +62,13 @@ object FastFairySoulsPathfinder {
     )
 
     private class IslandData(
-        var found: Int,
         val total: Int,
         val route: MutableList<LorenzVec>,
         val allSouls: Set<LorenzVec>,
-        var foundButNotClickedSoul: LorenzVec? = null,
     ) {
-        var disabled = total > 0 && found == total
+        var disabled = total > 0 && currentData.amountFound == total
         var debugState: String? = null
+        var foundButNotClickedSoul: LorenzVec? = null
 
         fun foundNearby() {
             if (disabled) return
@@ -85,21 +84,15 @@ object FastFairySoulsPathfinder {
                 )
                 return
             }
-            found(nearest)
+            currentData.add(nearest)
             pathToNext()
-        }
-
-        private fun found(nearest: LorenzVec) {
-            if (route.remove(nearest)) {
-                found++
-            }
-            currentIslandData.add(nearest)
         }
 
         fun pathToNext() {
             if (disabled) return
             if (route.isEmpty()) {
-                val message = "§e[SkyHanni] Found all §5$found Fairy Souls §ein ${SkyBlockUtils.currentIsland.displayName}!"
+                val message =
+                    "§e[SkyHanni] Found all §5${currentData.amountFound} Fairy Souls §ein ${SkyBlockUtils.currentIsland.displayName}!"
                 IslandGraphs.overrideChatMessage(message)
                 allFound("found last soul of ${SkyBlockUtils.currentIsland}")
             } else {
@@ -118,11 +111,11 @@ object FastFairySoulsPathfinder {
         }
 
         private fun pathTo(loc: LorenzVec) {
-            val percentage = (found.toDouble() / total) * 100
+            val percentage = (currentData.amountFound.toDouble() / total) * 100
             val percentageLabel = "§8(§b${percentage.roundTo(1)}%§8)"
             IslandGraphs.pathFind(
                 loc,
-                "§b$found/$total §5Fairy Souls $percentageLabel",
+                "§b${currentData.amountFound}/$total §5Fairy Souls $percentageLabel",
                 LorenzColor.DARK_PURPLE.toColor(),
                 onFound = {
                     foundButNotClickedSoul = loc
@@ -133,13 +126,12 @@ object FastFairySoulsPathfinder {
 
         fun allFound(state: String) {
             disabled = true
-            currentIslandData.addAll(route)
-            found = currentIslandData.amountFound
+            currentData.addAll(route)
             debugState = state
         }
 
         fun checkHaveAll(): Boolean {
-            val haveAll = total > 0 && currentIslandData.amountFound == total
+            val haveAll = total > 0 && currentData.amountFound == total
             if (haveAll) {
                 allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to hypixel data")
             }
@@ -198,7 +190,11 @@ object FastFairySoulsPathfinder {
         islandData?.checkHaveAll()
     }
 
-    private fun createEmptyData(): IslandData = IslandData(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
+    private fun createEmptyData(debug: String): IslandData = IslandData(0, mutableListOf(), emptySet()).apply {
+        disabled = true
+        debugState = debug
+    }
+
     private val calculatingMessageId = ChatUtils.getUniqueMessageId()
 
     private var calculating = false
@@ -206,31 +202,29 @@ object FastFairySoulsPathfinder {
 
     private fun reload() {
         val currentIsland = SkyBlockUtils.currentIsland
+
         val graph = IslandGraphs.currentIslandGraph ?: run {
-            islandData = createEmptyData().also {
-                it.debugState = "island graph is empty"
-            }
+            islandData = createEmptyData("island graph is empty")
             return
         }
-        val foundSouls = currentIslandData.foundSouls
         val allSouls = getTargetNodes(graph.nodes)
+
+        val foundSouls = currentData.foundSouls
+
         val missingSouls = allSouls.filter { it.position !in foundSouls }
 
         if (missingSouls.isEmpty()) {
             islandData = if (foundSouls.isEmpty()) {
-                createEmptyData().also {
-                    it.debugState = "There are no fairy souls in the graph network of ${SkyBlockUtils.currentIsland}"
-                }
+                createEmptyData("There are no fairy souls in the graph network of ${SkyBlockUtils.currentIsland}")
             } else {
-                val size = foundSouls.size
-                IslandData(found = size, total = size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
+                IslandData(total = foundSouls.size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
                     it.debugState = "found all souls on ${SkyBlockUtils.currentIsland}"
                 }
             }
             return
         }
 
-        islandData = IslandData(found = 0, total = allSouls.size, route = mutableListOf(), allSouls = emptySet())
+        islandData = IslandData(total = allSouls.size, route = mutableListOf(), allSouls = emptySet())
         if (islandData?.checkHaveAll() == true) return
         calculating = true
         calculatingStart = SimpleTimeMark.now()
@@ -244,18 +238,16 @@ object FastFairySoulsPathfinder {
             calculating = false
             // TODO: fix the root issue of all changes being ignored while calculating (e.g. island change without this check or commands)
             if (currentIsland == SkyBlockUtils.currentIsland) { // Only set data if the island has not changed during calculation
-                setData(foundSouls, allSouls, route)
+                setData(allSouls, route)
             }
         }
     }
 
     private fun setData(
-        foundSouls: MutableSet<LorenzVec>,
         allSouls: List<GraphNode>,
         route: MutableList<LorenzVec>,
     ) {
         islandData = IslandData(
-            found = foundSouls.size,
             total = allSouls.size,
             route,
             allSouls = allSouls.map { it.position }.toSet(),
@@ -277,8 +269,8 @@ object FastFairySoulsPathfinder {
                     add(it)
                     add("")
                 }
-                add("found with known location: $found")
-                add("actual amount of found souls: ${currentIslandData.amountFound}")
+                add("found with known location: ${currentData.foundSouls.size}")
+                add("actual amount of found souls: ${currentData.amountFound}")
                 add("total: $total")
                 add("route: ${route.size}")
                 add("foundButNotClickedSoul: $foundButNotClickedSoul")
@@ -309,7 +301,7 @@ object FastFairySoulsPathfinder {
 
     private fun onResetCommand() {
         if (isDisabledCommand()) return
-        currentIslandData.reset()
+        currentData.reset()
         reload()
         ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
     }

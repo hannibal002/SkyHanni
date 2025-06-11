@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -31,17 +34,18 @@ object FairySoulsApi {
 
         fun add(vec: LorenzVec) {
             foundSouls.add(vec)
-            amountFound = foundSouls.size
+            if (foundSouls.size + 1 > amountFound) {
+                // Make sure the amountFound is correct
+                amountFound = foundSouls.size
+            }
         }
 
         fun addAll(vecs: Collection<LorenzVec>) {
             foundSouls.addAll(vecs)
-            amountFound = foundSouls.size
-        }
-
-        fun remove(vec: LorenzVec) {
-            foundSouls.remove(vec)
-            amountFound = foundSouls.size
+            if (foundSouls.size > amountFound) {
+                // Make sure the amountFound is correct
+                amountFound = foundSouls.size
+            }
         }
 
         fun reset() {
@@ -69,6 +73,15 @@ object FairySoulsApi {
         "§7Fairy Souls: §e(?<have>.*)§7\\/§d(?<total>.*)",
     )
 
+    var currentData: IslandFairySoulsData = getIslandData(SkyBlockUtils.currentIsland)
+    fun getIslandData(island: IslandType): IslandFairySoulsData {
+        val result = storage.firstOrNull { it.island == island }
+        if (result != null) return result
+        val newData = IslandFairySoulsData(island)
+        storage.add(newData)
+        return newData
+    }
+
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Fairy Souls Guide") return
@@ -93,7 +106,7 @@ object FairySoulsApi {
 
         event.addData {
             add("Total Found Souls ${storage.sumOf { it.amountFound }}")
-            add("Souls on Current Island ${currentIslandData.amountFound}")
+            add("Souls on current Island ${currentData.amountFound}")
             add("Souls on Islands:")
             for (islandData in storage) {
                 add("  ${islandData.island.displayName}: ${islandData.amountFound}")
@@ -101,14 +114,13 @@ object FairySoulsApi {
         }
     }
 
-    val currentIslandData: IslandFairySoulsData
-        get() = getIslandData(SkyBlockUtils.currentIsland)
+    @HandleEvent(eventTypes = [GraphAreaChangeEvent::class, WorldChangeEvent::class])
+    fun islandUpdate() {
+        currentData = getIslandData(SkyBlockUtils.currentIsland)
+    }
 
-    fun getIslandData(island: IslandType): IslandFairySoulsData {
-        val result = storage.firstOrNull { it.island == island }
-        if (result != null) return result
-        val newData = IslandFairySoulsData(island)
-        storage.add(newData)
-        return newData
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        // TODO
     }
 }
