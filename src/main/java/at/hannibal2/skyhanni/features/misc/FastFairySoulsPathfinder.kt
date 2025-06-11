@@ -243,7 +243,10 @@ object FastFairySoulsPathfinder {
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
                 .send(calculatingMessageId)
             calculating = false
-            setData(foundSouls, allSouls, route, currentIsland)
+            // TODO: fix the root issue of all changes being ignored while calculating (e.g. island change without this check or commands)
+            if (currentIsland == SkyBlockUtils.currentIsland) { // Only set data if the island has not changed during calculation
+                setData(foundSouls, allSouls, route)
+            }
         }
     }
 
@@ -251,13 +254,7 @@ object FastFairySoulsPathfinder {
         foundSouls: MutableSet<LorenzVec>,
         allSouls: List<GraphNode>,
         route: MutableList<LorenzVec>,
-        island: IslandType,
     ) {
-        if (island != SkyBlockUtils.currentIsland) {
-            islandData = null
-            return
-        }
-
         islandData = IslandData(
             found = foundSouls.size,
             total = allSouls.size,
