@@ -7,7 +7,6 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
-import java.util.WeakHashMap
 //#if MC < 1.16
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.ChatComponentText
@@ -27,9 +26,11 @@ import net.minecraft.util.ChatComponentText
 //$$ import net.minecraft.text.TranslatableTextContent
 //#endif
 
-private val unformattedTextCache = WeakHashMap<IChatComponent, String>()
-private val formattedTextCache = WeakHashMap<IChatComponent, String>()
-private val formattedTextNoResetsCache = WeakHashMap<IChatComponent, String>()
+//#if MC > 1.16
+private val unformattedTextCache = java.util.WeakHashMap<IChatComponent, String>()
+private val formattedTextCache = java.util.WeakHashMap<IChatComponent, String>()
+private val formattedTextNoResetsCache = java.util.WeakHashMap<IChatComponent, String>()
+//#endif
 
 fun IChatComponent.unformattedTextForChatCompat(): String {
 //#if MC < 1.16
