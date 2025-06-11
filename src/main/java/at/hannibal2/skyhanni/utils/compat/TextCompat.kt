@@ -7,10 +7,10 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
+import java.util.WeakHashMap
 //#if MC < 1.16
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.ChatComponentText
-
 //#endif
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
@@ -27,16 +27,26 @@ import net.minecraft.util.ChatComponentText
 //$$ import net.minecraft.text.TranslatableTextContent
 //#endif
 
+private val unformattedTextCache = WeakHashMap<IChatComponent, String>()
+private val formattedTextCache = WeakHashMap<IChatComponent, String>()
+private val formattedTextNoResetsCache = WeakHashMap<IChatComponent, String>()
+
 fun IChatComponent.unformattedTextForChatCompat(): String {
 //#if MC < 1.16
     return this.unformattedTextForChat
 //#elseif MC < 1.21
 //$$ return this.contents
 //#else
-//$$ if (this.content is TranslatableTextContent) {
-//$$     return (this.content as TranslatableTextContent).key.orEmpty()
+//$$     return unformattedTextCache.getOrPut(this) {
+//$$         computeUnformattedTextCompat()
+//$$     }
 //$$ }
-//$$ return (this.content as? PlainTextContent)?.string().orEmpty()
+//$$
+//$$ private fun Text.computeUnformattedTextCompat(): String {
+//$$     if (this.content is TranslatableTextContent) {
+//$$         return (this.content as TranslatableTextContent).key.orEmpty()
+//$$     }
+//$$     return (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif
 }
 
@@ -58,6 +68,19 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false): String 
 //#else
 //$$ run {
 //$$     this ?: return@run ""
+//$$     if (noExtraResets) {
+//$$         formattedTextCache.getOrPut(this) {
+//$$             computeFormattedTextCompat(true)
+//$$         }
+//$$     } else {
+//$$         formattedTextCache.getOrPut(this) {
+//$$             computeFormattedTextCompat(false)
+//$$         }
+//$$     }
+//$$ }
+//$$
+//$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean): String {
+//$$     this ?: return ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
 //$$         val chatStyle = component.style.chatStyle()
@@ -68,10 +91,10 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false): String 
 //$$         if (!noExtraResets) {
 //$$             sb.append("§r")
 //$$         } else {
-//$$             if (component == Text.empty()) sb.append("§r")
+//$$             if (component == Component.empty()) sb.append("§r")
 //$$         }
 //$$     }
-//$$     sb.toString().removeSuffix("§r").removePrefix("§r")
+//$$     return sb.toString().removeSuffix("§r").removePrefix("§r")
 //$$ }
 //$$
 //$$ private val textColorLUT = ChatFormatting.entries
