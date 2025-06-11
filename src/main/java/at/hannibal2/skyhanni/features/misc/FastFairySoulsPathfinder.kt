@@ -339,10 +339,10 @@ object FastFairySoulsPathfinder {
             category = CommandCategory.USERS_RESET
             callback { onFoundAllCommand() }
         }
-        event.register("shsoulsreload") {
+        event.register("shsoulsreloadpath") {
             description = "Reload the Fairy Souls pathfinder."
             category = CommandCategory.USERS_RESET
-            callback { onReloadCommand() }
+            callback { onReloadPathCommand() }
         }
     }
 
@@ -361,7 +361,7 @@ object FastFairySoulsPathfinder {
         ChatUtils.chat("Marked all Fairy Souls as found on ${island.displayName}.")
     }
 
-    private fun onReloadCommand() {
+    private fun onReloadPathCommand() {
         if (isDisabledCommand()) return
         data = null
         reload()
