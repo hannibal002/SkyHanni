@@ -70,7 +70,7 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false): String 
 //$$ run {
 //$$     this ?: return@run ""
 //$$     if (noExtraResets) {
-//$$         formattedTextCache.getOrPut(this) {
+//$$         formattedTextNoResetsCache.getOrPut(this) {
 //$$             computeFormattedTextCompat(true)
 //$$         }
 //$$     } else {
