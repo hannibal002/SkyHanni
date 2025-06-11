@@ -269,14 +269,15 @@ object FastFairySoulsPathfinder {
         foundSouls: MutableSet<LorenzVec>,
         allSouls: List<GraphNode>,
         route: MutableList<LorenzVec>,
-    ): Data = Data(
-        found = foundSouls.size,
-        total = allSouls.size,
-        route,
-        allSouls = allSouls.map { it.position }.toSet(),
-    ).also {
-        it.pathToNext()
-        this.data = it
+    ) {
+        this.data = Data(
+            found = foundSouls.size,
+            total = allSouls.size,
+            route,
+            allSouls = allSouls.map { it.position }.toSet(),
+        ).also {
+            it.pathToNext()
+        }
     }
 
     @HandleEvent
