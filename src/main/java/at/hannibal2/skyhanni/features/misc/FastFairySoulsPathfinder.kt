@@ -339,21 +339,33 @@ object FastFairySoulsPathfinder {
             category = CommandCategory.USERS_RESET
             callback { onFoundAllCommand() }
         }
+        event.register("shsoulsreload") {
+            description = "Reload the Fairy Souls pathfinder."
+            category = CommandCategory.USERS_RESET
+            callback { onReloadCommand() }
+        }
     }
 
     private fun onResetCommand() {
         if (isDisabledCommand()) return
         resetFoundOnCurrentIsland()
-        ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
         reload()
+        ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
     }
 
     private fun onFoundAllCommand() {
         if (isDisabledCommand()) return
         val island = SkyBlockUtils.currentIsland
-        ChatUtils.chat("Marked all Fairy Souls as found on ${island.displayName}.")
         data?.allFound("manually set all souls in $island as found via command")
         reload()
+        ChatUtils.chat("Marked all Fairy Souls as found on ${island.displayName}.")
+    }
+
+    private fun onReloadCommand() {
+        if (isDisabledCommand()) return
+        data = null
+        reload()
+        ChatUtils.chat("Reloaded Fairy Souls pathfinder.")
     }
 
     private fun isDisabledCommand(): Boolean {
