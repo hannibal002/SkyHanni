@@ -42,7 +42,6 @@ allprojects {
         maven("https://repo.nea.moe/releases") // libautoupdate
         maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
         maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
-        maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
         maven("https://api.modrinth.com/maven") // Modrinth
     }
 }
