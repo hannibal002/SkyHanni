@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -474,24 +472,24 @@ object EnoughUpdatesManager {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         if (!PlatformUtils.isNeuLoaded()) {
-            event.register("neureloadrepo") {
+            event.registerBrigadier("neureloadrepo") {
                 aliases = listOf("shreloadneurepo")
                 description = "Reloads the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
-                callback { reloadRepo() }
+                simpleCallback { reloadRepo() }
             }
-            event.register("neuresetrepo") {
+            event.registerBrigadier("neuresetrepo") {
                 aliases = listOf("shresetneurepo")
                 description = "Redownload the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
-                callback { downloadRepo() }
+                simpleCallback { downloadRepo() }
             }
         }
 
-        event.register("shneurepostatus") {
+        event.registerBrigadier("shneurepostatus") {
             description = "Get the status of the NEU repo"
             category = CommandCategory.DEVELOPER_TEST
-            callback {
+            simpleCallback {
                 val loadedItems = itemMap.size
                 val directorySize = itemCountInRepoFolder()
 

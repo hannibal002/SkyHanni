@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+//#if TODO
 import at.hannibal2.skyhanni.data.NotificationManager
 //#endif
 import at.hannibal2.skyhanni.data.PetApi
@@ -751,26 +752,27 @@ object ItemUtils {
     //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestitem") {
+        event.registerBrigadier("shtestitem") {
             description = "test item internal name resolving"
             category = CommandCategory.DEVELOPER_TEST
-            callback { testItemCommand(it) }
+            arg("item", BrigadierArguments.greedyString()) { item ->
+                callback {
+                    testItemCommand(getArg(item))
+                }
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+            }
         }
     }
     //#endif
 
-    private fun testItemCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
-            return
-        }
-
-        val input = args.joinToString(" ")
+    private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
         SkyHanniMod.coroutineScope.launch {
-            buildTestItemMessage(input).send(testItemMessageId)
+            buildTestItemMessage(args).send(testItemMessageId)
         }
     }
 

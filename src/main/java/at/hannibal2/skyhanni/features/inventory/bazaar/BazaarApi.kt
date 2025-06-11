@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 //#if TODO
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 //#endif
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils

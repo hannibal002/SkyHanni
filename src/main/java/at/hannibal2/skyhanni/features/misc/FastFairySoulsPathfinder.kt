@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FastFairySoulsPathfinder {
     val config get() = SkyHanniMod.feature.misc

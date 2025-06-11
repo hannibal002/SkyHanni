@@ -12,6 +12,9 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
+//#if MC > 1.21
+//$$ import net.minecraft.network.packet.s2c.play.InventoryS2CPacket
+//#endif
 
 @SkyHanniModule
 object OtherInventoryData {
@@ -46,10 +49,20 @@ object OtherInventoryData {
             close()
         }
 
+        //#if MC < 1.21
         if (packet is S2DPacketOpenWindow) {
-            val windowId = packet.windowId
+            //#else
+            //$$ if (packet is InventoryS2CPacket) {
+            //#endif
+            //#if MC < 1.21
             val title = packet.windowTitle.unformattedText
+            val windowId = packet.windowId
             val slotCount = packet.slotCount
+            //#else
+            //$$ val title = InventoryUtils.openInventoryName()
+            //$$ val slotCount = packet.contents.size
+            //$$ val windowId = packet.syncId
+            //#endif
             close(reopenSameName = title == currentInventory?.title)
 
             currentInventory = Inventory(windowId, title, slotCount)

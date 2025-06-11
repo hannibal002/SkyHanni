@@ -8,26 +8,12 @@ object ColorUtils {
 
     @JvmStatic
     @JvmOverloads
-    fun Color.toChromaColor(alpha: Int = this.alpha, chroma: Int = 0): ChromaColour =
-        ChromaColour.fromRGB(red, green, blue, alpha, chroma)
+    fun Color.toChromaColor(alpha: Int = this.alpha, chromaSpeedMillis: Int = 0): ChromaColour =
+        ChromaColour.fromRGB(red, green, blue, chromaSpeedMillis, alpha)
 
-    @JvmStatic
-    fun String.toChromaColor() = ChromaColour.forLegacyString(this)
+    fun ChromaColour.toColor(): Color = getEffectiveColour()
 
-    fun ChromaColour.toColor(): Color = Color(toInt(), true)
-
-    // TODO: Replace this code with the call to moulconfig's function once its fixed. revert #3821
-    fun ChromaColour.toInt(): Int {
-        val effectiveHue: Double
-        if (timeForFullRotationInMillis > 0) {
-            effectiveHue = System.currentTimeMillis() / timeForFullRotationInMillis.toDouble()
-        } else {
-            effectiveHue = hue.toDouble()
-        }
-
-        val rgb = Color.HSBtoRGB((effectiveHue % 1.0).toFloat(), this.saturation, this.brightness)
-        return (alpha and 0xFF) shl 24 or (rgb and 0xFFFFFF)
-    }
+    fun ChromaColour.toInt() = this.getEffectiveColour().rgb
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
 

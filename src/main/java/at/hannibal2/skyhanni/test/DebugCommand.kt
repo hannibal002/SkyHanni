@@ -1,29 +1,40 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+//#if TODO
 import at.hannibal2.skyhanni.data.ProfileStorageData
+//#endif
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.CurrentPing
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
+//#endif
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
+@SkyHanniModule
 object DebugCommand {
 
     fun command(args: Array<String>) {
@@ -34,7 +45,7 @@ object DebugCommand {
         }
         val list = mutableListOf<String>()
         list.add("```")
-        list.add("= Debug Information for SkyHanni ${SkyHanniMod.VERSION} =")
+        list.add("= Debug Information for SkyHanni ${SkyHanniMod.VERSION} ${PlatformUtils.MC_VERSION} =")
         list.add("")
 
         val search = args.joinToString(" ")
@@ -73,17 +84,19 @@ object DebugCommand {
 
     private fun profileType(event: DebugDataCollectEvent) {
         event.title("Profile Type")
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             event.addIrrelevant("Not on SkyBlock")
             return
         }
 
+        //#if TODO
         if (ProfileStorageData.playerSpecific == null) {
             event.addData("playerSpecific is null!")
             return
         }
+        //#endif
 
-        val classic = !LorenzUtils.noTradeMode
+        val classic = !SkyBlockUtils.noTradeMode
         if (classic) {
             event.addIrrelevant("on classic")
         } else {
@@ -101,7 +114,7 @@ object DebugCommand {
 
     private fun profileName(event: DebugDataCollectEvent) {
         event.title("Profile Name")
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             event.addIrrelevant("Not on SkyBlock")
             return
         }
@@ -115,24 +128,24 @@ object DebugCommand {
 
     private fun skyblockStatus(event: DebugDataCollectEvent) {
         event.title("SkyBlock Status")
-        if (!LorenzUtils.onHypixel) {
+        if (!SkyBlockUtils.onHypixel) {
             event.addData("not on Hypixel")
             return
         }
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             event.addData("not on SkyBlock, but on Hypixel")
             return
         }
-        if (LorenzUtils.skyBlockIsland == IslandType.UNKNOWN) {
+        if (SkyBlockUtils.currentIsland == IslandType.UNKNOWN) {
             event.addData("Unknown SkyBlock island!")
             return
         }
-        if (LorenzUtils.skyBlockIsland == IslandType.NONE) {
+        if (SkyBlockUtils.currentIsland == IslandType.NONE) {
             event.addData("No SkyBlock island found!")
             return
         }
 
-        if (LorenzUtils.skyBlockIsland != HypixelData.skyBlockIsland) {
+        if (SkyBlockUtils.currentIsland != HypixelData.skyBlockIsland) {
             event.addData {
                 add("using a test island!")
                 add("test island: ${SkyBlockIslandTest.testIsland}")
@@ -143,18 +156,21 @@ object DebugCommand {
 
         event.addIrrelevant {
             add("on Hypixel SkyBlock")
-            add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
+            add("skyBlockIsland: ${SkyBlockUtils.currentIsland}")
             add("skyBlockArea:")
-            add("  scoreboard: '${LorenzUtils.skyBlockArea}'")
-            add("  graph network: '${IslandAreas.currentAreaName}'")
+            //#if TODO
+            add("  scoreboard: '${SkyBlockUtils.graphArea}'")
+            add("  graph network: '${SkyBlockUtils.graphArea}'")
+            //#endif
             with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
-            add("isOnAlphaServer: '${LorenzUtils.isOnAlphaServer}'")
+            add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
         }
     }
 
     private fun globalRender(event: DebugDataCollectEvent) {
+        //#if TODO
         event.title("Global Render")
         if (SkyHanniDebugsAndTests.globalRender) {
             event.addIrrelevant("normal enabled")
@@ -164,6 +180,7 @@ object DebugCommand {
                 add("No renderable elements from SkyHanni will show up anywhere!")
             }
         }
+        //#endif
     }
 
     private fun repoData(event: DebugDataCollectEvent) {
@@ -201,8 +218,8 @@ object DebugCommand {
     private fun player(event: DebugDataCollectEvent) {
         event.title("Player")
         event.addIrrelevant {
-            add("name: '${LorenzUtils.getPlayerName()}'")
-            add("uuid: '${LorenzUtils.getPlayerUuid()}'")
+            add("name: '${PlayerUtils.getName()}'")
+            add("uuid: '${PlayerUtils.getUuid()}'")
         }
     }
 
@@ -210,6 +227,7 @@ object DebugCommand {
     private val pingLimit = 1.5.seconds
 
     private fun networkInfo(event: DebugDataCollectEvent) {
+        //#if TODO
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
         val pingEnabled = SkyHanniMod.feature.dev.hypixelPingApi
@@ -218,7 +236,7 @@ object DebugCommand {
             add("tps: $tps")
             add("ping: ${CurrentPing.averagePing.inWholeMilliseconds.formatTime()}")
 
-            val lastWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince()
+            val lastWorldSwitch = SkyBlockUtils.lastWorldSwitch.passedSince()
             var showPreviousPings = CurrentPing.averagePing > pingLimit
             if (!pingEnabled) {
                 add("Hypixel Ping Packet disabled in settings!")
@@ -246,6 +264,17 @@ object DebugCommand {
             event.addData(list)
         } else {
             event.addIrrelevant(list)
+        }
+        //#endif
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        // todo convert to actual brigadier
+        event.registerBrigadier("shdebug") {
+            description = "Copies SkyHanni debug data in the clipboard."
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { command(it) }
         }
     }
 
