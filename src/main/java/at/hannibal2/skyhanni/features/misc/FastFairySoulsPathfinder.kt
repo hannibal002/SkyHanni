@@ -192,6 +192,7 @@ object FastFairySoulsPathfinder {
     private var calculatingStart = SimpleTimeMark.farPast()
 
     private fun reload() {
+        val currentIsland = SkyBlockUtils.currentIsland
         val graph = IslandGraphs.currentIslandGraph ?: run {
             islandData = createEmptyData().also {
                 it.debugState = "island graph is empty"
@@ -228,7 +229,7 @@ object FastFairySoulsPathfinder {
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
                 .send(calculatingMessageId)
             calculating = false
-            setData(foundSouls, allSouls, route)
+            setData(foundSouls, allSouls, route, currentIsland)
         }
     }
 
@@ -236,30 +237,19 @@ object FastFairySoulsPathfinder {
         foundSouls: MutableSet<LorenzVec>,
         allSouls: List<GraphNode>,
         route: MutableList<LorenzVec>,
-    ): IslandData = IslandData(
-        found = foundSouls.size,
-        total = allSouls.size,
-        route,
-        allSouls = allSouls.map { it.position }.toSet(),
-    ).also {
-        it.pathToNext()
-        this.islandData = it
-    }
-
-    @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent) {
-        if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
-            islandData?.foundNearby()
-        }
-    }
-
-    @HandleEvent
-    fun onIslandGraphReload(event: IslandGraphReloadEvent) {
-        if (isEnabled()) {
-            reload()
-        } else {
+        island: IslandType,
+    ) {
+        if (island != SkyBlockUtils.currentIsland) {
             islandData = null
+            return
         }
+
+        islandData = IslandData(
+            found = foundSouls.size,
+            total = allSouls.size,
+            route,
+            allSouls = allSouls.map { it.position }.toSet(),
+        ).also { it.pathToNext() }
     }
 
     @HandleEvent
