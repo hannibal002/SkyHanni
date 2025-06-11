@@ -14,7 +14,8 @@ import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object FairySoulsApi {
-    private val storage: MutableSet<IslandFairySoulsData> get() = ProfileStorageData.profileSpecific?.fairySouls ?: mutableSetOf()
+    private val storage: MutableSet<IslandFairySoulsData>
+        get() = ProfileStorageData.profileSpecific?.fairySouls ?: mutableSetOf()
 
     class IslandFairySoulsData(
         @Expose
@@ -24,6 +25,7 @@ object FairySoulsApi {
     ) {
         @Expose
         var amountFound: Int = 0
+
         @Expose
         val foundSouls: MutableSet<LorenzVec> = mutableSetOf()
 
