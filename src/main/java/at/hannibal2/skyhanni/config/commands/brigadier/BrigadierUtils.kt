@@ -98,7 +98,6 @@ object BrigadierUtils {
             ?: NeuInternalName.fromItemNameOrInternalName(withSpaces).handleItem()
     }
 
-    // TODO: add support for 1.21
     fun SuggestionsBuilder.addOptionalEscaped(
         collection: Collection<String>,
     ): SuggestionsBuilder {
@@ -127,7 +126,6 @@ object BrigadierUtils {
         return this
     }
 
-    // TODO: add support for 1.21
     fun SuggestionsBuilder.addEscaped(
         collection: Collection<String>,
     ): SuggestionsBuilder {
