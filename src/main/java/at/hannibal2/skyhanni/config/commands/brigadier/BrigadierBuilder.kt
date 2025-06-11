@@ -178,7 +178,8 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         val builder = BrigadierBuilder(
             RequiredArgumentBuilder.argument<Any?, T>(name, argument).apply {
                 if (suggestions != null) suggests(suggestions)
-            }, isGreedy
+            },
+            isGreedy,
         )
         builder.action()
         this.builder.then(builder.builder)
