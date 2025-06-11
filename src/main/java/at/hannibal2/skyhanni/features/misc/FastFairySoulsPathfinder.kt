@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.FairySoulsApi
 import at.hannibal2.skyhanni.data.FairySoulsApi.currentIslandData
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
@@ -301,21 +300,33 @@ object FastFairySoulsPathfinder {
             category = CommandCategory.USERS_RESET
             callback { onFoundAllCommand() }
         }
+        event.register("shsoulsreloadpath") {
+            description = "Reload the Fairy Souls pathfinder."
+            category = CommandCategory.USERS_RESET
+            callback { onReloadPathCommand() }
+        }
     }
 
     private fun onResetCommand() {
         if (isDisabledCommand()) return
         currentIslandData.reset()
-        ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
         reload()
+        ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
     }
 
     private fun onFoundAllCommand() {
         if (isDisabledCommand()) return
         val island = SkyBlockUtils.currentIsland
-        ChatUtils.chat("Marked all Fairy Souls as found on ${island.displayName}.")
         islandData?.allFound("manually set all souls in $island as found via command")
         reload()
+        ChatUtils.chat("Marked all Fairy Souls as found on ${island.displayName}.")
+    }
+
+    private fun onReloadPathCommand() {
+        if (isDisabledCommand()) return
+        islandData = null
+        reload()
+        ChatUtils.chat("Reloaded Fairy Souls pathfinder.")
     }
 
     private fun isDisabledCommand(): Boolean {
@@ -324,7 +335,6 @@ object FastFairySoulsPathfinder {
             "§cFairy Souls are disabled. Click to enable!",
             onClick = {
                 config.fastFairySouls = true
-                reload()
             },
         )
         return true
