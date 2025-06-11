@@ -125,7 +125,8 @@ class DevConfig {
     @ConfigEditorBoolean
     var numberFormatOverride: Boolean = false
 
-    @OnlyLegacy // TODO: remove when mod api is implemented in 1.21
+    // TODO: remove when mod api is implemented in 1.21
+    @OnlyLegacy
     @Expose
     @ConfigOption(
         name = "Use Hypixel Mod API",
