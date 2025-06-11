@@ -17,7 +17,7 @@ public class MixinWorldRenderer {
     @WrapOperation(method = {"renderEntities", "getEntitiesToRender"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
     public boolean shouldAlsoGlow(MinecraftClient instance, Entity entity, Operation<Boolean> original) {
         if (entity instanceof LivingEntity livingEntity) {
-            int i = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity);
+            int i = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity,0);
             if (i == 0) return original.call(instance, entity);
             return EntityUtils.INSTANCE.canBeSeen(entity, 150, .5);
         }
@@ -27,7 +27,7 @@ public class MixinWorldRenderer {
     @WrapOperation(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getTeamColorValue()I"))
     public int changeGlowColour(Entity entity, Operation<Integer> original) {
         if (entity instanceof LivingEntity livingEntity) {
-            int i = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity);
+            int i = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity, 0);
             if (i == 0) return original.call(entity);
             return i;
         }
