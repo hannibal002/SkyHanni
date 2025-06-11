@@ -257,9 +257,7 @@ object FastFairySoulsPathfinder {
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
                 .send(calculatingMessageId)
             calculating = false
-            if (currentIsland != SkyBlockUtils.currentIsland) {
-                data = null
-            } else {
+            if (currentIsland == SkyBlockUtils.currentIsland) {
                 setData(foundSouls, allSouls, route)
             }
         }
