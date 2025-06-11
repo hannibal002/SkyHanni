@@ -93,7 +93,7 @@ object PartyChatCommands {
                 if (TpsCounter.tps != null) {
                     HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}", prefix = true)
                 } else {
-                    ChatUtils.chat("TPS Command Sent too early to calculate TPS", true)
+                    ChatUtils.chat("TPS Command Sent too early to calculate TPS")
                 }
             },
         ),
