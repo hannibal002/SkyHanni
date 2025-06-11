@@ -287,8 +287,8 @@ object FastFairySoulsPathfinder {
         }
     }
 
-    @HandleEvent
-    fun onIslandGraphReload(event: IslandGraphReloadEvent) {
+    @HandleEvent(IslandGraphReloadEvent::class)
+    fun onIslandGraphReload() {
         if (isEnabled()) {
             reload()
         } else {
