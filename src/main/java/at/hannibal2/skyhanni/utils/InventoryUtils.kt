@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.convertEmptyToNull
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.filterNotNullOrEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
@@ -57,7 +58,7 @@ object InventoryUtils {
     fun getSlotsInOwnInventory(): List<Slot> {
         val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return emptyList()
         return guiInventory.slots()
-            .filter { it.inventory is InventoryPlayer && it.stack != null }
+            .filter { it.inventory is InventoryPlayer && it.stack.isNotEmpty() }
     }
 
     fun openInventoryName(): String = InventoryCompat.getOpenChestName()
