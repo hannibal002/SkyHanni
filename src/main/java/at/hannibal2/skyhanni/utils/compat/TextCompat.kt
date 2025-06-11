@@ -27,9 +27,9 @@ import net.minecraft.util.ChatComponentText
 //#endif
 
 //#if MC > 1.16
-private val unformattedTextCache = java.util.WeakHashMap<IChatComponent, String>()
-private val formattedTextCache = java.util.WeakHashMap<IChatComponent, String>()
-private val formattedTextNoResetsCache = java.util.WeakHashMap<IChatComponent, String>()
+//$$ private val unformattedTextCache = java.util.WeakHashMap<IChatComponent, String>()
+//$$ private val formattedTextCache = java.util.WeakHashMap<IChatComponent, String>()
+//$$ private val formattedTextNoResetsCache = java.util.WeakHashMap<IChatComponent, String>()
 //#endif
 
 fun IChatComponent.unformattedTextForChatCompat(): String {
