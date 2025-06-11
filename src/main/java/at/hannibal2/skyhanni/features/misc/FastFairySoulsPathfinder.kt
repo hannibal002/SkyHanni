@@ -256,7 +256,7 @@ object FastFairySoulsPathfinder {
                 .send(calculatingMessageId)
             calculating = false
             // TODO: fix the root issue of all changes being ignored while calculating (e.g. island change without this check or commands)
-            if (currentIsland == SkyBlockUtils.currentIsland) {  // Only set data if the island has not changed during calculation
+            if (currentIsland == SkyBlockUtils.currentIsland) { // Only set data if the island has not changed during calculation
                 setData(foundSouls, allSouls, route)
             }
         }
