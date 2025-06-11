@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
+import at.hannibal2.skyhanni.data.FairySoulsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
@@ -852,15 +853,7 @@ class ProfileSpecificStorage {
     var godPotExpiry: SimpleTimeMark = farPast()
 
     @Expose
-    var fairySouls: FairySoulsStorage = FairySoulsStorage()
-
-    class FairySoulsStorage {
-        @Expose
-        var totalFound: MutableMap<IslandType, Int> = mutableMapOf()
-
-        @Expose
-        var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
-    }
+    var fairySouls: MutableSet<FairySoulsApi.IslandFairySoulsData> = mutableSetOf()
 
     @Expose
     var cakeCounterData: CakeCounterData = CakeCounterData()

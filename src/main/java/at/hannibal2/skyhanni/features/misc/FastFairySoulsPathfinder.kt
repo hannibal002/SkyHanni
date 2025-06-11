@@ -5,16 +5,15 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.FairySoulsApi
-import at.hannibal2.skyhanni.data.FairySoulsApi.amountFoundOnCurrentIsland
-import at.hannibal2.skyhanni.data.FairySoulsApi.foundSoulsOnCurrentIsland
-import at.hannibal2.skyhanni.data.FairySoulsApi.resetFoundOnCurrentIsland
-import at.hannibal2.skyhanni.data.FairySoulsApi.setAmountFoundOnCurrentIsland
+import at.hannibal2.skyhanni.data.FairySoulsApi.currentIslandData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -93,7 +93,7 @@ object FastFairySoulsPathfinder {
             if (route.remove(nearest)) {
                 found++
             }
-            foundSoulsOnCurrentIsland().add(nearest)
+            currentIslandData.add(nearest)
         }
 
         fun pathToNext() {
@@ -133,14 +133,13 @@ object FastFairySoulsPathfinder {
 
         fun allFound(state: String) {
             disabled = true
-            foundSoulsOnCurrentIsland().addAll(route)
-            found = foundSoulsOnCurrentIsland().size
-            setAmountFoundOnCurrentIsland(found)
+            currentIslandData.addAll(route)
+            found = currentIslandData.amountFound
             debugState = state
         }
 
         fun checkHaveAll(): Boolean {
-            val haveAll = total > 0 && amountFoundOnCurrentIsland() == total
+            val haveAll = total > 0 && currentIslandData.amountFound == total
             if (haveAll) {
                 allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to hypixel data")
             }
@@ -153,6 +152,22 @@ object FastFairySoulsPathfinder {
     @HandleEvent(WorldChangeEvent::class)
     fun onWorldChange() {
         islandData = null
+    }
+
+    @HandleEvent
+    fun onSystemMessage(event: SystemMessageEvent) {
+        if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
+            islandData?.foundNearby()
+        }
+    }
+
+    @HandleEvent(IslandGraphReloadEvent::class)
+    fun onIslandGraphReload() {
+        if (isEnabled()) {
+            reload()
+        } else {
+            islandData = null
+        }
     }
 
     @HandleEvent
@@ -197,7 +212,7 @@ object FastFairySoulsPathfinder {
             }
             return
         }
-        val foundSouls = foundSoulsOnCurrentIsland()
+        val foundSouls = currentIslandData.foundSouls
         val allSouls = getTargetNodes(graph.nodes)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
 
@@ -266,7 +281,7 @@ object FastFairySoulsPathfinder {
                     add("")
                 }
                 add("found with known location: $found")
-                add("actual amount of found souls: ${amountFoundOnCurrentIsland()}")
+                add("actual amount of found souls: ${currentIslandData.amountFound}")
                 add("total: $total")
                 add("route: ${route.size}")
                 add("foundButNotClickedSoul: $foundButNotClickedSoul")
@@ -292,7 +307,7 @@ object FastFairySoulsPathfinder {
 
     private fun onResetCommand() {
         if (isDisabledCommand()) return
-        resetFoundOnCurrentIsland()
+        currentIslandData.reset()
         ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
         reload()
     }
