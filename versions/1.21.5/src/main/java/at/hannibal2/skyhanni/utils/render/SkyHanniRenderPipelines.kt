@@ -15,7 +15,7 @@ object SkyHanniRenderPipelines {
     val LINES: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
             .withLocation(Identifier.of(SkyHanniMod.MODID, "line"))
-            .withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, VertexFormat.DrawMode.LINE_STRIP)
+            .withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, VertexFormat.DrawMode.LINES)
             .withCull(false)
             .withDepthWrite(true)
             .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
@@ -25,7 +25,7 @@ object SkyHanniRenderPipelines {
     val LINES_XRAY: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
             .withLocation(Identifier.of(SkyHanniMod.MODID, "line_xray"))
-            .withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, VertexFormat.DrawMode.LINE_STRIP)
+            .withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, VertexFormat.DrawMode.LINES)
             .withCull(false)
             .withDepthWrite(false)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
