@@ -167,7 +167,9 @@ object HypixelLocationApi {
         island = IslandType.NONE
         inSkyblock = false
         serverId = null
+        //#if TODO
         serverType = null
+        //#endif
         mode = null
         map = null
         isGuest = false
@@ -184,15 +186,13 @@ object HypixelLocationApi {
             if (isModApiDetection) IslandChangeEvent(island, oldIsland).post()
         }
 
-        val oldInHypixel = inHypixel
-        inHypixel = false
-        if (oldInHypixel != inHypixel) {
+        if (inHypixel) {
+            inHypixel = false
             if (isModApiDetection) HypixelLeaveEvent.post()
         }
 
-        val oldSkyblock = inSkyblock
-        inSkyblock = false
-        if (oldSkyblock != inSkyblock) {
+        if (inSkyblock) {
+            inSkyblock = false
             if (isModApiDetection) SkyBlockLeaveEvent.post()
         }
 
