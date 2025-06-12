@@ -259,7 +259,6 @@ object WorldRenderUtils {
             c.blue / 255f * 0.9f,
             c.alpha / 255f * alphaMultiplier,
         )
-        vertexConsumers.draw(layer)
         matrices.pop()
     }
 
@@ -385,7 +384,6 @@ object WorldRenderUtils {
                 .color(color.red, color.green, color.blue, color.alpha)
         }
 
-        vertexConsumers.draw(layer)
         matrices.pop()
     }
 
@@ -445,7 +443,6 @@ object WorldRenderUtils {
         buf.vertex((x + radius).toFloat(), (y + height).toFloat(), (z + 0).toFloat())
             .color(color.red, color.green, color.blue, color.alpha)
 
-        vertexConsumers.draw(layer)
         matrices.pop()
 
         drawCircleFilled(locX, locY, locZ, radius.toDouble(), color, depth = true, segments = segments)
@@ -500,7 +497,6 @@ object WorldRenderUtils {
         buf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
             .color(color.red, color.green, color.blue, color.alpha)
 
-        vertexConsumers.draw(layer)
 
         val quadLayer = SkyHanniRenderLayers.getQuads(!depth)
         val quadBuf = vertexConsumers.getBuffer(layer)
@@ -584,7 +580,6 @@ object WorldRenderUtils {
             }
         }
 
-        vertexConsumers.draw(layer)
         matrices.pop()
     }
 
