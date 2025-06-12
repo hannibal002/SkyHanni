@@ -19,10 +19,8 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.Camera
 import net.minecraft.client.render.LightmapTextureManager
-import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.VertexRendering
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer
-import net.minecraft.client.util.BufferAllocator
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Box
 import org.joml.Matrix4f
@@ -272,43 +270,41 @@ object WorldRenderUtils {
         drawString(location, text, seeThroughBlocks, color)
     }
 
-    private val bufferAllocator: BufferAllocator = BufferAllocator(1536)
-
     fun SkyHanniRenderWorldEvent.drawString(
-        loc: LorenzVec,
+        location: LorenzVec,
         text: String,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
+        scale: Double = 0.53333333,
+        shadow: Boolean = false,
+        yOffset: Float = 0f,
+        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
         val matrix = Matrix4f()
         val cameraPos = camera.pos
         val fr = MinecraftClient.getInstance().textRenderer
-
-        val scale = 0.02666667f
+        val adjustedScale = (scale * 0.05).toFloat()
 
         matrix.translate(
-            (loc.x - cameraPos.getX()).toFloat(),
-            (loc.y - cameraPos.getY()).toFloat(),
-            (loc.z - cameraPos.getZ()).toFloat(),
-        ).rotate(camera.rotation).scale(scale, -scale, scale)
+            (location.x - cameraPos.getX()).toFloat(),
+            (location.y - cameraPos.getY() + yOffset * adjustedScale).toFloat(),
+            (location.z - cameraPos.getZ()).toFloat(),
+        ).rotate(camera.rotation).scale(adjustedScale, -adjustedScale, adjustedScale)
 
         val x = -fr.getWidth(text) / 2f
-
-        val consumers = VertexConsumerProvider.immediate(bufferAllocator)
 
         fr.draw(
             text,
             x,
             0f,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            false,
+            shadow,
             matrix,
-            consumers,
+            vertexConsumers,
             if (seeThroughBlocks) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
-            LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+            backGroundColor,
             LightmapTextureManager.MAX_LIGHT_COORDINATE,
         )
-        consumers.draw()
     }
 
     private fun SkyHanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
@@ -688,46 +684,7 @@ object WorldRenderUtils {
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        renderText(renderLocation, "§f$text", scale, seeThroughBlocks, true, yOff)
-    }
-
-    private fun SkyHanniRenderWorldEvent.renderText(
-        location: LorenzVec,
-        text: String,
-        scale: Double,
-        seeThroughBlocks: Boolean,
-        shadow: Boolean,
-        yOff: Float,
-    ) {
-        val realScale = (scale * 0.05).toFloat()
-
-        val matrix = Matrix4f()
-        val cameraPos = camera.pos
-        val fr = MinecraftClient.getInstance().textRenderer
-
-        matrix.translate(
-            (location.x - cameraPos.getX()).toFloat(),
-            (location.y - cameraPos.getY() + yOff * realScale).toFloat(),
-            (location.z - cameraPos.getZ()).toFloat(),
-        ).rotate(camera.rotation).scale(realScale, -realScale, realScale)
-
-        val x = -fr.getWidth(text) / 2f
-
-        val consumers = VertexConsumerProvider.immediate(bufferAllocator)
-
-        fr.draw(
-            text,
-            x,
-            0f,
-            LorenzColor.WHITE.toColor().rgb,
-            shadow,
-            matrix,
-            consumers,
-            if (seeThroughBlocks) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
-            0,
-            LightmapTextureManager.MAX_LIGHT_COORDINATE,
-        )
-        consumers.draw()
+        drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {

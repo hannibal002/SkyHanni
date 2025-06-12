@@ -1106,6 +1106,7 @@ at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiNewChat.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinInventoryBasic.java
 at.hannibal2.skyhanni.mixins.transformers.render.MixinRendererLivingEntity.java
+at.hannibal2.skyhanni.mixins.transformers.render.MixinVertexConsumerProvider.java
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.HighlightMissingRepoItems.kt
 at.hannibal2.skyhanni.test.ParkourWaypointSaver.kt
