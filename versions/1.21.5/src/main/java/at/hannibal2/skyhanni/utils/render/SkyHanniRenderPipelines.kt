@@ -51,6 +51,27 @@ object SkyHanniRenderPipelines {
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .build(),
     )
+
+    val TRIANGLES: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, "triangles"))
+            .withCull(false)
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLES)
+            .withDepthWrite(true)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+            .build(),
+    )
+
+    val TRIANGLES_XRAY: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, "triangles_xray"))
+            .withCull(false)
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLES)
+            .withDepthWrite(false)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .build(),
+    )
+
     val TRIANGLE_FAN: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
             .withLocation(Identifier.of(SkyHanniMod.MODID, "filled"))
@@ -97,7 +118,7 @@ object SkyHanniRenderPipelines {
             .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
             .withBlend(BlendFunction.TRANSLUCENT)
             .withVertexShader(Identifier.of(SkyHanniMod.MODID, "rounded_rect"))
-            .withFragmentShader(Identifier.of(SkyHanniMod.MODID,"rounded_rect"))
+            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "rounded_rect"))
             .withUniform("scaleFactor", UniformType.FLOAT)
             .withUniform("radius", UniformType.FLOAT)
             .withUniform("smoothness", UniformType.FLOAT)
@@ -106,7 +127,7 @@ object SkyHanniRenderPipelines {
             .withUniform("modelViewMatrix", UniformType.MATRIX4X4)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .withDepthWrite(false)
-            .build()
+            .build(),
     )
 
     val ROUNDED_TEXTURED_RECT: RenderPipeline = RenderPipelines.register(
@@ -125,7 +146,7 @@ object SkyHanniRenderPipelines {
             .withUniform("modelViewMatrix", UniformType.MATRIX4X4)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .withDepthWrite(false)
-            .build()
+            .build(),
     )
 
     val ROUNDED_RECT_OUTLINE: RenderPipeline = RenderPipelines.register(
@@ -144,6 +165,6 @@ object SkyHanniRenderPipelines {
             .withUniform("borderBlur", UniformType.FLOAT)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .withDepthWrite(false)
-            .build()
+            .build(),
     )
 }

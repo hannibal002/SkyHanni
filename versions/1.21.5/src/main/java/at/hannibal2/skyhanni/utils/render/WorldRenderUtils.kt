@@ -467,49 +467,36 @@ object WorldRenderUtils {
         color: Color,
         depth: Boolean = true,
     ) {
-        val layer = SkyHanniRenderLayers.getTriangleFan(!depth)
+        val layer = SkyHanniRenderLayers.getTriangles(!depth)
         val buf = vertexConsumers.getBuffer(layer)
         matrices.push()
 
         val viewerPos = getViewerPos()
-        val newTopPoint = topPoint - viewerPos
-        val newBaseCenterPoint = baseCenterPoint - viewerPos
-        val newBaseEdgePoint = baseEdgePoint - viewerPos
+        val newTop = topPoint - viewerPos
+        val baseCenter = baseCenterPoint - viewerPos
+        val baseEdge = baseEdgePoint - viewerPos
 
-        val cornerCenterVec = newBaseEdgePoint - newBaseCenterPoint
-        val baseTopVecNormalized = (newTopPoint - newBaseCenterPoint).normalize()
+        val edgeVec = baseEdge - baseCenter
+        val topVecNorm = (newTop - baseCenter).normalize()
+        val corner1 = baseEdge
+        val corner2 = topVecNorm.crossProduct(edgeVec).normalize() * edgeVec.length() + baseCenter
+        val corner3 = baseCenter - edgeVec
+        val corner4 = edgeVec.crossProduct(topVecNorm).normalize() * edgeVec.length() + baseCenter
 
-        val corner1 = newBaseEdgePoint
-        val corner2 = baseTopVecNormalized.crossProduct(cornerCenterVec) + newBaseCenterPoint
-        val corner3 = newBaseCenterPoint - cornerCenterVec
-        val corner4 = cornerCenterVec.crossProduct(baseTopVecNormalized) + newBaseCenterPoint
+        fun tri(a: LorenzVec, b: LorenzVec, c: LorenzVec) {
+            buf.vertex(a.x.toFloat(), a.y.toFloat(), a.z.toFloat()).color(color.red, color.green, color.blue, color.alpha)
+            buf.vertex(b.x.toFloat(), b.y.toFloat(), b.z.toFloat()).color(color.red, color.green, color.blue, color.alpha)
+            buf.vertex(c.x.toFloat(), c.y.toFloat(), c.z.toFloat()).color(color.red, color.green, color.blue, color.alpha)
+        }
 
-        buf.vertex(newTopPoint.x.toFloat(), newTopPoint.y.toFloat(), newTopPoint.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner2.x.toFloat(), corner2.y.toFloat(), corner2.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner3.x.toFloat(), corner3.y.toFloat(), corner3.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner4.x.toFloat(), corner4.y.toFloat(), corner4.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
+        tri(newTop, corner1, corner2)
+        tri(newTop, corner2, corner3)
+        tri(newTop, corner3, corner4)
+        tri(newTop, corner4, corner1)
 
+        tri(corner1, corner2, corner3)
+        tri(corner1, corner3, corner4)
 
-        val quadLayer = SkyHanniRenderLayers.getQuads(!depth)
-        val quadBuf = vertexConsumers.getBuffer(layer)
-        quadBuf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        quadBuf.vertex(corner4.x.toFloat(), corner4.y.toFloat(), corner4.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        quadBuf.vertex(corner3.x.toFloat(), corner3.y.toFloat(), corner3.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        quadBuf.vertex(corner2.x.toFloat(), corner2.y.toFloat(), corner2.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-
-        vertexConsumers.draw(quadLayer)
         matrices.pop()
     }
 
