@@ -242,7 +242,8 @@ object PartyApi {
         if (message == "§eYou left the party." ||
             message == "§cThe party was disbanded because all invites expired and the party was empty." ||
             message == "§cYou are not currently in a party." ||
-            message == "§cYou are not in a party."
+            message == "§cYou are not in a party." ||
+            message == "§cThe party was disbanded because the party leader disconnected."
         ) {
             partyLeft()
         }
