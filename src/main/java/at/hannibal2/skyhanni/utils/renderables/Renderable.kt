@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 //#endif
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -1580,9 +1580,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.color(1f, 1f, 1f, 1f)
-                //#if TODO
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
-                //#endif
                 val mouse = currentRenderPassMousePosition ?: return
                 val mouseXRelativeToPlayer = if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
                 val mouseYRelativeToPlayer = if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
@@ -1597,6 +1595,7 @@ interface Renderable {
                     player,
                 )
                 //#else
+                //$$ DrawContextUtils.translate(-35f, -125f, 0f)
                 //$$ drawEntity(
                 //$$     DrawContextUtils.drawContext,
                 //$$     playerX,
@@ -1605,10 +1604,11 @@ interface Renderable {
                 //$$     playerY + height,
                 //$$     entityScale,
                 //$$     0.0625f,
-                //$$     mouseXRelativeToPlayer,
-                //$$     mouseYRelativeToPlayer,
+                //$$     -mouseXRelativeToPlayer,
+                //$$     -mouseYRelativeToPlayer,
                 //$$     player
                 //$$ )
+                //$$ DrawContextUtils.translate(35f, 125f, 0f)
                 //#endif
                 DrawContextUtils.translate(0f, 0f, -100f)
             }

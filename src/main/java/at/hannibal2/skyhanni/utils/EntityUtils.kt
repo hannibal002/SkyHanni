@@ -195,10 +195,19 @@ object EntityUtils {
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
-    //#if TODO
+    //#if MC < 1.21
     fun getAllTileEntities(): Sequence<TileEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
+    //#else
+    //$$ fun getAllTileEntities(): Sequence<BlockEntity> {
+    //$$     if (!MinecraftCompat.localWorldExists) return emptySequence()
+    //$$     val blockEntityTickers = MinecraftCompat.localWorld.blockEntityTickers.let {
+    //$$         if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
+    //$$     }.asSequence().filterNotNull()
+    //$$
+    //$$     return blockEntityTickers.map { MinecraftCompat.localWorld.getBlockEntity(it.pos) }.filterNotNull()
+    //$$ }
     //#endif
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {

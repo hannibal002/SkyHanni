@@ -65,7 +65,7 @@ class CakeTrackerConfig {
         desc = "The color that should be used to highlight unobtained cakes in the Auction House."
     )
     @ConfigEditorColour
-    val missingColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
+    var missingColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
 
     @Expose
     @ConfigOption(
@@ -73,7 +73,7 @@ class CakeTrackerConfig {
         desc = "The color that should be used to highlight obtained cakes in the Auction House."
     )
     @ConfigEditorColour
-    val ownedColor: ChromaColour = LorenzColor.GREEN.toChromaColor(255)
+    var ownedColor: ChromaColour = LorenzColor.GREEN.toChromaColor(255)
 
     @Expose
     @ConfigOption(name = "Max Height", desc = "Maximum height of the tracker.")

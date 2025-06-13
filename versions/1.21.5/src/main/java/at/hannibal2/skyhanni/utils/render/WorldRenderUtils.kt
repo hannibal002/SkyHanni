@@ -19,10 +19,8 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.Camera
 import net.minecraft.client.render.LightmapTextureManager
-import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.VertexRendering
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer
-import net.minecraft.client.util.BufferAllocator
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Box
 import org.joml.Matrix4f
@@ -259,7 +257,6 @@ object WorldRenderUtils {
             c.blue / 255f * 0.9f,
             c.alpha / 255f * alphaMultiplier,
         )
-        vertexConsumers.draw(layer)
         matrices.pop()
     }
 
@@ -273,43 +270,41 @@ object WorldRenderUtils {
         drawString(location, text, seeThroughBlocks, color)
     }
 
-    private val bufferAllocator: BufferAllocator = BufferAllocator(1536)
-
     fun SkyHanniRenderWorldEvent.drawString(
-        loc: LorenzVec,
+        location: LorenzVec,
         text: String,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
+        scale: Double = 0.53333333,
+        shadow: Boolean = false,
+        yOffset: Float = 0f,
+        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
         val matrix = Matrix4f()
         val cameraPos = camera.pos
         val fr = MinecraftClient.getInstance().textRenderer
-
-        val scale = 0.02666667f
+        val adjustedScale = (scale * 0.05).toFloat()
 
         matrix.translate(
-            (loc.x - cameraPos.getX()).toFloat(),
-            (loc.y - cameraPos.getY()).toFloat(),
-            (loc.z - cameraPos.getZ()).toFloat(),
-        ).rotate(camera.rotation).scale(scale, -scale, scale)
+            (location.x - cameraPos.getX()).toFloat(),
+            (location.y - cameraPos.getY() + yOffset * adjustedScale).toFloat(),
+            (location.z - cameraPos.getZ()).toFloat(),
+        ).rotate(camera.rotation).scale(adjustedScale, -adjustedScale, adjustedScale)
 
         val x = -fr.getWidth(text) / 2f
-
-        val consumers = VertexConsumerProvider.immediate(bufferAllocator)
 
         fr.draw(
             text,
             x,
             0f,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            false,
+            shadow,
             matrix,
-            consumers,
+            vertexConsumers,
             if (seeThroughBlocks) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
-            LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+            backGroundColor,
             LightmapTextureManager.MAX_LIGHT_COORDINATE,
         )
-        consumers.draw()
     }
 
     private fun SkyHanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
@@ -385,7 +380,6 @@ object WorldRenderUtils {
                 .color(color.red, color.green, color.blue, color.alpha)
         }
 
-        vertexConsumers.draw(layer)
         matrices.pop()
     }
 
@@ -445,7 +439,6 @@ object WorldRenderUtils {
         buf.vertex((x + radius).toFloat(), (y + height).toFloat(), (z + 0).toFloat())
             .color(color.red, color.green, color.blue, color.alpha)
 
-        vertexConsumers.draw(layer)
         matrices.pop()
 
         drawCircleFilled(locX, locY, locZ, radius.toDouble(), color, depth = true, segments = segments)
@@ -470,50 +463,36 @@ object WorldRenderUtils {
         color: Color,
         depth: Boolean = true,
     ) {
-        val layer = SkyHanniRenderLayers.getTriangleFan(!depth)
+        val layer = SkyHanniRenderLayers.getTriangles(!depth)
         val buf = vertexConsumers.getBuffer(layer)
         matrices.push()
 
         val viewerPos = getViewerPos()
-        val newTopPoint = topPoint - viewerPos
-        val newBaseCenterPoint = baseCenterPoint - viewerPos
-        val newBaseEdgePoint = baseEdgePoint - viewerPos
+        val newTop = topPoint - viewerPos
+        val baseCenter = baseCenterPoint - viewerPos
+        val baseEdge = baseEdgePoint - viewerPos
 
-        val cornerCenterVec = newBaseEdgePoint - newBaseCenterPoint
-        val baseTopVecNormalized = (newTopPoint - newBaseCenterPoint).normalize()
+        val edgeVec = baseEdge - baseCenter
+        val topVecNorm = (newTop - baseCenter).normalize()
+        val corner1 = baseEdge
+        val corner2 = topVecNorm.crossProduct(edgeVec).normalize() * edgeVec.length() + baseCenter
+        val corner3 = baseCenter - edgeVec
+        val corner4 = edgeVec.crossProduct(topVecNorm).normalize() * edgeVec.length() + baseCenter
 
-        val corner1 = newBaseEdgePoint
-        val corner2 = baseTopVecNormalized.crossProduct(cornerCenterVec) + newBaseCenterPoint
-        val corner3 = newBaseCenterPoint - cornerCenterVec
-        val corner4 = cornerCenterVec.crossProduct(baseTopVecNormalized) + newBaseCenterPoint
+        fun tri(a: LorenzVec, b: LorenzVec, c: LorenzVec) {
+            buf.vertex(a.x.toFloat(), a.y.toFloat(), a.z.toFloat()).color(color.red, color.green, color.blue, color.alpha)
+            buf.vertex(b.x.toFloat(), b.y.toFloat(), b.z.toFloat()).color(color.red, color.green, color.blue, color.alpha)
+            buf.vertex(c.x.toFloat(), c.y.toFloat(), c.z.toFloat()).color(color.red, color.green, color.blue, color.alpha)
+        }
 
-        buf.vertex(newTopPoint.x.toFloat(), newTopPoint.y.toFloat(), newTopPoint.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner2.x.toFloat(), corner2.y.toFloat(), corner2.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner3.x.toFloat(), corner3.y.toFloat(), corner3.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner4.x.toFloat(), corner4.y.toFloat(), corner4.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        buf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
+        tri(newTop, corner1, corner2)
+        tri(newTop, corner2, corner3)
+        tri(newTop, corner3, corner4)
+        tri(newTop, corner4, corner1)
 
-        vertexConsumers.draw(layer)
+        tri(corner1, corner2, corner3)
+        tri(corner1, corner3, corner4)
 
-        val quadLayer = SkyHanniRenderLayers.getQuads(!depth)
-        val quadBuf = vertexConsumers.getBuffer(layer)
-        quadBuf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        quadBuf.vertex(corner4.x.toFloat(), corner4.y.toFloat(), corner4.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        quadBuf.vertex(corner3.x.toFloat(), corner3.y.toFloat(), corner3.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-        quadBuf.vertex(corner2.x.toFloat(), corner2.y.toFloat(), corner2.z.toFloat())
-            .color(color.red, color.green, color.blue, color.alpha)
-
-        vertexConsumers.draw(quadLayer)
         matrices.pop()
     }
 
@@ -584,7 +563,6 @@ object WorldRenderUtils {
             }
         }
 
-        vertexConsumers.draw(layer)
         matrices.pop()
     }
 
@@ -706,46 +684,7 @@ object WorldRenderUtils {
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        renderText(renderLocation, "§f$text", scale, seeThroughBlocks, true, yOff)
-    }
-
-    private fun SkyHanniRenderWorldEvent.renderText(
-        location: LorenzVec,
-        text: String,
-        scale: Double,
-        seeThroughBlocks: Boolean,
-        shadow: Boolean,
-        yOff: Float,
-    ) {
-        val realScale = (scale * 0.05).toFloat()
-
-        val matrix = Matrix4f()
-        val cameraPos = camera.pos
-        val fr = MinecraftClient.getInstance().textRenderer
-
-        matrix.translate(
-            (location.x - cameraPos.getX()).toFloat(),
-            (location.y - cameraPos.getY() + yOff * realScale).toFloat(),
-            (location.z - cameraPos.getZ()).toFloat(),
-        ).rotate(camera.rotation).scale(realScale, -realScale, realScale)
-
-        val x = -fr.getWidth(text) / 2f
-
-        val consumers = VertexConsumerProvider.immediate(bufferAllocator)
-
-        fr.draw(
-            text,
-            x,
-            0f,
-            LorenzColor.WHITE.toColor().rgb,
-            shadow,
-            matrix,
-            consumers,
-            if (seeThroughBlocks) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
-            0,
-            LightmapTextureManager.MAX_LIGHT_COORDINATE,
-        )
-        consumers.draw()
+        drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
@@ -842,7 +781,7 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(
-            exactPlayerEyeLocation(),
+            exactPlayerEyeLocation() + MinecraftCompat.localPlayer.rotationVector.toLorenzVec().times(2),
             location,
             color,
             lineWidth,

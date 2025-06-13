@@ -63,6 +63,7 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import net.minecraft.component.type.NbtComponent
@@ -72,6 +73,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import com.mojang.authlib.properties.Property
 //$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
+//$$ import net.minecraft.registry.Registries
 //#endif
 
 @SkyHanniModule
@@ -148,7 +150,7 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() }  ?: emptyList()
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -161,7 +163,7 @@ object ItemUtils {
     //#else
     //$$ fun ComponentMap?.getLore(): List<String> {
     //$$     this ?: return emptyList()
-    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) } ?: emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
     //$$ }
     //#endif
 
@@ -295,7 +297,12 @@ object ItemUtils {
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
     // Checks for the enchantment glint as part of the minecraft enchantments
-    fun ItemStack.isEnchanted() = isItemEnchanted
+    fun ItemStack.isEnchanted(): Boolean =
+        //#if MC < 1.21
+        isItemEnchanted
+    //#else
+    //$$ hasEnchantments() || this.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) == true
+    //#endif
 
     // Checks for hypixel enchantments in the attributes
     fun ItemStack.hasHypixelEnchantments() = getHypixelEnchantments()?.isNotEmpty() ?: false
@@ -922,4 +929,12 @@ object ItemUtils {
 
         return skull
     }
+
+    //#if MC > 1.21
+    //$$ fun ItemStack.getItemModel(): Item? {
+    //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
+    //$$     val item = Registries.ITEM.get(identifier)
+    //$$     return if (item == Items.AIR) null else item
+    //$$ }
+    //#endif
 }

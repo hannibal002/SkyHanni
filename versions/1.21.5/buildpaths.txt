@@ -9,10 +9,12 @@ at.hannibal2.skyhanni.api.SkyBlockXPApi.kt
 at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager.kt
 at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo.kt
 at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery.kt
+at.hannibal2.skyhanni.api.enoughupdates.NeuEventWrappers.kt
 at.hannibal2.skyhanni.api.event.GeneratedEventPrimaryFunctionNames.kt
 at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi.kt
+at.hannibal2.skyhanni.api.minecraftevents.EntityEvents.kt
 at.hannibal2.skyhanni.config.ConfigGuiManager.kt
 at.hannibal2.skyhanni.config.ConfigManager.kt
 at.hannibal2.skyhanni.config.ConfigModMenuInterop.kt
@@ -49,6 +51,7 @@ at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig.kt
 at.hannibal2.skyhanni.config.features.dev.WaypointsConfig.kt
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.ConsoleFiltersConfig.kt
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig.kt
+at.hannibal2.skyhanni.config.features.foraging.ForagingConfig.kt
 at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.java
 at.hannibal2.skyhanni.config.features.garden.GardenLevelConfig.java
 at.hannibal2.skyhanni.config.features.garden.NumbersConfig.java
@@ -174,6 +177,7 @@ at.hannibal2.skyhanni.data.mob.MobDebug.kt
 at.hannibal2.skyhanni.data.mob.MobDetection.kt
 at.hannibal2.skyhanni.data.mob.MobFactories.kt
 at.hannibal2.skyhanni.data.mob.MobFilter.kt
+at.hannibal2.skyhanni.data.mob.ModernIslandExceptions.kt
 at.hannibal2.skyhanni.data.model.ComposterUpgrade.kt
 at.hannibal2.skyhanni.data.model.Graph.kt
 at.hannibal2.skyhanni.data.model.GraphNode.kt
@@ -266,6 +270,7 @@ at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent.kt
+at.hannibal2.skyhanni.events.entity.EntityHurtEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityMoveEvent.kt
@@ -742,6 +747,7 @@ at.hannibal2.skyhanni.features.inventory.MinisterInCalendar.kt
 at.hannibal2.skyhanni.features.inventory.PageScrolling.kt
 at.hannibal2.skyhanni.features.inventory.PersonalCompactorOverlay.kt
 at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures.kt
+at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures.kt
 at.hannibal2.skyhanni.features.inventory.ReforgeHelper.kt
 at.hannibal2.skyhanni.features.inventory.RngMeterInventory.kt
 at.hannibal2.skyhanni.features.inventory.SackDisplay.kt
@@ -975,7 +981,6 @@ at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangHighlights.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
-at.hannibal2.skyhanni.api.enoughupdates.NeuEventWrappers.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraProfileViewerBlocker.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.kt
 at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper.kt
@@ -1075,9 +1080,11 @@ at.hannibal2.skyhanni.mixins.transformers.MixinChatHud.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatLine.java
 at.hannibal2.skyhanni.mixins.transformers.MixinClientEntityManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinClientPlayNetworkHandler.java
+at.hannibal2.skyhanni.mixins.transformers.MixinClientWorld.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDataTracker.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDrawContext.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntity.java
+at.hannibal2.skyhanni.mixins.transformers.MixinEntityEnderman.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityPlayer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderDispatcher.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderer.java
@@ -1087,6 +1094,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.MixinHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.MixinItemStack.java
 at.hannibal2.skyhanni.mixins.transformers.MixinKeyboard.java
+at.hannibal2.skyhanni.mixins.transformers.MixinLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMessageHandler.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
@@ -1094,11 +1102,15 @@ at.hannibal2.skyhanni.mixins.transformers.MixinPlayerEntityRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRenderManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinTextRendererDrawer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinTextVisitFactory.java
+at.hannibal2.skyhanni.mixins.transformers.MixinWorldRenderer.java
+at.hannibal2.skyhanni.mixins.transformers.RenderPipelineMixin.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiContainer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiNewChat.java
+at.hannibal2.skyhanni.mixins.transformers.gui.MixinInventoryBasic.java
 at.hannibal2.skyhanni.mixins.transformers.render.MixinRendererLivingEntity.java
+at.hannibal2.skyhanni.mixins.transformers.render.MixinVertexConsumerProvider.java
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.HighlightMissingRepoItems.kt
 at.hannibal2.skyhanni.test.ParkourWaypointSaver.kt
@@ -1163,6 +1175,7 @@ at.hannibal2.skyhanni.utils.LorenzVec.kt
 at.hannibal2.skyhanni.utils.Matrix.kt
 at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.kt
 at.hannibal2.skyhanni.utils.MobUtils.kt
+at.hannibal2.skyhanni.utils.ModernPatterns.kt
 at.hannibal2.skyhanni.utils.MultiFilter.kt
 at.hannibal2.skyhanni.utils.NeuCalculator.kt
 at.hannibal2.skyhanni.utils.NeuInternalName.kt
@@ -1202,6 +1215,7 @@ at.hannibal2.skyhanni.utils.compat.BlockCompat.kt
 at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.kt
 at.hannibal2.skyhanni.utils.compat.DrawContextUtils.kt
 at.hannibal2.skyhanni.utils.compat.MiscCompat.kt
+at.hannibal2.skyhanni.utils.compat.SoundCompat.kt
 at.hannibal2.skyhanni.utils.guide.GuideGui.kt
 at.hannibal2.skyhanni.utils.guide.GuidePage.kt
 at.hannibal2.skyhanni.utils.guide.GuideRenderablePage.kt
@@ -1405,15 +1419,15 @@ at/hannibal2/skyhanni/config/features/garden/DicerRngDropTrackerConfig.kt
 at/hannibal2/skyhanni/config/features/garden/EliteFarmingWeightConfig.kt
 at/hannibal2/skyhanni/config/features/garden/FarmingFortuneConfig.kt
 at/hannibal2/skyhanni/config/features/garden/GardenCommandsConfig.kt
-at/hannibal2/skyhanni/config/features/garden/GardenConfig.java
-at/hannibal2/skyhanni/config/features/garden/GardenLevelConfig.java
-at/hannibal2/skyhanni/config/features/garden/KeyBindConfig.java
-at/hannibal2/skyhanni/config/features/garden/MoneyPerHourConfig.java
-at/hannibal2/skyhanni/config/features/garden/NextJacobContestConfig.java
-at/hannibal2/skyhanni/config/features/garden/NumbersConfig.java
-at/hannibal2/skyhanni/config/features/garden/PersonalBestsConfig.java
-at/hannibal2/skyhanni/config/features/garden/PlotIconConfig.java
-at/hannibal2/skyhanni/config/features/garden/PlotMenuHighlightingConfig.java
+at/hannibal2/skyhanni/config/features/garden/GardenConfig.kt
+at/hannibal2/skyhanni/config/features/garden/GardenLevelConfig.kt
+at/hannibal2/skyhanni/config/features/garden/KeyBindConfig.kt
+at/hannibal2/skyhanni/config/features/garden/MoneyPerHourConfig.kt
+at/hannibal2/skyhanni/config/features/garden/NextJacobContestConfig.kt
+at/hannibal2/skyhanni/config/features/garden/NumbersConfig.kt
+at/hannibal2/skyhanni/config/features/garden/PersonalBestsConfig.kt
+at/hannibal2/skyhanni/config/features/garden/PlotIconConfig.kt
+at/hannibal2/skyhanni/config/features/garden/PlotMenuHighlightingConfig.kt
 at/hannibal2/skyhanni/config/features/garden/SensitivityReducerConfig.kt
 at/hannibal2/skyhanni/config/features/garden/SkyMartConfig.kt
 at/hannibal2/skyhanni/config/features/garden/TooltipTweaksConfig.kt
@@ -1536,6 +1550,7 @@ at/hannibal2/skyhanni/config/features/mining/nucleus/AreaWallsConfig.kt
 at/hannibal2/skyhanni/config/features/mining/nucleus/CrystalHighlighterColorConfig.kt
 at/hannibal2/skyhanni/config/features/mining/nucleus/CrystalHighlighterConfig.kt
 at/hannibal2/skyhanni/config/features/mining/nucleus/CrystalNucleusTrackerConfig.kt
+at/hannibal2/skyhanni/config/features/mining/nucleus/PowderChestTimerConfig.kt
 at/hannibal2/skyhanni/config/features/mining/nucleus/PowderTrackerConfig.kt
 at/hannibal2/skyhanni/config/features/minion/EmptiedTimeConfig.kt
 at/hannibal2/skyhanni/config/features/minion/LastClickedMinionConfig.kt
