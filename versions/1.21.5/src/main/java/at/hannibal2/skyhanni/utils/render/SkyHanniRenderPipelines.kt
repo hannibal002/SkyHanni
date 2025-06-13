@@ -146,4 +146,19 @@ object SkyHanniRenderPipelines {
             .withDepthWrite(false)
             .build()
     )
+
+    val CHROMA_TEXT: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, "chroma_text"))
+            .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS)
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withVertexShader(Identifier.of(SkyHanniMod.MODID, "textured_chroma"))
+            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "textured_chroma"))
+            .withSampler("Sampler0")
+            .withUniform("chromaSize", UniformType.FLOAT)
+            .withUniform("timeOffset", UniformType.FLOAT)
+            .withUniform("saturation", UniformType.FLOAT)
+            .withUniform("forwardDirection", UniformType.INT)
+            .build()
+    )
 }

@@ -382,6 +382,7 @@ at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier.kt
 at.hannibal2.skyhanni.features.chat.translation.TranslatableLanguage.kt
 at.hannibal2.skyhanni.features.chat.translation.Translator.kt
 at.hannibal2.skyhanni.features.chroma.ChromaManager.kt
+at.hannibal2.skyhanni.features.chroma.ChromaFontManager.kt
 at.hannibal2.skyhanni.features.combat.ArmorStackDisplay.kt
 at.hannibal2.skyhanni.features.combat.BestiaryData.kt
 at.hannibal2.skyhanni.features.combat.BroodmotherFeatures.kt
@@ -1080,6 +1081,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinEntity.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityPlayer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderDispatcher.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderer.java
+at.hannibal2.skyhanni.mixins.transformers.MixinFontStorage.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGameRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.MixinHandledScreen.java
@@ -1090,6 +1092,8 @@ at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinPlayerEntityRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRenderManager.java
+at.hannibal2.skyhanni.mixins.transformers.MixinTextRendererDrawer.java
+at.hannibal2.skyhanni.mixins.transformers.MixinTextVisitFactory.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiContainer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
@@ -1216,6 +1220,7 @@ at.hannibal2.skyhanni.utils.render.QuadDrawer.kt
 at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers.kt
 at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelines.kt
 at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
+at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer.kt
 at.hannibal2.skyhanni.utils.renderables.DragNDrop.kt
 at.hannibal2.skyhanni.utils.renderables.Renderable.kt
 at.hannibal2.skyhanni.utils.renderables.RenderableInventory.kt
