@@ -23,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // todo 1.21 impl needed
@@ -59,26 +58,7 @@ public abstract class MixinHandledScreen {
 
     @ModifyArg(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), index = 1)
     private List<Text> renderBackground(List<Text> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) DrawContext drawContext) {
-        List<String> tooltip = new ArrayList<>();
-        for (Text text : textTooltip) {
-            tooltip.add(TextCompatKt.formattedTextCompat(text));
-        }
-        List<String> beforeTooltip = new ArrayList<>(tooltip);
-        ToolTipData.getTooltip(itemStack, tooltip);
-        ToolTipData.onHover(drawContext, itemStack, tooltip);
-        GuiScreenHookKt.renderToolTip(drawContext, itemStack);
-        if (tooltip.equals(beforeTooltip)) return textTooltip;
-        List<Text> newTooltip = new ArrayList<>();
-        if (tooltip.isEmpty()) return newTooltip;
-        for (int i = 0; i < tooltip.size(); i++) {
-            // todo this approach sucks but idk see a better way without recoding everywhere to use text
-            if (beforeTooltip.size() > i && beforeTooltip.get(i).equals(tooltip.get(i))) {
-                newTooltip.add(textTooltip.get(i));
-            } else {
-                newTooltip.add(Text.of(tooltip.get(i)));
-            }
-        }
-        return newTooltip;
+        return ToolTipData.processModernTooltip(drawContext, itemStack, textTooltip);
     }
 
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
