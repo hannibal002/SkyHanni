@@ -39,7 +39,7 @@ object InventoryUtils {
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
     fun getItemsInOpenChest(): List<Slot> {
-        return getItemsInOpenChestWithNull().filter { it.stack != null }
+        return getItemsInOpenChestWithNull().filter { it.stack.isNotEmpty() }
     }
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
