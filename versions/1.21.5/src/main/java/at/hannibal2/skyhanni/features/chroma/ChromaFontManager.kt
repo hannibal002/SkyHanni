@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier
 
 private var textRenderLayerSetMap: MutableMap<TextRenderLayerSet, TextRenderLayerSet> = mutableMapOf()
 var renderingChat: Boolean = false
+private val textColor = TextColor(0xFFFFFF, "chroma")
 
 fun addTextRenderLayerSet(identifier: Identifier, textRenderLayerSet: TextRenderLayerSet) {
     // To render in chroma, we need to use our own RenderLayer that uses a chroma shader.
@@ -64,7 +65,7 @@ fun replaceGlyphRenderLayer(instance: BakedGlyph, layerType: TextLayerType, orig
 
 fun setChromaColorStyle(style: Style, text: String, colorCode: Char): Style {
     if (colorCode.lowercaseChar() == 'z') {
-        return Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma"))
+        return Style.EMPTY.withColor(textColor)
     }
     return style
 }
@@ -76,7 +77,7 @@ fun forceWhiteTextColorForChroma(color: TextColor?): TextColor? {
     val chatFlag = SkyHanniMod.feature.gui.chroma.ignoreChat && renderingChat
 
     if (allChroma && !chatFlag) {
-        return TextColor(0xFFFFFF, "chroma")
+        return textColor
     }
     return color
 }
@@ -88,7 +89,7 @@ fun forceChromaStyleIfNecessary(style: Style): Style {
     val chatFlag = SkyHanniMod.feature.gui.chroma.ignoreChat && renderingChat
 
     if (allChroma && !chatFlag) {
-        return style.withColor(TextColor(0xFFFFFE, "chroma"))
+        return style.withColor(textColor)
     }
     return style
 }
