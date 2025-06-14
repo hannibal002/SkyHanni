@@ -64,7 +64,7 @@ fun replaceGlyphRenderLayer(instance: BakedGlyph, layerType: TextLayerType, orig
 
 fun setChromaColorStyle(style: Style, text: String, colorCode: Char): Style {
     if (colorCode.lowercaseChar() == 'z') {
-        return style.withColor(TextColor(0xFFFFFF, "chroma"))
+        return Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma"))
     }
     return style
 }
