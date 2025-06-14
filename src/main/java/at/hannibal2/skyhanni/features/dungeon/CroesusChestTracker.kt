@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
@@ -258,7 +260,16 @@ object CroesusChestTracker {
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }
 
-    fun resetChest() = croesusChests?.let {
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetkismet") {
+            description = "Resets the saved values of the applied kismet feathers in Croesus"
+            category = CommandCategory.USERS_RESET
+            simpleCallback { resetChest() }
+        }
+    }
+
+    private fun resetChest() = croesusChests?.let {
         it.clear()
         it.addAll(generateMaxChest())
         ChatUtils.chat("Kismet State was Reset!")
