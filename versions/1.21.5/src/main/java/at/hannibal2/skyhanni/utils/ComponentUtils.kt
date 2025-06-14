@@ -70,7 +70,7 @@ object ComponentUtils {
             uuid = uuid.toString(),
             properties = propertiesInfo,
             hypixelPopulated = NbtBoolean(true),
-            name = profile?.name?.getOrNull()
+            name = profile?.name?.getOrNull(),
         )
         val lore = stack.getLore()
         val color = stack.get(DataComponentTypes.DYED_COLOR)?.rgb
@@ -106,189 +106,408 @@ object ComponentUtils {
     private fun convertMinecraftIdToModern2(id: String, damage: Int): String {
         val strippedId = id.replace("minecraft:", "")
         return when {
-            strippedId == "skull" -> "player_head"
-            strippedId == "red_flower" -> when (damage) {
-                0 -> "poppy"
-                1 -> "blue_orchid"
-                2 -> "allium"
-                3 -> "azure_bluet"
-                4 -> "red_tulip"
-                5 -> "orange_tulip"
-                6 -> "white_tulip"
-                7 -> "pink_tulip"
-                8 -> "oxeye_daisy"
-                else -> strippedId
-            }
-
-            strippedId == "yellow_flower" -> "dandelion"
-            strippedId == "fireworks" -> "firework_rocket"
-            strippedId == "dye" -> when (damage) {
-                0 -> "ink_sac"
-                1 -> "red_dye"
-                2 -> "green_dye"
-                3 -> "cocoa_beans"
-                4 -> "lapis_lazuli"
-                5 -> "purple_dye"
-                6 -> "cyan_dye"
-                7 -> "light_gray_dye"
-                8 -> "gray_dye"
-                9 -> "pink_dye"
-                10 -> "lime_dye"
-                11 -> "yellow_dye"
-                12 -> "light_blue_dye"
-                13 -> "magenta_dye"
-                14 -> "orange_dye"
-                15 -> "bone_meal"
-                else -> strippedId
-            }
-
-            strippedId == "spawn_egg" -> when (damage) {
-                0 -> "polar_bear_spawn_egg"
-                4 -> "elder_guardian_spawn_egg"
-                52 -> "spider_spawn_egg"
-                54 -> "zombie_spawn_egg"
-                55 -> "slime_spawn_egg"
-                58 -> "enderman_spawn_egg"
-                61 -> "blaze_spawn_egg"
-                67 -> "endermite_spawn_egg"
-                94 -> "squid_spawn_egg"
-                96 -> "mooshroom_spawn_egg"
-                101 -> "rabbit_spawn_egg"
-                120 -> "villager_spawn_egg"
-                else -> strippedId
-            }
-
-            strippedId == "carpet" -> getColor(damage) + "_carpet"
-            strippedId == "leaves" -> getWood(damage) + "_leaves"
-            strippedId == "leaves2" -> when (damage) {
-                0 -> "acacia_leaves"
-                1 -> "dark_oak_leaves"
-                else -> strippedId
-            }
-
-            strippedId == "banner" -> getColor(damage) + "_banner"
+            strippedId == "red_flower" -> getRedFlowerByDamage(damage) ?: strippedId
+            strippedId == "dye" -> getDyeByDamage(damage) ?: strippedId
+            strippedId == "spawn_egg" -> getSpawnEggByDamage(damage) ?: strippedId
+            strippedId == "carpet" -> getColorByDamage(damage) + "_carpet"
+            strippedId == "leaves" -> getWoodByDamage(damage) + "_leaves"
+            strippedId == "leaves2" -> getWood2ByDamage(damage) + "_leaves"
+            strippedId == "banner" -> getColorByDamage(damage) + "_banner"
             strippedId.contains("record_") -> strippedId.replace("record_", "music_disc_")
-            strippedId == "cooked_fish" -> when (damage) {
-                0 -> "cooked_cod"
-                1 -> "cooked_salmon"
-                else -> strippedId
-            }
+            strippedId == "cooked_fish" -> getCookedFishByDamage(damage) ?: strippedId
+            strippedId == "wool" -> getColorByDamage(damage) + "_wool"
+            strippedId == "fish" -> getFishByDamage(damage) ?: strippedId
+            strippedId == "log" -> getWoodByDamage(damage) + "_log"
+            strippedId == "log2" -> getWood2ByDamage(damage) + "_log"
+            strippedId == "double_plant" -> getDoublePlantByDamage(damage) ?: strippedId
+            strippedId == "stained_glass" -> getColorByDamage(damage) + "_stained_glass"
+            strippedId == "stained_glass_pane" -> getColorByDamage(damage) + "_stained_glass_pane"
+            strippedId == "stained_hardened_clay" -> getColorByDamage(damage) + "_terracotta"
+            strippedId == "planks" -> getWoodByDamage(damage) + "_planks"
+            strippedId == "sapling" -> getWoodByDamage(damage) + "_sapling"
+            strippedId == "stonebrick" -> getStoneBrickByDamage(damage) ?: strippedId
+            strippedId == "wooden_slab" -> getWoodByDamage(damage) + "_slab"
+            strippedId == "tallgrass" -> getTallGrassByDamage(damage) ?: strippedId
+            strippedId == "monster_egg" -> getMonsterEggByDamage(damage) ?: strippedId
 
-            strippedId == "bed" -> "red_bed"
-            strippedId == "wool" -> getColor(damage) + "_wool"
-            strippedId == "trapdoor" -> "oak_trapdoor"
-            strippedId == "speckled_melon" -> "glistering_melon_slice"
-            strippedId == "melon_block" -> "melon"
-            strippedId == "fish" -> when (damage) {
-                0 -> "cod"
-                1 -> "salmon"
-                2 -> "tropical_fish"
-                3 -> "pufferfish"
-                else -> strippedId
-            }
-
-            strippedId == "log" -> getWood(damage) + "_log"
-            strippedId == "log2" -> when (damage) {
-                0 -> "acacia_log"
-                1 -> "dark_oak_log"
-                else -> strippedId
-            }
-
-            strippedId == "waterlily" -> "lily_pad"
-            strippedId == "web" -> "cobweb"
-            strippedId == "reeds" -> "sugar_cane"
-            strippedId == "double_plant" -> when (damage) {
-                0 -> "sunflower"
-                1 -> "lilac"
-                2 -> "tall_grass"
-                3 -> "large_fern"
-                4 -> "rose_bush"
-                5 -> "peony"
-                else -> strippedId
-            }
-
-            strippedId == "deadbush" -> "dead_bush"
-            strippedId == "firework_charge" -> "firework_star"
-            strippedId == "netherbrick" -> "nether_brick"
-            strippedId == "wooden_button" -> "oak_button"
-            strippedId == "slime" -> "slime_block"
-            strippedId == "boat" -> "oak_boat"
-            strippedId == "brick_block" -> "bricks"
-            strippedId == "stained_glass" -> getColor(damage) + "_stained_glass"
-            strippedId == "stained_glass_pane" -> getColor(damage) + "_stained_glass_pane"
-            strippedId == "hardened_clay" -> "terracotta"
-            strippedId == "stained_hardened_clay" -> getColor(damage) + "_terracotta"
-            strippedId == "fence" -> "oak_fence"
-            strippedId == "fence_gate" -> "oak_fence_gate"
-            strippedId == "grass" -> "grass_block"
-            strippedId == "lit_pumpkin" -> "jack_o_lantern"
-            strippedId == "planks" -> getWood(damage) + "_planks"
-            strippedId == "mob_spawner" -> "spawner"
-            strippedId == "noteblock" -> "note_block"
-            strippedId == "golden_rail" -> "powered_rail"
-            strippedId == "quartz_ore" -> "nether_quartz_ore"
-            strippedId == "sapling" -> getWood(damage) + "_sapling"
-            strippedId == "sign" -> "oak_sign"
-            strippedId == "stonebrick" -> when (damage) {
-                0 -> "stone_bricks"
-                1 -> "mossy_stone_bricks"
-                2 -> "cracked_stone_bricks"
-                3 -> "chiseled_stone_bricks"
-                else -> strippedId
-            }
-
-            strippedId == "snow_layer" -> "snow"
-            strippedId == "wooden_slab" -> getWood(damage) + "_slab"
-            strippedId == "stone_slab2" -> "red_sandstone_slab"
-            strippedId == "wooden_door" -> "oak_door"
-            strippedId == "wooden_pressure_plate" -> "oak_pressure_plate"
-            strippedId == "tallgrass" -> when (damage) {
-                0 -> "dead_bush"
-                1 -> "short_grass"
-                2 -> "fern"
-                else -> strippedId
-            }
-
-            strippedId == "monster_egg" -> when (damage) {
-                0 -> "infested_stone"
-                else -> strippedId
-            }
-
-            else -> strippedId
+            else -> getOtherItemById(strippedId) ?: strippedId
         }
     }
 
-    private fun getColor(damage: Int): String {
-        return when (damage) {
-            0 -> "white"
-            1 -> "orange"
-            2 -> "magenta"
-            3 -> "light_blue"
-            4 -> "yellow"
-            5 -> "lime"
-            6 -> "pink"
-            7 -> "gray"
-            8 -> "light_gray"
-            9 -> "cyan"
-            10 -> "purple"
-            11 -> "blue"
-            12 -> "brown"
-            13 -> "green"
-            14 -> "red"
-            15 -> "black"
-            else -> ""
-        }
+    fun convertModernToLegacyId(modernId: String): Pair<String, Int> {
+        val (id, damage) = convertModernToLegacyId2(modernId.replace("minecraft:", ""))
+        return Pair("minecraft:$id", damage)
     }
 
-    private fun getWood(damage: Int): String {
-        return when (damage) {
-            0 -> "oak"
-            1 -> "spruce"
-            2 -> "birch"
-            3 -> "jungle"
-            4 -> "acacia"
-            5 -> "dark_oak"
-            else -> ""
+    private fun convertModernToLegacyId2(modernId: String): Pair<String, Int> {
+        if (modernId == "player_head") return "skull" to 3
+        getOtherItemByIdReversed(modernId)?.let { return it to 0 }
+        getRedFlowerDamage(modernId)?.let { return "red_flower" to it }
+        getDyeDamage(modernId)?.let { return "dye" to it }
+        getSpawnEggDamage(modernId)?.let { return "spawn_egg" to it }
+        getCookedFishDamage(modernId)?.let { return "cooked_fish" to it }
+        getFishDamage(modernId)?.let { return "fish" to it }
+        getDoublePlantDamage(modernId)?.let { return "double_plant" to it }
+        getStoneBrickDamage(modernId)?.let { return "stonebrick" to it }
+        getTallGrassDamage(modernId)?.let { return "tallgrass" to it }
+        getMonsterEggDamage(modernId)?.let { return "monster_egg" to it }
+        when {
+            modernId.contains("music_disc_") -> {
+                return modernId.replace("music_disc_", "record_") to 0
+            }
+
+            modernId.endsWith("_carpet") -> {
+                val color = modernId.removeSuffix("_carpet")
+                val damage = getColorDamage(color)
+                if (damage != null) {
+                    return "carpet" to damage
+                }
+            }
+
+            modernId.endsWith("_leaves") -> {
+                val wood = modernId.removeSuffix("_leaves")
+                var damage = getWood2Damage(wood)
+                if (damage != null) {
+                    return "leaves" to damage
+                }
+                damage = getWoodDamage(wood)
+                if (damage != null) {
+                    return "leaves2" to damage
+                }
+            }
+
+            modernId.endsWith("_banner") -> {
+                val color = modernId.removeSuffix("_banner")
+                val damage = getColorDamage(color)
+                if (damage != null) {
+                    return "banner" to damage
+                }
+            }
+
+            modernId.endsWith("_wool") -> {
+                val color = modernId.removeSuffix("_wool")
+                val damage = getColorDamage(color)
+                if (damage != null) {
+                    return "wool" to damage
+                }
+            }
+
+            modernId.endsWith("_log") -> {
+                val wood = modernId.removeSuffix("_log")
+                var damage = getWood2Damage(wood)
+                if (damage != null) {
+                    return "log" to damage
+                }
+                damage = getWoodDamage(wood)
+                if (damage != null) {
+                    return "log2" to damage
+                }
+            }
+
+            modernId.endsWith("stained_glass") -> {
+                val color = modernId.removeSuffix("_stained_glass")
+                val damage = getColorDamage(color)
+                if (damage != null) {
+                    return "stained_glass" to damage
+                }
+            }
+
+            modernId.endsWith("stained_glass_pane") -> {
+                val color = modernId.removeSuffix("_stained_glass_pane")
+                val damage = getColorDamage(color)
+                if (damage != null) {
+                    return "stained_glass_pane" to damage
+                }
+            }
+
+            modernId.endsWith("_terracotta") -> {
+                val color = modernId.removeSuffix("_terracotta")
+                val damage = getColorDamage(color)
+                if (damage != null) {
+                    return "stained_hardened_clay" to damage
+                }
+            }
+
+            modernId.endsWith("_planks") -> {
+                val wood = modernId.removeSuffix("_planks")
+                val damage = getWoodDamage(wood)
+                if (damage != null) {
+                    return "planks" to damage
+                }
+            }
+
+            modernId.endsWith("_sapling") -> {
+                val wood = modernId.removeSuffix("_sapling")
+                val damage = getWoodDamage(wood)
+                if (damage != null) {
+                    return "sapling" to damage
+                }
+            }
+
+            modernId.endsWith("_slab") -> {
+                val wood = modernId.removeSuffix("_slab")
+                val damage = getWoodDamage(wood)
+                if (damage != null) {
+                    return "wooden_slab" to damage
+                }
+            }
         }
+
+        return modernId to 0
+    }
+
+    private val otherItemsMap = mapOf(
+        "skull" to "player_head",
+        "yellow_flower" to "dandelion",
+        "fireworks" to "firework_rocket",
+        "bed" to "red_bed",
+        "trapdoor" to "oak_trapdoor",
+        "speckled_melon" to "glistering_melon_slice",
+        "melon_block" to "melon",
+        "waterlily" to "lily_pad",
+        "web" to "cobweb",
+        "reeds" to "sugar_cane",
+        "deadbush" to "dead_bush",
+        "firework_charge" to "firework_star",
+        "netherbrick" to "nether_brick",
+        "wooden_button" to "oak_button",
+        "slime" to "slime_block",
+        "boat" to "oak_boat",
+        "brick_block" to "bricks",
+        "fence" to "oak_fence",
+        "hardened_clay" to "terracotta",
+        "fence_gate" to "oak_fence_gate",
+        "grass" to "grass_block",
+        "lit_pumpkin" to "jack_o_lantern",
+        "mob_spawner" to "spawner",
+        "noteblock" to "note_block",
+        "golden_rail" to "powered_rail",
+        "quartz_ore" to "nether_quartz_ore",
+        "sign" to "oak_sign",
+        "snow_layer" to "snow",
+        "stone_slab2" to "red_sandstone_slab",
+        "wooden_door" to "oak_door",
+        "wooden_pressure_plate" to "oak_pressure_plate",
+    )
+
+    private fun getOtherItemById(id: String): String? {
+        return otherItemsMap[id]
+    }
+
+    private fun getOtherItemByIdReversed(id: String): String? {
+        return otherItemsMap.entries.find { it.value == id }?.key
+    }
+
+    private val redFlowerMap = mapOf(
+        0 to "poppy",
+        1 to "blue_orchid",
+        2 to "allium",
+        3 to "azure_bluet",
+        4 to "red_tulip",
+        5 to "orange_tulip",
+        6 to "white_tulip",
+        7 to "pink_tulip",
+        8 to "oxeye_daisy",
+    )
+
+    private fun getRedFlowerByDamage(damage: Int): String? {
+        return redFlowerMap[damage]
+    }
+
+    private fun getRedFlowerDamage(id: String): Int? {
+        return redFlowerMap.entries.find { it.value == id }?.key
+    }
+
+    private val dyeMap = mapOf(
+        0 to "ink_sac",
+        1 to "red_dye",
+        2 to "green_dye",
+        3 to "cocoa_beans",
+        4 to "lapis_lazuli",
+        5 to "purple_dye",
+        6 to "cyan_dye",
+        7 to "light_gray_dye",
+        8 to "gray_dye",
+        9 to "pink_dye",
+        10 to "lime_dye",
+        11 to "yellow_dye",
+        12 to "light_blue_dye",
+        13 to "magenta_dye",
+        14 to "orange_dye",
+        15 to "bone_meal",
+    )
+
+    private fun getDyeByDamage(damage: Int): String? {
+        return dyeMap[damage]
+    }
+
+    private fun getDyeDamage(id: String): Int? {
+        return dyeMap.entries.find { it.value == id }?.key
+    }
+
+    private val spawnEggMap = mapOf(
+        0 to "polar_bear_spawn_egg",
+        4 to "elder_guardian_spawn_egg",
+        52 to "spider_spawn_egg",
+        54 to "zombie_spawn_egg",
+        55 to "slime_spawn_egg",
+        58 to "enderman_spawn_egg",
+        61 to "blaze_spawn_egg",
+        67 to "endermite_spawn_egg",
+        94 to "squid_spawn_egg",
+        96 to "mooshroom_spawn_egg",
+        101 to "rabbit_spawn_egg",
+        120 to "villager_spawn_egg",
+    )
+
+    private fun getSpawnEggByDamage(damage: Int): String? {
+        return spawnEggMap[damage]
+    }
+
+    private fun getSpawnEggDamage(id: String): Int? {
+        return spawnEggMap.entries.find { it.value == id }?.key
+    }
+
+    private val cookedFishMap = mapOf(
+        0 to "cooked_cod",
+        1 to "cooked_salmon",
+    )
+
+    private fun getCookedFishByDamage(damage: Int): String? {
+        return cookedFishMap[damage]
+    }
+
+    private fun getCookedFishDamage(id: String): Int? {
+        return cookedFishMap.entries.find { it.value == id }?.key
+    }
+
+    private val fishMap = mapOf(
+        0 to "cod",
+        1 to "salmon",
+        2 to "tropical_fish",
+        3 to "pufferfish",
+    )
+
+    private fun getFishByDamage(damage: Int): String? {
+        return fishMap[damage]
+    }
+
+    private fun getFishDamage(id: String): Int? {
+        return fishMap.entries.find { it.value == id }?.key
+    }
+
+    private val log2Map = mapOf(
+        0 to "acacia",
+        1 to "dark_oak",
+    )
+
+    private fun getWood2ByDamage(damage: Int): String {
+        return log2Map[damage] ?: ""
+    }
+
+    private fun getWood2Damage(id: String): Int? {
+        return log2Map.entries.find { it.value == id }?.key
+    }
+
+    private val doublePlantMap = mapOf(
+        0 to "sunflower",
+        1 to "lilac",
+        2 to "tall_grass",
+        3 to "large_fern",
+        4 to "rose_bush",
+        5 to "peony",
+    )
+
+    private fun getDoublePlantByDamage(damage: Int): String? {
+        return doublePlantMap[damage]
+    }
+
+    private fun getDoublePlantDamage(id: String): Int? {
+        return doublePlantMap.entries.find { it.value == id }?.key
+    }
+
+    private val stoneBrickMap = mapOf(
+        0 to "stone_bricks",
+        1 to "mossy_stone_bricks",
+        2 to "cracked_stone_bricks",
+        3 to "chiseled_stone_bricks",
+    )
+
+    private fun getStoneBrickByDamage(damage: Int): String? {
+        return stoneBrickMap[damage]
+    }
+
+    private fun getStoneBrickDamage(id: String): Int? {
+        return stoneBrickMap.entries.find { it.value == id }?.key
+    }
+
+    private val tallGrassMap = mapOf(
+        0 to "dead_bush",
+        1 to "short_grass",
+        2 to "fern",
+    )
+
+    private fun getTallGrassByDamage(damage: Int): String? {
+        return tallGrassMap[damage]
+    }
+
+    private fun getTallGrassDamage(id: String): Int? {
+        return tallGrassMap.entries.find { it.value == id }?.key
+    }
+
+    private val colorMap = mapOf(
+        0 to "white",
+        1 to "orange",
+        2 to "magenta",
+        3 to "light_blue",
+        4 to "yellow",
+        5 to "lime",
+        6 to "pink",
+        7 to "gray",
+        8 to "light_gray",
+        9 to "cyan",
+        10 to "purple",
+        11 to "blue",
+        12 to "brown",
+        13 to "green",
+        14 to "red",
+        15 to "black",
+    )
+
+    private fun getColorByDamage(damage: Int): String {
+        return colorMap[damage] ?: ""
+    }
+
+    private fun getColorDamage(id: String): Int? {
+        return colorMap.entries.find { it.value == id }?.key
+    }
+
+    private val woodMap = mapOf(
+        0 to "oak",
+        1 to "spruce",
+        2 to "birch",
+        3 to "jungle",
+        4 to "acacia",
+        5 to "dark_oak",
+    )
+
+    private fun getWoodByDamage(damage: Int): String {
+        return woodMap[damage] ?: ""
+    }
+
+    private fun getWoodDamage(id: String): Int? {
+        return woodMap.entries.find { it.value == id }?.key
+    }
+
+    private val monsterEggMap = mapOf(
+        0 to "infested_stone",
+    )
+
+    private fun getMonsterEggByDamage(damage: Int): String? {
+        return monsterEggMap[damage]
+    }
+
+    private fun getMonsterEggDamage(id: String): Int? {
+        return monsterEggMap.entries.find { it.value == id }?.key
     }
 }

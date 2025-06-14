@@ -15,9 +15,11 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.skyhanni.utils.compat.NbtCompat.appendString
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
@@ -49,7 +51,6 @@ import kotlin.math.floor
 //$$ import at.hannibal2.skyhanni.utils.ComponentUtils
 //$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 //#else
-import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
 //#endif
 
@@ -102,6 +103,16 @@ object EnoughUpdatesManager {
             ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
             isLoading = false
         }
+    }
+
+    fun reloadDataForItem(internalName: NeuInternalName, newData: JsonObject) {
+        // TODO implement this function properly
+        // A few neuItems maps need to be updated
+        NeuItems.allInternalNames.remove(internalName.asString())
+        itemStackCache.remove(internalName.asString())
+        displayNameCache.remove(internalName.asString())
+
+        itemMap[internalName.asString()] = newData
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
@@ -441,11 +452,7 @@ object EnoughUpdatesManager {
             for ((key, value) in replacements) {
                 loreLine.replace("{$key}", value)
             }
-            //#if MC < 1.21
-            loreList.appendTag(NBTTagString(loreLine))
-            //#else
-            //$$ loreList.add(NbtString.of(loreLine))
-            //#endif
+            loreList.appendString(loreLine)
         }
         return loreList
     }

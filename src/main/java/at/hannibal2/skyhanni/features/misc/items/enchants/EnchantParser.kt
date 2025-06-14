@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchGlint
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -440,7 +440,7 @@ object EnchantParser {
     private fun accountForAndRemoveGrayEnchants(loreList: MutableList<String>, item: ItemStack?): Int {
         if (item != null) {
             // If the item has no enchantmentTagList then there will be no gray enchants
-            if (!item.isEnchanted() || item.enchantmentTagList.tagCount() == 0) return -1
+            if (!item.hasEnchGlint() || item.enchantmentTagList.tagCount() == 0) return -1
         }
 
         var lastGrayEnchant = -1

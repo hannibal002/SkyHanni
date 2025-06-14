@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchGlint
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -177,7 +177,7 @@ object CopyNearbyEntitiesCommand {
         val stackName = stack.displayName
         val stackDisplayName = stack.displayName
         val cleanName = stack.cleanName()
-        val itemEnchanted = stack.isEnchanted()
+        val itemEnchanted = stack.hasEnchGlint()
         //#if MC < 1.16
         val itemDamage = stack.itemDamage
         //#endif

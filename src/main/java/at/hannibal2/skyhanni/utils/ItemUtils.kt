@@ -297,7 +297,7 @@ object ItemUtils {
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
     // Checks for the enchantment glint as part of the minecraft enchantments
-    fun ItemStack.isEnchanted(): Boolean =
+    fun ItemStack.hasEnchGlint(): Boolean =
         //#if MC < 1.21
         isItemEnchanted
     //#else
@@ -930,11 +930,20 @@ object ItemUtils {
         return skull
     }
 
-    //#if MC > 1.21
+    //#if MC < 1.21
+    fun ItemStack.getItemModel(): Item? = null
+    //#else
     //$$ fun ItemStack.getItemModel(): Item? {
     //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
     //$$     val item = Registries.ITEM.get(identifier)
     //$$     return if (item == Items.AIR) null else item
     //$$ }
+    //#endif
+
+    fun ItemStack.findItemDamage(): Int =
+        //#if MC < 1.21
+        itemDamage
+    //#else
+    //$$ 0 // todo on modern
     //#endif
 }

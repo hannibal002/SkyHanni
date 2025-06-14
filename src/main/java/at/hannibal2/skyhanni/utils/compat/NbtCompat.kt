@@ -2,10 +2,9 @@ package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
-
+import net.minecraft.nbt.NBTTagString
 //#if MC > 1.21
 //$$ import kotlin.jvm.optionals.getOrNull
-//$$ import net.minecraft.nbt.NbtString
 //$$ import net.minecraft.nbt.NbtByte
 //$$ import net.minecraft.nbt.NbtDouble
 //$$ import net.minecraft.nbt.NbtFloat
@@ -61,6 +60,14 @@ object NbtCompat {
         //#else
         //$$ val nbtList = list.getList(key).getOrNull() ?: NbtList()
         //$$ return getList(nbtList, TAG_COMPOUND)
+        //#endif
+    }
+
+    fun NBTTagList.appendString(value: String) {
+        //#if MC < 1.21
+        appendTag(NBTTagString(value))
+        //#else
+        //$$ add(NbtString.of(value))
         //#endif
     }
 
