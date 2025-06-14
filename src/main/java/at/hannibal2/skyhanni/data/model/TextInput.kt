@@ -163,7 +163,7 @@ open class TextInput {
                 return
             }
             //#if MC > 1.21
-            //$$ if (GLFW.GLFW_KEY_BACKSPACE.isKeyClicked()) {
+            //$$ if (GLFW.GLFW_KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && GLFW.GLFW_KEY_DELETE.isKeyClicked())) {
             //$$     if (carriage != null) {
             //$$         textBox = textBox.removeRange(carriage, carriage + 1)
             //$$     } else {
