@@ -160,19 +160,21 @@ open class TextInput {
                 }
                 return
             }
-            if (Keyboard.KEY_BACK.isKeyClicked()) {
-                if (carriage != null) {
-                    textBox = textBox.removeRange(carriage, carriage + 1)
-                } else {
-                    if (KeyboardManager.isModifierKeyDown()) {
-                        textBox = textBox.removeWordsAtEnd(1)
-                    } else {
-                        textBox = textBox.dropLast(1)
-                    }
-                }
-                updated()
-                return
-            }
+            //#if MC > 1.21
+            //$$ if (Keyboard.KEY_BACK.isKeyClicked()) {
+            //$$     if (carriage != null) {
+            //$$         textBox = textBox.removeRange(carriage, carriage + 1)
+            //$$     } else {
+            //$$         if (KeyboardManager.isModifierKeyDown()) {
+            //$$             textBox = textBox.removeWordsAtEnd(1)
+            //$$         } else {
+            //$$             textBox = textBox.dropLast(1)
+            //$$         }
+            //$$     }
+            //$$     updated()
+            //$$     return
+            //$$ }
+            //#endif
 
             //#if MC < 1.21
             if (timeSinceKeyEvent == Keyboard.getEventNanoseconds()) return
