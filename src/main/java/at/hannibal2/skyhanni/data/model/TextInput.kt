@@ -7,13 +7,15 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
-import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+//#endif
 
 open class TextInput {
 
