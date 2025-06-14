@@ -8,6 +8,8 @@ object SoundCompat {
         "dig.glass" to "block.glass.break",
         "dig.gravel" to "block.gravel.break",
         "dig.stone" to "block.stone.break",
+        "fire.ignite" to "item.flintandsteel.use",
+        "fireworks.launch" to "entity.firework_rocket.launch",
         "liquid.lavapop" to "block.lava.pop",
         "mob.bat.hurt" to "entity.bat.hurt",
         "mob.bat.idle" to "entity.bat.ambient",
@@ -20,6 +22,7 @@ object SoundCompat {
         "mob.ghast.fireball" to "entity.ghast.shoot",
         "mob.ghast.scream" to "entity.ghast.scream",
         "mob.guardian.curse" to "entity.elder_guardian.curse",
+        "mob.guardian.elder.idle" to "entity.elder_guardian.ambient",
         "mob.horse.donkey.death" to "entity.donkey.death",
         "mob.horse.donkey.hit" to "entity.donkey.hurt",
         "mob.pig.say" to "entity.pig.ambient",
@@ -41,13 +44,8 @@ object SoundCompat {
         "random.explode" to "entity.generic.explode",
         "random.levelup" to "entity.player.levelup",
         "random.orb" to "entity.experience_orb.pickup",
-
-        // todo modern
-        "random.successful_hit" to "",
-        "mob.guardian.elder.idle" to "",
-        "fire.ignite" to "",
-        "random.wood_click" to "",
-        "fireworks.launch" to "",
+        "random.successful_hit" to "entity.arrow.hit_player",
+        "random.wood_click" to "block.lever.click",
     )
 
     fun getModernSoundName(soundName: String): String {
