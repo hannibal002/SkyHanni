@@ -74,7 +74,7 @@ class ModuleProcessor(
         return symbols.filter {
             val path = it.containingFile?.filePath ?: return@filter false
             val properPath = path.substringAfter("/main/java/")
-            properPath in validPaths
+            properPath !in validPaths
         }
     }
 
