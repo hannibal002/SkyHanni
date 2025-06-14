@@ -27,6 +27,7 @@ object SoundCompat {
         "mob.horse.donkey.hit" to "entity.donkey.hurt",
         "mob.pig.say" to "entity.pig.ambient",
         "mob.sheep.say" to "entity.sheep.ambient",
+        "mob.wither.shoot" to "entity.wither.shoot",
         "mob.wolf.bark" to "entity.wolf.ambient",
         "mob.wolf.panting" to "entity.wolf.pant",
         "mob.wolf.whine" to "entity.wolf.whine",
