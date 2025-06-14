@@ -8,7 +8,7 @@ class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
     fun findOriginatingModCall(skipSkyhanni: Boolean = false): StackTraceElement? {
         return Thread.currentThread().stackTrace
             // Skip calls before the event is being called
-            .dropWhile { isNetworkHandlerClass(it.className) }
+            .dropWhile { !isNetworkHandlerClass(it.className) }
             // Limit the remaining callstack until only the main entrypoint to hide the relauncher
             .takeWhile { !it.className.endsWith(".Main") }
             // Drop minecraft or skyhanni call frames
@@ -20,13 +20,12 @@ class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
 
     companion object {
 
-        private fun isNetworkHandlerClass(className: String): Boolean {
-            //#if MC < 1.21
-            return className == "net.minecraft.client.network.NetHandlerPlayClient"
-            //#else
-            //$$ return className == "net.minecraft.client.network.ClientPlayNetworkHandler" || className == "net.minecraft.class_2535"
-            //#endif
-        }
+        //#if MC < 1.21
+        private fun isNetworkHandlerClass(className: String) = className == "net.minecraft.client.network.NetHandlerPlayClient"
+        //#else
+        //$$ private val networkClassName = net.minecraft.client.network.ClientPlayNetworkHandler::class.java.name
+        //$$ private fun isNetworkHandlerClass(className: String) = className == networkClassName
+        //#endif
 
         private fun startsWithMinecraft(string: String): Boolean {
             //#if MC < 1.21
