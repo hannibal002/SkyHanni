@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
+import java.util.OptionalDouble
+import java.util.concurrent.ConcurrentHashMap
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.RenderLayer.MultiPhase
 import net.minecraft.client.render.RenderLayer.MultiPhaseParameters
 import net.minecraft.client.render.RenderPhase
-import java.util.OptionalDouble
-import java.util.concurrent.ConcurrentHashMap
+import net.minecraft.util.Identifier
+import net.minecraft.util.TriState
+import net.minecraft.util.Util
 
 object SkyHanniRenderLayers {
 
@@ -84,6 +88,19 @@ object SkyHanniRenderLayers {
         MultiPhaseParameters.builder().build(false),
     )
 
+    private val CHROMA_TEXT: java.util.function.Function<Identifier, RenderLayer> = Util.memoize {
+        texture -> ChromaRenderLayer(
+        "skyhanni_text_chroma",
+        RenderLayer.CUTOUT_BUFFER_SIZE,
+        false,
+        false,
+        SkyHanniRenderPipelines.CHROMA_TEXT,
+        MultiPhaseParameters.builder()
+            .texture(RenderPhase.Texture(texture, TriState.FALSE, false))
+            .build(false)
+        )
+    }
+
     private fun createLineRenderLayer(lineWidth: Double, throughWalls: Boolean): MultiPhase {
         val pipeLine = if (throughWalls) SkyHanniRenderPipelines.LINES_XRAY else SkyHanniRenderPipelines.LINES
         return RenderLayer.of(
@@ -121,4 +138,6 @@ object SkyHanniRenderLayers {
             createLineRenderLayer(lineWidth, throughWalls)
         }
     }
+
+    fun getChromaText(identifier: Identifier) = CHROMA_TEXT.apply(identifier)
 }

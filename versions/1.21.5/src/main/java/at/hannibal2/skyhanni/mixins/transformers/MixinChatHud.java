@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -13,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ListIterator;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ChatHud.class)
 public abstract class MixinChatHud {
@@ -41,6 +43,16 @@ public abstract class MixinChatHud {
         if (ChatPeek.peek()) {
             cir.setReturnValue(getHeight(client.options.getChatHeightFocused().getValue()));
         }
+    }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void onRender(CallbackInfo info) {
+        ChromaFontManagerKt.setRenderingChat(true);
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void onRender2(CallbackInfo info) {
+        ChromaFontManagerKt.setRenderingChat(false);
     }
 
 }
