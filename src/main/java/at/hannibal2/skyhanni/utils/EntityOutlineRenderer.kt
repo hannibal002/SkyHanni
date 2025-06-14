@@ -228,7 +228,7 @@ object EntityOutlineRenderer {
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
         // SkyBlock Conditions
-        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) return false
+        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) return false
 
         // Main toggle for outlines features
         if (!isEnabled()) return false
