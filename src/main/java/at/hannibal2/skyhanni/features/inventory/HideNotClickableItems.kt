@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isCoopSoulBound
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.isSoulBound
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -495,7 +495,7 @@ object HideNotClickableItems {
 
             if (hideNpcSellFilter.match(name)) return false
 
-            if (stack.isVanilla() && !stack.isEnchanted()) {
+            if (stack.isVanilla() && !stack.hasEnchGlint()) {
                 return false
             }
         }

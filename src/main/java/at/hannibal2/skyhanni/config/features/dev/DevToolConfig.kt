@@ -9,4 +9,9 @@ class DevToolConfig {
     @ConfigOption(name = "Graph Tools", desc = "")
     @Accordion
     var graph: GraphConfig = GraphConfig()
+
+    @Expose
+    @ConfigOption(name = "Repo Item Editor", desc = "")
+    @Accordion
+    var repoItemEditor: RepoItemEditorConfig = RepoItemEditorConfig()
 }
