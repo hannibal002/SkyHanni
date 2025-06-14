@@ -88,7 +88,16 @@ object SkyHanniRenderLayers {
         MultiPhaseParameters.builder().build(false),
     )
 
-    private val CHROMA_TEXT: java.util.function.Function<Identifier, RenderLayer> = Util.memoize {
+    private val CHROMA_STANDARD: MultiPhase = ChromaRenderLayer(
+        "skyhanni_standard_chroma",
+        RenderLayer.CUTOUT_BUFFER_SIZE,
+        false,
+        false,
+        SkyHanniRenderPipelines.CHROMA_STANDARD,
+        MultiPhaseParameters.builder().build(false)
+    )
+
+    private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderLayer> = Util.memoize {
         texture -> ChromaRenderLayer(
         "skyhanni_text_chroma",
         RenderLayer.CUTOUT_BUFFER_SIZE,
@@ -139,5 +148,7 @@ object SkyHanniRenderLayers {
         }
     }
 
-    fun getChromaText(identifier: Identifier) = CHROMA_TEXT.apply(identifier)
+    fun getChromaStandard() = CHROMA_STANDARD
+
+    fun getChromaTextured(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
 }

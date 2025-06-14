@@ -41,9 +41,9 @@ fun addTextRenderLayerSet(identifier: Identifier, textRenderLayerSet: TextRender
     // may be rendered to other atlases, but I haven't found what exactly is rendered to them.)
     if (!identifier.toString().startsWith("minecraft:default/")) return
     val chromaTextRenderLayerSet = TextRenderLayerSet(
-        SkyHanniRenderLayers.getChromaText(identifier),
-        SkyHanniRenderLayers.getChromaText(identifier),
-        SkyHanniRenderLayers.getChromaText(identifier),
+        SkyHanniRenderLayers.getChromaTextured(identifier),
+        SkyHanniRenderLayers.getChromaTextured(identifier),
+        SkyHanniRenderLayers.getChromaTextured(identifier),
     )
 
     // Map Minecraft's TextRenderLayerSet to our custom TextRenderLayerSet
