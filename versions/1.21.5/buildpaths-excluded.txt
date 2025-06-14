@@ -57,6 +57,7 @@ at.hannibal2.skyhanni.test.DVDTest.kt
 at.hannibal2.skyhanni.utils.json.NBTTypeAdapter.kt
 at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory.kt
 at.hannibal2.skyhanni.features.rift.area.mirrorverse.CraftRoomHolographicMob.kt
+at.hannibal2.skyhanni.api.DataWatcherApi.kt
 
 at.hannibal2.skyhanni.test.ComponentSpanTest.kt
 at.hannibal2.skyhanni.test.RepoPatternTest.kt
