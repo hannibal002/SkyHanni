@@ -23,7 +23,7 @@ vec3 hsb2rgb_smooth(vec3 c) {
 }
 
 void main() {
-    vec4 originalColor = texture2D(Sampler0, texCoord0) * vertexColor;
+    vec4 originalColor = texture(Sampler0, texCoord0) * vertexColor;
 
     if (originalColor.a < 0.1) {
         discard;
