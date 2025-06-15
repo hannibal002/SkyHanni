@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.pets
+package at.hannibal2.skyhanni.features.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent

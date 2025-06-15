@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 //#if TODO
 import at.hannibal2.skyhanni.data.NotificationManager
 //#endif
-import at.hannibal2.skyhanni.data.PetApi
 //#if TODO
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 //#endif
@@ -33,6 +32,8 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PetUtils.getCleanName
+import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -438,13 +439,23 @@ object ItemUtils {
         LorenzRarity.entries.joinToString(separator = "|") { it.name },
     )
 
+    private val ignoredPetStrings = listOf(
+        "Archer",
+        "Berserk",
+        "Mage",
+        "Tank",
+        "Healer",
+        "➡",
+    )
+
+    private fun ItemStack.isPet() = petItemNamePattern.matches(cleanName()) && !ignoredPetStrings.any {
+        cleanName().contains(it)
+    }
+
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
+        if (this.isPet()) return getPetRarity(this) to ItemCategory.PET
+
         val cleanName = this.cleanName()
-
-        if (PetApi.hasPetName(cleanName)) {
-            return getPetRarity(this) to ItemCategory.PET
-        }
-
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
@@ -488,7 +499,6 @@ object ItemUtils {
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-            PetApi.hasPetName(cleanName) -> ItemCategory.PET
             UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
@@ -709,7 +719,7 @@ object ItemUtils {
         }
 
         // hide pet level
-        PetApi.getCleanName(name)?.let {
+        getCleanName(name)?.let {
             return "$it Pet"
         }
         return name

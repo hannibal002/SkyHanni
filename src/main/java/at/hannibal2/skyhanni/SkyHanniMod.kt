@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 //#if TODO
 import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.data.PetDataStorage
 //#endif
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -105,6 +106,9 @@ object SkyHanniMod {
     lateinit var jacobContestsData: JacobContestsJson
     //#endif
     lateinit var visualWordsData: VisualWordsJson
+    //#if TODO
+    lateinit var petData: PetDataStorage
+    //#endif
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")

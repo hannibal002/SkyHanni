@@ -165,6 +165,11 @@ class DebugConfig {
     var oreEventMessages: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Pet Event Messages", desc = "Shows debug messages every time the Pet Event happens.")
+    @ConfigEditorBoolean
+    var petEventMessages: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Powder Messages", desc = "Shows debug messages every time Hotm Powder changes.")
     @ConfigEditorBoolean
     val powderMessages: Boolean = false
