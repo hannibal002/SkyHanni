@@ -12,6 +12,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -164,9 +165,18 @@ class GardenConfig {
         name = "Burrowing Spores",
         desc = "Show a notification when a Burrowing Spores spawns while farming mushrooms."
     )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var burrowingSporesNotification: Boolean = true
+    @ConfigEditorDropdown
+    var burrowingSporesNotificationType: BurrowingSporesNotificationType = BurrowingSporesNotificationType.TITLE
+
+    enum class BurrowingSporesNotificationType(val displayName: String) {
+        TITLE("Title"),
+        BLINK("Blink"),
+        BOTH("Both"),
+        NONE("None"),
+        ;
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(

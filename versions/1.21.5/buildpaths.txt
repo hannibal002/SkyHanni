@@ -381,6 +381,7 @@ at/hannibal2/skyhanni/config/features/garden/pests/PestFinderConfig.kt
 at/hannibal2/skyhanni/config/features/garden/pests/PestProfitTrackerConfig.kt
 at/hannibal2/skyhanni/config/features/garden/pests/PestSpawnConfig.kt
 at/hannibal2/skyhanni/config/features/garden/pests/PestTimerConfig.kt
+at/hannibal2/skyhanni/config/features/garden/pests/PestTrapConfig.kt
 at/hannibal2/skyhanni/config/features/garden/pests/PestWaypointConfig.kt
 at/hannibal2/skyhanni/config/features/garden/pests/PesthunterShopConfig.kt
 at/hannibal2/skyhanni/config/features/garden/pests/PestsConfig.kt

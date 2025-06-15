@@ -31,6 +31,11 @@ class PestsConfig {
     var pestTimer: PestTimerConfig = PestTimerConfig()
 
     @Expose
+    @ConfigOption(name = "Pest Trap", desc = "")
+    @Accordion
+    var pestTrap: PestTrapConfig = PestTrapConfig()
+
+    @Expose
     @ConfigOption(name = "Pest Profit Tracker", desc = "")
     @Accordion
     var pestProfitTacker: PestProfitTrackerConfig = PestProfitTrackerConfig()
