@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -28,8 +30,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -39,6 +45,8 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import kotlin.math.absoluteValue
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ExperimentsProfitTracker {
@@ -55,6 +63,7 @@ object ExperimentsProfitTracker {
             xpGained = 0L
             bitCost = 0L
             startCost = 0L
+            timeWasted = enumMapOf()
         }
 
         override fun getDescription(timesGained: Long): List<String> {
@@ -81,6 +90,9 @@ object ExperimentsProfitTracker {
 
         @Expose
         var startCost = 0L
+
+        @Expose
+        var timeWasted: MutableMap<ExperimentationTableApi.ExperimentationTaskType, Duration> = enumMapOf()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -154,6 +166,24 @@ object ExperimentsProfitTracker {
         )
     }
 
+    private var lastAddedTimeWasted: SimpleTimeMark = SimpleTimeMark.farPast()
+
+    @HandleEvent(SecondPassedEvent::class)
+    fun checkAddTimeWasted() {
+        if (ExperimentationTableApi.expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!ExperimentationTableApi.inTable || !config.trackTimeSpent) {
+            lastAddedTimeWasted = SimpleTimeMark.farPast()
+            return
+        }
+        val currentType = ExperimentationTableApi.currentExperimentType ?: return
+        lastAddedTimeWasted.takeIfInitialized()?.let { lastAdded ->
+            tracker.modify {
+                it.timeWasted.addOrPut(currentType, lastAdded.passedSince())
+            }
+        }
+        lastAddedTimeWasted = SimpleTimeMark.now()
+    }
+
     private fun NeuInternalName.formatWarningString(amount: Int) = buildString {
         val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
         val amountFormat = "§8${amount}x ".takeIf { amount > 1 }.orEmpty()
@@ -177,6 +207,11 @@ object ExperimentsProfitTracker {
 
         val experimentsDone = data.experimentsDone
         addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
+
+        if (config.trackTimeSpent) {
+            val timeFormat = data.timeWasted.values.sumOf { it.inWholeSeconds }.seconds.format()
+            addSearchString("§eTime Spent: §b$timeFormat")
+        }
 
         val startCostFormat = startCost.absoluteValue
         val bitCostFormat = data.bitCost

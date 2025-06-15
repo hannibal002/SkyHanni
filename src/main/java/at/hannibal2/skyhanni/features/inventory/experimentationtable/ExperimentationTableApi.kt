@@ -306,7 +306,7 @@ object ExperimentationTableApi {
      * REGEX-TEST: Superpairs Rewards
      * REGEX-TEST: Experiment Over
      */
-    private val expOverInventoryPattern by patternGroup.pattern(
+    val expOverInventoryPattern by patternGroup.pattern(
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
     )
