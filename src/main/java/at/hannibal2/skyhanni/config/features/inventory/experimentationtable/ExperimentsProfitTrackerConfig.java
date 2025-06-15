@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 //#if TODO
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.ExperimentationMessages;
+import at.hannibal2.skyhanni.api.ExperimentationTableApi.ExperimentationMessages;
 //#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;

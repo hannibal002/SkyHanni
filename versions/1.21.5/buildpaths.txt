@@ -448,7 +448,7 @@ at/hannibal2/skyhanni/config/features/inventory/customwardrobe/CustomWardrobeCon
 at/hannibal2/skyhanni/config/features/inventory/customwardrobe/KeybindConfig.java
 at/hannibal2/skyhanni/config/features/inventory/customwardrobe/SpacingConfig.java
 at/hannibal2/skyhanni/config/features/inventory/evolvingItemsConfig.java
-at/hannibal2/skyhanni/config/features/inventory/experimentationtable/ExperimentationTableConfig.java
+at/hannibal2/skyhanni/config/features/inventory/experimentationtable/ExperimentationTableConfig.kt
 at/hannibal2/skyhanni/config/features/inventory/experimentationtable/ExperimentsDryStreakConfig.java
 at/hannibal2/skyhanni/config/features/inventory/experimentationtable/ExperimentsProfitTrackerConfig.java
 at/hannibal2/skyhanni/config/features/inventory/helper/HarpConfigKeyBinds.java

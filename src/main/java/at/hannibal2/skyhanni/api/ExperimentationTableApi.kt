@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable
+package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -44,8 +44,11 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
+import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
+
+typealias TaskType = ExperimentationTableApi.ExperimentationTaskType
 
 @SkyHanniModule
 object ExperimentationTableApi {
@@ -53,7 +56,7 @@ object ExperimentationTableApi {
     private const val ADDONS_OVER_DATA_SLOT = 11
     private const val SUPERPAIRS_OVER_DATA_SLOT = 13
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val currentExperimentData = ExperimentationDataSet()
@@ -61,9 +64,11 @@ object ExperimentationTableApi {
     val patternGroup = RepoPattern.group("enchanting.experiments")
     val experimentationTableInventory = InventoryDetector { name -> inventoriesPattern.matches(name) }
     val inTable get() = experimentationTableInventory.isInside()
-    val isActive get() = currentExperimentData.tier != null
     val currentExperimentTier get() = currentExperimentData.tier
     val currentExperimentType get() = currentExperimentData.type
+    val inChronomatron get() = currentExperimentType == TaskType.CHRONOMATRON
+    val inUltrasequencer get() = currentExperimentType == TaskType.ULTRASEQUENCER
+    val inAddon get() = inChronomatron || inUltrasequencer
 
     private var lastExpOverHash: Int = 0
     private var currentExpOverHash: Int = 0
@@ -317,7 +322,7 @@ object ExperimentationTableApi {
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
     }
 
-    private fun ExperimentationMessages.isSelected() = config.hideMessages.contains(this)
+    private fun ExperimentationMessages.isSelected() = config.experimentsProfitTracker.hideMessages.contains(this)
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
@@ -410,8 +415,6 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
-
-        updateTablePos()
         event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
         handleExpBottles(false)
@@ -419,14 +422,28 @@ object ExperimentationTableApi {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!inTable || event.item?.displayName != "§cDecline") return
+        if (!inTable || event.item == null || event.slot == null) return
+        event.tryResetQueuedEvent()
+    }
+
+    private fun GuiContainerEvent.SlotClickEvent.tryResetQueuedEvent() {
+        if (item?.displayName != "§cDecline") return
         queuedCompleteEvent = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!inTable) return
+        updateTablePosition()
         event.tryProcessExperimentOver()
+    }
+
+    private fun updateTablePosition() {
+        val storage = storage ?: return
+        val tableEntity = EntityUtils.getEntities<EntityArmorStand>().find {
+            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+        } ?: return
+        storage.tablePos = tableEntity.getLorenzVec()
     }
 
     private fun InventoryOpenEvent.tryProcessExperimentOver() {
@@ -507,26 +524,20 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun InventoryOpenEvent.tryUpdateCurrentActivity() = currentTypeAndTierPattern.matchMatcher(inventoryName) {
-        if (inventoryName == "Experimentation Table") return@matchMatcher currentExperimentData.reset()
+    private fun InventoryOpenEvent.tryUpdateCurrentActivity() =
+        if (inventoryName == "Experimentation Table") currentExperimentData.reset()
+        else currentTypeAndTierPattern.matchMatcher(inventoryName) {
+            val type = ExperimentationTaskType.fromStringOrNull(group("type")) ?: return@matchMatcher
+            val tier = ExperimentationTier.byNameOrNull(group("tier")) ?: return@matchMatcher
+            if (type == currentExperimentType && tier == currentExperimentTier) return@matchMatcher
 
-        val type = ExperimentationTaskType.fromStringOrNull(group("type")) ?: return@matchMatcher
-        val tier = ExperimentationTier.byNameOrNull(group("tier")) ?: return@matchMatcher
-        if (type == currentExperimentType && tier == currentExperimentTier) return@matchMatcher
+            currentExperimentData.apply {
+                this.type = type
+                this.tier = tier
+            }
 
-        currentExperimentData.apply {
-            this.type = type
-            this.tier = tier
+            TableTaskStartedEvent(type, tier).post()
         }
-
-        TableTaskStartedEvent(type, tier).post()
-    }
-
-    private fun updateTablePos() {
-        storage?.tablePos = EntityUtils.getEntities<EntityArmorStand>().find {
-            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
-        }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
-    }
 
     fun hasGuardianPet(): Boolean = guardianPetNamePattern.matches(PetApi.currentPet)
 }
