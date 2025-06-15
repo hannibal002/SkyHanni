@@ -79,7 +79,11 @@ object EnoughUpdatesManager {
         }
     }
 
+    private var isLoading = false
+
     fun reloadRepo() {
+        if (isLoading) return
+        isLoading = true
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
@@ -96,6 +100,7 @@ object EnoughUpdatesManager {
             }
             NeuRepositoryReloadEvent.post()
             ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
+            isLoading = false
         }
     }
 
