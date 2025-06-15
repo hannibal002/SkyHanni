@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -68,37 +67,25 @@ public class TrevorTheTrapperConfig {
         ELUSIVE
     ));
 
-    public enum TrackerEntry implements HasLegacyId {
-        TITLE("§b§lTrevor Data Tracker", 0),
-        QUESTS_STARTED("§b1,428 §9Quests Started", 1),
-        TOTAL_PELTS("§b11,281 §5Total Pelts Gained", 2),
-        PELTS_PER_HOUR("§b2,448 §5Pelts Per Hour", 3),
-        SPACER_1("", 4),
-        KILLED("§b850 §cKilled Animals", 5),
-        SELF_KILLING("§b153 §cSelf Killing Animals", 6),
-        TRACKABLE("§b788 §fTrackable Animals", 7),
-        UNTRACKABLE("§b239 §aUntrackable Animals", 8),
-        UNDETECTED("§b115 §9Undetected Animals", 9),
-        ENDANGERED("§b73 §5Endangered Animals", 10),
-        ELUSIVE("§b12 §6Elusive Animals", 11),
+    public enum TrackerEntry {
+        TITLE("§b§lTrevor Data Tracker"),
+        QUESTS_STARTED("§b1,428 §9Quests Started"),
+        TOTAL_PELTS("§b11,281 §5Total Pelts Gained"),
+        PELTS_PER_HOUR("§b2,448 §5Pelts Per Hour"),
+        SPACER_1(""),
+        KILLED("§b850 §cKilled Animals"),
+        SELF_KILLING("§b153 §cSelf Killing Animals"),
+        TRACKABLE("§b788 §fTrackable Animals"),
+        UNTRACKABLE("§b239 §aUntrackable Animals"),
+        UNDETECTED("§b115 §9Undetected Animals"),
+        ENDANGERED("§b73 §5Endangered Animals"),
+        ELUSIVE("§b12 §6Elusive Animals"),
         ;
 
         private final String displayName;
-        private final int legacyId;
 
-        TrackerEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         TrackerEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override

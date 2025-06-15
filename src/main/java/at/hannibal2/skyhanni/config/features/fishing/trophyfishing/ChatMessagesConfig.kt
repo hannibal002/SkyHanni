@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.fishing.trophyfishing
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -27,12 +26,12 @@ class ChatMessagesConfig {
     @ConfigEditorDropdown
     var design: DesignFormat = DesignFormat.STYLE_1
 
-    enum class DesignFormat(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        STYLE_1("Style 1", 0),
-        STYLE_2("Style 2", 1),
-        STYLE_3("Style 3", 2);
+    enum class DesignFormat(private val displayName: String) {
+        STYLE_1("Style 1"),
+        STYLE_2("Style 2"),
+        STYLE_3("Style 3"),
+        ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

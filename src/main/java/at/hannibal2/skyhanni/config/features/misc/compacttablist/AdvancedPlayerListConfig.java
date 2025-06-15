@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.misc.compacttablist;
 
-import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -13,30 +12,18 @@ public class AdvancedPlayerListConfig {
     @ConfigEditorDropdown
     public PlayerSortEntry playerSortOrder = PlayerSortEntry.RANK;
 
-    public enum PlayerSortEntry implements HasLegacyId {
-        RANK("Rank (Default)", 0),
-        SB_LEVEL("SB Level", 1),
-        NAME("Name (Abc)", 2),
-        PROFILE_TYPE("Ironman/Bingo", 3),
-        SOCIAL_STATUS("Party/Friends/Guild", 4),
-        RANDOM("Random", 5);
+    public enum PlayerSortEntry {
+        RANK("Rank (Default)"),
+        SB_LEVEL("SB Level"),
+        NAME("Name (Abc)"),
+        PROFILE_TYPE("Ironman/Bingo"),
+        SOCIAL_STATUS("Party/Friends/Guild"),
+        RANDOM("Random");
 
         private final String displayName;
-        private final int legacyId;
 
-        PlayerSortEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         PlayerSortEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override

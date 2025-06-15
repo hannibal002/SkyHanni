@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -316,10 +315,6 @@ object GardenVisitorDropStatistics {
         event.move(3, "${originalPrefix}displayIcons", "${newPrefix}displayIcons")
         event.move(3, "${originalPrefix}onlyOnBarn", "${newPrefix}onlyOnBarn")
         event.move(3, "${originalPrefix}visitorDropPos", "${newPrefix}pos")
-
-        event.transform(11, "${newPrefix}textFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
-        }
 
         // Was a list of longs, now a map of rarity to count
         event.move(
