@@ -203,7 +203,7 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char, keyCode: Int) {
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (clickedPos == -1) return
         val position = positions[clickedPos]
         if (position.clicked) return

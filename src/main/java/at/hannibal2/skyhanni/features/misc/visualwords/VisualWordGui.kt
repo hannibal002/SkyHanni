@@ -462,7 +462,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
     }
 
-    override fun onKeyTyped(typedChar: Char, keyCode: Int) {
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (!currentlyEditing) {
             if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
                 if (KeyboardManager.isModifierKeyDown()) {
@@ -500,7 +500,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             return
         }
 
-        if (currentText.length < maxTextLength && !Character.isISOControl(typedChar)) {
+        if (currentText.length < maxTextLength && (typedChar != null && !Character.isISOControl(typedChar))) {
             currentText += typedChar
             saveTextChanges()
             return
