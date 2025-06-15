@@ -31,7 +31,11 @@ object LowHealthAlert {
             val alertSound = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch)
             SoundUtils.repeatSound(100, soundConfig.repeatSound, alertSound)
             lastAlert?.stop()
-            TitleManager.sendTitle("§c$username §ais low", "§c$health❤", 1.seconds)?.let {
+            TitleManager.sendTitle(
+                "§c$username §ais low",
+                "§c$health❤",
+                1.seconds
+            )?.let {
                 lastAlert = it
             }
         }

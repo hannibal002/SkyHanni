@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -43,10 +44,58 @@ object TitleManager {
 
     private val titleLocationQueues: MutableMap<TitleLocation, CollectionUtils.OrderedQueue<TitleContext>> = enumMapOf()
     private val currentTitles: MutableMap<TitleLocation, TitleContext?> = enumMapOf()
+    val guiConfig get() = SkyHanniMod.feature.gui
+    val existingIntentions = guiConfig.titleIntentionPositions.values.map { it.keys }.flatten().toSet()
+    val intentionMapper: MutableMap<String, TitleIntention> = mutableMapOf()
+
+    data class TitleIntention(
+        val displayName: String,
+        val internalName: String,
+    )
+
+    inline fun<reified E : Enum<E>> registerIntentions(
+        invokerClazz: Class<Any>,
+        defaultPosition: Position? = null,
+    ) {
+        val enumClass = E::class.java
+        val enumConstants = enumClass.enumConstants
+
+        for (enumConstant in enumConstants) {
+            val name = enumConstant.name
+            val reifiedName = "${invokerClazz.simpleName}.${enumClass.simpleName}.$name"
+            val intentionContext = TitleIntention(
+                displayName = enumConstant.toString(),
+                internalName = reifiedName,
+            )
+
+            if (existingIntentions.contains(reifiedName)) {
+                intentionMapper[name] = intentionContext
+                continue
+            }
+
+            existingIntentions.firstOrNull {
+                it != reifiedName && it.endsWith(".$name")
+            }?.let {
+                ErrorManager.skyHanniError(
+                    "Unique title intention violation - ${invokerClazz.simpleName} " +
+                        "attempted to register $name, but $it already exists."
+                )
+            }
+
+            intentionMapper[name] = intentionContext
+            val position = defaultPosition ?: guiConfig.titlePosition
+            TitleLocation.entries.forEach { locationType ->
+                val intentionPosition = guiConfig.titleIntentionPositions.getOrPut(locationType) { mutableMapOf() }
+                intentionPosition[reifiedName] = position
+                guiConfig.titleIntentionPositions[locationType] = intentionPosition
+            }
+        }
+    }
 
     open class TitleContext(
         private var titleText: String = "",
         private var subtitleText: String? = null,
+        var intention: TitleIntention? = null,
         var duration: Duration = 1.seconds,
         val weight: Double = 1.0,
         var discardOnWorldChange: Boolean = true,
@@ -207,10 +256,11 @@ object TitleManager {
         override fun toString() = displayName
     }
 
-    fun sendTitle(
+    fun <E : Enum<E>> sendTitle(
         titleText: String,
         subtitleText: String? = null,
         duration: Duration = 5.seconds,
+        intention: E? = null,
         location: TitleLocation = TitleLocation.GLOBAL,
         addType: TitleAddType = TitleAddType.QUEUE,
         weight: Double = 1.0,
@@ -235,7 +285,12 @@ object TitleManager {
          */
         loomDuration: Duration = 250.milliseconds,
     ): TitleContext? {
-        val newTitle = TitleContext(titleText, subtitleText, duration, weight).let {
+        val parsedIntention: TitleIntention? = when (intention) {
+            null -> null
+            else -> intentionMapper[intention.name]
+        }
+
+        val newTitle = TitleContext(titleText, subtitleText, parsedIntention, duration, weight).let {
             when (countDownDisplayType) {
                 null -> it
                 else -> it.fromTitleData(
@@ -314,6 +369,7 @@ object TitleManager {
             title,
             subtitleText = null,
             duration = duration,
+            intention = null,
             location,
             countDownDisplayType = if (countdown) CountdownTitleDisplayType.PARTIAL_SECONDS else null,
         )
@@ -439,10 +495,16 @@ object TitleManager {
         globalTitle.tryRenderGlobalTitle()
     }
 
+    private fun TitleIntention.getPositionOrNull(location: TitleLocation): Position? {
+        val intentionPosition = guiConfig.titleIntentionPositions[location]
+        return intentionPosition?.get(this.internalName)
+    }
+
     // TODO move function inside title context class
     private fun TitleContext.tryRenderGlobalTitle() {
-        val gui = SkyHanniMod.feature.gui
-        val position = gui.titlePosition
+        val intentionPosition = intention?.getPositionOrNull(TitleLocation.GLOBAL)
+        val position = intentionPosition ?: guiConfig.titlePosition
+
         val guiWidth = GuiScreenUtils.scaledWindowWidth
 
         val mainScalar = position.scale * 3.0
@@ -490,7 +552,14 @@ object TitleManager {
         targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
         DrawContextUtils.popMatrix()
 
-        GuiEditManager.add(position, "Title", targetRenderable.width, targetRenderable.height)
+        if (intentionPosition != null) {
+            // Intention is never null here, but it's mutable so
+            val qualifiedIntention = intention ?: return
+            val intentionFormat = "Title: ${qualifiedIntention.displayName}"
+            GuiEditManager.add(intentionPosition, intentionFormat, targetRenderable.width, targetRenderable.height)
+        } else {
+            GuiEditManager.add(position, "Title", targetRenderable.width, targetRenderable.height)
+        }
     }
 
     @HandleEvent
