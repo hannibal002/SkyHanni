@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
@@ -30,10 +31,13 @@ import kotlin.math.min
 //#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
+import java.nio.FloatBuffer
+
 //#else
 //$$ import net.minecraft.client.render.RenderLayer
 //#endif
 
+// todo, some functions need 1.21 impls
 /**
  * Some functions taken from NotEnoughUpdates
  */
@@ -314,50 +318,68 @@ object GuiRenderUtils {
         y: Float,
         scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
+        rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
         val isSkull = rescaleSkulls && item.item === Items.skull
 
-        val baseScale = (if (isSkull) 4f / 3f else 1f)
+        val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
+        val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
+        val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
+
+        val baseScale = if (isSkull) (4f / 3f) else 1f
         val finalScale = (baseScale * scaleMultiplier).toFloat()
 
-        val translateX: Float
-        val translateY: Float
-        if (isSkull) {
-            val skullDiff = ((scaleMultiplier) * 2.5).toFloat()
-            translateX = x - skullDiff
-            translateY = y - skullDiff
-        } else {
-            translateX = x
-            translateY = y
+        val (translateX, translateY) = if (isSkull) {
+            val skullDiff = ((scaleMultiplier) * 2.5f).toFloat()
+            x - skullDiff to y - skullDiff
+        } else x to y
+
+        val halfIconX = 8f
+        val halfIconY = 8f
+        val halfIconZ = 100f
+
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate(translateX, translateY, -19f)
+            DrawContextUtils.scale(finalScale, finalScale, 0.2f)
+
+            // Rotation
+            val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+            DrawContextUtils.pushPop {
+                DrawContextUtils.loadIdentity()
+
+                DrawContextUtils.translate(halfIconX, halfIconY, halfIconZ)
+                if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
+                if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
+                if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
+                DrawContextUtils.translate(-halfIconX, -halfIconY, -halfIconZ)
+
+                DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+            }
+            DrawContextUtils.multMatrix(savedMV)
+
+            GL11.glEnable(GL11.GL_NORMALIZE)
+            GL11.glNormal3f(0f, 0f, 1f)
+
+            //#if MC < 1.21
+            RenderHelper.enableGUIStandardItemLighting()
+            AdjustStandardItemLighting.adjust() // Compensate for z scaling
+            try {
+                Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e, "Error rendering item onto screen",
+                    "itemName" to item.displayName,
+                    "internalName" to item.getInternalNameOrNull(),
+                )
+            }
+            RenderHelper.disableStandardItemLighting()
+            GL11.glDisable(GL11.GL_NORMALIZE)
+            RenderHelper.disableStandardItemLighting()
+            //#else
+            //$$ renderItemStack(item, 0, 0)
+            //#endif
         }
-
-        DrawContextUtils.pushMatrix()
-
-        DrawContextUtils.translate(translateX, translateY, -19f)
-        DrawContextUtils.scale(finalScale, finalScale, 0.2f)
-        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
-
-        //#if MC < 1.21
-        RenderHelper.enableGUIStandardItemLighting()
-        AdjustStandardItemLighting.adjust() // Compensate for z scaling
-
-        try {
-            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error rendering item onto screen",
-                "itemName" to item.displayName,
-                "internalName" to item.getInternalNameOrNull(),
-            )
-        }
-
-        RenderHelper.disableStandardItemLighting()
-        //#else
-        //$$ renderItemStack(item, 0, 0)
-        //#endif
-
-        DrawContextUtils.popMatrix()
     }
 
     //#if MC < 1.21

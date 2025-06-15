@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets
-
     private val patternGroup = RepoPattern.group("misc.currentpet")
 
     /**
