@@ -41,9 +41,9 @@ class TrophyFishDisplayConfig {
     var keybind: Int = Keyboard.KEY_NONE
 
     @Expose
-    @ConfigOption(name = "Hunter Armor", desc = "Only show when wearing a full Hunter Armor.")
+    @ConfigOption(name = "Hunter Armor", desc = "Only show when wearing a full Hunter Armor or Ember Armor.")
     @ConfigEditorBoolean
-    var requireHunterArmor: Property<Boolean> = Property.of(false)
+    var requireArmor: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Highlight New", desc = "Highlight new trophies green for couple seconds.")
