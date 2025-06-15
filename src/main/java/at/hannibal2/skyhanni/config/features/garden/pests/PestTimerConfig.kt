@@ -29,7 +29,7 @@ class PestTimerConfig {
     @Expose
     @ConfigOption(name = "Pest Timer Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var pestDisplay: MutableList<PestTimerTextEntry> = mutableListOf(
+    val pestDisplay: MutableList<PestTimerTextEntry> = mutableListOf(
         PestTimerTextEntry.PEST_TIMER,
         PestTimerTextEntry.PEST_COOLDOWN
     )
@@ -73,5 +73,5 @@ class PestTimerConfig {
 
     @Expose
     @ConfigLink(owner = PestTimerConfig::class, field = "enabled")
-    var position: Position = Position(383, 93)
+    val position: Position = Position(383, 93)
 }

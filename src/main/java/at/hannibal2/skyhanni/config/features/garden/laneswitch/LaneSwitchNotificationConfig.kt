@@ -34,5 +34,5 @@ class LaneSwitchNotificationConfig {
     @Expose
     @ConfigOption(name = "Sound Settings", desc = "")
     @Accordion
-    var sound: LaneSwitchSoundSettings = LaneSwitchSoundSettings()
+    val sound: LaneSwitchSoundSettings = LaneSwitchSoundSettings()
 }

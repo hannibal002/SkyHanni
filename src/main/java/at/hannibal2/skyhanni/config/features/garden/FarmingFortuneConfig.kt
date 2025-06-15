@@ -38,10 +38,10 @@ class FarmingFortuneConfig {
         desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff"
     )
     @ConfigEditorButton(buttonText = "Open")
-    var open: Runnable = Runnable(FFGuideGui::onCommand)
+    val open: Runnable = Runnable(FFGuideGui::onCommand)
     //#endif
 
     @Expose
     @ConfigLink(owner = FarmingFortuneConfig::class, field = "display")
-    var position: Position = Position(5, -180)
+    val position: Position = Position(5, -180)
 }

@@ -25,5 +25,5 @@ class KingTalismanConfig {
 
     @Expose
     @ConfigLink(owner = KingTalismanConfig::class, field = "enabled")
-    var position: Position = Position(-400, 220)
+    val position: Position = Position(-400, 220)
 }

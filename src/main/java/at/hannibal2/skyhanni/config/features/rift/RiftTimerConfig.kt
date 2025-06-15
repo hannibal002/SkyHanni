@@ -21,16 +21,16 @@ class RiftTimerConfig {
     @Expose
     @ConfigOption(name = "Max Time", desc = "Show max time.")
     @ConfigEditorBoolean
-    var maxTime: Property<Boolean> = Property.of(true)
+    val maxTime: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Percentage", desc = "Show percentage.")
     @ConfigEditorBoolean
-    var percentage: Property<Boolean> = Property.of(true)
+    val percentage: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigLink(owner = RiftTimerConfig::class, field = "enabled")
-    var timerPosition: Position = Position(10, 10)
+    val timerPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Nametag Format", desc = "Format the remaining rift time for other players in their nametag.")

@@ -10,17 +10,17 @@ class GlaciteMineshaftConfig {
     @Expose
     @ConfigOption(name = "Mineshaft Waypoints", desc = "General waypoints inside the Mineshaft.")
     @Accordion
-    var mineshaftWaypoints: MineshaftWaypointsConfig = MineshaftWaypointsConfig()
+    val mineshaftWaypoints: MineshaftWaypointsConfig = MineshaftWaypointsConfig()
 
     @Expose
     @ConfigOption(name = "Corpse Locator", desc = "")
     @Accordion
-    var corpseLocator: CorpseLocatorConfig = CorpseLocatorConfig()
+    val corpseLocator: CorpseLocatorConfig = CorpseLocatorConfig()
 
     @Expose
     @ConfigOption(name = "Corpse Tracker", desc = "")
     @Accordion
-    var corpseTracker: CorpseTrackerConfig = CorpseTrackerConfig()
+    val corpseTracker: CorpseTrackerConfig = CorpseTrackerConfig()
 
     @Expose
     @ConfigOption(

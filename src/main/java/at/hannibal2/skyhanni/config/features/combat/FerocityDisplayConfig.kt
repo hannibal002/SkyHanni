@@ -20,5 +20,5 @@ class FerocityDisplayConfig {
 
     @Expose
     @ConfigLink(owner = FerocityDisplayConfig::class, field = "enabled")
-    var position: Position = Position(10, 80)
+    val position: Position = Position(10, 80)
 }

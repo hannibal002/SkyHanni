@@ -34,7 +34,7 @@ import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.IChatComponent
 import java.util.LinkedList
 import java.util.Queue
-import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
@@ -394,7 +394,7 @@ object ChatUtils {
     fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
         MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
 
-    fun chatAndOpenConfig(message: String, property: KMutableProperty0<*>) {
+    fun chatAndOpenConfig(message: String, property: KProperty0<*>) {
         clickableChat(
             message,
             onClick = { property.jumpToEditor() },
@@ -404,7 +404,7 @@ object ChatUtils {
 
     fun clickToActionOrDisable(
         message: String,
-        option: KMutableProperty0<*>,
+        option: KProperty0<*>,
         actionName: String,
         action: () -> Unit,
         oneTimeClick: Boolean = false,

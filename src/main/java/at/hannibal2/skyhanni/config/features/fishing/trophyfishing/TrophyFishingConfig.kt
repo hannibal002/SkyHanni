@@ -11,27 +11,27 @@ class TrophyFishingConfig {
     @Expose
     @ConfigOption(name = "Trophy Fishing Chat Messages", desc = "")
     @Accordion
-    var chatMessages: ChatMessagesConfig = ChatMessagesConfig()
+    val chatMessages: ChatMessagesConfig = ChatMessagesConfig()
 
     @Expose
     @ConfigOption(name = "Trophy Fishing Display", desc = "")
     @Accordion
-    var display: TrophyFishDisplayConfig = TrophyFishDisplayConfig()
+    val display: TrophyFishDisplayConfig = TrophyFishDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Geyser Fishing", desc = "")
     @Accordion
-    var geyserOptions: GeyserFishingConfig = GeyserFishingConfig()
+    val geyserOptions: GeyserFishingConfig = GeyserFishingConfig()
 
     @ConfigOption(name = "Sulphur Skitter Box", desc = "")
     @Accordion
     @Expose
-    var sulphurSkitterBox: SulphurSkitterBoxConfig = SulphurSkitterBoxConfig()
+    val sulphurSkitterBox: SulphurSkitterBoxConfig = SulphurSkitterBoxConfig()
 
     @Expose
     @ConfigOption(name = "Golden Fish Timer", desc = "")
     @Accordion
-    var goldenFishTimer: GoldenFishTimerConfig = GoldenFishTimerConfig()
+    val goldenFishTimer: GoldenFishTimerConfig = GoldenFishTimerConfig()
 
     @Expose
     @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of Trophy Fish in tooltip.")

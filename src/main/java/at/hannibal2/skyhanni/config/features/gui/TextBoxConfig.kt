@@ -27,9 +27,9 @@ class TextBoxConfig {
             "§eUse '\\n' as the line break character."
     )
     @ConfigEditorText
-    var text: Property<String> = Property.of("&aYour Text Here\\n&bYour new line here")
+    val text: Property<String> = Property.of("&aYour Text Here\\n&bYour new line here")
 
     @Expose
     @ConfigLink(owner = TextBoxConfig::class, field = "enabled")
-    var position: Position = Position(10, 80)
+    val position: Position = Position(10, 80)
 }

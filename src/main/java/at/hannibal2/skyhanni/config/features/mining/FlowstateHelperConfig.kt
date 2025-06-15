@@ -25,7 +25,7 @@ class FlowstateHelperConfig {
     @Expose
     @ConfigOption(name = "Appearance", desc = "Drag text to change the appearance.")
     @ConfigEditorDraggableList
-    var appearance: MutableList<FlowstateElements> = FlowstateElements.defaultOption.toMutableList()
+    val appearance: MutableList<FlowstateElements> = FlowstateElements.defaultOption.toMutableList()
     //#endif
 
     @Expose
@@ -41,5 +41,5 @@ class FlowstateHelperConfig {
 
     @Expose
     @ConfigLink(owner = FlowstateHelperConfig::class, field = "enabled")
-    var position: Position = Position(-110, 9)
+    val position: Position = Position(-110, 9)
 }

@@ -53,9 +53,9 @@ class BlazeHellionConfig {
 
     @Expose
     @ConfigLink(owner = BlazeHellionConfig::class, field = "daggers")
-    var positionTop: Position = Position(-475, 173, 4.4f, true)
+    val positionTop: Position = Position(-475, 173, 4.4f, true)
 
     @Expose
     @ConfigLink(owner = BlazeHellionConfig::class, field = "daggers")
-    var positionBottom: Position = Position(-475, 230, 3.2f, true)
+    val positionBottom: Position = Position(-475, 230, 3.2f, true)
 }

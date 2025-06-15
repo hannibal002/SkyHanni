@@ -104,7 +104,7 @@ class FlareConfig {
 
     @Expose
     @ConfigLink(owner = FlareConfig::class, field = "enabled")
-    var position: Position = Position(150, 200)
+    val position: Position = Position(150, 200)
 
     @Expose
     @ConfigOption(name = "Show Buff", desc = "Show the mana regen buff next to the flare name.")

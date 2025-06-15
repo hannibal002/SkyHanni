@@ -9,7 +9,7 @@ class SkillOverflowConfig {
     @Expose
     @ConfigOption(name = "Display", desc = "Enable the overflow calculation in the progress display.")
     @ConfigEditorBoolean
-    var enableInDisplay: Property<Boolean> = Property.of(false)
+    val enableInDisplay: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -17,17 +17,17 @@ class SkillOverflowConfig {
         desc = "Enable the overflow calculation in the all skill progress display."
     )
     @ConfigEditorBoolean
-    var enableInAllDisplay: Property<Boolean> = Property.of(false)
+    val enableInAllDisplay: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "ETA Display", desc = "Enable the overflow calculation in the ETA skill display.")
     @ConfigEditorBoolean
-    var enableInEtaDisplay: Property<Boolean> = Property.of(false)
+    val enableInEtaDisplay: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Progress Bar", desc = "Enable the overflow calculation in the progress bar of the display.")
     @ConfigEditorBoolean
-    var enableInProgressBar: Property<Boolean> = Property.of(false)
+    val enableInProgressBar: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(

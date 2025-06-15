@@ -17,12 +17,12 @@ class MythologicalMobTrackerConfig {
 
     @Expose
     @ConfigLink(owner = MythologicalMobTrackerConfig::class, field = "enabled")
-    var position: Position = Position(20, 20)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Percentage", desc = "Show percentage how often what mob spawned.")
     @ConfigEditorBoolean
-    var showPercentage: Property<Boolean> = Property.of(false)
+    val showPercentage: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat messages when digging up a mythological mob.")

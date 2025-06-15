@@ -22,7 +22,7 @@ class MayorOverlayConfig {
     @Expose
     @ConfigOption(name = "Appearance", desc = "Change the order of appearance of the Mayor Overlay.")
     @ConfigEditorDraggableList
-    var mayorOverlay: MutableList<MayorOverlay> = MayorOverlay.entries.toMutableList()
+    val mayorOverlay: MutableList<MayorOverlay> = MayorOverlay.entries.toMutableList()
     //#endif
 
     @Expose
@@ -42,5 +42,5 @@ class MayorOverlayConfig {
 
     @Expose
     @ConfigLink(owner = MayorOverlayConfig::class, field = "enabled")
-    var position: Position = Position(10, 10)
+    val position: Position = Position(10, 10)
 }

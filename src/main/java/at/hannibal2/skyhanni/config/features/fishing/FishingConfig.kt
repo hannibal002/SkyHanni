@@ -13,62 +13,62 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class FishingConfig {
     @Expose
     @Category(name = "Trophy Fishing", desc = "Trophy Fishing Settings")
-    var trophyFishing: TrophyFishingConfig = TrophyFishingConfig()
+    val trophyFishing: TrophyFishingConfig = TrophyFishingConfig()
 
     @Expose
     @ConfigOption(name = "Thunder Spark", desc = "")
     @Accordion
-    var thunderSpark: ThunderSparkConfig = ThunderSparkConfig()
+    val thunderSpark: ThunderSparkConfig = ThunderSparkConfig()
 
     @Expose
     @ConfigOption(name = "Barn Fishing Timer", desc = "")
     @Accordion
-    var barnTimer: BarnTimerConfig = BarnTimerConfig()
+    val barnTimer: BarnTimerConfig = BarnTimerConfig()
 
     @Expose
     @ConfigOption(name = "Chum/Chumcap Bucket Hider", desc = "")
     @Accordion
-    var chumBucketHider: ChumBucketHiderConfig = ChumBucketHiderConfig()
+    val chumBucketHider: ChumBucketHiderConfig = ChumBucketHiderConfig()
 
     @Expose
     @ConfigOption(name = "Fished Item Name", desc = "")
     @Accordion
-    var fishedItemName: FishedItemNameConfig = FishedItemNameConfig()
+    val fishedItemName: FishedItemNameConfig = FishedItemNameConfig()
 
     @Expose
     @ConfigOption(name = "Fishing Hook Display", desc = "")
     @Accordion
-    var fishingHookDisplay: FishingHookDisplayConfig = FishingHookDisplayConfig()
+    val fishingHookDisplay: FishingHookDisplayConfig = FishingHookDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Bait Warnings", desc = "")
     @Accordion
-    var fishingBaitWarnings: FishingBaitWarningsConfig = FishingBaitWarningsConfig()
+    val fishingBaitWarnings: FishingBaitWarningsConfig = FishingBaitWarningsConfig()
 
     @Expose
     @ConfigOption(name = "Rare Sea Creatures", desc = "")
     @Accordion
-    var rareCatches: RareCatchesConfig = RareCatchesConfig()
+    val rareCatches: RareCatchesConfig = RareCatchesConfig()
 
     @Expose
     @ConfigOption(name = "Fishing Profit Tracker", desc = "")
     @Accordion
-    var fishingProfitTracker: FishingProfitTrackerConfig = FishingProfitTrackerConfig()
+    val fishingProfitTracker: FishingProfitTrackerConfig = FishingProfitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Totem of Corruption", desc = "")
     @Accordion
-    var totemOfCorruption: TotemOfCorruptionConfig = TotemOfCorruptionConfig()
+    val totemOfCorruption: TotemOfCorruptionConfig = TotemOfCorruptionConfig()
 
     @Expose
     @ConfigOption(name = "Sea Creature Tracker", desc = "")
     @Accordion
-    var seaCreatureTracker: SeaCreatureTrackerConfig = SeaCreatureTrackerConfig()
+    val seaCreatureTracker: SeaCreatureTrackerConfig = SeaCreatureTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Lava Replacement", desc = "")
     @Accordion
-    var lavaReplacement: LavaReplacementConfig = LavaReplacementConfig()
+    val lavaReplacement: LavaReplacementConfig = LavaReplacementConfig()
 
     @Expose
     @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
@@ -78,7 +78,7 @@ class FishingConfig {
 
     @Expose
     @ConfigLink(owner = FishingConfig::class, field = "sharkFishCounter")
-    var sharkFishCounterPos: Position = Position(10, 10)
+    val sharkFishCounterPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

@@ -24,5 +24,5 @@ class DanceRoomFormattingConfig {
     @Expose
     @ConfigOption(name = "Color Option", desc = "")
     @Accordion
-    var color: ColorConfig = ColorConfig()
+    val color: ColorConfig = ColorConfig()
 }

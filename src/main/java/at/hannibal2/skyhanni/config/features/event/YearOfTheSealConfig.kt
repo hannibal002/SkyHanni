@@ -19,5 +19,5 @@ class YearOfTheSealConfig {
 
     @Expose
     @ConfigLink(owner = YearOfTheSealConfig::class, field = "fishyTreatProfit")
-    var fishyTreatProfitPosition: Position = Position(170, 150)
+    val fishyTreatProfitPosition: Position = Position(170, 150)
 }

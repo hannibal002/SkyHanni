@@ -16,13 +16,13 @@ class EventsConfig {
     @Expose
     @ConfigOption(name = "Events Priority", desc = "Drag your list to select the priority of each event.")
     @ConfigEditorDraggableList
-    var eventEntries: Property<MutableList<ScoreboardConfigEventElement>> =
+    val eventEntries: Property<MutableList<ScoreboardConfigEventElement>> =
         Property.of(ArrayList(ScoreboardConfigEventElement.defaultOption))
 
     // TODO move into kotlin
     @ConfigOption(name = "Reset Events Priority", desc = "Reset the priority of all events.")
     @ConfigEditorButton(buttonText = "Reset")
-    var reset: Runnable = Runnable {
+    val reset: Runnable = Runnable {
         eventEntries.get().clear()
         eventEntries.get().addAll(ScoreboardConfigEventElement.defaultOption)
         eventEntries.notifyObservers()

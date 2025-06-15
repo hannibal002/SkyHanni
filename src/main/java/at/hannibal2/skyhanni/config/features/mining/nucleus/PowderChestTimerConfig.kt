@@ -66,5 +66,5 @@ class PowderChestTimerConfig {
 
     @Expose
     @ConfigLink(owner = PowderChestTimerConfig::class, field = "enabled")
-    var position: Position = Position(100, 100)
+    val position: Position = Position(100, 100)
 }

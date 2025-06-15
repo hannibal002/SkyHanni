@@ -31,7 +31,7 @@ class CFStrayRabbitWarningConfig {
             "§cMust be a .ogg file"
     )
     @ConfigEditorText
-    var specialRabbitSound: Property<String> = Property.of("note.pling")
+    val specialRabbitSound: Property<String> = Property.of("note.pling")
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")
@@ -63,5 +63,5 @@ class CFStrayRabbitWarningConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    var sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 }

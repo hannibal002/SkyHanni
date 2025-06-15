@@ -25,7 +25,7 @@ class FarmingLaneConfig {
     @Expose
     @ConfigOption(name = "Lane Switch Notification", desc = "")
     @Accordion
-    var laneSwitchNotification: LaneSwitchNotificationConfig = LaneSwitchNotificationConfig()
+    val laneSwitchNotification: LaneSwitchNotificationConfig = LaneSwitchNotificationConfig()
 
     @Expose
     @ConfigOption(
@@ -46,7 +46,7 @@ class FarmingLaneConfig {
 
     @Expose
     @ConfigLink(owner = FarmingLaneConfig::class, field = "distanceDisplay")
-    var distanceDisplayPosition: Position = Position(0, 200)
+    val distanceDisplayPosition: Position = Position(0, 200)
 
     @Expose
     @ConfigOption(name = "Corner Waypoints", desc = "Show the corner for the current lane in the world.")
@@ -58,6 +58,6 @@ class FarmingLaneConfig {
     @Expose
     @ConfigOption(name = "Ignored Crops", desc = "Add the crops you wish to not setup a lane for.")
     @ConfigEditorDraggableList
-    var ignoredCrops: MutableList<CropType> = mutableListOf()
+    val ignoredCrops: MutableList<CropType> = mutableListOf()
     //#endif
 }

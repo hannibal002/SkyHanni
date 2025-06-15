@@ -14,7 +14,7 @@ class ChunkedStatsConfig {
     @Expose
     @ConfigOption(name = "Chunked Stats", desc = "Select the stats you want to display chunked on the scoreboard.")
     @ConfigEditorDraggableList
-    var chunkedStats: MutableList<ChunkedStatsLine> = ChunkedStatsLine.entries.toMutableList()
+    val chunkedStats: MutableList<ChunkedStatsLine> = ChunkedStatsLine.entries.toMutableList()
     //#endif
 
     @Expose

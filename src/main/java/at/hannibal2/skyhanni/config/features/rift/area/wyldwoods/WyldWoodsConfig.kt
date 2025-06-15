@@ -20,10 +20,10 @@ class WyldWoodsConfig {
     @ConfigOption(name = "Larvas", desc = "")
     @Accordion
     @Expose
-    var larvas: LarvasConfig = LarvasConfig()
+    val larvas: LarvasConfig = LarvasConfig()
 
     @ConfigOption(name = "Odonatas", desc = "")
     @Accordion
     @Expose
-    var odonata: OdonataConfig = OdonataConfig()
+    val odonata: OdonataConfig = OdonataConfig()
 }

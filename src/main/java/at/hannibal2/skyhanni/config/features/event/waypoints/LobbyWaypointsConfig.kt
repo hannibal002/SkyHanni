@@ -8,15 +8,15 @@ class LobbyWaypointsConfig {
     @Expose
     @ConfigOption(name = "Easter Egg Waypoints", desc = "")
     @Accordion
-    var easterEgg: EasterEggConfig = EasterEggConfig()
+    val easterEgg: EasterEggConfig = EasterEggConfig()
 
     @Expose
     @ConfigOption(name = "Halloween Basket Waypoints", desc = "")
     @Accordion
-    var halloweenBasket: HalloweenBasketConfig = HalloweenBasketConfig()
+    val halloweenBasket: HalloweenBasketConfig = HalloweenBasketConfig()
 
     @Expose
     @ConfigOption(name = "Christmas Present Waypoints", desc = "")
     @Accordion
-    var christmasPresent: ChristmasPresentConfig = ChristmasPresentConfig()
+    val christmasPresent: ChristmasPresentConfig = ChristmasPresentConfig()
 }

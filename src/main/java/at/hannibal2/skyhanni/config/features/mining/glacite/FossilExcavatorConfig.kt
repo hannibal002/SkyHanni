@@ -10,17 +10,17 @@ class FossilExcavatorConfig {
     @Expose
     @ConfigOption(name = "Fossil Excavator Solver", desc = "")
     @Accordion
-    var solver: FossilExcavatorSolverConfig = FossilExcavatorSolverConfig()
+    val solver: FossilExcavatorSolverConfig = FossilExcavatorSolverConfig()
 
     @Expose
     @ConfigOption(name = "Excavator Profit Tracker", desc = "")
     @Accordion
-    var profitTracker: ExcavatorProfitTrackerConfig = ExcavatorProfitTrackerConfig()
+    val profitTracker: ExcavatorProfitTrackerConfig = ExcavatorProfitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Excavator Tooltip Hider", desc = "")
     @Accordion
-    var tooltipHider: ExcavatorTooltipHiderConfig = ExcavatorTooltipHiderConfig()
+    val tooltipHider: ExcavatorTooltipHiderConfig = ExcavatorTooltipHiderConfig()
 
     @Expose
     @ConfigOption(

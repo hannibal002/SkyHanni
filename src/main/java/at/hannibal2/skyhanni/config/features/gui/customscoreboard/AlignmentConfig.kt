@@ -11,11 +11,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 // todo 1.21 impl needed
 class AlignmentConfig {
     //#if TODO
+    @Suppress("StorageVarOrVal")
     @Expose
     @ConfigOption(name = "Horizontal Alignment", desc = "Alignment for the scoreboard on the horizontal axis.")
     @ConfigEditorDropdown
     var horizontalAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.RIGHT
 
+    @Suppress("StorageVarOrVal")
     @Expose
     @ConfigOption(name = "Vertical Alignment", desc = "Alignment for the scoreboard on the vertical axis.")
     @ConfigEditorDropdown

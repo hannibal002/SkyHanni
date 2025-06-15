@@ -12,17 +12,17 @@ class AshfangConfig {
     @ConfigOption(name = "Gravity Orbs", desc = "")
     @Accordion
     @Expose
-    var gravityOrbs: GravityOrbsConfig = GravityOrbsConfig()
+    val gravityOrbs: GravityOrbsConfig = GravityOrbsConfig()
 
     @ConfigOption(name = "Blazing Souls", desc = "")
     @Accordion
     @Expose
-    var blazingSouls: BlazingSoulsColor = BlazingSoulsColor()
+    val blazingSouls: BlazingSoulsColor = BlazingSoulsColor()
 
     @ConfigOption(name = "Hide Stuff", desc = "")
     @Accordion
     @Expose
-    var hide: HideAshfangConfig = HideAshfangConfig()
+    val hide: HideAshfangConfig = HideAshfangConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Blazes", desc = "Highlight the different blazes in their respective colors.")
@@ -38,7 +38,7 @@ class AshfangConfig {
 
     @Expose
     @ConfigLink(owner = AshfangConfig::class, field = "freezeCooldown")
-    var freezeCooldownPos: Position = Position(10, 10)
+    val freezeCooldownPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Reset Time", desc = "Show the cooldown until Ashfang pulls his underlings back.")
@@ -48,5 +48,5 @@ class AshfangConfig {
 
     @Expose
     @ConfigLink(owner = AshfangConfig::class, field = "nextResetCooldown")
-    var nextResetCooldownPos: Position = Position(10, 10)
+    val nextResetCooldownPos: Position = Position(10, 10)
 }

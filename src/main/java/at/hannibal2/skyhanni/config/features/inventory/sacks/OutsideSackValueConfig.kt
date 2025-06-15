@@ -17,5 +17,5 @@ class OutsideSackValueConfig {
 
     @Expose
     @ConfigLink(owner = OutsideSackValueConfig::class, field = "enabled")
-    var position: Position = Position(144, 139)
+    val position: Position = Position(144, 139)
 }

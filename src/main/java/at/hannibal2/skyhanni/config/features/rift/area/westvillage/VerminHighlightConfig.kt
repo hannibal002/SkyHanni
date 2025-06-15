@@ -17,5 +17,5 @@ class VerminHighlightConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Change Vermin highlight color.")
     @ConfigEditorColour
-    var color: Property<String> = Property.of("0:60:0:0:255")
+    val color: Property<String> = Property.of("0:60:0:0:255")
 }

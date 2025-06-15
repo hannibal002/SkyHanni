@@ -13,7 +13,7 @@ class PartyConfig {
         desc = "Max number of party members to show in the party list (you are not included)."
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 25f, minStep = 1f)
-    var maxPartyList: Property<Int> = Property.of(4)
+    val maxPartyList: Property<Int> = Property.of(4)
 
     @Expose
     @ConfigOption(

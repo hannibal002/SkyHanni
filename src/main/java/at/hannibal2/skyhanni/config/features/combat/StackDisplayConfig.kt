@@ -19,5 +19,5 @@ class StackDisplayConfig {
 
     @Expose
     @ConfigLink(owner = StackDisplayConfig::class, field = "enabled")
-    var position: Position = Position(480, -210, 1.9f)
+    val position: Position = Position(480, -210, 1.9f)
 }

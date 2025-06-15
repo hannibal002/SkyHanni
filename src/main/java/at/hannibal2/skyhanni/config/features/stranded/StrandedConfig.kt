@@ -25,5 +25,5 @@ class StrandedConfig {
 
     @Expose
     @ConfigLink(owner = StrandedConfig::class, field = "inWaterDisplay")
-    var inWaterPosition: Position = Position(20, 20)
+    val inWaterPosition: Position = Position(20, 20)
 }

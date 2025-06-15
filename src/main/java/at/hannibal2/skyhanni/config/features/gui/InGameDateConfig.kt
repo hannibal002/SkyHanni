@@ -21,7 +21,7 @@ class InGameDateConfig {
 
     @Expose
     @ConfigLink(owner = InGameDateConfig::class, field = "enabled")
-    var position: Position = Position(10, 10)
+    val position: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

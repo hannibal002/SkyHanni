@@ -9,7 +9,7 @@ class StillgoreChateauConfig {
     @Expose
     @ConfigOption(name = "Blood Effigies", desc = "")
     @Accordion
-    var bloodEffigies: EffigiesConfig = EffigiesConfig()
+    val bloodEffigies: EffigiesConfig = EffigiesConfig()
 
     @Expose
     @ConfigOption(

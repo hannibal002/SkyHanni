@@ -29,5 +29,5 @@ class ExcavatorProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = ExcavatorProfitTrackerConfig::class, field = "enabled")
-    var position: Position = Position(-380, 150)
+    val position: Position = Position(-380, 150)
 }

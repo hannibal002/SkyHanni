@@ -25,10 +25,10 @@ class InquisitorSoundConfig {
     //#if TODO
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    var testSound: Runnable = Runnable { InquisitorWaypointShare.playUserSound() }
+    val testSound: Runnable = Runnable { InquisitorWaypointShare.playUserSound() }
     //#endif
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
-    var listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 }

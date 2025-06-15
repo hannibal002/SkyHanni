@@ -34,7 +34,7 @@ class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Change by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 50f, minStep = 1f)
-    var reducingFactor: Property<Float> = Property.of(15f)
+    val reducingFactor: Property<Float> = Property.of(15f)
 
     @Expose
     @ConfigOption(name = "Show GUI", desc = "Show the GUI element while the feature is enabled.")
@@ -44,14 +44,14 @@ class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Only in Ground", desc = "Lower sensitivity when standing on the ground.")
     @ConfigEditorBoolean
-    var onGround: Property<Boolean> = Property.of(false)
+    val onGround: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Disable in Barn", desc = "Disable reduced sensitivity in barn plot.")
     @ConfigEditorBoolean
-    var onlyPlot: Property<Boolean> = Property.of(true)
+    val onlyPlot: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigLink(owner = SensitivityReducerConfig::class, field = "showGui")
-    var position: Position = Position(400, 400, 0.8f)
+    val position: Position = Position(400, 400, 0.8f)
 }

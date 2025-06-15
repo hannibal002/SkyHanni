@@ -21,34 +21,34 @@ class CustomScoreboardConfig {
     @ConfigOption(name = "Enabled", desc = "Show a custom scoreboard instead of the vanilla one.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     //#if TODO
     @Expose
     @ConfigOption(name = "Appearance", desc = "Drag text to change the appearance of the advanced scoreboard.")
     @ConfigEditorDraggableList
-    var scoreboardEntries: Property<MutableList<ScoreboardConfigElement>> =
+    val scoreboardEntries: Property<MutableList<ScoreboardConfigElement>> =
         Property.of(ScoreboardConfigElement.defaultOptions.toMutableList())
 
     @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
     @ConfigEditorButton(buttonText = "Reset")
-    var reset: Runnable = Runnable(CustomScoreboard::resetAppearance)
+    val reset: Runnable = Runnable(CustomScoreboard::resetAppearance)
     //#endif
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")
     @Accordion
-    var display: DisplayConfig = DisplayConfig()
+    val display: DisplayConfig = DisplayConfig()
 
     @Expose
     @ConfigOption(name = "Background Options", desc = "")
     @Accordion
-    var background: BackgroundConfig = BackgroundConfig()
+    val background: BackgroundConfig = BackgroundConfig()
 
     @Expose
     @ConfigOption(name = "Information Filtering", desc = "")
     @Accordion
-    var informationFiltering: InformationFilteringConfig = InformationFilteringConfig()
+    val informationFiltering: InformationFilteringConfig = InformationFilteringConfig()
 
     @Expose
     @ConfigOption(
@@ -61,5 +61,5 @@ class CustomScoreboardConfig {
 
     @Expose
     @ConfigLink(owner = CustomScoreboardConfig::class, field = "enabled")
-    var position: Position = Position(10, 80)
+    val position: Position = Position(10, 80)
 }

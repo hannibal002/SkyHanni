@@ -35,7 +35,7 @@ class BingoCardConfig {
     @Expose
     @ConfigOption(name = "Hide Community Goals", desc = "Hide Community Goals from the Bingo Card display.")
     @ConfigEditorBoolean
-    var hideCommunityGoals: Property<Boolean> = Property.of(false)
+    val hideCommunityGoals: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -49,7 +49,7 @@ class BingoCardConfig {
 
     @Expose
     @ConfigLink(owner = BingoCardConfig::class, field = "enabled")
-    var bingoCardPos: Position = Position(10, 10)
+    val bingoCardPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(
@@ -57,7 +57,7 @@ class BingoCardConfig {
         desc = "Show the duration until the next hidden personal goal gets a tip revealed."
     )
     @ConfigEditorBoolean
-    var nextTipDuration: Property<Boolean> = Property.of(true)
+    val nextTipDuration: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(

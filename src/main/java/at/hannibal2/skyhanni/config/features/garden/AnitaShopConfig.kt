@@ -26,5 +26,5 @@ class AnitaShopConfig {
 
     @Expose
     @ConfigLink(owner = AnitaShopConfig::class, field = "medalProfitEnabled")
-    var medalProfitPos: Position = Position(206, 158)
+    val medalProfitPos: Position = Position(206, 158)
 }

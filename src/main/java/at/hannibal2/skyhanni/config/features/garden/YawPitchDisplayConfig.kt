@@ -51,11 +51,13 @@ class YawPitchDisplayConfig {
     @ConfigEditorBoolean
     var showAlways: Boolean = false
 
+    // Todo rename to position
     @Expose
     @ConfigLink(owner = YawPitchDisplayConfig::class, field = "enabled")
-    var pos: Position = Position(445, 225)
+    val pos: Position = Position(445, 225)
 
+    // Todo rename to positionOutside
     @Expose
     @ConfigLink(owner = YawPitchDisplayConfig::class, field = "showOutsideGarden")
-    var posOutside: Position = Position(445, 225)
+    val posOutside: Position = Position(445, 225)
 }

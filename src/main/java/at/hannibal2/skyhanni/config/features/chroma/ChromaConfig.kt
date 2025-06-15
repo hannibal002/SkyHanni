@@ -21,7 +21,7 @@ class ChromaConfig {
     @ConfigOption(name = "Enabled", desc = "Toggle SkyHanni's chroma.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Chroma Size", desc = "Change the size of each color in the chroma.")
@@ -38,6 +38,7 @@ class ChromaConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.01f)
     var chromaSaturation: Float = 0.75f
 
+    @Suppress("StorageVarOrVal")
     @Expose
     @ConfigOption(name = "Chroma Direction", desc = "Change the slant and direction of the chroma.")
     @ConfigEditorDropdown
@@ -55,7 +56,7 @@ class ChromaConfig {
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all chroma settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    var resetSettings: Runnable = Runnable { ChromaManager.resetChromaSettings() }
+    val resetSettings: Runnable = Runnable { ChromaManager.resetChromaSettings() }
 
     @Expose
     @ConfigOption(

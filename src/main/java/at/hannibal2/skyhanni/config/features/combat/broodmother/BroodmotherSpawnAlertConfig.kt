@@ -25,7 +25,7 @@ class BroodmotherSpawnAlertConfig {
     //#if TODO
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    var testSound: Runnable = Runnable(BroodmotherFeatures::playTestSound)
+    val testSound: Runnable = Runnable(BroodmotherFeatures::playTestSound)
     //#endif
 
     @Expose
@@ -35,7 +35,7 @@ class BroodmotherSpawnAlertConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    var sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 
     @Expose
     @ConfigOption(name = "Text", desc = "The text with color to be displayed as the title notification.")

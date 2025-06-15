@@ -11,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// TODO moulconfig runnable support
 class NextConfig {
     @Expose
     @ConfigOption(
@@ -22,11 +21,10 @@ class NextConfig {
     @FeatureToggle
     var bestDisplay: Boolean = false
 
-    // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock EXP.")
     @ConfigEditorDropdown
-    var bestType: Property<BestTypeEntry> = Property.of(BestTypeEntry.GARDEN_EXP)
+    val bestType: Property<BestTypeEntry> = Property.of(BestTypeEntry.GARDEN_EXP)
 
     enum class BestTypeEntry(
         private val displayName: String,
@@ -40,11 +38,10 @@ class NextConfig {
         override fun toString() = displayName
     }
 
-    // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Only Show Top", desc = "Only show the top # crops.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
-    var showOnlyBest: Property<Int> = Property.of(10)
+    val showOnlyBest: Property<Int> = Property.of(10)
 
     @Expose
     @ConfigOption(
@@ -52,13 +49,12 @@ class NextConfig {
         desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.",
     )
     @ConfigEditorBoolean
-    var showCurrent: Property<Boolean> = Property.of(true)
+    val showCurrent: Property<Boolean> = Property.of(true)
 
-    // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Always On", desc = "Show the Best Display always while in the garden.")
     @ConfigEditorBoolean
-    var bestAlwaysOn: Property<Boolean> = Property.of(false)
+    val bestAlwaysOn: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -66,14 +62,14 @@ class NextConfig {
         desc = "A more compact best crop time: Removing the crop name and exp, hide the # number and using a more compact time format.",
     )
     @ConfigEditorBoolean
-    var bestCompact: Property<Boolean> = Property.of(false)
+    val bestCompact: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Title", desc = "Hide the 'Best Crop Time' line entirely.")
     @ConfigEditorBoolean
-    var bestHideTitle: Property<Boolean> = Property.of(false)
+    val bestHideTitle: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigLink(owner = NextConfig::class, field = "bestDisplay")
-    var displayPos: Position = Position(-200, -200)
+    val displayPos: Position = Position(-200, -200)
 }
