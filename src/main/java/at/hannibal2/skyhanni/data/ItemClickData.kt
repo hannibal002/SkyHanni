@@ -16,6 +16,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0APacketAnimation
 //#if MC > 1.21
 //$$ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
+//$$ import net.minecraft.util.Hand
 //#endif
 
 @SkyHanniModule
@@ -73,6 +74,12 @@ object ItemClickData {
                 //#if MC < 1.21
                 val clickedEntity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
                 //#else
+                //$$ if (packet.type is PlayerInteractEntityC2SPacket.InteractAtHandler) {
+                //$$     return
+                //$$ }
+                //$$ if (packet.type is PlayerInteractEntityC2SPacket.InteractHandler) {
+                //$$     if ((packet.type as PlayerInteractEntityC2SPacket.InteractHandler).hand == Hand.OFF_HAND) return
+                //$$ }
                 //$$ val world = MinecraftCompat.localPlayer.world
                 //$$ val clickedEntity = world.getEntityById(packet.entityId) ?: return
                 //#endif

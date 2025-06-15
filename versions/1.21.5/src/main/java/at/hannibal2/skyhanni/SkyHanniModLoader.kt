@@ -8,9 +8,7 @@ class SkyHanniModLoader : ModInitializer {
     override fun onInitialize() {
         SkyHanniMod.preInit()
         SkyHanniMod.init()
-        println("skyhanni loaded")
         loadedClasses.clear()
-        TestingModFeatures
     }
 
     companion object {

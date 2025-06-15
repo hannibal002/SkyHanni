@@ -15,3 +15,14 @@ accessible field net/minecraft/util/hit/BlockHitResult missed Z
 accessible class net/minecraft/client/gui/hud/ChatHud$RemovalQueuedMessage
 accessible field net/minecraft/client/gui/hud/ChatHud messages Ljava/util/List;
 accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util/List;
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractAtHandler
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractHandler
+accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractHandler hand Lnet/minecraft/util/Hand;
+accessible field net/minecraft/world/World blockEntityTickers Ljava/util/List;
+accessible class net/minecraft/client/font/TextRenderer$Drawer
+accessible field net/minecraft/client/render/RenderLayer$MultiPhase phases Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
+accessible field net/minecraft/client/render/RenderLayer$MultiPhaseParameters target Lnet/minecraft/client/render/RenderPhase$Target;
+accessible method net/minecraft/client/render/RenderLayer$MultiPhase <init> (Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)V
+extendable class net/minecraft/client/render/RenderLayer$MultiPhase
+accessible field net/minecraft/client/font/BakedGlyph textRenderLayers Lnet/minecraft/client/font/TextRenderLayerSet;
+accessible method net/minecraft/text/TextColor <init> (ILjava/lang/String;)V

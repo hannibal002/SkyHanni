@@ -8,9 +8,45 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.mixins.hooks.renderToolTip
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//$$ import net.minecraft.text.Text
+//#endif
 
-// Please use LorenzToolTipEvent over ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
+// Please use ToolTipEvent over ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
 object ToolTipData {
+
+    //#if MC > 1.21
+    //$$ @JvmStatic
+    //$$ fun processModernTooltip(
+    //$$     context: DrawContext,
+    //$$     stack: ItemStack,
+    //$$     originalToolTip: MutableList<Text>,
+    //$$ ): MutableList<Text> {
+    //$$     val tooltip = originalToolTip.map { it.formattedTextCompatLessResets().removePrefix("§5") }.toMutableList()
+    //$$     val tooltipCopy = tooltip.toMutableList()
+    //$$     getTooltip(stack, tooltip)
+    //$$     onHover(context, stack, tooltip)
+    //$$     renderToolTip(context, stack)
+    //$$     if (tooltip.isEmpty()) {
+    //$$         return mutableListOf()
+    //$$     }
+    //$$     if (tooltip == tooltipCopy) {
+    //$$         return originalToolTip
+    //$$     }
+    //$$     // TODO need a better way to handle this
+    //$$     val newTooltip = mutableListOf<Text>()
+    //$$     for ((i, line) in tooltip.withIndex()) {
+    //$$         if (tooltipCopy.size > i && tooltipCopy[i] == line) {
+    //$$             newTooltip.add(originalToolTip[i])
+    //$$         } else {
+    //$$             newTooltip.add(Text.of(tooltip[i]))
+    //$$         }
+    //$$     }
+    //$$     return newTooltip
+    //$$ }
+    //#endif
 
     @JvmStatic
     fun getTooltip(stack: ItemStack, toolTip: MutableList<String>) {

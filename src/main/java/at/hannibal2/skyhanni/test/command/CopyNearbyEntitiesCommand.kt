@@ -115,6 +115,9 @@ object CopyNearbyEntitiesCommand {
                     is EntityWither -> addWither(entity)
                     //#if MC > 1.21
                     //$$ is net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity -> addItemDisplayEntity(entity)
+                    //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
+                    //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
+                    //$$ is net.minecraft.entity.passive.PandaEntity -> addPanda(entity)
                     //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
@@ -227,12 +230,36 @@ object CopyNearbyEntitiesCommand {
     //$$     add("EntityItemDisplay:")
     //$$     val stack = entity.itemStack
     //$$     val rotation = entity.rotationVector
-    //$$     val position = entity.pos.toLorenzVec()
     //$$
     //$$     add("-  itemStack:")
     //$$     printItemStackData(stack)
     //$$     add("-  rotation: $rotation")
-    //$$     add("-  position: $position")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addTropicalFish(entity: net.minecraft.entity.passive.TropicalFishEntity) {
+    //$$     add("EntityTropicalFish:")
+    //$$     val variety = entity.variety
+    //$$     val patternColor = entity.patternColor
+    //$$     val baseColor = entity.baseColor
+    //$$     add("-  variety: $variety")
+    //$$     add("-  patternColor: $patternColor")
+    //$$     add("-  baseColor: $baseColor")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addShulker(entity: net.minecraft.entity.mob.ShulkerEntity) {
+    //$$     add("EntityShulker:")
+    //$$     val color = entity.color
+    //$$     val attachedFace = entity.attachedFace
+    //$$     add("-  color: $color")
+    //$$     add("-  attachedFace: $attachedFace")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addPanda(entity: net.minecraft.entity.passive.PandaEntity) {
+    //$$     add("EntityPanda:")
+    //$$     val mainGene = entity.mainGene
+    //$$     val hiddenGene = entity.hiddenGene
+    //$$     add("-  mainGene: $mainGene")
+    //$$     add("-  hiddenGene: $hiddenGene")
     //$$ }
     //#endif
 

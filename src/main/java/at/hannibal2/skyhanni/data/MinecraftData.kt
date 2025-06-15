@@ -13,14 +13,12 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
-//#if TODO
+//#if MC < 1.21
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
-//#endif
-//#if MC > 1.21
-//$$ import net.minecraft.registry.Registries
+//#else
+//$$ import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object MinecraftData {
 
@@ -32,7 +30,7 @@ object MinecraftData {
                         //#if MC < 1.21
                         packet.soundName,
                         //#else
-                        //$$ packet.sound.value().id.toString(),
+                        //$$ packet.sound.value().id.toString().removePrefix("minecraft:"),
                         //#endif
                         LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume,
                     ).post()
@@ -62,16 +60,24 @@ object MinecraftData {
                 }
             }
 
-            //#if TODO
+            //#if MC < 1.21
             is S32PacketConfirmTransaction -> {
                 if (packet.actionNumber > 0) return
+                //#else
+                //$$ is CommonPingS2CPacket -> {
+                //$$ if (lastPingParameter == packet.parameter) return
+                //$$ lastPingParameter = packet.parameter
+                //#endif
 
                 totalServerTicks++
                 ServerTickEvent.post()
             }
-            //#endif
         }
     }
+
+    //#if MC > 1.21
+    //$$ private var lastPingParameter = 0
+    //#endif
 
     var totalServerTicks: Long = 0L
         private set

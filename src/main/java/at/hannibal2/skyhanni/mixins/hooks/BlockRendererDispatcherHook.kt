@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.resources.model.IBakedModel
@@ -20,7 +20,7 @@ fun modifyGetModelFromBlockState(
 ) {
     if (pos == null) return
 
-    if (!LorenzUtils.inSkyBlock) return
+    if (!SkyBlockUtils.inSkyBlock) return
 
     val returnState = MiningCommissionsBlocksColor.processState(state)
 

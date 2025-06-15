@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.minion
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
@@ -226,7 +228,16 @@ object MinionFeatures {
         lastMinionOpened = 0
     }
 
-    fun removeBuggedMinions(isCommand: Boolean = false) {
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shfixminions") {
+            description = "Removed bugged minion locations from your private island"
+            category = CommandCategory.USERS_BUG_FIX
+            simpleCallback { removeBuggedMinions(isCommand = true) }
+        }
+    }
+
+    private fun removeBuggedMinions(isCommand: Boolean = false) {
         if (!IslandType.PRIVATE_ISLAND.isCurrent()) return
         val minions = minions ?: return
 

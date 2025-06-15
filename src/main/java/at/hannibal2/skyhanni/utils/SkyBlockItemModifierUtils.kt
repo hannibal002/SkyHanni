@@ -250,7 +250,10 @@ object SkyBlockItemModifierUtils {
         return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
     }
     //#else
+    //$$ private val identifierPattern = "[a-z0-9_\\-.:]+".toRegex()
+    //$$
     //$$ fun isVanillaItem(itemId: String): Boolean {
+    //$$     if (!identifierPattern.matches(itemId)) return false
     //$$     return Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
     //$$ }
     //#endif

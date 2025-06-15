@@ -268,7 +268,7 @@ afterEvaluate {
     tasks.named("kspKotlin", KspTaskJvm::class) {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
         this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
     }
 }
 
@@ -321,20 +321,20 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
+fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
                 .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
-            kotlin.include(buildPaths)
-            java.include(buildPaths)
+            kotlin.exclude(buildPaths)
+            java.exclude(buildPaths)
         }
     }
 }
-includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
-includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
