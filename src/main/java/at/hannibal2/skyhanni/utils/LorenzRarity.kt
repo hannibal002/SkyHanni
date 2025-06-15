@@ -56,7 +56,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
         fun getByName(name: String): LorenzRarity? = entries.find { it.name.equals(name, ignoreCase = true) }
 
-        private fun getByColor(color: LorenzColor?): LorenzRarity? = entries.find { it.color == color }
+        fun getByColor(color: LorenzColor?): LorenzRarity? = entries.find { it.color == color }
 
         private fun getByColorCode(colorCode: Char): LorenzRarity? = getByColor(colorCode.toLorenzColor())
 
