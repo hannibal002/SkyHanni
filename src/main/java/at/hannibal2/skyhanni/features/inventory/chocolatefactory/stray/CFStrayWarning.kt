@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig.StrayTypeEntry
+import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
@@ -20,6 +23,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -32,6 +36,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import kotlin.math.sin
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CFStrayWarning {
@@ -44,6 +49,7 @@ object CFStrayWarning {
 
     private var flashScreen = false
     private var activeStraySlots: Set<Int> = setOf()
+    private var destructiveSlots: Set<Int> = setOf()
 
     private fun reset() {
         flashScreen = false
@@ -71,7 +77,6 @@ object CFStrayWarning {
         StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
-        else -> false
     }
 
     private fun handleRabbitWarnings(item: ItemStack) {
@@ -141,7 +146,6 @@ object CFStrayWarning {
                 }
 
                 StrayTypeEntry.NONE -> false
-                else -> false
             }
         }
     }
@@ -166,5 +170,37 @@ object CFStrayWarning {
         val color = (alpha shl 24) or (toUse.toSpecialColorInt() and 0xFFFFFF)
         GuiRenderUtils.drawRect(0, 0, GuiScreenUtils.displayWidth, GuiScreenUtils.displayHeight, color)
         GlStateManager.color(1F, 1F, 1F, 1F)
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        destructiveSlots = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").destructiveSlots
+    }
+
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!CFApi.inChocolateFactory || !warningConfig.blockClosing) return
+        if (event.slotId in destructiveSlots) {
+            event.cancel()
+            preventCloseTitle()
+        }
+    }
+
+    private fun preventCloseTitle() {
+        TitleManager.sendTitle(
+            "§cStray Rabbit Prevented Close",
+            subtitleText = "§7Hold §eShift §7to bypass",
+            duration = 5.seconds,
+            location = TitleManager.TitleLocation.INVENTORY
+        )
+        SoundUtils.playErrorSound()
+    }
+
+    @JvmStatic
+    fun shouldContinueWithKeypress(keycode: Int): Boolean {
+        if (!config.rabbitWarning.blockClosing) return true
+        val shouldContinue = !isInventoryClosure(keycode) || activeStraySlots.isEmpty()
+        if (!shouldContinue) preventCloseTitle()
+        return shouldContinue
     }
 }

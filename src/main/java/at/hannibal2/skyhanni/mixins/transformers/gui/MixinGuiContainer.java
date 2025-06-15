@@ -2,8 +2,11 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTimer;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayWarning;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import at.hannibal2.skyhanni.utils.compat.DrawContext;
+import at.hannibal2.skyhanni.utils.KeyboardManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
@@ -31,7 +34,14 @@ public abstract class MixinGuiContainer extends GuiScreen {
 
     @Inject(method = "keyTyped", at = @At("HEAD"), cancellable = true)
     private void onKeyTyped(char typedChar, int keyCode, CallbackInfo ci) {
-        if (!HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode)) {
+        // Holding shift bypasses closure checks
+        if (KeyboardManager.isShiftKeyDown()) return;
+
+        boolean shouldHoppityRabbitTheFishContinue = HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode);
+        boolean shouldCfStrayWarningContinue = CFStrayWarning.shouldContinueWithKeypress(keyCode);
+        boolean shouldCfStrayTimerContinue = CFStrayTimer.shouldContinueWithKeypress(keyCode);
+
+        if (!shouldHoppityRabbitTheFishContinue || !shouldCfStrayWarningContinue || !shouldCfStrayTimerContinue) {
             ci.cancel();
         }
     }

@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -200,7 +199,7 @@ object CFStrayTracker {
 
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
-            if (rarity == LEGENDARY) tip += extractGoldenTypesCaught(data)
+            if (rarity == LorenzRarity.LEGENDARY) tip += extractGoldenTypesCaught(data)
             Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.partyModeReplace().split("\n"))
         } ?: Renderable.string(lineFormat)
         return renderable.toSearchable(rarity.toString())
@@ -247,7 +246,7 @@ object CFStrayTracker {
 
         // Golden Strays, Jackpot and Mountain, raw choc only reward.
         goldenStrayJackpotMountainPattern.matchMatcher(loreLine) {
-            val amount = group("amount").formatLong().also { am -> incrementRarity(LEGENDARY, am) }
+            val amount = group("amount").formatLong().also { am -> incrementRarity(LorenzRarity.LEGENDARY, am) }
             val multiplier = amount / CFApi.chocolatePerSecond
             when (multiplier) {
                 in 479.0..481.0 -> incrementGoldenType("jackpot")
@@ -258,19 +257,19 @@ object CFStrayTracker {
         // Golden Strays, "Golden Click"
         goldenStrayClick.matchMatcher(loreLine) {
             incrementGoldenType("goldenclick")
-            incrementRarity(LEGENDARY, 0)
+            incrementRarity(LorenzRarity.LEGENDARY, 0)
         }
 
         // Golden Strays, hoard/stampede
         strayHoardPattern.matchMatcher(loreLine.removeResets()) {
             incrementGoldenType("stampede")
-            incrementRarity(LEGENDARY, 0)
+            incrementRarity(LorenzRarity.LEGENDARY, 0)
         }
 
         // El Dorado - all catches
         strayDoradoPattern.matchMatcher(loreLine) {
             groupOrNull("amount")?.let { amount ->
-                incrementRarity(LEGENDARY, amount.formatLong())
+                incrementRarity(LorenzRarity.LEGENDARY, amount.formatLong())
             }
             incrementGoldenType("dorado")
         }
@@ -299,7 +298,7 @@ object CFStrayTracker {
                 claimedStraysSlots.remove(claimedStraysSlots.indexOf(it))
             }
         }
-        incrementRarity(LEGENDARY, 0)
+        incrementRarity(LorenzRarity.LEGENDARY, 0)
         incrementGoldenType("sidedish")
     }
 

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -21,6 +22,15 @@ class CFStrayRabbitWarningConfig {
     @ConfigOption(name = "Highlight Color", desc = "Choose the color that stray rabbits should be highlighted as.")
     @ConfigEditorColour
     var inventoryHighlightColor: String = LorenzColor.RED.toConfigColor()
+
+    @Expose
+    @ConfigOption(
+        name = "Block Closing",
+        desc = "Block closing the Chocolate Factory while there is a stray active.\n" +
+            "§eHold §cShift §eto bypass"
+    )
+    @ConfigEditorBoolean
+    var blockClosing: Boolean = false
 
     @Expose
     @ConfigOption(

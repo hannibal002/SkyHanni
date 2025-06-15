@@ -123,10 +123,9 @@ object HoppityEventSummary {
         // Get the inventory name and check if it matches any of the specific inventories
         val inventoryName = InventoryUtils.openInventoryName()
 
-        val inChocolateFactory =
-            CFApi.inChocolateFactory ||
-                menuNamePattern.matches(inventoryName) ||
-                miscCfInventoryPatterns.matches(inventoryName)
+        val inChocolateFactory = CFApi.inChocolateFactory ||
+            menuNamePattern.matches(inventoryName) ||
+            miscCfInventoryPatterns.matches(inventoryName)
 
         return if (currentScreen is GuiInventory) {
             HoppityLiveDisplayInventoryType.OWN_INVENTORY in setting

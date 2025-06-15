@@ -39,6 +39,11 @@ class HoppityEggsConfig {
     var waypoints: HoppityWaypointsConfig = HoppityWaypointsConfig()
 
     @Expose
+    @ConfigOption(name = "Egg Locations", desc = "")
+    @Accordion
+    var locations: HoppityLocationConfig = HoppityLocationConfig()
+
+    @Expose
     @ConfigOption(name = "Unclaimed Eggs", desc = "")
     @Accordion
     var unclaimedEggs: HoppityUnclaimedEggsConfig = HoppityUnclaimedEggsConfig()
@@ -79,7 +84,8 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Prevent Missing Rabbit the Fish",
-        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.",
+        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.\n" +
+            "§eHold §cShift §eto bypass.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
