@@ -122,6 +122,7 @@ at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
 at.hannibal2.skyhanni.utils.ExtendedChatColor.kt
 at.hannibal2.skyhanni.events.ConfigLoadEvent.kt
 at.hannibal2.skyhanni.events.InventoryCloseEvent.kt
+at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent.kt
 at.hannibal2.skyhanni.events.IslandChangeEvent.kt
 at.hannibal2.skyhanni.events.ProfileJoinEvent.kt
 at.hannibal2.skyhanni.events.minecraft.KeyDownEvent.kt
@@ -313,12 +314,14 @@ at/hannibal2/skyhanni/config/features/event/hoppity/HoppityCallWarningConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityChatConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEggsConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryCFReminderConfig.kt
-at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryLiveDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityStrayTimerConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityUnclaimedEggsConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityWarpMenuConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityWaypointsConfig.kt
+at/hannibal2/skyhanni/config/features/event/hoppity/summary/HoppityEventSummaryCFReminderConfig.kt
+at/hannibal2/skyhanni/config/features/event/hoppity/summary/HoppityEventSummaryConfig.kt
+at/hannibal2/skyhanni/config/features/event/hoppity/summary/HoppityLiveDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/event/waypoints/ChristmasPresentConfig.kt
 at/hannibal2/skyhanni/config/features/event/waypoints/EasterEggConfig.kt
 at/hannibal2/skyhanni/config/features/event/waypoints/HalloweenBasketConfig.kt
