@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
@@ -20,49 +18,43 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
 ) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
-    @Deprecated("Use addCoins(bucket, coins) instead", ReplaceWith("addCoins(bucket, coins)"))
+    @Deprecated(
+        "Use addCoins(bucket, coins, command) instead",
+        ReplaceWith("addCoins(bucket, coins, command)")
+    )
     override fun addCoins(amount: Int, command: Boolean) =
-        throw UnsupportedOperationException("Use addCoins(bucket, coins) instead")
+        throw UnsupportedOperationException("Use addCoins(bucket, coins, command) instead")
 
-    fun addCoins(bucket: E, coins: Int) {
-        addItem(bucket, SKYBLOCK_COIN, coins)
+    fun addCoins(bucket: E, coins: Int, command: Boolean) {
+        addItem(bucket, SKYBLOCK_COIN, coins, command)
     }
 
-    // TODO impl in normal item tracker as well
-    fun ItemAddEvent.addItemFromEvent() {
-        var bucket: E? = null
+    override fun ItemAddEvent.addItemFromEvent() {
+        val command = source == ItemAddManager.Source.COMMAND
+        lateinit var bucket: E
         modify { data ->
-            bucket = data.selectedBucket
-        }
-        val selectedBucket: E = bucket ?: run {
-            ChatUtils.userError(
-                "No bucket selected for §b$name§c.\n§cSelect one in the §b$name §cGUI, then try again.",
-            )
-            cancel()
-            return
-        }
-
-        modify {
-            it.addItem(selectedBucket, internalName, amount)
-        }
-        if (source == ItemAddManager.Source.COMMAND) {
-            TrackerManager.commandEditTrackerSuccess = true
-            ChatUtils.chat(
-                "Added ${internalName.repoItemName} §e$amount§7x to ($selectedBucket§7)",
-            )
+            bucket = data.selectedBucket ?: run {
+                ChatUtils.userError(
+                    "No bucket selected for §b$name§c.\n§cSelect one in the §b$name §cGUI, then try again.",
+                )
+                cancel()
+                return@modify
+            }
+            data.addItem(bucket, internalName, amount, command)
+            logCompletedAddEvent()
         }
     }
 
     @Deprecated(
-        "Use addItem(bucket, internalName, amount) instead",
-        ReplaceWith("addItem(bucket, internalName, amount)"),
+        "Use addItem(bucket, internalName, amount, command, message) instead",
+        ReplaceWith("addItem(bucket, internalName, amount, command, message)"),
     )
     override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) =
-        throw UnsupportedOperationException("Use addItem(bucket, internalName, amount) instead")
+        throw UnsupportedOperationException("Use addItem(bucket, internalName, amount, command, message) instead")
 
-    fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, message: Boolean = true) {
+    fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
         modify {
-            it.addItem(bucket, internalName, amount)
+            it.addItem(bucket, internalName, amount, command)
         }
         getSharedTracker()?.let {
             val totalProp = it.get(DisplayMode.TOTAL).selectedBucketItems.getOrPut(internalName) {
@@ -73,6 +65,8 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             }
             sessionProp.hidden = totalProp.hidden
         }
+
+        if (command) logCommandAdd(internalName, amount)
         handlePossibleRareDrop(internalName, amount, message)
     }
 
@@ -90,7 +84,6 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                     modifyEachMode {
                         it.selectedBucket = new
                     }
-                    update()
                 },
                 universe = data.selectableBuckets,
                 nullLabel = nullBucketLabel,
@@ -121,9 +114,9 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             }
             ChatUtils.chat("Removed $cleanName §efrom $name.")
         },
-        itemHider = { internalName, _ ->
+        itemHider = { internalName, currentlyHidden ->
             modify {
-                it.toggleItemHide(data.selectedBucket, internalName)
+                it.toggleItemHide(data.selectedBucket, internalName, currentlyHidden)
             }
         },
         getLoreList = { internalName, item ->
