@@ -368,6 +368,9 @@ at/hannibal2/skyhanni/config/features/garden/TooltipTweaksConfig.kt
 at/hannibal2/skyhanni/config/features/garden/YawPitchDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/garden/composter/ComposterConfig.kt
 at/hannibal2/skyhanni/config/features/garden/composter/NotifyLowConfig.kt
+at/hannibal2/skyhanni/config/features/garden/contest/ContestSummaryConfig.kt
+at/hannibal2/skyhanni/config/features/garden/contest/ContestTimesConfig.kt
+at/hannibal2/skyhanni/config/features/garden/contest/JacobContestConfig.kt
 at/hannibal2/skyhanni/config/features/garden/cropmilestones/CropMilestonesConfig.kt
 at/hannibal2/skyhanni/config/features/garden/cropmilestones/CropMilestonesOverflowConfig.kt
 at/hannibal2/skyhanni/config/features/garden/cropmilestones/MushroomPetPerkConfig.kt

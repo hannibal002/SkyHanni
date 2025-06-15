@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -26,14 +26,14 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object JacobContestFFNeededDisplay {
 
-    private val config get() = GardenApi.config
+    private val config get() = GardenApi.config.jacobContest
     private var display = emptyList<Renderable>()
     private var lastToolTipTime = SimpleTimeMark.farPast()
     private val cache = mutableMapOf<ItemStack, List<Renderable>>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
-        if (!isEnabled()) return
+        if (!config.ffForContest) return
 
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
         val stack = event.stack
@@ -142,15 +142,13 @@ object JacobContestFFNeededDisplay {
         return " ${bracket.displayName}§f: §6$format FF §7(${counter.addSeparators()} crops)"
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.ffForContest) return
         if (!FarmingContestApi.inInventory) return
         if (lastToolTipTime.passedSince() > 200.milliseconds) return
-        config.farmingFortuneForContestPos.renderRenderables(display, posLabel = "Jacob Contest Crop Data")
+        config.ffForContestPosition.renderRenderables(display, posLabel = "Jacob Contest Crop Data")
     }
-
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest
 }
 
 private fun CropType.getRealBlocksPerSecond(): Double {
