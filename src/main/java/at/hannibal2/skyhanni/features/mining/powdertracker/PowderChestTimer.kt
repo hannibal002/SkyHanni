@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
