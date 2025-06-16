@@ -495,6 +495,10 @@ at.hannibal2.skyhanni.utils.LorenzRarity.kt
 at.hannibal2.skyhanni.utils.LorenzVec.kt
 at.hannibal2.skyhanni.utils.Matrix.kt
 at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.kt
+at/hannibal2/skyhanni/utils/collection/CacheSet.kt
+at/hannibal2/skyhanni/utils/collection/CacheMap.kt
+at/hannibal2/skyhanni/utils/collection/TimeLimitedSet.kt
+at/hannibal2/skyhanni/utils/collection/TimeLimitedCache.kt
 at.hannibal2.skyhanni.utils.MobUtils.kt
 at.hannibal2.skyhanni.utils.MultiFilter.kt
 at.hannibal2.skyhanni.utils.NeuCalculator.kt
@@ -608,6 +612,8 @@ at/hannibal2/skyhanni/config/features/combat/QuiverDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/combat/StackDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/combat/SummoningsConfig.kt
 at/hannibal2/skyhanni/config/features/combat/broodmother/BroodmotherConfig.kt
+at.hannibal2.skyhanni.config.OnlyLegacy.kt
+at.hannibal2.skyhanni.config.OnlyModern.kt
 at/hannibal2/skyhanni/config/features/combat/broodmother/BroodmotherSpawnAlertConfig.kt
 at/hannibal2/skyhanni/config/features/combat/damageindicator/DamageIndicatorConfig.kt
 at/hannibal2/skyhanni/config/features/combat/damageindicator/EnderSlayerConfig.kt
