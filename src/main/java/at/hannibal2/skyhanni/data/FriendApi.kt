@@ -160,7 +160,7 @@ object FriendApi {
                     }
                 }
             }
-            val bestFriend = sibling.unformattedText.contains("§l")
+            val bestFriend = sibling.unformattedText.split(" ")[0].contains("§l")
             val name = readName(sibling)
             if (uuid != null && name != null) {
                 getFriends()[uuid] = Friend().also {
