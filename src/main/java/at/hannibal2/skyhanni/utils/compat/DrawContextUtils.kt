@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.Vec3
-//#if MC > 1.21
+//#if MC < 1.21
+import java.nio.FloatBuffer
+//#else
 //$$ import net.minecraft.client.gui.DrawContext
 //$$ import org.joml.Quaternionf
 //#endif
@@ -12,6 +14,13 @@ import net.minecraft.util.Vec3
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
  */
 object DrawContextUtils {
+
+    // GL11.GL_MODELVIEW_MATRIX
+    const val GL_MODELVIEW_MATRIX = 2982
+    // GL11.GL_PROJECTION_MATRIX
+    const val GL_PROJECTION_MATRIX = 2983
+    // GL11.GL_CURRENT_COLOR
+    const val GL_CURRENT_COLOR = 2816
 
     private var _drawContext: DrawContext? = null
 
@@ -25,6 +34,7 @@ object DrawContextUtils {
 
     val drawContext: DrawContext
         get() = _drawContext ?: run {
+
             ErrorManager.crashInDevEnv("drawContext is null")
             ErrorManager.skyHanniError("drawContext is null")
         }
@@ -79,6 +89,34 @@ object DrawContextUtils {
         GlStateManager.rotate(angle, x, y, z)
         //#else
         //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
+        //#endif
+    }
+
+    fun getFloat(pName: Int, params: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.getFloat(pName, params)
+        //#else
+        //$$ params.clear()
+        //$$ when (pName) {
+        //$$     GL_MODELVIEW_MATRIX -> {
+        //$$         val mvEntry = drawContext.matrices.peek()
+        //$$         mvEntry.getPositionMatrix().get(params)
+        //$$     }
+        //$$     GL_PROJECTION_MATRIX -> {
+        //$$         RenderSystem.assertOnRenderThread()
+        //$$         RenderSystem.getProjectionMatrix().get(params)
+        //$$     }
+        //$$     GL_CURRENT_COLOR -> {
+        //$$         RenderSystem.assertOnRenderThread()
+        //$$         val c = RenderSystem.getShaderColor()
+        //$$         params.put(0, c[0])
+        //$$         params.put(1, c[1])
+        //$$         params.put(2, c[2])
+        //$$         params.put(3, c[3])
+        //$$     }
+        //$$     else -> { }
+        //$$ }
+        //$$ params.flip()
         //#endif
     }
 
