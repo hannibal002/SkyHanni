@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.test.repoitem
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -24,7 +23,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagList
-import java.io.File
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.ComponentUtils
 //$$ import net.minecraft.component.MergedComponentMap
@@ -39,8 +37,6 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
     private val baseJson = EnoughUpdatesManager.getItemById(internalName.asString()) ?: JsonObject()
     private var internalNameString = internalName.asString()
     private var displayName = underlyingStack.displayName
-
-    // need 1.8 id
     private var minecraftItemId: String
     private var itemModel: String
     private var lore = underlyingStack.getLore().joinToString("\n")
@@ -48,8 +44,6 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
     private var infoType: String
     private var additionalInfo: String
     private var clickCommand: String
-
-    // need to get 1.8 damage
     private var damage: String
     private var hasEnchantGlint = underlyingStack.hasEnchGlint()
 
@@ -100,25 +94,20 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             if (!UtilsPatterns.rarityLoreLinePattern.matches(line)) {
                 newLore.add(line)
             } else {
-                // todo remove
                 newLore.add(line)
                 lore = newLore.joinToString("\n")
             }
         }
     }
 
-    fun saveItem() {
+    fun saveItem(message: Boolean = true) {
         try {
-            val repoItemJson = createRepoItemJson()
-
-            val itemsDir = File(EnoughUpdatesManager.repoLocation, "items")
-            val itemFile = File(itemsDir, "$internalNameString.json")
-            RepoManager.writeJson(repoItemJson, itemFile)
-
-            EnoughUpdatesManager.reloadDataForItem(internalNameString.toInternalName(), repoItemJson)
-            ChatUtils.chat("§aSuccessfully saved $internalNameString to repo folder")
+            RepoItemEditor.saveItemToRepo(internalNameString.toInternalName(), createRepoItemJson())
+            if (message) {
+                ChatUtils.chat("§aSuccessfully saved $internalNameString to repo folder!")
+            }
         } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Failed to save $internalNameString to repo folder", ignoreErrorCache = true)
+            ErrorManager.logErrorWithData(e, "Failed to save $internalNameString to repo folder!", ignoreErrorCache = true)
         }
     }
 
@@ -215,6 +204,12 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
     //$$
     //$$     if (nbtTag.contains(DataComponentTypes.UNBREAKABLE)) {
     //$$         tag.putBoolean("Unbreakable", true)
+    //$$     }
+    //$$
+    //$$     if (nbtTag.get(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.modifiers?.isNotEmpty() == true) {
+    //$$         println("modifiers: ${nbtTag.get(DataComponentTypes.ATTRIBUTE_MODIFIERS)}")
+    //$$         tag.putBoolean("overrideMeta", true)
+    //$$         tag.put("AttributeModifiers", NbtList())
     //$$     }
     //$$
     //$$     val loreList = NbtList()
