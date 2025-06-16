@@ -343,7 +343,7 @@ object GuiRenderUtils {
             DrawContextUtils.translate(translateX, translateY, -19f)
             DrawContextUtils.scale(finalScale, finalScale, 0.2f)
 
-            // Rotation
+            //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
             DrawContextUtils.pushPop {
                 DrawContextUtils.loadIdentity()
@@ -361,9 +361,8 @@ object GuiRenderUtils {
             GL11.glEnable(GL11.GL_NORMALIZE)
             GL11.glNormal3f(0f, 0f, 1f)
 
-            //#if MC < 1.21
             RenderHelper.enableGUIStandardItemLighting()
-            AdjustStandardItemLighting.adjust() // Compensate for z scaling
+            AdjustStandardItemLighting.adjust()
             try {
                 Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
             } catch (e: Exception) {
@@ -377,7 +376,14 @@ object GuiRenderUtils {
             GL11.glDisable(GL11.GL_NORMALIZE)
             RenderHelper.disableStandardItemLighting()
             //#else
-            //$$ renderItemStack(item, 0, 0)
+            //$$ DrawContextUtils.pushPop {
+            //$$     DrawContextUtils.translate(halfIconX, halfIconY, halfIconZ)
+            //$$     if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
+            //$$     if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
+            //$$     if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
+            //$$     DrawContextUtils.translate(-halfIconX, -halfIconY, -halfIconZ)
+            //$$ }
+            //$$ DrawContextUtils.drawContext.drawItem(item, 0, 0)
             //#endif
         }
     }
