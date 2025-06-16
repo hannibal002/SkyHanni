@@ -52,7 +52,6 @@ at.hannibal2.skyhanni.mixins.transformers.renderer.MixinContributorRendererEntit
 at.hannibal2.skyhanni.mixins.transformers.renderer.MixinRendererLivingEntity.java
 
 # these files do not work yet but should be made to work in the future
-at.hannibal2.skyhanni.features.mining.PrecisionMiningHighlight.kt
 at/hannibal2/skyhanni/mixins/hooks/BlockRendererDispatcherHook.kt
 at.hannibal2.skyhanni.test.PacketTest.kt
 at.hannibal2.skyhanni.utils.HolographicEntities.kt

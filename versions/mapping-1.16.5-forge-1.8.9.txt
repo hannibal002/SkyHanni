@@ -868,10 +868,14 @@ net.minecraft.world.level.block.state.properties.IntegerProperty net.minecraft.b
 
 net.minecraft.world.phys.AABB net.minecraft.util.AxisAlignedBB
 net.minecraft.world.phys.HitResult net.minecraft.util.MovingObjectPosition
-net.minecraft.world.phys.HitResult$Type net.minecraft.util.math.RayTraceResult$MovingObjectType
+net.minecraft.world.phys.HitResult$Type net.minecraft.util.MovingObjectPosition$MovingObjectType
 net.minecraft.world.phys.Vec3 net.minecraft.util.Vec3
 
 net.minecraft.world.phys.AABB contains() isVecInside()
+net.minecraft.world.phys.AABB intersects() intersectsWith()
+
+net.minecraft.world.phys.HitResult getLocation() getBlockPos()
+net.minecraft.world.phys.HitResult type typeOfHit
 
 net.minecraft.world.phys.Vec3 distanceToSqr() squareDistanceTo()
 net.minecraft.world.phys.Vec3 x xCoord
