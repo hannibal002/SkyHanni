@@ -13,7 +13,8 @@ class RepoItemEditorConfig {
     @ConfigOption(
         name = "Edit Mode",
         desc = "Enables you to edit repo items for the item repository.\n" +
-            "§eOnly turn on if you know what you are doing!",
+            "§cOnly turn on if you know what you are doing!\n" +
+            "§eThis option is required for the following keybinds to work!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -34,5 +35,23 @@ class RepoItemEditorConfig {
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var instantEditKeybind: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(
+        name = "Save Recipe Keybind",
+        desc = "Saves the currently open recipe to the item repo.",
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    var saveRecipeKeybind: Int = Keyboard.KEY_NONE
+
+    // todo save npc
+
+    @Expose
+    @ConfigOption(
+        name = "Refresh NBT Keybind",
+        desc = "Instantly updates the nbt of the item to match the current file on the computer.",
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    var refreshNbtKeybind: Int = Keyboard.KEY_NONE
 
 }
