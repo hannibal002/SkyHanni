@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -72,7 +72,7 @@ object PetUtils {
      */
     private val petSkinNamePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet.skin",
-        "PET_SKIN_(?<pet>[A-Z])_?(?<skin>[A-Z_]+)?"
+        "PET_SKIN_(?<pet>[A-Z])_?(?<skin>[A-Z_]+)?",
     )
 
     /**
@@ -81,7 +81,7 @@ object PetUtils {
      */
     private val neuPetLorePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet.lore",
-        "§7§eRight-click to add this pet to(?: your)?"
+        "§7§eRight-click to add this pet to(?: your)?",
     )
     // </editor-fold>
 
