@@ -122,7 +122,6 @@ object TrevorFeatures {
 
     @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onSecondPassed() {
-        if (!onFarmingIsland()) return
         updateTrapper()
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
