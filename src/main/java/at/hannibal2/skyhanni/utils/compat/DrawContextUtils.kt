@@ -34,7 +34,6 @@ object DrawContextUtils {
 
     val drawContext: DrawContext
         get() = _drawContext ?: run {
-
             ErrorManager.crashInDevEnv("drawContext is null")
             ErrorManager.skyHanniError("drawContext is null")
         }
