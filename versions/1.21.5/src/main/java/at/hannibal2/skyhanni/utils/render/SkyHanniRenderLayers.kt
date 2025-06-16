@@ -110,6 +110,26 @@ object SkyHanniRenderLayers {
         )
     }
 
+    private val CIRCLE: MultiPhase = RenderLayer.of(
+        "skyhanni_circle",
+        RenderLayer.DEFAULT_BUFFER_SIZE,
+        false,
+        true,
+        SkyHanniRenderPipelines.CIRCLE,
+        MultiPhaseParameters.builder()
+            .build(false),
+    )
+
+    private val CIRCLE_XRAY: MultiPhase = RenderLayer.of(
+        "skyhanni_circle_xray",
+        RenderLayer.DEFAULT_BUFFER_SIZE,
+        false,
+        true,
+        SkyHanniRenderPipelines.CIRCLE, // same pipeline, just different params
+        MultiPhaseParameters.builder()
+            .build(false),
+    )
+
     private fun createLineRenderLayer(lineWidth: Double, throughWalls: Boolean): MultiPhase {
         val pipeLine = if (throughWalls) SkyHanniRenderPipelines.LINES_XRAY else SkyHanniRenderPipelines.LINES
         return RenderLayer.of(
@@ -123,6 +143,10 @@ object SkyHanniRenderLayers {
                 .layering(if (throughWalls) RenderPhase.NO_LAYERING else RenderPhase.VIEW_OFFSET_Z_LAYERING)
                 .build(false),
         )
+    }
+
+    fun getCircle(throughWalls: Boolean): MultiPhase {
+        return if (throughWalls) CIRCLE else CIRCLE_XRAY
     }
 
     fun getFilled(throughWalls: Boolean): MultiPhase {

@@ -196,4 +196,22 @@ object SkyHanniRenderPipelines {
             .withUniform("forwardDirection", UniformType.INT)
             .build()
     )
+
+    val CIRCLE: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, "circle"))
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_FAN)
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withVertexShader(Identifier.of(SkyHanniMod.MODID, "circle"))
+            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "circle"))
+            .withUniform("scaleFactor", UniformType.FLOAT)
+            .withUniform("radius", UniformType.FLOAT)
+            .withUniform("smoothness", UniformType.FLOAT)
+            .withUniform("centerPos", UniformType.VEC2)
+            .withUniform("angle1", UniformType.FLOAT)
+            .withUniform("angle2", UniformType.FLOAT)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withDepthWrite(false)
+            .build(),
+    )
 }

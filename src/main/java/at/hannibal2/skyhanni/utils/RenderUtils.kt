@@ -62,6 +62,9 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedRectDrawer
+//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelines
+//$$ import net.minecraft.client.render.Tessellator
+//$$ import net.minecraft.client.render.BufferBuilder
 //$$ import org.joml.Matrix4f
 //#endif
 
@@ -800,6 +803,8 @@ object RenderUtils {
         val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
         //#else
         //$$ val scaleFactor = MinecraftClient.getInstance().window.scaleFactor
+        //$$ val pipeline = SkyHanniRenderPipelines.CIRCLE
+        //$$ val matrices = DrawContextUtils.drawContext.matrices.peek()
         //#endif
 
         val radiusIn = radius * scaleFactor
@@ -816,11 +821,28 @@ object RenderUtils {
         // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
         val circleColor = color.addAlpha(255).rgb
 
+        //#if MC < 1.21
         DrawContextUtils.pushPop {
             ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
             GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, circleColor)
             ShaderManager.disableShader()
         }
+        //#else
+        //$$ val buffer = Tessellator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
+        //$$ buffer.vertex(matrices, x.toFloat(), y.toFloat(), 0f).color(circleColor)
+        //$$ buffer.vertex(matrices, x.toFloat(), (y + radius * 2).toFloat(), 0f).color(circleColor)
+        //$$ buffer.vertex(matrices, (x + radius * 2).toFloat(), (y + radius * 2).toFloat(), 0f).color(circleColor)
+        //$$ buffer.vertex(matrices, (x + radius * 2).toFloat(), y.toFloat(), 0f).color(circleColor)
+        //$$
+        //$$ RoundedRectDrawer.draw(pipeline, buffer.end()) { pass ->
+        //$$     pass.setUniform("scaleFactor", CircleShader.scaleFactor)
+        //$$     pass.setUniform("radius", CircleShader.radius)
+        //$$     pass.setUniform("smoothness", CircleShader.smoothness)
+        //$$     pass.setUniform("centerPos", CircleShader.centerPos[0], CircleShader.centerPos[1])
+        //$$     pass.setUniform("angle1", CircleShader.angle1)
+        //$$     pass.setUniform("angle2", CircleShader.angle2)
+        //$$ }
+        //#endif
     }
 
     fun getAlpha(): Float {

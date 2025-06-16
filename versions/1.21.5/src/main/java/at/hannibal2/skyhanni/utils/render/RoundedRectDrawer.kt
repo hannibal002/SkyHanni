@@ -81,7 +81,7 @@ object RoundedRectDrawer {
     /**
      * Method inspired by SkyOcean's [InventoryRenderer](https://github.com/meowdding/SkyOcean/blob/feat/iteam-search/src/client/kotlin/me/owdding/skyocean/utils/rendering/InventoryRenderer.kt)
      */
-    private fun draw(pipeline: RenderPipeline, mesh: BuiltBuffer, pass: (RenderPass) -> Unit) {
+    fun draw(pipeline: RenderPipeline, mesh: BuiltBuffer, pass: (RenderPass) -> Unit) {
         val device = RenderSystem.getDevice()
         val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.buffer)
 
