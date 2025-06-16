@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.Vec3
 import java.nio.FloatBuffer
 //#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf

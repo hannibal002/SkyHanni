@@ -67,6 +67,7 @@ import kotlin.time.DurationUnit
 //$$ import net.minecraft.client.render.BufferBuilder
 //$$ import org.lwjgl.BufferUtils
 //$$ import org.joml.Matrix4f
+//$$ import org.lwjgl.BufferUtils
 //#endif
 
 @Suppress("LargeClass", "TooManyFunctions")
