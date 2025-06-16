@@ -717,7 +717,10 @@ at.hannibal2.skyhanni.events.TitleReceivedEvent.kt
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.SkyBlockIslandTest.kt
 at.hannibal2.skyhanni.utils.ComputerEnvDebug.kt
-
+at/hannibal2/skyhanni/events/hoppity
+at.hannibal2.skyhanni.events.hoppity.EggFoundEvent.kt
+at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent.kt
+at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent.kt
 at.hannibal2.skyhanni.config.commands.brigadier.ArgContext.kt
 at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArgument.kt
 at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments.kt
