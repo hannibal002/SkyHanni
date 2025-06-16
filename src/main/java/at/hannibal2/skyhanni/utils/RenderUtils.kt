@@ -91,15 +91,19 @@ object RenderUtils {
         override fun toString() = value
     }
 
-    //#if TODO
+    //#if MC < 1.21
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+    //#else
+    //$$ private val matrixBuffer: FloatBuffer = BufferUtils.createFloatBuffer(16)
+    //$$ private val colorBuffer:  FloatBuffer = BufferUtils.createFloatBuffer(16)
+    //#endif
 
     val absoluteTranslation
         get() = run {
             matrixBuffer.clear()
 
-            GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
+            DrawContextUtils.getFloat(DrawContextUtils.GL_MODELVIEW_MATRIX, matrixBuffer)
 
             val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
 
@@ -111,7 +115,6 @@ object RenderUtils {
 
             Triple(xTranslate, yTranslate, zTranslate)
         }
-    //#endif
 
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
