@@ -65,7 +65,6 @@ import kotlin.time.DurationUnit
 //$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelines
 //$$ import net.minecraft.client.render.Tessellator
 //$$ import net.minecraft.client.render.BufferBuilder
-//$$ import org.lwjgl.BufferUtils
 //$$ import org.joml.Matrix4f
 //$$ import org.lwjgl.BufferUtils
 //#endif
