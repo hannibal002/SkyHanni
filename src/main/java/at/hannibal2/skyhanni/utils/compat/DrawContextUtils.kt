@@ -92,7 +92,26 @@ object DrawContextUtils {
         GlStateManager.getFloat(pName, params)
         //#else
         //$$ params.clear()
-        //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
+        //$$ when (pName) {
+        //$$     GL_MODELVIEW_MATRIX -> {
+        //$$         val mvEntry = drawContext.matrices.peek()
+        //$$         mvEntry.getPositionMatrix().get(params)
+        //$$     }
+        //$$     GL_PROJECTION_MATRIX -> {
+        //$$         RenderSystem.assertOnRenderThread()
+        //$$         RenderSystem.getProjectionMatrix().get(params)
+        //$$     }
+        //$$     GL_CURRENT_COLOR -> {
+        //$$         RenderSystem.assertOnRenderThread()
+        //$$         val c = RenderSystem.getShaderColor()
+        //$$         params.put(0, c[0])
+        //$$         params.put(1, c[1])
+        //$$         params.put(2, c[2])
+        //$$         params.put(3, c[3])
+        //$$     }
+        //$$     else -> { }
+        //$$ }
+        //$$ params.flip()
         //#endif
     }
 
