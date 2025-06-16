@@ -33,8 +33,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
@@ -216,7 +216,7 @@ object PestProfitTracker {
 
         add(
             when {
-                selectedBucket != null -> RenderableString(pestCountFormat).toSearchable()
+                selectedBucket != null -> StringRenderable(pestCountFormat).toSearchable()
                 else -> Renderable.hoverTips(
                     pestCountFormat,
                     buildList {
