@@ -38,6 +38,7 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object MiningApi {
 
@@ -162,6 +163,8 @@ object MiningApi {
 
     var heat: Int = 0
         private set
+    var heatDisplay: String? = null
+        private set
     var lastHeatUpdate = SimpleTimeMark.farPast()
         private set
 
@@ -219,13 +222,22 @@ object MiningApi {
         }
 
         if (IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
+            var found = false
             heatPattern.firstMatcher(event.new) {
+                found = true
                 val newHeat = group("heat")
+                heatDisplay = group("scoreboard").takeIf { it.isNotEmpty() }
                 if (newHeat == "IMMUNE") {
                     updateHeat(0)
                 } else if (newHeat.toInt() != heat) {
                     updateHeat(newHeat.toInt())
                 }
+            }
+            if (!found) {
+                if (heat != 0) {
+                    updateHeat(0)
+                }
+                heatDisplay = null
             }
         }
     }
@@ -388,8 +400,8 @@ object MiningApi {
         }
     }
 
-    @HandleEvent
-    fun onAreaChange(event: ScoreboardAreaChangeEvent) {
+    @HandleEvent(ScoreboardAreaChangeEvent::class)
+    fun onAreaChange() {
         if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
         updateLocation()
     }
