@@ -65,6 +65,7 @@ import kotlin.time.DurationUnit
 //$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelines
 //$$ import net.minecraft.client.render.Tessellator
 //$$ import net.minecraft.client.render.BufferBuilder
+//$$ import org.lwjgl.BufferUtils
 //$$ import org.joml.Matrix4f
 //#endif
 
@@ -850,7 +851,7 @@ object RenderUtils {
 
     fun getAlpha(): Float {
         colorBuffer.clear()
-        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)
+        DrawContextUtils.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)
         if (colorBuffer.limit() < 4) return 1f
         return colorBuffer.get(3)
     }
