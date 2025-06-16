@@ -42,9 +42,9 @@ object SkyHanniEvents {
     private fun registerMethod(method: Method, instance: Any) {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return
 
+        if (registerNoEventType(options, method, instance)) return
         if (registerSingleEventType(options, method, instance)) return
         if (registerMultipleEventTypes(options, method, instance)) return
-        if (registerNoEventType(options, method, instance)) return
     }
 
     @JvmStatic
