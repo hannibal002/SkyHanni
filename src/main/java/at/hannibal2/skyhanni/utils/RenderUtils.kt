@@ -56,6 +56,7 @@ import kotlin.time.DurationUnit
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedRectDrawer
 //$$ import org.joml.Matrix4f
+//$$ import org.lwjgl.BufferUtils
 //#endif
 
 @Suppress("LargeClass", "TooManyFunctions")
@@ -81,9 +82,13 @@ object RenderUtils {
         override fun toString() = value
     }
 
-    //#if TODO
+    //#if MC < 1.21
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+    //#else
+    //$$ private val matrixBuffer: FloatBuffer = BufferUtils.createFloatBuffer(16)
+    //$$ private val colorBuffer:  FloatBuffer = BufferUtils.createFloatBuffer(16)
+    //#endif
 
     val absoluteTranslation
         get() = run {
@@ -101,7 +106,6 @@ object RenderUtils {
 
             Triple(xTranslate, yTranslate, zTranslate)
         }
-    //#endif
 
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
