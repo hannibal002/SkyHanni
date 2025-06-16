@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -121,7 +120,7 @@ object TrevorFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    @HandleEvent(SecondPassedEvent::class)
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onSecondPassed() {
         if (!onFarmingIsland()) return
         updateTrapper()
@@ -132,10 +131,8 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!onFarmingIsland()) return
-
         val formattedMessage = event.message.removeColor()
 
         mobDiedPattern.matchMatcher(event.message) {
@@ -195,10 +192,9 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderOverlay() {
         if (!config.trapperCooldownGui) return
-        if (!onFarmingIsland()) return
 
         val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
         else if (timeUntilNextReady == 1) "1 second left"
@@ -264,9 +260,8 @@ object TrevorFeatures {
         questActive = active
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!onFarmingIsland()) return
         var entityTrapper = EntityUtils.getEntityByID(TRAPPER_ID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
@@ -301,9 +296,8 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onKeyPress(event: KeyPressEvent) {
-        if (!onFarmingIsland()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
 
@@ -363,8 +357,6 @@ object TrevorFeatures {
         val color = baseColor.toColor().addAlpha(75)
         val colorCode = baseColor.getChatColor()
     }
-
-    fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
