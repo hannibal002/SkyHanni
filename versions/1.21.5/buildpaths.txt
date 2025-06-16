@@ -641,6 +641,7 @@ at/hannibal2/skyhanni/mixins/hooks/MessageHandlerHook.kt
 at.hannibal2.skyhanni.mixins.transformers.MixinMessageHandler.java
 at.hannibal2.skyhanni.events.ActionBarUpdateEvent.kt
 at/hannibal2/skyhanni/data/ActionBarStatsData.kt
+at/hannibal2/skyhanni/data/PetData.kt
 at.hannibal2.skyhanni.features.chat.SkyblockXPInChat.kt
 at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent.kt
 at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent.kt
@@ -689,6 +690,7 @@ at/hannibal2/skyhanni/config/commands/brigadier/BrigadierBuilder.kt
 at.hannibal2.skyhanni.config.commands.CommandBuilder.kt
 at.hannibal2.skyhanni.config.commands.CommandsRegistry.kt
 at/hannibal2/skyhanni/utils/CommandUtils.kt
+at.hannibal2.skyhanni.utils.PetUtils.kt
 at.hannibal2.skyhanni.utils.NeuCalculator.kt
 at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.kt
 at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent.kt
@@ -705,7 +707,11 @@ at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent.kt
 at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent.kt
 at.hannibal2.skyhanni.api.ItemBuyApi.kt
 at.hannibal2.skyhanni.api.ReforgeApi.kt
+at.hannibal2.skyhanni.api.CurrentPetApi.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeJson.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson.kt
 at.hannibal2.skyhanni.data.FriendApi.kt
 at.hannibal2.skyhanni.data.TitleData.kt
 at.hannibal2.skyhanni.data.ToolTipData.kt
