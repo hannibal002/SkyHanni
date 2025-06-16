@@ -55,5 +55,5 @@ object PlayerUtils {
 
     fun getName(): String = MinecraftCompat.localPlayer.name
 
-    fun inAir(): Boolean = MinecraftCompat.localPlayer.isAirBorne
+    fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround
 }
