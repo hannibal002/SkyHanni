@@ -3,10 +3,6 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import net.minecraft.nbt.CompressedStreamTools
-import net.minecraft.nbt.NBTTagCompound
-import java.io.ByteArrayInputStream
-import java.util.Base64
 
 data class NeuItemJson(
     @Expose @SerializedName("itemid") val itemId: String,
@@ -20,21 +16,4 @@ data class NeuItemJson(
     @Expose @SerializedName("modver") val modVersion: String,
     @Expose val infoType: String,
     @Expose val info: List<String>
-) {
-    /**
-     * Parses the NBT tag from the JSON into an NBTTagCompound.
-     * @return Parsed NBTTagCompound object.
-     * @throws IllegalArgumentException if the NBT parsing fails.
-     */
-    private fun getParsedNBT(): NBTTagCompound {
-        return try {
-            val decodedBytes = Base64.getDecoder().decode(nbtTagString.toByteArray(Charsets.UTF_8))
-            val inputStream = ByteArrayInputStream(decodedBytes)
-            CompressedStreamTools.readCompressed(inputStream)
-        } catch (e: Exception) {
-            throw IllegalArgumentException("Failed to parse NBT tag: $nbtTagString", e)
-        }
-    }
-
-    val nbtTag get() = getParsedNBT()
-}
+)

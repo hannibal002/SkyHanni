@@ -707,7 +707,8 @@ at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent.kt
 at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent.kt
 at.hannibal2.skyhanni.api.ItemBuyApi.kt
 at.hannibal2.skyhanni.api.ReforgeApi.kt
-at.hannibal2.skyhanni.api.CurrentPetApi.kt
+at/hannibal2/skyhanni/api/pet
+at.hannibal2.skyhanni.api.pet.CurrentPetApi.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeJson.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson.kt
