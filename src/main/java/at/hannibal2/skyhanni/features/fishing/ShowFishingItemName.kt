@@ -10,11 +10,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.item.EntityItem
@@ -72,14 +71,14 @@ object ShowFishingItemName {
     }
 
     private fun inCorrectArea(): Boolean {
-        if (IslandType.HUB.isInIsland()) {
+        if (IslandType.HUB.isCurrent()) {
             IslandAreas.currentAreaName.let {
                 if (it.endsWith(" Atrium") || it.endsWith(" Museum")) return false
                 if (it == "Fashion Shop" || it == "Shen's Auction") return false
             }
         }
-        return !(IslandType.THE_END.isInIsland())
+        return !(IslandType.THE_END.isCurrent())
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingApi.holdingRod && inCorrectArea()
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && FishingApi.holdingRod && inCorrectArea()
 }

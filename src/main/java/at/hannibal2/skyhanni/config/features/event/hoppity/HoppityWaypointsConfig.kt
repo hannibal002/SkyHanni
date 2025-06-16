@@ -23,15 +23,6 @@ class HoppityWaypointsConfig {
     var shared: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Show Waypoints Immediately",
-        desc = "Show an estimated waypoint immediately after clicking.\n" +
-            "§cThis might cause issues with other particle sources."
-    )
-    @ConfigEditorBoolean
-    var showImmediately: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Color", desc = "Color of the waypoint.")
     @ConfigEditorColour
     var color: String = "0:53:46:224:73"

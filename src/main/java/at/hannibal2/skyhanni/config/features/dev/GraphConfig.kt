@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -34,8 +35,8 @@ class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
-    @ConfigEditorKeybind(defaultKey = -98)
-    var selectKey: Int = -98 // Middle Mouse
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.MIDDLE_MOUSE)
+    var selectKey: Int = KeyboardManager.MIDDLE_MOUSE
 
     @Expose
     @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")

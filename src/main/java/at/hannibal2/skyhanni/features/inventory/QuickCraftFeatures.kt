@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -86,7 +86,7 @@ object QuickCraftFeatures {
     }
 
     private fun getInventoryType(): InventoryType? {
-        if (!LorenzUtils.inSkyBlock || !config.quickCraftingConfirmation) return null
+        if (!SkyBlockUtils.inSkyBlock || !config.quickCraftingConfirmation) return null
 
         val inventoryName = InventoryUtils.openInventoryName()
         return InventoryType.entries.firstOrNull { it.inventoryName == inventoryName }

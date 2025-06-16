@@ -31,7 +31,7 @@ object EnigmaRoseFlowerpot {
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled() && !inArea) return
+        if (!isEnabled() || !inArea) return
 
         event.drawWaypointFilled(dropLocation, LorenzColor.WHITE.toColor(), beacon = true)
         event.drawDynamicText(dropLocation, "Drop", 1.5)

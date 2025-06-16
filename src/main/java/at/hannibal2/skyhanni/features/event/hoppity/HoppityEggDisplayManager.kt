@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyMode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -94,7 +94,7 @@ object HoppityEggDisplayManager {
                 add("§7 - ${it.formattedName}$color $timeFormat")
             }
 
-            if (!unclaimedEggsConfig.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
+            if (!unclaimedEggsConfig.showCollectedLocationCount || !SkyBlockUtils.inSkyBlock) return@buildList
 
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {

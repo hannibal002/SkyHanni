@@ -1,16 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
-//#if TODO
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
-//#if TODO
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
-//#endif
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.convertEmptyToNull
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.filterNotNullOrEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
@@ -29,7 +28,6 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
 object InventoryUtils {
 
@@ -41,7 +39,7 @@ object InventoryUtils {
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
     fun getItemsInOpenChest(): List<Slot> {
-        return getItemsInOpenChestWithNull().filter { it.stack != null }
+        return getItemsInOpenChestWithNull().filter { it.stack.isNotEmpty() }
     }
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
@@ -60,7 +58,7 @@ object InventoryUtils {
     fun getSlotsInOwnInventory(): List<Slot> {
         val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return emptyList()
         return guiInventory.slots()
-            .filter { it.inventory is InventoryPlayer && it.stack != null }
+            .filter { it.inventory is InventoryPlayer && it.stack.isNotEmpty() }
     }
 
     fun openInventoryName(): String = InventoryCompat.getOpenChestName()
@@ -74,10 +72,10 @@ object InventoryUtils {
     fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
 
     fun getItemsInOwnInventory(): List<ItemStack> =
-        getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
+        getItemsInOwnInventoryWithNull()?.filterNotNullOrEmpty().orEmpty()
 
     fun getItemsInOwnInventoryWithNull(): Array<ItemStack?>? =
-        MinecraftCompat.localPlayerOrNull?.inventory?.mainInventory?.normalizeAsArray()
+        MinecraftCompat.localPlayerOrNull?.inventory?.mainInventory?.normalizeAsArray().convertEmptyToNull()
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar(): List<ItemStack> =
@@ -96,7 +94,6 @@ object InventoryUtils {
 
     fun getItemInHand(): ItemStack? = MinecraftCompat.localPlayerOrNull?.heldItem
 
-    //#if TODO
     fun getArmor(): Array<ItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
 
     fun getHelmet(): ItemStack? = getArmor()[3]
@@ -111,7 +108,6 @@ object InventoryUtils {
             this.cancel()
         }
     }
-    //#endif
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -177,9 +173,7 @@ object InventoryUtils {
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
-    //#if TODO
     fun NeuInternalName.getAmountInInventoryAndSacks(): Int = getAmountInInventory() + getAmountInSacks()
-    //#endif
 
     fun Slot.isTopInventory() = inventory.isTopInventory()
 

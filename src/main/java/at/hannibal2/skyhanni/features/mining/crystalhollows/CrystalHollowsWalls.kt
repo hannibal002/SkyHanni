@@ -7,13 +7,12 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.inflateBlock
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.QuadDrawer
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 
@@ -71,7 +70,7 @@ object CrystalHollowsWalls {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        val position = RenderUtils.getViewerPos(event.partialTicks)
+        val position = WorldRenderUtils.getViewerPos(event.partialTicks)
         when {
             position.y < HEAT_HEIGHT + yViewOffset -> drawHeat(event)
             nucleusBBOffsetY.isVecInside(position.toVec3()) -> {
@@ -97,23 +96,23 @@ object CrystalHollowsWalls {
         }
     }
 
-    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(true, false, Area.JUNGLE.color, Area.PRECURSOR.color)
     }
 
-    private fun drawJungle(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawJungle(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(true, true, Area.GOBLIN.color, Area.MITHRIL.color)
     }
 
-    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(false, false, Area.MITHRIL.color, Area.GOBLIN.color)
     }
 
-    private fun drawMithril(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawMithril(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(false, true, Area.PRECURSOR.color, Area.JUNGLE.color)
     }
 
-    private fun drawHeat(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawHeat(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         val heatHeight = HEAT_HEIGHT.shiftNY()
         draw(
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
@@ -134,7 +133,7 @@ object CrystalHollowsWalls {
         val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) =
             nucleusBBInflate.getCornersAtHeight(nucleusBBInflate.maxY)
 
-        QuadDrawer.draw3D(event.partialTicks) {
+        QuadDrawer.draw3D(event) {
             draw(
                 southEastCorner,
                 southWestCorner,
@@ -297,5 +296,5 @@ object CrystalHollowsWalls {
         )
     }
 
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isCurrent()
 }

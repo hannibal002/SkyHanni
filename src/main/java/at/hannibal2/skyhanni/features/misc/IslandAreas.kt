@@ -21,10 +21,10 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -226,7 +226,7 @@ object IslandAreas {
             )
         }
         if (foundAreas == 0) {
-            val islandName = LorenzUtils.skyBlockIsland.displayName
+            val islandName = SkyBlockUtils.currentIsland.displayName
             if (foundCurrentArea) {
                 buildDisplay?.addSearchString("§cThere is only one area in $islandName,")
                 buildDisplay?.addSearchString("§cnothing else to navigate to!")

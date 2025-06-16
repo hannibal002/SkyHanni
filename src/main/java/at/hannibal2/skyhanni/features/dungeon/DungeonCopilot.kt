@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -62,7 +62,7 @@ object DungeonCopilot {
             changeNextStep("Ready up")
         }
 
-        if (message.endsWith("§a is now ready!") && message.contains(LorenzUtils.getPlayerName())) {
+        if (message.endsWith("§a is now ready!") && message.contains(PlayerUtils.getName())) {
             changeNextStep("Wait for the dungeon to start!")
         }
 

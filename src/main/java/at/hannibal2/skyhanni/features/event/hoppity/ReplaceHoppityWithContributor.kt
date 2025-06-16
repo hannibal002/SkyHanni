@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CircularList
@@ -75,5 +75,5 @@ object ReplaceHoppityWithContributor {
         event.toolTip[index] = newLine
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.contributorRabbitName
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.contributorRabbitName
 }

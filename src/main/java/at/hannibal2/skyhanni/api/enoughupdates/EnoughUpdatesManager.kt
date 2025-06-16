@@ -53,7 +53,6 @@ import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
 //#endif
 
-// todo 1.21 impl needed
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
@@ -80,7 +79,11 @@ object EnoughUpdatesManager {
         }
     }
 
+    private var isLoading = false
+
     fun reloadRepo() {
+        if (isLoading) return
+        isLoading = true
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
@@ -97,6 +100,7 @@ object EnoughUpdatesManager {
             }
             NeuRepositoryReloadEvent.post()
             ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
+            isLoading = false
         }
     }
 
@@ -170,9 +174,10 @@ object EnoughUpdatesManager {
         json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
         //#if MC < 1.21
-        // todo nbt tag doesnt exist on modern
         json.addProperty("nbttag", tag.toString())
         json.addProperty("damage", stack.itemDamage)
+        //#else
+        //$$ json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
         //#endif
 
         val jsonLore = JsonArray()
@@ -272,8 +277,13 @@ object EnoughUpdatesManager {
         //$$ json["count"]?.asInt?.let { stack.count = it }
         //$$
         //$$
-        //$$ json["nbttag"]?.asString?.let { nbt ->
-        //$$     ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
+        //$$ if (json["nbttag"]?.isJsonObject == false) {
+        //$$     json["nbttag"]?.asString?.let { nbt ->
+        //$$         ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
+        //$$     }
+        //$$ } else {
+        //$$     val neuNbtInfoJson = ConfigManager.gson.fromJson(json["nbttag"], NeuNbtInfoJson::class.java)
+        //$$     ComponentUtils.convertToComponents(stack, neuNbtInfoJson)
         //$$ }
         //$$
         //$$ var replacements = mapOf<String, String>()
@@ -468,7 +478,6 @@ object EnoughUpdatesManager {
         neuPetNums = event.readConstant<JsonObject>("petnums")
     }
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -504,5 +513,4 @@ object EnoughUpdatesManager {
             }
         }
     }
-    //#endif
 }

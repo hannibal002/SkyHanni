@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
@@ -94,5 +93,5 @@ object MineshaftWaypoints {
             }
     }
 
-    fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.mineshaftWaypoints.enabled
+    fun isEnabled() = IslandType.MINESHAFT.isCurrent() && config.mineshaftWaypoints.enabled
 }

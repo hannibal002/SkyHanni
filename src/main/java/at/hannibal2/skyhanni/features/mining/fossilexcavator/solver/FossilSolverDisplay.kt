@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -239,5 +238,5 @@ object FossilSolverDisplay {
         isCompleted = true
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled && FossilExcavatorApi.inInventory
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isCurrent() && config.enabled && FossilExcavatorApi.inInventory
 }

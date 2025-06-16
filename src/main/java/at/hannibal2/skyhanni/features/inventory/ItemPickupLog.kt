@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -26,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
@@ -60,7 +60,13 @@ object ItemPickupLog {
         ),
         ITEM_NAME(
             "§d[:3] TransRights's Cake Soul",
-            { entry, _ -> Renderable.string(entry.name) },
+            { entry, _ ->
+                var name = entry.name
+                if (entry.name == "block.minecraft.air") {
+                    name = entry.neuInternalName?.repoItemName ?: "?"
+                }
+                Renderable.string(name)
+            },
         ),
         ;
 
@@ -343,7 +349,7 @@ object ItemPickupLog {
         }
     }
 
-    private fun worldChangeCooldown(): Boolean = LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
+    private fun worldChangeCooldown(): Boolean = SkyBlockUtils.lastWorldSwitch.passedSince() > 2.seconds
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

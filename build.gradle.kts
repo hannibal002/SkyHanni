@@ -186,11 +186,11 @@ dependencies {
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
         modImplementation("net.fabricmc:fabric-loader:0.16.13")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5")
         // on fabric everyone be using the kotlin language mod so we don't need to bundle kotlin ourselves
         modImplementation("net.fabricmc:fabric-language-kotlin:1.13.2+kotlin.2.1.20")
 
-        modLocalRuntime(libs.modmenu)
+        modImplementation(libs.modmenu)
     }
 
     if (target != ProjectTarget.MODERN) {
@@ -268,7 +268,7 @@ afterEvaluate {
     tasks.named("kspKotlin", KspTaskJvm::class) {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
         this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
     }
 }
 
@@ -321,20 +321,20 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
+fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
                 .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
-            kotlin.include(buildPaths)
-            java.include(buildPaths)
+            kotlin.exclude(buildPaths)
+            java.exclude(buildPaths)
         }
     }
 }
-includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
-includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))

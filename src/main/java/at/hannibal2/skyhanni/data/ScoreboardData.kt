@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.inventory.FixIronman
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,8 +24,10 @@ import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ScoreboardData {
 
@@ -139,7 +141,7 @@ object ScoreboardData {
         }
     }
 
-    fun toggleMonitor() {
+    private fun toggleMonitor() {
         monitor = !monitor
         val action = if (monitor) "Enabled" else "Disabled"
         ChatUtils.chat("$action scoreboard monitoring in the console.")
@@ -166,7 +168,7 @@ object ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
         //#else
-        //$$ return list.map { it.formattedTextCompat() }
+        //$$ return list.map { it.formattedTextCompatLessResets() }
         //#endif
     }
 
@@ -193,12 +195,10 @@ object ScoreboardData {
             return null
         }
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-            //#if TODO
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")
                 return "Purse: $coins"
             }
-            //#endif
         }
 
         if (SkyHanniMod.feature.misc.colorMonthNames) {
@@ -208,11 +208,9 @@ object ScoreboardData {
                 }
             }
         }
-        //#if TODO
         FixIronman.fixScoreboard(text)?.let {
             return it
         }
-        //#endif
 
         return text
     }
@@ -250,4 +248,15 @@ object ScoreboardData {
         "\uD83C\uDF82",
         "\uD83D\uDD2B",
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shdebugscoreboard") {
+            description =
+                "Monitors the scoreboard changes: " +
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { toggleMonitor() }
+        }
+    }
 }

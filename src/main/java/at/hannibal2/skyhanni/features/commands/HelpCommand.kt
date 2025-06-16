@@ -90,10 +90,10 @@ object HelpCommand {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shcommands") {
+        event.registerBrigadier("shcommands") {
             description = "Shows this list"
             aliases = listOf("shhelp", "shcommand", "shcmd", "shc")
-            callback { onCommand(it, event.commands, event.dispatcher) }
+            legacyCallbackArgs { onCommand(it, event.commands, event.dispatcher) }
         }
     }
 }

@@ -43,8 +43,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -53,6 +51,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -148,7 +147,7 @@ object HoppityEventSummary {
         val isEggLocatorEnabled = !liveDisplayConfig.mustHoldEggLocator || InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
         val isInventoryEnabled = liveDisplayConfig.specificInventories.isEmpty() || inMatchingInventory()
 
-        return LorenzUtils.inSkyBlock &&
+        return SkyBlockUtils.inSkyBlock &&
             !isToggledOff &&
             isEnabled &&
             isIslandEnabled &&
@@ -174,7 +173,7 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        onHoppityIsland = LorenzUtils.inSkyBlock && allowedHoppityIslands.any { it.isInIsland() }
+        onHoppityIsland = SkyBlockUtils.inSkyBlock && allowedHoppityIslands.any { it.isCurrent() }
     }
 
     @HandleEvent
@@ -349,7 +348,7 @@ object HoppityEventSummary {
     }
 
     private fun checkLbUpdateWarning() {
-        if (!LorenzUtils.inSkyBlock || !HoppityApi.isHoppityEvent() || !updateCfConfig.enabled) return
+        if (!SkyBlockUtils.inSkyBlock || !HoppityApi.isHoppityEvent() || !updateCfConfig.enabled) return
 
         // Only run if the user has leaderboard stats enabled
         if (!statDisplayList.contains(HoppityStat.LEADERBOARD_CHANGE)) return

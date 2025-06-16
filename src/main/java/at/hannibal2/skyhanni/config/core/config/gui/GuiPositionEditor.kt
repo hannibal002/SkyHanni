@@ -62,7 +62,11 @@ class GuiPositionEditor(
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
             val accessor = oldScreen as AccessorGuiContainer
+            //#if MC < 1.21
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
+            //#else
+            //$$ oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
+            //#endif
         }
 
         GlStateManager.disableLighting()
@@ -199,7 +203,7 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char, keyCode: Int) {
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (clickedPos == -1) return
         val position = positions[clickedPos]
         if (position.clicked) return
@@ -259,4 +263,14 @@ class GuiPositionEditor(
         else
             hovered.scale += .1F
     }
+
+    //#if MC > 1.21
+    //$$ override fun close() {
+    //$$ if (oldScreen == null) {
+    //$$     super.close()
+    //$$ } else {
+    //$$     net.minecraft.client.MinecraftClient.getInstance().currentScreen = oldScreen
+    //$$ }
+    //$$ }
+    //#endif
 }

@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -36,6 +35,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -148,7 +148,7 @@ object CropMoneyDisplay {
             if (GardenApi.mushroomCowPet && it != CropType.MUSHROOM && config.mooshroom) {
                 val redMushroom = "ENCHANTED_RED_MUSHROOM".toInternalName()
                 val brownMushroom = "ENCHANTED_BROWN_MUSHROOM".toInternalName()
-                val (redPrice, brownPrice) = if (LorenzUtils.noTradeMode) {
+                val (redPrice, brownPrice) = if (SkyBlockUtils.noTradeMode) {
                     val redPrice = (redMushroom.getNpcPriceOrNull() ?: 160.0) / 160
                     val brownPrice = (brownMushroom.getNpcPriceOrNull() ?: 160.0) / 160
                     redPrice to brownPrice
@@ -177,7 +177,7 @@ object CropMoneyDisplay {
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
-                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
+                    if (SkyBlockUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
                     else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
                 extraMoneyPerHour.dicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
@@ -282,7 +282,7 @@ object CropMoneyDisplay {
         val moneyPerHours = mutableMapOf<NeuInternalName, CropMoneyData>()
 
         val onlyNpcPrice =
-            (!config.useCustomFormat && LorenzUtils.noTradeMode) ||
+            (!config.useCustomFormat && SkyBlockUtils.noTradeMode) ||
                 (config.useCustomFormat && config.customFormat.singleOrNull() == CustomFormatEntry.NPC_PRICE)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
@@ -340,7 +340,7 @@ object CropMoneyDisplay {
     private fun currentFormats() =
         if (config.useCustomFormat) {
             config.customFormat
-        } else if (LorenzUtils.noTradeMode) {
+        } else if (SkyBlockUtils.noTradeMode) {
             listOf(CustomFormatEntry.NPC_PRICE)
         } else {
             listOf(CustomFormatEntry.SELL_OFFER)

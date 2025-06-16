@@ -76,6 +76,18 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
+    fun drawStrings(strings: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        drawStrings(strings.split("\n"), x, y, color, shadow)
+    }
+
+    fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        var newY = y
+        for (string in strings) {
+            DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
+            newY += 9
+        }
+    }
+
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
         //#if MC < 1.21
         val itemRender = Minecraft.getMinecraft().renderItem

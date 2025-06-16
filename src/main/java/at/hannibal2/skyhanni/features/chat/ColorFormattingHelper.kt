@@ -1,13 +1,18 @@
 package at.hannibal2.skyhanni.features.chat
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 
+@SkyHanniModule
 object ColorFormattingHelper {
-    fun printColorCodeList() {
+    private fun printColorCodeList() {
         val text = mutableListOf<String>()
         text.add("§c=================== General Colors ===================")
         text.add("§f&0 = §0Black              §f&1 = §1Dark Blue")
@@ -56,5 +61,16 @@ object ColorFormattingHelper {
             prefix = false,
         )
         ChatUtils.chat("§c===================================================", false)
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcolors") {
+            description = "Prints a list of all Minecraft color & formatting codes in chat."
+            category = CommandCategory.USERS_ACTIVE
+            @Suppress("AvoidBritishSpelling")
+            aliases = listOf("shcolor", "shcolours", "shcolour")
+            simpleCallback { printColorCodeList() }
+        }
     }
 }

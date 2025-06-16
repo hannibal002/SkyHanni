@@ -14,10 +14,9 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -112,7 +111,7 @@ object CorpseLocator {
 
     private fun handleChatEvent(author: String, message: String) {
         if (!isEnabled()) return
-        if (LorenzUtils.getPlayerName() in author) return
+        if (PlayerUtils.getName() in author) return
 
         mineshaftCoordsPattern.matchMatcher(message) {
             val (x, y, z) = listOf(group("x"), group("y"), group("z")).map { it.formatInt() }
@@ -124,5 +123,5 @@ object CorpseLocator {
         }
     }
 
-    fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.enabled
+    fun isEnabled() = IslandType.MINESHAFT.isCurrent() && config.enabled
 }

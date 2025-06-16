@@ -25,13 +25,14 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
@@ -226,7 +227,7 @@ object FarmingWeightDisplay {
             Renderable.clickable(
                 "§6${lbName()}§7: $weight$leaderboard",
                 tips = listOf("§eClick to open your Farming Profile."),
-                onLeftClick = { openWebsite(LorenzUtils.getPlayerName()) },
+                onLeftClick = { openWebsite(PlayerUtils.getName()) },
             ),
         )
 
@@ -395,13 +396,13 @@ object FarmingWeightDisplay {
                 "§eClick to open your Farming Weight",
                 "§eprofile on §celitebot.dev",
             ),
-            "/shfarmingprofile ${LorenzUtils.getPlayerName()}",
+            "/shfarmingprofile ${PlayerUtils.getName()}",
         )
     }
 
     private fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
-    private fun outsideEnabled() = OutsideSBFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
-    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenApi.inGarden()) || config.showOutsideGarden
+    private fun outsideEnabled() = OutsideSBFeature.FARMING_WEIGHT.isSelected() && !SkyBlockUtils.inSkyBlock
+    private fun inGardenEnabled() = (SkyBlockUtils.inSkyBlock && GardenApi.inGarden()) || config.showOutsideGarden
 
     private fun isEtaEnabled() = config.overtakeETA
     private fun isMonthlyLB() = config.eliteLBType.get() == EliteFarmingWeightConfig.EliteFarmingWeightLBType.MONTHLY
@@ -475,7 +476,7 @@ object FarmingWeightDisplay {
     private fun lbName() = "${if (isMonthlyLB()) "Monthly " else ""}Farming Weight"
 
     private fun loadLeaderboardPosition(): Int {
-        val uuid = LorenzUtils.getPlayerUuid()
+        val uuid = PlayerUtils.getUuid()
 
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val upcomingPlayersParam = when {
@@ -545,7 +546,7 @@ object FarmingWeightDisplay {
     }
 
     private fun loadWeight(localProfile: String) {
-        val uuid = LorenzUtils.getPlayerUuid()
+        val uuid = PlayerUtils.getUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
         val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elite Farming Weight")
 
@@ -619,7 +620,7 @@ object FarmingWeightDisplay {
     }
 
     private fun lookUpCommand(it: Array<String>) {
-        val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
+        val name = if (it.size == 1) it[0] else PlayerUtils.getName()
         openWebsite(name, ignoreCooldown = true)
     }
 

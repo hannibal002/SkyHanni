@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -34,7 +36,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -47,6 +48,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -104,7 +106,7 @@ object ComposterOverlay {
             GardenApi.storage?.composterCurrentFuelItem = value
         }
 
-    fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         if (args.size != 1) {
             ChatUtils.userError("Usage: /shtestcomposter <offset>")
             return
@@ -535,7 +537,7 @@ object ComposterOverlay {
     private fun retrieveMaterials(internalName: NeuInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
         if (config.retrieveFrom == RetrieveFromEntry.BAZAAR &&
-            !LorenzUtils.noTradeMode && internalName != BIOFUEL
+            !SkyBlockUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
@@ -562,7 +564,7 @@ object ComposterOverlay {
         }
         if (havingInSacks == 0) {
             SoundUtils.playErrorSound()
-            if (LorenzUtils.noTradeMode) {
+            if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("No $itemName §efound in sacks.")
             } else {
                 ChatUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
@@ -574,7 +576,7 @@ object ComposterOverlay {
         HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
         val havingInTotal = havingInInventory + havingInSacks
         if (itemsNeeded >= havingInTotal) {
-            if (LorenzUtils.noTradeMode) {
+            if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 ChatUtils.clickableChat(
@@ -720,6 +722,15 @@ object ComposterOverlay {
             for ((a, b) in tabListData) {
                 add("tabListData $a: $b")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestcomposter") {
+            description = "Test the composter overlay"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { onCommand(it) }
         }
     }
 }

@@ -9,18 +9,17 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
@@ -76,7 +75,7 @@ object CarnivalZombieShootout {
         if (!isEnabled() || !started || (!config.coloredHitboxes && !config.coloredLines)) return
 
         lamp?.let {
-            if (config.coloredLines) event.draw3DLine(event.exactPlayerEyeLocation(), it.pos.add(0.0, 0.5, 0.0), Color.RED, 3, false)
+            if (config.coloredLines) event.drawLineToEye(it.pos.add(0.0, 0.5, 0.0), Color.RED, 3, false)
             if (config.coloredHitboxes) event.drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1f)
         }
 
@@ -93,7 +92,11 @@ object CarnivalZombieShootout {
                         "helmet" to helmet,
                         "helmet.displayName" to helmet.displayName,
                         "helmet.item" to helmet.item,
+                        //#if MC < 1.21
                         "helmet.unlocalizedName" to helmet.unlocalizedName,
+                        //#else
+                        //$$ "helmet.unlocalizedName" to helmet.item.translationKey,
+                        //#endif
                     )
                     return@mapNotNull null
                 }
@@ -120,8 +123,8 @@ object CarnivalZombieShootout {
 
             event.drawHitbox(
                 boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
-                lineWidth = 3,
                 type.color,
+                lineWidth = 3,
                 depth = false,
             )
         }
@@ -185,5 +188,5 @@ object CarnivalZombieShootout {
 
     private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.item }
 
-    private fun isEnabled() = config.enabled && LorenzUtils.skyBlockArea == "Carnival"
+    private fun isEnabled() = config.enabled && SkyBlockUtils.graphArea == "Carnival"
 }

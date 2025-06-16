@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.player.Action
 import at.hannibal2.skyhanni.events.player.PlayerInteractionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -63,6 +64,6 @@ object ClientEvents {
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        PlayerInteractionEvent(event.action, event.pos, event.face).post()
+        PlayerInteractionEvent(Action.fromForge(event.action), event.pos, event.face).post()
     }
 }

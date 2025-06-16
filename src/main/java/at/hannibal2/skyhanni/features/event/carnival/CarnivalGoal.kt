@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
@@ -213,7 +213,7 @@ enum class CarnivalGoal(
         }
 
         fun isEnabled() =
-            LorenzUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
+            SkyBlockUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
 
         private enum class GoalType(val item: Item, display: String) {
             FRUIT_DIGGING(Item.getItemFromBlock(Blocks.sand), "§6Fruit Digging"),

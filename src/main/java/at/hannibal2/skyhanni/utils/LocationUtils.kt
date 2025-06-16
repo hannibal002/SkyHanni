@@ -21,17 +21,11 @@ object LocationUtils {
         return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
     }
 
-    private fun canSee0(a: LorenzVec, b: LorenzVec) =
-        //#if TODO
-        MinecraftCompat.localWorld.rayTraceBlocks(
-            a.toVec3(),
-            b.toVec3(),
-            false, // stopOnLiquid
-            true, // ignoreBlockWithoutBoundingBox
-            false, // returnLastUncollidableBlock
-        ) == null
+    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean =
+        //#if MC < 1.21
+        BlockUtils.rayTrace(a, b) == null
     //#else
-    //$$ false
+    //$$ BlockUtils.rayTrace(a, b)?.missed == true
     //#endif
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()

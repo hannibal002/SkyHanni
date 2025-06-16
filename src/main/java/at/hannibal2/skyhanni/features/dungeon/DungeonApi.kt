@@ -21,10 +21,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
@@ -143,7 +142,7 @@ object DungeonApi {
         }
     }
 
-    fun inDungeon(): Boolean = IslandType.CATACOMBS.isInIsland()
+    fun inDungeon(): Boolean = IslandType.CATACOMBS.isCurrent()
 
     fun isOneOf(vararg floors: String): Boolean = dungeonFloor?.equalsOneOf(*floors) == true
 
@@ -222,7 +221,7 @@ object DungeonApi {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
-        val playerTeam = event.tabList.find { it.contains(LorenzUtils.getPlayerName()) }?.removeColor() ?: return
+        val playerTeam = event.tabList.find { it.contains(PlayerUtils.getName()) }?.removeColor() ?: return
         for (dungeonClass in DungeonClass.entries) {
             if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()

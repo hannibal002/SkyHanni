@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -167,7 +169,7 @@ object CaptureFarmingGear {
         }
     }
 
-    fun handelCarrolyn(input: Array<String>) {
+    private fun handelCarrolyn(input: Array<String>) {
         val string = input.joinToString("_").uppercase()
         val crop = CropType.entries.firstOrNull { it.name == string }
             ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string").run { return }
@@ -435,7 +437,7 @@ object CaptureFarmingGear {
         }
     }
 
-    fun onResetGearCommand() {
+    private fun onResetGearCommand() {
         val storage = GardenApi.storage?.fortune ?: return
         ChatUtils.chat("Resets farming items")
         storage.farmingItems.clear()
@@ -447,5 +449,19 @@ object CaptureFarmingGear {
         event.move(48, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")
         event.move(48, "#profile.garden.fortune.pumpkinFortune", "#profile.garden.fortune.carrolyn.PUMPKIN")
         event.move(48, "#profile.garden.fortune.cocoaBeansFortune", "#profile.garden.fortune.carrolyn.COCOA_BEANS")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcarrolyn") {
+            description = "Toggles if the specified crops effect is active from carrolyn"
+            category = CommandCategory.USERS_BUG_FIX
+            legacyCallbackArgs { handelCarrolyn(it) }
+        }
+        event.registerBrigadier("shresetfarmingitems") {
+            description = "Resets farming items saved for the Farming Fortune Guide"
+            category = CommandCategory.USERS_RESET
+            simpleCallback { onResetGearCommand() }
+        }
     }
 }

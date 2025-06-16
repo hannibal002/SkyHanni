@@ -6,15 +6,15 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
-//#if MC < 1.16
+//#if MC > 1.16
 //$$ import net.minecraft.item.SpawnEggItem
 //#endif
 
@@ -52,6 +52,6 @@ object SlayerItemsOnGround {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled &&
         SlayerApi.isInCorrectArea && SlayerApi.hasActiveSlayerQuest()
 }

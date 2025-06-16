@@ -21,13 +21,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
@@ -119,14 +119,14 @@ object ElectionApi {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
         if (event.repeatSeconds(2)) {
             checkHypixelApi()
             getTimeTillNextMayor()
         }
 
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
         if (!ElectionCandidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()

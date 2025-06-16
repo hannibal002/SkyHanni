@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.monster.EntityEnderman
@@ -46,7 +45,7 @@ object EndermanSlayerHideParticles {
 
     private fun LorenzVec.distanceToNearestEnderman() = endermanLocations.minOfOrNull { it.distanceSq(this) }
 
-    fun isEnabled() = IslandType.THE_END.isInIsland() && SlayerApi.config.endermen.hideParticles
+    fun isEnabled() = IslandType.THE_END.isCurrent() && SlayerApi.config.endermen.hideParticles
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -22,7 +22,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.monster.EntityGhast
-import net.minecraft.entity.monster.EntityGolem
+import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 
 @SkyHanniModule
@@ -85,7 +85,7 @@ object HideFarEntities {
         }
         if (IslandType.DWARVEN_MINES.isCurrent()) {
             // powder ghast & golem defender (from goblin raid event)
-            list += allEntities.filter { it is EntityGhast || it is EntityGolem }
+            list += allEntities.filter { it is EntityGhast || it is EntityIronGolem }
         }
 
         // Always show boss bar

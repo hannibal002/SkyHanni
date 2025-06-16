@@ -13,13 +13,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playBeepSound
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -165,8 +165,8 @@ object TotemOfCorruption {
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }
 
-    private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay.get()
-    private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.outlineType != OutlineType.NONE
+    private fun isOverlayEnabled() = SkyBlockUtils.inSkyBlock && config.showOverlay.get()
+    private fun isEffectiveAreaEnabled() = SkyBlockUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
 
 private class Totem(

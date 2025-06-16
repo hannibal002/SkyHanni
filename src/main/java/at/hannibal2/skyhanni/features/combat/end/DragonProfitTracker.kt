@@ -44,7 +44,7 @@ object DragonProfitTracker {
         { drawDisplay(it) },
     )
 
-    class BucketData : BucketedItemTrackerData<DragonType>() {
+    class BucketData : BucketedItemTrackerData<DragonType>(DragonType::class) {
         override fun getCoinName(bucket: DragonType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: DragonType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
@@ -138,8 +138,8 @@ object DragonProfitTracker {
         ChatUtils.debug("Added $type to tracker, lastDragonKill: $lastDragonKill")
     }
 
-    fun addDragonLoot(type: DragonType, item: NeuInternalName, amount: Int) {
-        tracker.addItem(type, item, amount)
+    fun addDragonLoot(type: DragonType, item: NeuInternalName, amount: Int, command: Boolean = false) {
+        tracker.addItem(type, item, amount, command)
         ChatUtils.debug("Added $item to tracker (amount: $amount, type: $type)")
     }
 

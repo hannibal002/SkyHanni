@@ -11,12 +11,11 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 @SkyHanniModule
@@ -62,7 +61,7 @@ object MiningEventDisplay {
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
                 MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
-                MiningEventConfig.ShowType.CURRENT -> islandType.isInIsland()
+                MiningEventConfig.ShowType.CURRENT -> islandType.isCurrent()
                 else -> true
             }
 
@@ -133,7 +132,7 @@ object MiningEventDisplay {
     }
 
     private fun shouldDisplay(): Boolean {
-        val isOnValidMiningLocation = LorenzUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
+        val isOnValidMiningLocation = SkyBlockUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
 
         return (isOnValidMiningLocation || OutsideSBFeature.MINING_EVENT_DISPLAY.isSelected()) && config.enabled
     }

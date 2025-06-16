@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEndermite
@@ -103,6 +102,5 @@ object HighlightMiningCommissionMobs {
         event.move(2, "misc.mining", "mining")
     }
 
-    fun isEnabled() = config.highlightCommissionMobs &&
-        (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
+    fun isEnabled() = config.highlightCommissionMobs && (IslandType.DWARVEN_MINES.isCurrent() || IslandType.CRYSTAL_HOLLOWS.isCurrent())
 }

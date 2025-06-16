@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.MinecraftClient
 
 object MouseCompat {
@@ -14,18 +15,13 @@ object MouseCompat {
     }
 
     fun isButtonDown(button: Int): Boolean {
-        return when (button) {
-            0 -> mouse.wasLeftButtonClicked()
-            1 -> mouse.wasMiddleButtonClicked()
-            2 -> mouse.wasRightButtonClicked()
-            else -> false
-        }
+        return getEventButton() == button
     }
 
     fun getScrollDelta(): Int {
         val delta = scroll
-        scroll = 0.0
-        return delta.toInt()
+        DelayedRun.runNextTick { scroll = 0.0 }
+        return delta.toInt() * 120
     }
 
     fun getX(): Int {
@@ -50,7 +46,7 @@ object MouseCompat {
 
     fun getEventButton(): Int {
         val button = lastEventButton
-        lastEventButton = -1
+        DelayedRun.runNextTick { lastEventButton = -1 }
         return button
     }
 }

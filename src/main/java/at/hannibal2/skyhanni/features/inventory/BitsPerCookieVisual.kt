@@ -6,12 +6,12 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcherWithIndex
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -74,6 +74,6 @@ object BitsPerCookieVisual {
         )
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock &&
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
         config.let { it.bulkBuyCookieTime || it.showBitsOnCookie || it.showBitsChangeOnCookie }
 }

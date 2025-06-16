@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.init.Blocks
 import kotlin.concurrent.fixedRateTimer
@@ -38,7 +38,7 @@ object MovementSpeedDisplay {
     }
 
     private fun checkSpeed() {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
 
         speed = with(MinecraftCompat.localPlayer) {
             val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
@@ -70,7 +70,7 @@ object MovementSpeedDisplay {
         config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")
     }
 
-    fun isEnabled() = LorenzUtils.onHypixel &&
-        (LorenzUtils.inSkyBlock || OutsideSBFeature.MOVEMENT_SPEED.isSelected()) &&
+    fun isEnabled() = SkyBlockUtils.onHypixel &&
+        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MOVEMENT_SPEED.isSelected()) &&
         config.playerMovementSpeed
 }

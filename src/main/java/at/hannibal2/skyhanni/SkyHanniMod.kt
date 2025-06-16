@@ -4,18 +4,17 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
-//#if TODO
 import at.hannibal2.skyhanni.config.SackData
-//#endif
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-//#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
-//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
@@ -42,7 +41,6 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object SkyHanniMod {
 
@@ -77,7 +75,14 @@ object SkyHanniMod {
             screenTicks++
             if (screenTicks == 5) {
                 val title = InventoryUtils.openInventoryName()
-                MinecraftCompat.localPlayer.closeScreen()
+                if (shouldCloseScreen) {
+                    //#if MC < 1.21
+                    MinecraftCompat.localPlayer.closeScreen()
+                    //#else
+                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
+                    //#endif
+                }
+                shouldCloseScreen = true
                 OtherInventoryData.close(title)
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
@@ -96,14 +101,10 @@ object SkyHanniMod {
 
     @JvmField
     var feature: Features = Features()
-    //#if TODO
     lateinit var sackData: SackData
-    //#endif
     lateinit var friendsData: FriendsJson
     lateinit var knownFeaturesData: KnownFeaturesJson
-    //#if TODO
     lateinit var jacobContestsData: JacobContestsJson
-    //#endif
     lateinit var visualWordsData: VisualWordsJson
 
     lateinit var configManager: ConfigManager
@@ -127,6 +128,7 @@ object SkyHanniMod {
     }
 
     var screenToOpen: GuiScreen? = null
+    var shouldCloseScreen: Boolean = true
     private var screenTicks = 0
     fun consoleLog(message: String) {
         logger.log(Level.INFO, message)
@@ -150,9 +152,20 @@ object SkyHanniMod {
         event.registerBrigadier("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"
-            legacyCallbackArgs {
-                ConfigGuiManager.onCommand(it)
+            literalCallback("gui") {
+                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             }
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
+                openConfigGui(search)
+            }
+            simpleCallback {
+                openConfigGui()
+            }
+        }
+        event.registerBrigadier("shconfigsave") {
+            description = "Manually saving the config"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
         }
     }
 }

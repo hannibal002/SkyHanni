@@ -5,11 +5,10 @@ import at.hannibal2.skyhanni.config.features.chat.CrystalNucleusConfig.CrystalNu
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -309,6 +308,6 @@ object CrystalNucleusChatFilter {
     }
 
     private fun shouldBlock(type: CrystalNucleusMessageTypes) = config.modifiedMessages.contains(type)
-    private fun inNucleus() = LorenzUtils.skyBlockArea == "Crystal Nucleus"
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    private fun inNucleus() = SkyBlockUtils.graphArea == "Crystal Nucleus"
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isCurrent()
 }

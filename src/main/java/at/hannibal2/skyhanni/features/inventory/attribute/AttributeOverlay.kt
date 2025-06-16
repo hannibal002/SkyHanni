@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.getRollTy
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.isPartialRoll
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.item.ItemStack
@@ -89,5 +89,5 @@ object AttributeOverlay {
         drawSlotText(levelX, levelY, levelString, SCALE)
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

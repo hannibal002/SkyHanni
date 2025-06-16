@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -21,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -148,7 +149,7 @@ object PunchcardHighlight {
             255 -> 1
             else -> 255 - color.alpha
         }
-        RenderLivingEntityHelper.setEntityColor(entity, color.addAlpha(alpha)) { IslandType.THE_RIFT.isInIsland() }
+        RenderLivingEntityHelper.setEntityColor(entity, color.addAlpha(alpha)) { IslandType.THE_RIFT.isCurrent() }
     }
 
     private fun removePlayerColor(entity: EntityLivingBase) {
@@ -245,6 +246,15 @@ object PunchcardHighlight {
         val reverse = config.reverse.get()
         for (player in MobData.players.filter { (reverse && it.name in playerList) || (!reverse && it.name !in playerList) }) {
             colorPlayer(player.baseEntity)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetpunchcard") {
+            description = "Resets the Rift Punchcard Artifact player list."
+            category = CommandCategory.USERS_RESET
+            simpleCallback { onResetCommand() }
         }
     }
 }

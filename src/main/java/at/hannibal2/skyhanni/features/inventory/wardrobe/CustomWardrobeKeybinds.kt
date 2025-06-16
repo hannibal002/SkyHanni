@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.clickSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -61,5 +61,6 @@ object CustomWardrobeKeybinds {
     fun allowMouseClick() = isEnabled() && keybinds.filter { it < 0 }.any { it.isKeyHeld() }
     fun allowKeyboardClick() = isEnabled() && keybinds.filter { it > 0 }.any { it.isKeyHeld() }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && WardrobeApi.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
+    private fun isEnabled() =
+        SkyBlockUtils.inSkyBlock && WardrobeApi.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
 }

@@ -12,6 +12,7 @@ import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacke
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import kotlin.jvm.optionals.getOrNull
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object HypixelEventApi {
 
@@ -42,6 +43,9 @@ object HypixelEventApi {
     }
 
     fun sendPacket(packet: ServerboundVersionedPacket) {
-        modApi.sendPacket(packet)
+        try {
+            modApi.sendPacket(packet)
+        } catch (_: Exception) {
+        }
     }
 }
