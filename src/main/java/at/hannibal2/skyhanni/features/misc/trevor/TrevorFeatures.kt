@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.Tracker
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.TitleManager.TitleContext
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -116,6 +117,7 @@ object TrevorFeatures {
     var questActive = false
     var inBetweenQuests = false
     var inTrapperDen = false
+    var lastTitle: TitleContext? = null
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
@@ -139,7 +141,8 @@ object TrevorFeatures {
         mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
-                TitleManager.sendTitle("§2Mob Died ")
+                lastTitle?.stop()
+                lastTitle = TitleManager.sendTitle("§2Mob Died")
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
