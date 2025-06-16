@@ -270,6 +270,9 @@ object ExperimentsAddonsHelper {
             )
         }.sortedBy { it.sequenceNumber }
 
+        // Discard any old results that might've been cached
+        if (currentUltraSequencerRound != orderedUltrasequencerSlots.size) return
+
         userUltrasequencerProgress.clear()
         hypixelUltrasequencerData.addAll(orderedUltrasequencerSlots.map { it.slotIndex })
     }
