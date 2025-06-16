@@ -164,7 +164,7 @@ object ChatManager {
         val chatEvent = SkyHanniChatEvent(message, component)
         chatEvent.post()
 
-        val blockReason = chatEvent.blockedReason.uppercase()
+        val blockReason = chatEvent.blockedReason.orEmpty().uppercase()
         if (blockReason != "") {
             loggerFiltered.log("[$blockReason] $message")
             loggerAll.log("[$blockReason] $message")
