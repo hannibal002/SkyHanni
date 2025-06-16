@@ -45,7 +45,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
@@ -75,7 +75,7 @@ object GardenApi {
                 storage?.experience = it
             }
         }
-    private val cropIconCache: TimeLimitedCache<String, ItemStack> = TimeLimitedCache(10.minutes)
+    private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     // TODO USE SH-REPO
@@ -93,8 +93,8 @@ object GardenApi {
         checkItemInHand()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         if (!inGarden()) return
         checkItemInHand()
         DelayedRun.runDelayed(500.milliseconds) {
@@ -205,8 +205,8 @@ object GardenApi {
         ChatUtils.chat("Manually reset all crop speed data!")
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         GardenBestCropTime.reset()
     }
 

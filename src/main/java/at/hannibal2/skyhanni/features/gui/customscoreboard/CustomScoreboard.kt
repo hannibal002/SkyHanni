@@ -218,7 +218,7 @@ object CustomScoreboard {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }
 
-        activePatterns = (ScoreboardConfigElement.getElements() + ScoreboardConfigEventElement.getEvents())
+        activePatterns = ScoreboardConfigElement.getElements()
             .flatMap { it.elementPatterns }
             .distinct()
         activePatterns += ScoreboardPattern.brokenPatterns
