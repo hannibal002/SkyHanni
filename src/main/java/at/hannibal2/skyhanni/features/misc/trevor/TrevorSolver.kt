@@ -53,6 +53,7 @@ object TrevorSolver {
         val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
+            if (!entity.isEntityAlive) continue
             val name = entity.name
             val isTrevor = MobData.entityToMob[entity]?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
