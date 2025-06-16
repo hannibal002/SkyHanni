@@ -53,9 +53,10 @@ object TrevorSolver {
         val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
-            if (!entity.isEntityAlive) continue
+            val mob = MobData.entityToMob[entity]
+            if (!entity.isEntityAlive || mob?.isEntityAlive == false) continue
             val name = entity.name
-            val isTrevor = MobData.entityToMob[entity]?.let { it.name != name && isTrevorMob(it) } ?: false
+            val isTrevor = mob?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) || it.entityName.contains(name) }
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
@@ -64,7 +65,7 @@ object TrevorSolver {
                     ErrorManager.skyHanniError(
                         "Found trevor mob but current mob is null",
                         "entity" to entity,
-                        "mobDataMob" to MobData.entityToMob[entity],
+                        "mobDataMob" to mob,
                     )
                 }
 
