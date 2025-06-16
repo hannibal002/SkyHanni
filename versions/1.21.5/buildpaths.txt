@@ -421,7 +421,10 @@ at/hannibal2/skyhanni/config/features/inventory/CakeTrackerConfig.kt
 at/hannibal2/skyhanni/config/features/inventory/ChestValueConfig.java
 at/hannibal2/skyhanni/config/features/inventory/CraftableItemListConfig.java
 at/hannibal2/skyhanni/config/features/inventory/EnchantParsingConfig.java
-at/hannibal2/skyhanni/config/features/inventory/ExperimentationTableConfig.kt
+at/hannibal2/skyhanni/config/features/inventory/experimentationtable
+at/hannibal2/skyhanni/config/features/inventory/experimentationtable/ExperimentationTableConfig.kt
+at/hannibal2/skyhanni/config/features/inventory/experimentationtable/ExperimentsAddonsConfig.kt
+at/hannibal2/skyhanni/config/features/inventory/experimentationtable/ExperimentsSuperpairsConfig.kt
 at/hannibal2/skyhanni/config/features/inventory/FocusModeConfig.java
 at/hannibal2/skyhanni/config/features/inventory/GetFromSackConfig.java
 at/hannibal2/skyhanni/config/features/inventory/HideNotClickableConfig.java
