@@ -2,7 +2,11 @@ package at.hannibal2.skyhanni.shader
 
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
+//#if MC < 1.21
 import net.minecraft.client.Minecraft
+//#else
+//$$ import net.minecraft.client.MinecraftClient
+//#endif
 
 object CircleShader : Shader("circle", "circle") {
 
@@ -13,7 +17,12 @@ object CircleShader : Shader("circle", "circle") {
     var smoothness: Float = 0f
     var centerPos: FloatArray = floatArrayOf(0f, 0f)
         set(value) {
-            field = floatArrayOf(value[0], Minecraft.getMinecraft().displayHeight - value[1])
+            //#if MC < 1.21
+            val gameHeight = Minecraft.getMinecraft().displayHeight
+            //#else
+            //$$ val gameHeight = MinecraftClient.getInstance().window.framebufferHeight.toFloat()
+            //#endif
+            field = floatArrayOf(value[0], gameHeight - value[1])
         }
     var angle1: Float = 0f
     var angle2: Float = 0f
