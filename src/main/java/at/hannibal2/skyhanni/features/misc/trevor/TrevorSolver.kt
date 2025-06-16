@@ -54,7 +54,7 @@ object TrevorSolver {
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
             val mob = MobData.entityToMob[entity]
-            if (!entity.isEntityAlive || mob?.isEntityAlive == false) continue
+            if (!entity.isEntityAlive || mob?.isAlive == false) continue
             val name = entity.name
             val isTrevor = mob?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
