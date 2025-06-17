@@ -334,6 +334,8 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt$WorldRenderUtils$it.name!!</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
+    <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var x = globalMouseX * scaledWindowWidth / displayWidth</ID>
+    <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var y = globalMouseY * height / displayHeight</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
     <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var displayName = underlyingStack.displayName</ID>
