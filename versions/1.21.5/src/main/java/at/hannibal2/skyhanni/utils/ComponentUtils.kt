@@ -237,6 +237,7 @@ object ComponentUtils {
                 else -> strippedId
             }
 
+            strippedId == "snow" -> "snow_block"
             strippedId == "snow_layer" -> "snow"
             strippedId == "wooden_slab" -> getWood(damage) + "_slab"
             strippedId == "stone_slab2" -> "red_sandstone_slab"
@@ -253,6 +254,8 @@ object ComponentUtils {
                 0 -> "infested_stone"
                 else -> strippedId
             }
+
+            strippedId == "sand" && damage == 1 -> "red_sand"
 
             else -> strippedId
         }
