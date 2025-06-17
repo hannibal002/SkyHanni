@@ -49,6 +49,8 @@ import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -345,6 +347,24 @@ object ItemUtils {
         //#else
         //$$ return this.get(DataComponentTypes.PROFILE)?.id?.get().toString()
         //#endif
+    }
+
+    val skullGson by lazy { Gson() }
+
+    fun createSkullWithSkinUrl(
+        displayName: String,
+        uuid: String,
+        skinUrl: String,
+        vararg lore: String,
+    ): ItemStack {
+        val obj = JsonObject()
+        val textures = JsonObject()
+        val skin = JsonObject()
+        skin.addProperty("url", skinUrl)
+        textures.add("SKIN", skin)
+        obj.add("textures", textures)
+        val json = skullGson.toJson(obj)
+        return createSkull(displayName, uuid, StringUtils.encodeBase64(json), *lore)
     }
 
     // Taken from NEU
@@ -928,6 +948,14 @@ object ItemUtils {
         skull.extraAttributes = skull.extraAttributes.apply { setString("id", "SKYBLOCK_COIN") }
 
         return skull
+    }
+
+    val questionMarkSkull by lazy {
+        createSkull(
+            displayName = "§c?",
+            uuid = "28aa984a-2077-40cc-8de7-e641adf2c497",
+            value = SkullTextureHolder.getTexture("QUESTION_MARK"),
+        )
     }
 
     //#if MC < 1.21

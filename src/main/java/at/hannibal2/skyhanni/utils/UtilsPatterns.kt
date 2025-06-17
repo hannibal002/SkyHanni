@@ -162,4 +162,20 @@ object UtilsPatterns {
         "inventory.skyblockmenu",
         "SkyBlock Menu",
     )
+
+    /**
+     * REGEX-TEST: §eClick to buyback!
+     */
+    val lastLoreLineOfSellPattern by patternGroup.pattern(
+        "inventory.npc.sell.lore",
+        "§7them to this Shop!|§eClick to buyback!",
+    )
+
+    /**
+     * REGEX-TEST: §62,000,000 Coins
+     */
+    val coinsPattern by patternGroup.pattern(
+        "coins",
+        "§6(?<coins>.*) Coins",
+    )
 }

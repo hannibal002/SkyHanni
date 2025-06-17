@@ -22,10 +22,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import net.minecraft.item.ItemStack
 
@@ -36,16 +36,6 @@ object FishyTreatProfit {
     private var display = emptyList<Renderable>()
     private val inventory = InventoryDetector { name -> name == "Lukas the Aquarist" }
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
-
-    private val patternGroup = RepoPattern.group("event.year-of-the-seal.fishy-treat")
-
-    /**
-     * REGEX-TEST: §62,000,000 Coins
-     */
-    private val coinsPattern by patternGroup.pattern(
-        "coins",
-        "§6(?<coins>.*) Coins",
-    )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -154,7 +144,7 @@ object FishyTreatProfit {
     private fun getAdditionalMaterials(requiredItems: Map<String, Int>): Map<NeuInternalName, Int> {
         val additionalMaterials = mutableMapOf<NeuInternalName, Int>()
         for ((name, amount) in requiredItems) {
-            coinsPattern.matchMatcher(name) {
+            UtilsPatterns.coinsPattern.matchMatcher(name) {
                 additionalMaterials[NeuInternalName.SKYBLOCK_COIN] = group("coins").formatInt()
             } ?: run {
                 additionalMaterials[NeuInternalName.fromItemName(name)] = amount

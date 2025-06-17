@@ -19,17 +19,22 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveIngredient
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import java.io.File
 
 @SkyHanniModule
 object RepoItemEditor {
+
+    val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
 
     private val patternGroup = RepoPattern.group("dev.repoitemeditor")
 
@@ -38,15 +43,14 @@ object RepoItemEditor {
         "§aCrafting Table",
     )
 
-    val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
-
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.editModeEnabled) return
         when {
             config.openRepoItemEditorKeybind.isKeyHeld() -> attemptToOpenInEditor(instantSave = false)
             config.instantEditKeybind.isKeyHeld() -> attemptToOpenInEditor(instantSave = true)
             config.saveRecipeKeybind.isKeyHeld() -> saveRecipe()
+            config.loadInventoryAsTradesKeybind.isKeyHeld() -> NpcShopExporter.processCurrentlyOpenInventory()
             else -> return
         }
     }
@@ -70,6 +74,47 @@ object RepoItemEditor {
         } else {
             SkyHanniMod.screenToOpen = screen
         }
+    }
+
+    fun createRepoItemJson(
+        baseJson: JsonObject,
+        internalName: String,
+        minecraftItemId: String,
+        displayName: String,
+        itemModel: String,
+        lore: String,
+        craftText: String,
+        infoType: String,
+        additionalInfo: String,
+        clickCommand: String,
+        damage: Int,
+        nbtTag: NBTTagCompound,
+    ): JsonObject {
+        baseJson.addProperty("itemid", minecraftItemId)
+        baseJson.addProperty("displayname", displayName)
+        if (itemModel.isNotEmpty()) {
+            baseJson.addProperty("itemModel", itemModel)
+        }
+        baseJson.addProperty("nbttag", nbtTag.toString())
+        baseJson.addProperty("damage", damage)
+        val jsonLore = JsonArray()
+        lore.split("\n").forEach { line ->
+            jsonLore.add(JsonPrimitive(line))
+        }
+        baseJson.add("lore", jsonLore)
+        baseJson.addProperty("internalname", internalName)
+        baseJson.addProperty("crafttext", craftText)
+        baseJson.addProperty("clickcommand", clickCommand)
+        baseJson.addProperty("modver", SkyHanniMod.VERSION)
+        baseJson.addProperty("infoType", infoType)
+        if (additionalInfo.isNotEmpty()) {
+            val additionalInfoArray = JsonArray()
+            additionalInfo.split("\n").forEach { line ->
+                additionalInfoArray.add(JsonPrimitive(line))
+            }
+            baseJson.add("info", additionalInfoArray)
+        }
+        return baseJson
     }
 
     fun saveItemToRepo(internalName: NeuInternalName, json: JsonObject) {
@@ -107,11 +152,7 @@ object RepoItemEditor {
 
                 val recipeTileName = "${'A' + j}${i + 1}"
                 println("slotIndex: $slotIndex, tileName: $recipeTileName")
-                if (slotStack.isNotEmpty()) {
-                    recipeJson.addProperty(recipeTileName, "${slotStack.getInternalNameOrNull()?.asString()}:${slotStack.stackSize}")
-                } else {
-                    recipeJson.addProperty(recipeTileName, "")
-                }
+                recipeJson.addProperty(recipeTileName, slotStack.toPrimitiveIngredient().asRepoString())
             }
         }
         existingJson.add("recipe", recipeJson)
@@ -122,6 +163,8 @@ object RepoItemEditor {
         ChatUtils.chat("§aSuccessfully saved recipe for ${resultInternalName.asString()} to repo folder!")
     }
 
+    // TODO: Add a command for refreshing nbt of a specific item in the repo
+    // TODO: Also use Empa's pr for tab completion of this
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sheditrepoitem") {

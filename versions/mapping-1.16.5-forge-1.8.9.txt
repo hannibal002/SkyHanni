@@ -87,6 +87,8 @@ net.minecraft.client.player.AbstractClientPlayer net.minecraft.client.entity.Abs
 net.minecraft.client.player.LocalPlayer net.minecraft.client.entity.EntityPlayerSP
 net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOtherPlayerMP
 
+net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
+
 net.minecraft.client.player.LocalPlayer chat() sendChatMessage()
 net.minecraft.client.player.LocalPlayer setExperienceValues() setXPStats()
 
@@ -303,6 +305,7 @@ net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
 net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
 
+net.minecraft.world.entity.Entity blockPosition() getPosition()
 net.minecraft.world.entity.Entity customName setCustomNameTag()
 net.minecraft.world.entity.Entity deltaMovement.x motionX
 net.minecraft.world.entity.Entity deltaMovement.y motionY

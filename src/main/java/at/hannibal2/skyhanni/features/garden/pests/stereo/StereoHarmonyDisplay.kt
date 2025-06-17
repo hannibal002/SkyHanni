@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -54,14 +53,6 @@ object StereoHarmonyDisplay {
 
     private var display = emptyList<Renderable>()
 
-    private val questionMarkSkull by lazy {
-        ItemUtils.createSkull(
-            displayName = "§c?",
-            uuid = "28aa984a-2077-40cc-8de7-e641adf2c497",
-            value = SkullTextureHolder.getTexture("QUESTION_MARK"),
-        )
-    }
-
     private fun update() {
         display = drawDisplay()
     }
@@ -70,7 +61,7 @@ object StereoHarmonyDisplay {
         val vinyl = activeVinyl ?: return@buildList
         val pest = vinyl.getPest()
 
-        val itemStack = pest?.internalName?.getItemStack() ?: questionMarkSkull
+        val itemStack = pest?.internalName?.getItemStack() ?: ItemUtils.questionMarkSkull
         if (config.showHead.get()) add(Renderable.itemStack(itemStack, 1.67))
         val list = mutableListOf<Renderable>()
         val vinylName = vinyl.displayName

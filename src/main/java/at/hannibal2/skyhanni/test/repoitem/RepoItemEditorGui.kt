@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test.repoitem
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -18,18 +17,16 @@ import at.hannibal2.skyhanni.utils.compat.NbtCompat.appendString
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.json.fromJson
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.ComponentUtils
 //$$ import net.minecraft.component.MergedComponentMap
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.NbtComponent
-//$$ import net.minecraft.component.type.ProfileComponent
-//$$ import net.minecraft.nbt.NbtCompound
 //#endif
 
 class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStack) : SkyhanniBaseScreen() {
@@ -83,7 +80,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
 
         craftText = baseJson.get("craftText")?.asString.orEmpty()
         infoType = baseJson.get("infoType")?.asString.orEmpty()
-        additionalInfo = baseJson.get("info")?.asJsonArray?.joinToString("\n") { it.asString } ?: ""
+        additionalInfo = baseJson.get("info")?.asJsonArray?.joinToString("\n") { it.asString }.orEmpty()
         clickCommand = baseJson.get("clickcommand")?.asString.orEmpty()
     }
 
@@ -102,7 +99,21 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
 
     fun saveItem(message: Boolean = true) {
         try {
-            RepoItemEditor.saveItemToRepo(internalNameString.toInternalName(), createRepoItemJson())
+            val newJson = RepoItemEditor.createRepoItemJson(
+                baseJson,
+                internalNameString,
+                minecraftItemId,
+                displayName,
+                itemModel,
+                lore,
+                craftText,
+                infoType,
+                additionalInfo,
+                clickCommand,
+                damage.toIntOrNull() ?: 0,
+                getNbtTag()
+            )
+            RepoItemEditor.saveItemToRepo(internalNameString.toInternalName(), newJson)
             if (message) {
                 ChatUtils.chat("§aSuccessfully saved $internalNameString to repo folder!")
             }
@@ -111,11 +122,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         }
     }
 
-    private fun createRepoItemJson(): JsonObject {
-        val damageInt = damage.toIntOrNull() ?: 0
-        val json = baseJson
-        json.addProperty("itemid", minecraftItemId)
-        json.addProperty("displayname", displayName)
+    private fun getNbtTag(): NBTTagCompound {
         //#if MC < 1.21
         nbtTag.setInteger("HideFlags", 254)
         if (hasEnchantGlint) {
@@ -136,100 +143,65 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         val extraAttributes = nbtTag.extraAttributes
         extraAttributes.setString("id", internalNameString)
         nbtTag.setTag("ExtraAttributes", extraAttributes)
-
-        json.addProperty("nbttag", nbtTag.toString())
-
+        return nbtTag
         //#else
-        //$$ val nbt = getModernNbtTag(nbtTag.get(DataComponentTypes.PROFILE), nbtTag.extraAttributes)
-        //$$ json.addProperty("nbttag", nbt.toString())
+        //$$     val tag = NbtCompound()
+        //$$     tag.putInt("HideFlags", 254)
+        //$$     if (hasEnchantGlint) {
+        //$$         tag.put("ench", NbtList())
+        //$$     }
+        //$$
+        //$$     nbtTag.get(DataComponentTypes.PROFILE)?.let {
+        //$$         val skullOwner = NbtCompound()
+        //$$         skullOwner.putString("Id", it.id.get().toString())
+        //$$         skullOwner.putBoolean("hypixelPopulated", true)
+        //$$         val properties = NbtCompound()
+        //$$         val skullTexture = it.properties.get("textures").first()
+        //$$         val textures = NbtCompound()
+        //$$         if (skullTexture.hasSignature()) {
+        //$$             textures.putString("Signature", skullTexture.signature)
+        //$$         }
+        //$$         textures.putString("Value", skullTexture.value)
+        //$$
+        //$$         properties.put(
+        //$$             "textures",
+        //$$             NbtList().apply {
+        //$$                 add(textures)
+        //$$             },
+        //$$         )
+        //$$         skullOwner.put("Properties", properties)
+        //$$         tag.put("SkullOwner", skullOwner)
+        //$$     }
+        //$$
+        //$$     if (nbtTag.contains(DataComponentTypes.UNBREAKABLE)) {
+        //$$         tag.putBoolean("Unbreakable", true)
+        //$$     }
+        //$$
+        //$$     if (nbtTag.get(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.modifiers?.isNotEmpty() == true) {
+        //$$         println("modifiers: ${nbtTag.get(DataComponentTypes.ATTRIBUTE_MODIFIERS)}")
+        //$$         tag.putBoolean("overrideMeta", true)
+        //$$         tag.put("AttributeModifiers", NbtList())
+        //$$     }
+        //$$
+        //$$     val loreList = NbtList()
+        //$$     lore.split("\n").forEach { line ->
+        //$$         loreList.appendString(line)
+        //$$     }
+        //$$
+        //$$     val display = NbtCompound()
+        //$$     display.put("Lore", loreList)
+        //$$     display.putString("Name", displayName)
+        //$$     val color = nbtTag.get(DataComponentTypes.DYED_COLOR)?.rgb
+        //$$     color?.let {
+        //$$         display.putInt("color", it)
+        //$$     }
+        //$$     tag.put("display", display)
+        //$$
+        //$$     val extraAttributes = nbtTag.extraAttributes
+        //$$     extraAttributes.putString("id", internalNameString)
+        //$$     tag.put("ExtraAttributes", extraAttributes)
+        //$$
+        //$$     return tag
         //#endif
-
-        json.addProperty("damage", damageInt)
-
-        val jsonLore = JsonArray()
-        lore.split("\n").forEach { line ->
-            jsonLore.add(JsonPrimitive(line))
-        }
-        json.add("lore", jsonLore)
-
-        if (itemModel.isNotEmpty()) {
-            json.addProperty("itemModel", itemModel)
-        }
-
-        json.addProperty("internalname", internalNameString)
-        json.addProperty("crafttext", craftText)
-        json.addProperty("clickcommand", clickCommand)
-        json.addProperty("modver", SkyHanniMod.VERSION)
-        json.addProperty("infoType", infoType)
-        if (additionalInfo.isNotEmpty()) {
-            val additionalInfoArray = JsonArray()
-            additionalInfo.split("\n").forEach { line ->
-                additionalInfoArray.add(JsonPrimitive(line))
-            }
-            json.add("info", additionalInfoArray)
-        }
-
-        return json
     }
-
-    //#if MC > 1.21
-    //$$ private fun getModernNbtTag(profileComponent: ProfileComponent?, extraAttributes: NbtCompound): NbtCompound {
-    //$$     val tag = NbtCompound()
-    //$$     tag.putInt("HideFlags", 254)
-    //$$     if (hasEnchantGlint) {
-    //$$         tag.put("ench", NbtList())
-    //$$     }
-    //$$
-    //$$     profileComponent?.let {
-    //$$         val skullOwner = NbtCompound()
-    //$$         skullOwner.putString("Id", it.id.get().toString())
-    //$$         skullOwner.putBoolean("hypixelPopulated", true)
-    //$$         val properties = NbtCompound()
-    //$$         val skullTexture = it.properties.get("textures").first()
-    //$$         val textures = NbtCompound()
-    //$$         if (skullTexture.hasSignature()) {
-    //$$             textures.putString("Signature", skullTexture.signature)
-    //$$         }
-    //$$         textures.putString("Value", skullTexture.value)
-    //$$
-    //$$         properties.put(
-    //$$             "textures",
-    //$$             NbtList().apply {
-    //$$                 add(textures)
-    //$$             },
-    //$$         )
-    //$$         skullOwner.put("Properties", properties)
-    //$$         tag.put("SkullOwner", skullOwner)
-    //$$     }
-    //$$
-    //$$     if (nbtTag.contains(DataComponentTypes.UNBREAKABLE)) {
-    //$$         tag.putBoolean("Unbreakable", true)
-    //$$     }
-    //$$
-    //$$     if (nbtTag.get(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.modifiers?.isNotEmpty() == true) {
-    //$$         println("modifiers: ${nbtTag.get(DataComponentTypes.ATTRIBUTE_MODIFIERS)}")
-    //$$         tag.putBoolean("overrideMeta", true)
-    //$$         tag.put("AttributeModifiers", NbtList())
-    //$$     }
-    //$$
-    //$$     val loreList = NbtList()
-    //$$     lore.split("\n").forEach { line ->
-    //$$         loreList.appendString(line)
-    //$$     }
-    //$$
-    //$$     val display = NbtCompound()
-    //$$     display.put("Lore", loreList)
-    //$$     display.putString("Name", displayName)
-    //$$     val color = nbtTag.get(DataComponentTypes.DYED_COLOR)?.rgb
-    //$$     color?.let {
-    //$$         display.putInt("color", it)
-    //$$     }
-    //$$     tag.put("display", display)
-    //$$
-    //$$     extraAttributes.putString("id", internalNameString)
-    //$$     tag.put("ExtraAttributes", extraAttributes)
-    //$$
-    //$$     return tag
-    //$$ }
-    //#endif
 }

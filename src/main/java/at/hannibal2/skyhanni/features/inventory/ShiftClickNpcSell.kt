@@ -10,22 +10,14 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.makeShiftClick
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 
 @SkyHanniModule
 object ShiftClickNpcSell {
 
     private val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
-    private val sellSlot = -4
-
-    /**
-     * REGEX-TEST: §eClick to buyback!
-     */
-    private val lastLoreLineOfSellPattern by RepoPattern.pattern(
-        "inventory.npc.sell.lore",
-        "§7them to this Shop!|§eClick to buyback!",
-    )
+    private const val SELL_SLOT = -4
 
     var inInventory = false
         private set
@@ -35,9 +27,9 @@ object ShiftClickNpcSell {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryItems.isEmpty()) return
-        val item = event.inventoryItems[event.inventoryItems.keys.last() + sellSlot] ?: return
+        val item = event.inventoryItems[event.inventoryItems.keys.last() + SELL_SLOT] ?: return
 
-        inInventory = lastLoreLineOfSellPattern.matches(item.getLore().lastOrNull())
+        inInventory = UtilsPatterns.lastLoreLineOfSellPattern.matches(item.getLore().lastOrNull())
     }
 
     @HandleEvent

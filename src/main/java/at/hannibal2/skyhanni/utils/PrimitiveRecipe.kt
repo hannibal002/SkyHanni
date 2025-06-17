@@ -3,7 +3,10 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RecipeType.CRAFTING
+import at.hannibal2.skyhanni.utils.RecipeType.NPC_SHOP
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 
 data class PrimitiveRecipe(
     val ingredients: Set<PrimitiveIngredient>,
@@ -120,14 +123,32 @@ data class PrimitiveRecipe(
     }
 
     fun isCraftingRecipe() = this.recipeType == CRAFTING
+
+    // TODO add more recipe types as they are needed
+    fun asRepoJson(): JsonObject {
+        val json = JsonObject()
+        val outputRepoString = this.output?.asRepoString() ?: return json
+        if (recipeType != NPC_SHOP) {
+            return json
+        }
+        json.addProperty("type", recipeType.jsonName)
+        val cost = JsonArray()
+        for (ingredient in ingredients) {
+            cost.add(JsonPrimitive(ingredient.asRepoString()))
+        }
+        json.add("cost", cost)
+        json.addProperty("result", outputRepoString)
+
+        return json
+    }
 }
 
-enum class RecipeType {
-    FORGE,
-    TRADE,
-    MOB_DROP,
-    NPC_SHOP,
-    KAT_UPGRADE,
-    ESSENCE,
-    CRAFTING,
+enum class RecipeType(val jsonName: String) {
+    FORGE("forge"),
+    TRADE("trade"),
+    MOB_DROP("drops"),
+    NPC_SHOP("npc_shop"),
+    KAT_UPGRADE("katgrade"),
+    ESSENCE("essence"),
+    CRAFTING("crafting"),
 }

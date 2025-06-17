@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
@@ -44,14 +46,26 @@ class RepoItemEditorConfig {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var saveRecipeKeybind: Int = Keyboard.KEY_NONE
 
-    // todo save npc
-
     @Expose
     @ConfigOption(
-        name = "Refresh NBT Keybind",
-        desc = "Instantly updates the nbt of the item to match the current file on the computer.",
+        name = "Load Inventory as Trades",
+        desc = "Keybind will attempt to load the currently open menu as a NPC trades menu.\n" +
+            "§eFor inventories such as the community shop or Anita that are missing the sell item button"
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var refreshNbtKeybind: Int = Keyboard.KEY_NONE
+    var loadInventoryAsTradesKeybind: Int = Keyboard.KEY_NONE
+
+    // todo implement
+    // @Expose
+    // @ConfigOption(
+    //     name = "Refresh NBT Keybind",
+    //     desc = "Instantly updates the nbt of the item to match the current file on the computer.",
+    // )
+    // @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    // var refreshNbtKeybind: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigLink(owner = RepoItemEditorConfig::class, field = "editModeEnabled")
+    var displayPosition: Position = Position(-300, 140)
 
 }

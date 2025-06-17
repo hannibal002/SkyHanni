@@ -22,7 +22,8 @@ object MobDebug {
 
     private val config get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
 
-    private var lastRayHit: Mob? = null
+    var lastRayHit: Mob? = null
+        private set
 
     private fun HowToShow.isHighlight() =
         this == HowToShow.ONLY_HIGHLIGHT || this == HowToShow.NAME_AND_HIGHLIGHT
