@@ -81,9 +81,9 @@ object SkyHanniMod {
                     //#else
                     //$$ MinecraftCompat.localPlayer.closeHandledScreen()
                     //#endif
+                    OtherInventoryData.close(title)
                 }
                 shouldCloseScreen = true
-                OtherInventoryData.close(title)
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null
