@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.findItemDamage
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
@@ -13,15 +15,24 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.NbtCompat.appendString
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.WrappedRenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
+import java.awt.Color
+
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.ComponentUtils
 //$$ import net.minecraft.component.MergedComponentMap
@@ -84,6 +95,69 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         clickCommand = baseJson.get("clickcommand")?.asString.orEmpty()
     }
 
+    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(originalMouseY, originalMouseX, partialTicks)
+
+        val listOf = listOf(
+            RenderableString("Internal Name:"),
+            RenderableString(internalNameString),
+            RenderableString("Item ID:"),
+            RenderableString(minecraftItemId),
+            RenderableString("Display name:"),
+            RenderableString(displayName),
+            RenderableString("Lore:"),
+            WrappedRenderableString(lore, width = 400),
+            RenderableString("Item Model:"),
+            RenderableString(itemModel),
+            RenderableString("Craft text:"),
+            RenderableString(craftText),
+            RenderableString("Info type:"),
+            RenderableString(infoType),
+            RenderableString("Additional information:"),
+            WrappedRenderableString(additionalInfo, width = 400),
+            RenderableString("Click-command (viewrecipe or viewpotion)"),
+            RenderableString(clickCommand),
+            RenderableString("Damage:"),
+            RenderableString(damage),
+        )
+
+        val table = VerticalContainerRenderable(listOf)
+        DrawContextUtils.translate(15.0, 15.0, 0.0)
+        table.render(0, 0)
+        DrawContextUtils.translate(-15.0, -15.0, 0.0)
+
+        val itemToRender: ItemStack?
+        if (itemModel.getVanillaItem() != null) {
+            itemToRender = ItemStack(itemModel.getVanillaItem())
+        } else if (minecraftItemId.getVanillaItem() != null) {
+            itemToRender = ItemStack(minecraftItemId.getVanillaItem())
+        } else {
+            itemToRender = null
+        }
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate(390f, 90f, 0f)
+            GuiRenderUtils.drawRect(-10, -10, 70, 70, Color.GRAY.rgb)
+            if (itemToRender != null) {
+                DrawContextUtils.scale(5f, 5f, 0f)
+                Renderable.itemStack(itemToRender).render(0, 0)
+                DrawContextUtils.scale(-5f, -5f, 0f)
+            }
+        }
+
+        DrawContextUtils.translate(700f, 10f, 0f)
+        Renderable.clickable("§7Close (discards changes)", onLeftClick = { InventoryUtils.closeInventory() }).render(700, 10)
+        DrawContextUtils.translate(0f, 40f, 0f)
+        Renderable.clickable("§aSave to local disk", onLeftClick = {}).render(700, 50)
+        DrawContextUtils.translate(0f, 20f, 0f)
+        Renderable.clickable("§5Remove enchants", onLeftClick = {}).render(700, 70)
+        DrawContextUtils.translate(0f, 20f, 0f)
+        Renderable.clickable("§6Add enchant glint", onLeftClick = {}).render(700, 90)
+        DrawContextUtils.translate(-700f, -90f, 0f)
+
+
+        RenderableTooltips.setTooltipForRender(listOf(RenderableString("x: $originalMouseX y: $originalMouseY")))
+    }
+
     fun adjustLore() {
         val loreList = lore.split("\n")
         val newLore = mutableListOf<String>()
@@ -111,7 +185,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
                 additionalInfo,
                 clickCommand,
                 damage.toIntOrNull() ?: 0,
-                getNbtTag()
+                getNbtTag(),
             )
             RepoItemEditor.saveItemToRepo(internalNameString.toInternalName(), newJson)
             if (message) {
