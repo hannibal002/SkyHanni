@@ -52,8 +52,6 @@ net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNe
 net.minecraft.client.gui.components.EditBox net.minecraft.client.gui.GuiTextField
 net.minecraft.client.gui.components.Widget net.minecraft.client.gui.GuiButton
 
-net.minecraft.client.gui.components.EditBox setMaxLength() setMaxStringLength()
-
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
 net.minecraft.client.gui.components.ChatComponent chatScrollbarPos scrollPos
 net.minecraft.client.gui.components.ChatComponent getLinesPerPage() getLineCount()
@@ -62,10 +60,13 @@ net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
 net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
 net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
 
+net.minecraft.client.gui.components.EditBox setMaxLength() setMaxStringLength()
+
 net.minecraft.client.gui.screens.ChatScreen net.minecraft.client.gui.GuiChat
 net.minecraft.client.gui.screens.PauseScreen net.minecraft.client.gui.GuiIngameMenu
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 
+net.minecraft.client.gui.screens.Screen isPaste() isKeyComboCtrlV()
 net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
 
 net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiChest
