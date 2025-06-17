@@ -16,11 +16,13 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.NbtCompat.appendString
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.renderables.TextFieldRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
@@ -95,6 +97,8 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         clickCommand = baseJson.get("clickcommand")?.asString.orEmpty()
     }
 
+    private val testTextBox = TextFieldRenderable("Testing")
+
     override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         drawDefaultBackground(originalMouseY, originalMouseX, partialTicks)
 
@@ -154,8 +158,26 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         Renderable.clickable("§6Add enchant glint", onLeftClick = {}).render(700, 90)
         DrawContextUtils.translate(-700f, -90f, 0f)
 
+        val widthPos = GuiScreenUtils.displayWidth / 3 - 200
+        val heightPos = GuiScreenUtils.displayHeight / 3 - 100
+        DrawContextUtils.translate(widthPos.toDouble(), heightPos.toDouble(), 0.0)
+
+        testTextBox.render(0, 0)
+        DrawContextUtils.translate(-widthPos.toDouble(), -heightPos.toDouble(), 0.0)
 
         RenderableTooltips.setTooltipForRender(listOf(RenderableString("x: $originalMouseX y: $originalMouseY")))
+    }
+
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
+        testTextBox.keyTyped(typedChar ?: ' ', keyCode ?: 0)
+    }
+
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
+        testTextBox.mouseClicked(originalMouseX, originalMouseY, mouseButton)
+    }
+
+    override fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
+        testTextBox.mouseClickMove(originalMouseX, originalMouseY, clickedMouseButton, timeSinceLastClick)
     }
 
     fun adjustLore() {

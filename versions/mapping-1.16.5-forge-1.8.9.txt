@@ -49,7 +49,10 @@ net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
 net.minecraft.client.gui.Gui getChat() getChatGUI()
 
 net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNewChat
+net.minecraft.client.gui.components.EditBox net.minecraft.client.gui.GuiTextField
 net.minecraft.client.gui.components.Widget net.minecraft.client.gui.GuiButton
+
+net.minecraft.client.gui.components.EditBox setMaxLength() setMaxStringLength()
 
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
 net.minecraft.client.gui.components.ChatComponent chatScrollbarPos scrollPos
