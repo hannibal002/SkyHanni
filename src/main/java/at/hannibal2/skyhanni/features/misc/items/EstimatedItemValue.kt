@@ -297,7 +297,7 @@ object EstimatedItemValue {
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
 
-        event.move(88, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
+        event.move(89, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
     }
 
     fun renderInNeuStorageOverlay() {
