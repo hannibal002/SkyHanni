@@ -120,8 +120,18 @@ object RepoItemEditor {
     fun saveItemToRepo(internalName: NeuInternalName, json: JsonObject) {
         val itemsDir = File(EnoughUpdatesManager.repoLocation, "items")
         val itemFile = File(itemsDir, "${internalName.asString()}.json")
-        println("saving item to repo: ${itemFile.absolutePath}, contents:\n$json")
         RepoManager.writeJson(json, itemFile)
+        val firmFolder = File(".firmament/repo-extracted/items")
+        if (firmFolder.exists()) {
+            val firmItemFile = File(firmFolder, "${internalName.asString()}.json")
+            RepoManager.writeJson(json, firmItemFile)
+        }
+
+        val skyblockerFolder = File("config/skyblocker/item-repo/items")
+        if (skyblockerFolder.exists()) {
+            val skyblockerItemFile = File(skyblockerFolder, "${internalName.asString()}.json")
+            RepoManager.writeJson(json, skyblockerItemFile)
+        }
 
         EnoughUpdatesManager.reloadDataForItem(internalName, json)
     }
