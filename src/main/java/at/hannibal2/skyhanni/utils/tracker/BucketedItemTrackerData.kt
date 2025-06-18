@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
-import kotlin.reflect.KClass
+import java.lang.reflect.ParameterizedType
 
-abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrackerData() {
+abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
 
     @Deprecated(
         "Use getDescription(bucket, timesGained) instead",
@@ -87,7 +87,13 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     abstract fun E.isBucketSelectable(): Boolean
 
-    private val buckets: Array<E> = clazz.java.enumConstants
+    @Suppress("UNCHECKED_CAST")
+    private val enumClass: Class<E> by lazy {
+        val superType = (javaClass.genericSuperclass as ParameterizedType)
+        superType.actualTypeArguments[0] as Class<E>
+    }
+
+    private val buckets: Array<E> = enumClass.enumConstants
     val selectableBuckets: List<E> = buckets.filter { it.isBucketSelectable() }
 
     private val scrollValues: Map<E?, ScrollValue> = buckets.associateWith { ScrollValue() } + (null to ScrollValue())

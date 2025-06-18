@@ -87,7 +87,7 @@ object PestProfitTracker {
     )
     private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
 
-    class BucketData : BucketedItemTrackerData<PestType>(PestType::class) {
+    class BucketData : BucketedItemTrackerData<PestType>() {
         override fun resetItems() {
             @Suppress("DEPRECATION")
             totalPestsKills = 0L
