@@ -67,6 +67,7 @@ loom {
     if (target == ProjectTarget.MODERN) {
         accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
     }
+    @Suppress("UnstableApiUsage")
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -114,7 +115,7 @@ val devenvMod: Configuration by configurations.creating {
     isVisible = false
 }
 
-val headlessLwjgl by configurations.creating {
+val headlessLwjgl: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
@@ -225,7 +226,7 @@ dependencies {
         shadowModImpl(libs.moulconfigModern)
         include(libs.moulconfigModern)
     }
-
+    @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
@@ -301,7 +302,7 @@ tasks.processResources {
 }
 
 if (target == ProjectTarget.MAIN) {
-    tasks.create("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).apply {
+    tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
         jvmArgs(
@@ -437,7 +438,7 @@ preprocess {
     vars.put("TODO", if (skipTodos) 1 else 0)
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
+val sourcesJar by tasks.registering(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
     from(sourceSets.main.get().allSource)
