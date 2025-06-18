@@ -26,6 +26,10 @@ data class CachedItemData(
     var lastInternalName: NeuInternalName? = null,
 
     var lastInternalNameFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+
+    var lastLore: List<String> = listOf(),
+
+    var lastLoreFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 ) {
     /**
      * Delegate constructor to avoid calling a function with default arguments from java.
