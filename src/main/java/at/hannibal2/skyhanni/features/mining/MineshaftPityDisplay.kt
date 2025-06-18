@@ -24,12 +24,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.annotations.Expose
 import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -229,8 +229,8 @@ object MineshaftPityDisplay {
         display = listOf(
             Renderable.verticalContainer(
                 config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
-                spacing = 2
-            )
+                spacing = 2,
+            ),
         )
     }
 
@@ -305,14 +305,14 @@ object MineshaftPityDisplay {
             "Mithril",
             listOf(OreType.MITHRIL),
             2,
-            ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata),
+            ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
         ),
 
         GEMSTONE(
             "Gemstone",
             OreType.entries.filter { it.isGemstone() },
             4,
-            ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata),
+            ColoredBlockCompat.BLUE.createGlassStack(),
         ),
         GLACITE(
             "Glacite",
