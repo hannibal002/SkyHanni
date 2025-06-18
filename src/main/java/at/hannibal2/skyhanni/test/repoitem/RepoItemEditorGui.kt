@@ -194,7 +194,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
                 //$$ itemToRender.copy(DataComponentTypes.PROFILE, nbtTag)
                 //$$ itemToRender.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, hasEnchantGlint)
                 //#endif
-                Renderable.itemStack(itemToRender, scale = 5.0).render(0, 0)
+                Renderable.itemStack(itemToRender, scale = 5.0, highlight = hasEnchantGlint).render(0, 0)
             }
         }
 

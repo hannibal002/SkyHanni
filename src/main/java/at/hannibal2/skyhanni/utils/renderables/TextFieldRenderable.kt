@@ -41,6 +41,14 @@ class TextFieldRenderable(
 
     private val fr get() = Minecraft.getMinecraft().fontRendererObj
 
+    private fun moveCursor(pos: Int) {
+        //#if MC < 1.21
+        textField.cursorPosition = pos
+        //#else
+        //$$ textField.setCursor(pos, KeyboardManager.isShiftKeyDown())
+        //#endif
+    }
+
     private val textField =
         //#if MC < 1.21
         GuiTextField(0, fr, 0, 0, 0, 0).apply {
@@ -101,20 +109,8 @@ class TextFieldRenderable(
         val extraSize = (searchBarYSize - 8) / 2 + 8
 
         val lineNum = Math.round((((yComp - (searchBarYSize - 8) / 2)) / extraSize).toFloat())
-        var text = textField.text
-        var textNoColor = textField.text
-        while (true) {
-            val matcher = patternControlCode.matcher(text)
-            if (!matcher.find() || matcher.groupCount() < 1) break
-            val code = matcher.group(1)
-            text = matcher.replaceFirst("§$code¶$code")
-        }
-        while (true) {
-            val matcher = patternControlCode.matcher(textNoColor)
-            if (!matcher.find() || matcher.groupCount() < 1) break
-            val code = matcher.group(1)
-            textNoColor = matcher.replaceFirst("¶$code")
-        }
+        val text = textField.text.replacePatternControlCodes()
+        val textNoColor = textField.text.replacePatternControlCodesNoColors()
 
         var currentLine = 0
         var cursorIndex = 0
@@ -167,11 +163,7 @@ class TextFieldRenderable(
         if (mouseButton == 1) {
             textField.text = ""
         } else {
-            //#if MC < 1.21
-            textField.cursorPosition = getCursorPos(mouseX, mouseY)
-            //#else
-            //$$ textField.setCursor(getCursorPos(mouseX, mouseY), KeyboardManager.isShiftKeyDown())
-            //#endif
+            moveCursor(getCursorPos(mouseX, mouseY))
         }
         isFocussed = true
     }
@@ -196,10 +188,23 @@ class TextFieldRenderable(
         val lines = text.split('\n')
         val lineIndex = text.substring(0, cursor).count { it == '\n' }
         val lineStart = text.lineStartIndex(lineIndex)
-        val colOffset = getStringWidth0(text.substring(lineStart, cursor))
+        val colOffset = getStringWidth0(text.substring(lineStart, cursor).replace("§", "¶"))
+  
+        if (keyCode != Keyboard.KEY_V) {
+            //#if MC < 1.21
+            textField.setEnabled(true)
+            //#else
+            //$$ textField.setEditable(true)
+            //#endif
+        }
 
         when (keyCode) {
             Keyboard.KEY_V -> if (KeyboardManager.isModifierKeyDown()) {
+                //#if MC < 1.21
+                textField.setEnabled(false)
+                //#else
+                //$$ textField.setEditable(false)
+                //#endif
                 val selectionEnd = textField.selectionEnd
                 val cursorPosition = textField.cursorPosition
                 val start = minOf(selectionEnd, cursorPosition)
@@ -213,7 +218,7 @@ class TextFieldRenderable(
                     }
 
                     textField.text = updatedText.toString()
-                    textField.cursorPosition = start + content.length
+                    moveCursor(start + content.length)
                 }
                 return
             }
@@ -224,7 +229,7 @@ class TextFieldRenderable(
                     append('\n')
                     append(text.substring(cursor))
                 }
-                textField.cursorPosition = cursor + 1
+                moveCursor(cursor + 1)
                 return
             }
 
@@ -233,7 +238,9 @@ class TextFieldRenderable(
                     val prevLineStart = text.lineStartIndex(lineIndex - 1)
                     val prevLine = lines[lineIndex - 1]
                     val newCursorOffset = offsetToIndex(prevLine, colOffset)
-                    textField.cursorPosition = prevLineStart + newCursorOffset
+                    moveCursor(prevLineStart + newCursorOffset)
+                } else {
+                    moveCursor(0)
                 }
                 return
             }
@@ -243,7 +250,9 @@ class TextFieldRenderable(
                     val nextLineStart = text.lineStartIndex(lineIndex + 1)
                     val nextLine = lines[lineIndex + 1]
                     val newCursorOffset = offsetToIndex(nextLine, colOffset)
-                    textField.cursorPosition = nextLineStart + newCursorOffset
+                    moveCursor(nextLineStart + newCursorOffset)
+                } else {
+                    moveCursor(text.length)
                 }
                 return
             }
@@ -258,6 +267,27 @@ class TextFieldRenderable(
         //$$     textField.charTyped(typedChar, 0)
         //$$ }
         //#endif
+
+        val cursorPos = textField.cursorPosition
+        if (cursorPos > 0) {
+            if (getText()[cursorPos - 1] == '§') {
+                val before = textField.text.substring(0, cursorPos - 1)
+                var after = ""
+                if (cursorPos < textField.text.length) {
+                    after = textField.text.substring(cursorPos)
+                }
+                textField.text = "$before&&$after"
+                moveCursor(cursorPos + 1)
+            } else if (cursorPos > 2 && getText().substring(cursorPos - 3, cursorPos - 1) == "&&") {
+                val before = textField.text.substring(0, cursorPos - 3)
+                var after = "$typedChar"
+                if (cursorPos < textField.text.length) {
+                    after = textField.text.substring(cursorPos - 1)
+                }
+                textField.text = "$before§$after"
+                moveCursor(cursorPos - 1)
+            }
+        }
     }
 
     private fun String.lineStartIndex(line: Int): Int {
@@ -275,11 +305,12 @@ class TextFieldRenderable(
 
     private fun offsetToIndex(line: String, pixelOffset: Int): Int {
         var width = 0
-        for (i in line.indices) {
-            width += getStringWidth0(line[i].toString())
+        val newLine = line.replace("§", "¶")
+        for (i in newLine.indices) {
+            width += getStringWidth0(newLine[i].toString())
             if (width > pixelOffset) return i
         }
-        return line.length
+        return newLine.length
     }
 
     override fun render(posX: Int, posY: Int) {
@@ -306,20 +337,8 @@ class TextFieldRenderable(
         GuiRenderUtils.drawRect(0, 0, width, bottom, LorenzColor.BLACK.toColor().rgb)
 
         //bar text
-        var text = textField.text
-        var textNoColor = textField.text
-        while (true) {
-            val matcher = patternControlCode.matcher(text)
-            if (!matcher.find() || matcher.groupCount() < 1) break
-            val code = matcher.group(1)
-            text = matcher.replaceFirst("§$code¶$code")
-        }
-        while (true) {
-            val matcher = patternControlCode.matcher(textNoColor)
-            if (!matcher.find() || matcher.groupCount() < 1) break
-            val code = matcher.group(1)
-            textNoColor = matcher.replaceFirst("¶$code")
-        }
+        val text = renderText.replacePatternControlCodes()
+        val textNoColor = textField.text.replacePatternControlCodesNoColors()
 
         val xStartOffset = 5
         text.lines().forEachIndexed { i, line ->
@@ -402,5 +421,13 @@ class TextFieldRenderable(
     companion object {
         private val patternControlCode = "(?i)§([^¶])(?!¶)".toPattern()
         private val nonBoldFormattingCodes = listOf('k', 'm', 'n', 'o')
+
+        private fun String.replacePatternControlCodes(): String {
+            return patternControlCode.matcher(this).replaceAll("§$1¶$1")
+        }
+
+        private fun String.replacePatternControlCodesNoColors(): String {
+            return patternControlCode.matcher(this).replaceAll("¶$1")
+        }
     }
 }
