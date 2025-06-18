@@ -336,6 +336,7 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
+    //#if TODO
     @Deprecated("Use WorldRenderUtils' drawCircle instead")
     fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
         _drawCircle(entity, rad, color)
