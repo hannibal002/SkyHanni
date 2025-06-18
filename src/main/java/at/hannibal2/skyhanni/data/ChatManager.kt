@@ -7,9 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -32,7 +30,6 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ChatManager {
 
@@ -178,7 +175,6 @@ object ChatManager {
     }
 
     private fun openChatHistoryGui(args: Array<String>) {
-        //#if TODO
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatHistoryGui(getRecentMessageHistory())
         } else {
@@ -190,7 +186,6 @@ object ChatManager {
             }
             ChatHistoryGui(history)
         }
-        //#endif
     }
 
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched
