@@ -100,7 +100,11 @@ object ComponentUtils {
     }
 
     fun convertMinecraftIdToModern(id: String, damage: Int): String {
-        return "minecraft:" + convertMinecraftIdToModern2(id, damage)
+        val convertMinecraftIdToModern2 = convertMinecraftIdToModern2(id, damage)
+        if (convertMinecraftIdToModern2 == id && damage > 0) {
+            println("Unconverted minecraft id with damage above 0. id: $id damage: $damage")
+        }
+        return "minecraft:" + convertMinecraftIdToModern2
     }
 
     private fun convertMinecraftIdToModern2(id: String, damage: Int): String {
