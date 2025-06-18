@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import net.minecraft.nbt.NBTTagCompound
+
 data class CachedItemData(
     // -1 = not loaded
     var petCandies: Int? = -1,
@@ -30,6 +32,10 @@ data class CachedItemData(
     var lastLore: List<String> = listOf(),
 
     var lastLoreFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+
+    var lastExtraAttributes: NBTTagCompound? = null,
+
+    var lastExtraAttributesFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 ) {
     /**
      * Delegate constructor to avoid calling a function with default arguments from java.
