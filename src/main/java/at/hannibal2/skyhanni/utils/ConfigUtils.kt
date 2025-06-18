@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-//#if TODO
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-//#endif
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonArray
@@ -85,9 +83,7 @@ object ConfigUtils {
     }
 
     fun KMutableProperty0<*>.jumpToEditor() {
-        //#if TODO
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
-        //#endif
 
         ErrorManager.crashInDevEnv("Can not open config $name")
         ErrorManager.logErrorStateWithData(

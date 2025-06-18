@@ -13,8 +13,14 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
+//#if TODO
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
+//#endif
+//#if MC > 1.21
+//$$ import net.minecraft.registry.Registries
+//#endif
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object MinecraftData {
 
@@ -22,32 +28,48 @@ object MinecraftData {
     fun onPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
             is S29PacketSoundEffect -> {
-                if (PlaySoundEvent(packet.soundName, LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume).post()) {
-                    event.cancel()
-                }
-            }
-
-            is S2APacketParticles -> {
-                if (ReceiveParticleEvent(
-                        packet.particleType,
-                        LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate),
-                        packet.particleCount,
-                        packet.particleSpeed,
-                        LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
-                        packet.isLongDistance,
-                        packet.particleArgs,
+                if (PlaySoundEvent(
+                        //#if TODO
+                        packet.soundName,
+                        //#else
+                        //$$ packet.sound.value().id.toString(),
+                        //#endif
+                        LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume,
                     ).post()
                 ) {
                     event.cancel()
                 }
             }
 
+            is S2APacketParticles -> {
+                if (ReceiveParticleEvent(
+                        //#if MC < 1.21
+                        packet.particleType,
+                        //#else
+                        //$$ packet.parameters.type,
+                        //#endif
+                        LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate),
+                        packet.particleCount,
+                        packet.particleSpeed,
+                        LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
+                        packet.isLongDistance,
+                        //#if MC < 1.21
+                        packet.particleArgs,
+                        //#endif
+                    ).post()
+                ) {
+                    event.cancel()
+                }
+            }
+
+            //#if TODO
             is S32PacketConfirmTransaction -> {
                 if (packet.actionNumber > 0) return
 
                 totalServerTicks++
                 ServerTickEvent.post()
             }
+            //#endif
         }
     }
 
