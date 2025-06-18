@@ -39,9 +39,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
-//#if TODO
-import at.hannibal2.skyhanni.utils.render.LineDrawer
-//#endif
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 //#if TODO
