@@ -10,13 +10,17 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object TpsCounter {
 
@@ -36,7 +40,7 @@ object TpsCounter {
 
     private var display: String? = null
 
-    private val timeSinceWorldSwitch get() = LorenzUtils.lastWorldSwitch.passedSince()
+    private val timeSinceWorldSwitch get() = SkyBlockUtils.lastWorldSwitch.passedSince()
     private val tilCalculated: String
         get() =
             "§fCalculating... §7(${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)"
@@ -78,7 +82,11 @@ object TpsCounter {
     }
 
     private fun fixTps(tps: Double): Double {
-        return if (LorenzUtils.isAprilFoolsDay) tps / 2 else tps
+        //#if TODO
+        return if (SkyHanniDebugsAndTests.isAprilFoolsDay) tps / 2 else tps
+        //#else
+        //$$ return tps
+        //#endif
     }
 
     private fun tpsCommand() {
@@ -117,17 +125,17 @@ object TpsCounter {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtps") {
+        event.registerBrigadier("shtps") {
             description = "Informs in chat about the server ticks per second (TPS)."
             category = CommandCategory.USERS_ACTIVE
-            callback { tpsCommand() }
+            simpleCallback { tpsCommand() }
         }
     }
 
     private fun shouldIgnore() = timeSinceWorldSwitch < ignorePacketDelay
 
-    private fun isEnabled() = LorenzUtils.onHypixel && config.tpsDisplay &&
-        (LorenzUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
+    private fun isEnabled() = SkyBlockUtils.onHypixel && config.tpsDisplay &&
+        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
