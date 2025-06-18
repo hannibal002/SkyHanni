@@ -134,7 +134,7 @@ object TrevorTracker {
         addString("§b${(storage.animalRarities[TrapperMobRarity.ELUSIVE] ?: 0).addSeparators()} §6Elusive Animals")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
         config.position.renderRenderables(display, posLabel = "Trevor Tracker")
@@ -142,7 +142,6 @@ object TrevorTracker {
 
     private fun shouldDisplay(): Boolean {
         if (!config.dataTracker) return false
-        if (!IslandType.THE_FARMING_ISLANDS.isCurrent()) return false
         if (TrevorFeatures.inTrapperDen) return true
         return when (config.displayType) {
             true -> (TrevorFeatures.inBetweenQuests || TrevorFeatures.questActive)
