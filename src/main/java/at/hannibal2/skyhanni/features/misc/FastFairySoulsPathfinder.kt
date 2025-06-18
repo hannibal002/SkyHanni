@@ -351,7 +351,7 @@ object FastFairySoulsPathfinder {
         }
         event.register("shsoulsreloadpath") {
             description = "Reload the Fairy Souls pathfinder."
-            category = CommandCategory.USERS_RESET
+            category = CommandCategory.DEVELOPER_TEST
             callback { onReloadPathCommand() }
         }
     }
