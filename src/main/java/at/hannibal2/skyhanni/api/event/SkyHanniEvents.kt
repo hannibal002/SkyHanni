@@ -70,17 +70,13 @@ object SkyHanniEvents {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun registerMultipleEventTypes(options: HandleEvent, method: Method, instance: Any): Boolean {
-        var registered = false
-        options.eventTypes.mapTo(mutableSetOf()) { it.java }.forEach { eventType ->
-            if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return@forEach
-            registered = true
-            listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
-                .addListener(method, instance, options)
-        }
-        return registered
-    }
-
+    private fun registerMultipleEventTypes(options: HandleEvent, method: Method, instance: Any): Boolean =
+        options.eventTypes.mapTo(mutableSetOf()) { it.java }
+            .filter { SkyHanniEvent::class.java.isAssignableFrom(it) }
+            .onEach { eventType ->
+                listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
+                    .addListener(method, instance, options)
+            }.any()
 
     private fun unregisterMethod(method: Method) {
         if (method.parameterCount != 1) return
