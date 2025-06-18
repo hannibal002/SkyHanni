@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object NonGodPotEffectDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.potionEffect
+    private val config get() = SkyHanniMod.feature.misc.nonGodPotEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private val setRecently: TimeLimitedSet<NonGodPotEffect> = TimeLimitedSet(5.seconds)
@@ -123,7 +123,7 @@ object NonGodPotEffectDisplay {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        if (config.nonGodPotEffectDisplay) update()
+        if (config.displayEnabled) update()
 
         val effectWarning = config.expireWarning
         val effectSound = config.expireSound
@@ -162,10 +162,10 @@ object NonGodPotEffectDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !config.nonGodPotEffectDisplay) return
+        if (!isEnabled() || !config.displayEnabled) return
         if (RiftApi.inRift()) return
 
-        config.nonGodPotEffectPos.renderStrings(
+        config.position.renderStrings(
             display,
             extraSpace = 3,
             posLabel = "Non God Pot Effects",
@@ -177,6 +177,9 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
+        event.move(90, "misc.potionEffect.nonGodPotEffectPos", "misc.potionEffect.position")
+        event.move(90, "misc.potionEffect.nonGodPotEffectDisplay", "misc.potionEffect.displayEnabled")
+        event.move(90, "misc.potionEffect", "misc.nonGodPotEffect")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight

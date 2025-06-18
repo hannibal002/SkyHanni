@@ -20,7 +20,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object HideArmor {
 
-    private val config get() = SkyHanniMod.feature.misc.hideArmor2
+    private val config get() = SkyHanniMod.feature.misc.hideArmor
     private var armor = mapOf<Int, ItemStack>()
 
     private fun shouldHideArmor(entity: EntityPlayer): Boolean {
@@ -73,5 +73,6 @@ object HideArmor {
         event.transform(15, "misc.hideArmor2.mode") { element ->
             ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)
         }
+        event.move(90, "misc.hideArmor2", "misc.hideArmor")
     }
 }
