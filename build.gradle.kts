@@ -213,8 +213,8 @@ dependencies {
         isTransitive = false
     }
     // December 29, 2024, 07:30 PM EST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.6.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.6.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
