@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat.appendString
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
@@ -136,6 +138,8 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         )
     }
 
+    private var scroll = 0
+    private var maxScroll = 0
     private fun findWhereThingsActuallyAre(offsetX: Int, offsetY: Int) {
         var height = 0
         for (renderable in renderableList) {
@@ -144,16 +148,18 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             }
             height += renderable.height + 2
         }
+        maxScroll = height + offsetY + 50
     }
 
     override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         drawDefaultBackground(originalMouseY, originalMouseX, partialTicks)
 
         val table = VerticalContainerRenderable(renderableList, spacing = 2)
-        DrawContextUtils.translate(15.0, 15.0, 0.0)
-        findWhereThingsActuallyAre(15, 15)
+        val offsetY = 15.0 + scroll
+        DrawContextUtils.translate(15.0, offsetY, 0.0)
+        findWhereThingsActuallyAre(15, offsetY.toInt())
         table.render(0, 0)
-        DrawContextUtils.translate(-15.0, -15.0, 0.0)
+        DrawContextUtils.translate(-15.0, -offsetY, 0.0)
 
         val damageInt = damageField.getText().toIntOrNull() ?: 0
         val itemToRender = when {
@@ -170,7 +176,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
                 //#if MC < 1.21
                 null
                 //#else
-                //$$ ItemStack(ComponentUtils.convertMinecraftIdToModern(minecraftItemIdField.getText(), damageInt).getVanillaItem())
+                //$$ ComponentUtils.convertMinecraftIdToModern(minecraftItemIdField.getText(), damageInt).getVanillaItem()?.let { ItemStack(it) }
                 //#endif
             }
 
@@ -178,9 +184,9 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         }
 
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate(390f, 90f, 0f)
+            val width = GuiScreenUtils.scaledWindowWidth * 0.50f
+            DrawContextUtils.translate(width, 90f, 0f)
             GuiRenderUtils.drawRect(-10, -10, 90, 90, Color.GRAY.rgb)
-            DrawContextUtils.translate(0f, 0f, 0f)
             if (itemToRender != null) {
                 //#if MC < 1.21
                 itemToRender.tagCompound = nbtTag
@@ -192,15 +198,16 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             }
         }
 
-        DrawContextUtils.translate(700f, 10f, 0f)
-        Renderable.clickable("§7Close (discards changes)", onLeftClick = { InventoryUtils.closeInventory() }).render(700, 10)
+        val width = GuiScreenUtils.scaledWindowWidth * 0.80f
+        DrawContextUtils.translate(width, 10f, 0f)
+        RenderableString("§7Close (discards changes)").render(7, 8)
         DrawContextUtils.translate(0f, 40f, 0f)
-        Renderable.clickable("§aSave to local disk", onLeftClick = {}).render(700, 50)
+        RenderableString("§aSave to local disk").render(1, 2)
         DrawContextUtils.translate(0f, 20f, 0f)
-        Renderable.clickable("§5Remove enchants", onLeftClick = {}).render(700, 70)
+        RenderableString("§5Remove enchants").render(3, 4)
         DrawContextUtils.translate(0f, 20f, 0f)
-        Renderable.clickable("§6Add enchant glint", onLeftClick = {}).render(700, 90)
-        DrawContextUtils.translate(-700f, -90f, 0f)
+        RenderableString("§6Add enchant glint").render(5, 6)
+        DrawContextUtils.translate(-width, -90f, 0f)
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
@@ -213,12 +220,41 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         getTextFields().forEach {
             it.mouseClicked(originalMouseX, originalMouseY, mouseButton)
         }
+        val buttonWidth = GuiScreenUtils.scaledWindowWidth * 0.80f
+        if (originalMouseX.toFloat() in buttonWidth..buttonWidth+50) {
+            if (originalMouseY in 10..30) {
+                InventoryUtils.closeInventory()
+            } else if (originalMouseY in 50..70) {
+                saveItem()
+            } else if (originalMouseY in 70..90) {
+                //#if MC < 1.8
+                nbtTag.removeTag("ench")
+                //#endif
+                nbtTag.extraAttributes.removeTag("enchantments")
+                hasEnchantGlint = false
+            } else if (originalMouseY in 90..110) {
+                hasEnchantGlint = true
+                //#if MC < 1.21
+                nbtTag.setTag("ench", NBTTagList())
+                //#endif
+            }
+        }
+
     }
 
     override fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
         getTextFields().forEach {
             it.mouseClickMove(originalMouseX, originalMouseY, clickedMouseButton, timeSinceLastClick)
         }
+    }
+
+    override fun onHandleMouseInput() {
+        val delta = MouseCompat.getScrollDelta()
+        if (delta == 0) return
+        scroll += delta
+        println(scroll)
+        if (scroll > 0) scroll = 0
+        if (scroll < -maxScroll) scroll = -maxScroll
     }
 
     fun adjustLore() {
