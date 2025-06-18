@@ -34,7 +34,7 @@ object GuardianReminder {
     }
 
     private fun warn() {
-        if (ExperimentationTableApi.guardianPetActive()) return
+        if (ExperimentationTableApi.hasGuardianPet()) return
 
         ChatUtils.clickToActionOrDisable(
             "Use a §9§lGuardian Pet §efor more Exp in the Experimentation Table.",
@@ -49,7 +49,7 @@ object GuardianReminder {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() != "Experimentation Table") return
         if (lastInventoryOpen.passedSince() > 2.seconds) return
-        if (ExperimentationTableApi.guardianPetActive()) return
+        if (ExperimentationTableApi.hasGuardianPet()) return
 
         TitleManager.sendTitle(
             titleText = "§cWrong Pet equipped!",

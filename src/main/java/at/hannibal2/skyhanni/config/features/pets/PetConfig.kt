@@ -21,11 +21,6 @@ class PetConfig {
     var display: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Rarity Circle", desc = "Display a circle around the pet icon based on rarity.")
-    @ConfigEditorBoolean
-    var rarityCircle: Boolean = true
-
-    @Expose
     @ConfigLink(owner = PetConfig::class, field = "display")
     val displayPos: Position = Position(-330, -15)
 

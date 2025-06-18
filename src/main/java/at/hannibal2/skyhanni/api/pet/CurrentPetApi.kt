@@ -39,8 +39,11 @@ object CurrentPetApi {
     fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
     fun isCurrentPetOrHigherRarity(petInternalName: NeuInternalName): Boolean {
         val currentPet = currentPet ?: return false
-        val (properPetName, startingRarity) = PetUtils.internalNameToProperPetWithRarity(petInternalName) ?: return false
-        return currentPet.inFamily(properPetName) && currentPet.rarity >= startingRarity
+        val comparisonResult = PetUtils.comparePets(
+            refPetInternalName = petInternalName,
+            opPetInternalName = currentPet.fauxInternalName,
+        ) ?: return false
+        return comparisonResult >= 0
     }
 
     enum class PetDataAssertionSource { TAB, AUTOPET, MENU }

@@ -32,8 +32,6 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.PetUtils.getCleanName
-import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -41,6 +39,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -439,21 +438,8 @@ object ItemUtils {
         LorenzRarity.entries.joinToString(separator = "|") { it.name },
     )
 
-    private val ignoredPetStrings = listOf(
-        "Archer",
-        "Berserk",
-        "Mage",
-        "Tank",
-        "Healer",
-        "➡",
-    )
-
-    private fun ItemStack.isPet() = petItemNamePattern.matches(cleanName()) && !ignoredPetStrings.any {
-        cleanName().contains(it)
-    }
-
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
-        if (this.isPet()) return getPetRarity(this) to ItemCategory.PET
+        if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
         val cleanName = this.cleanName()
         for (line in this.getLore().reversed()) {
@@ -679,6 +665,9 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
+        if (this.getItemStackOrNull()?.getPetInfo() != null) {
+            return PetUtils.getCleanPetName(this@grabItemName, colored = true) + " Pet"
+        }
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
         }
@@ -718,10 +707,6 @@ object ItemUtils {
             return ReplaceRomanNumerals.replaceLine(name)
         }
 
-        // hide pet level
-        getCleanName(name)?.let {
-            return "$it Pet"
-        }
         return name
     }
 

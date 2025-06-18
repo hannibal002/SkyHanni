@@ -271,7 +271,6 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
             val itemName = itemInHand?.displayName?.removeColor().orEmpty()
-            val extraAttributes = itemInHand?.extraAttributes
 
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"
@@ -289,6 +288,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 return percent
             }
 
+            val extraAttributes = itemInHand?.extraAttributes
             var stackingReturn = AutoStatus.STACKING.placeholderText
             if (extraAttributes != null) {
                 val enchantments = extraAttributes.getCompoundTag("enchantments")

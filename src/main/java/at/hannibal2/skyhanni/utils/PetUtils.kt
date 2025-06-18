@@ -16,47 +16,26 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 @SkyHanniModule
 object PetUtils {
-    // Map of Proper Pet Name to the skins that pet can have
-    val petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
-
+    private var petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
     private var basePetLeveling: List<Int> = listOf()
     private var customPetLeveling: Map<String, NeuPetData>? = null
+    private var animatedPetSkins: Map<String, AnimatedSkinJson> = mapOf()
+    private var displayNameMap: Map<String, String> = mapOf()
 
     var petInternalNames: Set<NeuInternalName> = setOf()
         private set
     var petItemResolution: Map<String, NeuInternalName> = mapOf()
         private set
-    var animatedPetSkins: Map<String, AnimatedSkinJson> = mapOf()
-        private set
     var petSkinVariants: Map<NeuInternalName, List<String>> = mapOf()
         private set
     var petSkinNbtNames: List<String> = listOf()
         private set
-    var displayNameMap: Map<String, String> = mapOf()
-        private set
 
     // <editor-fold desc="Patterns">
-    /**
-     * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
-     * REGEX-TEST: ⭐ [Lvl 100] Black Cat ✦
-     */
-    val petItemNamePattern by CurrentPetApi.patternGroup.pattern(
-        "item.name",
-        "(?<favorite>(?:§.)*⭐ )?(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)",
-    )
-
-    /**
-     * REGEX-TEST: §7[Lvl 1➡200] §6Golden Dragon
-     * REGEX-TEST: §7[Lvl {LVL}] §6Golden Dragon
-     */
-    private val neuRepoPetItemNamePattern by CurrentPetApi.patternGroup.pattern(
-        "item.name.neu.format",
-        "(?:§f§f)?§7\\[Lvl (?:1➡(?:100|200)|\\{LVL})] (?<name>.*)",
-    )
-
     /**
      * REGEX-TEST: PET_SKIN_ENDERMAN
      * REGEX-TEST: PET_SKIN_PARROT_TOUCAN
@@ -86,18 +65,7 @@ object PetUtils {
     // </editor-fold>
 
     // <editor-fold desc="Helpers">
-    fun getCleanName(nameWithLevel: String): String? {
-        petItemNamePattern.matchMatcher(nameWithLevel) {
-            return group("name")
-        }
-        neuRepoPetItemNamePattern.matchMatcher(nameWithLevel) {
-            return group("name")
-        }
-
-        return null
-    }
-
-    fun internalNameToProperPetWithRarity(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
+    private fun splitInternalName(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
         val parts = internalName.asString().split(";")
         if (parts.size < 2) return null
         val name = parts[0].takeIf { it.isNotBlank() } ?: return null
@@ -105,6 +73,53 @@ object PetUtils {
         val rarity = LorenzRarity.getById(rarityId) ?: return null
         return name to rarity
     }
+
+    private fun NeuInternalName.getProperName() = splitInternalName(this)?.first
+    fun getPetProperName(petInternalName: NeuInternalName): String? = splitInternalName(petInternalName)?.first
+    fun getPetRarity(petInternalName: NeuInternalName): LorenzRarity? = splitInternalName(petInternalName)?.second
+
+    private fun getFullLevelingTree(petInternalName: NeuInternalName): List<Int> =
+        basePetLeveling + customPetLeveling?.get(petInternalName.getProperName())?.petLevels.orEmpty()
+
+    /**
+     * @param refPetInternalName The pet to compare against
+     * @param opPetInternalName The pet that is being compared to the reference.
+     *
+     * @return An int (or null) representing the relationship between the two pets.
+     *  null in the case that the pets do not share a family
+     *      OR if either internal name passed is not a pet or cannot be parsed
+     *  1 if opPet is a higher rarity than refPet
+     *  0 if opPet is the same rarity as refPet
+     *  -1 if opPet is a lesser rarity than refPet
+     */
+    fun comparePets(refPetInternalName: NeuInternalName, opPetInternalName: NeuInternalName): Int? {
+        val (refProperName, refRarity) = splitInternalName(refPetInternalName) ?: return null
+        val (opProperName, opRarity) = splitInternalName(opPetInternalName) ?: return null
+        if (refProperName != opProperName) return null
+
+        // Comparable.compareTo returns <0, 0 or >0, compareTo(0) maps that to exactly -1,0 or +1
+        return opRarity.compareTo(refRarity).compareTo(0)
+    }
+
+    fun getCleanPetName(petInternalName: NeuInternalName, colored: Boolean = true): String {
+        val (properPetName, rarity) = splitInternalName(petInternalName) ?: return ""
+        return buildString {
+            if (colored) { append(rarity.chatColorCode) }
+            displayNameMap.getOrElse(properPetName) {
+                properPetName.split('_').joinToString(" ") {
+                    it.firstLetterUppercase()
+                }
+            }.let { append(it) }
+        }
+    }
+
+    fun getPetSkinOrNull(petInternalName: NeuInternalName, skinColorTag: String): NeuItemJson? =
+        petSkins[petInternalName.getProperName()]?.singleOrNull {
+            it.displayName.startsWith(skinColorTag)
+        }
+
+    fun getMaxLevel(petInternalName: NeuInternalName): Int =
+        customPetLeveling?.get(petInternalName.getProperName())?.maxLevel ?: 100
 
     fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity) =
         "${petName.uppercase().replace(" ", "_")};${rarity.id}".toInternalName()
@@ -134,19 +149,9 @@ object PetUtils {
         return level
     }
 
-    fun getMaxLevel(petInternalName: NeuInternalName): Int {
-        val properPetName = petInternalName.asString().split(";").first()
-        return customPetLeveling?.get(properPetName)?.maxLevel ?: 100
-    }
-
-    private fun getFullLevelingTree(petInternalName: NeuInternalName): List<Int> {
-        val properPetName = petInternalName.asString().split(";").first()
-        return basePetLeveling + customPetLeveling?.get(properPetName)?.petLevels.orEmpty()
-    }
-
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {
         val petsData = customPetLeveling ?: return null
-        val (properPetName, rarity) = internalNameToProperPetWithRarity(petInternalName) ?: return null
+        val (properPetName, rarity) = splitInternalName(petInternalName) ?: return null
         return petsData[properPetName]?.rarityOffset?.get(rarity) ?: when (rarity) {
             LorenzRarity.COMMON -> 0
             LorenzRarity.UNCOMMON -> 6
@@ -161,7 +166,7 @@ object PetUtils {
     private val nextTierCache: MutableMap<NeuInternalName, Boolean> = mutableMapOf()
     fun NeuInternalName.hasValidHigherTier() = nextTierCache.getOrPut(this) {
         if (!this.isPet) return@getOrPut false
-        val (properPetName, rarity) = internalNameToProperPetWithRarity(this)
+        val (properPetName, rarity) = splitInternalName(this)
             ?: return@getOrPut false
         val rarityAbove = rarity.oneAbove() ?: return@getOrPut false
         val tierAboveInternalName = petWithRarityToInternalName(properPetName, rarityAbove)
@@ -183,17 +188,19 @@ object PetUtils {
         petSkinNbtNames = skinData.petSkinNbtNames
 
         val rawPetInternalNames = mutableSetOf<NeuInternalName>()
+        val rawPetSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuItemJson::class.java)
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val properPetName = group("pet") ?: return@matchMatcher
-                petSkins.getOrPut(properPetName) { mutableListOf() }.add(petItemData)
+                rawPetSkins.getOrPut(properPetName) { mutableListOf() }.add(petItemData)
             }
             neuPetLorePattern.firstMatcher(petItemData.lore) {
                 rawPetInternalNames.add(rawInternalName.toInternalName())
             }
         }
         petInternalNames = rawPetInternalNames
+        petSkins = rawPetSkins
         nextTierCache.clear()
     }
 

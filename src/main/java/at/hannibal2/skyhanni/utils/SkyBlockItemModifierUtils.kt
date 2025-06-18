@@ -9,9 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
-import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
@@ -82,8 +80,8 @@ object SkyBlockItemModifierUtils {
         @Expose val candyUsed: Int = 0,
         @Expose val skin: String? = null,
         @Deprecated("Some pets do not have uuids, use uniqueId instead", replaceWith = ReplaceWith("uniqueId"))
-        @Expose val uuid: UUID,
-        @Expose val uniqueId: UUID,
+        @Expose val uuid: UUID? = null,
+        @Expose val uniqueId: UUID? = null, // Only null when pet is read from a shop, or another non-"owned" source
         @Expose val hideRightClick: Boolean,
         @Expose val noMove: Boolean,
         @Expose val extraData: JsonObject? = null,
@@ -130,15 +128,15 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
 
-    fun ItemStack.getPetInfo(): PetInfo? =
-        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), PetInfo::class.java)
-
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    fun ItemStack.getPetLevel(): Int = petItemNamePattern.matchGroup(displayName, "level")?.toInt() ?: 0
+    fun ItemStack.getPetInfo(): PetInfo? =
+        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), PetInfo::class.java)
 
-    fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".toInternalName()) 200 else 100
+    fun ItemStack.getPetLevel(): Int = PetUtils.xpToLevel(getPetInfo()?.exp ?: 0.0, getInternalName())
+
+    fun ItemStack.getMaxPetLevel(): Int = PetUtils.getMaxLevel(getInternalName())
 
     fun ItemStack.getDrillUpgrades() = getExtraAttributes()?.let {
         val list = mutableListOf<NeuInternalName>()

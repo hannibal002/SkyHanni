@@ -49,6 +49,7 @@ object PetStorageApi {
     private const val PET_MENU_CURRENT_PET_SLOT = 4
     private const val SB_MENU_CURRENT_PET_SLOT = 30
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
+    private val EXP_SHARE_SLOTS = listOf(30, 31, 32)
 
     // <editor-fold desc="Patterns">
     /**
@@ -152,17 +153,12 @@ object PetStorageApi {
 
     private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName): NeuItemJson? {
         val skin = groupOrNull("skin") ?: groupOrNull("altskin") ?: return null
-        val skinColor = skin.substring(0, 2)
-        val properPetName = petInternalName.asString().split(";").first()
-        return PetUtils.petSkins[properPetName]?.filter {
-            it.displayName.startsWith(skinColor)
-        }?.takeIf { it.size == 1 }?.first()
+        return PetUtils.getPetSkinOrNull(petInternalName, skin)
     }
 
-    private fun saveConfig() = SkyHanniMod.configManager.saveConfig(
-        ConfigFileType.PETS,
-        "saving-data"
-    )
+    private fun Matcher.getRarityOrNull() = LorenzRarity.getByColorCode(group("rarity")[0])
+
+    private fun saveConfig() = SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -170,7 +166,7 @@ object PetStorageApi {
         petTabWidgetNamePattern.firstMatcher(event.lines) {
             val petName = groupOrNull("pet") ?: return@firstMatcher false
             val level = group("level").toInt()
-            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@firstMatcher false
+            val rarity = getRarityOrNull() ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
                 val trimmed = line.trim().removeResets()
                 PetUtils.petItemResolution[trimmed]
@@ -209,13 +205,11 @@ object PetStorageApi {
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent) {
         autoPetMessagePattern.matchMatcher(event.message) {
-            if (config.hideAutopet) {
-                event.blockedReason = "autopet"
-            }
+            if (config.hideAutopet) event.blockedReason = "autopet"
 
             val petName = groupOrNull("pet") ?: return
             val level = group("level").toInt()
-            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return
+            val rarity = getRarityOrNull() ?: return
             val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
             val petSkin = getPetSkinOrNull(petInternalName)
             val petSkinTag = groupOrNull("skin")
@@ -263,8 +257,8 @@ object PetStorageApi {
             0 -> { // Left click - if not a shift click, summon/un-summon pet
                 if (KeyboardManager.isShiftKeyDown()) return
                 ProfileStorageData.profileSpecific?.currentPetUuid = when (currentPetUuid) {
-                    petInfo.uniqueId -> null
-                    else -> petInfo.uniqueId
+                    petInfo.uniqueId -> null // Un-summon
+                    else -> petInfo.uniqueId // Summon
                 }
             }
             else -> return
@@ -331,17 +325,16 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
-        val currentPetItemLore = inventoryItems[
-            when {
-                mainPetMenuNamePattern.matches(inventoryName) -> PET_MENU_CURRENT_PET_SLOT
-                inventoryName == "SkyBlock Menu" -> SB_MENU_CURRENT_PET_SLOT
-                else -> return
-            }
-        ]?.getLore()?.takeIfNotEmpty() ?: return
+        val petItemSlot = when {
+            mainPetMenuNamePattern.matches(inventoryName) -> PET_MENU_CURRENT_PET_SLOT
+            inventoryName == "SkyBlock Menu" -> SB_MENU_CURRENT_PET_SLOT
+            else -> return
+        }
+        val currentPetItemLore = inventoryItems[petItemSlot]?.getLore()?.takeIfNotEmpty() ?: return
 
         petMenuSelectedPetNamePattern.firstMatcher(currentPetItemLore) {
             val petName = groupOrNull("pet") ?: return@firstMatcher false
-            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@firstMatcher false
+            val rarity = getRarityOrNull() ?: return@firstMatcher false
             val petInternalname = PetUtils.petWithRarityToInternalName(petName, rarity)
             val petSkin = getPetSkinOrNull(petInternalname)
             val petSkinTag = groupOrNull("skin")
@@ -388,7 +381,7 @@ object PetStorageApi {
         val petStorage = petStorage ?: return
         petStorage.expSharePets.clear()
         petStorage.expSharePets.addAll(
-            listOf(30, 31, 32).map { expShareSlot ->
+            EXP_SHARE_SLOTS.map { expShareSlot ->
                 val slotItem = inventoryItems[expShareSlot]?.takeIf {
                     it.displayName != "§7No pet in slot"
                 } ?: return@map null

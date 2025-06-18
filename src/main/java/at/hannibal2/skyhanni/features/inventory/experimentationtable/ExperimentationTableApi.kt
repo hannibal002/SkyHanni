@@ -23,10 +23,11 @@ import net.minecraft.entity.item.EntityArmorStand
 object ExperimentationTableApi {
 
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-    private val inTable get() = inventoriesPattern.matches(openInventoryName())
-    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val patternGroup = RepoPattern.group("enchanting.experiments")
 
+    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
+    private val inTable get() = inventoriesPattern.matches(openInventoryName())
+    var currentExperiment: Experiment? = null
     val superpairInventory = InventoryDetector(
         openInventory = { name ->
             currentExperiment = superpairsPattern.matchMatcher(name) {
@@ -34,9 +35,6 @@ object ExperimentationTableApi {
             }
         },
     ) { name -> inventoriesPattern.matches(name) }
-
-    var currentExperiment: Experiment? = null
-        private set
 
     // <editor-fold desc="Patterns">
     /**
@@ -178,5 +176,5 @@ object ExperimentationTableApi {
         }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
     }
 
-    fun guardianPetActive(): Boolean = CurrentPetApi.isCurrentPet("Guardian")
+    fun hasGuardianPet(): Boolean = CurrentPetApi.isCurrentPet("Guardian")
 }
