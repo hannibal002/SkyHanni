@@ -34,7 +34,7 @@ allprojects {
         maven("https://repo.spongepowered.org/repository/maven-public/") // mixin
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
         maven("https://jitpack.io") {
-            // NotEnoughUpdates (compiled against)
+            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
@@ -42,7 +42,6 @@ allprojects {
         maven("https://repo.nea.moe/releases") // libautoupdate
         maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
         maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
-        maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
         maven("https://api.modrinth.com/maven") // Modrinth
     }
 }
