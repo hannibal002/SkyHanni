@@ -10,11 +10,17 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+//#endif
 import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
+//#if MC > 1.21
+//$$ import net.minecraft.registry.DynamicRegistryManager
+//#endif
 
+// todo 1.21 impl needed
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
 
     private var scroll = -1.0
@@ -38,11 +44,13 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         val t = (height / 2.0 - h / 2.0).toInt()
         DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
         GuiRenderUtils.drawFloatingRectDark(0, 0, w, h)
+        DrawContextUtils.translate(-l + 0.0, -t + 0.0, 0.0)
+        GuiRenderUtils.enableScissor(l + 5, t + 5, w + l - 5, h + t - 5)
+        DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
         DrawContextUtils.translate(5.0, 5.0 - scroll, 0.0)
         val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt()
-        GuiRenderUtils.enableScissor(l + 5, t + 5, w + l - 5, h + t - 5)
 
         for (msg in history) {
             GuiRenderUtils.drawString(msg.actionKind.renderedString, 0, 0, -1)
@@ -59,7 +67,12 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
                 queuedTooltip = msg.hoverExtraInfo
             if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
+                    //#if MC < 1.21
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
+                    //#else
+                    //$$ val serialize = Text.Serializer(DynamicRegistryManager.EMPTY).serialize(msg.message, null, null)
+                    //$$ OSUtils.copyToClipboard(serialize.toString())
+                    //#endif
                     ChatUtils.chat("Copied structured chat line to clipboard", false)
                 } else {
                     val message = msg.message.formattedText.stripHypixelMessage()
@@ -73,12 +86,19 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         wasMouseButtonDown = isMouseButtonDown
         DrawContextUtils.popMatrix()
         queuedTooltip?.let { tooltip ->
+            //#if TODO
             RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
+            //#endif
         }
     }
 
     private fun splitLine(comp: IChatComponent): List<String> {
+        //#if MC < 1.21
         return comp.formattedText.splitLines(w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10)).split("\n")
+        //#else
+        //$$ // todo splitlines kills colour for some reason
+        //$$ return comp.formattedTextCompat().split("\n")
+        //#endif
     }
 
     override fun onInitGui() {
