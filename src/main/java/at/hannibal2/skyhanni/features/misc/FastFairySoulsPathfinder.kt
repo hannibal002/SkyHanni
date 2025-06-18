@@ -21,11 +21,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -90,19 +90,32 @@ object FastFairySoulsPathfinder {
         fun foundNearby() {
             if (disabled) return
             foundButNotClickedSoul = null
-            val nearest = allSouls.minBy { it.distanceSqToPlayer() }
-            if (nearest.distanceToPlayer() > 10) {
-                ErrorManager.logErrorStateWithData(
-                    "unknown fairy soul",
-                    "user clicked a fairy soul while far away from known fairy souls",
-                    "nearest loc" to nearest,
-                    "player loc" to LocationUtils.playerLocation(),
-                    "distance" to nearest.distanceToPlayer().roundTo(1),
-                )
-                return
-            }
+            val nearest = getNearestSoul() ?: return
             found(nearest)
             pathToNext()
+        }
+
+        private fun getNearestSoul(): LorenzVec? {
+            val playerLocation = LocationUtils.playerLocation()
+            val nearest = allSouls.minBy { it.distanceSq(playerLocation) }
+            if (nearest.distanceToPlayer() < 10) return nearest
+
+            val inAir = PlayerUtils.inAir()
+            if (inAir) {
+                val abovePlayer = LocationUtils.playerLocation().up(10)
+                val aboveNearest = allSouls.minBy { it.distanceSq(abovePlayer) }
+                if (aboveNearest.distanceToPlayer() < 10) return aboveNearest
+            }
+
+            ErrorManager.logErrorStateWithData(
+                "unknown fairy soul",
+                "user clicked a fairy soul while far away from known fairy souls",
+                "nearest loc" to nearest,
+                "player loc" to LocationUtils.playerLocation(),
+                "distance" to nearest.distanceToPlayer().roundTo(1),
+                "inAir" to inAir,
+            )
+            return null
         }
 
         private fun found(nearest: LorenzVec) {
