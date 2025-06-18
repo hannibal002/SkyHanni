@@ -46,3 +46,4 @@ net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket getEntityId() getId()
 
 net.minecraft.text.Text net.minecraft.text.LiteralText
 
+at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer

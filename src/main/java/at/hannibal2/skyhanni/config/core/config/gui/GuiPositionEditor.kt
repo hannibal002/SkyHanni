@@ -33,8 +33,10 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+//#endif
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -62,7 +64,11 @@ class GuiPositionEditor(
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
             val accessor = oldScreen as AccessorGuiContainer
+            //#if MC < 1.21
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
+            //#else
+            //$$ oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
+            //#endif
         }
 
         GlStateManager.disableLighting()
@@ -111,7 +117,9 @@ class GuiPositionEditor(
     }
 
     private fun renderHover(text: List<String>) {
+        //#if TODO
         RenderableTooltips.setTooltipForRender(text.map { Renderable.string(it) })
+        //#endif
     }
 
     private fun renderRectangles(): Int {

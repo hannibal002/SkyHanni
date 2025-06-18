@@ -27,6 +27,7 @@
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
+    <ID>LargeClass:WorldRenderUtils.kt$WorldRenderUtils</ID>
     <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
@@ -293,6 +294,7 @@
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
     <ID>TooManyFunctions:SkyHanniTracker.kt$SkyHanniTracker&lt;Data : TrackerData&gt;</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
+    <ID>TooManyFunctions:WorldRenderUtils.kt$WorldRenderUtils</ID>
     <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Double::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
@@ -351,7 +353,6 @@
     <ID>UnsafeCallOnNullableType:RenderGlobalHook.kt$RenderGlobalHook$camera!!</ID>
     <ID>UnsafeCallOnNullableType:RenderLivingEntityHelper.kt$RenderLivingEntityHelper$entityColorCondition[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:RenderLivingEntityHelper.kt$RenderLivingEntityHelper$entityColorMap[entity]!!</ID>
-    <ID>UnsafeCallOnNullableType:RenderUtils.kt$RenderUtils$it.name!!</ID>
     <ID>UnsafeCallOnNullableType:RepoUtils.kt$RepoUtils$file!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[2]!!</ID>
@@ -370,6 +371,7 @@
     <ID>UnsafeCallOnNullableType:UpdateManager.kt$UpdateManager$potentialUpdate!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalPrice!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
+    <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt$WorldRenderUtils$it.name!!</ID>
     <ID>UnusedParameter:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$args: Array&lt;String&gt;</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
