@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType

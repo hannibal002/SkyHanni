@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
