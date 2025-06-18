@@ -4,13 +4,15 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 //#if TODO
 import at.hannibal2.skyhanni.config.SackData
 //#endif
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 //#if TODO
@@ -150,8 +152,14 @@ object SkyHanniMod {
         event.registerBrigadier("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"
-            legacyCallbackArgs {
-                ConfigGuiManager.onCommand(it)
+            literalCallback("gui") {
+                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
+            }
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
+                openConfigGui(search)
+            }
+            simpleCallback {
+                openConfigGui()
             }
         }
     }
