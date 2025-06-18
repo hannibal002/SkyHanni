@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -12,14 +13,13 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiTextField
 import org.lwjgl.input.Keyboard
-import kotlin.math.max
-import kotlin.math.roundToInt
+import kotlin.math.min
 
 /**
  * Taken and modified from NotEnoughUpdates.
  */
 class TextFieldRenderable(
-    initialText: String,
+    initialText: String = "",
     override val horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER,
     override val verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
 ) : Renderable {
@@ -34,10 +34,10 @@ class TextFieldRenderable(
     private var searchBarXSize = 350
     private val searchBarPadding = 2
 
-    private var focus = false
+    private var isFocussed = false
 
-    private var x = 0
-    private var y = 0
+    private var xOffset = 0
+    private var yOffset = 0
 
     private val fr get() = Minecraft.getMinecraft().fontRendererObj
 
@@ -54,10 +54,6 @@ class TextFieldRenderable(
         }
 
     private var customBorderColour = -1
-
-    fun setMaxStringLength(len: Int) {
-        textField.maxStringLength = len
-    }
 
     fun setCustomBorderColour(colour: Int) {
         this.customBorderColour = colour
@@ -76,9 +72,12 @@ class TextFieldRenderable(
         searchBarYSize = height
     }
 
-    override fun toString(): String = textField.text
+    fun setOffset(xOffset: Int, yOffset: Int) {
+        this.xOffset = xOffset
+        this.yOffset = yOffset
+    }
 
-    fun getFocus(): Boolean = focus
+    override fun toString(): String = textField.text
 
     private fun calculateHeight(): Int {
         val scale = GuiScreenUtils.scaleFactor
@@ -96,65 +95,91 @@ class TextFieldRenderable(
     private fun getStringWidth0(str: String) = fr.getStringWidth(str)
 
     private fun getCursorPos(mouseX: Int, mouseY: Int): Int {
-        val xComp = mouseX - x
-        val yComp = mouseY - y
+        val xComp: Int = mouseX - xOffset
+        val yComp: Int = mouseY - yOffset
+
         val extraSize = (searchBarYSize - 8) / 2 + 8
 
-        val text = textField.text
+        val lineNum = Math.round((((yComp - (searchBarYSize - 8) / 2)) / extraSize).toFloat())
+        var text = textField.text
+        var textNoColor = textField.text
+        while (true) {
+            val matcher = patternControlCode.matcher(text)
+            if (!matcher.find() || matcher.groupCount() < 1) break
+            val code = matcher.group(1)
+            text = matcher.replaceFirst("§$code¶$code")
+        }
+        while (true) {
+            val matcher = patternControlCode.matcher(textNoColor)
+            if (!matcher.find() || matcher.groupCount() < 1) break
+            val code = matcher.group(1)
+            textNoColor = matcher.replaceFirst("¶$code")
+        }
 
-        val lineNum = ((yComp - (searchBarYSize - 8) / 2) / extraSize.toFloat()).roundToInt()
+        var currentLine = 0
+        var cursorIndex = 0
+        while (cursorIndex < textNoColor.length) {
+            if (currentLine == lineNum) break
+            if (textNoColor[cursorIndex] == '\n') {
+                currentLine++
+            }
+            cursorIndex++
+        }
 
-        val textNoColor = text.replace(Regex("(?i)§."), "")
-        val cursorIndex = textNoColor.indexOfNth('\n', lineNum).takeIf { it != -1 } ?: textNoColor.length
-        val lines = text.substring(cursorIndex).split('\n')
-        if (lines.isEmpty()) return 0
-
+        val textNC = textNoColor.substring(0, cursorIndex)
+        val colorCodes = textNC.count { it == '¶' }
+        val lines =
+            text.substring(cursorIndex + (colorCodes * 2)).split("\n".toRegex())
+                .dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+        if (lines.isEmpty()) {
+            return 0
+        }
         val line = lines[0]
-        val padding = minOf(5, searchBarXSize - strLenNoColor(line)) / 2
+
+        val padding = (min(5.0, (searchBarXSize - strLenNoColor(line)).toDouble()) / 2).toInt()
         val trimmed = line.capAtMinecraftLength(xComp - padding)
         var linePos = strLenNoColor(trimmed)
-        if (linePos < line.length) {
+        if (linePos != strLenNoColor(line)) {
             val after = line[linePos]
-            val trimmedWidth = getStringWidth0(trimmed)
+            val trimmedWidth: Int = getStringWidth0(trimmed)
             val charWidth = getStringWidth0(after.toString())
-            if (trimmedWidth + charWidth / 2 < xComp - padding) linePos++
+            if (trimmedWidth + charWidth / 2 < xComp - padding) {
+                linePos++
+            }
         }
-        return cursorIndex + linePos
+        cursorIndex += linePos
+
+        return cursorIndex
     }
 
     fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
+        if (!GuiRenderUtils.isPointInRect(mouseX, mouseY, xOffset, yOffset, width, height)) {
+            isFocussed = false
+            //#if MC < 1.21
+            textField.setSelectionPos(textField.cursorPosition)
+            //#else
+            //$$ textField.setSelectionEnd(textField.cursor)
+            //#endif
+            return
+        }
+
         if (mouseButton == 1) {
             textField.text = ""
         } else {
+            //#if MC < 1.21
             textField.cursorPosition = getCursorPos(mouseX, mouseY)
+            //#else
+            //$$ textField.setCursor(getCursorPos(mouseX, mouseY), KeyboardManager.isShiftKeyDown())
+            //#endif
         }
-        focus = true
-    }
-
-    fun otherComponentClick() {
-        focus = false
-        //#if MC < 1.21
-        textField.setSelectionPos(textField.cursorPosition)
-        //#else
-        //$$ textField.setSelectionEnd(textField.cursor)
-        //#endif
-    }
-
-    private fun String.indexOfNth(char: Char, n: Int): Int {
-        var pos = -1
-        var count = 0
-        while (count <= n) {
-            pos = indexOf(char, pos + 1)
-            if (pos == -1) return -1
-            count++
-        }
-        return pos
+        isFocussed = true
     }
 
     private fun strLenNoColor(str: String): Int = str.replace(Regex("(?i)§."), "").length
 
     fun mouseClickMove(mouseX: Int, mouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
-        if (focus) {
+        if (isFocussed) {
             //#if MC < 1.21
             textField.setSelectionPos(getCursorPos(mouseX, mouseY))
             //#else
@@ -164,18 +189,16 @@ class TextFieldRenderable(
     }
 
     fun keyTyped(typedChar: Char, keyCode: Int) {
-        if (!focus) return
+        if (!isFocussed) return
         val text = textField.text
         val cursor = textField.cursorPosition
 
-        // Cache current line/column info
         val lines = text.split('\n')
         val lineIndex = text.substring(0, cursor).count { it == '\n' }
         val lineStart = text.lineStartIndex(lineIndex)
         val colOffset = getStringWidth0(text.substring(lineStart, cursor))
 
         when (keyCode) {
-            // Ctrl+V (paste)
             Keyboard.KEY_V -> if (KeyboardManager.isModifierKeyDown()) {
                 val selectionEnd = textField.selectionEnd
                 val cursorPosition = textField.cursorPosition
@@ -195,7 +218,6 @@ class TextFieldRenderable(
                 return
             }
 
-            // Enter (multiline insert)
             Keyboard.KEY_RETURN -> {
                 textField.text = buildString {
                     append(text.substring(0, cursor))
@@ -206,7 +228,6 @@ class TextFieldRenderable(
                 return
             }
 
-            // UP arrow
             Keyboard.KEY_UP -> {
                 if (lineIndex > 0) {
                     val prevLineStart = text.lineStartIndex(lineIndex - 1)
@@ -217,7 +238,6 @@ class TextFieldRenderable(
                 return
             }
 
-            // DOWN arrow
             Keyboard.KEY_DOWN -> {
                 if (lineIndex < lines.lastIndex) {
                     val nextLineStart = text.lineStartIndex(lineIndex + 1)
@@ -263,116 +283,124 @@ class TextFieldRenderable(
     }
 
     override fun render(posX: Int, posY: Int) {
-        this.x = posX
-        this.y = posY
-        drawTextbox(posX, posY, searchBarXSize, searchBarYSize, searchBarPadding, textField, focus)
+        try {
+            drawTextbox(searchBarXSize, searchBarYSize, textField, isFocussed)
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Error rendering TextFieldRenderable")
+        }
     }
 
-    private fun drawTextbox(
-        x: Int,
-        y: Int,
-        width: Int,
-        height: Int,
-        padding: Int,
-        textField: GuiTextField,
-        focus: Boolean,
-    ) {
-        val scale = GuiScreenUtils.scaleFactor
-        val paddingUnscaled = max(1, padding / scale)
-
+    private fun drawTextbox(width: Int, height: Int, textField: GuiTextField, focus: Boolean) {
         val renderText = textField.text
-        val lines = renderText.split("\n")
+        val lineCount = renderText.count { it == '\n' } + 1
         val extraSize = (height - 8) / 2 + 8
-        val bottom = y + height + extraSize * (lines.size - 1)
+        val bottom = height + extraSize * (lineCount - 1)
 
-        val borderColor = if (focus) LorenzColor.GREEN.toColor().rgb else LorenzColor.WHITE.toColor().rgb
-
-        // Background & border
-        GuiRenderUtils.drawRect(
-            x - paddingUnscaled,
-            y - paddingUnscaled,
-            x + width + paddingUnscaled,
-            bottom + paddingUnscaled,
-            borderColor,
-        )
-        GuiRenderUtils.drawRect(x, y, x + width, bottom, LorenzColor.BLACK.toColor().rgb)
-
-        // Process § color codes into sentinel §X§X for coloring
-        val pattern = Regex("§([^¶\\n])(?=([^¶\\n])?)")
-        val coloredText = pattern.replace(renderText) { "§${it.groupValues[1]}¶${it.groupValues[1]}" }
-        val plainText = Regex("§.|¶.").replace(coloredText, "")
-
-        // Draw lines
-        val xOffset = 5
-
-        lines.forEachIndexed { i, line ->
-            val yOffset = i * extraSize
-            val displayLine = line.capAtMinecraftLength(width - 10)
-            GuiRenderUtils.drawString(displayLine, x + xOffset, y + (height - 8) / 2 + yOffset)
+        var borderColor = if (focus) LorenzColor.GREEN.toColor().rgb else LorenzColor.WHITE.toColor().rgb
+        if (customBorderColour != -1) {
+            borderColor = customBorderColour
         }
 
-        // Cursor blink
+        // Background & border
+        GuiRenderUtils.drawRect(-1, -1, width + 1, bottom + 1, borderColor)
+        GuiRenderUtils.drawRect(0, 0, width, bottom, LorenzColor.BLACK.toColor().rgb)
+
+        //bar text
+        var text = textField.text
+        var textNoColor = textField.text
+        while (true) {
+            val matcher = patternControlCode.matcher(text)
+            if (!matcher.find() || matcher.groupCount() < 1) break
+            val code = matcher.group(1)
+            text = matcher.replaceFirst("§$code¶$code")
+        }
+        while (true) {
+            val matcher = patternControlCode.matcher(textNoColor)
+            if (!matcher.find() || matcher.groupCount() < 1) break
+            val code = matcher.group(1)
+            textNoColor = matcher.replaceFirst("¶$code")
+        }
+
+        val xStartOffset = 5
+        text.lines().forEachIndexed { i, line ->
+            val yOffset = i * extraSize
+            val displayLine = line.capAtMinecraftLength(width - 10)
+            GuiRenderUtils.drawString(displayLine, xStartOffset, (height - 8) / 2 + yOffset)
+        }
+
         if (focus && System.currentTimeMillis() % 1000 > 500) {
-            val cursorPos = textField.cursorPosition
-            val beforeCursor = plainText.substring(0, cursorPos)
+            val textNC = textNoColor.substring(0, textField.cursorPosition)
+            val colorCodes = textNC.count { it == '¶' }
+            val beforeCursor = text.substring(0, textField.cursorPosition + (colorCodes * 2))
             val lineIndex = beforeCursor.count { it == '\n' }
             val lineText = beforeCursor.split("\n").lastOrNull() ?: ""
-            val cursorX = x + xOffset + getStringWidth0(lineText)
-            val cursorY = y + (height - 8) / 2 + lineIndex * extraSize
+            val cursorX = xStartOffset + getStringWidth0(lineText)
+            val cursorY = (height - 8) / 2 + lineIndex * extraSize
             GuiRenderUtils.drawRect(cursorX, cursorY - 1, cursorX + 1, cursorY + 9, LorenzColor.WHITE.toColor().rgb)
         }
 
         // Selection highlighting
         val selected = textField.selectedText
-        if (selected.isNotEmpty()) {
-            val (start, end) = listOf(textField.cursorPosition, textField.selectionEnd).sorted()
-            var drawX = 0
-            var drawY = 0
-            var sectionSign = false
-            var bold = false
+        if (selected.isEmpty()) return
 
-            plainText.forEachIndexed { i, c ->
-                if (c == '¶') {
-                    sectionSign = true
-                    return@forEachIndexed
+        val (start, end) = listOf(textField.cursorPosition, textField.selectionEnd).sorted()
+
+        var texX = 0
+        var texY = 0
+        var sectionSignPrev = false
+        var bold = false
+
+        for ((i, c) in textNoColor.withIndex()) {
+            if (sectionSignPrev) {
+                val lowercase = c.lowercaseChar()
+                if (lowercase !in nonBoldFormattingCodes) {
+                    bold = lowercase == 'l'
                 }
-                if (sectionSign) {
-                    sectionSign = false
-                    bold = c.equals('l', ignoreCase = true)
-                    return@forEachIndexed
-                }
+            }
+            sectionSignPrev = c == '¶'
 
-                if (c == '\n') {
-                    drawX = 0
-                    drawY += extraSize
-                    return@forEachIndexed
-                }
-
-                val charWidth = getStringWidth0(c.toString()) + if (bold) 1 else 0
-
+            if (c == '\n') {
                 if (i in start until end) {
                     GuiRenderUtils.drawRect(
-                        x + xOffset + drawX, y + (height - 8) / 2 - 1 + drawY,
-                        x + xOffset + drawX + charWidth, y + (height - 8) / 2 + 9 + drawY,
+                        xStartOffset + texX, (height - 8) / 2 - 1 + texY,
+                        xStartOffset + texX + 3, (height - 8) / 2 + 9 + texY,
                         LorenzColor.GRAY.toColor().rgb,
                     )
-
-                    GuiRenderUtils.drawString(
-                        c.toString(),
-                        x + xOffset + drawX,
-                        y + (height - 8) / 2 + drawY,
-                    )
-                    if (bold) {
-                        GuiRenderUtils.drawString(
-                            c.toString(),
-                            x + xOffset + drawX + 1,
-                            y + (height - 8) / 2 + drawY,
-                        )
-                    }
                 }
 
-                drawX += charWidth
+                texX = 0
+                texY += extraSize
+                continue
             }
+
+            val charWidth = getStringWidth0(c.toString()) + if (bold) 1 else 0
+
+            if (i in start until end) {
+                GuiRenderUtils.drawRect(
+                    xStartOffset + texX, (height - 8) / 2 - 1 + texY,
+                    xStartOffset + (texX + charWidth), (height - 8) / 2 + 9 + texY,
+                    LorenzColor.GRAY.toColor().rgb,
+                )
+                GuiRenderUtils.drawString(
+                    c.toString(),
+                    xStartOffset + texX,
+                    (height - 8) / 2 + texY,
+                )
+                if (bold) {
+                    GuiRenderUtils.drawString(
+                        c.toString(),
+                        xStartOffset + texX + 1,
+                        (height - 8) / 2 + texY,
+                    )
+                }
+            }
+
+            texX += charWidth
         }
+    }
+
+    companion object {
+        private val patternControlCode = "(?i)§([^¶])(?!¶)".toPattern()
+        private val nonBoldFormattingCodes = listOf('k', 'm', 'n', 'o')
     }
 }

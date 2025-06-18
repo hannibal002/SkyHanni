@@ -16,17 +16,14 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.NbtCompat.appendString
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.renderables.TextFieldRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
-import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import at.hannibal2.skyhanni.utils.renderables.WrappedRenderableString
+import at.hannibal2.skyhanni.utils.renderables.TextFieldRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -45,16 +42,16 @@ import java.awt.Color
 class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStack) : SkyhanniBaseScreen() {
 
     private val baseJson = EnoughUpdatesManager.getItemById(internalName.asString()) ?: JsonObject()
-    private var internalNameString = internalName.asString()
-    private var displayName = underlyingStack.displayName
-    private var minecraftItemId: String
-    private var itemModel: String
-    private var lore = underlyingStack.getLore().joinToString("\n")
-    private var craftText: String
-    private var infoType: String
-    private var additionalInfo: String
-    private var clickCommand: String
-    private var damage: String
+    private var internalNameStringField = TextFieldRenderable(internalName.asString())
+    private var displayNameField = TextFieldRenderable(underlyingStack.displayName)
+    private var minecraftItemIdField = TextFieldRenderable()
+    private var itemModelField = TextFieldRenderable()
+    private var loreField = TextFieldRenderable(underlyingStack.getLore().joinToString("\n"))
+    private var craftTextField = TextFieldRenderable()
+    private var infoTypeField = TextFieldRenderable()
+    private var additionalInfoField = TextFieldRenderable()
+    private var clickCommandField = TextFieldRenderable()
+    private var damageField = TextFieldRenderable()
     private var hasEnchantGlint = underlyingStack.hasEnchGlint()
 
     private var nbtTag = underlyingStack.tagCompound
@@ -66,7 +63,11 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
 
         val baseUnderlyingMinecraftId = underlyingStack.item.getIdentifierString()
         val modernItemModel = underlyingStack.getItemModel()?.getIdentifierString().orEmpty()
-        itemModel = if (modernItemModel != baseUnderlyingMinecraftId) modernItemModel else ""
+        if (modernItemModel != baseUnderlyingMinecraftId) {
+            itemModelField.setText(modernItemModel)
+        } else {
+            itemModelField.setText("")
+        }
 
         val extraAttributes = nbtTag.extraAttributes
         extraAttributes.removeTag("uuid")
@@ -81,70 +82,113 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             extraAttributes.setString("petInfo", petInfoJson.toString())
         }
         //#if MC < 1.21
-        minecraftItemId = baseUnderlyingMinecraftId
-        damage = underlyingStack.findItemDamage().toString()
+        minecraftItemIdField.setText(baseUnderlyingMinecraftId)
+        damageField.setText(underlyingStack.findItemDamage().toString())
         nbtTag.setTag("ExtraAttributes", extraAttributes)
         //#else
         //$$ val (id, itemDamage) = ComponentUtils.convertModernToLegacyId(baseUnderlyingMinecraftId)
-        //$$ minecraftItemId = id
-        //$$ damage = itemDamage.toString()
+        //$$ minecraftItemIdField.setText(id)
+        //$$ damageField.setText(itemDamage.toString())
         //$$ nbtTag.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(extraAttributes))
         //#endif
 
-        craftText = baseJson.get("craftText")?.asString.orEmpty()
-        infoType = baseJson.get("infoType")?.asString.orEmpty()
-        additionalInfo = baseJson.get("info")?.asJsonArray?.joinToString("\n") { it.asString }.orEmpty()
-        clickCommand = baseJson.get("clickcommand")?.asString.orEmpty()
+        craftTextField.setText(baseJson.get("craftText")?.asString.orEmpty())
+        infoTypeField.setText(baseJson.get("infoType")?.asString.orEmpty())
+        additionalInfoField.setText(baseJson.get("info")?.asJsonArray?.joinToString("\n") { it.asString }.orEmpty())
+        clickCommandField.setText(baseJson.get("clickcommand")?.asString.orEmpty())
     }
 
-    private val testTextBox = TextFieldRenderable("Testing")
+    private val renderableList = listOf(
+        RenderableString("Internal Name:"),
+        internalNameStringField,
+        RenderableString("Item ID:"),
+        minecraftItemIdField,
+        RenderableString("Display name:"),
+        displayNameField,
+        RenderableString("Lore:"),
+        loreField,
+        RenderableString("Item Model:"),
+        itemModelField,
+        RenderableString("Craft text:"),
+        craftTextField,
+        RenderableString("Info type:"),
+        infoTypeField,
+        RenderableString("Additional information:"),
+        additionalInfoField,
+        RenderableString("Click-command (viewrecipe or viewpotion)"),
+        clickCommandField,
+        RenderableString("Damage:"),
+        damageField,
+    )
+
+    private fun getTextFields(): List<TextFieldRenderable> {
+        return listOf(
+            internalNameStringField,
+            minecraftItemIdField,
+            displayNameField,
+            loreField,
+            itemModelField,
+            craftTextField,
+            infoTypeField,
+            additionalInfoField,
+            clickCommandField,
+            damageField,
+        )
+    }
+
+    private fun findWhereThingsActuallyAre(offsetX: Int, offsetY: Int) {
+        var height = 0
+        for (renderable in renderableList) {
+            if (renderable is TextFieldRenderable) {
+                renderable.setOffset(offsetX, offsetY + height)
+            }
+            height += renderable.height + 2
+        }
+    }
 
     override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         drawDefaultBackground(originalMouseY, originalMouseX, partialTicks)
 
-        val listOf = listOf(
-            RenderableString("Internal Name:"),
-            RenderableString(internalNameString),
-            RenderableString("Item ID:"),
-            RenderableString(minecraftItemId),
-            RenderableString("Display name:"),
-            RenderableString(displayName),
-            RenderableString("Lore:"),
-            WrappedRenderableString(lore, width = 400),
-            RenderableString("Item Model:"),
-            RenderableString(itemModel),
-            RenderableString("Craft text:"),
-            RenderableString(craftText),
-            RenderableString("Info type:"),
-            RenderableString(infoType),
-            RenderableString("Additional information:"),
-            WrappedRenderableString(additionalInfo, width = 400),
-            RenderableString("Click-command (viewrecipe or viewpotion)"),
-            RenderableString(clickCommand),
-            RenderableString("Damage:"),
-            RenderableString(damage),
-        )
-
-        val table = VerticalContainerRenderable(listOf)
+        val table = VerticalContainerRenderable(renderableList, spacing = 2)
         DrawContextUtils.translate(15.0, 15.0, 0.0)
+        findWhereThingsActuallyAre(15, 15)
         table.render(0, 0)
         DrawContextUtils.translate(-15.0, -15.0, 0.0)
 
-        val itemToRender: ItemStack?
-        if (itemModel.getVanillaItem() != null) {
-            itemToRender = ItemStack(itemModel.getVanillaItem())
-        } else if (minecraftItemId.getVanillaItem() != null) {
-            itemToRender = ItemStack(minecraftItemId.getVanillaItem())
-        } else {
-            itemToRender = null
+        val damageInt = damageField.getText().toIntOrNull() ?: 0
+        val itemToRender = when {
+            itemModelField.getText().getVanillaItem() != null -> ItemStack(itemModelField.getText().getVanillaItem())
+            minecraftItemIdField.getText().getVanillaItem() != null -> {
+                //#if MC < 1.21
+                ItemStack(minecraftItemIdField.getText().getVanillaItem(), 1, damageInt)
+                //#else
+                //$$ ItemStack(minecraftItemIdField.getText().getVanillaItem())
+                //#endif
+            }
+
+            minecraftItemIdField.getText().isNotEmpty() -> {
+                //#if MC < 1.21
+                null
+                //#else
+                //$$ ItemStack(ComponentUtils.convertMinecraftIdToModern(minecraftItemIdField.getText(), damageInt).getVanillaItem())
+                //#endif
+            }
+
+            else -> null
         }
+
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(390f, 90f, 0f)
-            GuiRenderUtils.drawRect(-10, -10, 70, 70, Color.GRAY.rgb)
+            GuiRenderUtils.drawRect(-10, -10, 90, 90, Color.GRAY.rgb)
+            DrawContextUtils.translate(0f, 0f, 0f)
             if (itemToRender != null) {
-                DrawContextUtils.scale(5f, 5f, 0f)
-                Renderable.itemStack(itemToRender).render(0, 0)
-                DrawContextUtils.scale(-5f, -5f, 0f)
+                //#if MC < 1.21
+                itemToRender.tagCompound = nbtTag
+                //#else
+                //$$ itemToRender.copy(DataComponentTypes.PROFILE, nbtTag)
+                //$$ itemToRender.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, hasEnchantGlint)
+                //#endif
+                Renderable.itemStack(itemToRender, scale = 5.0).render(0, 0)
             }
         }
 
@@ -157,38 +201,35 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         DrawContextUtils.translate(0f, 20f, 0f)
         Renderable.clickable("§6Add enchant glint", onLeftClick = {}).render(700, 90)
         DrawContextUtils.translate(-700f, -90f, 0f)
-
-        val widthPos = GuiScreenUtils.displayWidth / 3 - 200
-        val heightPos = GuiScreenUtils.displayHeight / 3 - 100
-        DrawContextUtils.translate(widthPos.toDouble(), heightPos.toDouble(), 0.0)
-
-        testTextBox.render(0, 0)
-        DrawContextUtils.translate(-widthPos.toDouble(), -heightPos.toDouble(), 0.0)
-
-        RenderableTooltips.setTooltipForRender(listOf(RenderableString("x: $originalMouseX y: $originalMouseY")))
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
-        testTextBox.keyTyped(typedChar ?: ' ', keyCode ?: 0)
+        getTextFields().forEach {
+            it.keyTyped(typedChar ?: ' ', keyCode ?: 0)
+        }
     }
 
     override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
-        testTextBox.mouseClicked(originalMouseX, originalMouseY, mouseButton)
+        getTextFields().forEach {
+            it.mouseClicked(originalMouseX, originalMouseY, mouseButton)
+        }
     }
 
     override fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
-        testTextBox.mouseClickMove(originalMouseX, originalMouseY, clickedMouseButton, timeSinceLastClick)
+        getTextFields().forEach {
+            it.mouseClickMove(originalMouseX, originalMouseY, clickedMouseButton, timeSinceLastClick)
+        }
     }
 
     fun adjustLore() {
-        val loreList = lore.split("\n")
+        val loreList = loreField.getText().split("\n")
         val newLore = mutableListOf<String>()
         for (line in loreList) {
             if (!UtilsPatterns.rarityLoreLinePattern.matches(line)) {
                 newLore.add(line)
             } else {
                 newLore.add(line)
-                lore = newLore.joinToString("\n")
+                loreField.setText(newLore.joinToString("\n"))
             }
         }
     }
@@ -197,24 +238,24 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         try {
             val newJson = RepoItemEditor.createRepoItemJson(
                 baseJson,
-                internalNameString,
-                minecraftItemId,
-                displayName,
-                itemModel,
-                lore,
-                craftText,
-                infoType,
-                additionalInfo,
-                clickCommand,
-                damage.toIntOrNull() ?: 0,
+                internalNameStringField.getText(),
+                minecraftItemIdField.getText(),
+                displayNameField.getText(),
+                itemModelField.getText(),
+                loreField.getText(),
+                craftTextField.getText(),
+                infoTypeField.getText(),
+                additionalInfoField.getText(),
+                clickCommandField.getText(),
+                damageField.getText().toIntOrNull() ?: 0,
                 getNbtTag(),
             )
-            RepoItemEditor.saveItemToRepo(internalNameString.toInternalName(), newJson)
+            RepoItemEditor.saveItemToRepo(internalNameStringField.getText().toInternalName(), newJson)
             if (message) {
-                ChatUtils.chat("§aSuccessfully saved $internalNameString to repo folder!")
+                ChatUtils.chat("§aSuccessfully saved $internalNameStringField to repo folder!")
             }
         } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Failed to save $internalNameString to repo folder!", ignoreErrorCache = true)
+            ErrorManager.logErrorWithData(e, "Failed to save $internalNameStringField to repo folder!", ignoreErrorCache = true)
         }
     }
 
@@ -228,16 +269,16 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         }
 
         val loreList = NBTTagList()
-        lore.split("\n").forEach { line ->
+        loreField.getText().split("\n").forEach { line ->
             loreList.appendString(line)
         }
         val display = nbtTag.getCompoundTag("display")
         display.setTag("Lore", loreList)
-        display.setString("Name", displayName)
+        display.setString("Name", displayNameField.getText())
         nbtTag.setTag("display", display)
 
         val extraAttributes = nbtTag.extraAttributes
-        extraAttributes.setString("id", internalNameString)
+        extraAttributes.setString("id", internalNameStringField.getText())
         nbtTag.setTag("ExtraAttributes", extraAttributes)
         return nbtTag
         //#else
@@ -280,13 +321,13 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         //$$     }
         //$$
         //$$     val loreList = NbtList()
-        //$$     lore.split("\n").forEach { line ->
+        //$$     loreField.getText().split("\n").forEach { line ->
         //$$         loreList.appendString(line)
         //$$     }
         //$$
         //$$     val display = NbtCompound()
         //$$     display.put("Lore", loreList)
-        //$$     display.putString("Name", displayName)
+        //$$     display.putString("Name", displayNameField.getText())
         //$$     val color = nbtTag.get(DataComponentTypes.DYED_COLOR)?.rgb
         //$$     color?.let {
         //$$         display.putInt("color", it)
@@ -294,7 +335,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         //$$     tag.put("display", display)
         //$$
         //$$     val extraAttributes = nbtTag.extraAttributes
-        //$$     extraAttributes.putString("id", internalNameString)
+        //$$     extraAttributes.putString("id", internalNameStringField.getText())
         //$$     tag.put("ExtraAttributes", extraAttributes)
         //$$
         //$$     return tag
