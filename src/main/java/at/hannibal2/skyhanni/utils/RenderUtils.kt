@@ -23,12 +23,12 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCircle
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawColor
-//#if TODO
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawFilledBoundingBox
@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
+//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
@@ -89,8 +90,10 @@ object RenderUtils {
     //#if TODO
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    //#endif
 
+    /**
+     * Used for some debugging purposes.
+     */
     val absoluteTranslation
         get() = run {
             matrixBuffer.clear()
@@ -108,7 +111,6 @@ object RenderUtils {
             Triple(xTranslate, yTranslate, zTranslate)
         }
 
-    //#if TODO
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
     }
