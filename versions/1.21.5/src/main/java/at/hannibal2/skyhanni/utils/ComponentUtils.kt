@@ -100,12 +100,17 @@ object ComponentUtils {
     }
 
     fun convertMinecraftIdToModern(id: String, damage: Int): String {
-        return "minecraft:" + convertMinecraftIdToModern2(id, damage)
+        val convertMinecraftIdToModern2 = convertMinecraftIdToModern2(id, damage)
+        if (convertMinecraftIdToModern2 == id && damage > 0) {
+            println("Unconverted minecraft id with damage above 0. id: $id damage: $damage")
+        }
+        return "minecraft:" + convertMinecraftIdToModern2
     }
 
     private fun convertMinecraftIdToModern2(id: String, damage: Int): String {
         val strippedId = id.replace("minecraft:", "")
         return when {
+            strippedId == "sand" -> getSandByDamage(damage) ?: strippedId
             strippedId == "red_flower" -> getRedFlowerByDamage(damage) ?: strippedId
             strippedId == "dye" -> getDyeByDamage(damage) ?: strippedId
             strippedId == "spawn_egg" -> getSpawnEggByDamage(damage) ?: strippedId
@@ -142,6 +147,7 @@ object ComponentUtils {
     private fun convertModernToLegacyId2(modernId: String): Pair<String, Int> {
         if (modernId == "player_head") return "skull" to 3
         getOtherItemByIdReversed(modernId)?.let { return it to 0 }
+        getSandDamage(modernId)?.let { return "sand" to it }
         getRedFlowerDamage(modernId)?.let { return "red_flower" to it }
         getDyeDamage(modernId)?.let { return "dye" to it }
         getSpawnEggDamage(modernId)?.let { return "spawn_egg" to it }
@@ -284,6 +290,7 @@ object ComponentUtils {
         "golden_rail" to "powered_rail",
         "quartz_ore" to "nether_quartz_ore",
         "sign" to "oak_sign",
+        "snow" to "snow_block",
         "snow_layer" to "snow",
         "stone_slab2" to "red_sandstone_slab",
         "wooden_door" to "oak_door",
@@ -296,6 +303,19 @@ object ComponentUtils {
 
     private fun getOtherItemByIdReversed(id: String): String? {
         return otherItemsMap.entries.find { it.value == id }?.key
+    }
+
+    private val sandMap = mapOf(
+        0 to "sand",
+        1 to "red_sand",
+    )
+
+    private fun getSandByDamage(damage: Int): String? {
+        return sandMap[damage]
+    }
+
+    private fun getSandDamage(id: String): Int? {
+        return sandMap.entries.find { it.value == id }?.key
     }
 
     private val redFlowerMap = mapOf(
