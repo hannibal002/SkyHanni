@@ -38,8 +38,8 @@ open class CircularRenderable(
 
 class CircularContainerRenderable(
     private val renderable: Renderable,
-    smoothness: Float = 1f,
     backgroundColor: ChromaColour,
+    smoothness: Float = 1f,
     filledPercentage: Double = 100.0,
     unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
     horizontalAlignment: HorizontalAlignment = HorizontalAlignment.CENTER,
