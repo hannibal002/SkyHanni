@@ -959,9 +959,8 @@ at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
 at/hannibal2/skyhanni/events/GuiContainerEvent.kt
 at.hannibal2.skyhanni.config.OnlyLegacy.kt
 
-
-
-
+at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
+at.hannibal2.skyhanni.utils.render.LineDrawer.kt
 
 
 # \.(?!kt|java|\()

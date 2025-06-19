@@ -45,6 +45,9 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         GuiRenderUtils.enableScissor(l + 5, t + 5, w + l - 5, h + t - 5)
         DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
         GuiRenderUtils.drawFloatingRectDark(0, 0, w, h)
+        DrawContextUtils.translate(-l + 0.0, -t + 0.0, 0.0)
+        GuiRenderUtils.enableScissor(l + 5, t + 5, w + l - 5, h + t - 5)
+        DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
         DrawContextUtils.translate(5.0, 5.0 - scroll, 0.0)
         val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)

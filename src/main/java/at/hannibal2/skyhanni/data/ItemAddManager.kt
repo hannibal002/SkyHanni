@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+//#if TODO
 import at.hannibal2.skyhanni.events.SackChangeEvent
+//#endif
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
@@ -61,6 +63,7 @@ object ItemAddManager {
         }
     }
 
+    //#if TODO
     @HandleEvent(onlyOnSkyblock = true)
     fun onSackChange(event: SackChangeEvent) {
 
@@ -75,6 +78,7 @@ object ItemAddManager {
         }
         superCraftedItems.clear()
     }
+    //#endif
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemAdd(event: ItemAddInInventoryEvent) {
@@ -143,7 +147,9 @@ object ItemAddManager {
         }
         craftedPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemName(group("item"))
+            //#if TODO
             if (!SackApi.sackListInternalNames.contains(internalName.asString())) return@matchMatcher
+            //#endif
             superCraftedItems.add(internalName)
         }
     }

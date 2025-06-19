@@ -22,6 +22,7 @@ import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
 
+// todo 1.21 impl needed
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
@@ -379,6 +380,7 @@ internal object RenderableUtils {
     fun MutableList<Renderable>.addCenteredString(string: String) =
         this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
 
+    //#if TODO
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
@@ -401,15 +403,18 @@ internal object RenderableUtils {
         }
         return Renderable.table(outerList, xPadding = 5, yPadding = padding)
     }
+    //#endif
 }
 
 fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
     add(HorizontalContainerRenderable(buildList { builderAction() }))
 }
 
+//#if TODO
 fun MutableList<Renderable>.addLine(tips: List<String>, builderAction: MutableList<Renderable>.() -> Unit) {
     add(hoverTips(HorizontalContainerRenderable(buildList { builderAction() }, 0), tips = tips))
 }
+//#endif
 
 internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
     override val width = content.width
