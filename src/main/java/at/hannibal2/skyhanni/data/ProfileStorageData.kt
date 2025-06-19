@@ -49,11 +49,7 @@ object ProfileStorageData {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
 
-        loadProfileSpecific(
-            playerSpecific,
-            sackPlayers,
-            profileName,
-        )
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
         ConfigLoadEvent.post()
     }
 
@@ -74,11 +70,7 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
-        loadProfileSpecific(
-            playerSpecific,
-            sackPlayers,
-            profileName,
-        )
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
         ConfigLoadEvent.post()
     }
 
