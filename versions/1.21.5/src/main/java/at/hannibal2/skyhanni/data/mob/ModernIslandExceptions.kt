@@ -30,7 +30,7 @@ object ModernIslandExceptions {
                 Mob(baseEntity, Mob.Type.BASIC, name = "Mossybit"),
             )
 
-        baseEntity is PandaEntity ->
+        baseEntity is PandaEntity && baseEntity.isBrown ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Mochibear"),
             )
