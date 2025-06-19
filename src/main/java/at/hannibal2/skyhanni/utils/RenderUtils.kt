@@ -445,7 +445,9 @@ object RenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
+        //#if TODO
         PatcherFixes.onPlayerEyeLine()
+        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
@@ -479,6 +481,7 @@ object RenderUtils {
         _drawWireframeBoundingBox(aabb, color)
     }
 
+    //#if TODO
     @Deprecated("Use WorldRenderUtils' draw3DPathWithWaypoint instead")
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
         path: Graph,
@@ -506,6 +509,7 @@ object RenderUtils {
             markLastBlock,
         )
     }
+    //#endif
 
     @Deprecated("Use WorldRenderUtils' drawFilledBoundingBox instead")
     fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
