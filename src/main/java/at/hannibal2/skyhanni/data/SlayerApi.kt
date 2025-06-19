@@ -144,7 +144,6 @@ object SlayerApi {
             }
         }
     }
-
     // TODO USE SH-REPO
     private fun checkSlayerTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
         "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isCurrent()) SlayerType.REVENANT else null

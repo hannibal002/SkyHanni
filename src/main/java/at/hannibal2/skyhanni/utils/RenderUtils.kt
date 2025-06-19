@@ -84,7 +84,12 @@ object RenderUtils {
     //#if TODO
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+    //#endif
 
+    //#if MC < 1.8.9
+    /**
+     * Used for some debugging purposes.
+     */
     val absoluteTranslation
         get() = run {
             matrixBuffer.clear()
