@@ -838,9 +838,9 @@ at/hannibal2/skyhanni/config/features/misc/cosmetic/CosmeticConfig.java
 at/hannibal2/skyhanni/config/features/misc/cosmetic/FollowingLineConfig.java
 at/hannibal2/skyhanni/config/features/misc/frogmask/FrogMaskFeaturesConfig.kt
 at/hannibal2/skyhanni/config/features/misc/frogmask/FrogMaskWarningConfig.kt
-at/hannibal2/skyhanni/config/features/misc/pets/PetConfig.kt
-at/hannibal2/skyhanni/config/features/misc/pets/PetExperienceToolTipConfig.java
-at/hannibal2/skyhanni/config/features/misc/pets/PetNametagConfig.java
+at/hannibal2/skyhanni/config/features/pets/PetConfig.kt
+at/hannibal2/skyhanni/config/features/pets/PetExperienceToolTipConfig.java
+at/hannibal2/skyhanni/config/features/pets/PetNametagConfig.java
 at/hannibal2/skyhanni/config/features/rift/CruxTalismanDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/rift/EnigmaSoulConfig.kt
 at/hannibal2/skyhanni/config/features/rift/MotesOrbsConfig.kt
