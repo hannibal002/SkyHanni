@@ -12,7 +12,6 @@ import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacke
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import kotlin.jvm.optionals.getOrNull
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object HypixelEventApi {
 
