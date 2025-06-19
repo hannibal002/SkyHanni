@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -47,6 +46,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -535,7 +535,7 @@ object ComposterOverlay {
     private fun retrieveMaterials(internalName: NeuInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
         if (config.retrieveFrom == RetrieveFromEntry.BAZAAR &&
-            !LorenzUtils.noTradeMode && internalName != BIOFUEL
+            !SkyBlockUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
@@ -562,7 +562,7 @@ object ComposterOverlay {
         }
         if (havingInSacks == 0) {
             SoundUtils.playErrorSound()
-            if (LorenzUtils.noTradeMode) {
+            if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("No $itemName §efound in sacks.")
             } else {
                 ChatUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
@@ -574,7 +574,7 @@ object ComposterOverlay {
         HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
         val havingInTotal = havingInInventory + havingInSacks
         if (itemsNeeded >= havingInTotal) {
-            if (LorenzUtils.noTradeMode) {
+            if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 ChatUtils.clickableChat(

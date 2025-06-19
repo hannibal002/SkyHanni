@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-//#if TODO
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DefaultDisplayMode
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -18,7 +16,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class TrackerConfig {
     @Expose
     @ConfigOption(name = "Hide with Item Value", desc = "Hide all trackers while the Estimated Item Value is visible.")
@@ -33,12 +30,10 @@ class TrackerConfig {
     @ConfigEditorDropdown
     var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
     @ConfigEditorDropdown
     val defaultDisplayMode: Property<DefaultDisplayMode> = Property.of(DefaultDisplayMode.REMEMBER_LAST)
-    //#endif
 
     @Expose
     @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently gained items.")

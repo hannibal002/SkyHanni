@@ -34,7 +34,11 @@ public class MixinKeyboard {
         // the extension functions such as isActive() and isKeyHeld() still work from keyboard manager
         // this only replaces the posting of events
         if (action == 0) new KeyUpEvent(key).post();
-        if (action == 1) new KeyDownEvent(key).post();
+        if (action == 1) {
+            new KeyDownEvent(key).post();
+            // on 1.21 it takes like 1 full second before the key press event will get posted so im doing it here
+            new KeyPressEvent(key).post();
+        }
         if (action == 2) new KeyPressEvent(key).post();
     }
 }

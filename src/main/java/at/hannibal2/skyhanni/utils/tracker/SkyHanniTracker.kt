@@ -6,9 +6,13 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SlayerApi
+//#if TODO
 import at.hannibal2.skyhanni.data.TitleManager
+//#endif
 import at.hannibal2.skyhanni.data.TrackerManager
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -67,10 +71,9 @@ open class SkyHanniTracker<Data : TrackerData>(
     )
 
     fun modify(modifyFunction: (Data) -> Unit) {
-        getSharedTracker()?.let {
-            it.modify(modifyFunction)
-            update()
-        }
+        val sharedTracker = getSharedTracker() ?: return
+        sharedTracker.modify(modifyFunction)
+        update()
     }
 
     fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
@@ -79,21 +82,18 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
-    private fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
-        getSharedTracker()?.let {
-            it.tryModify(mode, modifyFunction)
-            update()
-        }
-    }
-
     fun modifyEachMode(modifyFunction: (Data) -> Unit) {
-        DisplayMode.entries.forEach {
-            tryModify(it, modifyFunction)
+        val sharedTracker = getSharedTracker() ?: return
+        DisplayMode.entries.forEach { mode ->
+            sharedTracker.tryModify(mode, modifyFunction)
         }
+        update()
     }
 
     fun renderDisplay(position: Position) {
+        //#if TODO
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
+        //#endif
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
         if (!currentlyOpen && config.hideOutsideInventory && this is SkyHanniItemTracker) {
@@ -243,7 +243,9 @@ open class SkyHanniTracker<Data : TrackerData>(
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
+            //#if TODO
             TitleManager.sendTitle("§a+ $itemName", weight = price)
+            //#endif
         }
     }
 

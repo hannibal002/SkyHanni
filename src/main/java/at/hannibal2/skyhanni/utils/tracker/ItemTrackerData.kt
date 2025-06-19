@@ -22,47 +22,39 @@ abstract class ItemTrackerData : TrackerData() {
         resetItems()
     }
 
-    fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         val item = items.getOrPut(internalName) { TrackedItem() }
+        item.processAdd(internalName, amount, command)
+    }
 
-        if (!command) {
-            item.timesGained++
-        }
-        item.totalAmount += amount
-        item.lastTimeUpdated = SimpleTimeMark.now()
-        if (command && item.totalAmount <= 0) {
-            items.remove(internalName)
-        }
+    open fun removeItem(internalName: NeuInternalName) {
+        items.remove(internalName)
+    }
+
+    open fun toggleItemHide(internalName: NeuInternalName, currentlyHidden: Boolean) {
+        val item = items.getOrPut(internalName) { TrackedItem() }
+        item.hidden = !currentlyHidden
+    }
+
+    fun TrackedItem.processAdd(
+        internalName: NeuInternalName,
+        amount: Int,
+        command: Boolean,
+        removalRunner: (NeuInternalName) -> Unit? = { removeItem(internalName) },
+    ) = apply {
+        if (!command) { timesGained++ }
+        totalAmount += amount
+        lastTimeUpdated = SimpleTimeMark.now()
+        if (command && totalAmount <= 0) { removalRunner(internalName) }
     }
 
     @Expose
     var items: MutableMap<NeuInternalName, TrackedItem> = HashMap()
 
-    class TrackedItem {
-
-        @Expose
-        var timesGained: Long = 0
-
-        @Expose
-        var totalAmount: Long = 0
-
-        @Expose
-        var hidden = false
-
-        var lastTimeUpdated = SimpleTimeMark.farPast()
-
-        fun copy(
-            timesGained: Long = this.timesGained,
-            totalAmount: Long = this.totalAmount,
-            hidden: Boolean = this.hidden,
-            lastTimeUpdated: SimpleTimeMark = this.lastTimeUpdated,
-        ): TrackedItem {
-            val copy = TrackedItem()
-            copy.timesGained = timesGained
-            copy.totalAmount = totalAmount
-            copy.hidden = hidden
-            copy.lastTimeUpdated = lastTimeUpdated
-            return copy
-        }
-    }
+    data class TrackedItem(
+        @Expose var timesGained: Long = 0,
+        @Expose var totalAmount: Long = 0,
+        @Expose var hidden: Boolean = false,
+        var lastTimeUpdated: SimpleTimeMark = SimpleTimeMark.farPast()
+    )
 }
