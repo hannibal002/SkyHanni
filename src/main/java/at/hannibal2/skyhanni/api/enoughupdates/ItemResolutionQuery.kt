@@ -176,7 +176,7 @@ class ItemResolutionQuery {
                 "ABICASE" -> resolvePhoneCase()
                 "PARTY_HAT_SLOTH" -> resolveSlothHatName()
                 "POTION" -> resolvePotionName()
-                "BALLOON_HAT_2024" -> resolveBalloonHatName()
+                "BALLOON_HAT_2024", "BALLOON_HAT_2025" -> resolveBalloonHatName()
                 "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
                 else -> resolvedName
             }
@@ -251,7 +251,8 @@ class ItemResolutionQuery {
 
     private fun resolveBalloonHatName(): String {
         val color = getExtraAttributes().getString("party_hat_color")
-        return "BALLOON_HAT_2024_" + color.uppercase()
+        val balloonHatYear = getExtraAttributes().getInteger("party_hat_year")
+        return "BALLOON_HAT_" + balloonHatYear + "_" + color.uppercase()
     }
 
     private fun resolveAttributeShardName(): String? {

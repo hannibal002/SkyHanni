@@ -241,11 +241,21 @@ object FishingApi {
         return !hasFishingMobName || isSummonedSoul
     }
 
-    private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
-        trophyArmorNames.matches(it?.getInternalName()?.asString())
-    }
+    private fun isWearingTrophyArmor(): Boolean =
+        //#if TODO
+        InventoryUtils.getArmor().all {
+            trophyArmorNames.matches(it?.getInternalName()?.asString())
+        }
+    //#else
+    //$$ false
+    //#endif
 
-    fun isWearingEmberArmor(): Boolean = InventoryUtils.getArmor().all {
-        emberArmorNames.matches(it?.getInternalName()?.asString())
-    }
+    fun isWearingEmberArmor(): Boolean =
+        //#if TODO
+        InventoryUtils.getArmor().all {
+            emberArmorNames.matches(it?.getInternalName()?.asString())
+        }
+    //#else
+    //$$ false
+    //#endif
 }
