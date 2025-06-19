@@ -14,12 +14,7 @@ object MouseCompat {
     }
 
     fun isButtonDown(button: Int): Boolean {
-        return when (button) {
-            0 -> mouse.wasLeftButtonClicked()
-            1 -> mouse.wasMiddleButtonClicked()
-            2 -> mouse.wasRightButtonClicked()
-            else -> false
-        }
+        return getEventButton() == button
     }
 
     fun getScrollDelta(): Int {
