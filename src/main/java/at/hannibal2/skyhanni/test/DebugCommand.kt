@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-//#if TODO
 import at.hannibal2.skyhanni.data.ProfileStorageData
-//#endif
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 //#if TODO
 import at.hannibal2.skyhanni.features.misc.CurrentPing
+//#endif
 import at.hannibal2.skyhanni.features.misc.TpsCounter
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -84,12 +84,10 @@ object DebugCommand {
             return
         }
 
-        //#if TODO
         if (ProfileStorageData.playerSpecific == null) {
             event.addData("playerSpecific is null!")
             return
         }
-        //#endif
 
         val classic = !SkyBlockUtils.noTradeMode
         if (classic) {
@@ -153,10 +151,8 @@ object DebugCommand {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${SkyBlockUtils.currentIsland}")
             add("skyBlockArea:")
-            //#if TODO
             add("  scoreboard: '${SkyBlockUtils.graphArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            //#endif
             with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }

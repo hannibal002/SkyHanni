@@ -6,9 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
-import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
@@ -26,7 +24,6 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -40,16 +37,10 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
-import at.hannibal2.skyhanni.test.command.CopyActionBarCommand
-import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
-import at.hannibal2.skyhanni.test.command.CopyItemCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
@@ -70,10 +61,6 @@ object Commands {
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
-        event.register("ff") {
-            description = "Opens the Farming Fortune Guide"
-            callback { FFGuideGui.onCommand() }
-        }
         event.register("shwords") {
             description = "Opens the config list for modifying visual words"
             callback { VisualWordGui.onCommand() }
@@ -210,11 +197,6 @@ object Commands {
     }
 
     private fun usersBugFix(event: CommandRegistrationEvent) {
-        event.register("shupdaterepo") {
-            description = "Download the SkyHanni repo again"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { RepoManager.updateRepo() }
-        }
         event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"
             category = CommandCategory.USERS_BUG_FIX
@@ -235,11 +217,6 @@ object Commands {
             category = CommandCategory.USERS_BUG_FIX
             callback { CaptureFarmingGear.handelCarrolyn(it) }
         }
-        event.register("shrepostatus") {
-            description = "Shows the status of all the mods constants"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { RepoManager.displayRepoStatus(false) }
-        }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
             category = CommandCategory.USERS_BUG_FIX
@@ -249,11 +226,6 @@ object Commands {
             description = "Forcefully updating the bazaar prices right now."
             category = CommandCategory.USERS_BUG_FIX
             callback { HypixelBazaarFetcher.fetchNow() }
-        }
-        event.register("shedittracker") {
-            description = "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { TrackerManager.commandEditTracker(it) }
         }
     }
 
@@ -341,36 +313,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_DEBUG
             callback { SkyHanniDebugsAndTests.copyLocation(it) }
         }
-        event.register("shcopyentities") {
-            description = "Copies entities in the specified radius around the player to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyNearbyEntitiesCommand.command(it) }
-        }
-        event.register("shcopytablist") {
-            description = "Copies the tab list data to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { TabListData.copyCommand(it) }
-        }
-        event.register("shcopyactionbar") {
-            description = "Copies the action bar to the clipboard, including formatting codes"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyActionBarCommand.command(it) }
-        }
-        event.register("shcopyscoreboard") {
-            description = "Copies the scoreboard data to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyScoreboardCommand.command(it) }
-        }
-        event.register("shcopybossbar") {
-            description = "Copies the name of the bossbar to the clipboard, including formatting codes"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyBossbarCommand.command(it) }
-        }
-        event.register("shcopyitem") {
-            description = "Copies information about the item in hand to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyItemCommand.command() }
-        }
     }
 
     @Suppress("LongMethod")
@@ -379,11 +321,6 @@ object Commands {
             description = "Unused test command."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.testCommand(it) }
-        }
-        event.register("shreloadlocalrepo") {
-            description = "Reloading the local repo data"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { RepoManager.reloadLocalRepo() }
         }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"
