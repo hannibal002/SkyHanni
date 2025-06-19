@@ -288,7 +288,7 @@ object CopyNearbyEntitiesCommand {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcopyentities") {
-            description = "Copies the entites in the specified radius around the player into the clipboard"
+            description = "Copies the entities in the specified radius around the player into the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
             legacyCallbackArgs { command(it) }
         }
