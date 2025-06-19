@@ -14,6 +14,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 
 // todo 1.21 impl needed
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object LocationUtils {
 
     fun canSee(a: LorenzVec, b: LorenzVec, offset: Double? = null): Boolean {

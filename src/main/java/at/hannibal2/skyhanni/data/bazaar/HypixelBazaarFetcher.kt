@@ -10,15 +10,19 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+//#if TODO
 import at.hannibal2.skyhanni.utils.LorenzUtils
+//#endif
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 // https://api.hypixel.net/#tag/SkyBlock/paths/~1v2~1skyblock~1bazaar/get
 @SkyHanniModule
 object HypixelBazaarFetcher {
@@ -90,7 +94,9 @@ object HypixelBazaarFetcher {
         if (internalName.getItemStackOrNull() == null) {
             // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in the ingame bazaar).
             // Should only include Enchants
+            //#if TODO
             if (!isUnobtainableBazaarProduct(key) && LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
+            //#endif
             return@mapNotNull null
         }
         internalName to BazaarData(internalName.repoItemName, sellOfferPrice, instantBuyPrice, product)
@@ -149,5 +155,5 @@ object HypixelBazaarFetcher {
         ChatUtils.chat("Manually updating the bazaar prices right now..")
     }
 
-    private fun canFetch() = LorenzUtils.onHypixel && nextFetchTime.isInPast()
+    private fun canFetch() = SkyBlockUtils.onHypixel && nextFetchTime.isInPast()
 }

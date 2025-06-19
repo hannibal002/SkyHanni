@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
-//#if TODO
+import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-//#endif
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 //#if TODO
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -11,11 +10,9 @@ import at.hannibal2.skyhanni.features.garden.pests.PestType
 //#endif
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
-//#if TODO
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
-//#endif
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.system.ModVersion
@@ -43,12 +40,15 @@ object SkyHanniTypeAdapters {
         { java.util.UUID.fromString(this) },
     )
 
-    //#if TODO
+    val NBT_BOOLEAN: TypeAdapter<NbtBoolean> = SimpleStringTypeAdapter(
+        { this.asString() },
+        { NbtBoolean.fromString(this) },
+    )
+
     val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
         { this.asString() },
         { this.toInternalName() },
     )
-    //#endif
 
     val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
         LorenzVec::asStoredString,
@@ -90,12 +90,12 @@ object SkyHanniTypeAdapters {
         { name },
         { PestType.getByName(this) },
     )
+    //#endif
 
     val SKYBLOCK_STAT: TypeAdapter<SkyblockStat> = SimpleStringTypeAdapter(
         { name.lowercase() },
         { SkyblockStat.getValue(this.uppercase()) },
     )
-    //#endif
 
     val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 

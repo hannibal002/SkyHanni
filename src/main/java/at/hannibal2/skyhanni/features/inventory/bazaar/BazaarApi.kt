@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
@@ -24,13 +25,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+//#endif
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -39,6 +42,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object BazaarApi {
 
@@ -109,10 +113,10 @@ object BazaarApi {
     }
 
     fun searchForBazaarItem(displayName: String, amount: Int? = null) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
         if (NeuItems.neuHasFocus()) return
-        if (LorenzUtils.noTradeMode) return
-        if (DungeonApi.inDungeon() || LorenzUtils.inKuudraFight) return
+        if (SkyBlockUtils.noTradeMode) return
+        if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
         HypixelCommands.bazaar(displayName.removeColor())
         amount?.let { OSUtils.copyToClipboard(it.toString()) }
         currentSearchedItem = displayName.removeColor()
@@ -193,7 +197,9 @@ object BazaarApi {
             }
 
             if (stack.displayName.removeColor() == currentSearchedItem) {
+                //#if TODO
                 slot.highlight(LorenzColor.GREEN)
+                //#endif
             }
         }
     }

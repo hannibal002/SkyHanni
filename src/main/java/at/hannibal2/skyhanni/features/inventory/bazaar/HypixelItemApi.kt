@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson
+//#if TODO
 import at.hannibal2.skyhanni.features.rift.RiftApi
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -12,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlinx.coroutines.launch
 
+// todo 1.21 impl needed
 class HypixelItemApi {
 
     companion object {
@@ -39,7 +42,9 @@ class HypixelItemApi {
                 item.stats?.let { stats -> allStats[neuItemId] = stats }
             }
             ItemUtils.updateBaseStats(allStats)
+            //#if TODO
             RiftApi.motesPrice = motesPrice
+            //#endif
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Error getting npc sell prices",

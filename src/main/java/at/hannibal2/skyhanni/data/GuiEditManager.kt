@@ -8,10 +8,14 @@ import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuItems
+//#if TODO
 import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
+//#endif
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -28,6 +32,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object GuiEditManager {
 
@@ -52,7 +57,9 @@ object GuiEditManager {
         if (isInNeuPv) return
         guiScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
+            //#if TODO
             if (it is GuiEditSign && !it.isGardenSign()) return
+            //#endif
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
@@ -107,6 +114,7 @@ object GuiEditManager {
 
     @JvmStatic
     fun renderLast(context: DrawContext) {
+        //#if TODO
         if (!isInGui()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
 
@@ -120,6 +128,7 @@ object GuiEditManager {
         context.matrices.popMatrix()
 
         context.matrices.translate(0f, 0f, -200f)
+        //#endif
     }
 
     fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor
