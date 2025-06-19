@@ -28,7 +28,7 @@ object CopyItemCommand {
 
     fun copyItemToClipboard(itemStack: ItemStack) {
         val resultList = mutableListOf<String>()
-        resultList.add(itemStack.getInternalName().toString())
+        resultList.add("internal name: " + itemStack.getInternalName().asString())
         resultList.add("display name: '" + itemStack.displayName.toString() + "'")
         resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
         resultList.add("lore:")
@@ -36,8 +36,13 @@ object CopyItemCommand {
             resultList.add(" '$line'")
         }
         resultList.add("")
-        resultList.add("getTagCompound")
-        resultList.addAll(itemStack.extraAttributes.getReadableNBTDump())
+        val attributes = itemStack.extraAttributes.getReadableNBTDump()
+        if (attributes.isEmpty()) {
+            resultList.add("no tag compound")
+        } else {
+            resultList.add("getTagCompound")
+            resultList.addAll(attributes)
+        }
 
         val string = resultList.joinToString("\n")
         OSUtils.copyToClipboard(string)
