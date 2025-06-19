@@ -1,15 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-//#if TODO
 import at.hannibal2.skyhanni.api.GetFromSackApi
-//#endif
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
-//#if TODO
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-//#endif
 
-// todo 1.21 impl needed
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -35,11 +30,9 @@ object HypixelCommands {
         send("skills")
     }
 
-    //#if TODO
     fun viewRecipe(itemId: NeuInternalName, page: Int = 1) {
         send("viewrecipe ${itemId.skyblockCommandId} $page")
     }
-    //#endif
 
     fun recipe(itemName: String) {
         send("recipe $itemName")
@@ -78,11 +71,9 @@ object HypixelCommands {
         send("sethome")
     }
 
-    //#if TODO
     fun getFromSacks(itemName: String, amount: Int) {
         GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
     }
-    //#endif
 
     fun widget() {
         send("widget")

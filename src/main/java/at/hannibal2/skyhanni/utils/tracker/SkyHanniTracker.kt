@@ -6,9 +6,13 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SlayerApi
+//#if TODO
 import at.hannibal2.skyhanni.data.TitleManager
+//#endif
 import at.hannibal2.skyhanni.data.TrackerManager
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -87,7 +91,9 @@ open class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun renderDisplay(position: Position) {
+        //#if TODO
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
+        //#endif
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
         if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
@@ -237,7 +243,9 @@ open class SkyHanniTracker<Data : TrackerData>(
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
+            //#if TODO
             TitleManager.sendTitle("§a+ $itemName", weight = price)
+            //#endif
         }
     }
 
