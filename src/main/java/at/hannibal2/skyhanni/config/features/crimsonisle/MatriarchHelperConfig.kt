@@ -34,7 +34,10 @@ class MatriarchHelperConfig {
     var simpleLine: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Shortest Distance", desc = "Uses the shortest Distance instead of height for ordering the pearls. §cNot recommended!")
+    @ConfigOption(
+        name = "Shortest Distance",
+        desc = "Uses the shortest Distance instead of height for ordering the pearls. §cNot recommended!",
+    )
     @ConfigEditorBoolean
     var useShortestDistance: Boolean = false
 
