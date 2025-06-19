@@ -62,7 +62,7 @@ object ItemPickupLog {
             "§d[:3] TransRights's Cake Soul",
             { entry, _ ->
                 var name = entry.name
-                if (entry.name == "block.minecraft.air") {
+                if (entry.name == "Air") {
                     name = entry.neuInternalName?.repoItemName ?: "?"
                 }
                 Renderable.string(name)
