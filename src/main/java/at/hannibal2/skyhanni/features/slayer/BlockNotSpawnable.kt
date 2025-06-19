@@ -30,7 +30,8 @@ object BlockNotSpawnable {
         val slot = event.slot ?: return
         if (InventoryUtils.openInventoryName() != "Slayer") return
 
-        if (notSpawnablePattern.anyMatches(slot.stack.getLore())) {
+        val stack = slot.stack ?: return
+        if (notSpawnablePattern.anyMatches(stack.getLore())) {
             event.cancel()
         }
     }
