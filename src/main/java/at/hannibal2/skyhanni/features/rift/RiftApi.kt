@@ -101,6 +101,7 @@ object RiftApi {
 
     }
 
+    // TODO use graph area for all those
     fun inLivingCave() = SkyBlockUtils.scoreboardArea == "Living Cave"
     fun inLivingStillness() = SkyBlockUtils.scoreboardArea == "Living Stillness"
     fun inStillgoreChateau() = SkyBlockUtils.scoreboardArea.let { it == "Stillgore Château" || it == "Oubliette" }
