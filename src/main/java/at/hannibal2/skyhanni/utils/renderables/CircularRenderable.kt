@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledCircle
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
@@ -14,7 +14,7 @@ import kotlin.math.max
 open class CircularRenderable(
     private val backgroundColor: ChromaColour,
     val radius: Int,
-    private val smoothness: Int = 1,
+    private val smoothness: Float = 1f,
     private val filledPercentage: Double = 100.0,
     private val unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
     horizontalAlignment: HorizontalAlignment = HorizontalAlignment.CENTER,
@@ -29,16 +29,16 @@ open class CircularRenderable(
         filledPercentage < 100.0 -> {
             val baseAngle = Math.PI.toFloat() * 3f / 2f
             val endAngle = (baseAngle + ((100.0 - filledPercentage) / 50.0 * Math.PI).toFloat()).mod(2f * Math.PI.toFloat())
-            drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness, baseAngle, endAngle)
-            drawFilledCircle(0, 0, unfilledColor.toColor(), radius, smoothness, endAngle, baseAngle)
+            ShaderRenderUtils.drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness, baseAngle, endAngle)
+            ShaderRenderUtils.drawFilledCircle(0, 0, unfilledColor.toColor(), radius, smoothness, endAngle, baseAngle)
         }
-        else -> drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness = smoothness)
+        else -> ShaderRenderUtils.drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness = smoothness)
     }
 }
 
 class CircularContainerRenderable(
     private val renderable: Renderable,
-    smoothness: Int = 1,
+    smoothness: Float = 1f,
     backgroundColor: ChromaColour,
     filledPercentage: Double = 100.0,
     unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
