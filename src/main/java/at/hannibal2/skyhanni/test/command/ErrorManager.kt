@@ -20,6 +20,18 @@ import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
+/** Crashes if [value] is false and in developer environment */
+fun requireDevEnv(value: Boolean) = requireDevEnv(value, null)
+
+/** Crashes if [value] is false and in developer environment */
+fun requireDevEnv(value: Boolean, lazyMessage: (() -> Any)?) {
+    if (!value) {
+        val msg = lazyMessage?.invoke()?.toString()
+        val message = "Failed requirement in Dev Environment" + msg?.let { ": $it" }.orEmpty()
+        ErrorManager.crashInDevEnv(message)
+    }
+}
+
 @SkyHanniModule
 object ErrorManager {
 
@@ -43,6 +55,8 @@ object ErrorManager {
         "io.moulberry.notenoughupdates." to "NEU.",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
+        "knot//" to "",
+        "java.base/" to "",
     )
 
     private val replaceEntirely = mapOf(
@@ -89,6 +103,13 @@ object ErrorManager {
             simpleCallback {
                 cache.clear()
                 ChatUtils.chat("Error cache reset.")
+            }
+        }
+        event.registerBrigadier("shthrowerror") {
+            description = "Throws an error to test error manager."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                logErrorWithData(NullPointerException(), "Manually triggered error!")
             }
         }
     }

@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
@@ -25,6 +27,8 @@ object SkullTextureHolder {
 
     // Any classes that rely on textures that cannot make use of by lazy or other late initializers
     private fun fixLateInits() {
+        //#if TODO
         MiningEventType.fixGoblinItemStack()
+        //#endif
     }
 }
