@@ -42,7 +42,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
-import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
 import kotlin.time.Duration
@@ -597,7 +596,7 @@ object RenderUtils {
 
     fun getAlpha(): Float {
         colorBuffer.clear()
-        DrawContextUtils.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)
+        DrawContextUtils.getFloat(DrawContextUtils.GL_CURRENT_COLOR, colorBuffer)
         if (colorBuffer.limit() < 4) return 1f
         return colorBuffer.get(3)
     }
