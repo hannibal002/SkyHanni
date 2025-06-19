@@ -36,8 +36,13 @@ object CopyItemCommand {
             resultList.add(" '$line'")
         }
         resultList.add("")
-        resultList.add("getTagCompound")
-        resultList.addAll(itemStack.extraAttributes.getReadableNBTDump())
+        val attributes = itemStack.extraAttributes.getReadableNBTDump()
+        if (attributes.isEmpty()) {
+            resultList.add("no tag compound")
+        } else {
+            resultList.add("getTagCompound")
+            resultList.addAll(attributes)
+        }
 
         val string = resultList.joinToString("\n")
         OSUtils.copyToClipboard(string)
