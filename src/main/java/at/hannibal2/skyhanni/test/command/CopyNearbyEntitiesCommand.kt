@@ -39,15 +39,6 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shcopyentities") {
-            description = "Copies entities in the specified radius around the player to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { command(it) }
-        }
-    }
-
     fun command(args: Array<String>) {
         var searchRadius = 10
         if (args.size == 1) {
@@ -291,6 +282,15 @@ object CopyNearbyEntitiesCommand {
         }
         if (mob.boundingBox != mob.baseEntity.entityBoundingBox) {
             add("Bounding Box: ${mob.boundingBox}")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcopyentities") {
+            description = "Copies the entites in the specified radius around the player into the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { command(it) }
         }
     }
 
