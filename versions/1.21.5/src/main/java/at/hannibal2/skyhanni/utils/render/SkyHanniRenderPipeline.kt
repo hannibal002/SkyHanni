@@ -110,25 +110,23 @@ enum class SkyHanniRenderPipeline(
     )
     ;
 
-    private val _pipe: RenderPipeline by lazy {
-        RenderPipelines.register(
-            RenderPipeline.builder(snippet)
-                .withLocation(Identifier.of(SkyHanniMod.MODID, this.name.lowercase()))
-                .withVertexFormat(vFormat, vDrawMode)
-                .apply {
-                    blend?.let(this::withBlend)
-                    withCull?.let(this::withCull)
-                    vertexShaderPath?.let { withVertexShader(Identifier.of(SkyHanniMod.MODID, it)) }
-                    fragmentShaderPath?.let { withFragmentShader(Identifier.of(SkyHanniMod.MODID, it)) }
-                    sampler?.let(this::withSampler)
-                    uniforms.forEach(this::withUniform)
-                }
-                .withDepthWrite(depthWrite)
-                .withDepthTestFunction(depthTestFunction)
-                .apply(additionalBuild)
-                .build()
-        )
-    }
+    private val _pipe: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(snippet)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, this.name.lowercase()))
+            .withVertexFormat(vFormat, vDrawMode)
+            .apply {
+                blend?.let(this::withBlend)
+                withCull?.let(this::withCull)
+                vertexShaderPath?.let { withVertexShader(Identifier.of(SkyHanniMod.MODID, it)) }
+                fragmentShaderPath?.let { withFragmentShader(Identifier.of(SkyHanniMod.MODID, it)) }
+                sampler?.let(this::withSampler)
+                uniforms.forEach(this::withUniform)
+            }
+            .withDepthWrite(depthWrite)
+            .withDepthTestFunction(depthTestFunction)
+            .apply(additionalBuild)
+            .build()
+    )
 
     operator fun invoke(): RenderPipeline = _pipe
 }
