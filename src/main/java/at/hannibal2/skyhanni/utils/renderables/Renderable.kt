@@ -767,7 +767,6 @@ interface Renderable {
 
         }
 
-        //#if TODO
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
@@ -907,7 +906,6 @@ interface Renderable {
                 DrawContextUtils.translate(-(xOffset - posX).toFloat(), 0f, 0f)
             }
         }
-        //#endif
 
         fun fixedSizeColumn(
             content: Renderable,
