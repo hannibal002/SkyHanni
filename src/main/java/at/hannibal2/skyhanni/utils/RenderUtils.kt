@@ -337,7 +337,6 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    //#if TODO
     @Deprecated("Use WorldRenderUtils' drawCircle instead")
     fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
         _drawCircle(entity, rad, color)
@@ -438,7 +437,9 @@ object RenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
+        //#if TODO
         PatcherFixes.onPlayerEyeLine()
+        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
@@ -472,6 +473,7 @@ object RenderUtils {
         _drawWireframeBoundingBox(aabb, color)
     }
 
+    //#if TODO
     @Deprecated("Use WorldRenderUtils' draw3DPathWithWaypoint instead")
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
         path: Graph,
@@ -499,6 +501,7 @@ object RenderUtils {
             markLastBlock,
         )
     }
+    //#endif
 
     @Deprecated("Use WorldRenderUtils' drawFilledBoundingBox instead")
     fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
@@ -545,7 +548,6 @@ object RenderUtils {
     ) {
         _drawHitbox(boundingBox, lineWidth, color, depth)
     }
-    //#endif
 
     fun chromaColor(
         timeTillRepeat: Duration,
