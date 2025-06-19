@@ -14,6 +14,7 @@ import kotlin.math.max
 open class CircularRenderable(
     private val backgroundColor: ChromaColour,
     val radius: Int,
+    private val smoothness: Int = 1,
     private val filledPercentage: Double = 100.0,
     private val unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
     horizontalAlignment: HorizontalAlignment = HorizontalAlignment.CENTER,
@@ -28,15 +29,16 @@ open class CircularRenderable(
         filledPercentage < 100.0 -> {
             val baseAngle = Math.PI.toFloat() * 3f / 2f
             val endAngle = (baseAngle + ((100.0 - filledPercentage) / 50.0 * Math.PI).toFloat()).mod(2f * Math.PI.toFloat())
-            drawFilledCircle(0, 0, radius, backgroundColor.toColor(), angle1 = baseAngle, angle2 = endAngle)
-            drawFilledCircle(0, 0, radius, unfilledColor.toColor(), angle1 = endAngle, angle2 = baseAngle)
+            drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness, baseAngle, endAngle)
+            drawFilledCircle(0, 0, unfilledColor.toColor(), radius, smoothness, endAngle, baseAngle)
         }
-        else -> drawFilledCircle(0, 0, radius, backgroundColor.toColor())
+        else -> drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness = smoothness)
     }
 }
 
 class CircularContainerRenderable(
     private val renderable: Renderable,
+    smoothness: Int = 1,
     backgroundColor: ChromaColour,
     filledPercentage: Double = 100.0,
     unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
@@ -46,6 +48,7 @@ class CircularContainerRenderable(
 ) : CircularRenderable(
     backgroundColor,
     radius = (max(renderable.width, renderable.height) / 2) + padding,
+    smoothness,
     filledPercentage,
     unfilledColor,
     horizontalAlignment,

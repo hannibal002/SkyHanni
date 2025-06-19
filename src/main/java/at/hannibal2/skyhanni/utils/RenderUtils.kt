@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
-import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleShader
+import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.shader.CircleShader
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -42,7 +42,6 @@ import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 //#if MC < 1.21
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 //#else
 //$$ import net.minecraft.client.MinecraftClient
 //#endif
@@ -62,9 +61,6 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedRectDrawer
-//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelines
-//$$ import net.minecraft.client.render.Tessellator
-//$$ import net.minecraft.client.render.BufferBuilder
 //$$ import org.joml.Matrix4f
 //$$ import org.lwjgl.BufferUtils
 //#endif
@@ -691,23 +687,23 @@ object RenderUtils {
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
-        RoundedRectangleShader.scaleFactor = scaleFactor.toFloat()
-        RoundedRectangleShader.radius = radius.toFloat()
-        RoundedRectangleShader.smoothness = smoothness.toFloat()
-        RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
-        RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
-        //#if MC > 1.21
-        //$$ RoundedRectangleShader.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
-        //#endif
+        RoundedRectangleShader.apply {
+            this.scaleFactor = GuiScreenUtils.scaleFactor.toFloat()
+            this.radius = radius.toFloat()
+            this.smoothness = smoothness.toFloat()
+            this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+            this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+            //#if MC > 1.21
+            //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
+            //#endif
+        }
 
         //#if MC < 1.21
-        DrawContextUtils.pushMatrix()
-        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
-
-        GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
-
-        ShaderManager.disableShader()
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
+            GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
+            ShaderManager.disableShader()
+        }
         //#else
         //$$ RoundedRectDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
         //#endif
@@ -761,20 +757,18 @@ object RenderUtils {
         RoundedRectangleOutlineShader.borderBlur = max(1 - blur, 0f)
 
         //#if MC < 1.21
-        DrawContextUtils.pushMatrix()
-        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
-
-        GuiRenderUtils.drawGradientRect(
-            x - borderAdjustment,
-            y - borderAdjustment,
-            x + width + borderAdjustment,
-            y + height + borderAdjustment,
-            topColor,
-            bottomColor,
-        )
-
-        ShaderManager.disableShader()
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
+            GuiRenderUtils.drawGradientRect(
+                x - borderAdjustment,
+                y - borderAdjustment,
+                x + width + borderAdjustment,
+                y + height + borderAdjustment,
+                topColor,
+                bottomColor,
+            )
+            ShaderManager.disableShader()
+        }
         //#else
         //$$ RoundedRectDrawer.drawRoundedRectOutline(
         //$$     x - borderAdjustment,
@@ -802,25 +796,23 @@ object RenderUtils {
      * @param angle2 defines the end of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
      * @param smoothness smooths out the edge. (In amount of blurred pixels)
      */
-    fun drawFilledCircle(x: Int, y: Int, radius: Int, color: Color, smoothness: Float = 2.5f, angle1: Float = 7.0f, angle2: Float = 7.0f) {
-        //#if MC < 1.21
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
-        //#else
-        //$$ val scaleFactor = MinecraftClient.getInstance().window.scaleFactor
-        //$$ val pipeline = SkyHanniRenderPipelines.CIRCLE
-        //$$ val matrices = DrawContextUtils.drawContext.matrices.peek()
-        //#endif
-
+    fun drawFilledCircle(x: Int, y: Int, color: Color, radius: Int = 10, smoothness: Int = 1, angle1: Float = 7.0f, angle2: Float = 7.0f) {
+        val scaleFactor = GuiScreenUtils.scaleFactor
         val radiusIn = radius * scaleFactor
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
-        CircleShader.scaleFactor = scaleFactor.toFloat()
-        CircleShader.radius = radiusIn.toFloat()
-        CircleShader.smoothness = smoothness
-        CircleShader.centerPos = floatArrayOf((xIn + radiusIn).toFloat(), (yIn + radiusIn).toFloat())
-        CircleShader.angle1 = angle1 - Math.PI.toFloat()
-        CircleShader.angle2 = angle2 - Math.PI.toFloat()
+        CircleShader.apply {
+            this.scaleFactor = scaleFactor.toFloat()
+            this.radius = radiusIn.toFloat()
+            this.smoothness = smoothness.toFloat()
+            this.centerPos = floatArrayOf((xIn + radiusIn).toFloat(), (yIn + radiusIn).toFloat())
+            this.angle1 = angle1 - Math.PI.toFloat()
+            this.angle2 = angle2 - Math.PI.toFloat()
+            //#if MC > 1.21
+            //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
+            //#endif
+        }
 
         // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
         val circleColor = color.addAlpha(255).rgb
@@ -832,20 +824,7 @@ object RenderUtils {
             ShaderManager.disableShader()
         }
         //#else
-        //$$ val buffer = Tessellator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
-        //$$ buffer.vertex(matrices, x.toFloat(), y.toFloat(), 0f).color(circleColor)
-        //$$ buffer.vertex(matrices, x.toFloat(), (y + radius * 2).toFloat(), 0f).color(circleColor)
-        //$$ buffer.vertex(matrices, (x + radius * 2).toFloat(), (y + radius * 2).toFloat(), 0f).color(circleColor)
-        //$$ buffer.vertex(matrices, (x + radius * 2).toFloat(), y.toFloat(), 0f).color(circleColor)
-        //$$
-        //$$ RoundedRectDrawer.draw(pipeline, buffer.end()) { pass ->
-        //$$     pass.setUniform("scaleFactor", CircleShader.scaleFactor)
-        //$$     pass.setUniform("radius", CircleShader.radius)
-        //$$     pass.setUniform("smoothness", CircleShader.smoothness)
-        //$$     pass.setUniform("centerPos", CircleShader.centerPos[0], CircleShader.centerPos[1])
-        //$$     pass.setUniform("angle1", CircleShader.angle1)
-        //$$     pass.setUniform("angle2", CircleShader.angle2)
-        //$$ }
+        //$$ RoundedRectDrawer.drawCircle(x - 5, y - 5, x + width + 5, y + height + 5, angle1, angle2, circleColor)
         //#endif
     }
 

@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.utils.shader
 import at.hannibal2.skyhanni.features.chroma.StandardChromaShader
 import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
 import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
-import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.shader.CircleShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleShader
+import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
