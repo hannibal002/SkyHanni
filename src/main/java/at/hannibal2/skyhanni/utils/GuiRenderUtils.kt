@@ -12,9 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-//#endif
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -91,7 +89,6 @@ object GuiRenderUtils {
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
         left <= x && x < left + width && top <= y && y < top + height
 
-    //#if TODO
     fun getFarmingBar(
         label: String,
         tooltip: String,
@@ -131,7 +128,6 @@ object GuiRenderUtils {
             tooltip.split('\n').map { Renderable.string(it) },
         )
     }
-    //#endif
 
     fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
         drawRect(
@@ -341,9 +337,9 @@ object GuiRenderUtils {
 
         DrawContextUtils.translate(translateX, translateY, -19f)
         DrawContextUtils.scale(finalScale, finalScale, 0.2f)
+        //#if MC < 1.21
         GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
 
-        //#if MC < 1.21
         RenderHelper.enableGUIStandardItemLighting()
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 

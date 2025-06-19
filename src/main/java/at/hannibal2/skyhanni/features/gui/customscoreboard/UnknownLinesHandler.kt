@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
@@ -38,6 +38,7 @@ object UnknownLinesHandler {
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
+        //#if TODO
         val patternsToExclude = CustomScoreboard.activePatterns.toMutableList()
 
         if (::remoteOnlyPatterns.isInitialized) {
@@ -111,7 +112,7 @@ object UnknownLinesHandler {
         for (line in unknownLines) {
             val unknownLine = allUnknownLines.firstOrNull { it.line == line }
             if (unknownLine == null) {
-                if (LorenzUtils.inSkyBlock) {
+                if (SkyBlockUtils.inSkyBlock) {
                     ChatUtils.debug("Unknown Scoreboard line: '$line'")
                 }
                 allUnknownLines = allUnknownLines.editCopy {
@@ -135,19 +136,26 @@ object UnknownLinesHandler {
                 warn(recentAlarms.first().line, "5 different lines in 5 seconds")
             }
         }
+        //#else
+        //$$ return
+        //#endif
     }
 
     private fun warn(line: String, reason: String) {
+        //#if TODO
         if (!CustomScoreboard.config.unknownLinesWarning) return
+        //#endif
         ErrorManager.logErrorWithData(
             // line included in chat message to not cache a previous message
             Exception(line),
             "CustomScoreboard detected an unknown line: '$line'",
             "Unknown Line" to line,
             "reason" to reason,
-            "Island" to LorenzUtils.skyBlockIsland,
+            "Island" to SkyBlockUtils.currentIsland,
             "Area" to HypixelData.skyBlockArea,
+            //#if TODO
             "Loaded Patterns" to CustomScoreboard.activePatterns.size,
+            //#endif
             "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
             noStackTrace = true,
             betaOnly = true,

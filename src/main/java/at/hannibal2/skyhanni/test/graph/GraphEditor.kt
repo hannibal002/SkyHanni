@@ -444,7 +444,6 @@ object GraphEditor {
             chatAtDisable()
         }
         if (inTextMode) {
-            textBox.handle()
             val text = textBox.finalText()
             activeNode?.name = text.ifEmpty { null }
             return

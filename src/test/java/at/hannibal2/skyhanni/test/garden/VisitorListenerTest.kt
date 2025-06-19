@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -22,8 +24,9 @@ class VisitorListenerTest {
         mockkObject(GardenApi)
         every { GardenApi.inGarden() } returns true
 
-        mockkObject(LorenzUtils)
-        every { LorenzUtils.getPlayerName() } returns "ThePlayerName"
+        mockkObject(PlayerUtils)
+        mockkObject(SkyBlockUtils)
+        every { PlayerUtils.getName() } returns "ThePlayerName"
 
         mockkObject(VisitorApi)
         every { VisitorApi.addVisitor(any()) } returns true
@@ -72,7 +75,7 @@ class VisitorListenerTest {
             mockk { every { visitorName } returns "§fJacob" },
         )
 
-        every { LorenzUtils.lastWorldSwitch } returns SimpleTimeMark.now()
+        every { SkyBlockUtils.lastWorldSwitch } returns SimpleTimeMark.now()
 
         listener.onWidgetUpdate(
             fakeTabWidget(
