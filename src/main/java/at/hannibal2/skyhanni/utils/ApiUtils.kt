@@ -243,7 +243,10 @@ object ApiUtils {
         "https://api.mineatar.io/${part.path}/${LorenzUtils.getPlayerUuid()}?scale=$scale"
 
 
-    private fun readResponse(entity: HttpEntity): JsonObject {
+    private fun readResponse(entity: HttpEntity?): JsonObject {
+        if (entity == null || entity.contentLength == 0L) {
+            return JsonObject() // Handle responses without a body
+        }
         val retSrc = EntityUtils.toString(entity) ?: return JsonObject()
 
         try {

@@ -13,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.jvm.javaField
 
+// todo 1.21 impl needed
 object ConfigUtils {
 
     /**

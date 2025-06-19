@@ -18,7 +18,9 @@ import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
 import at.hannibal2.skyhanni.config.storage.Storage
+//#if TODO
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAprilFoolsDay
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
@@ -27,6 +29,7 @@ import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
+// todo 1.21 impl needed
 class Features : Config() {
     private val discord = MyResourceLocation("skyhanni", "social/discord.png")
     private val github = MyResourceLocation("skyhanni", "social/github.png")
@@ -38,7 +41,9 @@ class Features : Config() {
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
+        //#if TODO
         if (isAprilFoolsDay) return HorizontalAlign.RIGHT
+        //#endif
         return super.alignCategory(category, isSelected)
     }
 
@@ -55,7 +60,11 @@ class Features : Config() {
     }
 
     override fun getTitle(): String {
+        //#if TODO
         val modName = if (isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
+        //#else
+        //$$ val modName = "SkyHanni"
+        //#endif
         return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
 

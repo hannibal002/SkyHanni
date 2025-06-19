@@ -212,6 +212,14 @@ object IslandExceptions {
 
         baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
         baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
+        baseEntity is EntityPig && MobFilter.shinyPig.matches(armorStand?.cleanName()) -> MobData.MobResult.found(
+            Mob(
+                baseEntity,
+                Mob.Type.SPECIAL,
+                armorStand,
+                "SHINY PIG",
+            ),
+        )
 
         else -> null
     }

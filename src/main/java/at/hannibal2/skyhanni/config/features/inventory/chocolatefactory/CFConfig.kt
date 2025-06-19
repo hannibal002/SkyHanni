@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,6 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo 1.21 impl needed
 class CFConfig {
     @Expose
     @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all chocolate factory features.")
@@ -25,6 +28,7 @@ class CFConfig {
     @FeatureToggle
     var statsDisplay: Boolean = true
 
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Stats List",
@@ -50,6 +54,7 @@ class CFConfig {
         CFStat.LEADERBOARD_POS,
         CFStat.TIME_TO_BEST_UPGRADE,
     )
+    //#endif
 
     @Expose
     @ConfigOption(name = "Stray Rabbit Warning", desc = "")
@@ -169,7 +174,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "statsDisplay")
-    var position: Position = Position(163, 160, false, true)
+    var position: Position = Position(163, 160)
 
     @Expose
     @ConfigOption(name = "Compact On Click", desc = "Compact the item tooltip when clicking on the chocolate.")
@@ -196,7 +201,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "tooltipMove")
-    var tooltipMovePosition: Position = Position(-380, 150, false, true)
+    var tooltipMovePosition: Position = Position(-380, 150)
 
     @Expose
     @ConfigOption(
@@ -243,7 +248,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "strayRabbitTracker")
-    var strayRabbitTrackerPosition: Position = Position(300, 300, false, true)
+    var strayRabbitTrackerPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")
@@ -253,7 +258,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "hitmanCosts")
-    var hitmanCostsPosition: Position = Position(300, 300, false, true)
+    var hitmanCostsPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(

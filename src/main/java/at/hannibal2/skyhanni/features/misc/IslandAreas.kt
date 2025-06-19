@@ -47,7 +47,11 @@ object IslandAreas {
     private var paths = mapOf<GraphNode, Graph>()
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
-    var currentAreaName = ""
+
+    @Deprecated("moved", ReplaceWith("LorenzUtils.graphArea"))
+    val currentAreaName get() = currentArea
+
+    var currentArea = ""
     private val textInput = SearchTextInput()
 
     @HandleEvent
@@ -90,11 +94,9 @@ object IslandAreas {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-        if (event.isMod(2) && hasMoved) {
-            updatePosition()
-            hasMoved = false
-        }
+        if (!isEnabled() || !event.isMod(2) || !hasMoved) return
+        update(shouldBuildDisplay = isPathfinderEnabled())
+        hasMoved = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -104,14 +106,10 @@ object IslandAreas {
         }
     }
 
-    private fun updatePosition() {
-        display = buildDisplay().buildSearchBox(textInput)
-    }
-
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
-        if (!config.pathfinder.enabled) return
+        if (!isPathfinderEnabled()) return
         if (!config.pathfinder.showAlways) return
         val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (isInOwnInventory) return
@@ -121,10 +119,10 @@ object IslandAreas {
         }
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onBackgroundDraw() {
         if (!isEnabled()) return
-        if (!config.pathfinder.enabled) return
+        if (!isPathfinderEnabled()) return
         val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (!isInOwnInventory) return
 
@@ -133,20 +131,24 @@ object IslandAreas {
         }
     }
 
-    @HandleEvent
-    fun onIslandGraphReload(event: IslandGraphReloadEvent) {
+    @HandleEvent(IslandGraphReloadEvent::class)
+    fun onIslandGraphReload() {
         nodeMoved()
+
         DelayedRun.runDelayed(150.milliseconds) {
-            updatePosition()
+            update(shouldBuildDisplay = isPathfinderEnabled())
         }
     }
 
-    private fun buildDisplay() = buildList<Searchable> {
+    // updateing the position (mandatory for all other features), and builds the display (optionally)
+    // TODO split the position update logic outside the display creation logic, without reducing performance.
+    private fun update(shouldBuildDisplay: Boolean = true) {
         var foundCurrentArea = false
         var foundAreas = 0
-
-        for ((node, diff) in nodes) {
-            val difference = diff
+        val buildDisplay: MutableList<Searchable>? = if (shouldBuildDisplay) {
+            mutableListOf()
+        } else null
+        for ((node, difference) in nodes) {
             val tag = node.getAreaTag() ?: continue
 
             val name = node.name ?: continue
@@ -162,7 +164,7 @@ object IslandAreas {
                 passedAreas.remove(name)
                 passedAreas.remove(null)
                 passedAreas.remove("null")
-                passedAreas.remove(currentAreaName)
+                passedAreas.remove(currentArea)
                 // so show areas needed to pass thorough
                 // TODO show this pass through in the /shnavigate command
                 if (passedAreas.isNotEmpty()) {
@@ -180,14 +182,14 @@ object IslandAreas {
                 val inAnArea = name != "no_area" && isConfigVisible
                 if (config.pathfinder.includeCurrentArea.get()) {
                     if (inAnArea) {
-                        addSearchString("§eCurrent area: $coloredName")
+                        buildDisplay?.addSearchString("§eCurrent area: $coloredName")
                     } else {
-                        addSearchString("§7Not in an area.")
+                        buildDisplay?.addSearchString("§7Not in an area.")
                     }
                 }
                 updateArea(name, onlyInternal = !isConfigVisible)
 
-                addSearchString("§eAreas nearby:")
+                buildDisplay?.addSearchString("§eAreas nearby:")
                 continue
             }
 
@@ -195,7 +197,7 @@ object IslandAreas {
             if (!isConfigVisible) continue
             foundAreas++
 
-            add(
+            buildDisplay?.add(
                 Renderable.clickable(
                     text,
                     tips = buildList {
@@ -215,7 +217,7 @@ object IslandAreas {
                         if (node == targetNode) {
                             targetNode = null
                             IslandGraphs.stop()
-                            updatePosition()
+                            update()
                         } else {
                             setTarget(node)
                         }
@@ -226,18 +228,21 @@ object IslandAreas {
         if (foundAreas == 0) {
             val islandName = LorenzUtils.skyBlockIsland.displayName
             if (foundCurrentArea) {
-                addSearchString("§cThere is only one area in $islandName,")
-                addSearchString("§cnothing else to navigate to!")
+                buildDisplay?.addSearchString("§cThere is only one area in $islandName,")
+                buildDisplay?.addSearchString("§cnothing else to navigate to!")
             } else {
-                addSearchString("§cThere is no $islandName area data avaliable yet!")
+                buildDisplay?.addSearchString("§cThere is no $islandName area data avaliable yet!")
             }
+        }
+        buildDisplay?.let {
+            display = it.buildSearchBox(textInput)
         }
     }
 
     private fun updateArea(name: String, onlyInternal: Boolean) {
-        if (name != currentAreaName) {
-            val oldArea = currentAreaName
-            currentAreaName = name
+        if (name != currentArea) {
+            val oldArea = currentArea
+            currentArea = name
             GraphAreaChangeEvent(name, oldArea, onlyInternal).post()
         }
     }
@@ -259,7 +264,7 @@ object IslandAreas {
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
-            if (name == currentAreaName) continue
+            if (name == currentArea) continue
             if (name == "no_area") continue
             val position = node.position
             val areaTag = node.getAreaTag(useConfig = true) ?: continue
@@ -269,16 +274,22 @@ object IslandAreas {
         }
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.pathfinder.color) {
-            targetNode?.let {
-                setTarget(it)
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        with(config.pathfinder) {
+            ConditionalUtils.onToggle(color) {
+                targetNode?.let {
+                    setTarget(it)
+                }
             }
-        }
-        ConditionalUtils.onToggle(config.pathfinder.color, config.pathfinder.includeCurrentArea) {
-            updateNodes()
-            updatePosition()
+            ConditionalUtils.onToggle(
+                color,
+                includeCurrentArea,
+                enabled,
+            ) {
+                updateNodes()
+                update()
+            }
         }
     }
 
@@ -299,13 +310,15 @@ object IslandAreas {
             color,
             onFound = {
                 targetNode = null
-                updatePosition()
+                update()
             },
             allowRerouting = true,
-            condition = { config.pathfinder.enabled },
+            condition = { isPathfinderEnabled() },
         )
-        updatePosition()
+        update()
     }
 
-    fun isEnabled() = IslandGraphs.currentIslandGraph != null
+    private fun isPathfinderEnabled(): Boolean = config.pathfinder.enabled.get()
+
+    private fun isEnabled() = IslandGraphs.currentIslandGraph != null
 }

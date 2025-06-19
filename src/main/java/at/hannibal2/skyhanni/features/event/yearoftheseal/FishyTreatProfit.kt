@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -99,7 +99,7 @@ object FishyTreatProfit {
             internalName = item.getInternalName()
         }
 
-        val itemPrice = internalName.getPrice() * amount
+        val itemPrice = SkyHanniTracker.getPricePer(internalName) * amount
         if (itemPrice < 0) return
 
         val profitPerSell = itemPrice - additionalCost
@@ -139,7 +139,7 @@ object FishyTreatProfit {
 
     private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
         for ((internalName, amount) in additionalMaterials) {
-            add(internalName.getPriceName(amount))
+            add(internalName.getPriceName(amount, SkyHanniTracker.getPricePer(internalName)))
         }
     }
 
@@ -166,7 +166,7 @@ object FishyTreatProfit {
     private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Int>): Double {
         var otherItemsPrice = 0.0
         for ((name, amount) in requiredItems) {
-            otherItemsPrice += name.getPrice() * amount
+            otherItemsPrice += SkyHanniTracker.getPricePer(name) * amount
         }
         return otherItemsPrice
     }

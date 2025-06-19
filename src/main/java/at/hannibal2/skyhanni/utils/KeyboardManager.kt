@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
@@ -13,11 +12,12 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
+import at.hannibal2.skyhanni.data.model.TextInput
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
+import org.lwjgl.input.Mouse
 //#else
 //$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
@@ -26,9 +26,15 @@ import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 @SkyHanniModule
 object KeyboardManager {
 
+    //#if MC < 1.21
     const val LEFT_MOUSE = -100
     const val RIGHT_MOUSE = -99
     const val MIDDLE_MOUSE = -98
+    //#else
+    //$$ const val LEFT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_LEFT
+    //$$ const val RIGHT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_RIGHT
+    //$$ const val MIDDLE_MOUSE = GLFW.GLFW_MOUSE_BUTTON_MIDDLE
+    //#endif
 
     private var lastClickedMouseButton = -1
 
@@ -141,6 +147,8 @@ object KeyboardManager {
     and in renderable calls have time to react first, and lock this key press event properly
      */
 
+    // On 1.21 we post these events inside mixins
+    //#if MC < 1.21
     private fun postKeyPressEvent(keyCode: Int) {
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
@@ -161,6 +169,7 @@ object KeyboardManager {
             KeyUpEvent(keyCode).post()
         }
     }
+    //#endif
 
     fun KeyBinding.isActive(): Boolean {
         //#if MC < 1.16
@@ -190,7 +199,9 @@ object KeyboardManager {
 
         else -> Keyboard.isKeyDown(this)
         //#else
-        //$$ this == -1 || this == 0 -> false
+        //$$ this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid", "keycode" to this)
+        //$$ this == -1 -> false
+        //$$ this in 0..3 -> MouseCompat.isButtonDown(this)
         //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window.handle, this)
         //#endif
     }

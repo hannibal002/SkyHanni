@@ -1,0 +1,945 @@
+
+com.mojang.blaze3d.platform.Lighting net.minecraft.client.renderer.RenderHelper
+
+com.mojang.blaze3d.platform.Lighting setupFor3DItems() enableGUIStandardItemLighting()
+com.mojang.blaze3d.platform.Lighting turnBackOn() enableStandardItemLighting()
+com.mojang.blaze3d.platform.Lighting turnOff() disableStandardItemLighting()
+
+com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
+
+com.mojang.blaze3d.systems.RenderSystem blendFuncSeparate() tryBlendFuncSeparate()
+com.mojang.blaze3d.systems.RenderSystem disableDepthTest() disableDepth()
+com.mojang.blaze3d.systems.RenderSystem enableDepthTest() enableDepth()
+
+io.github.notenoughupdates.moulconfig.gui.GuiElementWrapper io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+
+net.minecraft.ChatFormatting net.minecraft.util.EnumChatFormatting
+
+net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
+
+net.minecraft.client.KeyMapping net.minecraft.client.settings.KeyBinding
+net.minecraft.client.Options net.minecraft.client.settings.GameSettings
+
+net.minecraft.client.KeyMapping boundKey.getCode() getKeyCode()
+net.minecraft.client.KeyMapping isDown() isKeyDown()
+net.minecraft.client.KeyMapping releaseAll() unPressAllKeys()
+
+net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
+net.minecraft.client.Minecraft isWindowActive inGameHasFocus
+net.minecraft.client.Minecraft setScreen() displayGuiScreen()
+net.minecraft.client.Minecraft submit() addScheduledTask()
+
+net.minecraft.client.Options getSoundSourceVolume() getSoundLevel()
+net.minecraft.client.Options keyAttack keyBindAttack
+net.minecraft.client.Options keyDown keyBindBack
+net.minecraft.client.Options keyFullscreen keyBindFullscreen
+net.minecraft.client.Options keyInventory keyBindInventory
+net.minecraft.client.Options keyJump keyBindJump
+net.minecraft.client.Options keyLeft keyBindLeft
+net.minecraft.client.Options keyPlayerList keyBindPlayerList
+net.minecraft.client.Options keyRight keyBindRight
+net.minecraft.client.Options keyScreenshot keyBindScreenshot
+net.minecraft.client.Options keyShift keyBindSneak
+net.minecraft.client.Options keyUp keyBindForward
+net.minecraft.client.Options keyUse keyBindUseItem
+
+net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
+
+net.minecraft.client.gui.Gui getChat() getChatGUI()
+
+net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNewChat
+net.minecraft.client.gui.components.Widget net.minecraft.client.gui.GuiButton
+
+net.minecraft.client.gui.components.ChatComponent allMessages chatLines
+net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
+net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
+net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
+
+net.minecraft.client.gui.screens.ChatScreen net.minecraft.client.gui.GuiChat
+net.minecraft.client.gui.screens.PauseScreen net.minecraft.client.gui.GuiIngameMenu
+net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
+
+net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
+
+net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiChest
+net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
+net.minecraft.client.gui.screens.inventory.SignEditScreen net.minecraft.client.gui.inventory.GuiEditSign
+
+net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots
+
+net.minecraft.client.gui.screens.inventory.SignEditScreen line editLine
+net.minecraft.client.gui.screens.inventory.SignEditScreen sign tileSign
+
+net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.multiplayer.WorldClient
+net.minecraft.client.multiplayer.ClientPacketListener net.minecraft.client.network.NetHandlerPlayClient
+net.minecraft.client.multiplayer.PlayerInfo net.minecraft.client.network.NetworkPlayerInfo
+
+net.minecraft.client.multiplayer.ClientLevel players() getPlayers()
+
+net.minecraft.client.multiplayer.PlayerInfo getGameMode() getGameType()
+net.minecraft.client.multiplayer.PlayerInfo getProfile() getGameProfile()
+net.minecraft.client.multiplayer.PlayerInfo getTeam() getPlayerTeam()
+
+net.minecraft.client.player.AbstractClientPlayer net.minecraft.client.entity.AbstractClientPlayer
+net.minecraft.client.player.LocalPlayer net.minecraft.client.entity.EntityPlayerSP
+net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOtherPlayerMP
+
+net.minecraft.client.player.LocalPlayer chat() sendChatMessage()
+net.minecraft.client.player.LocalPlayer setExperienceValues() setXPStats()
+
+net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
+net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.WorldRenderer
+net.minecraft.client.renderer.RenderItem net.minecraft.client.renderer.entity.RenderItem
+
+net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
+
+net.minecraft.client.renderer.block.model.IBakedModel net.minecraft.client.resources.model.IBakedModel
+
+net.minecraft.client.renderer.entity.EntityRenderDispatcher net.minecraft.client.renderer.entity.RenderManager
+net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.renderer.entity.RendererLivingEntity
+
+net.minecraft.client.renderer.entity.EntityRenderDispatcher getRenderer() getEntityRenderObject()
+
+net.minecraft.client.sounds.SoundManager net.minecraft.client.audio.SoundHandler
+
+net.minecraft.client.sounds.SoundManager play() playSound()
+net.minecraft.client.sounds.SoundManager updateSourceVolume() setSoundLevel()
+
+net.minecraft.core.BlockPos net.minecraft.util.BlockPos
+net.minecraft.core.Direction net.minecraft.util.EnumFacing
+net.minecraft.core.Rotations net.minecraft.util.Rotations
+
+net.minecraft.core.particles.ParticleTypes net.minecraft.util.EnumParticleTypes
+
+net.minecraft.core.particles.ParticleTypes ANGRY_VILLAGER VILLAGER_ANGRY
+net.minecraft.core.particles.ParticleTypes DRIPPING_LAVA DRIP_LAVA
+net.minecraft.core.particles.ParticleTypes DUST REDSTONE
+net.minecraft.core.particles.ParticleTypes ENCHANT ENCHANTMENT_TABLE
+net.minecraft.core.particles.ParticleTypes ENCHANTED_HIT CRIT_MAGIC
+net.minecraft.core.particles.ParticleTypes ENTITY_EFFECT SPELL_MOB
+net.minecraft.core.particles.ParticleTypes EXPLOSION EXPLOSION_LARGE
+net.minecraft.core.particles.ParticleTypes EXPLOSION_EMITTER EXPLOSION_HUGE
+net.minecraft.core.particles.ParticleTypes FIREWORK FIREWORKS_SPARK
+net.minecraft.core.particles.ParticleTypes HAPPY_VILLAGER VILLAGER_HAPPY
+net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
+net.minecraft.core.particles.ParticleTypes POOF EXPLOSION_NORMAL
+net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
+net.minecraft.core.particles.ParticleTypes WITCH SPELL_WITCH
+
+net.minecraft.entity.projectile.EntityArrow owner shootingEntity
+
+net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
+net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
+net.minecraft.nbt.StringTag net.minecraft.nbt.NBTTagString
+
+net.minecraft.nbt.CompoundTag contains() hasKey()
+net.minecraft.nbt.CompoundTag get() getTag()
+net.minecraft.nbt.CompoundTag getCompound() getCompoundTag()
+net.minecraft.nbt.CompoundTag getInt() getInteger()
+net.minecraft.nbt.CompoundTag getKeys() getKeySet()
+net.minecraft.nbt.CompoundTag getList() getTagList()
+net.minecraft.nbt.CompoundTag put() setTag()
+net.minecraft.nbt.CompoundTag putBoolean() setBoolean()
+net.minecraft.nbt.CompoundTag putInt() setInteger()
+net.minecraft.nbt.CompoundTag putString() setString()
+net.minecraft.nbt.CompoundTag remove() removeTag()
+
+net.minecraft.nbt.ListTag add() appendTag()
+net.minecraft.nbt.ListTag getCompound() getCompoundTagAt()
+net.minecraft.nbt.ListTag getSize() tagCount()
+net.minecraft.nbt.ListTag getString() getStringTagAt()
+
+net.minecraft.network.chat.BaseComponent net.minecraft.util.ChatComponentStyle
+net.minecraft.network.chat.ClickEvent net.minecraft.event.ClickEvent
+net.minecraft.network.chat.Component net.minecraft.util.IChatComponent
+net.minecraft.network.chat.HoverEvent net.minecraft.event.HoverEvent
+net.minecraft.network.chat.Style net.minecraft.util.ChatStyle
+net.minecraft.network.chat.TextComponent net.minecraft.util.ChatComponentText
+net.minecraft.network.chat.TranslatableComponent net.minecraft.util.ChatComponentTranslation
+
+net.minecraft.network.chat.BaseComponent append() appendSibling()
+
+net.minecraft.network.chat.Component copy() createCopy()
+net.minecraft.network.chat.Component getStyle() getChatStyle()
+net.minecraft.network.chat.Component setStyle() setChatStyle()
+
+net.minecraft.network.chat.MutableComponent append() appendSibling()
+
+net.minecraft.network.chat.Style applyTo() setParentStyle()
+net.minecraft.network.chat.Style getClickEvent() getChatClickEvent()
+net.minecraft.network.chat.Style getHoverEvent() getChatHoverEvent()
+net.minecraft.network.chat.Style withBold() setBold()
+net.minecraft.network.chat.Style withColor() setColor()
+net.minecraft.network.chat.Style withItalic() setItalic()
+
+net.minecraft.network.protocol.Packet net.minecraft.network.Packet
+
+net.minecraft.network.protocol.game.ClientboundAddEntityPacket net.minecraft.network.play.server.S0EPacketSpawnObject
+net.minecraft.network.protocol.game.ClientboundAddMobPacket net.minecraft.network.play.server.S0FPacketSpawnMob
+net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.S0CPacketSpawnPlayer
+net.minecraft.network.protocol.game.ClientboundAnimatePacket net.minecraft.network.play.server.S0BPacketAnimation
+net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket net.minecraft.network.play.server.S23PacketBlockChange
+net.minecraft.network.protocol.game.ClientboundContainerAckPacket net.minecraft.network.play.server.S32PacketConfirmTransaction
+net.minecraft.network.protocol.game.ClientboundContainerClosePacket net.minecraft.network.play.server.S2EPacketCloseWindow
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket net.minecraft.network.play.server.S2FPacketSetSlot
+net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.S19PacketEntityStatus
+net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.S28PacketEffect
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.S2APacketParticles
+net.minecraft.network.protocol.game.ClientboundLoginPacket net.minecraft.network.play.server.S01PacketJoinGame
+net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.network.play.server.S14PacketEntity
+net.minecraft.network.protocol.game.ClientboundOpenScreenPacket net.minecraft.network.play.server.S2DPacketOpenWindow
+net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket net.minecraft.network.play.server.S38PacketPlayerListItem
+net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket net.minecraft.network.play.server.S13PacketDestroyEntities
+net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket net.minecraft.network.play.server.S22PacketMultiBlockChange
+net.minecraft.network.protocol.game.ClientboundSetBorderPacket net.minecraft.network.play.server.S44PacketWorldBorder
+net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket net.minecraft.network.play.server.S1CPacketEntityMetadata
+net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket net.minecraft.network.play.server.S1BPacketEntityAttach
+net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecraft.network.play.server.S12PacketEntityVelocity
+net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.S04PacketEntityEquipment
+net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.S3BPacketScoreboardObjective
+net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket net.minecraft.network.play.server.S3EPacketTeams
+net.minecraft.network.protocol.game.ClientboundSetScorePacket net.minecraft.network.play.server.S3CPacketUpdateScore
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket net.minecraft.network.play.server.S45PacketTitle
+net.minecraft.network.protocol.game.ClientboundSoundPacket net.minecraft.network.play.server.S29PacketSoundEffect
+net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
+net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket net.minecraft.network.play.server.S0DPacketCollectItem
+net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraft.network.play.server.S18PacketEntityTeleport
+net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.S20PacketEntityProperties
+net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.S1DPacketEntityEffect
+net.minecraft.network.protocol.game.ServerboundChatPacket net.minecraft.network.play.client.C01PacketChatMessage
+net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraft.network.play.client.C0EPacketClickWindow
+net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.C02PacketUseEntity
+net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.C03PacketPlayer
+net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.C09PacketHeldItemChange
+net.minecraft.network.protocol.game.ServerboundPlayerActionPacket net.minecraft.network.play.client.C07PacketPlayerDigging
+net.minecraft.network.protocol.game.ServerboundSwingPacket net.minecraft.network.play.client.C0APacketAnimation
+net.minecraft.network.protocol.game.ServerboundUseItemOnPacket net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+
+net.minecraft.network.protocol.game.ClientboundAddEntityPacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundAddMobPacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundAddPlayerPacket getEntityId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundAnimatePacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket getPos() getBlockPosition()
+
+net.minecraft.network.protocol.game.ClientboundContainerAckPacket getUid() getActionNumber()
+
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getContainerId() func_149175_c()
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getItem() func_149174_e()
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getSlot() func_149173_d()
+
+net.minecraft.network.protocol.game.ClientboundLevelEventPacket getPos() getSoundPos()
+
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getCount() getParticleCount()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getMaxSpeed() getParticleSpeed()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getX() getXCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getXDist() getXOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getY() getYCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getYDist() getYOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZ() getZCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZDist() getZOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket isOverrideLimiter() isLongDistance()
+
+net.minecraft.network.protocol.game.ClientboundOpenScreenPacket getContainerId() getWindowId()
+net.minecraft.network.protocol.game.ClientboundOpenScreenPacket getTitle() getWindowTitle()
+
+net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket getEntityIds() getEntityIDs()
+
+net.minecraft.network.protocol.game.ClientboundRotateHeadPacket  net.minecraft.network.play.server.S19PacketEntityHeadLook
+
+net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket getId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket getSourceId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket getEntity() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundSetObjectivePacket getDisplayName() func_149337_d()
+net.minecraft.network.protocol.game.ClientboundSetObjectivePacket getObjectiveName() func_149339_c()
+net.minecraft.network.protocol.game.ClientboundSetObjectivePacket getRenderType() func_179817_d()
+
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket getText() getMessage()
+
+net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getEntityId()
+
+net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEntityFromWorld()
+
+net.minecraft.network.protocol.game.ServerboundPlayerActionPacket getPos() getPosition()
+
+net.minecraft.network.protocol.game.ServerboundUseItemOnPacket hitResult.getBlockPos() getPos()
+
+net.minecraft.server.level.ServerPlayer net.minecraft.entity.player.EntityPlayerMP
+
+net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
+
+net.minecraft.sounds.SoundSource net.minecraft.client.audio.SoundCategory
+
+net.minecraft.util.Mth net.minecraft.util.MathHelper
+
+net.minecraft.world.SimpleContainer net.minecraft.client.player.inventory.ContainerLocalMenu
+
+net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
+net.minecraft.world.effect.MobEffectInstance net.minecraft.potion.PotionEffect
+net.minecraft.world.effect.MobEffects net.minecraft.init.MobEffects
+
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity
+net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
+net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
+net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
+
+net.minecraft.world.entity.Entity customName setCustomNameTag()
+net.minecraft.world.entity.Entity deltaMovement.x motionX
+net.minecraft.world.entity.Entity deltaMovement.y motionY
+net.minecraft.world.entity.Entity deltaMovement.z motionZ
+net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
+net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
+net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
+net.minecraft.world.entity.Entity getEyePosition() getPositionEyes()
+net.minecraft.world.entity.Entity getId() getEntityId()
+net.minecraft.world.entity.Entity getLookAngle() getLookVec()
+net.minecraft.world.entity.Entity getPosition() getPositionVector()
+net.minecraft.world.entity.Entity getUUID() getUniqueID()
+net.minecraft.world.entity.Entity getVehicle() getRidingEntity()
+net.minecraft.world.entity.Entity isOnFire() isBurning()
+net.minecraft.world.entity.Entity isOnGround onGround
+net.minecraft.world.entity.Entity level world
+net.minecraft.world.entity.Entity position.x posX
+net.minecraft.world.entity.Entity position.y posY
+net.minecraft.world.entity.Entity position.z posZ
+net.minecraft.world.entity.Entity removed isDead
+net.minecraft.world.entity.Entity setCustomName() setCustomNameTag()
+net.minecraft.world.entity.Entity tickCount ticksExisted
+net.minecraft.world.entity.Entity xOld prevPosX
+net.minecraft.world.entity.Entity xRot rotationPitch
+net.minecraft.world.entity.Entity yOld prevPosY
+net.minecraft.world.entity.Entity yRot rotationYaw
+net.minecraft.world.entity.Entity zOld prevPosZ
+
+net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
+net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItem()
+net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
+net.minecraft.world.entity.LivingEntity hasEffect() isPotionActive()
+net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
+net.minecraft.world.entity.LivingEntity isBaby() isChild()
+
+net.minecraft.world.entity.ambient.Bat net.minecraft.entity.passive.EntityBat
+
+net.minecraft.world.entity.animal.Animal net.minecraft.entity.passive.EntityAnimal
+net.minecraft.world.entity.animal.Chicken net.minecraft.entity.passive.EntityChicken
+net.minecraft.world.entity.animal.Cow net.minecraft.entity.passive.EntityCow
+net.minecraft.world.entity.animal.IronGolem net.minecraft.entity.monster.EntityIronGolem
+net.minecraft.world.entity.animal.MushroomCow net.minecraft.entity.passive.EntityMooshroom
+net.minecraft.world.entity.animal.Ocelot net.minecraft.entity.passive.EntityOcelot
+net.minecraft.world.entity.animal.Pig net.minecraft.entity.passive.EntityPig
+net.minecraft.world.entity.animal.Rabbit net.minecraft.entity.passive.EntityRabbit
+net.minecraft.world.entity.animal.Sheep net.minecraft.entity.passive.EntitySheep
+net.minecraft.world.entity.animal.SnowGolem net.minecraft.entity.monster.EntitySnowman
+net.minecraft.world.entity.animal.Squid net.minecraft.entity.passive.EntitySquid
+net.minecraft.world.entity.animal.Wolf net.minecraft.entity.passive.EntityWolf
+
+net.minecraft.world.entity.animal.horse.Horse net.minecraft.entity.passive.EntityHorse
+
+net.minecraft.world.entity.boss.enderdragon.EnderDragon net.minecraft.entity.boss.EntityDragon
+
+net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
+
+net.minecraft.world.entity.boss.wither.WitherBoss getInvulnerableTicks() getInvulTime()
+net.minecraft.world.entity.boss.wither.WitherBoss isPowered() isArmored()
+
+net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
+net.minecraft.world.entity.decoration.ItemFrame net.minecraft.entity.item.EntityItemFrame
+
+net.minecraft.world.entity.decoration.ArmorStand isNoBasePlate() hasNoBasePlate()
+net.minecraft.world.entity.decoration.ArmorStand isShowArms() getShowArms()
+
+net.minecraft.world.entity.item.ItemEntity net.minecraft.entity.item.EntityItem
+
+net.minecraft.world.entity.monster.Blaze net.minecraft.entity.monster.EntityBlaze
+net.minecraft.world.entity.monster.CaveSpider net.minecraft.entity.monster.EntityCaveSpider
+net.minecraft.world.entity.monster.Creeper net.minecraft.entity.monster.EntityCreeper
+net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityEnderman
+net.minecraft.world.entity.monster.Endermite net.minecraft.entity.monster.EntityEndermite
+net.minecraft.world.entity.monster.Ghast net.minecraft.entity.monster.EntityGhast
+net.minecraft.world.entity.monster.Giant net.minecraft.entity.monster.EntityGiantZombie
+net.minecraft.world.entity.monster.Guardian net.minecraft.entity.monster.EntityGuardian
+net.minecraft.world.entity.monster.MagmaCube net.minecraft.entity.monster.EntityMagmaCube
+net.minecraft.world.entity.monster.Silverfish net.minecraft.entity.monster.EntitySilverfish
+net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntitySkeleton
+net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
+net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
+net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
+net.minecraft.world.entity.monster.Zombie net.minecraft.entity.monster.EntityZombie
+net.minecraft.world.entity.monster.ZombifiedPiglin net.minecraft.entity.monster.EntityPigZombie
+
+net.minecraft.world.entity.monster.Creeper isIgnited() hasIgnited()
+net.minecraft.world.entity.monster.Creeper isPowered() getPowered()
+
+net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
+
+net.minecraft.world.entity.monster.Slime getSize() getSlimeSize()
+net.minecraft.world.entity.monster.Slime squish squishFactor
+
+net.minecraft.world.entity.npc.Villager net.minecraft.entity.passive.EntityVillager
+
+net.minecraft.world.entity.player.Inventory net.minecraft.entity.player.InventoryPlayer
+net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer
+net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
+
+net.minecraft.world.entity.player.Inventory armor armorInventory
+net.minecraft.world.entity.player.Inventory getCarried() getItemStack()
+net.minecraft.world.entity.player.Inventory getSelected() getCurrentItem()
+net.minecraft.world.entity.player.Inventory items mainInventory
+
+net.minecraft.world.entity.player.Player containerMenu openContainer
+net.minecraft.world.entity.player.Player experienceProgress experience
+net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
+net.minecraft.world.entity.player.Player totalExperience experienceTotal
+
+net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
+net.minecraft.world.entity.projectile.Fireball net.minecraft.entity.projectile.EntityFireball
+net.minecraft.world.entity.projectile.FishingHook net.minecraft.entity.projectile.EntityFishHook
+net.minecraft.world.entity.projectile.SmallFireball net.minecraft.entity.projectile.EntitySmallFireball
+
+net.minecraft.world.entity.projectile.FishingHook playerOwner angler
+
+net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Container
+net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
+net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
+
+net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
+net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
+
+net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
+
+net.minecraft.world.inventory.Slot getItem() getStack()
+net.minecraft.world.inventory.Slot hasItem() getHasStack()
+net.minecraft.world.inventory.Slot index slotNumber
+net.minecraft.world.inventory.Slot x xPos
+net.minecraft.world.inventory.Slot y yPos
+
+net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
+net.minecraft.world.item.DyeColor net.minecraft.item.EnumDyeColor
+net.minecraft.world.item.Item net.minecraft.item.Item
+net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
+net.minecraft.world.item.Items net.minecraft.init.Items
+
+net.minecraft.world.item.DyeColor LIGHT_GRAY SILVER
+
+net.minecraft.world.item.Item byBlock() getItemFromBlock()
+
+net.minecraft.world.item.ItemStack count stackSize
+net.minecraft.world.item.ItemStack getEnchantmentTags() getEnchantmentTagList()
+net.minecraft.world.item.ItemStack getTag() getTagCompound()
+net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
+
+net.minecraft.world.item.Items ACACIA_DOOR acacia_door
+net.minecraft.world.item.Items APPLE apple
+net.minecraft.world.item.Items ARMOR_STAND armor_stand
+net.minecraft.world.item.Items ARROW arrow
+net.minecraft.world.item.Items BAKED_POTATO baked_potato
+net.minecraft.world.item.Items BANNER banner
+net.minecraft.world.item.Items BED bed
+net.minecraft.world.item.Items BEEF beef
+net.minecraft.world.item.Items BIRCH_DOOR birch_door
+net.minecraft.world.item.Items BLAZE_POWDER blaze_powder
+net.minecraft.world.item.Items BLAZE_ROD blaze_rod
+net.minecraft.world.item.Items BOAT boat
+net.minecraft.world.item.Items BONE bone
+net.minecraft.world.item.Items BOOK book
+net.minecraft.world.item.Items BOW bow
+net.minecraft.world.item.Items BOWL bowl
+net.minecraft.world.item.Items BREAD bread
+net.minecraft.world.item.Items BREWING_STAND brewing_stand
+net.minecraft.world.item.Items BRICK brick
+net.minecraft.world.item.Items BUCKET bucket
+net.minecraft.world.item.Items CAKE cake
+net.minecraft.world.item.Items CARROT carrot
+net.minecraft.world.item.Items CARROT_ON_A_STICK carrot_on_a_stick
+net.minecraft.world.item.Items CAULDRON cauldron
+net.minecraft.world.item.Items CHAINMAIL_BOOTS chainmail_boots
+net.minecraft.world.item.Items CHAINMAIL_CHESTPLATE chainmail_chestplate
+net.minecraft.world.item.Items CHAINMAIL_HELMET chainmail_helmet
+net.minecraft.world.item.Items CHAINMAIL_LEGGINGS chainmail_leggings
+net.minecraft.world.item.Items CHEST_MINECART chest_minecart
+net.minecraft.world.item.Items CHICKEN chicken
+net.minecraft.world.item.Items CLAY_BALL clay_ball
+net.minecraft.world.item.Items CLOCK clock
+net.minecraft.world.item.Items COAL coal
+net.minecraft.world.item.Items COD fish
+net.minecraft.world.item.Items COMMAND_BLOCK_MINECART command_block_minecart
+net.minecraft.world.item.Items COMPARATOR comparator
+net.minecraft.world.item.Items COMPASS compass
+net.minecraft.world.item.Items COOKED_BEEF cooked_beef
+net.minecraft.world.item.Items COOKED_CHICKEN cooked_chicken
+net.minecraft.world.item.Items COOKED_FISH cooked_fish
+net.minecraft.world.item.Items COOKED_MUTTON cooked_mutton
+net.minecraft.world.item.Items COOKED_PORKCHOP cooked_porkchop
+net.minecraft.world.item.Items COOKED_RABBIT cooked_rabbit
+net.minecraft.world.item.Items COOKIE cookie
+net.minecraft.world.item.Items DARK_OAK_DOOR dark_oak_door
+net.minecraft.world.item.Items DIAMOND diamond
+net.minecraft.world.item.Items DIAMOND_AXE diamond_axe
+net.minecraft.world.item.Items DIAMOND_BOOTS diamond_boots
+net.minecraft.world.item.Items DIAMOND_CHESTPLATE diamond_chestplate
+net.minecraft.world.item.Items DIAMOND_HELMET diamond_helmet
+net.minecraft.world.item.Items DIAMOND_HOE diamond_hoe
+net.minecraft.world.item.Items DIAMOND_HORSE_ARMOR diamond_horse_armor
+net.minecraft.world.item.Items DIAMOND_LEGGINGS diamond_leggings
+net.minecraft.world.item.Items DIAMOND_PICKAXE diamond_pickaxe
+net.minecraft.world.item.Items DIAMOND_SHOVEL diamond_shovel
+net.minecraft.world.item.Items DIAMOND_SWORD diamond_sword
+net.minecraft.world.item.Items DYE dye
+net.minecraft.world.item.Items EGG egg
+net.minecraft.world.item.Items EMERALD emerald
+net.minecraft.world.item.Items ENCHANTED_BOOK enchanted_book
+net.minecraft.world.item.Items ENDER_EYE ender_eye
+net.minecraft.world.item.Items ENDER_PEARL ender_pearl
+net.minecraft.world.item.Items EXPERIENCE_BOTTLE experience_bottle
+net.minecraft.world.item.Items FEATHER feather
+net.minecraft.world.item.Items FERMENTED_SPIDER_EYE fermented_spider_eye
+net.minecraft.world.item.Items FILLED_MAP filled_map
+net.minecraft.world.item.Items FIREWORKS fireworks
+net.minecraft.world.item.Items FIREWORK_CHARGE firework_charge
+net.minecraft.world.item.Items FIRE_CHARGE fire_charge
+net.minecraft.world.item.Items FISHING_ROD fishing_rod
+net.minecraft.world.item.Items FLINT flint
+net.minecraft.world.item.Items FLINT_AND_STEEL flint_and_steel
+net.minecraft.world.item.Items FLOWER_POT flower_pot
+net.minecraft.world.item.Items FURNACE_MINECART furnace_minecart
+net.minecraft.world.item.Items GHAST_TEAR ghast_tear
+net.minecraft.world.item.Items GLASS_BOTTLE glass_bottle
+net.minecraft.world.item.Items GLOWSTONE_DUST glowstone_dust
+net.minecraft.world.item.Items GOLDEN_APPLE golden_apple
+net.minecraft.world.item.Items GOLDEN_AXE golden_axe
+net.minecraft.world.item.Items GOLDEN_BOOTS golden_boots
+net.minecraft.world.item.Items GOLDEN_CARROT golden_carrot
+net.minecraft.world.item.Items GOLDEN_CHESTPLATE golden_chestplate
+net.minecraft.world.item.Items GOLDEN_HELMET golden_helmet
+net.minecraft.world.item.Items GOLDEN_HOE golden_hoe
+net.minecraft.world.item.Items GOLDEN_HORSE_ARMOR golden_horse_armor
+net.minecraft.world.item.Items GOLDEN_LEGGINGS golden_leggings
+net.minecraft.world.item.Items GOLDEN_PICKAXE golden_pickaxe
+net.minecraft.world.item.Items GOLDEN_SHOVEL golden_shovel
+net.minecraft.world.item.Items GOLDEN_SWORD golden_sword
+net.minecraft.world.item.Items GOLD_INGOT gold_ingot
+net.minecraft.world.item.Items GOLD_NUGGET gold_nugget
+net.minecraft.world.item.Items GUNPOWDER gunpowder
+net.minecraft.world.item.Items HOPPER_MINECART hopper_minecart
+net.minecraft.world.item.Items IRON_AXE iron_axe
+net.minecraft.world.item.Items IRON_BOOTS iron_boots
+net.minecraft.world.item.Items IRON_CHESTPLATE iron_chestplate
+net.minecraft.world.item.Items IRON_DOOR iron_door
+net.minecraft.world.item.Items IRON_HELMET iron_helmet
+net.minecraft.world.item.Items IRON_HOE iron_hoe
+net.minecraft.world.item.Items IRON_HORSE_ARMOR iron_horse_armor
+net.minecraft.world.item.Items IRON_INGOT iron_ingot
+net.minecraft.world.item.Items IRON_LEGGINGS iron_leggings
+net.minecraft.world.item.Items IRON_PICKAXE iron_pickaxe
+net.minecraft.world.item.Items IRON_SHOVEL iron_shovel
+net.minecraft.world.item.Items IRON_SWORD iron_sword
+net.minecraft.world.item.Items ITEM_FRAME item_frame
+net.minecraft.world.item.Items JUNGLE_DOOR jungle_door
+net.minecraft.world.item.Items LAVA_BUCKET lava_bucket
+net.minecraft.world.item.Items LEAD lead
+net.minecraft.world.item.Items LEATHER leather
+net.minecraft.world.item.Items LEATHER_BOOTS leather_boots
+net.minecraft.world.item.Items LEATHER_CHESTPLATE leather_chestplate
+net.minecraft.world.item.Items LEATHER_HELMET leather_helmet
+net.minecraft.world.item.Items LEATHER_LEGGINGS leather_leggings
+net.minecraft.world.item.Items MAGMA_CREAM magma_cream
+net.minecraft.world.item.Items MAP map
+net.minecraft.world.item.Items MELON melon
+net.minecraft.world.item.Items MELON_SEEDS melon_seeds
+net.minecraft.world.item.Items MILK_BUCKET milk_bucket
+net.minecraft.world.item.Items MINECART minecart
+net.minecraft.world.item.Items MUSHROOM_STEW mushroom_stew
+net.minecraft.world.item.Items MUTTON mutton
+net.minecraft.world.item.Items NAME_TAG name_tag
+net.minecraft.world.item.Items NET net.minecraft.init.Items
+net.minecraft.world.item.Items NETHERBRICK netherbrick
+net.minecraft.world.item.Items NETHER_STAR nether_star
+net.minecraft.world.item.Items NETHER_WART nether_wart
+net.minecraft.world.item.Items OAK_DOOR oak_door
+net.minecraft.world.item.Items PAINTING painting
+net.minecraft.world.item.Items PAPER paper
+net.minecraft.world.item.Items PLAYER_HEAD skull
+net.minecraft.world.item.Items POISONOUS_POTATO poisonous_potato
+net.minecraft.world.item.Items PORKCHOP porkchop
+net.minecraft.world.item.Items POTATO potato
+net.minecraft.world.item.Items POTIONITEM potionitem
+net.minecraft.world.item.Items PRISMARINE_CRYSTALS prismarine_crystals
+net.minecraft.world.item.Items PRISMARINE_SHARD prismarine_shard
+net.minecraft.world.item.Items PUMPKIN_PIE pumpkin_pie
+net.minecraft.world.item.Items PUMPKIN_SEEDS pumpkin_seeds
+net.minecraft.world.item.Items QUARTZ quartz
+net.minecraft.world.item.Items RABBIT rabbit
+net.minecraft.world.item.Items RABBIT_FOOT rabbit_foot
+net.minecraft.world.item.Items RABBIT_HIDE rabbit_hide
+net.minecraft.world.item.Items RABBIT_STEW rabbit_stew
+net.minecraft.world.item.Items RECORD_11 record_11
+net.minecraft.world.item.Items RECORD_13 record_13
+net.minecraft.world.item.Items RECORD_BLOCKS record_blocks
+net.minecraft.world.item.Items RECORD_CAT record_cat
+net.minecraft.world.item.Items RECORD_CHIRP record_chirp
+net.minecraft.world.item.Items RECORD_FAR record_far
+net.minecraft.world.item.Items RECORD_MALL record_mall
+net.minecraft.world.item.Items RECORD_MELLOHI record_mellohi
+net.minecraft.world.item.Items RECORD_STAL record_stal
+net.minecraft.world.item.Items RECORD_STRAD record_strad
+net.minecraft.world.item.Items RECORD_WAIT record_wait
+net.minecraft.world.item.Items RECORD_WARD record_ward
+net.minecraft.world.item.Items REDSTONE redstone
+net.minecraft.world.item.Items REPEATER repeater
+net.minecraft.world.item.Items ROTTEN_FLESH rotten_flesh
+net.minecraft.world.item.Items SADDLE saddle
+net.minecraft.world.item.Items SHEARS shears
+net.minecraft.world.item.Items SIGN sign
+net.minecraft.world.item.Items SLIME_BALL slime_ball
+net.minecraft.world.item.Items SNOWBALL snowball
+net.minecraft.world.item.Items SPAWN_EGG spawn_egg
+net.minecraft.world.item.Items SPECKLED_MELON speckled_melon
+net.minecraft.world.item.Items SPIDER_EYE spider_eye
+net.minecraft.world.item.Items SPRUCE_DOOR spruce_door
+net.minecraft.world.item.Items STICK stick
+net.minecraft.world.item.Items STONE_AXE stone_axe
+net.minecraft.world.item.Items STONE_HOE stone_hoe
+net.minecraft.world.item.Items STONE_PICKAXE stone_pickaxe
+net.minecraft.world.item.Items STONE_SHOVEL stone_shovel
+net.minecraft.world.item.Items STONE_SWORD stone_sword
+net.minecraft.world.item.Items STRING string
+net.minecraft.world.item.Items SUGAR sugar
+net.minecraft.world.item.Items SUGAR_CANE reeds
+net.minecraft.world.item.Items TNT_MINECART tnt_minecart
+net.minecraft.world.item.Items WATER_BUCKET water_bucket
+net.minecraft.world.item.Items WHEAT wheat
+net.minecraft.world.item.Items WHEAT_SEEDS wheat_seeds
+net.minecraft.world.item.Items WOODEN_AXE wooden_axe
+net.minecraft.world.item.Items WOODEN_HOE wooden_hoe
+net.minecraft.world.item.Items WOODEN_PICKAXE wooden_pickaxe
+net.minecraft.world.item.Items WOODEN_SHOVEL wooden_shovel
+net.minecraft.world.item.Items WOODEN_SWORD wooden_sword
+net.minecraft.world.item.Items WRITABLE_BOOK writable_book
+net.minecraft.world.item.Items WRITTEN_BOOK written_book
+
+net.minecraft.world.level.Level net.minecraft.world.World
+
+net.minecraft.world.level.Level getBlockEntity() getTileEntity()
+net.minecraft.world.level.Level getDayTime() getWorldTime()
+net.minecraft.world.level.Level getEntity() getEntityByID()
+net.minecraft.world.level.Level getPlayerByUUID() getPlayerEntityByUUID()
+
+net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
+net.minecraft.world.level.block.StainedGlassBlock net.minecraft.block.BlockStainedGlass
+net.minecraft.world.level.block.StainedGlassPaneBlock net.minecraft.block.BlockStainedGlassPane
+
+net.minecraft.world.level.block.Blocks ACACIA_DOOR acacia_door
+net.minecraft.world.level.block.Blocks ACACIA_FENCE acacia_fence
+net.minecraft.world.level.block.Blocks ACACIA_FENCE_GATE acacia_fence_gate
+net.minecraft.world.level.block.Blocks ACACIA_STAIRS acacia_stairs
+net.minecraft.world.level.block.Blocks ACTIVATOR_RAIL activator_rail
+net.minecraft.world.level.block.Blocks AIR air
+net.minecraft.world.level.block.Blocks ANVIL anvil
+net.minecraft.world.level.block.Blocks BARRIER barrier
+net.minecraft.world.level.block.Blocks BEACON beacon
+net.minecraft.world.level.block.Blocks BED bed
+net.minecraft.world.level.block.Blocks BEDROCK bedrock
+net.minecraft.world.level.block.Blocks BIRCH_DOOR birch_door
+net.minecraft.world.level.block.Blocks BIRCH_FENCE birch_fence
+net.minecraft.world.level.block.Blocks BIRCH_FENCE_GATE birch_fence_gate
+net.minecraft.world.level.block.Blocks BIRCH_STAIRS birch_stairs
+net.minecraft.world.level.block.Blocks BOOKSHELF bookshelf
+net.minecraft.world.level.block.Blocks BREWING_STAND brewing_stand
+net.minecraft.world.level.block.Blocks BRICK_BLOCK brick_block
+net.minecraft.world.level.block.Blocks BRICK_STAIRS brick_stairs
+net.minecraft.world.level.block.Blocks BROWN_MUSHROOM brown_mushroom
+net.minecraft.world.level.block.Blocks BROWN_MUSHROOM_BLOCK brown_mushroom_block
+net.minecraft.world.level.block.Blocks CACTUS cactus
+net.minecraft.world.level.block.Blocks CAKE cake
+net.minecraft.world.level.block.Blocks CARPET carpet
+net.minecraft.world.level.block.Blocks CARROTS carrots
+net.minecraft.world.level.block.Blocks CAULDRON cauldron
+net.minecraft.world.level.block.Blocks CHEST chest
+net.minecraft.world.level.block.Blocks CLAY clay
+net.minecraft.world.level.block.Blocks COAL_BLOCK coal_block
+net.minecraft.world.level.block.Blocks COAL_ORE coal_ore
+net.minecraft.world.level.block.Blocks COBBLESTONE cobblestone
+net.minecraft.world.level.block.Blocks COBBLESTONE_STAIRS stone_stairs
+net.minecraft.world.level.block.Blocks COBBLESTONE_WALL cobblestone_wall
+net.minecraft.world.level.block.Blocks COCOA cocoa
+net.minecraft.world.level.block.Blocks COMMAND_BLOCK command_block
+net.minecraft.world.level.block.Blocks CRAFTING_TABLE crafting_table
+net.minecraft.world.level.block.Blocks DANDELION yellow_flower
+net.minecraft.world.level.block.Blocks DARK_OAK_DOOR dark_oak_door
+net.minecraft.world.level.block.Blocks DARK_OAK_FENCE dark_oak_fence
+net.minecraft.world.level.block.Blocks DARK_OAK_FENCE_GATE dark_oak_fence_gate
+net.minecraft.world.level.block.Blocks DARK_OAK_STAIRS dark_oak_stairs
+net.minecraft.world.level.block.Blocks DAYLIGHT_DETECTOR daylight_detector
+net.minecraft.world.level.block.Blocks DAYLIGHT_DETECTOR_INVERTED daylight_detector_inverted
+net.minecraft.world.level.block.Blocks DEADBUSH deadbush
+net.minecraft.world.level.block.Blocks DETECTOR_RAIL detector_rail
+net.minecraft.world.level.block.Blocks DIAMOND_BLOCK diamond_block
+net.minecraft.world.level.block.Blocks DIAMOND_ORE diamond_ore
+net.minecraft.world.level.block.Blocks DIRT dirt
+net.minecraft.world.level.block.Blocks DISPENSER dispenser
+net.minecraft.world.level.block.Blocks DOUBLE_PLANT double_plant
+net.minecraft.world.level.block.Blocks DOUBLE_STONE_SLAB double_stone_slab
+net.minecraft.world.level.block.Blocks DOUBLE_STONE_SLAB2 double_stone_slab2
+net.minecraft.world.level.block.Blocks DOUBLE_WOODEN_SLAB double_wooden_slab
+net.minecraft.world.level.block.Blocks DRAGON_EGG dragon_egg
+net.minecraft.world.level.block.Blocks DROPPER dropper
+net.minecraft.world.level.block.Blocks EMERALD_BLOCK emerald_block
+net.minecraft.world.level.block.Blocks EMERALD_ORE emerald_ore
+net.minecraft.world.level.block.Blocks ENCHANTING_TABLE enchanting_table
+net.minecraft.world.level.block.Blocks ENDER_CHEST ender_chest
+net.minecraft.world.level.block.Blocks END_PORTAL end_portal
+net.minecraft.world.level.block.Blocks END_PORTAL_FRAME end_portal_frame
+net.minecraft.world.level.block.Blocks END_STONE end_stone
+net.minecraft.world.level.block.Blocks FARMLAND farmland
+net.minecraft.world.level.block.Blocks FIRE fire
+net.minecraft.world.level.block.Blocks FLOWER_POT flower_pot
+net.minecraft.world.level.block.Blocks FLOWING_LAVA flowing_lava
+net.minecraft.world.level.block.Blocks FLOWING_WATER flowing_water
+net.minecraft.world.level.block.Blocks FURNACE furnace
+net.minecraft.world.level.block.Blocks GLASS glass
+net.minecraft.world.level.block.Blocks GLASS_PANE glass_pane
+net.minecraft.world.level.block.Blocks GLOWSTONE glowstone
+net.minecraft.world.level.block.Blocks GOLDEN_RAIL golden_rail
+net.minecraft.world.level.block.Blocks GOLD_BLOCK gold_block
+net.minecraft.world.level.block.Blocks GOLD_ORE gold_ore
+net.minecraft.world.level.block.Blocks GRASS_BLOCK grass
+net.minecraft.world.level.block.Blocks GRAVEL gravel
+net.minecraft.world.level.block.Blocks HAY_BLOCK hay_block
+net.minecraft.world.level.block.Blocks HEAVY_WEIGHTED_PRESSURE_PLATE heavy_weighted_pressure_plate
+net.minecraft.world.level.block.Blocks HOPPER hopper
+net.minecraft.world.level.block.Blocks ICE ice
+net.minecraft.world.level.block.Blocks IRON_BARS iron_bars
+net.minecraft.world.level.block.Blocks IRON_BLOCK iron_block
+net.minecraft.world.level.block.Blocks IRON_DOOR iron_door
+net.minecraft.world.level.block.Blocks IRON_ORE iron_ore
+net.minecraft.world.level.block.Blocks IRON_TRAPDOOR iron_trapdoor
+net.minecraft.world.level.block.Blocks JUKEBOX jukebox
+net.minecraft.world.level.block.Blocks JUNGLE_DOOR jungle_door
+net.minecraft.world.level.block.Blocks JUNGLE_FENCE jungle_fence
+net.minecraft.world.level.block.Blocks JUNGLE_FENCE_GATE jungle_fence_gate
+net.minecraft.world.level.block.Blocks JUNGLE_STAIRS jungle_stairs
+net.minecraft.world.level.block.Blocks LADDER ladder
+net.minecraft.world.level.block.Blocks LAPIS_BLOCK lapis_block
+net.minecraft.world.level.block.Blocks LAPIS_ORE lapis_ore
+net.minecraft.world.level.block.Blocks LAVA lava
+net.minecraft.world.level.block.Blocks LEAVES leaves
+net.minecraft.world.level.block.Blocks LEAVES2 leaves2
+net.minecraft.world.level.block.Blocks LEVER lever
+net.minecraft.world.level.block.Blocks LIGHT_WEIGHTED_PRESSURE_PLATE light_weighted_pressure_plate
+net.minecraft.world.level.block.Blocks LIT_FURNACE lit_furnace
+net.minecraft.world.level.block.Blocks LIT_PUMPKIN lit_pumpkin
+net.minecraft.world.level.block.Blocks LIT_REDSTONE_LAMP lit_redstone_lamp
+net.minecraft.world.level.block.Blocks LIT_REDSTONE_ORE lit_redstone_ore
+net.minecraft.world.level.block.Blocks LOG log
+net.minecraft.world.level.block.Blocks LOG2 log2
+net.minecraft.world.level.block.Blocks MELON melon_block
+net.minecraft.world.level.block.Blocks MELON_STEM melon_stem
+net.minecraft.world.level.block.Blocks MOB_SPAWNER mob_spawner
+net.minecraft.world.level.block.Blocks MONSTER_EGG monster_egg
+net.minecraft.world.level.block.Blocks MOSSY_COBBLESTONE mossy_cobblestone
+net.minecraft.world.level.block.Blocks MYCELIUM mycelium
+net.minecraft.world.level.block.Blocks NETHERRACK netherrack
+net.minecraft.world.level.block.Blocks NETHER_BRICK nether_brick
+net.minecraft.world.level.block.Blocks NETHER_BRICK_FENCE nether_brick_fence
+net.minecraft.world.level.block.Blocks NETHER_BRICK_STAIRS nether_brick_stairs
+net.minecraft.world.level.block.Blocks NETHER_QUARTZ_ORE quartz_ore
+net.minecraft.world.level.block.Blocks NETHER_WART nether_wart
+net.minecraft.world.level.block.Blocks NOTEBLOCK noteblock
+net.minecraft.world.level.block.Blocks OAK_DOOR oak_door
+net.minecraft.world.level.block.Blocks OAK_FENCE oak_fence
+net.minecraft.world.level.block.Blocks OAK_FENCE_GATE oak_fence_gate
+net.minecraft.world.level.block.Blocks OAK_STAIRS oak_stairs
+net.minecraft.world.level.block.Blocks OBSIDIAN obsidian
+net.minecraft.world.level.block.Blocks PACKED_ICE packed_ice
+net.minecraft.world.level.block.Blocks PISTON piston
+net.minecraft.world.level.block.Blocks PISTON_EXTENSION piston_extension
+net.minecraft.world.level.block.Blocks PISTON_HEAD piston_head
+net.minecraft.world.level.block.Blocks PLANKS planks
+net.minecraft.world.level.block.Blocks PLAYER_HEAD skull
+net.minecraft.world.level.block.Blocks PORTAL portal
+net.minecraft.world.level.block.Blocks POTATOES potatoes
+net.minecraft.world.level.block.Blocks POWERED_COMPARATOR powered_comparator
+net.minecraft.world.level.block.Blocks POWERED_REPEATER powered_repeater
+net.minecraft.world.level.block.Blocks PRISMARINE prismarine
+net.minecraft.world.level.block.Blocks PUMPKIN pumpkin
+net.minecraft.world.level.block.Blocks PUMPKIN_STEM pumpkin_stem
+net.minecraft.world.level.block.Blocks QUARTZ_BLOCK quartz_block
+net.minecraft.world.level.block.Blocks QUARTZ_STAIRS quartz_stairs
+net.minecraft.world.level.block.Blocks RAIL rail
+net.minecraft.world.level.block.Blocks REDSTONE_BLOCK redstone_block
+net.minecraft.world.level.block.Blocks REDSTONE_LAMP redstone_lamp
+net.minecraft.world.level.block.Blocks REDSTONE_ORE redstone_ore
+net.minecraft.world.level.block.Blocks REDSTONE_TORCH redstone_torch
+net.minecraft.world.level.block.Blocks REDSTONE_WIRE redstone_wire
+net.minecraft.world.level.block.Blocks RED_FLOWER red_flower
+net.minecraft.world.level.block.Blocks RED_MUSHROOM red_mushroom
+net.minecraft.world.level.block.Blocks RED_MUSHROOM_BLOCK red_mushroom_block
+net.minecraft.world.level.block.Blocks RED_SANDSTONE red_sandstone
+net.minecraft.world.level.block.Blocks RED_SANDSTONE_STAIRS red_sandstone_stairs
+net.minecraft.world.level.block.Blocks SAND sand
+net.minecraft.world.level.block.Blocks SANDSTONE sandstone
+net.minecraft.world.level.block.Blocks SANDSTONE_STAIRS sandstone_stairs
+net.minecraft.world.level.block.Blocks SAPLING sapling
+net.minecraft.world.level.block.Blocks SEA_LANTERN sea_lantern
+net.minecraft.world.level.block.Blocks SLIME_BLOCK slime_block
+net.minecraft.world.level.block.Blocks SNOW snow
+net.minecraft.world.level.block.Blocks SNOW_LAYER snow_layer
+net.minecraft.world.level.block.Blocks SOUL_SAND soul_sand
+net.minecraft.world.level.block.Blocks SPONGE sponge
+net.minecraft.world.level.block.Blocks SPRUCE_DOOR spruce_door
+net.minecraft.world.level.block.Blocks SPRUCE_FENCE spruce_fence
+net.minecraft.world.level.block.Blocks SPRUCE_FENCE_GATE spruce_fence_gate
+net.minecraft.world.level.block.Blocks SPRUCE_STAIRS spruce_stairs
+net.minecraft.world.level.block.Blocks STAINED_GLASS stained_glass
+net.minecraft.world.level.block.Blocks STAINED_GLASS_PANE stained_glass_pane
+net.minecraft.world.level.block.Blocks STAINED_HARDENED_CLAY stained_hardened_clay
+net.minecraft.world.level.block.Blocks STANDING_BANNER standing_banner
+net.minecraft.world.level.block.Blocks STANDING_SIGN standing_sign
+net.minecraft.world.level.block.Blocks STICKY_PISTON sticky_piston
+net.minecraft.world.level.block.Blocks STONE stone
+net.minecraft.world.level.block.Blocks STONEBRICK stonebrick
+net.minecraft.world.level.block.Blocks STONE_BRICK_STAIRS stone_brick_stairs
+net.minecraft.world.level.block.Blocks STONE_BUTTON stone_button
+net.minecraft.world.level.block.Blocks STONE_PRESSURE_PLATE stone_pressure_plate
+net.minecraft.world.level.block.Blocks STONE_SLAB stone_slab
+net.minecraft.world.level.block.Blocks STONE_SLAB2 stone_slab2
+net.minecraft.world.level.block.Blocks SUGAR_CANE reeds
+net.minecraft.world.level.block.Blocks TALLGRASS tallgrass
+net.minecraft.world.level.block.Blocks TERRACOTTA hardened_clay
+net.minecraft.world.level.block.Blocks TNT tnt
+net.minecraft.world.level.block.Blocks TORCH torch
+net.minecraft.world.level.block.Blocks TRAPDOOR trapdoor
+net.minecraft.world.level.block.Blocks TRAPPED_CHEST trapped_chest
+net.minecraft.world.level.block.Blocks TRIPWIRE tripwire
+net.minecraft.world.level.block.Blocks TRIPWIRE_HOOK tripwire_hook
+net.minecraft.world.level.block.Blocks UNLIT_REDSTONE_TORCH unlit_redstone_torch
+net.minecraft.world.level.block.Blocks UNPOWERED_COMPARATOR unpowered_comparator
+net.minecraft.world.level.block.Blocks UNPOWERED_REPEATER unpowered_repeater
+net.minecraft.world.level.block.Blocks VINE vine
+net.minecraft.world.level.block.Blocks WALL_BANNER wall_banner
+net.minecraft.world.level.block.Blocks WALL_SIGN wall_sign
+net.minecraft.world.level.block.Blocks WATER water
+net.minecraft.world.level.block.Blocks WATERLILY waterlily
+net.minecraft.world.level.block.Blocks WEB web
+net.minecraft.world.level.block.Blocks WHEAT wheat
+net.minecraft.world.level.block.Blocks WOODEN_BUTTON wooden_button
+net.minecraft.world.level.block.Blocks WOODEN_PRESSURE_PLATE wooden_pressure_plate
+net.minecraft.world.level.block.Blocks WOODEN_SLAB wooden_slab
+net.minecraft.world.level.block.Blocks WOOL wool
+
+net.minecraft.world.level.block.entity.BeaconBlockEntity net.minecraft.tileentity.TileEntityBeacon
+net.minecraft.world.level.block.entity.SignBlockEntity net.minecraft.tileentity.TileEntitySign
+net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
+
+net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
+
+net.minecraft.world.level.block.state.properties.BooleanProperty net.minecraft.block.properties.PropertyBool
+net.minecraft.world.level.block.state.properties.DirectionProperty net.minecraft.block.properties.PropertyDirection
+net.minecraft.world.level.block.state.properties.EnumProperty net.minecraft.block.properties.PropertyEnum
+net.minecraft.world.level.block.state.properties.IntegerProperty net.minecraft.block.properties.PropertyInteger
+
+net.minecraft.world.phys.AABB net.minecraft.util.AxisAlignedBB
+net.minecraft.world.phys.HitResult net.minecraft.util.MovingObjectPosition
+net.minecraft.world.phys.HitResult$Type net.minecraft.util.math.RayTraceResult$MovingObjectType
+net.minecraft.world.phys.Vec3 net.minecraft.util.Vec3
+
+net.minecraft.world.phys.AABB contains() isVecInside()
+
+net.minecraft.world.phys.Vec3 distanceToSqr() squareDistanceTo()
+net.minecraft.world.phys.Vec3 x xCoord
+net.minecraft.world.phys.Vec3 y yCoord
+net.minecraft.world.phys.Vec3 z zCoord
+
+net.minecraft.world.scores.PlayerTeam net.minecraft.scoreboard.ScorePlayerTeam
+net.minecraft.world.scores.Team net.minecraft.scoreboard.Team
+net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
+
+net.minecraft.world.scores.PlayerTeam getName() getRegisteredName()
+
+net.minecraft.world.scores.criteria.ObjectiveCriteria net.minecraft.scoreboard.IScoreObjectiveCriteria
+net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType net.minecraft.scoreboard.IScoreObjectiveCriteria$EnumRenderType
+
+net.minecraftforge.api.distmarker.Dist net.minecraftforge.fml.relauncher.Side
+net.minecraftforge.api.distmarker.OnlyIn net.minecraftforge.fml.relauncher.SideOnly
+
+net.minecraftforge.event.TickEvent net.minecraftforge.fml.common.gameevent.TickEvent
+
+net.minecraftforge.eventbus.api.Cancelable net.minecraftforge.fml.common.eventhandler.Cancelable
+net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
+net.minecraftforge.eventbus.api.EventPriority net.minecraftforge.fml.common.eventhandler.EventPriority
+net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+
+net.minecraftforge.fml.ModContainer net.minecraftforge.fml.common.ModContainer
+
+org.lwjgl.glfw.GLFW org.lwjgl.input.Keyboard
+
+org.lwjgl.glfw.GLFW GLFW_KEY_0 KEY_0
+org.lwjgl.glfw.GLFW GLFW_KEY_1 KEY_1
+org.lwjgl.glfw.GLFW GLFW_KEY_2 KEY_2
+org.lwjgl.glfw.GLFW GLFW_KEY_3 KEY_3
+org.lwjgl.glfw.GLFW GLFW_KEY_4 KEY_4
+org.lwjgl.glfw.GLFW GLFW_KEY_5 KEY_5
+org.lwjgl.glfw.GLFW GLFW_KEY_6 KEY_6
+org.lwjgl.glfw.GLFW GLFW_KEY_7 KEY_7
+org.lwjgl.glfw.GLFW GLFW_KEY_8 KEY_8
+org.lwjgl.glfw.GLFW GLFW_KEY_9 KEY_9
+org.lwjgl.glfw.GLFW GLFW_KEY_A KEY_A
+org.lwjgl.glfw.GLFW GLFW_KEY_B KEY_B
+org.lwjgl.glfw.GLFW GLFW_KEY_BACKSPACE KEY_BACK
+org.lwjgl.glfw.GLFW GLFW_KEY_C KEY_C
+org.lwjgl.glfw.GLFW GLFW_KEY_D KEY_D
+org.lwjgl.glfw.GLFW GLFW_KEY_DOWN KEY_DOWN
+org.lwjgl.glfw.GLFW GLFW_KEY_E KEY_E
+org.lwjgl.glfw.GLFW GLFW_KEY_END KEY_END
+org.lwjgl.glfw.GLFW GLFW_KEY_ENTER KEY_RETURN
+org.lwjgl.glfw.GLFW GLFW_KEY_EQUAL KEY_EQUALS
+org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
+org.lwjgl.glfw.GLFW GLFW_KEY_F KEY_F
+org.lwjgl.glfw.GLFW GLFW_KEY_F3 KEY_F3
+org.lwjgl.glfw.GLFW GLFW_KEY_G KEY_G
+org.lwjgl.glfw.GLFW GLFW_KEY_H KEY_H
+org.lwjgl.glfw.GLFW GLFW_KEY_HOME KEY_HOME
+org.lwjgl.glfw.GLFW GLFW_KEY_I KEY_I
+org.lwjgl.glfw.GLFW GLFW_KEY_J KEY_J
+org.lwjgl.glfw.GLFW GLFW_KEY_K KEY_K
+org.lwjgl.glfw.GLFW GLFW_KEY_KP_ADD KEY_ADD
+org.lwjgl.glfw.GLFW GLFW_KEY_KP_SUBTRACT KEY_SUBTRACT
+org.lwjgl.glfw.GLFW GLFW_KEY_L KEY_L
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT KEY_LEFT
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT_ALT KEY_LMENU
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT_CONTROL KEY_LCONTROL
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT_SHIFT KEY_LSHIFT
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT_SUPER KEY_LMETA
+org.lwjgl.glfw.GLFW GLFW_KEY_M KEY_M
+org.lwjgl.glfw.GLFW GLFW_KEY_MINUS KEY_MINUS
+org.lwjgl.glfw.GLFW GLFW_KEY_N KEY_N
+org.lwjgl.glfw.GLFW GLFW_KEY_O KEY_O
+org.lwjgl.glfw.GLFW GLFW_KEY_P KEY_P
+org.lwjgl.glfw.GLFW GLFW_KEY_Q KEY_Q
+org.lwjgl.glfw.GLFW GLFW_KEY_R KEY_R
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT KEY_RIGHT
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT_ALT KEY_RMENU
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT_CONTROL KEY_RCONTROL
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT_SHIFT KEY_RSHIFT
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT_SUPER KEY_RMETA
+org.lwjgl.glfw.GLFW GLFW_KEY_S KEY_S
+org.lwjgl.glfw.GLFW GLFW_KEY_SPACE KEY_SPACE
+org.lwjgl.glfw.GLFW GLFW_KEY_T KEY_T
+org.lwjgl.glfw.GLFW GLFW_KEY_TAB KEY_TAB
+org.lwjgl.glfw.GLFW GLFW_KEY_U KEY_U
+org.lwjgl.glfw.GLFW GLFW_KEY_UNKNOWN KEY_NONE
+org.lwjgl.glfw.GLFW GLFW_KEY_UP KEY_UP
+org.lwjgl.glfw.GLFW GLFW_KEY_V KEY_V
+org.lwjgl.glfw.GLFW GLFW_KEY_W KEY_W
+org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
+org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
+org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
+

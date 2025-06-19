@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -34,15 +34,17 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.getWoolColor
-import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
+
+// TODO replace all drawLineToEye with LineToMobHandler
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -57,9 +59,6 @@ object DungeonLividFinder {
     private var fakeLivids = mutableSetOf<EntityOtherPlayerMP>()
     private val lividEntities
         get() = EntityUtils.getEntities<EntityOtherPlayerMP>().filter { it.isNpc() && lividNamePattern.matches(it.name) }.toList()
-
-    // avoid rendering the line while closer than 7 blocks or further than 90 blocks
-    private val lineRenderRange = 50.0..900.0
 
     private var color: LorenzColor? = null
     private val lividNameColor = mapOf(
@@ -121,7 +120,7 @@ object DungeonLividFinder {
         if (event.location != blockLocation) return
         if (!event.location.getBlockAt().isWool()) return
 
-        val newColor = event.newState.getWoolColor()
+        val newColor = event.newState.getBlockColor()
         color = newColor
         ChatUtils.debug("newColor! $newColor")
 
@@ -206,6 +205,7 @@ object DungeonLividFinder {
         val lorenzColor =
             if (config.colorOverride != LividColorHighlight.DEFAULT) config.colorOverride.color as LorenzColor else color ?: return
 
+        if (!entity.canBeSeen()) return
         val location = event.exactLocation(entity)
         val boundingBox = event.exactBoundingBox(entity)
 
@@ -213,10 +213,7 @@ object DungeonLividFinder {
 
         val color = lorenzColor.toColor()
         event.drawFilledBoundingBox(boundingBox, color, 0.5f)
-
-        if (location.distanceSqToPlayer() in lineRenderRange) {
-            event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)
-        }
+        event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)
     }
 
     private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F5

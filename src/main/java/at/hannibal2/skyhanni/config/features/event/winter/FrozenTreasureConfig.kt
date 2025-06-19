@@ -89,5 +89,5 @@ class FrozenTreasureConfig {
 
     @Expose
     @ConfigLink(owner = FrozenTreasureConfig::class, field = "enabled")
-    var position: Position = Position(10, 80, false, true)
+    var position: Position = Position(10, 80)
 }

@@ -12,5 +12,5 @@ public interface AccessorRendererLivingEntity<T extends EntityLivingBase>
     boolean setBrightness_skyhanni(T entityLivingBaseIn, float partialTicks, boolean combineTextures);
 
     @Invoker("unsetBrightness")
-    void setBrightness_skyhanni();
+    void unsetBrightness_skyhanni();
 }

@@ -43,6 +43,8 @@ object ErrorManager {
         "io.moulberry.notenoughupdates." to "NEU.",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
+        "knot//" to "",
+        "java.base/" to "",
     )
 
     private val replaceEntirely = mapOf(
@@ -83,29 +85,33 @@ object ErrorManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestreseterrorcache") {
+        event.registerBrigadier("shtestreseterrorcache") {
             description = "Resets the cache of errors."
             category = CommandCategory.DEVELOPER_TEST
-            callback {
+            simpleCallback {
                 cache.clear()
                 ChatUtils.chat("Error cache reset.")
             }
         }
+        event.registerBrigadier("shthrowerror") {
+            description = "Throws an error to test error manager."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                logErrorWithData(NullPointerException(), "Manually triggered error!")
+            }
+        }
     }
+
 
     // Extra data from last thrown error
     private var cachedExtraData: String? = null
 
     // throw an error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
-        val exception = IllegalStateException(message.removeColor())
-        println("silent SkyHanni error:")
-        println("message: '$message'")
         buildExtraDataString(extraData)?.let {
-            println("extraData: \n$it")
             cachedExtraData = it
         }
-        throw exception
+        throw IllegalStateException(message.removeColor())
     }
 
     private fun copyError(errorId: String) {

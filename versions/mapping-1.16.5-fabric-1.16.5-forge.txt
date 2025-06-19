@@ -4,6 +4,8 @@ net.fabricmc.api.Environment net.minecraftforge.api.distmarker.OnlyIn
 
 net.fabricmc.loader.api.ModContainer net.minecraftforge.fml.ModContainer
 
+net.minecraft.client.gui.screen.GameMenuScreen net.minecraft.client.gui.screens.PauseScreen
+
 net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.player.LocalPlayer
 
 net.minecraft.client.network.ClientPlayerEntity networkHandler connection
@@ -27,10 +29,13 @@ net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.deco
 net.minecraft.entity.decoration.ArmorStandEntity shouldHideBasePlate() isNoBasePlate()
 net.minecraft.entity.decoration.ArmorStandEntity shouldShowArms() isShowArms()
 
+net.minecraft.entity.mob.CreeperEntity isIgnited() getCreeperState()
+
 net.minecraft.entity.passive.VillagerEntity net.minecraft.world.entity.npc.Villager
 
 net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack
 
+net.minecraft.item.ItemStack getEnchantments() getEnchantmentTags()
 net.minecraft.item.ItemStack getName() getDisplayName()
 
 net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket net.minecraft.network.protocol.game.ClientboundAddPlayerPacket
@@ -64,9 +69,14 @@ net.minecraft.util.math.Box net.minecraft.world.phys.AABB
 net.minecraft.util.math.Vec3d net.minecraft.world.phys.Vec3
 
 net.minecraft.util.math.Box contains() contains()
+net.minecraft.util.math.Box expand() inflate()
 net.minecraft.util.math.Box offset() move()
 
 net.minecraft.util.math.Vec3d squaredDistanceTo() distanceToSqr()
+
+net.minecraft.world.EntityView net.minecraft.world.level.EntityGetter
+
+net.minecraft.world.EntityView getPlayerByUuid() getPlayerByUUID()
 
 net.minecraft.world.phys.HitResult getPos() getLocation()
 

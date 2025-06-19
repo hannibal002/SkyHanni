@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -32,6 +36,7 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
+@SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
     fun command(args: Array<String>) {
@@ -165,7 +170,9 @@ object CopyNearbyEntitiesCommand {
         val stackDisplayName = stack.displayName
         val cleanName = stack.cleanName()
         val itemEnchanted = stack.isEnchanted()
+        //#if MC < 1.16
         val itemDamage = stack.itemDamage
+        //#endif
         val stackSize = stack.stackSize
         val maxStackSize = stack.maxStackSize
         val skullTexture = stack.getSkullTexture()
@@ -173,7 +180,9 @@ object CopyNearbyEntitiesCommand {
         add("-  stackDisplayName: '$stackDisplayName'")
         add("-  cleanName: '$cleanName'")
         add("-  itemEnchanted: '$itemEnchanted'")
+        //#if MC < 1.16
         add("-  itemDamage: '$itemDamage'")
+        //#endif
         add("-  stackSize: '$stackSize'")
         add("-  maxStackSize: '$maxStackSize'")
         skullTexture?.let { add("-  skullTexture: '$it'") }
@@ -273,6 +282,15 @@ object CopyNearbyEntitiesCommand {
         }
         if (mob.boundingBox != mob.baseEntity.entityBoundingBox) {
             add("Bounding Box: ${mob.boundingBox}")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcopyentities") {
+            description = "Copies the entities in the specified radius around the player into the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { command(it) }
         }
     }
 

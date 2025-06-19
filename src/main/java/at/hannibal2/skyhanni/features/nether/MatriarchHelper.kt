@@ -55,7 +55,7 @@ object MatriarchHelper {
         if (config.highlight) {
             val color = config.highlightColor.toSpecialColor()
             pearlList.forEach {
-                event.drawFilledBoundingBox(it.boundingBox.expandBlock(), color, 1.0f)
+                event.drawFilledBoundingBox(it.boundingBox.expandBlock(), color, 1f)
             }
         }
         if (config.line) {

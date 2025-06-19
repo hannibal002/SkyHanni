@@ -144,113 +144,112 @@ object SoopyGuessBurrow {
                 run = true
             }
         }
-        if (run) {
-            if (locations.size < 100 && locations.isEmpty() || locations.last().distance(currLoc) != 0.0) {
-                var distMultiplier = 1.0
-                if (locations.size > 2) {
-                    val predictedDist = 0.06507 * locations.size + 0.259
-                    val lastPos = locations.last()
-                    val actualDist = currLoc.distance(lastPos)
-                    distMultiplier = actualDist / predictedDist
+        if (!run) return
+        if (locations.size < 100 && locations.isEmpty() || locations.last().distance(currLoc) != 0.0) {
+            var distMultiplier = 1.0
+            if (locations.size > 2) {
+                val predictedDist = 0.06507 * locations.size + 0.259
+                val lastPos = locations.last()
+                val actualDist = currLoc.distance(lastPos)
+                distMultiplier = actualDist / predictedDist
+            }
+            locations.add(currLoc)
+
+            if (locations.size > 5 && guessPoint != null) {
+
+                val slopeThing = locations.zipWithNext { a, b ->
+                    atan((a.x - b.x) / (a.z - b.z))
                 }
-                locations.add(currLoc)
 
-                if (locations.size > 5 && guessPoint != null) {
+                val (a, b, c) = solveEquationThing(
+                    LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
+                    LorenzVec(
+                        slopeThing[slopeThing.size - 5],
+                        slopeThing[slopeThing.size - 3],
+                        slopeThing[slopeThing.size - 1],
+                    ),
+                )
 
-                    val slopeThing = locations.zipWithNext { a, b ->
-                        atan((a.x - b.x) / (a.z - b.z))
-                    }
+                val pr1 = mutableListOf<LorenzVec>()
+                val pr2 = mutableListOf<LorenzVec>()
 
-                    val (a, b, c) = solveEquationThing(
-                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
-                        LorenzVec(
-                            slopeThing[slopeThing.size - 5],
-                            slopeThing[slopeThing.size - 3],
-                            slopeThing[slopeThing.size - 1],
-                        ),
-                    )
+                val start = slopeThing.size - 1
+                val lastPos = locations[start].toDoubleArray()
+                val lastPos2 = locations[start].toDoubleArray()
 
-                    val pr1 = mutableListOf<LorenzVec>()
-                    val pr2 = mutableListOf<LorenzVec>()
+                var distCovered = 0.0
 
-                    val start = slopeThing.size - 1
-                    val lastPos = locations[start].toDoubleArray()
-                    val lastPos2 = locations[start].toDoubleArray()
+                val ySpeed = locations[locations.size - 1].x - locations[locations.size - 2].x / hypot(
+                    locations[locations.size - 1].x - locations[locations.size - 2].x,
+                    locations[locations.size - 1].z - locations[locations.size - 2].x,
+                )
 
-                    var distCovered = 0.0
+                var i = start + 1
+                while (distCovered < distance2!! && i < 10000) {
+                    val y = b / (i + a) + c
+                    val dist = distMultiplier * (0.06507 * i + 0.259)
 
-                    val ySpeed = locations[locations.size - 1].x - locations[locations.size - 2].x / hypot(
-                        locations[locations.size - 1].x - locations[locations.size - 2].x,
-                        locations[locations.size - 1].z - locations[locations.size - 2].x,
-                    )
+                    val xOff = dist * sin(y)
+                    val zOff = dist * cos(y)
 
-                    var i = start + 1
-                    while (distCovered < distance2!! && i < 10000) {
-                        val y = b / (i + a) + c
-                        val dist = distMultiplier * (0.06507 * i + 0.259)
+                    val density = 5
 
-                        val xOff = dist * sin(y)
-                        val zOff = dist * cos(y)
+                    for (o in 0..density) {
+                        lastPos[0] += xOff / density
+                        lastPos[2] += zOff / density
 
-                        val density = 5
+                        lastPos[1] += ySpeed * dist / density
+                        lastPos2[1] += ySpeed * dist / density
 
-                        for (o in 0..density) {
-                            lastPos[0] += xOff / density
-                            lastPos[2] += zOff / density
+                        lastPos2[0] -= xOff / density
+                        lastPos2[2] -= zOff / density
 
-                            lastPos[1] += ySpeed * dist / density
-                            lastPos2[1] += ySpeed * dist / density
-
-                            lastPos2[0] -= xOff / density
-                            lastPos2[2] -= zOff / density
-
-                            pr1.add(lastPos.toLorenzVec())
-                            pr2.add(lastPos2.toLorenzVec())
+                        pr1.add(lastPos.toLorenzVec())
+                        pr2.add(lastPos2.toLorenzVec())
 
 
-                            lastSoundPoint?.let {
-                                distCovered = hypot(lastPos[0] - it.x, lastPos[2] - it.z)
-                            }
-
-                            if (distCovered > distance2!!) break
+                        lastSoundPoint?.let {
+                            distCovered = hypot(lastPos[0] - it.x, lastPos[2] - it.z)
                         }
-                        i++
+
+                        if (distCovered > distance2!!) break
                     }
+                    i++
+                }
 
-                    // Why does this happen?
-                    if (pr1.isEmpty()) return
+                // Why does this happen?
+                if (pr1.isEmpty()) return
 
-                    val p1 = pr1.last()
-                    val p2 = pr2.last()
+                val p1 = pr1.last()
+                val p2 = pr2.last()
 
 
-                    guessPoint?.let {
-                        val d1 = ((p1.x - it.x).times(2 + (p1.z - it.z))).pow(2)
-                        val d2 = ((p2.x - it.x).times(2 + (p2.z - it.z))).pow(2)
+                guessPoint?.let {
+                    val d1 = ((p1.x - it.x).times(2 + (p1.z - it.z))).pow(2)
+                    val d2 = ((p2.x - it.x).times(2 + (p2.z - it.z))).pow(2)
 
-                        val finalLocation = if (d1 < d2) {
-                            LorenzVec(floor(p1.x), 255.0, floor(p1.z))
-                        } else {
-                            LorenzVec(floor(p2.x), 255.0, floor(p2.z))
-                        }
-                        BurrowGuessEvent(finalLocation, precise = false).post()
+                    val finalLocation = if (d1 < d2) {
+                        LorenzVec(floor(p1.x), 255.0, floor(p1.z))
+                    } else {
+                        LorenzVec(floor(p2.x), 255.0, floor(p2.z))
                     }
+                    BurrowGuessEvent(finalLocation, precise = false, new = false).post()
                 }
             }
-
-            if (lastParticlePoint == null) {
-                firstParticlePoint = currLoc.clone()
-            }
-
-            lastParticlePoint2 = lastParticlePoint
-            lastParticlePoint = particlePoint
-
-            particlePoint = currLoc.clone()
-
-            if (lastParticlePoint2 == null || firstParticlePoint == null || distance2 == null || lastSoundPoint == null) return
-
-            calcNewGuessPoint()
         }
+
+        if (lastParticlePoint == null) {
+            firstParticlePoint = currLoc.clone()
+        }
+
+        lastParticlePoint2 = lastParticlePoint
+        lastParticlePoint = particlePoint
+
+        particlePoint = currLoc.clone()
+
+        if (lastParticlePoint2 == null || firstParticlePoint == null || distance2 == null || lastSoundPoint == null) return
+
+        calcNewGuessPoint()
     }
 
     private fun calcNewGuessPoint() {
