@@ -481,7 +481,6 @@ object RenderUtils {
         _drawWireframeBoundingBox(aabb, color)
     }
 
-    //#if TODO
     @Deprecated("Use WorldRenderUtils' draw3DPathWithWaypoint instead")
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
         path: Graph,
@@ -509,7 +508,6 @@ object RenderUtils {
             markLastBlock,
         )
     }
-    //#endif
 
     @Deprecated("Use WorldRenderUtils' drawFilledBoundingBox instead")
     fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
