@@ -5,22 +5,16 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-//#if TODO
 import at.hannibal2.skyhanni.data.NotificationManager
-//#endif
 import at.hannibal2.skyhanni.data.PetApi
-//#if TODO
 import at.hannibal2.skyhanni.data.SkyHanniNotification
-//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 //#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -157,7 +151,7 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) }  ?: emptyList()
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -170,7 +164,7 @@ object ItemUtils {
     //#else
     //$$ fun ComponentMap?.getLore(): List<String> {
     //$$     this ?: return emptyList()
-    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() } ?: emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) } ?: emptyList()
     //$$ }
     //#endif
 
@@ -609,22 +603,18 @@ object ItemUtils {
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.repoItemName: String
         get() {
-            //#if TODO
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
-            //#endif
             return getInternalNameOrNull()?.repoItemName ?: "<null>"
         }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.repoItemNameCompact: String
         get() {
-            //#if TODO
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
-            //#endif
             return getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
         }
 
@@ -884,9 +874,7 @@ object ItemUtils {
             "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
             "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
         )
-        //#if TODO
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
-        //#endif
     }
 
     fun NBTTagCompound.getStringList(key: String): List<String> {

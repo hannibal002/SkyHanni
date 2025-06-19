@@ -24,6 +24,9 @@ net.minecraft.client.util.math.MatrixStack push() pushMatrix()
 
 net.minecraft.entity.Entity getEquippedItems() getItemsEquipped()
 net.minecraft.entity.Entity getId() getEntityId()
+net.minecraft.entity.Entity lastX prevX
+net.minecraft.entity.Entity lastY prevY
+net.minecraft.entity.Entity lastZ prevZ
 
 net.minecraft.entity.decoration.ArmorStandEntity shouldShowBasePlate().not() shouldHideBasePlate()
 

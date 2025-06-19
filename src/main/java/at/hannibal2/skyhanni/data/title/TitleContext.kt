@@ -25,6 +25,7 @@ data class TitleIntention(
     val internalName: String,
 )
 
+// todo 1.21 impl needed
 open class TitleContext(
     private var titleText: String = "",
     private var subtitleText: String? = null,
@@ -150,12 +151,14 @@ open class TitleContext(
 
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(0f, -translation, 500f)
+            //#if TODO
             Renderable.drawInsideRoundedRect(
                 stringRenderable,
                 ColorUtils.TRANSPARENT_COLOR,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ).renderXYAligned(0, 125, gui.width, gui.height)
+            //#endif
 
             DrawContextUtils.translate(0f, translation, -500f)
         }
