@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
@@ -22,8 +23,6 @@ import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
 import java.io.File
@@ -199,9 +198,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 }
 
                 val statusBlock = if (phrase.enabled) {
-                    ItemStack(Blocks.stained_hardened_clay, 1, 13)
+                    ColoredBlockCompat.GREEN.createStainedClay()
                 } else {
-                    ItemStack(Blocks.stained_hardened_clay, 1, 14)
+                    ColoredBlockCompat.RED.createStainedClay()
                 }
 
                 DrawContextUtils.scale(inverseScale, inverseScale, 1f)
@@ -298,34 +297,32 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                     GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
                 }
 
-                DrawContextUtils.scale(0.75f, 0.75f, 1f)
+                DrawContextUtils.scaled(scale, scale) {
+                    // TODO remove more code duplication
+                    drawUnmodifiedString(
+                        "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
+                    )
+                    drawUnmodifiedString(
+                        "§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale,
+                    )
 
-                // TODO remove more code duplication
-                drawUnmodifiedString(
-                    "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
-                )
-                drawUnmodifiedString(
-                    "§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale,
-                )
+                    drawUnmodifiedString("§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
+                    drawUnmodifiedString(
+                        "§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale,
+                    )
 
-                drawUnmodifiedString("§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
-                drawUnmodifiedString(
-                    "§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale,
-                )
+                    drawUnmodifiedString(
+                        currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale,
+                    )
+                    drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
-                drawUnmodifiedString(
-                    currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale,
-                )
-                drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
-
-                drawUnmodifiedString(
-                    currentPhrase.replacement.convertToFormatted(),
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 95) * inverseScale,
-                )
-                drawUnmodifiedString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
-
-                DrawContextUtils.scale(inverseScale, inverseScale, 1f)
+                    drawUnmodifiedString(
+                        currentPhrase.replacement.convertToFormatted(),
+                        (guiLeft + 30) * inverseScale,
+                        (guiTop + 95) * inverseScale,
+                    )
+                    drawUnmodifiedString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
+                }
             }
         }
 

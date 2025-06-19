@@ -26,7 +26,7 @@ class SummoningsConfig {
 
     @Expose
     @ConfigLink(owner = SummoningsConfig::class, field = "summoningMobDisplay")
-    var summoningMobDisplayPos: Position = Position(10, 10, false, true)
+    var summoningMobDisplayPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Summoning Mob Nametag", desc = "Hide the nametag of your spawned summons.")

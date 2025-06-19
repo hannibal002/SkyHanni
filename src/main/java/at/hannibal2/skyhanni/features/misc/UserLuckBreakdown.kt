@@ -84,8 +84,8 @@ object UserLuckBreakdown {
         if (!inMiscStats) return
 
         if (event.slot == replaceSlot && !inCustomBreakdown) {
-            val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
-            if (limboUserLuck == 0.0f && !showAllStats) return
+            val limboUserLuck = storage?.limbo?.userLuck ?: 0f
+            if (limboUserLuck == 0f && !showAllStats) return
             if (itemCreateCoolDown.passedSince() > 3.seconds) {
                 itemCreateCoolDown = SimpleTimeMark.now()
                 createItems()
@@ -167,7 +167,7 @@ object UserLuckBreakdown {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
         }
-        val limboLuck = storage?.limbo?.userLuck?.roundTo(1) ?: 0.0f
+        val limboLuck = storage?.limbo?.userLuck?.roundTo(1) ?: 0f
         when (InventoryUtils.openInventoryName()) {
             "Your Equipment and Stats" -> equipmentMenuTooltip(event, limboLuck)
             "Your Stats Breakdown" -> statsBreakdownLoreTooltip(event, limboLuck)
@@ -177,7 +177,7 @@ object UserLuckBreakdown {
 
     private fun equipmentMenuTooltip(event: ToolTipEvent, limboLuck: Float) {
         if (event.slot.slotIndex != 25) return
-        if (limboLuck == 0.0f && !showAllStats) return
+        if (limboLuck == 0f && !showAllStats) return
 
         val skillLuck = skillOverflowLuck.values.sum()
         var totalLuck = skillLuck + limboLuck
@@ -197,7 +197,7 @@ object UserLuckBreakdown {
             event.toolTip[1] = "§7To Your Stats Breakdown"
         }
         if (event.slot.slotIndex != 4) return
-        if (limboLuck == 0.0f && !showAllStats) return
+        if (limboLuck == 0f && !showAllStats) return
 
         val skillLuck = skillOverflowLuck.values.sum()
         var totalLuck = skillLuck + limboLuck
@@ -234,8 +234,8 @@ object UserLuckBreakdown {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.userluckEnabled) return
         if (!inMiscStats) return
-        val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
-        if (limboUserLuck == 0.0f && !showAllStats) return
+        val limboUserLuck = storage?.limbo?.userLuck ?: 0f
+        if (limboUserLuck == 0f && !showAllStats) return
 
         if (inCustomBreakdown && event.slotId != 49) event.cancel()
         when (event.slotId) {
@@ -263,7 +263,7 @@ object UserLuckBreakdown {
             15,
         )
 
-        val limboLuck = storage?.limbo?.userLuck ?: 0.0f
+        val limboLuck = storage?.limbo?.userLuck ?: 0f
         val skillLuck = skillOverflowLuck.values.sum()
         var totalLuck = skillLuck + limboLuck
         var jerryLuck = 0f
@@ -296,12 +296,12 @@ object UserLuckBreakdown {
         }
     }
 
-    private fun createItemLore(type: String, luckInput: Float = 0.0f): Array<String> {
+    private fun createItemLore(type: String, luckInput: Float = 0f): Array<String> {
         calcSkillLuck()
         return when (type) {
             "mainMenu" -> {
                 val luckString = tryTruncateFloat(luckInput.roundTo(2))
-                if (luckInput == 0.0f) {
+                if (luckInput == 0f) {
                     arrayOf(
                         "§7SkyHanni User Luck is the best stat.",
                         "",

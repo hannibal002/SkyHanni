@@ -146,7 +146,7 @@ object QuestLoader {
             if (!categoryName.equals(name, ignoreCase = true)) continue
             val stack = event.inventoryItems[22] ?: continue
 
-            val completed = stack.getLore().any { DailyQuestHelper.completedPattern.matches(it) }
+            val completed = stack.getLore().any { DailyQuestHelper.townBoardCompletedPattern.matches(it) }
             if (completed && quest.state != QuestState.COLLECTED) {
                 quest.state = QuestState.COLLECTED
                 DailyQuestHelper.update()

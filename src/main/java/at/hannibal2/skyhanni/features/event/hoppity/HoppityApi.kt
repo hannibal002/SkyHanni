@@ -45,10 +45,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SkyblockSeasonModifier
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.init.Blocks
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import net.minecraft.init.Items
 import net.minecraft.inventory.Slot
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
@@ -140,9 +139,6 @@ object HoppityApi {
     val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()
     private val processedStraySlots = mutableMapOf<Int, String>()
-    private val miscProcessableItemTypes by lazy {
-        listOf(Items.skull, Item.getItemFromBlock(Blocks.stained_glass_pane))
-    }
 
     private var checkNextInvOpen = false
     private var lastHoppityCallAccept: SimpleTimeMark? = null
@@ -192,7 +188,7 @@ object HoppityApi {
 
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
-        stack != null && stack.item != null && stack.item in miscProcessableItemTypes &&
+        stack != null && stack.item != null && (stack.item == Items.skull || stack.isStainedGlassPane()) &&
             stack.displayName.isNotEmpty() && stack.getLore().isNotEmpty()
 
     private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent, note: String? = null) {

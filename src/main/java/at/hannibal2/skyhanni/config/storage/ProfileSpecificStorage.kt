@@ -11,16 +11,22 @@ import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
+//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.generateMaxChestAsList
+//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.LocationRabbit
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
+//#endif
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
+//#endif
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -35,20 +41,30 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
+//#endif
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
+//#endif
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
+//#endif
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+//#endif
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+//#endif
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
@@ -64,6 +80,7 @@ import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import kotlin.time.Duration
 
+// todo 1.21 impl needed
 // put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage {
     // api
@@ -109,6 +126,7 @@ class ProfileSpecificStorage {
         @Expose
         var bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
 
+        //#if TODO
         @Expose
         var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
 
@@ -129,6 +147,7 @@ class ProfileSpecificStorage {
             @Expose
             var kismetUsed: Boolean? = null
         }
+        //#endif
     }
 
     @Expose
@@ -264,8 +283,10 @@ class ProfileSpecificStorage {
         @Expose
         var rabbitCounts: MutableMap<String, Int> = mutableMapOf()
 
+        //#if TODO
         @Expose
         var locationRabbitRequirements: MutableMap<String, LocationRabbit> = mutableMapOf()
+        //#endif
 
         @Expose
         var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = enumMapOf()
@@ -284,6 +305,7 @@ class ProfileSpecificStorage {
         @Expose
         var hoppityShopYearOpened: Int? = null
 
+        //#if TODO
         @Expose
         var strayTracker: CFStrayTracker.Data = CFStrayTracker.Data()
 
@@ -292,6 +314,7 @@ class ProfileSpecificStorage {
 
         @Expose
         var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+        //#endif
 
         @Expose
         var hotChocolateMixinExpiry = farPast()
@@ -321,8 +344,10 @@ class ProfileSpecificStorage {
     var hoppityStatLiveDisplayToggledOff: Boolean = false
 
     data class HoppityEventStats(
+        //#if TODO
         @Expose var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
         @Expose var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
+        //#endif
         @Expose var dupeChocolateGained: Long = 0,
         @Expose var strayChocolateGained: Long = 0,
         @Expose var rabbitTheFishFinds: Int = 0,
@@ -348,6 +373,7 @@ class ProfileSpecificStorage {
         }
 
         operator fun plusAssign(it: HoppityEventStats) {
+            //#if TODO
             it.mealsFound.forEach { (key, value) ->
                 mealsFound.merge(key, value, Int::plus)
             }
@@ -360,6 +386,7 @@ class ProfileSpecificStorage {
                     )
                 }
             }
+            //#endif
             dupeChocolateGained += it.dupeChocolateGained
             strayChocolateGained += it.strayChocolateGained
             rabbitTheFishFinds += it.rabbitTheFishFinds
@@ -388,9 +415,11 @@ class ProfileSpecificStorage {
         }
     }
 
+    //#if TODO
     // - fame
     @Expose
     var communityShopProfileUpgrade: CommunityShopUpgrade? = null
+    //#endif
 
     // - fishing
     @Expose
@@ -573,6 +602,7 @@ class ProfileSpecificStorage {
         var farmingWeight: FarmingWeightConfig = FarmingWeightConfig()
 
         class FarmingWeightConfig {
+            // TODO rename to lastLeaderboard
             @Expose
             var lastFarmingWeightLeaderboard: Int = -1
         }
@@ -637,8 +667,10 @@ class ProfileSpecificStorage {
     var wardrobe: WardrobeStorage = WardrobeStorage()
 
     class WardrobeStorage {
+        //#if TODO
         @Expose
         var data: MutableMap<Int, WardrobeData> = mutableMapOf()
+        //#endif
 
         @Expose
         var currentSlot: Int? = null
@@ -657,9 +689,9 @@ class ProfileSpecificStorage {
 
     // - mining
     @Expose
-    var mining: MiningConfig = MiningConfig()
+    var mining: MiningStorage = MiningStorage()
 
-    class MiningConfig {
+    class MiningStorage {
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 
@@ -696,11 +728,13 @@ class ProfileSpecificStorage {
             @Expose
             var mineshaftTotalCount: Int = 0
 
+            //#if TODO
             @Expose
             var blocksBroken: MutableList<PityData> = mutableListOf()
 
             @Expose
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
+            //#endif
         }
 
         @Expose
@@ -746,9 +780,11 @@ class ProfileSpecificStorage {
         @Expose
         var selfKillingAnimals: Int = 0
 
+        //#if TODO
         // TODO change to sh tracker
         @Expose
         var animalRarities: Map<TrapperMobRarity, Int> = enumMapOf()
+        //#endif
     }
 
     @Expose
@@ -786,8 +822,10 @@ class ProfileSpecificStorage {
         @Expose
         var completedKloonTerminals: MutableList<KloonTerminal> = mutableListOf()
 
+        //#if TODO
         @Expose
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
+        //#endif
 
         @Expose
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()

@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+//#if TODO
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -32,6 +34,7 @@ import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object ChatUtils {
 
@@ -55,7 +58,12 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ) {
-        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
+        //#if TODO
+        val debug = LorenzUtils.debug
+        //#else
+        //$$ val debug = true
+        //#endif
+        if (debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             consoleLog("[Debug] $message")
         }
     }
@@ -277,6 +285,7 @@ object ChatUtils {
 
     private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
 
+    //#if TODO
     var chatLines: MutableList<ChatLine>
         get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
         set(value) {
@@ -288,6 +297,7 @@ object ChatUtils {
         set(value) {
             (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
         }
+    //#endif
 
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
     fun editFirstMessage(
@@ -295,8 +305,10 @@ object ChatUtils {
         reason: String,
         predicate: (ChatLine) -> Boolean,
     ) {
+        //#if TODO
         chatLines.editChatLine(component, predicate, reason)
-        chatGui.refreshChat()
+        refreshChat()
+        //#endif
     }
 
     /**
@@ -307,8 +319,16 @@ object ChatUtils {
         amount: Int = 1,
         predicate: (ChatLine) -> Boolean,
     ) {
+        //#if TODO
         chatLines.deleteChatLine(amount, reason, predicate)
-        chatGui.refreshChat()
+        refreshChat()
+        //#endif
+    }
+
+    private fun refreshChat() {
+        DelayedRun.onThread.execute {
+            chatGui.refreshChat()
+        }
     }
 
     private var deleteNext: Pair<String, (String) -> Boolean>? = null

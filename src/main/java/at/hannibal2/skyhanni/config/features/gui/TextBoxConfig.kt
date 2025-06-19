@@ -31,5 +31,5 @@ class TextBoxConfig {
 
     @Expose
     @ConfigLink(owner = TextBoxConfig::class, field = "enabled")
-    var position: Position = Position(10, 80, false, true)
+    var position: Position = Position(10, 80)
 }

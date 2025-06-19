@@ -40,7 +40,7 @@ class BingoConfig {
 
     @Expose
     @ConfigLink(owner = BingoConfig::class, field = "minionCraftHelperEnabled")
-    var minionCraftHelperPos: Position = Position(10, 10, false, true)
+    var minionCraftHelperPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

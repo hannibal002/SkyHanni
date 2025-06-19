@@ -21,5 +21,5 @@ class DraconicSacrificeTrackerConfig {
 
     @Expose
     @ConfigLink(owner = DraconicSacrificeTrackerConfig::class, field = "enabled")
-    var position: Position = Position(201, 199, false, true)
+    var position: Position = Position(201, 199)
 }

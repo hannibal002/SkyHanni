@@ -67,7 +67,7 @@ class ModuleProcessor(
         }
 
         val validPaths = buildPathsFile.readText().lineSequence()
-            .map { it.substringBefore("#").trim() }
+            .map { it.substringBefore("#").replace(Regex("\\.(?!kt|java|\\()"), "/").trim() }
             .filter { it.isNotBlank() }
             .toSet()
 

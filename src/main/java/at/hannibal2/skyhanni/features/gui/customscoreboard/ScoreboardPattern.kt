@@ -29,14 +29,6 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Heat: §c1♨
-     */
-    val heatPattern by mainSB.pattern(
-        "heat",
-        "Heat: (?<heat>.*)",
-    )
-
-    /**
      * REGEX-TEST: Copper: §c3,416
      */
     val copperPattern by mainSB.pattern(
@@ -261,15 +253,16 @@ object ScoreboardPattern {
      */
     val lockedPattern by farmingSB.pattern(
         "locked",
-        "\\s*§cLocked",
+        "\\s*§cLocked.*",
     )
 
     /**
      * REGEX-TEST:    §fCleanup§7: §e0.3%
+     * REGEX-TEST:    §fCleanup§7: §b2 §4§lൠ§7 x1
      */
     val cleanUpPattern by farmingSB.pattern(
         "cleanup",
-        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*[\\d,.]*%?",
+        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*.*",
     )
 
     /**
@@ -932,7 +925,7 @@ object ScoreboardPattern {
     val brokenPatterns by group.list(
         "broken",
         "\\s*§.§l⚡ §cRedston",
-        "\\s*§ce: §e§b0%",
+        "\\s*§ce: §e§b\\d+%",
         "\\s*Starting in: §a0 §c[\\d:]+",
         "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*",
     )

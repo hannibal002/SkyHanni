@@ -64,16 +64,15 @@ object TradeValue {
         val yourMap = mutableMapOf<Int, ItemStack>()
         // Gets total value of trade
         for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val stack = slot.stack
             // Gets value of their trade
             if (slot.slotIndex in otherList) {
                 otherMap[slot.slotIndex] = slot.stack
-                val stack = slot.stack
                 otherTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
             }
             // Gets value of your trade
             if (slot.slotIndex in yourList) {
                 yourMap[slot.slotIndex] = slot.stack
-                val stack = slot.stack
                 yourTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
             }
         }

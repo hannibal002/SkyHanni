@@ -89,8 +89,8 @@ object SoundUtils {
         }
 
         val soundName = args[0]
-        val pitch = args.getOrNull(1)?.toFloat() ?: 1.0f
-        val volume = args.getOrNull(2)?.toFloat() ?: 50.0f
+        val pitch = args.getOrNull(1)?.toFloat() ?: 1f
+        val volume = args.getOrNull(2)?.toFloat() ?: 50f
 
         createSound(soundName, pitch, volume).playSound()
     }

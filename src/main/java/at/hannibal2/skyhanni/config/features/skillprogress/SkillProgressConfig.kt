@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo 1.21 impl needed
 class SkillProgressConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show the Skill Progress Display.")
@@ -92,17 +93,17 @@ class SkillProgressConfig {
 
     @Expose
     @ConfigLink(owner = SkillProgressConfig::class, field = "enabled")
-    var displayPosition: Position = Position(384, -105, false, true)
+    var displayPosition: Position = Position(384, -105)
 
     @Expose
     @ConfigLink(owner = SkillProgressBarConfig::class, field = "enabled")
-    var barPosition: Position = Position(384, -87, false, true)
+    var barPosition: Position = Position(384, -87)
 
     @Expose
     @ConfigLink(owner = AllSkillDisplayConfig::class, field = "enabled")
-    var allSkillPosition: Position = Position(5, 209, false, true)
+    var allSkillPosition: Position = Position(5, 209)
 
     @Expose
     @ConfigLink(owner = SkillETADisplayConfig::class, field = "enabled")
-    var etaPosition: Position = Position(5, 155, false, true)
+    var etaPosition: Position = Position(5, 155)
 }

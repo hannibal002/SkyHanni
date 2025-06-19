@@ -16,9 +16,9 @@ object RendererLivingEntityHook {
         val color = EntityOutlineRenderer.getCustomOutlineColor(entity)
 
         if (color != null) {
-            val colorRed = (color shr 16 and 255).toFloat() / 255.0f
-            val colorGreen = (color shr 8 and 255).toFloat() / 255.0f
-            val colorBlue = (color and 255).toFloat() / 255.0f
+            val colorRed = (color shr 16 and 255).toFloat() / 255f
+            val colorGreen = (color shr 8 and 255).toFloat() / 255f
+            val colorBlue = (color and 255).toFloat() / 255f
             GlStateManager.color(colorRed, colorGreen, colorBlue, alpha)
         } else {
             GlStateManager.color(red, green, blue, alpha)

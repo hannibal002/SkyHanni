@@ -22,6 +22,12 @@ object ChargeBottleNotification {
 
     private val config get() = SkyHanniMod.feature.misc
 
+    private val emptyBottles = setOf(
+        "THUNDER_IN_A_BOTTLE_EMPTY",
+        "STORM_IN_A_BOTTLE_EMPTY",
+        "HURRICANE_IN_A_BOTTLE_EMPTY",
+    ).toInternalNames()
+
     private val bottles = setOf(
         "THUNDER_IN_A_BOTTLE",
         "STORM_IN_A_BOTTLE",
@@ -37,6 +43,7 @@ object ChargeBottleNotification {
 
         lastChecked = SimpleTimeMark.now()
         if (!isFishing) return
+        if (emptyBottles.any { InventoryUtils.isItemInInventory(it) }) return
         val bottlesInInventory = bottles.filter { InventoryUtils.isItemInInventory(it) }
             .map { it.itemNameWithoutColor }
         if (bottlesInInventory.isEmpty()) return

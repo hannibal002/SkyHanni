@@ -4,15 +4,21 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -58,7 +64,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
@@ -71,10 +76,13 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.ProfileComponent
 //#endif
 
+// todo 1.21 impl needed
 @SkyHanniModule
+@Suppress("LargeClass")
 object ItemUtils {
 
-    val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
+    private val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
+    private val compactItemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> compact item name
 
     // This map might not contain all stats the item has, compare with itemBaseStatsRaw if unclear
     private var itemBaseStats = mapOf<NeuInternalName, Map<SkyblockStat, Int>>()
@@ -126,10 +134,11 @@ object ItemUtils {
 
     fun NeuInternalName.getRawBaseStats(): Map<String, Int> = itemBaseStatsRaw[this].orEmpty()
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
             itemNameCache.clear()
+            compactItemNameCache.clear()
         }
     }
 
@@ -142,7 +151,7 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) }  ?: emptyList()
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -155,7 +164,7 @@ object ItemUtils {
     //#else
     //$$ fun ComponentMap?.getLore(): List<String> {
     //$$     this ?: return emptyList()
-    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() } ?: emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) } ?: emptyList()
     //$$ }
     //#endif
 
@@ -600,6 +609,15 @@ object ItemUtils {
             return getInternalNameOrNull()?.repoItemName ?: "<null>"
         }
 
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
+    val ItemStack.repoItemNameCompact: String
+        get() {
+            getAttributeFromShard()?.let {
+                return it.getAttributeName()
+            }
+            return getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
+        }
+
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
         if (!(getInternalName().asString().startsWith("ATTRIBUTE_SHARD"))) return null
         val attributes = getAttributes() ?: return null
@@ -613,12 +631,33 @@ object ItemUtils {
     val NeuInternalName.repoItemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
+    val NeuInternalName.repoItemNameCompact get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
+
+    private fun NeuInternalName.getRepoCompactName(): String {
+        var name = repoItemName
+        for ((from, to) in compactNameReplace) {
+            name = name.replace(from, to)
+        }
+        return name
+    }
+
+    private var compactNameReplace = mapOf<String, String>()
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        compactItemNameCache.clear()
+        // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
+        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
+        compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
+    }
+
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     val NeuInternalName.readableInternalName: String
         get() = asString().replace("_", " ").lowercase()
 
+    @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
@@ -700,27 +739,30 @@ object ItemUtils {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestitem") {
+        event.registerBrigadier("shtestitem") {
             description = "test item internal name resolving"
             category = CommandCategory.DEVELOPER_TEST
-            callback { testItemCommand(it) }
+            arg("item", BrigadierArguments.greedyString()) { item ->
+                callback {
+                    testItemCommand(getArg(item))
+                }
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+            }
         }
     }
+    //#endif
 
-    private fun testItemCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
-            return
-        }
-
-        val input = args.joinToString(" ")
+    private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
         SkyHanniMod.coroutineScope.launch {
-            buildTestItemMessage(input).send(testItemMessageId)
+            buildTestItemMessage(args).send(testItemMessageId)
         }
     }
 
@@ -816,7 +858,9 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-        if (!LorenzUtils.debug && !PlatformUtils.isDevEnvironment) return
+        //#if TODO
+        if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
+        //#endif
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()

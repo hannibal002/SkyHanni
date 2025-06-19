@@ -53,7 +53,7 @@ object ItemClickData {
                     else -> return
                 }
                 val clickedEntity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
-                EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).post()
+                EntityClickEvent(clickType, packet.action, clickedEntity, InventoryUtils.getItemInHand()).post()
             }
 
             else -> {

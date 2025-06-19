@@ -3,10 +3,14 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.entity.EndermanTeleportEvent
 import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 
@@ -16,6 +20,16 @@ import net.minecraftforge.client.event.RenderBlockOverlayEvent
 @SkyHanniModule
 object MiscFeatures {
 
+    /**
+     * REGEX-TEST: §6§LCHICKEN RACING §e00:26.842     §b2/9   §a§lJUMP
+     */
+    private val chickenRacePattern by RepoPattern.pattern(
+        "misc.chickenrace.active",
+        "(?:§.)*CHICKEN RACING.*",
+    )
+
+    private var inChickenRace = false
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onEndermanTeleport(event: EndermanTeleportEvent) {
         if (!SkyHanniMod.feature.combat.mobs.endermanTeleportationHider) return
@@ -23,8 +37,14 @@ object MiscFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
+        inChickenRace = IslandType.WINTER.isCurrent() && chickenRacePattern.matches(event.actionBar)
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!SkyHanniMod.feature.misc.hideExplosions) return
+        if (inChickenRace) return
 
         when (event.type) {
             EnumParticleTypes.EXPLOSION_LARGE,
