@@ -29,10 +29,8 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
-//#if TODO
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
-//#endif
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
@@ -446,7 +444,6 @@ class ProfileSpecificStorage {
         @Expose
         var savedCropAccessory: CropAccessory? = CropAccessory.NONE
 
-        //#if TODO
         @Expose
         var dicerDropTracker: DicerRngDropTracker.Data = DicerRngDropTracker.Data()
 
@@ -464,7 +461,6 @@ class ProfileSpecificStorage {
 
         @Expose
         var armorDropTracker: ArmorDropTracker.Data = ArmorDropTracker.Data()
-        //#endif
 
         @Expose
         var composterUpgrades: MutableMap<ComposterUpgrade, Int> = enumMapOf()
