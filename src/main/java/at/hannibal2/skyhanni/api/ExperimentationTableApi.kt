@@ -325,9 +325,9 @@ object ExperimentationTableApi {
     private fun ExperimentationMessages.isSelected() =
         //#if TODO
         config.experimentsProfitTracker.hideMessages.contains(this)
-        //#else
-        //$$false
-        //#endif
+    //#else
+    //$$false
+    //#endif
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
