@@ -326,7 +326,7 @@ enum class TabWidget(
     ;
 
     /** The pattern for the first line of the widget*/
-    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*$pattern0")
+    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*(?:$pattern0)")
 
     /** The current active information from tab list.
      *

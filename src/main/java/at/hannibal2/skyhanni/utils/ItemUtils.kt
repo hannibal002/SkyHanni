@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
@@ -15,7 +16,9 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -61,7 +64,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
@@ -74,6 +76,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.ProfileComponent
 //#endif
 
+// todo 1.21 impl needed
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
@@ -148,7 +151,7 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) }  ?: emptyList()
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -161,7 +164,7 @@ object ItemUtils {
     //#else
     //$$ fun ComponentMap?.getLore(): List<String> {
     //$$     this ?: return emptyList()
-    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() } ?: emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) } ?: emptyList()
     //$$ }
     //#endif
 
@@ -736,27 +739,30 @@ object ItemUtils {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestitem") {
+        event.registerBrigadier("shtestitem") {
             description = "test item internal name resolving"
             category = CommandCategory.DEVELOPER_TEST
-            callback { testItemCommand(it) }
+            arg("item", BrigadierArguments.greedyString()) { item ->
+                callback {
+                    testItemCommand(getArg(item))
+                }
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+            }
         }
     }
+    //#endif
 
-    private fun testItemCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
-            return
-        }
-
-        val input = args.joinToString(" ")
+    private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
         SkyHanniMod.coroutineScope.launch {
-            buildTestItemMessage(input).send(testItemMessageId)
+            buildTestItemMessage(args).send(testItemMessageId)
         }
     }
 
@@ -852,7 +858,9 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
+        //#if TODO
         if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
+        //#endif
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()

@@ -492,6 +492,17 @@ object StringUtils {
         return if (string[0] in "aeiou") "an" else "a"
     }
 
+    fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }
+
+    fun String.splitLastWhitespace(): Pair<String, String> {
+        val lastWhitespaceIndex = lastIndexOf(" ")
+        return if (lastWhitespaceIndex == -1) {
+            "" to this
+        } else {
+            substring(0, lastWhitespaceIndex) to substring(lastWhitespaceIndex + 1)
+        }
+    }
+
     fun String.addStrikethorugh(strikethorugh: Boolean = true): String {
         if (!strikethorugh) return this
 
