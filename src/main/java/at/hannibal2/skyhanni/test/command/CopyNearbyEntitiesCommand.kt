@@ -119,6 +119,7 @@ object CopyNearbyEntitiesCommand {
                     //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
                     //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
                     //$$ is net.minecraft.entity.passive.PandaEntity -> addPanda(entity)
+                    //$$ is net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity -> addBlockDisplayEntity(entity)
                     //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
@@ -262,6 +263,15 @@ object CopyNearbyEntitiesCommand {
     //$$     val hiddenGene = entity.hiddenGene
     //$$     add("-  mainGene: $mainGene")
     //$$     add("-  hiddenGene: $hiddenGene")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addBlockDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity) {
+    //$$     add("EntityBlockDisplay:")
+    //$$     val block = entity.blockState.block
+    //$$     val rotation = entity.rotationVector
+    //$$
+    //$$     add("-  block: ${block.name.formattedTextCompat()}")
+    //$$     add("-  rotation: $rotation")
     //$$ }
     //#endif
 
