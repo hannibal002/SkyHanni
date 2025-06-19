@@ -1437,7 +1437,6 @@ interface Renderable {
             }
         }
 
-        //#if TODO
         fun drawInsideRoundedRectOutline(
             input: Renderable,
             padding: Int = 2,
