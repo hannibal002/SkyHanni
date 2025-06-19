@@ -38,7 +38,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             changelog.render(context, getChangelogPosition(adjustedWidth), 30)
         }
 
-        val widthRemaining = adjustedWidth - max(button.width,changelog.width) - 10
+        val widthRemaining = adjustedWidth - max(button.width, changelog.width) - 10
 
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
             context.drawStringCenteredScaledMaxWidth(
@@ -104,7 +104,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
                 ?: ErrorManager.logErrorStateWithData(
                     "Can't get Changelog because of internal error",
                     "UpdateManager.getNextVersion is null even though updateState is != NONE",
-                    "state" to UpdateManager.updateState
+                    "state" to UpdateManager.updateState,
                 )
 
         return true
