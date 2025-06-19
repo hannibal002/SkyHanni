@@ -170,7 +170,7 @@ class TextFieldRenderable(
 
     private fun strLenNoColor(str: String): Int = str.replace(Regex("(?i)§."), "").length
 
-    fun mouseClickMove(mouseX: Int, mouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
+    fun mouseClickMove(mouseX: Int, mouseY: Int) {
         if (isFocussed) {
             //#if MC < 1.21
             textField.setSelectionPos(getCursorPos(mouseX, mouseY))
@@ -189,7 +189,7 @@ class TextFieldRenderable(
         val lineIndex = text.substring(0, cursor).count { it == '\n' }
         val lineStart = text.lineStartIndex(lineIndex)
         val colOffset = getStringWidth0(text.substring(lineStart, cursor).replace("§", "¶"))
-  
+
         if (keyCode != Keyboard.KEY_V) {
             //#if MC < 1.21
             textField.setEnabled(true)
@@ -336,7 +336,7 @@ class TextFieldRenderable(
         GuiRenderUtils.drawRect(-1, -1, width + 1, bottom + 1, borderColor)
         GuiRenderUtils.drawRect(0, 0, width, bottom, LorenzColor.BLACK.toColor().rgb)
 
-        //bar text
+        // Bar text
         val text = renderText.replacePatternControlCodes()
         val textNoColor = textField.text.replacePatternControlCodesNoColors()
 

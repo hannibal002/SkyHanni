@@ -295,9 +295,12 @@ object TitleManager {
                 }
             }
             literal("reset") {
+                // TODO fix the reset logic causing the title to show for one tick or so after reopening the inv
                 callback { resetCommand() }
             }
         }
+
+        // TODO maybe, only if possible, fix this cmd not doing anything (tested /shsendcountdowntitle 2m hey)
         event.registerBrigadier("shsendcountdowntitle") {
             description = "Display a countdown title on the screen with the specified settings."
             category = CommandCategory.DEVELOPER_TEST
@@ -551,12 +554,14 @@ object TitleManager {
 
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(0f, -(heightTranslation), 500f)
+        //#if TODO
         Renderable.drawInsideRoundedRect(
             stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 0, gui.width, gui.height)
+        //#endif
 
         DrawContextUtils.translate(0f, heightTranslation, -500f)
         DrawContextUtils.popMatrix()

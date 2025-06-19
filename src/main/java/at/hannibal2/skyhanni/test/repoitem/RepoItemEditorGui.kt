@@ -228,7 +228,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             it.mouseClicked(originalMouseX, originalMouseY, mouseButton)
         }
         val buttonWidth = GuiScreenUtils.scaledWindowWidth * 0.80f
-        if (originalMouseX.toFloat() in buttonWidth..buttonWidth+50) {
+        if (originalMouseX.toFloat() in buttonWidth..buttonWidth + 50) {
             if (originalMouseY in 10..30) {
                 InventoryUtils.closeInventory()
             } else if (originalMouseY in 50..70) {
@@ -251,7 +251,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
 
     override fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
         getTextFields().forEach {
-            it.mouseClickMove(originalMouseX, originalMouseY, clickedMouseButton, timeSinceLastClick)
+            it.mouseClickMove(originalMouseX, originalMouseY)
         }
     }
 
