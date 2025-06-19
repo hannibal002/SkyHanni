@@ -1,8 +1,12 @@
-#version 120
+#version 150 core
 
-varying vec4 color;
+uniform mat4 modelViewProjectionMatrix;
+
+in vec4 position;
+in vec4 vertexColor;
+out vec4 color;
 
 void main() {
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    color = gl_Color;
+    gl_Position = modelViewProjectionMatrix * position;
+    color = vertexColor;
 }
