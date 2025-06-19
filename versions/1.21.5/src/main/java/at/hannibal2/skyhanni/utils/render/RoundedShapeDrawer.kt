@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.MinecraftClient
@@ -34,7 +33,7 @@ object RoundedShapeDrawer {
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,
         passOp: (RenderPass.() -> Unit) = { },
-    ): RenderPass {
+    ) {
         val floatPairs = listOf(
             x1 to y1,
             x1 to y2,
@@ -53,13 +52,10 @@ object RoundedShapeDrawer {
                 }
             }
 
-            var passReturn: RenderPass? = null
             draw(pipeline, buffer.end()) { pass ->
                 this@performVQuadAndUniforms.performBaseUniforms(pass, withSmoothness, withHalfSize)
                 passOp.invoke(pass)
-                passReturn = pass
             }
-            return passReturn ?: ErrorManager.skyHanniError("RenderPass was not returned from draw operation")
         }
     }
 
