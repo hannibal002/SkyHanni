@@ -21,11 +21,10 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemCategory.Companion.containsItem
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -202,7 +201,7 @@ object EnderNodeTracker {
 
         val newProfit = mutableMapOf<EnderNode, Double>()
         for ((item, amount) in storage.lootCount) {
-            val altPrice = (if (!LorenzUtils.noTradeMode) SkyHanniTracker.getPricePer(item.internalName) else 0.0)
+            val altPrice = (if (!SkyBlockUtils.noTradeMode) SkyHanniTracker.getPricePer(item.internalName) else 0.0)
             val price = when (item.isEnderArmor()) {
                 true -> 10_000.0
                 false -> altPrice.coerceAtLeast(
@@ -214,7 +213,7 @@ object EnderNodeTracker {
         return newProfit
     }
 
-    private fun isEnabled() = IslandType.THE_END.isInIsland() && (!config.onlyPickaxe || hasItemInHand())
+    private fun isEnabled() = IslandType.THE_END.isCurrent() && (!config.onlyPickaxe || hasItemInHand())
 
     private fun hasItemInHand() = ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand())
 

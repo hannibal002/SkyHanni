@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropType
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -15,12 +13,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Show Jacob's Contest",
-        desc = "Show the current or next Jacob's farming contest time and crops."
+        desc = "Show the current or next Jacob's farming contest time and crops.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -34,7 +31,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "In Other Guis",
-        desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined."
+        desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined.",
     )
     @ConfigEditorBoolean
     var otherGuis: Boolean = false
@@ -42,7 +39,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Fetch Contests",
-        desc = "Automatically fetch Contests from elitebot.dev for the current year if they're uploaded already."
+        desc = "Automatically fetch Contests from elitebot.dev for the current year if they're uploaded already.",
     )
     @ConfigEditorBoolean
     var fetchAutomatically: Boolean = true
@@ -50,7 +47,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Additional Boosted Highlight",
-        desc = "Highlight the current boosted crop with an outline in addition to the enchant glint."
+        desc = "Highlight the current boosted crop with an outline in addition to the enchant glint.",
     )
     @ConfigEditorBoolean
     var additionalBoostedHighlight: Boolean = false
@@ -58,7 +55,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Additional Boosted Highlight Color",
-        desc = "Set the color of the highlight for the current boosted crop."
+        desc = "Set the color of the highlight for the current boosted crop.",
     )
     @ConfigEditorColour
     var additionalBoostedHighlightColor: String = "0:80:0:255:0"
@@ -66,7 +63,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Share Contests",
-        desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically."
+        desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.",
     )
     @ConfigEditorDropdown
     var shareAutomatically: ShareContestsEntry = ShareContestsEntry.ASK
@@ -97,17 +94,15 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Popup Warning",
-        desc = "Create a popup when the warning time is reached and Minecraft is not in focus."
+        desc = "Create a popup when the warning time is reached and Minecraft is not in focus.",
     )
     @ConfigEditorBoolean
     var warnPopup: Boolean = false
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Warn For", desc = "Only warn for these crops.")
     @ConfigEditorDraggableList
     var warnFor: MutableList<CropType> = CropType.entries.toMutableList()
-    //#endif
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
