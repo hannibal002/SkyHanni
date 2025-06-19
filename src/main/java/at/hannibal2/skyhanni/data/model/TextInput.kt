@@ -183,9 +183,7 @@ open class TextInput {
                     textBox
                 }
 
-                null -> {
-                    textBox
-                }
+                null -> textBox
 
                 else -> if (carriage != null) {
                     this.carriage = carriage + 1
@@ -197,20 +195,17 @@ open class TextInput {
             updated()
         }
 
-        private fun onRemove(): String {
-            carriage?.let {
-                return if (it == 0) {
-                    textBox.substring(1)
-                } else {
-                    this.carriage = it.minus(1)
-                    textBox.removeRange(it - 1, it)
-                }
-            }
-            return if (KeyboardManager.isModifierKeyDown()) {
-                textBox.removeWordsAtEnd(1)
+        private fun onRemove(): String = carriage?.let {
+            if (it == 0) {
+                textBox.substring(1)
             } else {
-                textBox.dropLast(1)
+                this.carriage = it.minus(1)
+                textBox.removeRange(it - 1, it)
             }
+        } ?: if (KeyboardManager.isModifierKeyDown()) {
+            textBox.removeWordsAtEnd(1)
+        } else {
+            textBox.dropLast(1)
         }
 
         private fun moveCarriageRight(carriage: Int) = carriage + 1
