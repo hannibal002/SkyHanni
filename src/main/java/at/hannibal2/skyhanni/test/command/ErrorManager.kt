@@ -20,6 +20,18 @@ import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
+/** Crashes if [value] is false and in developer environment */
+fun requireDevEnv(value: Boolean) = requireDevEnv(value, null)
+
+/** Crashes if [value] is false and in developer environment */
+fun requireDevEnv(value: Boolean, lazyMessage: (() -> Any)?) {
+    if (!value) {
+        val msg = lazyMessage?.invoke()?.toString()
+        val message = "Failed requirement in Dev Environment" + msg?.let { ": $it" }.orEmpty()
+        ErrorManager.crashInDevEnv(message)
+    }
+}
+
 @SkyHanniModule
 object ErrorManager {
 
