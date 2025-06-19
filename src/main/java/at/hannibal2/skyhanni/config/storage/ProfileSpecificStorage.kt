@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 //#endif
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
-//#endif
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 //#if TODO
 import at.hannibal2.skyhanni.features.garden.CropAccessory
@@ -450,7 +449,6 @@ class ProfileSpecificStorage {
         @Expose
         var seaCreatureTracker: SeaCreatureTracker.Data = SeaCreatureTracker.Data()
     }
-    //#endif
 
     // - garden
     @Expose
