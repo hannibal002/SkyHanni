@@ -264,12 +264,15 @@ object EnoughUpdatesManager {
         //$$ }
         //$$
         //$$ val damage = json["damage"]?.asInt ?: 0
-        //$$ val stack = ItemStack(
-        //$$             ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
-        //$$                 println(json["itemid"].asString + " " + damage + " is invalid item")
-        //$$                 return ItemStack(Blocks.STONE.asItem())
-        //$$             },
-        //$$         )
+        //$$ val item: Item = if (json["itemModel"]?.asString?.isNotEmpty() == true && json["itemModel"]?.asString?.getVanillaItem() != null) {
+        //$$     json["itemModel"].asString.getVanillaItem()!!
+        //$$ } else {
+        //$$     ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
+        //$$         println(json["itemid"].asString + " " + damage + " is invalid item")
+        //$$         return ItemStack(Blocks.STONE.asItem())
+        //$$     }
+        //$$ }
+        //$$ val stack = ItemStack(item)
         //$$ if (stack.item == Items.AIR) {
         //$$     return ItemStack(Blocks.STONE.asItem())
         //$$ }
