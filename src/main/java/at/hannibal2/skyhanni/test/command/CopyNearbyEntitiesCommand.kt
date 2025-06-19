@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -148,8 +149,9 @@ object CopyNearbyEntitiesCommand {
 
         add("-  inventory:")
         for ((id, stack) in entity.getInventoryItems().withIndex()) {
-            add("-  id $id ($stack)")
-            printItemStackData(stack)
+            val adjustedStack = stack.orNull()
+            add("-  id $id ($adjustedStack)")
+            printItemStackData(adjustedStack)
         }
     }
 
