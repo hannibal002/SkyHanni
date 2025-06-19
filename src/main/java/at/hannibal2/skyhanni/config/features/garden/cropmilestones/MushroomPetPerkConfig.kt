@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// TODO moulconfig runnable support
+// TODO Write ConditionalUtils.onToggle()-s for these values in their feature classes
 class MushroomPetPerkConfig {
     @Expose
     @ConfigOption(

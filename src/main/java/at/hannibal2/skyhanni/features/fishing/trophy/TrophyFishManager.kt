@@ -131,7 +131,9 @@ object TrophyFishManager {
 
         if (updatedFishes > 0) {
             ChatUtils.chat("Updated $updatedFishes Trophy Fishes from Odger.")
+            //#if TODO
             TrophyFishDisplay.update()
+            //#endif
         }
     }
 
@@ -148,7 +150,9 @@ object TrophyFishManager {
                 ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue")
             }
         }
+        //#if TODO
         TrophyFishDisplay.update()
+        //#endif
         ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
     }
 

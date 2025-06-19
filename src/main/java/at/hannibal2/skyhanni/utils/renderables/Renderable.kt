@@ -2,15 +2,19 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
+//#if TODO
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
+//#endif
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
+//#if TODO
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+//#endif
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -31,21 +35,24 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGui
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+//#if TODO
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+//#endif
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
+//#if TODO
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+//#endif
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
@@ -54,6 +61,7 @@ import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
 
+// todo 1.21 impl needed
 @Suppress("TooManyFunctions")
 interface Renderable {
 
@@ -113,7 +121,7 @@ interface Renderable {
             onLeftClick,
             bypassChecks,
             highlightsOnHoverSlots = highlightsOnHoverSlots,
-            condition
+            condition,
         )
 
         fun link(
@@ -280,7 +288,9 @@ interface Renderable {
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
+                            //#if TODO
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
+                            //#endif
                             DrawContextUtils.pushMatrix()
                             DrawContextUtils.translate(0F, 0F, 400F)
 
@@ -294,7 +304,9 @@ interface Renderable {
                             DrawContextUtils.popMatrix()
                         }
                     } else {
+                        //#if TODO
                         HighlightOnHoverSlot.currentSlots.remove(pair)
+                        //#endif
                     }
                 }
             }
@@ -311,7 +323,10 @@ interface Renderable {
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
-                ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
+                ToolTipData.lastSlot == null
+                    //#if TODO
+                    || GuiData.preDrawEventCancelled
+                //#endif
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 
@@ -391,11 +406,15 @@ interface Renderable {
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover()
                     hovered.render(posX, posY)
+                    //#if TODO
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
+                    //#endif
                     true
                 } else {
                     unHovered.render(posX, posY)
+                    //#if TODO
                     HighlightOnHoverSlot.currentSlots.remove(pair)
+                    //#endif
                     false
                 }
             }
@@ -468,6 +487,7 @@ interface Renderable {
             }
         }
 
+        //#if TODO
         fun Renderable.darken(amount: Float = 1f) = object : Renderable {
             override val width = this@darken.width
             override val height = this@darken.height
@@ -481,6 +501,7 @@ interface Renderable {
                 ShaderManager.disableShader()
             }
         }
+        //#endif
 
         @Deprecated(
             "Use RenderableString instead",
@@ -528,7 +549,7 @@ interface Renderable {
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
 
-            override fun render(posX: Int, posY: Int) { }
+            override fun render(posX: Int, posY: Int) {}
         }
 
         fun searchableTable(
@@ -718,7 +739,7 @@ interface Renderable {
                     textInput.makeActive()
                     textInput.handle()
                     val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
-                    if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && (-99).isKeyClicked()) {
+                    if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && RIGHT_MOUSE.isKeyClicked()) {
                         textInput.clear()
                     }
                 } else {
@@ -774,7 +795,9 @@ interface Renderable {
                     GuiRenderUtils.drawRect(0, 0, width, height, 0xFF43464B.toInt())
 
                     if (useChroma) {
+                        //#if TODO
                         ChromaShaderManager.begin(ChromaType.STANDARD)
+                        //#endif
                     }
 
                     val factor = 0.2
@@ -783,30 +806,39 @@ interface Renderable {
                     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
 
                     if (useChroma) {
+                        //#if TODO
                         ChromaShaderManager.end()
+                        //#endif
                     }
                 } else {
                     val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
                         0, 64,
                     ) else Pair(0, 0)
 
-                    Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY, width, height,
+                    GuiRenderUtils.drawTexturedRect(
+                        posX, posY, width, height, textureX.toFloat(), textureY.toFloat(),
+                        (textureX + width).toFloat(), (textureY + height).toFloat(), createResourceLocation(texture.path),
+                        alpha = 1f, filter = GL11.GL_NEAREST
                     )
 
                     if (useChroma) {
+                        //#if TODO
                         ChromaShaderManager.begin(ChromaType.TEXTURED)
+                        //#endif
                         GlStateManager.color(1f, 1f, 1f, 1f)
                     } else {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                     }
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY + height, progress, height,
+                    GuiRenderUtils.drawTexturedRect(
+                        posX, posY, progress, height, textureX.toFloat(), (textureY + height).toFloat(),
+                        (textureX + progress).toFloat(), (textureY + height + height).toFloat(), createResourceLocation(texture.path),
+                        alpha = 1f, filter = GL11.GL_NEAREST
                     )
 
                     if (useChroma) {
+                        //#if TODO
                         ChromaShaderManager.end()
+                        //#endif
                     }
                 }
             }
@@ -1425,6 +1457,7 @@ interface Renderable {
             }
         }
 
+        //#if TODO
         fun drawInsideRoundedRect(
             input: Renderable,
             color: Color,
@@ -1440,7 +1473,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
+                //#if TODO
                 RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+                //#endif
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
@@ -1618,5 +1653,6 @@ interface Renderable {
                 DrawContextUtils.translate(0f, 0f, -100f)
             }
         }
+        //#endif
     }
 }
