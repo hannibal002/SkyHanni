@@ -7,7 +7,10 @@ import at.hannibal2.skyhanni.utils.shader.Uniform
 //$$ import org.joml.Matrix4f
 //#endif
 
-abstract class RoundedShader<Self : RoundedShader<Self>>(vertex: String, fragment: String) : Shader(vertex, fragment) {
+abstract class RoundedShader<Self : RoundedShader<Self>>(
+    vertex: String,
+    fragment: String
+) : Shader(vertex, fragment) {
     @Suppress("UNCHECKED_CAST", "PropertyName", "VariableNaming")
     val INSTANCE: Self
         get() = this as Self
@@ -23,7 +26,10 @@ abstract class RoundedShader<Self : RoundedShader<Self>>(vertex: String, fragmen
     //$$ var modelViewMatrix: Matrix4f = Matrix4f()
     //#endif
 
-    fun applyBaseUniforms(hasSmoothness: Boolean = true, hasHalfSize: Boolean = true) {
+    fun applyBaseUniforms(
+        hasSmoothness: Boolean = true,
+        hasHalfSize: Boolean = true
+    ) {
         registerUniform(Uniform.UniformType.FLOAT, "scaleFactor") { scaleFactor }
         registerUniform(Uniform.UniformType.FLOAT, "radius") { radius }
         if (hasSmoothness) registerUniform(Uniform.UniformType.FLOAT, "smoothness") { smoothness }

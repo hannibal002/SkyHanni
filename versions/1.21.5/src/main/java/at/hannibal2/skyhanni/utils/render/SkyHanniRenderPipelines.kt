@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
+import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.DepthTestFunction
@@ -11,190 +13,175 @@ import net.minecraft.client.render.VertexFormats
 import net.minecraft.util.Identifier
 
 object SkyHanniRenderPipelines {
+    val LINES: RenderPipeline get() = SkyHanniRenderPipeline.LINES.pipelineInstance
+    val LINES_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.LINES_XRAY.pipelineInstance
+    val FILLED: RenderPipeline get() = SkyHanniRenderPipeline.FILLED.pipelineInstance
+    val FILLED_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.FILLED_XRAY.pipelineInstance
+    val TRIANGLES: RenderPipeline get() = SkyHanniRenderPipeline.TRIANGLES.pipelineInstance
+    val TRIANGLES_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.TRIANGLES_XRAY.pipelineInstance
+    val TRIANGLE_FAN: RenderPipeline get() = SkyHanniRenderPipeline.TRIANGLE_FAN.pipelineInstance
+    val TRIANGLE_FAN_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.TRIANGLE_FAN_XRAY.pipelineInstance
+    val QUADS: RenderPipeline get() = SkyHanniRenderPipeline.QUADS.pipelineInstance
+    val QUADS_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.QUADS_XRAY.pipelineInstance
+    val ROUNDED_RECT: RenderPipeline get() = SkyHanniRenderPipeline.ROUNDED_RECT.pipelineInstance
+    val ROUNDED_TEXTURED_RECT: RenderPipeline get() = SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT.pipelineInstance
+    val ROUNDED_RECT_OUTLINE: RenderPipeline get() = SkyHanniRenderPipeline.ROUNDED_RECT_OUTLINE.pipelineInstance
+    val CIRCLE: RenderPipeline get() = SkyHanniRenderPipeline.CIRCLE.pipelineInstance
+    val CHROMA_STANDARD: RenderPipeline get() = SkyHanniRenderPipeline.CHROMA_STANDARD.pipelineInstance
+    val CHROMA_TEXT: RenderPipeline get() = SkyHanniRenderPipeline.CHROMA_TEXT.pipelineInstance
+}
 
-    val LINES: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "line"))
-            .withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, VertexFormat.DrawMode.LINES)
-            .withCull(false)
-            .withDepthWrite(true)
-            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            .build(),
+private enum class SkyHanniRenderPipeline(
+    snippet: RenderPipeline.Snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+    vFormat: VertexFormat = VertexFormats.POSITION_COLOR,
+    vDrawMode: VertexFormat.DrawMode = VertexFormat.DrawMode.QUADS,
+    blend: BlendFunction? = null,
+    withCull: Boolean? = false,
+    vertexShaderPath: String? = null,
+    fragmentShaderPath: String? = vertexShaderPath,
+    sampler: String? = null,
+    uniforms: Map<String, UniformType> = emptyMap(),
+    depthWrite: Boolean = true,
+    depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
+    additionalBuild: RenderPipeline.Builder.() -> Unit = { },
+) {
+    LINES(
+        snippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR_NORMAL,
+        vDrawMode = VertexFormat.DrawMode.LINES,
+    ),
+    LINES_XRAY(
+        snippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR_NORMAL,
+        vDrawMode = VertexFormat.DrawMode.LINES,
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    FILLED(vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP),
+    FILLED_XRAY(
+        vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP,
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    TRIANGLES(vDrawMode = VertexFormat.DrawMode.TRIANGLES),
+    TRIANGLES_XRAY(
+        vDrawMode = VertexFormat.DrawMode.TRIANGLES,
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    TRIANGLE_FAN(vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN),
+    TRIANGLE_FAN_XRAY(
+        vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN,
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    QUADS(vDrawMode = VertexFormat.DrawMode.QUADS),
+    QUADS_XRAY(
+        vDrawMode = VertexFormat.DrawMode.QUADS,
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    ROUNDED_RECT(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR,
+        vDrawMode = VertexFormat.DrawMode.QUADS,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "rounded_rect",
+        uniforms = getCommonRoundedUniforms(),
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    ROUNDED_TEXTURED_RECT(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_TEXTURE,
+        vDrawMode = VertexFormat.DrawMode.QUADS,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "rounded_texture",
+        sampler = "textureSampler",
+        uniforms = getCommonRoundedUniforms(),
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    ROUNDED_RECT_OUTLINE(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "rounded_rect_outline",
+        uniforms = getCommonRoundedUniforms(withSmoothness = false) + mapOf(
+            "borderThickness" to UniformType.FLOAT,
+            "borderBlur" to UniformType.FLOAT,
+        ),
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    CIRCLE(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "circle",
+        uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+            "angle1" to UniformType.FLOAT,
+            "angle2" to UniformType.FLOAT,
+        ),
+        depthWrite = false,
+        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+    ),
+    CHROMA_STANDARD(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "standard_chroma",
+        uniforms = commonChromaUniforms,
+    ),
+    CHROMA_TEXT(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_TEXTURE_COLOR,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "textured_chroma",
+        sampler = "Sampler0",
+        uniforms = commonChromaUniforms,
     )
+    ;
 
-    val LINES_XRAY: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "line_xray"))
-            .withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, VertexFormat.DrawMode.LINES)
-            .withCull(false)
-            .withDepthWrite(false)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build(),
-    )
+    val pipelineInstance: RenderPipeline by lazy {
+        RenderPipelines.register(
+            RenderPipeline.builder(snippet)
+                .withLocation(Identifier.of(SkyHanniMod.MODID, this.name.lowercase()))
+                .withVertexFormat(vFormat, vDrawMode)
+                .apply {
+                    if (blend != null) withBlend(blend)
+                    if (withCull != null) withCull(withCull)
+                    if (vertexShaderPath != null) withVertexShader(Identifier.of(SkyHanniMod.MODID, vertexShaderPath))
+                    if (fragmentShaderPath != null) withFragmentShader(Identifier.of(SkyHanniMod.MODID, fragmentShaderPath))
+                    if (sampler != null) withSampler(sampler)
+                    uniforms.forEach(this::withUniform)
+                }
+                .withDepthWrite(depthWrite)
+                .withDepthTestFunction(depthTestFunction)
+                .apply(additionalBuild)
+                .build()
+        )
+    }
+}
 
-    val FILLED: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "filled"))
-            .withCull(false)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP)
-            .withDepthWrite(true)
-            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            .build(),
-    )
+private object SkyHanniRenderPipelineUtils {
+    fun getCommonRoundedUniforms(
+        withSmoothness: Boolean = true,
+        withHalfSize: Boolean = true,
+    ): Map<String, UniformType> = mapOf(
+        "scaleFactor" to UniformType.FLOAT,
+        "radius" to UniformType.FLOAT,
+        "smoothness" to UniformType.FLOAT,
+        "halfSize" to UniformType.VEC2,
+        "centerPos" to UniformType.VEC2,
+        "modelViewMatrix" to UniformType.MATRIX4X4,
+    ).filter {
+        (withSmoothness || it.key != "smoothness") &&
+            (withHalfSize || it.key != "halfSize")
+    }
 
-    val FILLED_XRAY: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "filled_xray"))
-            .withCull(false)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP)
-            .withDepthWrite(false)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build(),
-    )
-
-    val TRIANGLES: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "triangles"))
-            .withCull(false)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLES)
-            .withDepthWrite(true)
-            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            .build(),
-    )
-
-    val TRIANGLES_XRAY: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "triangles_xray"))
-            .withCull(false)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLES)
-            .withDepthWrite(false)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build(),
-    )
-
-    val TRIANGLE_FAN: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "filled"))
-            .withCull(false)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_FAN)
-            .withDepthWrite(true)
-            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            .build(),
-    )
-
-    val TRIANGLE_FAN_XRAY: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "filled_xray"))
-            .withCull(false)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_FAN)
-            .withDepthWrite(false)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build(),
-    )
-
-    val QUADS: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "quads"))
-            .withCull(false)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
-            .withDepthWrite(true)
-            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            .build(),
-    )
-
-    val QUADS_XRAY: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "quads_xray"))
-            .withCull(false)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
-            .withDepthWrite(false)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build(),
-    )
-
-    val ROUNDED_RECT: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "rounded_rect"))
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withVertexShader(Identifier.of(SkyHanniMod.MODID, "rounded_rect"))
-            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "rounded_rect"))
-            .withUniform("scaleFactor", UniformType.FLOAT)
-            .withUniform("radius", UniformType.FLOAT)
-            .withUniform("smoothness", UniformType.FLOAT)
-            .withUniform("halfSize", UniformType.VEC2)
-            .withUniform("centerPos", UniformType.VEC2)
-            .withUniform("modelViewMatrix", UniformType.MATRIX4X4)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .withDepthWrite(false)
-            .build(),
-    )
-
-    val ROUNDED_TEXTURED_RECT: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "rounded_texture_rect"))
-            .withVertexFormat(VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS)
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withVertexShader(Identifier.of(SkyHanniMod.MODID, "rounded_texture"))
-            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "rounded_texture"))
-            .withSampler("textureSampler")
-            .withUniform("scaleFactor", UniformType.FLOAT)
-            .withUniform("radius", UniformType.FLOAT)
-            .withUniform("smoothness", UniformType.FLOAT)
-            .withUniform("halfSize", UniformType.VEC2)
-            .withUniform("centerPos", UniformType.VEC2)
-            .withUniform("modelViewMatrix", UniformType.MATRIX4X4)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .withDepthWrite(false)
-            .build(),
-    )
-
-    val ROUNDED_RECT_OUTLINE: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "rounded_rect_outline"))
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withVertexShader(Identifier.of(SkyHanniMod.MODID, "rounded_rect_outline"))
-            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "rounded_rect_outline"))
-            .withUniform("scaleFactor", UniformType.FLOAT)
-            .withUniform("radius", UniformType.FLOAT)
-            .withUniform("halfSize", UniformType.VEC2)
-            .withUniform("centerPos", UniformType.VEC2)
-            .withUniform("modelViewMatrix", UniformType.MATRIX4X4)
-            .withUniform("borderThickness", UniformType.FLOAT)
-            .withUniform("borderBlur", UniformType.FLOAT)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .withDepthWrite(false)
-            .build(),
-    )
-
-    val CHROMA_STANDARD: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "chroma_standard"))
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withVertexShader(Identifier.of(SkyHanniMod.MODID, "standard_chroma"))
-            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "standard_chroma"))
-            .withUniform("chromaSize", UniformType.FLOAT)
-            .withUniform("timeOffset", UniformType.FLOAT)
-            .withUniform("saturation", UniformType.FLOAT)
-            .withUniform("forwardDirection", UniformType.INT)
-            .build()
-    )
-
-    val CHROMA_TEXT: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "chroma_text"))
-            .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS)
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withVertexShader(Identifier.of(SkyHanniMod.MODID, "textured_chroma"))
-            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "textured_chroma"))
-            .withSampler("Sampler0")
-            .withUniform("chromaSize", UniformType.FLOAT)
-            .withUniform("timeOffset", UniformType.FLOAT)
-            .withUniform("saturation", UniformType.FLOAT)
-            .withUniform("forwardDirection", UniformType.INT)
-            .build()
+    val commonChromaUniforms = mapOf(
+        "chromaSize" to UniformType.FLOAT,
+        "timeOffset" to UniformType.FLOAT,
+        "saturation" to UniformType.FLOAT,
+        "forwardDirection" to UniformType.INT,
     )
 
     val CIRCLE: RenderPipeline = RenderPipelines.register(

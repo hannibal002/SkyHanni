@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
-import at.hannibal2.skyhanni.features.misc.RoundedShader
-import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.shader.CircleShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleShader
+import at.hannibal2.skyhanni.shader.RoundedShader
+import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier
 
 object RoundedShapeDrawer {
 
-    private fun <T: RoundedShader> T.performBaseUniforms(
+    private fun <T: RoundedShader<T>> T.performBaseUniforms(
         renderPass: RenderPass,
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,
@@ -27,7 +27,7 @@ object RoundedShapeDrawer {
         if (withHalfSize) renderPass.setUniform("halfSize", this.halfSize[0], this.halfSize[1])
     }
 
-    private fun <T: RoundedShader> T.performVQuadAndUniforms(
+    private fun <T: RoundedShader<T>> T.performVQuadAndUniforms(
         pipeline: RenderPipeline,
         x1: Int, y1: Int, x2: Int, y2: Int,
         postVertexOps: List<(BufferBuilder.() -> Unit)>,
