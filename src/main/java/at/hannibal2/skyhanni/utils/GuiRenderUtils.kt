@@ -34,6 +34,7 @@ import net.minecraft.client.renderer.OpenGlHelper
 //$$ import net.minecraft.client.render.RenderLayer
 //#endif
 
+// todo 1.21 impl needed
 /**
  * Some functions taken from NotEnoughUpdates
  */
