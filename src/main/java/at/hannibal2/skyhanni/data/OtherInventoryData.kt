@@ -45,13 +45,21 @@ object OtherInventoryData {
 
     //#if MC > 1.21
     //$$ private val slotCountMap = mapOf(
-    //$$     ScreenHandlerType.GENERIC_9X1 to 9,
-    //$$     ScreenHandlerType.GENERIC_9X2 to 18,
-    //$$     ScreenHandlerType.GENERIC_9X3 to 27,
-    //$$     ScreenHandlerType.GENERIC_9X4 to 36,
-    //$$     ScreenHandlerType.GENERIC_9X5 to 45,
-    //$$     ScreenHandlerType.GENERIC_9X6 to 54,
-    //$$     ScreenHandlerType.GENERIC_3X3 to 9,
+    //$$    ScreenHandlerType.GENERIC_9X1 to 9,
+    //$$    ScreenHandlerType.GENERIC_9X2 to 18,
+    //$$    ScreenHandlerType.GENERIC_9X3 to 27,
+    //$$    ScreenHandlerType.GENERIC_9X4 to 36,
+    //$$    ScreenHandlerType.GENERIC_9X5 to 45,
+    //$$    ScreenHandlerType.GENERIC_9X6 to 54,
+    //$$    ScreenHandlerType.GENERIC_3X3 to 9,
+    //$$    ScreenHandlerType.CRAFTING to 9,
+    //$$    ScreenHandlerType.FURNACE to 3,
+    //$$    ScreenHandlerType.BLAST_FURNACE to 3,
+    //$$    ScreenHandlerType.SMOKER to 3,
+    //$$    ScreenHandlerType.ANVIL to 3,
+    //$$    ScreenHandlerType.BREWING_STAND to 5,
+    //$$    ScreenHandlerType.SHULKER_BOX to 27,
+    //$$    ScreenHandlerType.BEACON to 1,
     //$$ )
     //#endif
 
