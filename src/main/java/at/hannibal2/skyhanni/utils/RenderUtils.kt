@@ -34,11 +34,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.notenoughupdates.moulconfig.ChromaColour
-//#if MC < 1.21
 import net.minecraft.client.Minecraft
-//#else
-//$$ import net.minecraft.client.MinecraftClient
-//#endif
 //#if TODO
 import net.minecraft.client.renderer.GLAllocation
 //#endif
@@ -52,8 +48,6 @@ import java.nio.FloatBuffer
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
-//$$ import org.joml.Matrix4f
 //$$ import org.lwjgl.BufferUtils
 //#endif
 

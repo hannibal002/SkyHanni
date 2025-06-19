@@ -19,7 +19,7 @@ object RenderPipelineDrawer {
     ): BufferBuilder = Tessellator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
 
     /**
-     * Method inspired by SkyOcean's [InventoryRenderer](https://github.com/meowdding/SkyOcean/blob/feat/iteam-search/src/client/kotlin/me/owdding/skyocean/utils/rendering/InventoryRenderer.kt)
+     * Method inspired by SkyOcean's [InventoryRenderer](https://github.com/meowdding/SkyOcean/blob/main/src/client/kotlin/me/owdding/skyocean/utils/rendering/InventoryRenderer.kt)
      */
     fun draw(pipeline: RenderPipeline, mesh: BuiltBuffer, pass: (RenderPass) -> Unit) {
         val device = RenderSystem.getDevice()

@@ -8,13 +8,11 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
 import kotlin.math.max
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
 //$$ import org.joml.Matrix4f
-//$$ import org.lwjgl.BufferUtils
 //#endif
 
 object ShaderRenderUtils {
@@ -47,9 +45,9 @@ object ShaderRenderUtils {
     /**
      * Method to draw a rounded textured rect.
      *
-     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
-     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
-     * is called **BEFORE** [GlStateManager.scale], otherwise the textured rect will not be rendered correctly
+     * **NOTE:** If you are using [DrawContextUtils.translate] or [DrawContextUtils.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
+     * is called **BEFORE** [DrawContextUtils.scale], otherwise the textured rect will not be rendered correctly
      *
      * @param filter the texture filter to use
      * @param radius the radius of the corners (default 10), NOTE: If you pass less than 1 it will just draw as a normal textured rect
@@ -87,9 +85,9 @@ object ShaderRenderUtils {
     /**
      * Method to draw a rounded rectangle.
      *
-     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
-     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
-     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
+     * **NOTE:** If you are using [DrawContextUtils.translate] or [DrawContextUtils.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
+     * is called **BEFORE** [DrawContextUtils.scale], otherwise the rectangle will not be rendered correctly
      *
      * @param color color of rect
      * @param radius the radius of the corners (default 10)
