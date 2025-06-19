@@ -987,4 +987,8 @@ at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairsClicksAl
 at.hannibal2.skyhanni.features.inventory.experimentationtable.UltraRareBookAlert.kt
 at.hannibal2.skyhanni.mixins.transformers.MixinGameRenderer.java
 
+at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
+at.hannibal2.skyhanni.utils.render.LineDrawer.kt
+
+
 # \.(?!kt|java|\()
