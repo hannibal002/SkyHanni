@@ -15,7 +15,7 @@ object MouseCompat {
     }
 
     fun isButtonDown(button: Int): Boolean {
-        return getEventButton() == button
+        return lastEventButton == button
     }
 
     fun getScrollDelta(): Int {
@@ -32,21 +32,15 @@ object MouseCompat {
         return mouse.y.toInt()
     }
 
-    // i have no clue what the difference between getx and geteventx is on 1.8.9
+    // I have no clue what the difference between getx and geteventx is on 1.8.9
     // on 1.8.9 they are pretty much the same (they are the exact same when the mouse is still)
     fun getEventX(): Int = getX()
     fun getEventY(): Int = getY()
 
-    fun getEventButtonState(): Boolean = getEventButton() != -1
+    fun getEventButtonState(): Boolean = lastEventButton != -1
     fun getEventNanoseconds(): Long = timeDelta.toLong()
 
     fun getEventDY(): Int {
         return deltaMouseY.toInt()
-    }
-
-    fun getEventButton(): Int {
-        val button = lastEventButton
-        DelayedRun.runNextTick { lastEventButton = -1 }
-        return button
     }
 }
