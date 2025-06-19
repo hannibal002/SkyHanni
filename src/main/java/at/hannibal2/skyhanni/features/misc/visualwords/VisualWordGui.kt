@@ -30,7 +30,6 @@ import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
 import java.io.File
 import java.io.FileInputStream
-import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
@@ -368,9 +367,6 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, left, top, width, height)
 
     override fun onHandleMouseInput() {
-        if (MouseCompat.getEventButtonState()) {
-            mouseClickEvent()
-        }
         if (!MouseCompat.getEventButtonState()) {
             if (MouseCompat.getScrollDelta() != 0) {
                 lastMouseScroll = MouseCompat.getScrollDelta()
@@ -379,8 +375,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
     }
 
-    @Throws(IOException::class)
-    fun mouseClickEvent() {
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         if (!currentlyEditing) {
             if (isPointInMousePos(guiLeft, guiTop, sizeX, sizeY - 25)) {
                 lastClickedWidth = mouseX
