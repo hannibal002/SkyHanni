@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
+import kotlin.math.max
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
@@ -37,7 +38,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             changelog.render(context, getChangelogPosition(adjustedWidth), 30)
         }
 
-        val widthRemaining = width - button.width - 10
+        val widthRemaining = adjustedWidth - max(button.width,changelog.width) - 10
 
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
             context.drawStringCenteredScaledMaxWidth(
@@ -93,7 +94,13 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         if (UpdateManager.updateState != UpdateManager.UpdateState.NONE)
             UpdateManager.getNextVersion()
-                ?.let { ChangelogViewer.showChangelog(currentVersion, it) }
+                ?.let {
+                    //#if TODO
+                    ChangelogViewer.showChangelog(currentVersion, it)
+                    //#else
+                    //$$ null
+                    //#endif
+                }
                 ?: ErrorManager.logErrorStateWithData(
                     "Can't get Changelog because of internal error",
                     "UpdateManager.getNextVersion is null even though updateState is != NONE",
