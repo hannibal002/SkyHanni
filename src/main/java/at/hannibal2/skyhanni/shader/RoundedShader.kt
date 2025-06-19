@@ -7,10 +7,7 @@ import at.hannibal2.skyhanni.utils.shader.Uniform
 //$$ import org.joml.Matrix4f
 //#endif
 
-abstract class RoundedShader<Self : RoundedShader<Self>>(
-    vertex: String,
-    fragment: String
-) : Shader(vertex, fragment) {
+abstract class RoundedShader<Self : RoundedShader<Self>>(vertex: String, fragment: String) : Shader(vertex, fragment) {
     @Suppress("UNCHECKED_CAST", "PropertyName", "VariableNaming")
     val INSTANCE: Self
         get() = this as Self

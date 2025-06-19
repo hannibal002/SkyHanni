@@ -13,7 +13,7 @@ import net.minecraft.client.render.VertexFormats
 import net.minecraft.util.Identifier
 
 enum class SkyHanniRenderPipeline(
-    snippet: RenderPipeline.Snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+    snippet: RenderPipeline.Snippet,
     vFormat: VertexFormat = VertexFormats.POSITION_COLOR,
     vDrawMode: VertexFormat.DrawMode = VertexFormat.DrawMode.QUADS,
     blend: BlendFunction? = null,
@@ -22,91 +22,91 @@ enum class SkyHanniRenderPipeline(
     fragmentShaderPath: String? = vertexShaderPath,
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
-    depthWrite: Boolean = true,
+    depthWrite: Boolean? = false,
     depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
-    additionalBuild: RenderPipeline.Builder.() -> Unit = { },
 ) {
     LINES(
         snippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET,
         vFormat = VertexFormats.POSITION_COLOR_NORMAL,
         vDrawMode = VertexFormat.DrawMode.LINES,
+        depthWrite = true,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET,
         vFormat = VertexFormats.POSITION_COLOR_NORMAL,
         vDrawMode = VertexFormat.DrawMode.LINES,
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
-    FILLED(vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP),
-    FILLED_XRAY(
+    FILLED(
+        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP,
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        depthWrite = true,
     ),
-    TRIANGLES(vDrawMode = VertexFormat.DrawMode.TRIANGLES),
-    TRIANGLES_XRAY(
+    FILLED_XRAY(
+        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+        vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP,
+    ),
+    TRIANGLES(
+        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLES,
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        depthWrite = true,
     ),
-    TRIANGLE_FAN(vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN),
-    TRIANGLE_FAN_XRAY(
+    TRIANGLES_XRAY(
+        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+        vDrawMode = VertexFormat.DrawMode.TRIANGLES,
+    ),
+    TRIANGLE_FAN(
+        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN,
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        depthWrite = true,
     ),
-    QUADS(vDrawMode = VertexFormat.DrawMode.QUADS),
+    TRIANGLE_FAN_XRAY(
+        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+        vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN,
+    ),
+    QUADS(
+        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+        depthWrite = true,
+    ),
     QUADS_XRAY(
-        vDrawMode = VertexFormat.DrawMode.QUADS,
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
     ),
     ROUNDED_RECT(
         snippet = RenderPipelines.MATRICES_SNIPPET,
-        vFormat = VertexFormats.POSITION_COLOR,
-        vDrawMode = VertexFormat.DrawMode.QUADS,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect",
         uniforms = getCommonRoundedUniforms(),
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     ROUNDED_TEXTURED_RECT(
         snippet = RenderPipelines.MATRICES_SNIPPET,
         vFormat = VertexFormats.POSITION_TEXTURE,
-        vDrawMode = VertexFormat.DrawMode.QUADS,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_texture",
         sampler = "textureSampler",
         uniforms = getCommonRoundedUniforms(),
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     ROUNDED_RECT_OUTLINE(
         snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect_outline",
         uniforms = getCommonRoundedUniforms(withSmoothness = false) + mapOf(
             "borderThickness" to UniformType.FLOAT,
             "borderBlur" to UniformType.FLOAT,
         ),
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     CIRCLE(
         snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle",
         uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
             "angle1" to UniformType.FLOAT,
             "angle2" to UniformType.FLOAT,
         ),
-        depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "standard_chroma",
         uniforms = commonChromaUniforms,
@@ -126,16 +126,18 @@ enum class SkyHanniRenderPipeline(
             .withLocation(Identifier.of(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode)
             .apply {
-                blend?.let(this::withBlend)
-                withCull?.let(this::withCull)
+                // One or the other, never both
+                blend?.let(this::withBlend) ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(Identifier.of(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let { withFragmentShader(Identifier.of(SkyHanniMod.MODID, it)) }
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
+                depthWrite?.let { bool ->
+                    withDepthWrite(bool)
+                    if (bool) withDepthTestFunction(depthTestFunction)
+                    else withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                }
             }
-            .withDepthWrite(depthWrite)
-            .withDepthTestFunction(depthTestFunction)
-            .apply(additionalBuild)
             .build()
     )
 

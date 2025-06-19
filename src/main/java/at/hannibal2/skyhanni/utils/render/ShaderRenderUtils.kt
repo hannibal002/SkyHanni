@@ -25,24 +25,23 @@ object ShaderRenderUtils {
      */
     private fun <T : RoundedShader<T>> T.applyBaseSettings(
         radius: Int,
+        width: Int, height: Int,
         x: Int, y: Int,
-        width: Int? = null, height: Int? = null,
         smoothness: Float = 0f,
         extraApplies: (T.() -> Unit)? = null,
     ) = this.apply {
         val scaleFactor = GuiScreenUtils.scaleFactor
-        val widthIn: Int? = width?.let { it * scaleFactor }
-        val heightIn: Int? = height?.let { it * scaleFactor }
+        val widthIn: Int = width * scaleFactor
+        val heightIn: Int = height * scaleFactor
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
         this.scaleFactor = scaleFactor.toFloat()
         this.radius = radius.toFloat()
         this.smoothness = smoothness
-        if (widthIn != null && heightIn != null) {
-            this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
-            this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
-        }
+        this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+
         //#if MC > 1.21
         //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
         //#endif
@@ -190,25 +189,30 @@ object ShaderRenderUtils {
         angle1: Float = 7.0f,
         angle2: Float = 7.0f
     ) {
-        CircleShader.applyBaseSettings(radius, x, y, smoothness = smoothness) {
+        val radiusIn = radius * GuiScreenUtils.scaleFactor
+        val diameterIn = radiusIn * 2
+
+        CircleShader.applyBaseSettings(radiusIn, diameterIn, diameterIn, x, y, smoothness) {
             this.angle1 = angle1 - Math.PI.toFloat()
             this.angle2 = angle2 - Math.PI.toFloat()
-            //#if MC > 1.21
-            //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
-            //#endif
         }
 
         // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
         val circleColor = color.addAlpha(255).rgb
 
+        val left = x - 5
+        val top = y - 5
+        val right = x + (radius * 2) + 5
+        val bottom = y + (radius * 2) + 5
+
         //#if MC < 1.21
         DrawContextUtils.pushPop {
             ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
-            GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, circleColor)
+            GuiRenderUtils.drawRect(left, top, right, bottom, circleColor)
             ShaderManager.disableShader()
         }
         //#else
-        //$$ RoundedShapeDrawer.drawCircle(x - 5, y - 5, x + 5, y + 5, angle1, angle2, circleColor)
+        //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, circleColor)
         //#endif
     }
 }
