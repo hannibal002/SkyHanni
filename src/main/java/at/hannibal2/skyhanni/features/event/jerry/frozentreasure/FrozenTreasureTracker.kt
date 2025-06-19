@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -183,7 +182,7 @@ object FrozenTreasureTracker {
         event.move(2, "misc.frozenTreasureTracker", "event.winter.frozenTreasureTracker")
     }
 
-    private fun onJerryWorkshop() = IslandType.WINTER.isInIsland()
+    private fun onJerryWorkshop() = IslandType.WINTER.isCurrent()
 
     private fun inGlacialCave() =
         onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")

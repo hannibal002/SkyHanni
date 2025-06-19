@@ -10,10 +10,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-//#endif
 import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
 //#if MC > 1.21
@@ -86,9 +84,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         wasMouseButtonDown = isMouseButtonDown
         DrawContextUtils.popMatrix()
         queuedTooltip?.let { tooltip ->
-            //#if TODO
             RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
-            //#endif
         }
     }
 

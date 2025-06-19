@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -29,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -42,8 +42,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JButton
@@ -438,7 +438,7 @@ object GardenNextJacobContest {
         val cropTextNoColor = crops.joinToString(", ") {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
-        if (config.warnPopup && !Display.isActive()) {
+        if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow("<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>")
             }
@@ -516,8 +516,8 @@ object GardenNextJacobContest {
 
     private fun isEnabled() =
         config.display && (
-            (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)) ||
-                (OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock)
+            (SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)) ||
+                (OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock)
             )
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
