@@ -149,8 +149,8 @@ object SlayerApi {
         }
     }
 
-    // TODO USE SH-REPO
-   //#if TODO
+    // TODO USE SH-REPO - currently not working in 1.21: no_area + Revenant Cave
+    //#if TODO
     private fun checkSlayerTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
         //#else
         //$$ private fun checkSlayerTypeForCurrentArea() = when (SkyBlockUtils.currentIsland.name) {
