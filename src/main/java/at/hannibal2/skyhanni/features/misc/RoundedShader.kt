@@ -12,7 +12,7 @@ abstract class RoundedShader(vertex: String, fragment: String) : Shader(vertex, 
     var scaleFactor: Float = 0f
     var radius: Float = 0f
     var smoothness: Float = 0f
-    var halfSize: FloatArray = floatArrayOf(0f, 0f)
+    open var halfSize: FloatArray = floatArrayOf(0f, 0f)
     var centerPos: FloatArray = floatArrayOf(0f, 0f)
         set(value) {
             field = floatArrayOf(value[0], GuiScreenUtils.displayHeight - value[1])

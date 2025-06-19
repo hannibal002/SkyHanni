@@ -1,31 +1,21 @@
 package at.hannibal2.skyhanni.shader
 
-import at.hannibal2.skyhanni.utils.shader.Shader
+import at.hannibal2.skyhanni.features.misc.RoundedShader
 import at.hannibal2.skyhanni.utils.shader.Uniform
-//#if MC < 1.21
-import net.minecraft.client.Minecraft
-//#else
-//$$ import net.minecraft.client.MinecraftClient
-//#endif
 
-object CircleShader : Shader("circle", "circle") {
+object CircleShader : RoundedShader("circle", "circle") {
 
-    val INSTANCE get() = this
+    val INSTANCE: CircleShader
+        get() = this
 
-    var scaleFactor: Float = 0f
-    var radius: Float = 0f
-    var smoothness: Float = 0f
-    var centerPos: FloatArray = floatArrayOf(0f, 0f)
-        set(value) {
-            //#if MC < 1.21
-            val gameHeight = Minecraft.getMinecraft().displayHeight
-            //#else
-            //$$ val gameHeight = MinecraftClient.getInstance().window.framebufferHeight.toFloat()
-            //#endif
-            field = floatArrayOf(value[0], gameHeight - value[1])
-        }
+    @Deprecated("Unused in this shader.")
+    override var halfSize: FloatArray = floatArrayOf(0f, 0f)
+
     var angle1: Float = 0f
     var angle2: Float = 0f
+    //#if MC > 1.21
+    //$$ var modelViewMatrix: Matrix4f = Matrix4f()
+    //#endif
 
     override fun registerUniforms() {
         registerUniform(Uniform.UniformType.FLOAT, "scaleFactor") { scaleFactor }
