@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.render
 
-//import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-//import at.hannibal2.skyhanni.features.misc.PatcherFixes
+import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -423,26 +423,26 @@ object WorldRenderUtils {
 
     @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._draw3DPathWithWaypoint(
-        //path: Graph,
+        path: Graph,
         colorLine: Color,
         lineWidth: Int,
         depth: Boolean,
         startAtEye: Boolean = true,
         textSize: Double = 1.0,
-       // waypointColor: Color =
-        //    (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
+        waypointColor: Color =
+            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
         showNodeNames: Boolean = false,
         markLastBlock: Boolean = true,
     ) {
         draw3DPathWithWaypoint(
-           // path,
+            path,
             colorLine,
             lineWidth,
             depth,
             startAtEye,
             textSize,
-            //waypointColor,
+            waypointColor,
             bezierPoint,
             showNodeNames,
             markLastBlock,
@@ -450,14 +450,14 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
-       // path: Graph,
+        path: Graph,
         colorLine: Color,
         lineWidth: Int,
         depth: Boolean,
         startAtEye: Boolean = true,
         textSize: Double = 1.0,
-       // waypointColor: Color =
-       //     (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
+        waypointColor: Color =
+            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
         showNodeNames: Boolean = false,
         markLastBlock: Boolean = true,
@@ -480,7 +480,7 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.standingEyeHeight.toDouble()
-       // PatcherFixes.onPlayerEyeLine()
+        PatcherFixes.onPlayerEyeLine()
         return exactLocation(player).add(y = eyeHeight)
     }
 

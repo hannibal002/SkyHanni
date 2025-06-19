@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.config.features.misc.MiscConfig
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
-//#if TODO
 import at.hannibal2.skyhanni.config.storage.Storage
+//#if TODO
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAprilFoolsDay
 //#endif
 import com.google.gson.annotations.Expose
@@ -145,12 +145,10 @@ class Features : Config() {
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
     var dev: DevConfig = DevConfig()
 
-    //#if TODO
     @Expose
     var storage: Storage = Storage()
 
     @Expose
     @Suppress("unused")
     var lastVersion: Int = ConfigUpdaterMigrator.CONFIG_VERSION
-    //#endif
 }

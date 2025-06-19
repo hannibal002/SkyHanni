@@ -21,9 +21,7 @@ import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 //#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-//#if TODO
 import at.hannibal2.skyhanni.features.rift.RiftApi
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -392,9 +390,7 @@ object HypixelData {
         TabWidget.PROFILE.matchMatcherFirstLine {
             var newProfile = group("profile").lowercase()
             // Hypixel shows the profile name reversed while in the Rift
-            //#if TODO
             if (RiftApi.inRift()) newProfile = newProfile.reversed()
-            //#endif
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).post()
