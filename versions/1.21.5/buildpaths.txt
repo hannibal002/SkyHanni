@@ -1018,4 +1018,8 @@ at.hannibal2.skyhanni.data.EntityMovementData.kt
 at.hannibal2.skyhanni.events.SkyHanniWarpEvent.kt
 
 
+at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
+at.hannibal2.skyhanni.utils.render.LineDrawer.kt
+
+
 # \.(?!kt|java|\()

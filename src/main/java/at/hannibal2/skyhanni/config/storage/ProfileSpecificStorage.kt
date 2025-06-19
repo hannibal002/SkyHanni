@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
+//#if TODO
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
+//#endif
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
@@ -29,7 +31,9 @@ import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 //#endif
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
+//#endif
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
@@ -40,6 +44,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
+//#endif
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 //#if TODO
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
@@ -431,6 +436,7 @@ class ProfileSpecificStorage {
         @Expose
         var seaCreatureTracker: SeaCreatureTracker.Data = SeaCreatureTracker.Data()
     }
+    //#endif
 
     // - garden
     @Expose
@@ -440,6 +446,7 @@ class ProfileSpecificStorage {
         @Expose
         var experience: Long? = null
 
+        //#if TODO
         @Expose
         var cropCounter: MutableMap<CropType, Long> = enumMapOf()
 
@@ -485,6 +492,7 @@ class ProfileSpecificStorage {
 
         @Expose
         var toolWithBountiful: MutableMap<CropType, Boolean> = enumMapOf()
+        //#endif
 
         @Expose
         var composterCurrentOrganicMatterItem: NeuInternalName? = NONE
@@ -544,12 +552,15 @@ class ProfileSpecificStorage {
             var plotList: MutableMap<Int, NeuInternalName> = mutableMapOf()
         }
 
+        //#if TODO
         @Expose
         var plotData: MutableMap<Int, PlotData> = mutableMapOf()
+        //#endif
 
         @Expose
         var scoreboardPests: Int = 0
 
+        //#if TODO
         @Expose
         var cropStartLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
 
@@ -558,13 +569,16 @@ class ProfileSpecificStorage {
 
         @Expose
         var farmingLanes: MutableMap<CropType, FarmingLane> = enumMapOf()
+        //#endif
 
         @Expose
         var fortune: Fortune = Fortune()
 
         class Fortune {
+            //#if TODO
             @Expose
             var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
+            //#endif
 
             @Expose
             var farmingLevel: Int = -1
@@ -584,11 +598,13 @@ class ProfileSpecificStorage {
             @Expose
             var cakeExpiring: SimpleTimeMark? = null
 
+            //#if TODO
             @Expose
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
 
             @Expose
             var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
+            //#endif
         }
 
         @Expose
@@ -606,6 +622,7 @@ class ProfileSpecificStorage {
             var lastFarmingWeightLeaderboard: Int = -1
         }
 
+        //#if TODO
         @Expose
         var npcVisitorLocations: MutableMap<String, LorenzVec> = mutableMapOf()
 
@@ -617,6 +634,7 @@ class ProfileSpecificStorage {
 
         @Expose
         var activeVinyl: VinylType? = null
+        //#endif
     }
 
     // - gui

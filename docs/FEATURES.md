@@ -827,6 +827,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Warns when pests are about to spawn.
 + Added Pest Spawn Time Message. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3343)
     + Sends a chat message showing how long it took for a pest to spawn.
++ Added option to mute Vacuum in the Garden. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4051)
 
 </details>
 <details open><summary>
@@ -1006,6 +1007,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Powder Chest Timer in Crystal Hollows. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2204)
     + Despawn timer below every chest, and as GUI display.
     + Chests color-coded to show despawn timer.
++ Added option to mute High Heat Sound in Magma Fields. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2573)
 
 </details>
 <details open><summary>
