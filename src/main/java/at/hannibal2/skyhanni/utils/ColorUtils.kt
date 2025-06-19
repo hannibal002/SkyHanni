@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 
@@ -82,6 +83,11 @@ object ColorUtils {
     }
 
     fun getColorCode(color: Char): Int {
-        return colorCodes["0123456789abcdef".indexOf(color)]
+        var newColor = color
+        if (color == 'r') newColor = 'f'
+        if (newColor !in "0123456789abcdef") {
+            ErrorManager.skyHanniError("invalid color code", "color" to color)
+        }
+        return colorCodes["0123456789abcdef".indexOf(newColor)]
     }
 }

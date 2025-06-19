@@ -6,6 +6,9 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
+//#if TODO
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -13,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -230,10 +232,12 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         add("§7to edit the number.")
         add("§7Use negative numbers to remove items.")
 
-        if (LorenzUtils.debug) {
+        //#if TODO
+        if (SkyHanniDebugsAndTests.enabled) {
             add("")
             add("§7$internalName")
         }
+        //#endif
     }
 
     fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Searchable {

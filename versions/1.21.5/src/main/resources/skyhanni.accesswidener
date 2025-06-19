@@ -9,3 +9,5 @@ accessible method net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SP
 accessible method net/minecraft/client/gui/hud/ChatHud logChatMessage (Lnet/minecraft/client/gui/hud/ChatHudLine;)V
 accessible field net/minecraft/client/gui/hud/BossBarHud bossBars Ljava/util/Map;
 accessible field net/minecraft/client/render/WorldRenderer frustum Lnet/minecraft/client/render/Frustum;
+accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket entityId I
+accessible field net/minecraft/entity/player/PlayerInventory equipment Lnet/minecraft/entity/EntityEquipment;
