@@ -19,6 +19,7 @@ net.minecraft.block.ButtonBlock net.minecraft.block.BlockButtonWood
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
 net.minecraft.client.KeyMapping net.minecraft.client.settings.KeyBinding
+net.minecraft.client.KeyMapping consumeClick() isPressed()
 net.minecraft.client.Options net.minecraft.client.settings.GameSettings
 
 net.minecraft.client.KeyMapping boundKey.getCode() getKeyCode()
