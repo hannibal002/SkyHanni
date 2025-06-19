@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -34,6 +38,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
 // todo 1.21 impl needed
+@SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
     fun command(args: Array<String>) {
@@ -285,6 +290,15 @@ object CopyNearbyEntitiesCommand {
         }
         if (mob.boundingBox != mob.baseEntity.entityBoundingBox) {
             add("Bounding Box: ${mob.boundingBox}")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcopyentities") {
+            description = "Copies the entities in the specified radius around the player into the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { command(it) }
         }
     }
 
