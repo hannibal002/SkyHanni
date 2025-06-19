@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
+//#if TODO
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
+//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -31,6 +33,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 //#if MC > 1.21
 //$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.player.PlayerInventory
+//$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
 //#endif
@@ -159,11 +163,24 @@ object EntityUtils {
     fun EntityArmorStand.wearingSkullTexture(skin: String) = getStandHelmet()?.getSkullTexture() == skin
     fun EntityArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
-    fun EntityPlayer.isNpc() = !isRealPlayer()
-
     //#if TODO
+    fun EntityPlayer.isNpc() = !isRealPlayer()
+    //#else
+    //$$ fun Player.isNpc() = false
+    //#endif
+
+    //#if MC < 1.21
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
+    //#else
+    //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    //$$     if (this !is PlayerEntity) return null
+    //$$     val list = mutableListOf<ItemStack?>()
+    //$$     for (equipmentSlot in PlayerInventory.EQUIPMENT_SLOTS.values) {
+    //$$         list.add(inventory.equipment.get(equipmentSlot).orNull())
+    //$$     }
+    //$$     return list.normalizeAsArray()
+    //$$ }
     //#endif
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState

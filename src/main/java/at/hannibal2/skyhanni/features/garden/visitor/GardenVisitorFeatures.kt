@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -45,8 +44,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -56,11 +53,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+//#endif
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
 import at.hannibal2.skyhanni.utils.SignUtils.isSupercraftAmountSetSign
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -379,7 +379,9 @@ object GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
+        //#if TODO
         event.parent.drawString(location.up(2.23), text)
+        //#endif
         if (config.rewardWarning.showOverName) {
             val initialOffset = 2.73
             val heightOffset = 0.25
@@ -387,7 +389,9 @@ object GardenVisitorFeatures {
             visitor.getRewardWarningAwards().forEach { reward ->
                 val name = reward.displayName
                 val offset = initialOffset + (counter * heightOffset)
+                //#if TODO
                 event.parent.drawString(location.up(offset), "§c§l! $name §c§l!")
+                //#endif
                 counter++
             }
         }
@@ -530,7 +534,7 @@ object GardenVisitorFeatures {
 
         logger.log("New visitor detected: '$name'")
         // do not show titles and chat messages for visitors that spawned while the player was offline
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
         if (config.notificationTitle) {
             TitleManager.sendTitle("§eNew Visitor")
@@ -685,15 +689,17 @@ object GardenVisitorFeatures {
     private fun hideExtraGuis() = GardenApi.hideExtraGuis() && !VisitorApi.inInventory
 
     private fun showGui(): Boolean {
-        if (IslandType.HUB.isInIsland()) {
-            if (config.shoppingList.inBazaarAlley && IslandAreas.currentAreaName == "Bazaar Alley") {
+        if (IslandType.HUB.isCurrent()) {
+            //#if TODO
+            if (config.shoppingList.inBazaarAlley && SkyBlockUtils.graphArea == "Bazaar Alley") {
                 return true
             }
-            if (config.shoppingList.inFarmingAreas && IslandAreas.currentAreaName == "Farm") {
+            if (config.shoppingList.inFarmingAreas && SkyBlockUtils.graphArea == "Farm") {
                 return true
             }
+            //#endif
         }
-        if (config.shoppingList.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isInIsland()) return true
+        if (config.shoppingList.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isCurrent()) return true
         if (hideExtraGuis()) return false
         if (GardenApi.inGarden()) {
             if (GardenApi.onBarnPlot) return true

@@ -26,9 +26,15 @@ import org.lwjgl.input.Mouse
 @SkyHanniModule
 object KeyboardManager {
 
+    //#if MC < 1.21
     const val LEFT_MOUSE = -100
     const val RIGHT_MOUSE = -99
     const val MIDDLE_MOUSE = -98
+    //#else
+    //$$ const val LEFT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_LEFT
+    //$$ const val RIGHT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_RIGHT
+    //$$ const val MIDDLE_MOUSE = GLFW.GLFW_MOUSE_BUTTON_MIDDLE
+    //#endif
 
     private var lastClickedMouseButton = -1
 
@@ -193,7 +199,9 @@ object KeyboardManager {
 
         else -> Keyboard.isKeyDown(this)
         //#else
-        //$$ this == -1 || this == 0 -> false
+        //$$ this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid", "keycode" to this)
+        //$$ this == -1 -> false
+        //$$ this in 0..3 -> MouseCompat.isButtonDown(this)
         //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window.handle, this)
         //#endif
     }
