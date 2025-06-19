@@ -14,7 +14,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+//#endif
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -24,6 +26,7 @@ import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object GardenPlotApi {
 
@@ -393,7 +396,9 @@ object GardenPlotApi {
     ) {
         if (isOutOfBorders(p1)) return
         if (isOutOfBorders(p2)) return
+        //#if TODO
         draw3DLine(p1, p2, color, lineWidth, depth)
+        //#endif
     }
 
     private fun isOutOfBorders(location: LorenzVec) = when {

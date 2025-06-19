@@ -41,40 +41,42 @@ object SkyHanniEvents {
 
     private fun registerMethod(method: Method, instance: Any) {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return
-        registerNoEventType(options, method, instance)
-        registerSingleEventType(options, method, instance)
-        registerMultipleEventTypes(options, method, instance)
+
+        if (registerNoEventType(options, method, instance)) return
+        if (registerSingleEventType(options, method, instance)) return
+        if (registerMultipleEventTypes(options, method, instance)) return
     }
 
     @JvmStatic
     val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
         GeneratedEventPrimaryFunctionNames.map
 
-    private fun registerNoEventType(options: HandleEvent, method: Method, instance: Any) {
-        if (method.parameterTypes.any()) return
-        val eventType = eventPrimaryFunctionNames[method.name] ?: return
-        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
+    private fun registerNoEventType(options: HandleEvent, method: Method, instance: Any): Boolean {
+        if (method.parameterTypes.any()) return false
+        val eventType = eventPrimaryFunctionNames[method.name] ?: return false
+        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return false
         listeners.getOrPut(eventType) { EventListeners(eventType) }
             .addListener(method, instance, options)
+        return true
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun registerSingleEventType(options: HandleEvent, method: Method, instance: Any) {
+    private fun registerSingleEventType(options: HandleEvent, method: Method, instance: Any): Boolean {
         val eventType = method.parameterTypes.getOrNull(0) ?: options.eventType.java
-        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
+        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return false
         listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
             .addListener(method, instance, options)
+        return true
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun registerMultipleEventTypes(options: HandleEvent, method: Method, instance: Any) {
-        options.eventTypes.map { it.java }.forEach { eventType ->
-            if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
-            listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
-                .addListener(method, instance, options)
-        }
-    }
-
+    private fun registerMultipleEventTypes(options: HandleEvent, method: Method, instance: Any): Boolean =
+        options.eventTypes.mapTo(mutableSetOf()) { it.java }
+            .filter { SkyHanniEvent::class.java.isAssignableFrom(it) }
+            .onEach { eventType ->
+                listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
+                    .addListener(method, instance, options)
+            }.any()
 
     private fun unregisterMethod(method: Method) {
         if (method.parameterCount != 1) return
