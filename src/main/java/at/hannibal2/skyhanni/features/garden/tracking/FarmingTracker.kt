@@ -1,41 +1,42 @@
 package at.hannibal2.skyhanni.features.garden.tracking
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Crop
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.EmbedConfig.InformationType
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType.EDITED_MESSAGE
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType.NEW_MESSAGE
+import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Pet
+import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Field
 import at.hannibal2.skyhanni.data.Footer
-import at.hannibal2.skyhanni.data.Mayor
-import at.hannibal2.skyhanni.data.MayorAPI
-import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.Thumbnail
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.contest.ContestBracket
 import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.BRONZE
 import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.DIAMOND
 import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.GOLD
 import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.PLATINUM
 import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.SILVER
-import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
+import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtil.getPlayerSkin
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.WebhookUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -51,15 +52,14 @@ object FarmingTracker {
     val config get() = SkyHanniMod.feature.garden.tracking
 
     var status = "Offline"
-    var lastNotification = SimpleTimeMark.farPast()
-    var farmingSince = SimpleTimeMark.farFuture()
-    var playerFaceURL = ""
-    var stats = mutableMapOf<String, Int>()
-    var cookieBuffTimer = ""
-    var godPotionTimer = ""
-    var activeAnitaBuff = ""
-    var currentCrop: Crop? = null
-    var currentPlacement = 0.0
+    private var lastNotification = SimpleTimeMark.farPast()
+    private var farmingSince = SimpleTimeMark.farFuture()
+    private var playerFaceURL = ""
+    private var cookieBuffTimer = ""
+    private var godPotionTimer = ""
+    private var activeAnitaBuff = ""
+    private var currentCrop: Crop? = null
+    private var currentPlacement = 0.0
 
     private val patternGroup = RepoPattern.group("garden.tracking")
 
@@ -98,16 +98,16 @@ object FarmingTracker {
         "You have a God Potion active! (?<length>.+)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (lastNotification.passedSince() < config.webhook.interval.minutes) return
 
         status = when {
-            GardenAPI.isCurrentlyFarming() -> "Farming"
-            !GardenAPI.isCurrentlyFarming() && GardenAPI.inGarden() -> "Idle"
-            LorenzUtils.inSkyBlock && !GardenAPI.inGarden() -> "in Skyblock"
-            LorenzUtils.onHypixel -> "Online"
+            GardenApi.isCurrentlyFarming() -> "Farming"
+            !GardenApi.isCurrentlyFarming() && GardenApi.inGarden() -> "Idle"
+            SkyBlockUtils.inSkyBlock && !GardenApi.inGarden() -> "in Skyblock"
+            SkyBlockUtils.onHypixel -> "Online"
             else -> status
         }
 
@@ -127,9 +127,9 @@ object FarmingTracker {
         if (success) lastNotification = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWidgetUpdated(event: WidgetUpdateEvent) {
-        if (!isEnabled() && LorenzUtils.inSkyBlock) return
+        if (!isEnabled() && SkyBlockUtils.inSkyBlock) return
 
         val widget = event.widget
         val widgetLines = event.widget.lines.map { it.removeColor() }
@@ -162,9 +162,9 @@ object FarmingTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onFooterUpdated(event: TablistFooterUpdateEvent) {
-        if (!isEnabled() && LorenzUtils.inSkyBlock) return
+        if (!isEnabled() && SkyBlockUtils.inSkyBlock) return
 
         val footerLines = event.footer.removeColor().lines()
 
@@ -185,7 +185,7 @@ object FarmingTracker {
     }
 
     fun prepareAndSendEmbed(status: String): Boolean {
-        playerFaceURL = playerFaceURL.ifBlank { getPlayerSkin(config.embed.bodyPart, 12) }
+        playerFaceURL = playerFaceURL.ifBlank { ApiUtils.getPlayerSkin(config.embed.bodyPart, 12) }
 
         farmingSince =
             if (status != "Farming") SimpleTimeMark.farFuture() else farmingSince.takeUnless { it.isInFuture() } ?: SimpleTimeMark.now()
@@ -202,32 +202,31 @@ object FarmingTracker {
             .filter { it.isSelected() }
             .mapNotNull { type ->
                 val value = when (type) {
-                    InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue.roundToInt()
-                    InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue.roundToInt()
-                    InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue.roundToInt()
-                    InformationType.SPEED -> SkyblockStat.SPEED.lastKnownValue.roundToInt()
-                    InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownValue.roundToInt()
-                    InformationType.PET -> PetAPI.currentPet?.let { pet ->
+                    InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue?.roundToInt()
+                    InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue?.roundToInt()
+                    InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue?.roundToInt()
+                    InformationType.SPEED -> SkyblockStat.SPEED.lastKnownValue?.roundToInt()
+                    InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownValue?.roundToInt()
+                    InformationType.PET -> PetApi.currentPet?.let { pet ->
                         Pet.entries.find { it.toString() == pet.removeColor() }?.petName ?: ""
                     } ?: ""
 
                     InformationType.COOKIE_BUFF -> cookieBuffTimer.ifBlank { "<:no:1263210393723998278>" }
                     InformationType.GOD_POTION -> godPotionTimer.ifBlank { "<:no:1263210393723998278>" }
                     InformationType.JACOBS_CONTEST ->
-                        if (!FarmingContestAPI.inContest) ""
+                        if (!FarmingContestApi.inContest) ""
                         else convertPlacement(currentPlacement)?.let { bracket -> "$currentPlacement% ${bracket.emoji}" }
                             ?: ""
 
-                    InformationType.ACTIVE_CROP -> GardenAPI.getCurrentlyFarmedCrop()?.let { farmedCrop ->
+                    InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { farmedCrop ->
                         getCropEnum(farmedCrop.cropName)?.let { cropEnum ->
                             "${cropEnum.name} ${cropEnum.emoji}"
                         }.takeUnless { status == "Idle" || status == "Offline" } ?: ""
                     } ?: ""
 
                     InformationType.ANITA_BUFF -> activeAnitaBuff.ifBlank { "<:no:1263210393723998278>" }
-                    InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.round(2).takeUnless { it == 0.0 } ?: ""
+                    InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.roundTo(2).takeUnless { it == 0.0 } ?: ""
                     InformationType.FARMING_SINCE -> if (farmingSince.isInFuture()) "" else farmingSince.passedSince()
-                    else -> ""
                 }.toString().takeIf { it.isNotBlank() } ?: return@mapNotNull null
 
                 Field(
@@ -262,12 +261,11 @@ object FarmingTracker {
         )
 
         val threadID = config.threadId.ifBlank { null }
-        val username = "[FARMING TRACKER] ${LorenzUtils.getPlayerName()}"
+        val username = "[FARMING TRACKER] ${PlayerUtils.getName()}"
 
         return when (config.messageType) {
-            NEW_MESSAGE -> WebhookUtils.sendEmbedsToWebhook(config.webhook.url, listOf(embed), threadID, username)
-            EDITED_MESSAGE -> WebhookUtils.editMessageEmbeds(config.webhook.url, listOf(embed), threadID, username)
-            else -> WebhookUtils.sendEmbedsToWebhook(config.webhook.url, listOf(embed), threadID, username)
+            MessageType.NEW_MESSAGE -> WebhookUtils.sendEmbedsToWebhook(config.webhook.url, listOf(embed), threadID, username)
+            MessageType.EDITED_MESSAGE -> WebhookUtils.editMessageEmbeds(config.webhook.url, listOf(embed), threadID, username)
         }
     }
 
@@ -275,7 +273,7 @@ object FarmingTracker {
         Crop.entries.find { it.name == cropName }
 
     private fun LorenzColor.toIntColor(): Int {
-        val parts = this.toConfigColor().split(':')
+        val parts = this.toChromaColor().toString().split(":")
 
         val red = parts[2].toInt()
         val green = parts[3].toInt()
@@ -285,7 +283,7 @@ object FarmingTracker {
     }
 
     private fun convertPlacement(placement: Double): ContestBracket? {
-        val isFinnegan = MayorAPI.currentMayor == Mayor.FINNEGAN
+        val isFinnegan = ElectionApi.currentMayor == ElectionCandidate.FINNEGAN
         val (requiredBronze, requiredSilver, requiredGold, requiredPlatinum, requiredDiamond) = ContestBracket.entries
             .map {
                 if (isFinnegan) it.requiredNormal else it.requiredFinnegan

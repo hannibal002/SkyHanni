@@ -1,55 +1,49 @@
-package at.hannibal2.skyhanni.config.features.garden;
+package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.utils.APIUtil.SkinBodyPart;
-import at.hannibal2.skyhanni.utils.LorenzColor;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.ApiUtils.SkinBodyPart
+import at.hannibal2.skyhanni.utils.LorenzColor
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import java.util.Locale
 
-import java.util.ArrayList;
-import java.util.List;
 
-public class TrackingConfig {
-
+class TrackingConfig {
     @Expose
     @ConfigOption(name = "Webhook Settings", desc = "")
     @Accordion
-    public WebhookConfig webhook = new WebhookConfig();
+    var webhook: WebhookConfig = WebhookConfig()
 
-    public static class WebhookConfig {
+    class WebhookConfig {
         @Expose
         @ConfigOption(name = "URL", desc = "The URL of the webhook.")
         @ConfigEditorText
-        public String url = "";
+        var url: String = ""
 
         @Expose
         @ConfigOption(name = "Interval", desc = "The interval in which status updated will be sent.")
-        @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 10,
-            minStep = 1
-        )
-        public int interval = 5;
+        @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+        var interval: Int = 5
     }
 
     @Expose
     @ConfigOption(name = "Embed Settings", desc = "")
     @Accordion
-    public EmbedConfig embed = new EmbedConfig();
+    var embed: EmbedConfig = EmbedConfig()
 
-    public static class EmbedConfig {
+    class EmbedConfig {
         @Expose
         @ConfigOption(name = "Information Displayed", desc = "Change which stats are enabled, and the order they will be displayed in.")
         @ConfigEditorDraggableList
-        public List<InformationType> information = new ArrayList<>();
+        var information: List<InformationType> = ArrayList()
 
-        public enum InformationType {
+        enum class InformationType(val display: String, val fieldName: String) {
             FARMING_FORTUNE("§6Farming Fortune ☘", "FF <:farming_fortune:1263201171317854369>"),
             FARMING_WISDOM("§3Farming Wisdom ☯", "FW <:farming_wisdom:1263201172513099788>"),
             BONUS_PEST_CHANCE("§2Bonus Pest Chance ൠ", "Pest Chance <:bonus_pest_chance:1263201675724984370>"),
@@ -64,63 +58,48 @@ public class TrackingConfig {
             BPS("§eBlocks/Second", "BPS <:bps_sugar:1263285905083465729>"),
             FARMING_SINCE("§fFarming Since", "Farming For <:minecraftclock:1264539139911716866>");
 
-            public final String name;
-            public final String fieldName;
-
-            InformationType(String name, String fieldName) {
-                this.name = name;
-                this.fieldName = fieldName;
-            }
-
-            @Override
-            public String toString() {
-                return name;
-            }
+            override fun toString(): String = display
         }
 
         @Expose
         @ConfigOption(name = "Skin Part", desc = "Skin Part to be displayed (image) in the top right of the embed.")
         @ConfigEditorDropdown
-        public SkinBodyPart bodyPart = SkinBodyPart.HEAD;
+        var bodyPart: SkinBodyPart = SkinBodyPart.HEAD
 
         @Expose
-        @ConfigOption(name = "Use Default", desc = "Use default Discord color scheme for the embed sidebar" +
-            "(Online = Green, Idle = Yellow, Offline = Red).")
+        @ConfigOption(
+            name = "Use Default",
+            desc = "Use default Discord color scheme for the embed sidebar" +
+                "(Online = Green, Idle = Yellow, Offline = Red).",
+        )
         @ConfigEditorBoolean
-        public Boolean useDefault = true;
+        var useDefault: Boolean = true
 
         @Expose
         @ConfigOption(name = "Embed Colour", desc = "Which color the embed sidebar should be (Chroma displays as black).")
         @ConfigEditorDropdown
-        public LorenzColor color = LorenzColor.YELLOW;
+        var color: LorenzColor = LorenzColor.YELLOW
     }
 
     @Expose
     @ConfigOption(
         name = "Thread ID",
-        desc = "If you want the message to be sent to a thread in the webhook channel put it's id here, otherwise leave blank."
+        desc = "If you want the message to be sent to a thread in the webhook channel put it's id here, otherwise leave blank.",
     )
     @ConfigEditorText
-    public String threadId = "";
+    var threadId: String = ""
 
     @Expose
-    @ConfigOption(name = "Message Type", desc = "Shows which way the status will be sent.")
+    @ConfigOption(name = "Message Type", desc = "Choose which way the status will be sent.")
     @ConfigEditorDropdown
-    public MessageType messageType = MessageType.NEW_MESSAGE;
+    var messageType: MessageType = MessageType.NEW_MESSAGE
 
-    public enum MessageType {
+    enum class MessageType(private val str: String) {
         NEW_MESSAGE("New Message"),
         EDITED_MESSAGE("Edited Message");
 
-        private final String str;
-
-        MessageType(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
+        override fun toString(): String {
+            return str
         }
     }
 
@@ -128,9 +107,9 @@ public class TrackingConfig {
     @ConfigOption(name = "Tracking", desc = "Send an embed with the options you selected above to your specified webhook.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean tracking = true;
+    var tracking: Boolean = true
 
-    public enum Pet {
+    enum class Pet(val petName: String) {
         BEE("Bee <:bee:1263201131064983673>"),
         CHICKEN("Chicken <:chicken:1263201132658823178>"),
         ELEPHANT("Elephant <:elephant:1263201134466830357>"),
@@ -140,45 +119,27 @@ public class TrackingConfig {
         SLUG("Slug <:slug:1263201140086931511>"),
         ;
 
-        public final String petName;
-
-        Pet(String petName) {
-            this.petName = petName;
-        }
-
-        @Override
-        public String toString() {
-            String cleanName = name().replace("_", " ").toLowerCase();
-            cleanName = cleanName.substring(0, 1).toUpperCase() + cleanName.substring(1);
-            if (cleanName.equals("Mooshroom cow")) cleanName = "Mooshroom Cow";
-            return cleanName;
+        override fun toString(): String {
+            var cleanName = name.replace("_", " ").lowercase(Locale.getDefault())
+            cleanName = cleanName.substring(0, 1).uppercase(Locale.getDefault()) + cleanName.substring(1)
+            if (cleanName == "Mooshroom cow") cleanName = "Mooshroom Cow"
+            return cleanName
         }
     }
 
-    public enum Crop {
+    enum class Crop(val display: String, val emoji: String) {
         WHEAT("Wheat", "<:wheat:1263207588296790048>"),
         POTATO("Potato", "<:potato:1263207583502569522>"),
         CARROT("Carrot", "<:carrot:1263207574472359956>"),
         PUMPKIN("Pumpkin", "<:pumpkin:1263207585004257321>"),
         MELON("Melon", "<:melon:1263207577920213083>"),
         SUGAR_CANE("Sugar Cane", "<:sugar:1263207586463748289>"),
-        MUSHROOM("Mushroom", "<:mushroom:1263207580268888096>"), //TODO NEW EMOJI
+        MUSHROOM("Mushroom", "<:mushroom:1263207580268888096>"),  //TODO NEW EMOJI
         CACTUS("Cactus", "<:cactus:1263207572962414724>"),
         COCOA_BEANS("Cocoa Beans", "<:cocoa_beans:1263207576330567795>"),
         NETHER_WART("Nether Wart", "<:nether_wart:1263207581770579970>"),
         ;
 
-        public final String name;
-        public final String emoji;
-
-        Crop(String name, String emoji) {
-            this.name = name;
-            this.emoji = emoji;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
+        override fun toString(): String = display
     }
 }

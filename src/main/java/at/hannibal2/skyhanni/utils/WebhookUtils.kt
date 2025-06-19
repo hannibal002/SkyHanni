@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 
 @SkyHanniModule
 object WebhookUtils {
@@ -22,6 +23,7 @@ object WebhookUtils {
      * REGEX-TEST: https://discord.com/api/webhooks/1263107706752073801/EIjM9xNoZJmZ3zn4QcIIpGTlrg6xDH8BgHxYRyjR5VbFv8_6ql1UEijyBs7SDFlv8SCB/messages/1264323904462389385
      * REGEX-TEST: https://discord.com/api/webhooks/1263107706752073801/EIjM9xNoZJmZ3zn4QcIIpGTlrg6xDH8BgHxYRyjR5VbFv8_6ql1UEijyBs7SDFlv8SCB/messages/1264323904462389385?wait=true
      */
+    @Suppress("RegExpRedundantEscape")
     private val webhookPattern by patternGroup.pattern(
         "webhook",
         "^https:\\/\\/discord\\.com\\/api\\/webhooks\\/\\d+\\/[^\\/?\\s]+(?:\\/messages\\/\\d+)?(?:\\?thread_id=\\d+)?(?:[?&]wait=true)?$",
@@ -75,17 +77,13 @@ object WebhookUtils {
     }
 
     private fun checkForEmptyEmbeds(embeds: List<Embed>): Boolean =
-        if (embeds.any { embed ->
+        embeds.any { embed ->
                 embed.fields.filter { it.value.isEmpty() }
-                    .also { emptyFields ->
-                        emptyFields.forEach { field ->
-                            LorenzDebug.log("Field ${field.name} has empty value ${field.value}")
-                        }
+                    .onEach { field ->
+                        LorenzDebug.log("Field ${field.name} has empty value ${field.value}")
                     }
                     .isNotEmpty()
-            }) {
-            true
-        } else false
+            }
 
     private fun checkAndCreateEmbedPayload(
         finalUrl: String,
@@ -104,11 +102,11 @@ object WebhookUtils {
         )
     }
 
-    fun postPayload(payload: Payload, url: String) =
-        APIUtil.postJSON(url, Gson().toJson(payload)).data.asJsonObject
+    private fun postPayload(payload: Payload, url: String): JsonObject =
+        ApiUtils.postJSON(url, Gson().toJson(payload), "Discord Webhook Api").data.asJsonObject
 
-    fun patchPayload(payload: Payload, url: String) =
-        APIUtil.patchJSON(url, Gson().toJson(payload)).data.asJsonObject
+    private fun patchPayload(payload: Payload, url: String): JsonObject =
+        ApiUtils.patchJSON(url, Gson().toJson(payload), "Discord Webhook Api").data.asJsonObject
 
     fun sendMessageToWebhook(
         webhookUrl: String,
@@ -155,7 +153,7 @@ object WebhookUtils {
         avatarUrl: String? = SKYHANNI_URL,
         wait: Boolean = true,
     ): Boolean {
-        val edit = if (lastMessageID != null) true else false
+        val edit = lastMessageID != null
         val finalUrl = convertToWebhook(webhookUrl, threadID, edit, wait)
         val embedPayload = checkAndCreateEmbedPayload(finalUrl, embeds, username, avatarUrl) ?: return false
 

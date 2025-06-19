@@ -13,6 +13,7 @@ import com.google.gson.JsonParser
 import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
@@ -199,7 +200,7 @@ object ApiUtils {
         }
     }
 
-    fun patchJSON(urlString: String, body: String, silentError: Boolean = false): ApiResponse {
+    fun patchJSON(urlString: String, body: String, apiName: String, silentError: Boolean = false): ApiResponse {
         val client = builder.build()
 
         try {

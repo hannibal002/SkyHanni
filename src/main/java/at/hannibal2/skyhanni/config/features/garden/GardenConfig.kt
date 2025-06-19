@@ -54,7 +54,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(name = "Farming Tracker", desc = "")
     @Accordion
-    public TrackingConfig tracking = new TrackingConfig();
+    var tracking: TrackingConfig = TrackingConfig()
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
