@@ -211,6 +211,7 @@ object PestSpawnTimer {
     }
 
     private fun shouldRender(): Boolean = when {
+        !isEnabled() -> false
         config.onlyWithFarmingTool && config.onlyWithVacuum -> hasFarmingToolInHand() || hasVacuumInHand()
         config.onlyWithFarmingTool -> hasFarmingToolInHand()
         config.onlyWithVacuum -> hasVacuumInHand()
