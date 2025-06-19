@@ -21,7 +21,7 @@ object SkyHanniRenderLayers {
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipelines.FILLED,
+        SkyHanniRenderPipeline.FILLED(),
         MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
     )
 
@@ -30,7 +30,7 @@ object SkyHanniRenderLayers {
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipelines.FILLED_XRAY,
+        SkyHanniRenderPipeline.FILLED_XRAY(),
         MultiPhaseParameters.builder().build(false),
     )
 
@@ -39,7 +39,7 @@ object SkyHanniRenderLayers {
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipelines.TRIANGLES,
+        SkyHanniRenderPipeline.TRIANGLES(),
         MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
     )
 
@@ -48,7 +48,7 @@ object SkyHanniRenderLayers {
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipelines.TRIANGLES_XRAY,
+        SkyHanniRenderPipeline.TRIANGLES_XRAY(),
         MultiPhaseParameters.builder().build(false),
     )
 
@@ -57,7 +57,7 @@ object SkyHanniRenderLayers {
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipelines.TRIANGLE_FAN,
+        SkyHanniRenderPipeline.TRIANGLE_FAN(),
         MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
     )
 
@@ -66,7 +66,7 @@ object SkyHanniRenderLayers {
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipelines.TRIANGLE_FAN_XRAY,
+        SkyHanniRenderPipeline.TRIANGLE_FAN_XRAY(),
         MultiPhaseParameters.builder().build(false),
     )
 
@@ -75,7 +75,7 @@ object SkyHanniRenderLayers {
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipelines.QUADS,
+        SkyHanniRenderPipeline.QUADS(),
         MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
     )
 
@@ -84,7 +84,7 @@ object SkyHanniRenderLayers {
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipelines.QUADS_XRAY,
+        SkyHanniRenderPipeline.QUADS_XRAY(),
         MultiPhaseParameters.builder().build(false),
     )
 
@@ -93,7 +93,7 @@ object SkyHanniRenderLayers {
         RenderLayer.CUTOUT_BUFFER_SIZE,
         false,
         false,
-        SkyHanniRenderPipelines.CHROMA_STANDARD,
+        SkyHanniRenderPipeline.CHROMA_STANDARD(),
         MultiPhaseParameters.builder().build(false)
     )
 
@@ -103,35 +103,15 @@ object SkyHanniRenderLayers {
         RenderLayer.CUTOUT_BUFFER_SIZE,
         false,
         false,
-        SkyHanniRenderPipelines.CHROMA_TEXT,
+        SkyHanniRenderPipeline.CHROMA_TEXT(),
         MultiPhaseParameters.builder()
             .texture(RenderPhase.Texture(texture, TriState.FALSE, false))
             .build(false)
         )
     }
 
-    private val CIRCLE: MultiPhase = RenderLayer.of(
-        "skyhanni_circle",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
-        false,
-        true,
-        SkyHanniRenderPipelines.CIRCLE,
-        MultiPhaseParameters.builder()
-            .build(false),
-    )
-
-    private val CIRCLE_XRAY: MultiPhase = RenderLayer.of(
-        "skyhanni_circle_xray",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
-        false,
-        true,
-        SkyHanniRenderPipelines.CIRCLE, // same pipeline, just different params
-        MultiPhaseParameters.builder()
-            .build(false),
-    )
-
     private fun createLineRenderLayer(lineWidth: Double, throughWalls: Boolean): MultiPhase {
-        val pipeLine = if (throughWalls) SkyHanniRenderPipelines.LINES_XRAY else SkyHanniRenderPipelines.LINES
+        val pipeLine = if (throughWalls) SkyHanniRenderPipeline.LINES_XRAY() else SkyHanniRenderPipeline.LINES()
         return RenderLayer.of(
             "skyhanni_lines_${lineWidth}${if (throughWalls) "_xray" else ""}",
             RenderLayer.DEFAULT_BUFFER_SIZE,
@@ -143,10 +123,6 @@ object SkyHanniRenderLayers {
                 .layering(if (throughWalls) RenderPhase.NO_LAYERING else RenderPhase.VIEW_OFFSET_Z_LAYERING)
                 .build(false),
         )
-    }
-
-    fun getCircle(throughWalls: Boolean): MultiPhase {
-        return if (throughWalls) CIRCLE else CIRCLE_XRAY
     }
 
     fun getFilled(throughWalls: Boolean): MultiPhase {

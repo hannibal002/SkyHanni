@@ -12,26 +12,7 @@ import net.minecraft.client.gl.UniformType
 import net.minecraft.client.render.VertexFormats
 import net.minecraft.util.Identifier
 
-object SkyHanniRenderPipelines {
-    val LINES: RenderPipeline get() = SkyHanniRenderPipeline.LINES.pipelineInstance
-    val LINES_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.LINES_XRAY.pipelineInstance
-    val FILLED: RenderPipeline get() = SkyHanniRenderPipeline.FILLED.pipelineInstance
-    val FILLED_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.FILLED_XRAY.pipelineInstance
-    val TRIANGLES: RenderPipeline get() = SkyHanniRenderPipeline.TRIANGLES.pipelineInstance
-    val TRIANGLES_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.TRIANGLES_XRAY.pipelineInstance
-    val TRIANGLE_FAN: RenderPipeline get() = SkyHanniRenderPipeline.TRIANGLE_FAN.pipelineInstance
-    val TRIANGLE_FAN_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.TRIANGLE_FAN_XRAY.pipelineInstance
-    val QUADS: RenderPipeline get() = SkyHanniRenderPipeline.QUADS.pipelineInstance
-    val QUADS_XRAY: RenderPipeline get() = SkyHanniRenderPipeline.QUADS_XRAY.pipelineInstance
-    val ROUNDED_RECT: RenderPipeline get() = SkyHanniRenderPipeline.ROUNDED_RECT.pipelineInstance
-    val ROUNDED_TEXTURED_RECT: RenderPipeline get() = SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT.pipelineInstance
-    val ROUNDED_RECT_OUTLINE: RenderPipeline get() = SkyHanniRenderPipeline.ROUNDED_RECT_OUTLINE.pipelineInstance
-    val CIRCLE: RenderPipeline get() = SkyHanniRenderPipeline.CIRCLE.pipelineInstance
-    val CHROMA_STANDARD: RenderPipeline get() = SkyHanniRenderPipeline.CHROMA_STANDARD.pipelineInstance
-    val CHROMA_TEXT: RenderPipeline get() = SkyHanniRenderPipeline.CHROMA_TEXT.pipelineInstance
-}
-
-private enum class SkyHanniRenderPipeline(
+enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
     vFormat: VertexFormat = VertexFormats.POSITION_COLOR,
     vDrawMode: VertexFormat.DrawMode = VertexFormat.DrawMode.QUADS,
@@ -140,17 +121,17 @@ private enum class SkyHanniRenderPipeline(
     )
     ;
 
-    val pipelineInstance: RenderPipeline by lazy {
+    private val _pipe: RenderPipeline by lazy {
         RenderPipelines.register(
             RenderPipeline.builder(snippet)
                 .withLocation(Identifier.of(SkyHanniMod.MODID, this.name.lowercase()))
                 .withVertexFormat(vFormat, vDrawMode)
                 .apply {
-                    if (blend != null) withBlend(blend)
-                    if (withCull != null) withCull(withCull)
-                    if (vertexShaderPath != null) withVertexShader(Identifier.of(SkyHanniMod.MODID, vertexShaderPath))
-                    if (fragmentShaderPath != null) withFragmentShader(Identifier.of(SkyHanniMod.MODID, fragmentShaderPath))
-                    if (sampler != null) withSampler(sampler)
+                    blend?.let(this::withBlend)
+                    withCull?.let(this::withCull)
+                    vertexShaderPath?.let { withVertexShader(Identifier.of(SkyHanniMod.MODID, it)) }
+                    fragmentShaderPath?.let { withFragmentShader(Identifier.of(SkyHanniMod.MODID, it)) }
+                    sampler?.let(this::withSampler)
                     uniforms.forEach(this::withUniform)
                 }
                 .withDepthWrite(depthWrite)
@@ -159,6 +140,8 @@ private enum class SkyHanniRenderPipeline(
                 .build()
         )
     }
+
+    operator fun invoke(): RenderPipeline = _pipe
 }
 
 private object SkyHanniRenderPipelineUtils {
@@ -182,23 +165,5 @@ private object SkyHanniRenderPipelineUtils {
         "timeOffset" to UniformType.FLOAT,
         "saturation" to UniformType.FLOAT,
         "forwardDirection" to UniformType.INT,
-    )
-
-    val CIRCLE: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, "circle"))
-            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_FAN)
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withVertexShader(Identifier.of(SkyHanniMod.MODID, "circle"))
-            .withFragmentShader(Identifier.of(SkyHanniMod.MODID, "circle"))
-            .withUniform("scaleFactor", UniformType.FLOAT)
-            .withUniform("radius", UniformType.FLOAT)
-            .withUniform("smoothness", UniformType.FLOAT)
-            .withUniform("centerPos", UniformType.VEC2)
-            .withUniform("angle1", UniformType.FLOAT)
-            .withUniform("angle2", UniformType.FLOAT)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .withDepthWrite(false)
-            .build(),
     )
 }
