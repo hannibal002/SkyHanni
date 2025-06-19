@@ -174,8 +174,6 @@ class GuiConfig {
     @Expose
     var titlePosition: Position = Position(0, 160)
 
-    //#if TODO
     @Expose
     var titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
-    //#endif
 }

@@ -28,7 +28,7 @@ data class TitleIntention(
 open class TitleContext(
     private var titleText: String = "",
     private var subtitleText: String? = null,
-    var intention: TitleIntention? = null,
+    private var intention: TitleIntention? = null,
     var duration: Duration = 1.seconds,
     val weight: Double = 1.0,
     var discardOnWorldChange: Boolean = true,
