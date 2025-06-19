@@ -30,11 +30,10 @@ import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.math.min
-//#if MC < 1.21
+//#if TODO
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
-
 //#else
 //$$ import net.minecraft.client.render.RenderLayer
 //#endif
@@ -347,6 +346,7 @@ object GuiRenderUtils {
             DrawContextUtils.translate(translateX, translateY, -19f)
             DrawContextUtils.scale(finalScale, finalScale, 0.2f)
 
+            //#if TODO
             // Rotation
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
             DrawContextUtils.pushPop {
@@ -365,7 +365,6 @@ object GuiRenderUtils {
             GL11.glEnable(GL11.GL_NORMALIZE)
             GL11.glNormal3f(0f, 0f, 1f)
 
-            //#if MC < 1.21
             RenderHelper.enableGUIStandardItemLighting()
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
             try {
