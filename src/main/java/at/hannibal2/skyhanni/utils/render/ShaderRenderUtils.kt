@@ -208,7 +208,7 @@ object ShaderRenderUtils {
             ShaderManager.disableShader()
         }
         //#else
-        //$$ RoundedShapeDrawer.drawCircle(x - 5, y - 5, x + width + 5, y + height + 5, angle1, angle2, circleColor)
+        //$$ RoundedShapeDrawer.drawCircle(x - 5, y - 5, x + 5, y + 5, angle1, angle2, circleColor)
         //#endif
     }
 }
