@@ -22,8 +22,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -132,7 +131,7 @@ object ExperimentsProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !bottlesInventory.isInside() || !allowedSlots.contains(event.slotId)) return
-        val internalName = event.slot?.stack?.getInternalName()?.takeIf {
+        val internalName = event.slot?.stack?.getInternalNameOrNull()?.takeIf {
             experienceBottlePattern.matches(it.asString())
         } ?: return
 
@@ -246,7 +245,7 @@ object ExperimentsProfitTracker {
         tracker.initRenderer(
             { config.position },
             ExperimentationTableApi.experimentationTableInventory,
-        ) { config.enabled && isEnabled() && IslandType.PRIVATE_ISLAND.isInIsland() }
+        ) { config.enabled && isEnabled() && IslandType.PRIVATE_ISLAND.isCurrent() }
     }
 
     @HandleEvent
@@ -268,5 +267,4 @@ object ExperimentsProfitTracker {
     private fun isLocationEnabled(check: Boolean = true) = !check || ExperimentationTableApi.inDistanceToTable(5.0)
     private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
         config.enabled && isLocationEnabled(checkDistanceToExperimentationTable)
-
 }

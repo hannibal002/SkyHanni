@@ -158,6 +158,7 @@ object SuperpairDataDisplay {
         val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return@runDelayed
         val itemName = itemNow.displayName.removeColor()
         val reward = itemNow.convertToReward()
+        //#if TODO
         val itemData = SuperpairItem(slot, reward, itemNow.itemDamage)
         val uncovered = items.keys.maxOrNull() ?: -1
 
@@ -177,6 +178,9 @@ object SuperpairDataDisplay {
             items[uncovered + 2] = emptySuperpairItem
 
         display = drawDisplay()
+        //#else
+        //$$ // todo fix up item damage once the color compat is merged
+        //#endif
     }
 
     private fun handlePowerUp(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem, uncovered: Int) {
@@ -205,8 +209,6 @@ object SuperpairDataDisplay {
 
         handleFoundPair(item, emptySuperpairItem)
     }
-
-
 
     private fun handleFoundPair(
         foundFirst: SuperpairItem,

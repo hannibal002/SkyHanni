@@ -4,17 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-//#if TODO
 import at.hannibal2.skyhanni.data.ProfileStorageData
-//#endif
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 //#if TODO
 import at.hannibal2.skyhanni.features.misc.CurrentPing
+//#endif
 import at.hannibal2.skyhanni.features.misc.TpsCounter
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -37,18 +38,12 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object DebugCommand {
 
-    fun command(args: Array<String>) {
-        if (args.size == 2 && args[0] == "profileName") {
-            HypixelData.profileName = args[1].lowercase()
-            ChatUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
-            return
-        }
+    fun command(search: String) {
         val list = mutableListOf<String>()
         list.add("```")
         list.add("= Debug Information for SkyHanni ${SkyHanniMod.VERSION} ${PlatformUtils.MC_VERSION} =")
         list.add("")
 
-        val search = args.joinToString(" ")
         list.add(
             if (search.isNotEmpty()) {
                 if (search.equalsIgnoreColor("all")) {
@@ -89,12 +84,10 @@ object DebugCommand {
             return
         }
 
-        //#if TODO
         if (ProfileStorageData.playerSpecific == null) {
             event.addData("playerSpecific is null!")
             return
         }
-        //#endif
 
         val classic = !SkyBlockUtils.noTradeMode
         if (classic) {
@@ -158,10 +151,8 @@ object DebugCommand {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${SkyBlockUtils.currentIsland}")
             add("skyBlockArea:")
-            //#if TODO
             add("  scoreboard: '${SkyBlockUtils.graphArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            //#endif
             with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
@@ -274,7 +265,17 @@ object DebugCommand {
         event.registerBrigadier("shdebug") {
             description = "Copies SkyHanni debug data in the clipboard."
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs { command(it) }
+            argCallback("profilename profile", BrigadierArguments.string()) { profile ->
+                HypixelData.profileName = profile.lowercase()
+                ChatUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
+            }
+            literalCallback("all") {
+                command("all")
+            }
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
+                command(search)
+            }
+            simpleCallback { command("") }
         }
     }
 

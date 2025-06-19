@@ -1,9 +1,20 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
+import net.fabricmc.fabric.api.client.rendering.v1.LayeredDrawerWrapper
+import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.render.RenderTickCounter
+import net.minecraft.util.Identifier
+
 
 @SkyHanniModule
 object RenderEvents {
+
+
+    private val LAYER: Identifier = Identifier.of("skyhanni", "layer")
 
     init {
 
@@ -11,9 +22,17 @@ object RenderEvents {
 
         // ScreenDrawnEvent
 
-        // RenderingTickEvent
-
         // GameOverlayRenderPreEvent
+        HudLayerRegistrationCallback.EVENT.register(
+            HudLayerRegistrationCallback { layeredDrawer: LayeredDrawerWrapper ->
+                layeredDrawer.attachLayerBefore(
+                    IdentifiedLayer.HOTBAR_AND_BARS,
+                    LAYER,
+                    this::postEvent,
+                )
+            },
+        )
+
 
         // GameOverlayRenderPostEvent
 
@@ -25,12 +44,14 @@ object RenderEvents {
 
         // BlockOverlayRenderEvent
 
-        // DrawBackgroundEvent
-
         // GuiActionPerformedEvent
 
         // InitializeGuiEvent
 
+    }
+
+    private fun postEvent(context: DrawContext, ticks: RenderTickCounter) {
+        GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
     }
 
 }

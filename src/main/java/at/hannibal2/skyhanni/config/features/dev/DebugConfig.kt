@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.data.ElectionCandidate
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -12,7 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
-// todo 1.21 impl needed
 class DebugConfig {
     @Expose
     @ConfigOption(name = "Enable Debug", desc = "Enable Test logic")
@@ -169,12 +166,10 @@ class DebugConfig {
     @ConfigEditorBoolean
     val powderMessages: Boolean = false
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     var assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
-    //#endif
 
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")

@@ -7,18 +7,17 @@ import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
@@ -269,7 +268,7 @@ object MobFilter {
         baseEntity is EntityBat -> createBat(baseEntity)
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
-        baseEntity is EntityDragon -> when (LorenzUtils.skyBlockIsland) {
+        baseEntity is EntityDragon -> when (SkyBlockUtils.currentIsland) {
             IslandType.CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
                 .makeMobResult {
                     MobFactories.boss(baseEntity, it.first(), it.drop(1))
@@ -347,7 +346,7 @@ object MobFilter {
                     extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
                 else -> null
             }
-        } else when (LorenzUtils.skyBlockIsland) {
+        } else when (SkyBlockUtils.currentIsland) {
             IslandType.CRIMSON_ISLE -> when {
                 else -> null
             }
@@ -372,7 +371,7 @@ object MobFilter {
 
     fun EntityLivingBase.isFarmMob() =
         this is EntityAnimal && this.baseMaxHealth.derpy()
-            .let { it == 50 || it == 20 || it == 130 } && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
+            .let { it == 50 || it == 20 || it == 130 } && SkyBlockUtils.currentIsland != IslandType.PRIVATE_ISLAND
 
     private fun createFarmMobs(baseEntity: EntityLivingBase): Mob? = when (baseEntity) {
         is EntityMooshroom -> MobFactories.basic(baseEntity, "Farm Mooshroom")
@@ -387,13 +386,13 @@ object MobFilter {
     private fun createBat(baseEntity: EntityLivingBase): MobResult? = when (baseEntity.baseMaxHealth.derpy()) {
         5_000_000 -> MobResult.found(MobFactories.basic(baseEntity, "Cinderbat"))
         75_000 -> MobResult.found(MobFactories.basic(baseEntity, "Thorn Bat"))
-        600 -> if (IslandType.GARDEN.isInIsland()) null else MobResult.notYetFound
+        600 -> if (IslandType.GARDEN.isCurrent()) null else MobResult.notYetFound
         100 -> MobResult.found(
             MobFactories.basic(
                 baseEntity,
                 when {
                     DungeonApi.inDungeon() -> "Dungeon Secret Bat"
-                    IslandType.PRIVATE_ISLAND.isInIsland() -> "Private Island Bat"
+                    IslandType.PRIVATE_ISLAND.isCurrent() -> "Private Island Bat"
                     else -> "Mega Bat"
                 },
             ),
