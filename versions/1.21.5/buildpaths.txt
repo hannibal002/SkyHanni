@@ -60,6 +60,7 @@ at.hannibal2.skyhanni.config.features.misc.cosmetic.FollowingLineConfig.java
 at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.kt
 at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.kt
 at.hannibal2.skyhanni.config.storage.Storage.kt
+at.hannibal2.skyhanni.config.storage.ResettableStorageSet.kt
 at.hannibal2.skyhanni.data.ActionBarData.kt
 at.hannibal2.skyhanni.data.BossbarData.kt
 at.hannibal2.skyhanni.data.ChatManager.kt

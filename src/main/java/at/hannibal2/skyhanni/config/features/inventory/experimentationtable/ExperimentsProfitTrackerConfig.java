@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import java.util.ArrayList;
 import java.util.List;
 
+// todo 1.21 impl needed
 public class ExperimentsProfitTrackerConfig {
 
     @Expose

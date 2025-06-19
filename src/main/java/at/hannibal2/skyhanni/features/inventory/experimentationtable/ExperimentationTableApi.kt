@@ -317,7 +317,12 @@ object ExperimentationTableApi {
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
     }
 
-    private fun ExperimentationMessages.isSelected() = config.hideMessages.contains(this)
+    private fun ExperimentationMessages.isSelected() =
+        //#if TODO
+        config.hideMessages.contains(this)
+        //#else
+        //$$false
+        //#endif
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
