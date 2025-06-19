@@ -64,14 +64,14 @@ object RoundedShapeDrawer {
 
     fun drawRoundedRect(left: Int, top: Int, right: Int, bottom: Int, color: Int) =
         RoundedRectangleShader.performVQuadAndUniforms(
-            SkyHanniRenderPipelines.ROUNDED_RECT,
+            SkyHanniRenderPipeline.ROUNDED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf { color(color) },
         )
 
     fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: Identifier) =
         RoundedTextureShader.performVQuadAndUniforms(
-            SkyHanniRenderPipelines.ROUNDED_TEXTURED_RECT,
+            SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
                 { texture(0f, 0f) },
@@ -87,7 +87,7 @@ object RoundedShapeDrawer {
 
     fun drawRoundedRectOutline(left: Int, top: Int, right: Int, bottom: Int, topColor: Int, bottomColor: Int) =
         RoundedRectangleOutlineShader.performVQuadAndUniforms(
-            SkyHanniRenderPipelines.ROUNDED_RECT_OUTLINE,
+            SkyHanniRenderPipeline.ROUNDED_RECT_OUTLINE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
                 { color(topColor) },
