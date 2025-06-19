@@ -41,7 +41,7 @@ class TrackingConfig {
         @Expose
         @ConfigOption(name = "Information Displayed", desc = "Change which stats are enabled, and the order they will be displayed in.")
         @ConfigEditorDraggableList
-        var information: List<InformationType> = ArrayList()
+        var information: MutableList<InformationType> = ArrayList()
 
         enum class InformationType(val display: String, val fieldName: String) {
             FARMING_FORTUNE("§6Farming Fortune ☘", "FF <:farming_fortune:1263201171317854369>"),

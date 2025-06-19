@@ -228,39 +228,43 @@ object FarmingTracker {
     }
 
     private fun InformationType.buildField(status: String): Field? {
-        val value = when (this) {
-            InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue?.roundToInt()
-            InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue?.roundToInt()
-            InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue?.roundToInt()
-            InformationType.SPEED -> SkyblockStat.SPEED.lastKnownValue?.roundToInt()
-            InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownValue?.roundToInt()
-            InformationType.PET -> PetApi.currentPet?.let { pet ->
-                Pet.entries.find { it.toString() == pet.removeColor() }?.petName.orEmpty()
-            }.orEmpty()
+        val value = resolveValue(status)?.toString()?.takeIf { it.isNotBlank() } ?: return null
+        val name = getFieldDisplayName()
+        return Field(name, value, inline = true)
+    }
 
-            InformationType.COOKIE_BUFF -> cookieBuffTimer.ifBlank { "<:no:1263210393723998278>" }
-            InformationType.GOD_POTION -> godPotionTimer.ifBlank { "<:no:1263210393723998278>" }
-            InformationType.JACOBS_CONTEST ->
-                if (!FarmingContestApi.inContest) ""
-                else convertPlacement(currentPlacement)?.let { "$currentPlacement% ${it.emoji}" }.orEmpty()
+    private fun InformationType.resolveValue(status: String): Any? = when (this) {
+        InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue?.roundToInt()
+        InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue?.roundToInt()
+        InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue?.roundToInt()
+        InformationType.SPEED -> SkyblockStat.SPEED.lastKnownValue?.roundToInt()
+        InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownValue?.roundToInt()
+        InformationType.PET -> PetApi.currentPet?.let { pet ->
+            Pet.entries.find { it.toString() == pet.removeColor() }?.petName.orEmpty()
+        }
 
-            InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { crop ->
-                getCropEnum(crop.cropName)?.let { "${it.name} ${it.emoji}" }
-                    .takeUnless { status == "Idle" || status == "Offline" }
-            }.orEmpty()
+        InformationType.COOKIE_BUFF -> cookieBuffTimer.ifBlank { "<:no:1263210393723998278>" }
+        InformationType.GOD_POTION -> godPotionTimer.ifBlank { "<:no:1263210393723998278>" }
+        InformationType.JACOBS_CONTEST -> if (!FarmingContestApi.inContest) "" else {
+            convertPlacement(currentPlacement)?.let { "$currentPlacement% ${it.emoji}" }.orEmpty()
+        }
 
-            InformationType.ANITA_BUFF -> activeAnitaBuff.ifBlank { "<:no:1263210393723998278>" }
-            InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.roundTo(2).takeUnless { it == 0.0 } ?: ""
-            InformationType.FARMING_SINCE -> if (farmingSince.isInFuture()) "" else farmingSince.passedSince()
-        }?.toString()?.takeIf { it.isNotBlank() } ?: return null
+        InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { crop ->
+            getCropEnum(crop.cropName)?.let { "${it.name} ${it.emoji}" }
+                .takeUnless { status == "Idle" || status == "Offline" }
+        }
 
-        val name = if (this != InformationType.JACOBS_CONTEST) {
+        InformationType.ANITA_BUFF -> activeAnitaBuff.ifBlank { "<:no:1263210393723998278>" }
+        InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.roundTo(2).takeUnless { it == 0.0 }
+        InformationType.FARMING_SINCE -> if (farmingSince.isInFuture()) "" else farmingSince.passedSince()
+    }
+
+    private fun InformationType.getFieldDisplayName(): String {
+        return if (this != InformationType.JACOBS_CONTEST) {
             fieldName
         } else {
             currentCrop?.let { "${it.name} Contest ${it.emoji}" } ?: fieldName
         }
-
-        return Field(name, value, inline = true)
     }
 
     private fun notifyMissingFields() {
