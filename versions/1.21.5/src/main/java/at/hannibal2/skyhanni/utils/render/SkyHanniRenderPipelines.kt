@@ -10,6 +10,8 @@ import net.minecraft.client.gl.UniformType
 import net.minecraft.client.render.VertexFormats
 import net.minecraft.util.Identifier
 
+// Todo: Convert to enum class with applicable properties,
+//  and a companion object to register them
 object SkyHanniRenderPipelines {
 
     val LINES: RenderPipeline = RenderPipelines.register(
