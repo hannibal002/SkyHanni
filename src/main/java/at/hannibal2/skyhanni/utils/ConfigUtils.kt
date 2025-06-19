@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-//#if TODO
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-//#endif
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonArray
@@ -15,7 +13,6 @@ import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.jvm.javaField
 
-// todo 1.21 impl needed
 object ConfigUtils {
 
     /**
@@ -85,9 +82,7 @@ object ConfigUtils {
     }
 
     fun KMutableProperty0<*>.jumpToEditor() {
-        //#if TODO
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
-        //#endif
 
         ErrorManager.crashInDevEnv("Can not open config $name")
         ErrorManager.logErrorStateWithData(

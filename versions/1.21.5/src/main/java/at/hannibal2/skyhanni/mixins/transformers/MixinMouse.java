@@ -32,6 +32,8 @@ public class MixinMouse {
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         if (action == 1) {
             MouseCompat.INSTANCE.setLastEventButton(button);
+        } else {
+            MouseCompat.INSTANCE.setLastEventButton(-1);
         }
     }
 
