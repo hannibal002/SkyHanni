@@ -140,7 +140,7 @@ object FarmingTracker {
                 if (widgetLines[1].contains("Starts In:")) {
                     tablistUpcomingContestPattern.matchAll(widgetLines) {
                         getCropEnum(group("crop"))?.let { cropEnum ->
-                            activeAnitaBuff = cropEnum.name + cropEnum.emoji
+                            activeAnitaBuff = cropEnum.display + cropEnum.emoji
                         }
                     }
                 } else {
@@ -250,7 +250,7 @@ object FarmingTracker {
         }
 
         InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { crop ->
-            getCropEnum(crop.cropName)?.let { "${it.name} ${it.emoji}" }
+            getCropEnum(crop.cropName)?.let { "${it.display} ${it.emoji}" }
                 .takeUnless { status == "Idle" || status == "Offline" }
         }
 
@@ -298,14 +298,14 @@ object FarmingTracker {
     }
 
     private fun getCropEnum(cropName: String): Crop? =
-        Crop.entries.find { it.name == cropName }
+        Crop.entries.find { it.display == cropName }
 
     private fun LorenzColor.toIntColor(): Int {
-        val parts = this.toChromaColor().toString().split(":")
+        val color = this.toColor()
 
-        val red = parts[2].toInt()
-        val green = parts[3].toInt()
-        val blue = parts[4].toInt()
+        val red = color.red
+        val green = color.green
+        val blue = color.blue
 
         return (red shl 16) or (green shl 8) or blue
     }
