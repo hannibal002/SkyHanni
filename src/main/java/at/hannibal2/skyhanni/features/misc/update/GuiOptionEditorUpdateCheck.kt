@@ -33,7 +33,8 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         button.render(context, getButtonPosition(adjustedWidth), 10)
 
         if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
-            changelog.render(context, getChangelogPosition(width), 30)
+            changelog.width = changelog.getWidth(context)
+            changelog.render(context, getChangelogPosition(adjustedWidth), 30)
         }
 
         val widthRemaining = width - button.width - 10
@@ -88,7 +89,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             }
             return true
         }
-        if (!isInside(getChangelogPosition(width), height = 30, changelog)) return false
+        if (!isInside(getChangelogPosition(width - 20), height = 30, changelog)) return false
 
         if (UpdateManager.updateState != UpdateManager.UpdateState.NONE)
             UpdateManager.getNextVersion()

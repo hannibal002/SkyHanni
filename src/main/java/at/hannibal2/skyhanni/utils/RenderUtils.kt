@@ -741,7 +741,7 @@ object RenderUtils {
         DrawContextUtils.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
 
-        drawGradientRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
+        GuiRenderUtils.drawGradientRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
 
         ShaderManager.disableShader()
         DrawContextUtils.popMatrix()
