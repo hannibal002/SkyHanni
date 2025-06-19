@@ -45,7 +45,7 @@ fun IChatComponent.unformattedTextForChatCompat(): String {
 //$$
 //$$ private fun Text.computeUnformattedTextCompat(): String {
 //$$     if (this.content is TranslatableTextContent) {
-//$$         return (this.content as TranslatableTextContent).key.orEmpty()
+//$$         return this.string
 //$$     }
 //$$     return (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif

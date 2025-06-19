@@ -150,7 +150,16 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> {
+    //$$     val data = cachedData
+    //$$     if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
+    //$$         return data.lastLore
+    //$$     }
+    //$$     val lore = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+    //$$     data.lastLore = lore
+    //$$     data.lastLoreFetchTime = SimpleTimeMark.now()
+    //$$     return lore
+    //$$ }
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
