@@ -676,6 +676,7 @@ class ProfileSpecificStorage {
         var currentSlot: Int? = null
     }
 
+    //#if TODO
     @Expose
     var equipment: EquipmentStorage = EquipmentStorage()
 
@@ -686,6 +687,7 @@ class ProfileSpecificStorage {
         @Expose
         var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
     }
+    //#endif
 
     // - mining
     @Expose
