@@ -174,11 +174,11 @@ object ComponentUtils {
                 val wood = modernId.removeSuffix("_leaves")
                 var damage = getWood2Damage(wood)
                 if (damage != null) {
-                    return "leaves" to damage
+                    return "leaves2" to damage
                 }
                 damage = getWoodDamage(wood)
                 if (damage != null) {
-                    return "leaves2" to damage
+                    return "leaves" to damage
                 }
             }
 
@@ -202,11 +202,11 @@ object ComponentUtils {
                 val wood = modernId.removeSuffix("_log")
                 var damage = getWood2Damage(wood)
                 if (damage != null) {
-                    return "log" to damage
+                    return "log2" to damage
                 }
                 damage = getWoodDamage(wood)
                 if (damage != null) {
-                    return "log2" to damage
+                    return "log" to damage
                 }
             }
 

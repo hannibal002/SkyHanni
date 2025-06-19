@@ -45,7 +45,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
 
     private val baseJson = EnoughUpdatesManager.getItemById(internalName.asString()) ?: JsonObject()
     private var internalNameStringField = TextFieldRenderable(internalName.asString())
-    private var displayNameField = TextFieldRenderable(underlyingStack.displayName)
+    private var displayNameField = TextFieldRenderable(fixItemName(underlyingStack.displayName))
     private var minecraftItemIdField = TextFieldRenderable()
     private var itemModelField = TextFieldRenderable()
     private var loreField = TextFieldRenderable(underlyingStack.getLore().joinToString("\n"))
@@ -60,6 +60,13 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
     //#if MC > 1.21
     //$$ as MergedComponentMap
     //#endif
+
+    private fun fixItemName(name: String): String {
+        if (name.startsWith("§")) {
+            return name
+        }
+        return "§f$name"
+    }
 
     init {
 
@@ -94,7 +101,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         //$$ nbtTag.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(extraAttributes))
         //#endif
 
-        craftTextField.setText(baseJson.get("craftText")?.asString.orEmpty())
+        craftTextField.setText(baseJson.get("crafttext")?.asString.orEmpty())
         infoTypeField.setText(baseJson.get("infoType")?.asString.orEmpty())
         additionalInfoField.setText(baseJson.get("info")?.asJsonArray?.joinToString("\n") { it.asString }.orEmpty())
         clickCommandField.setText(baseJson.get("clickcommand")?.asString.orEmpty())

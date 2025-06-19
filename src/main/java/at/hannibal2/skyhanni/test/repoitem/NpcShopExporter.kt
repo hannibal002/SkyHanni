@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveIngredient
@@ -124,6 +125,11 @@ object NpcShopExporter {
     private fun parseRecipeFromItem(item: ItemStack): PrimitiveRecipe? {
         val resultItem = item.toPrimitiveIngredient()
         if (resultItem.internalName == NeuInternalName.NONE) return null
+
+        if (!NeuItems.allNeuRepoItems().containsKey(resultItem.internalName.asString())) {
+            RepoItemEditor.openItemInEditor(item, instantSave = true)
+        }
+
         var inCost = false
         val cost = mutableSetOf<PrimitiveIngredient>()
 

@@ -604,6 +604,7 @@ object GraphEditor {
     private fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
         "fsoul" -> GraphNodeTag.FAIRY_SOUL to "Fairy Soul"
         "na" -> GraphNodeTag.AREA to "no_area"
+        "hegg" -> GraphNodeTag.HOPPITY to "Hoppity Egg"
         else -> null
     }
 

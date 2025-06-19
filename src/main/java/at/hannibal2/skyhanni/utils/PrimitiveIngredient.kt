@@ -33,7 +33,7 @@ class PrimitiveIngredient(val internalName: NeuInternalName, val count: Double =
 
     fun asRepoString(): String {
         if (internalName == NeuInternalName.NONE) return ""
-        return "${internalName.asString()}:${count.toInt()}".removeSuffix(":1")
+        return "${internalName.asString()}:${count.toInt()}"
     }
 
     fun toPair() = Pair(internalName, count)

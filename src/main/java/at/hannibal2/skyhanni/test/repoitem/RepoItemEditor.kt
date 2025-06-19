@@ -76,6 +76,10 @@ object RepoItemEditor {
         }
     }
 
+    fun openItemInEditor(stack: ItemStack, instantSave: Boolean = false, message: Boolean = true) {
+        stack.openInEditor(instantSave, message)
+    }
+
     fun createRepoItemJson(
         baseJson: JsonObject,
         internalName: String,
@@ -148,7 +152,7 @@ object RepoItemEditor {
             "inventoryName" to InventoryUtils.openInventoryName(),
         )
         if (!NeuItems.allNeuRepoItems().containsKey(resultInternalName.asString())) {
-            resultItem.openInEditor(instantSave = true, message = false)
+            resultItem.openInEditor(instantSave = true)
         }
         val existingJson = EnoughUpdatesManager.getItemById(resultInternalName.asString()) ?: ErrorManager.skyHanniError(
             "Still no item data saved for: $resultInternalName",
