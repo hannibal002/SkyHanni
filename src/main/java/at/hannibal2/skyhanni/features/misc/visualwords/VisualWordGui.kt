@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
@@ -22,8 +23,6 @@ import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
 import java.io.File
@@ -199,9 +198,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 }
 
                 val statusBlock = if (phrase.enabled) {
-                    ItemStack(Blocks.stained_hardened_clay, 1, 13)
+                    ColoredBlockCompat.GREEN.createStainedClay()
                 } else {
-                    ItemStack(Blocks.stained_hardened_clay, 1, 14)
+                    ColoredBlockCompat.RED.createStainedClay()
                 }
 
                 DrawContextUtils.scale(inverseScale, inverseScale, 1f)
