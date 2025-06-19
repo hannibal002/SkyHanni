@@ -64,10 +64,6 @@ object Commands {
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
-        event.register("ff") {
-            description = "Opens the Farming Fortune Guide"
-            callback { FFGuideGui.onCommand() }
-        }
         event.register("shwords") {
             description = "Opens the config list for modifying visual words"
             callback { VisualWordGui.onCommand() }
