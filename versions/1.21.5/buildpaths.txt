@@ -60,6 +60,9 @@ at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuEssenceShopJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuHoppityJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuPetsJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuSkillLevelJson.kt
+at/hannibal2/skyhanni/data/title/TitleManager.kt
+at/hannibal2/skyhanni/data/title/TitleContext.kt
+at/hannibal2/skyhanni/data/title/CountdownTitleContext.kt
 at/hannibal2/skyhanni/skyhannimodule/SkyHanniModule.kt
 at/hannibal2/skyhanni/utils/CircularList.kt
 at/hannibal2/skyhanni/utils/KSerializable.kt

@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleContext
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -16,7 +17,7 @@ object ServerRestartTitle {
 
     private val config get() = SkyHanniMod.feature.misc
     private val patternGroup = RepoPattern.group("features.misc.serverrestart")
-    private var timerTitleContext: TitleManager.TitleContext? = null
+    private var timerTitleContext: TitleContext? = null
 
     /**
      * REGEX-TEST: §cServer closing: 03:11 §8m77A
