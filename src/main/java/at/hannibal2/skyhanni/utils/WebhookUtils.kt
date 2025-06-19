@@ -11,7 +11,8 @@ import com.google.gson.JsonObject
 @SkyHanniModule
 object WebhookUtils {
 
-    private const val SKYHANNI_URL = "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true"
+    private const val SKYHANNI_URL =
+        "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true"
 
     private var lastMessageID: Long? = null
 
@@ -29,12 +30,12 @@ object WebhookUtils {
         "^https:\\/\\/discord\\.com\\/api\\/webhooks\\/\\d+\\/[^\\/?\\s]+(?:\\/messages\\/\\d+)?(?:\\?thread_id=\\d+)?(?:[?&]wait=true)?$",
     )
 
-    private fun convertToWebhook(webhookUrl: String, threadID: String?, edit: Boolean, wait: Boolean) : String {
+    private fun convertToWebhook(webhookUrl: String, threadID: String?, edit: Boolean, wait: Boolean): String {
         var finalUrl = if (lastMessageID != null && edit) "$webhookUrl/messages/$lastMessageID" else webhookUrl
 
         val queryParams = listOfNotNull(
             threadID?.let { "thread_id=$it" },
-            if (wait) "wait=true" else null
+            if (wait) "wait=true" else null,
         ).takeIf { it.isNotEmpty() }?.joinToString("&")
 
         if (!queryParams.isNullOrEmpty()) {
@@ -78,12 +79,12 @@ object WebhookUtils {
 
     private fun checkForEmptyEmbeds(embeds: List<Embed>): Boolean =
         embeds.any { embed ->
-                embed.fields.filter { it.value.isEmpty() }
-                    .onEach { field ->
-                        LorenzDebug.log("Field ${field.name} has empty value ${field.value}")
-                    }
-                    .isNotEmpty()
-            }
+            embed.fields.filter { it.value.isEmpty() }
+                .onEach { field ->
+                    LorenzDebug.log("Field ${field.name} has empty value ${field.value}")
+                }
+                .isNotEmpty()
+        }
 
     private fun checkAndCreateEmbedPayload(
         finalUrl: String,

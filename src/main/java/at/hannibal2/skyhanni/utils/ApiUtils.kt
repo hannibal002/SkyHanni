@@ -218,7 +218,7 @@ object ApiUtils {
 
                 val message = "PATCH request to '$urlString' returned status ${status.statusCode}"
                 ErrorManager.logErrorStateWithData(
-                    "Error communicating with API", "APIUtil PATCH request returned an error code",
+                    "Error communicating with $apiName API", "APIUtil PATCH request returned an error code",
                     "statusCode" to status.statusCode,
                     "urlString" to urlString,
                     "body" to body,
@@ -241,7 +241,7 @@ object ApiUtils {
     }
 
     fun getPlayerSkin(part: SkinBodyPart, scale: Int) =
-        "https://api.mineatar.io/${part.path}/${LorenzUtils.getPlayerUuid()}?scale=$scale"
+        "https://api.mineatar.io/${part.path}/${PlayerUtils.getUuid()}?scale=$scale"
 
 
     private fun readResponse(entity: HttpEntity?): JsonObject {

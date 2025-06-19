@@ -76,7 +76,7 @@ class TrackingConfig {
         var useDefault: Boolean = true
 
         @Expose
-        @ConfigOption(name = "Embed Colour", desc = "Which color the embed sidebar should be (Chroma displays as black).")
+        @ConfigOption(name = "Embed Color", desc = "Which color the embed sidebar should be (Chroma displays as black).")
         @ConfigEditorDropdown
         var color: LorenzColor = LorenzColor.YELLOW
     }
@@ -134,7 +134,7 @@ class TrackingConfig {
         PUMPKIN("Pumpkin", "<:pumpkin:1263207585004257321>"),
         MELON("Melon", "<:melon:1263207577920213083>"),
         SUGAR_CANE("Sugar Cane", "<:sugar:1263207586463748289>"),
-        MUSHROOM("Mushroom", "<:mushroom:1263207580268888096>"),  //TODO NEW EMOJI
+        MUSHROOM("Mushroom", "<:mushroom:1263207580268888096>"), // TODO NEW EMOJI
         CACTUS("Cactus", "<:cactus:1263207572962414724>"),
         COCOA_BEANS("Cocoa Beans", "<:cocoa_beans:1263207576330567795>"),
         NETHER_WART("Nether Wart", "<:nether_wart:1263207581770579970>"),

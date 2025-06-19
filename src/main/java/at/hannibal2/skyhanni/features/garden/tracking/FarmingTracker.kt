@@ -58,7 +58,7 @@ object FarmingTracker {
     private var cookieBuffTimer = ""
     private var godPotionTimer = ""
     private var activeAnitaBuff = ""
-    private var currentCrop: Crop? = null
+    private val currentCrop: Crop? = null
     private var currentPlacement = 0.0
 
     private val patternGroup = RepoPattern.group("garden.tracking")
@@ -186,72 +186,97 @@ object FarmingTracker {
 
     fun prepareAndSendEmbed(status: String): Boolean {
         playerFaceURL = playerFaceURL.ifBlank { ApiUtils.getPlayerSkin(config.embed.bodyPart, 12) }
+        updateFarmingSince(status)
 
-        farmingSince =
-            if (status != "Farming") SimpleTimeMark.farFuture() else farmingSince.takeUnless { it.isInFuture() } ?: SimpleTimeMark.now()
+        val color = resolveColor(status)
+        val fields = collectFields(status)
 
-        val color = config.embed.takeIf { it.useDefault }?.run {
+        if (fields.isEmpty()) {
+            notifyMissingFields()
+            return false
+        }
+
+        val embed = buildEmbed(status, color, fields)
+        val threadID = config.threadId.ifBlank { null }
+        val username = "[FARMING TRACKER] ${PlayerUtils.getName()}"
+
+        return sendOrEditMessage(embed, threadID, username)
+    }
+
+    private fun updateFarmingSince(status: String) {
+        if (status == "Farming" && farmingSince.isInFuture()) {
+            farmingSince = SimpleTimeMark.now()
+        } else if (status != "Farming") {
+            farmingSince = SimpleTimeMark.farFuture()
+        }
+    }
+
+    private fun resolveColor(status: String): Int {
+        return config.embed.takeIf { it.useDefault }?.run {
             when (status) {
                 "Farming", "Online", "in Skyblock" -> LorenzColor.GREEN
                 "Offline" -> LorenzColor.RED
                 else -> LorenzColor.YELLOW
             }.toIntColor()
         } ?: config.embed.color.toIntColor()
+    }
 
-        val fields = config.embed.information
+    private fun collectFields(status: String): List<Field> {
+        return config.embed.information
             .filter { it.isSelected() }
-            .mapNotNull { type ->
-                val value = when (type) {
-                    InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue?.roundToInt()
-                    InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue?.roundToInt()
-                    InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue?.roundToInt()
-                    InformationType.SPEED -> SkyblockStat.SPEED.lastKnownValue?.roundToInt()
-                    InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownValue?.roundToInt()
-                    InformationType.PET -> PetApi.currentPet?.let { pet ->
-                        Pet.entries.find { it.toString() == pet.removeColor() }?.petName ?: ""
-                    } ?: ""
+            .mapNotNull { type -> type.buildField(status) }
+    }
 
-                    InformationType.COOKIE_BUFF -> cookieBuffTimer.ifBlank { "<:no:1263210393723998278>" }
-                    InformationType.GOD_POTION -> godPotionTimer.ifBlank { "<:no:1263210393723998278>" }
-                    InformationType.JACOBS_CONTEST ->
-                        if (!FarmingContestApi.inContest) ""
-                        else convertPlacement(currentPlacement)?.let { bracket -> "$currentPlacement% ${bracket.emoji}" }
-                            ?: ""
+    private fun InformationType.buildField(status: String): Field? {
+        val value = when (this) {
+            InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue?.roundToInt()
+            InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue?.roundToInt()
+            InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue?.roundToInt()
+            InformationType.SPEED -> SkyblockStat.SPEED.lastKnownValue?.roundToInt()
+            InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownValue?.roundToInt()
+            InformationType.PET -> PetApi.currentPet?.let { pet ->
+                Pet.entries.find { it.toString() == pet.removeColor() }?.petName.orEmpty()
+            }.orEmpty()
 
-                    InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { farmedCrop ->
-                        getCropEnum(farmedCrop.cropName)?.let { cropEnum ->
-                            "${cropEnum.name} ${cropEnum.emoji}"
-                        }.takeUnless { status == "Idle" || status == "Offline" } ?: ""
-                    } ?: ""
+            InformationType.COOKIE_BUFF -> cookieBuffTimer.ifBlank { "<:no:1263210393723998278>" }
+            InformationType.GOD_POTION -> godPotionTimer.ifBlank { "<:no:1263210393723998278>" }
+            InformationType.JACOBS_CONTEST ->
+                if (!FarmingContestApi.inContest) ""
+                else convertPlacement(currentPlacement)?.let { "$currentPlacement% ${it.emoji}" }.orEmpty()
 
-                    InformationType.ANITA_BUFF -> activeAnitaBuff.ifBlank { "<:no:1263210393723998278>" }
-                    InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.roundTo(2).takeUnless { it == 0.0 } ?: ""
-                    InformationType.FARMING_SINCE -> if (farmingSince.isInFuture()) "" else farmingSince.passedSince()
-                }.toString().takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { crop ->
+                getCropEnum(crop.cropName)?.let { "${it.name} ${it.emoji}" }
+                    .takeUnless { status == "Idle" || status == "Offline" }
+            }.orEmpty()
 
-                Field(
-                    name = if (type != InformationType.JACOBS_CONTEST) type.fieldName else currentCrop?.let { "${it.name} Contest ${it.emoji}" }
-                        ?: type.fieldName,
-                    value = value,
-                    inline = true,
-                )
-            }
+            InformationType.ANITA_BUFF -> activeAnitaBuff.ifBlank { "<:no:1263210393723998278>" }
+            InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.roundTo(2).takeUnless { it == 0.0 } ?: ""
+            InformationType.FARMING_SINCE -> if (farmingSince.isInFuture()) "" else farmingSince.passedSince()
+        }?.toString()?.takeIf { it.isNotBlank() } ?: return null
 
-        if (fields.isEmpty()) {
-            lastNotification = SimpleTimeMark.now()
-            ChatUtils.chatAndOpenConfig(
-                "No information could be displayed! Do you have them activated? Click to open Config.",
-                config.embed::information,
-            )
-            return false
+        val name = if (this != InformationType.JACOBS_CONTEST) {
+            fieldName
+        } else {
+            currentCrop?.let { "${it.name} Contest ${it.emoji}" } ?: fieldName
         }
 
+        return Field(name, value, inline = true)
+    }
 
+    private fun notifyMissingFields() {
+        lastNotification = SimpleTimeMark.now()
+        ChatUtils.chatAndOpenConfig(
+            "No information could be displayed! Do you have them activated? Click to open Config.",
+            config.embed::information,
+        )
+    }
+
+    private fun buildEmbed(status: String, color: Int, fields: List<Field>): Embed {
         val time = SimpleTimeMark.now().let {
             SimpleTimeMark(it.toMillis() - TimeZone.getDefault().getOffset(it.toMillis()))
         }.formattedDate("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
-        val embed = Embed(
+        return Embed(
             title = "Status - $status",
             color = color,
             fields = fields,
@@ -259,10 +284,9 @@ object FarmingTracker {
             thumbnail = Thumbnail(playerFaceURL),
             footer = Footer("Automatic Status Report"),
         )
+    }
 
-        val threadID = config.threadId.ifBlank { null }
-        val username = "[FARMING TRACKER] ${PlayerUtils.getName()}"
-
+    private fun sendOrEditMessage(embed: Embed, threadID: String?, username: String): Boolean {
         return when (config.messageType) {
             MessageType.NEW_MESSAGE -> WebhookUtils.sendEmbedsToWebhook(config.webhook.url, listOf(embed), threadID, username)
             MessageType.EDITED_MESSAGE -> WebhookUtils.editMessageEmbeds(config.webhook.url, listOf(embed), threadID, username)
