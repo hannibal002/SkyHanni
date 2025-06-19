@@ -92,6 +92,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     LOCATION(
         {
             // graphArea kept giving me no_area on my private island
+            // TODO use island type instead of your island string, use graph area again
             var location = SkyBlockUtils.scoreboardArea ?: "invalid"
             val island = SkyBlockUtils.currentIsland
 

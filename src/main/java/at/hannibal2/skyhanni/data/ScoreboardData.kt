@@ -166,7 +166,7 @@ object ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
         //#else
-        //$$ return list.map { it.formattedTextCompat() }
+        //$$ return list.map { it.formattedTextCompat(true) }
         //#endif
     }
 
