@@ -28,7 +28,7 @@ object CopyItemCommand {
 
     fun copyItemToClipboard(itemStack: ItemStack) {
         val resultList = mutableListOf<String>()
-        resultList.add(itemStack.getInternalName().toString())
+        resultList.add("internal name: " + itemStack.getInternalName().asString())
         resultList.add("display name: '" + itemStack.displayName.toString() + "'")
         resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
         resultList.add("lore:")
