@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -274,6 +275,15 @@ class ItemResolutionQuery {
         return null
     }
 
+    private fun resolveItemInAttributeMenu(displayName: String): String? {
+        var name = displayName.removeColor()
+        val tier = name.last().toString().romanToDecimal()
+        if (tier == 0) return null
+        name = name.dropLast(1)
+
+        return "ATTRIBUTE_SHARD_" + name.trim().replace(" ", "_") + ";$tier"
+    }
+
     private fun resolveContextualName(): String? {
         val chest = guiContext as? GuiChest ?: return null
         val inventorySlots = chest.inventorySlots as ContainerChest
@@ -302,6 +312,9 @@ class ItemResolutionQuery {
         }
         if (guiName.endsWith("Experimentation Table RNG")) {
             return resolveEnchantmentByName(displayName)
+        }
+        if (guiName == "Attribute Menu") {
+            return resolveItemInAttributeMenu(displayName)
         }
         return null
     }
