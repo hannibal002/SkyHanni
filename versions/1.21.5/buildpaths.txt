@@ -263,6 +263,8 @@ at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker.kt
 at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker.kt
+at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.kt
+at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.kt
 at.hannibal2.skyhanni.features.fame.ReminderUtils.kt
 at.hannibal2.skyhanni.features.fishing.FishingApi.kt
 at.hannibal2.skyhanni.features.fishing.SeaCreature.kt
@@ -626,8 +628,6 @@ at/hannibal2/skyhanni/config/features/event/gifting/GiftingConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityCallWarningConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityChatConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEggsConfig.kt
-at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEggType.kt
-at/hannibal2/skyhanni/config/features/event/hoppity/HoppityApi.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryCFReminderConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryLiveDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityStrayTimerConfig.kt
