@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -244,16 +244,6 @@ object ExperimentationTableApi {
     private val bookPattern by patternGroup.pattern(
         "book",
         "§9(?<enchant>.*)",
-    )
-
-    /**
-     * REGEX-TEST: §dGuardian
-     * REGEX-TEST: §9Guardian§e
-     * REGEX-TEST: §5Guardian
-     */
-    private val guardianPetNamePattern by patternGroup.pattern(
-        "guardianpet",
-        "§(?<color>[956d])Guardian.*",
     )
 
     /**
@@ -533,5 +523,5 @@ object ExperimentationTableApi {
         }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
     }
 
-    fun hasGuardianPet(): Boolean = guardianPetNamePattern.matches(PetApi.currentPet)
+    fun hasGuardianPet(): Boolean = CurrentPetApi.isCurrentPet("Guardian")
 }
