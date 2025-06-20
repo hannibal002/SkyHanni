@@ -449,13 +449,14 @@ at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsCompactChat.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared.kt
-at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler.kt
 at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning.kt
 at.hannibal2.skyhanni.features.event.hoppity.ReplaceHoppityWithContributor.kt
 at.hannibal2.skyhanni.features.event.hoppity.WarpMenuUniques.kt
+at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.kt
+at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityLiveDisplay.kt
 at.hannibal2.skyhanni.features.event.jerry.HighlightJerries.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker.kt
@@ -984,8 +985,6 @@ at/hannibal2/skyhanni/config/features/event/gifting/GiftingConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityCallWarningConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityChatConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEggsConfig.kt
-at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryCFReminderConfig.kt
-at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryLiveDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityStrayTimerConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityUnclaimedEggsConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityWarpMenuConfig.kt

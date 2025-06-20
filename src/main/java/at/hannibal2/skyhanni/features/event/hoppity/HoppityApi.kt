@@ -39,15 +39,13 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.LorenzRarity.RARE
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SkyblockSeasonModifier
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -165,10 +163,10 @@ object HoppityApi {
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) getEventEndMark(SkyBlockTime.now().year) else null
 
     fun getEventEndMark(year: Int) =
-        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeasonModifier.EARLY).asTimeMark()
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeasonModifier.EARLY).toTimeMark()
 
     fun getEventStartMark(year: Int) =
-        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeasonModifier.EARLY).asTimeMark()
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeasonModifier.EARLY).toTimeMark()
 
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
@@ -218,9 +216,9 @@ object HoppityApi {
         allowedHoppityIslands = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").apiEggLocations.keys.toSet()
     }
 
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        onHoppityIsland = LorenzUtils.inSkyBlock && allowedHoppityIslands.any { it.isInIsland() }
+    @HandleEvent(IslandChangeEvent::class)
+    fun onIslandChange() {
+        onHoppityIsland = SkyBlockUtils.inSkyBlock && allowedHoppityIslands.any { it.isCurrent() }
     }
 
     @HandleEvent
@@ -231,8 +229,8 @@ object HoppityApi {
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         processedStraySlots.clear()
         if (lastHoppityCallAccept == null) return
         DelayedRun.runDelayed(1.seconds) {
