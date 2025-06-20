@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -56,7 +55,7 @@ object CurrentPing {
     @JvmStatic
     fun fixedModApiKickMessage() {
         ChatUtils.debug("Stopped HypixelModApi ping packet error!")
-        if (SkyHanniDebugsAndTests.enabled) {
+        if (SkyBlockUtils.debug) {
             SoundUtils.playBeepSound()
         }
     }

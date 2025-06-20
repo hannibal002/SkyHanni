@@ -106,15 +106,6 @@ object ComposterOverlay {
             GardenApi.storage?.composterCurrentFuelItem = value
         }
 
-    private fun onCommand(args: Array<String>) {
-        if (args.size != 1) {
-            ChatUtils.userError("Usage: /shtestcomposter <offset>")
-            return
-        }
-        testOffset = args[0].toInt()
-        ChatUtils.chat("Composter test offset set to $testOffset.")
-    }
-
     private val COMPOST = "COMPOST".toInternalName()
     private val BIOFUEL = "BIOFUEL".toInternalName()
     private val VOLTA = "VOLTA".toInternalName()
@@ -730,7 +721,14 @@ object ComposterOverlay {
         event.registerBrigadier("shtestcomposter") {
             description = "Test the composter overlay"
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs { onCommand(it) }
+            legacyCallbackArgs {
+                if (it.size != 1) {
+                    ChatUtils.userError("Usage: /shtestcomposter <offset>")
+                } else {
+                    testOffset = it[0].toInt()
+                    ChatUtils.chat("Composter test offset set to $testOffset.")
+                }
+            }
         }
     }
 }

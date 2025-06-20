@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object FarmingMilestoneCommand {
 
-    fun onCommand(crop: String?, current: String?, target: String?, needsTime: Boolean) {
+    private fun onCommand(crop: String?, current: String?, target: String?, needsTime: Boolean) {
         if (crop == null) {
             ChatUtils.userError("No crop type entered")
             return
@@ -87,7 +87,7 @@ object FarmingMilestoneCommand {
         ChatUtils.chat("Custom goal milestone for §b${enteredCrop.cropName} §eset to §b$targetLevel.")
     }
 
-    fun onComplete(strings: Array<String>): List<String> {
+    private fun onComplete(strings: Array<String>): List<String> {
         return if (strings.size <= 1) {
             StringUtils.getListOfStringsMatchingLastWord(
                 strings,

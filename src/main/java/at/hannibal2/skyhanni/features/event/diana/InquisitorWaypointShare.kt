@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -110,13 +108,6 @@ object InquisitorWaypointShare {
         val location: LorenzVec,
         val spawnTime: SimpleTimeMark,
     )
-
-    private var test = false
-
-    fun test() {
-        test = !test
-        ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
-    }
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -331,15 +322,6 @@ object InquisitorWaypointShare {
     fun playUserSound() {
         with(config.sound) {
             SoundUtils.createSound(name, pitch).playSound()
-        }
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shtestinquisitor") {
-            description = "Test the inquisitor waypoint share"
-            category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { test() }
         }
     }
 }
