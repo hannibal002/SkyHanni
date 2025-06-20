@@ -333,9 +333,7 @@ object GuiRenderUtils {
             x - skullDiff to y - skullDiff
         } else x to y
 
-        val halfIconX = 8f
-        val halfIconY = 8f
-        val halfIconZ = 100f
+        val (hx, hy, hz) = listOf(8f, 8f, 100f)
 
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(translateX, translateY, -19f)
@@ -346,22 +344,22 @@ object GuiRenderUtils {
             DrawContextUtils.pushPop {
                 DrawContextUtils.loadIdentity()
 
-                DrawContextUtils.translate(halfIconX, halfIconY, halfIconZ)
+                DrawContextUtils.translate(hx, hy, hz)
                 if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
                 if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
                 if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
-                DrawContextUtils.translate(-halfIconX, -halfIconY, -halfIconZ)
+                DrawContextUtils.translate(-hx, -hy, -hz)
 
                 DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
             }
             DrawContextUtils.multMatrix(savedMV)
             //#else
             //$$ val rotMat = Matrix4f().identity()
-            //$$    .translate(half, half, centerZ)
+            //$$    .translate(hx, hy, hz)
             //$$    .rotateX(Math.toRadians(rotX.toDouble()).toFloat())
             //$$    .rotateY(Math.toRadians(rotY.toDouble()).toFloat())
             //$$    .rotateZ(Math.toRadians(rotZ.toDouble()).toFloat())
-            //$$    .translate(-half, -half, -centerZ)
+            //$$    .translate(-hx, -hy, -hz)
             //$$ DrawContextUtils.multMatrix(rotMat)
             //#endif
 
@@ -369,22 +367,23 @@ object GuiRenderUtils {
             GL11.glEnable(GL11.GL_NORMALIZE)
             GL11.glNormal3f(0f, 0f, 1f)
             //#else
-            //$$ RenderSystem.enableNormalize()
-            //$$ RenderSystem.normal3f(0f, 0f, 1f)
+            //$$ RenderSystem.assertOnRenderThread()
             //#endif
 
             RenderHelper.enableGUIStandardItemLighting()
             //#if MC < 1.21
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
             //#endif
-
             DrawContextUtils.drawItem(item, 0, 0)
 
             //#if MC < 1.21
             RenderHelper.disableStandardItemLighting()
-            GL11.glDisable(GL11.GL_NORMALIZE)
             //#else
-            //$$ RenderSystem.disableNormalize()
+            //$$ DiffuseLighting.disableGuiDepthLighting()
+            //#endif
+
+            //#if MC < 1.21
+            GL11.glDisable(GL11.GL_NORMALIZE)
             //#endif
         }
     }
