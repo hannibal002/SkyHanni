@@ -65,6 +65,7 @@ object RepoItemEditor {
                 )
                 refreshNbt(internalName)
             }
+
             else -> return
         }
     }
@@ -113,7 +114,7 @@ object RepoItemEditor {
         if (itemModel.isNotEmpty()) {
             baseJson.addProperty("itemModel", itemModel)
         }
-        baseJson.addProperty("nbttag", nbtTag.toString().replace("\u0027", ""))
+        baseJson.addProperty("nbttag", nbtTag.toString().replace("\u0027[", "[").replace("]\u0027", "]"))
         baseJson.addProperty("damage", damage)
         val jsonLore = JsonArray()
         lore.split("\n").forEach { line ->
@@ -224,7 +225,11 @@ object RepoItemEditor {
             }
 
         } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Error refreshing NBT for item", "internalName" to internalName.asString())
+            ErrorManager.logErrorWithData(
+                e, "Error refreshing NBT for item",
+                "internalName" to internalName.asString(),
+                ignoreErrorCache = true,
+            )
         }
     }
 
