@@ -430,4 +430,17 @@ object CollectionUtils {
         val oldestKey = minByOrNull { it.value }?.key ?: return
         remove(oldestKey)
     }
+
+    fun <T> Collection<T>.firstUniqueByOrNull(
+        vararg predicates: (T) -> Boolean
+    ): T? {
+        var candidates = this
+        for (pred in predicates) {
+            val next = candidates.filter(pred)
+            if (next.isEmpty()) return null
+            else if (next.size == 1) return next.single()
+            candidates = next
+        }
+        return null
+    }
 }
