@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -13,11 +12,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import java.util.Locale
+import java.util.UUID
+
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
@@ -68,21 +70,44 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
-    fun ItemStack.getPetExp() = getPetInfo()?.get("exp")?.asDouble
+    data class PetInfo(
+        @Expose val type: String,
+        @Expose val active: Boolean,
+        @Expose val exp: Double,
+        @Expose val tier: LorenzRarity,
+        @Expose val hideInfo: Boolean = false,
+        @Expose val heldItem: NeuInternalName? = null,
+        @Expose val candyUsed: Int = 0,
+        @Expose val skin: String? = null,
+        @Deprecated("Some pets do not have uuids, use uniqueId instead", replaceWith = ReplaceWith("uniqueId"))
+        @Expose val uuid: UUID? = null,
+        @Expose val uniqueId: UUID? = null, // Only null when pet is read from a shop, or another non-"owned" source
+        @Expose val hideRightClick: Boolean,
+        @Expose val noMove: Boolean,
+        @Expose val extraData: JsonObject? = null,
+    ) {
+        val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
+        fun getSkinVariantIndex() = skin?.let {
+            extraData?.entrySet()?.firstOrNull { json ->
+                val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == properSkinItem }
+                val expectedKey = PetUtils.petSkinNbtNames.getOrNull(repoVariantIndex) ?: return@firstOrNull false
+                json.key == expectedKey
+            }?.value?.asJsonPrimitive?.asNumber?.toInt()
+        }
+    }
 
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
         if (data.petCandies == -1) {
-            data.petCandies = getPetInfo()?.get("candyUsed")?.asInt
+            data.petCandies = getPetInfo()?.candyUsed
         }
         return data.petCandies
     }
 
-    // TODO use NeuInternalName here
-    fun ItemStack.getPetItem(): String? {
+    fun ItemStack.getHeldPetItem(): NeuInternalName? {
         val data = cachedData
-        if (data.heldItem == "") {
-            data.heldItem = getPetInfo()?.get("heldItem")?.asString
+        if (data.heldItem == NeuInternalName.NONE) {
+            data.heldItem = getPetInfo()?.heldItem
         }
         return data.heldItem
     }
@@ -103,15 +128,15 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
 
-    private fun ItemStack.getPetInfo() =
-        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
-
     @Suppress("CAST_NEVER_SUCCEEDS")
-    inline val ItemStack.cachedData get() = (this as ItemStackCachedData).skyhanni_cachedData
+    inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    fun ItemStack.getPetLevel(): Int = PetApi.getPetLevel(displayName) ?: 0
+    fun ItemStack.getPetInfo(): PetInfo? =
+        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), PetInfo::class.java)
 
-    fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".toInternalName()) 200 else 100
+    fun ItemStack.getPetLevel(): Int = PetUtils.xpToLevel(getPetInfo()?.exp ?: 0.0, getInternalName())
+
+    fun ItemStack.getMaxPetLevel(): Int = PetUtils.getMaxLevel(getInternalName())
 
     fun ItemStack.getDrillUpgrades() = getExtraAttributes()?.let {
         val list = mutableListOf<NeuInternalName>()

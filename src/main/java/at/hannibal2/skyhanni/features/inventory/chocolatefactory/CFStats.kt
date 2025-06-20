@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAp
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getTimeToFull
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -194,7 +194,7 @@ object CFStats {
         tips = listOf("§bCopy to Clipboard!"),
         onLeftClick = {
             val list = text.toMutableList()
-            list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
+            list.add(0, "${PlayerUtils.getName()}'s Chocolate Factory Stats")
 
             ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
         },

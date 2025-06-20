@@ -20,12 +20,12 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -278,7 +278,7 @@ object HoppityEggsManager {
 
     private val warpClickAction: Pair<() -> Unit, String>
         get() =
-            if (LorenzUtils.inSkyBlock) {
+            if (SkyBlockUtils.inSkyBlock) {
                 { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) } to
                     "warp to ${unclaimedEggsConfig.warpClickDestination}".trim()
             } else {
@@ -359,6 +359,6 @@ object HoppityEggsManager {
         }
     }
 
-    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && unclaimedEggsConfig.showOutsideSkyblock)) &&
+    fun isActive() = (SkyBlockUtils.inSkyBlock || (SkyBlockUtils.onHypixel && unclaimedEggsConfig.showOutsideSkyblock)) &&
         HoppityApi.isHoppityEvent()
 }
