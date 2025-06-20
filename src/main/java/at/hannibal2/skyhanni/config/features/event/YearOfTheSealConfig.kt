@@ -25,7 +25,7 @@ class YearOfTheSealConfig {
     var fishyTreatProfitPosition: Position = Position(170, 150)
 
     @Expose
-    @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown.")
+    @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown (Only works on normal ones, not giant).")
     @ConfigEditorBoolean
     @SearchTag("beach")
     var bouncyBallLine: Property<Boolean> = Property.of(true)
