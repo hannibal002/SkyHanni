@@ -81,7 +81,6 @@ object RenderUtils {
     //$$ private val colorBuffer:  FloatBuffer = BufferUtils.createFloatBuffer(16)
     //#endif
 
-    //#if MC < 1.8.9
     /**
      * Used for some debugging purposes.
      */
