@@ -382,7 +382,7 @@ object SkillApi {
         storage?.set(skillType, skillInfo)
     }
 
-    fun onCommand(it: Array<String>) {
+    private fun onCommand(it: Array<String>) {
         if (it.isEmpty()) {
             commandHelp()
             return
@@ -476,18 +476,6 @@ object SkillApi {
         commandHelp()
     }
 
-    fun onComplete(strings: Array<String>): List<String> {
-        return when (strings.size) {
-            1 -> listOf("levelwithxp", "xpforlevel", "goal")
-            2 -> if (strings[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
-                strings,
-                SkillType.entries.map { it.displayName },
-            ) else listOf()
-
-            else -> listOf()
-        }
-    }
-
     private fun commandHelp() {
         ChatUtils.chat(
             listOf(
@@ -533,7 +521,17 @@ object SkillApi {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE
             callback { onCommand(it) }
-            autoComplete { onComplete(it) }
+            autoComplete {
+                when (it.size) {
+                    1 -> listOf("levelwithxp", "xpforlevel", "goal")
+                    2 -> if (it[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
+                        it,
+                        SkillType.entries.map { it.displayName },
+                    ) else listOf()
+
+                    else -> listOf()
+                }
+            }
         }
     }
 }

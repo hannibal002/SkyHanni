@@ -20,24 +20,21 @@ class RepoPatternGui private constructor() {
     @SkyHanniModule
     companion object {
 
-        /**
-         * Open the [RepoPatternGui]
-         */
-        fun open() {
-            SkyHanniMod.screenToOpen = GuiComponentWrapper(
-                GuiContext(
-                    XMLUniverse.getDefaultUniverse()
-                        .load(RepoPatternGui(), MyResourceLocation("skyhanni", "gui/regexes.xml"))
-                )
-            )
-        }
-
         @HandleEvent
         fun onCommandRegistration(event: CommandRegistrationEvent) {
+
+            /**
+             * Open the [RepoPatternGui]
+             */
             event.registerBrigadier("shrepopatterns") {
                 description = "See where regexes are loaded from"
                 category = CommandCategory.DEVELOPER_TEST
-                simpleCallback { open() }
+                simpleCallback {
+                    val location = MyResourceLocation("skyhanni", "gui/regexes.xml")
+                    val universe = XMLUniverse.getDefaultUniverse()
+                    val context = GuiContext(universe.load(RepoPatternGui(), location))
+                    SkyHanniMod.screenToOpen = GuiComponentWrapper(context)
+                }
             }
         }
     }

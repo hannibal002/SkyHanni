@@ -172,15 +172,6 @@ object CaptureFarmingGear {
         }
     }
 
-    private fun handelCarrolyn(input: Array<String>) {
-        val string = input.joinToString("_").uppercase()
-        val crop = CropType.entries.firstOrNull { it.name == string }
-            ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string").run { return }
-        val carrolyn = CarrolynTable.getByCrop(crop)
-            ?: ChatUtils.userError("Invalid Argument, crop is not valid").run { return }
-        carrolyn.setVisibleActive(!carrolyn.get())
-    }
-
     private fun getUniqueVisitorsForTier(tier: Int): Int {
         return when {
             tier == 0 -> 0
@@ -446,13 +437,6 @@ object CaptureFarmingGear {
         }
     }
 
-    private fun onResetGearCommand() {
-        val storage = GardenApi.storage?.fortune ?: return
-        ChatUtils.chat("Resets farming items")
-        storage.farmingItems.clear()
-        storage.outdatedItems.clear()
-    }
-
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(48, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")
@@ -465,12 +449,26 @@ object CaptureFarmingGear {
         event.registerBrigadier("shcarrolyn") {
             description = "Toggles if the specified crops effect is active from carrolyn"
             category = CommandCategory.USERS_BUG_FIX
-            legacyCallbackArgs { handelCarrolyn(it) }
+            legacyCallbackArgs { args ->
+                val string = args.joinToString("_").uppercase()
+                val crop = CropType.entries.firstOrNull { it.name == string }
+                    ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string")
+                        .run<Unit, Nothing> { return@legacyCallbackArgs }
+                val carrolyn = CarrolynTable.getByCrop(crop)
+                    ?: ChatUtils.userError("Invalid Argument, crop is not valid")
+                        .run<Unit, Nothing> { return@legacyCallbackArgs }
+                carrolyn.setVisibleActive(!carrolyn.get())
+            }
         }
         event.registerBrigadier("shresetfarmingitems") {
             description = "Resets farming items saved for the Farming Fortune Guide"
             category = CommandCategory.USERS_RESET
-            simpleCallback { onResetGearCommand() }
+            simpleCallback {
+                val storage = GardenApi.storage?.fortune ?: return@simpleCallback
+                ChatUtils.chat("Resets farming items")
+                storage.farmingItems.clear()
+                storage.outdatedItems.clear()
+            }
         }
     }
 }
