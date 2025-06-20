@@ -32,8 +32,7 @@ object DrawContextUtils {
             ErrorManager.skyHanniError("drawContext is null")
         }
 
-    fun drawItem(item: ItemStack, x: Int, y: Int) =
-        drawContext.drawItem(item, x, y)
+    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.drawItem(item, x, y)
 
     fun setContext(context: DrawContext) {
         renderDepth++

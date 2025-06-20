@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
 import net.minecraft.entity.EntityLivingBase
 import java.awt.Color
 
@@ -62,9 +60,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T): Int {
-        //#if TODO
         if (!SkyHanniDebugsAndTests.globalRender) return 0
-        //#endif
         if (entityColorMap.containsKey(entity)) {
             val condition = entityColorCondition[entity]!!
             if (condition.invoke()) {
@@ -76,9 +72,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun <T : EntityLivingBase> internalChangeHurtTime(entity: T): Int {
-        //#if TODO
         if (!SkyHanniDebugsAndTests.globalRender) return entity.hurtTime
-        //#endif
         run {
             val condition = entityNoHurtTimeCondition[entity] ?: return@run
             if (condition.invoke()) {

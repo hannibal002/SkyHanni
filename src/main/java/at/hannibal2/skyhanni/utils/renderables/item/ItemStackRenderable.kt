@@ -31,7 +31,7 @@ open class ItemStackRenderable(
             xSpacing / 2.0f,
             0F,
             scaleMultiplier = scale,
-            rescaleSkulls
+            rescaleSkulls,
         )
     }
 
