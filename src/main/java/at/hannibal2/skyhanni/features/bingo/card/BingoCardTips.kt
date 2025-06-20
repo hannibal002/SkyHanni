@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
 
@@ -112,7 +112,7 @@ object BingoCardTips {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.bingoSplashGuide
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.bingoSplashGuide
 
     enum class Difficulty(rawName: String, val color: LorenzColor) {
         EASY("Easy", LorenzColor.GREEN),

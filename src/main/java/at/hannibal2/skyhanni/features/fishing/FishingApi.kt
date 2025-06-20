@@ -227,11 +227,7 @@ object FishingApi {
     }
 
     private fun isWearingTrophyArmor(): Boolean =
-        //#if TODO
         InventoryUtils.getArmor().all {
             trophyArmorNames.matches(it?.getInternalName()?.asString())
         }
-    //#else
-    //$$ false
-    //#endif
 }

@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.misc.limbo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -208,5 +210,14 @@ object LimboTimeTracker {
         val string = input.toString()
         return if (string.endsWith(".0")) return string.dropLast(2)
         else string
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shlimbostats") {
+            description = "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { printStats() }
+        }
     }
 }

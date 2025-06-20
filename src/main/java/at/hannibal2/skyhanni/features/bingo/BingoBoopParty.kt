@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -42,5 +42,5 @@ object BingoBoopParty {
         )
     }
 
-    private fun isEnabled() = LorenzUtils.isBingoProfile && config
+    private fun isEnabled() = SkyBlockUtils.isBingoProfile && config
 }

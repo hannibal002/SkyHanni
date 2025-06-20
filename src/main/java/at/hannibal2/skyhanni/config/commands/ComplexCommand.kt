@@ -30,8 +30,9 @@ data class ComplexCommand<O : CommandContextAwareObject>(
     }
 
     fun constructHelp(description: String): String = buildString {
-        appendLine(name)
         appendLine(description)
+        appendLine()
+        appendLine("Arguments:")
         specifiers
             .sortedBy {
                 when (it.defaultPosition) {
@@ -51,6 +52,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
                     appendLine(it.documentation)
                 }
             }
+        deleteAt(lastIndex) // Removes the last /n
     }
 
     private fun handleCommand(args: Array<String>) {

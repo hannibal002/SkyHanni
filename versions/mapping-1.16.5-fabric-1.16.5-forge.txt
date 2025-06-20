@@ -72,6 +72,8 @@ net.minecraft.util.math.Box contains() contains()
 net.minecraft.util.math.Box expand() inflate()
 net.minecraft.util.math.Box offset() move()
 
+net.minecraft.util.math.Direction getVector() getDirectionVec()
+
 net.minecraft.util.math.Vec3d squaredDistanceTo() distanceToSqr()
 
 net.minecraft.world.EntityView net.minecraft.world.level.EntityGetter
@@ -79,4 +81,3 @@ net.minecraft.world.EntityView net.minecraft.world.level.EntityGetter
 net.minecraft.world.EntityView getPlayerByUuid() getPlayerByUUID()
 
 net.minecraft.world.phys.HitResult getPos() getLocation()
-
