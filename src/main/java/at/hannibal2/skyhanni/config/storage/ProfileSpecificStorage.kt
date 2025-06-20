@@ -69,11 +69,14 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.time.Duration
 
 // todo 1.21 impl needed
 // put everything under its respective feature, the order of the features is the same as in the folder structure
-class ProfileSpecificStorage {
+class ProfileSpecificStorage(
+    @Expose var profileName: String = "",
+) {
     // api
     @Expose
     var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
@@ -815,7 +818,7 @@ class ProfileSpecificStorage {
 
     // data
     @Expose
-    var currentPet: String = ""
+    var currentPetUuid: UUID? = null
 
     @Expose
     var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()

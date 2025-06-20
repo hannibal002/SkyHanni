@@ -230,6 +230,7 @@ object SkyHanniDebugsAndTests {
         // saving old config state
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
         SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "reload config manager")
         Thread {
             Thread.sleep(500)
             SkyHanniMod.configManager.disableSaving()
