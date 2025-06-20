@@ -1,9 +1,14 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.data.GuiData;
 import at.hannibal2.skyhanni.data.ToolTipData;
+import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
+import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
 import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
+import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -26,6 +31,26 @@ public abstract class MixinHandledScreen {
 
     @Shadow
     protected abstract List<Text> getTooltipFromItem(ItemStack par1);
+
+    @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
+    private void renderHead(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        if (!SkyHanniDebugsAndTests.INSTANCE.getGlobalRender()) return;
+        HandledScreen<?> gui = (HandledScreen<?>) (Object) this;
+        if (new GuiContainerEvent.PreDraw(context, gui, gui.getScreenHandler(), mouseX, mouseY, deltaTicks).post()) {
+            GuiData.INSTANCE.setPreDrawEventCancelled(true);
+            ci.cancel();
+        } else {
+            DelayedRun.INSTANCE.runNextTick(() -> {
+                GuiData.INSTANCE.setPreDrawEventCancelled(false);
+                return null;
+            });
+        }
+    }
+
+    @Inject(method = "render", at = @At(value = "TAIL"), cancellable = true)
+    private void renderTail(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
+    }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(Lnet/minecraft/client/gui/DrawContext;IIF)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {

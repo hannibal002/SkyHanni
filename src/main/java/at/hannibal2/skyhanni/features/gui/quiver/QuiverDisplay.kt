@@ -13,11 +13,11 @@ import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
@@ -96,5 +96,5 @@ object QuiverDisplay {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

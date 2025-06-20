@@ -11,3 +11,5 @@ accessible field net/minecraft/client/gui/hud/BossBarHud bossBars Ljava/util/Map
 accessible field net/minecraft/client/render/WorldRenderer frustum Lnet/minecraft/client/render/Frustum;
 accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket entityId I
 accessible field net/minecraft/entity/player/PlayerInventory equipment Lnet/minecraft/entity/EntityEquipment;
+accessible field net/minecraft/util/hit/BlockHitResult missed Z
+accessible class net/minecraft/client/gui/hud/ChatHud$RemovalQueuedMessage
