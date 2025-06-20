@@ -233,7 +233,7 @@ object MoongladeBeacon {
                 in MATCH_SLOTS -> {
                     val colorIndex = slot.stack.getColorIndex()
                     if (colorIndex == -1) continue
-                    val isItemEnchanted = slot.stack.isEnchanted()
+                    val isItemEnchanted = slot.stack.hasEnchantments()
                     val tuningData = if (isItemEnchanted) enchantedTuning else normalTuning
                     tuningData.targetColor = colorIndex
                     tuningData.updateMatchSlot(slot.index)
@@ -242,7 +242,7 @@ object MoongladeBeacon {
                 in CHANGE_SLOTS -> {
                     val colorIndex = slot.stack.getColorIndex()
                     if (colorIndex == -1) continue
-                    val isItemEnchanted = slot.stack.isEnchanted()
+                    val isItemEnchanted = slot.stack.hasEnchantments()
                     val tuningData = if (isItemEnchanted) enchantedTuning else normalTuning
                     tuningData.currentColor = colorIndex
                 }
