@@ -356,22 +356,22 @@ object GuiRenderUtils {
             GL11.glNormal3f(0f, 0f, 1f)
             //#else
             //$$ RenderSystem.assertOnRenderThread()
-            //$$ RenderSystem.enableRescaleNormal()
-            //$$ RenderSystem.normal3f(0f, 0f, 1f)
             //#endif
 
             RenderHelper.enableGUIStandardItemLighting()
             //#if MC < 1.21
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
             //#endif
-
             DrawContextUtils.drawItem(item, 0, 0)
+
+            //#if MC < 1.21
             RenderHelper.disableStandardItemLighting()
+            //#else
+            //$$ DiffuseLighting.disableGuiDepthLighting()
+            //#endif
 
             //#if MC < 1.21
             GL11.glDisable(GL11.GL_NORMALIZE)
-            //#else
-            //$$ RenderSystem.disableRescaleNormal()
             //#endif
         }
     }
