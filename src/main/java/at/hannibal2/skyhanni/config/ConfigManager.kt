@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -24,6 +25,10 @@ import com.google.gson.TypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
+//#if MC < 1.21
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybindL
+//#endif
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -276,6 +281,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
+    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
@@ -296,7 +302,14 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
             extraPath = categoryParent.split(".").last() + "."
         }
         extraPath += processedOption.getPath()
-        //#if TODO
+        if (default is GuiOptionEditorKeybind) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#if MC < 1.21
+        if (default is GuiOptionEditorKeybindL) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#endif
         if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
             return GuiOptionEditorBlocked(default)
         }
@@ -310,7 +323,6 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
                 return GuiOptionEditorHidden(default)
             }
         }
-        //#endif
         return default
     }
 }

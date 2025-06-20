@@ -16,13 +16,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -85,7 +85,7 @@ object UpgradeReminder {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (ReminderUtils.isBusy()) return
-        if (inInventory || LorenzUtils.skyBlockArea == "Community Center") return
+        if (inInventory || SkyBlockUtils.graphArea == "Community Center") return
         if (lastReminderSend.passedSince() < 30.seconds) return
 
         currentProfileUpgrade?.sendReminderIfClaimable()
@@ -163,7 +163,7 @@ object UpgradeReminder {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.accountUpgradeReminder
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.accountUpgradeReminder
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
