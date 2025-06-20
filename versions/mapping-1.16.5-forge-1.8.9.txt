@@ -442,6 +442,7 @@ net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
 net.minecraft.world.item.Items net.minecraft.init.Items
 
 net.minecraft.world.item.DyeColor LIGHT_GRAY SILVER
+net.minecraft.world.item.DyeColor getId() getMetadata()
 
 net.minecraft.world.item.Item byBlock() getItemFromBlock()
 
