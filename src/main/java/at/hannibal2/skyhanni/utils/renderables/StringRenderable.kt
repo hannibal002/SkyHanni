@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import java.awt.Color
 
+// todo 1.21 impl needed
 open class RenderableString(
     val text: String,
     val scale: Double = 1.0,
@@ -42,9 +43,25 @@ class WrappedRenderableString(
 ) {
     private val fontRenderer: FontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
     val map by lazy {
-        fontRenderer.listFormattedStringToWidth(
-            text, (width / scale).toInt(),
-        ).associateWith { fontRenderer.getStringWidth(it) }
+        //#if TODO
+        // TODO do not use minecraft, as it this native one does not work properly
+        var pre: Map<String, Int>
+        var localWidth = width
+        var iteration = 0
+        while (true) {
+            pre = fontRenderer.listFormattedStringToWidth(
+                text, (localWidth / scale).toInt(),
+            ).associateWith { fontRenderer.getStringWidth(it) }
+            if (pre.none { it.value > width }) {
+                break
+            }
+            iteration++
+            localWidth = (width - iteration * width * 0.01).toInt()
+        }
+        pre
+        //#else
+        //$$ listOf(text).associateWith { fontRenderer.getWidth(text) }
+        //#endif
     }
 
     override val width by lazy { (rawWidth * scale).toInt() + 1 }

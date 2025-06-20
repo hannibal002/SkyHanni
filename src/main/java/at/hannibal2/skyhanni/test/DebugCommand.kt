@@ -4,19 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-//#if TODO
 import at.hannibal2.skyhanni.data.ProfileStorageData
-//#endif
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -33,22 +30,15 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object DebugCommand {
 
-    fun command(args: Array<String>) {
-        if (args.size == 2 && args[0] == "profileName") {
-            HypixelData.profileName = args[1].lowercase()
-            ChatUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
-            return
-        }
+    fun command(search: String) {
         val list = mutableListOf<String>()
         list.add("```")
         list.add("= Debug Information for SkyHanni ${SkyHanniMod.VERSION} ${PlatformUtils.MC_VERSION} =")
         list.add("")
 
-        val search = args.joinToString(" ")
         list.add(
             if (search.isNotEmpty()) {
                 if (search.equalsIgnoreColor("all")) {
@@ -89,12 +79,10 @@ object DebugCommand {
             return
         }
 
-        //#if TODO
         if (ProfileStorageData.playerSpecific == null) {
             event.addData("playerSpecific is null!")
             return
         }
-        //#endif
 
         val classic = !SkyBlockUtils.noTradeMode
         if (classic) {
@@ -158,10 +146,8 @@ object DebugCommand {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${SkyBlockUtils.currentIsland}")
             add("skyBlockArea:")
-            //#if TODO
             add("  scoreboard: '${SkyBlockUtils.graphArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            //#endif
             with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
@@ -170,7 +156,6 @@ object DebugCommand {
     }
 
     private fun globalRender(event: DebugDataCollectEvent) {
-        //#if TODO
         event.title("Global Render")
         if (SkyHanniDebugsAndTests.globalRender) {
             event.addIrrelevant("normal enabled")
@@ -180,7 +165,6 @@ object DebugCommand {
                 add("No renderable elements from SkyHanni will show up anywhere!")
             }
         }
-        //#endif
     }
 
     private fun repoData(event: DebugDataCollectEvent) {
@@ -227,7 +211,6 @@ object DebugCommand {
     private val pingLimit = 1.5.seconds
 
     private fun networkInfo(event: DebugDataCollectEvent) {
-        //#if TODO
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
         val pingEnabled = SkyHanniMod.feature.dev.hypixelPingApi
@@ -265,16 +248,24 @@ object DebugCommand {
         } else {
             event.addIrrelevant(list)
         }
-        //#endif
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        // todo convert to actual brigadier
         event.registerBrigadier("shdebug") {
             description = "Copies SkyHanni debug data in the clipboard."
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs { command(it) }
+            argCallback("profilename profile", BrigadierArguments.string()) { profile ->
+                HypixelData.profileName = profile.lowercase()
+                ChatUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
+            }
+            literalCallback("all") {
+                command("all")
+            }
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
+                command(search)
+            }
+            simpleCallback { command("") }
         }
     }
 

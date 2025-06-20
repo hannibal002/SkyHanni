@@ -66,6 +66,7 @@ abstract class ScrollInput(
                     scroll += MouseCompat.getEventDY() * velocity
                 }
                 val deltaWheel = MouseCompat.getScrollDelta()
+                println("second delta wheel $deltaWheel")
                 scroll += -deltaWheel.coerceIn(-1, 1) * 2.5 * velocity
                 coerceInLimit()
             }

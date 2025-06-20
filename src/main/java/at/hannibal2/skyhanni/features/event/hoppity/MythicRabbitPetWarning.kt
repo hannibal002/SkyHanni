@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.data.PetApi
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
 object MythicRabbitPetWarning {
-    private const val MYTHIC_RABBIT_DISPLAY_NAME = "§dRabbit"
+    private val MYTHIC_RABBIT = "RABBIT;5".toInternalName()
     private var lastCheck = SimpleTimeMark.farPast()
 
     fun check() {
@@ -21,7 +22,7 @@ object MythicRabbitPetWarning {
         }
     }
 
-    fun correctPet() = PetApi.isCurrentPet(MYTHIC_RABBIT_DISPLAY_NAME)
+    fun correctPet() = CurrentPetApi.isCurrentPet(MYTHIC_RABBIT)
 
     private fun warn() {
         ChatUtils.chat("Use a §dMythic Rabbit Pet §efor more chocolate!")
