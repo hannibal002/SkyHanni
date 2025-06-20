@@ -90,7 +90,9 @@ at.hannibal2.skyhanni.data.SackApi.kt
 at.hannibal2.skyhanni.data.ScoreboardData.kt
 at.hannibal2.skyhanni.data.SlayerApi.kt
 at.hannibal2.skyhanni.data.TitleData.kt
-at.hannibal2.skyhanni.data.TitleManager.kt
+at.hannibal2.skyhanni.data.title.TitleManager.kt
+at.hannibal2.skyhanni.data.title.TitleContext.kt
+at.hannibal2.skyhanni.data.title.CountdownTitleContext.kt
 at.hannibal2.skyhanni.data.ToolTipData.kt
 at.hannibal2.skyhanni.data.TrackerManager.kt
 at.hannibal2.skyhanni.data.WinterApi.kt
