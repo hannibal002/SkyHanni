@@ -1,18 +1,21 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -27,7 +30,6 @@ import java.util.regex.Matcher
 
 //#if MC > 1.21
 //$$ import net.minecraft.component.ComponentMap
-//#endif
 
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
@@ -42,8 +44,24 @@ class ItemResolutionQuery {
     private var knownInternalName: String? = null
     private var guiContext: GuiScreen? = null
 
+    @SkyHanniModule
     companion object {
+
+        val patternGroup = RepoPattern.group("itemresoultionquery")
+
+        /**
+         * REGEX-TEST: §6Nature Elemental
+         * REGEX-TEST: §6Berry Eater IX
+         * REGEX-TEST: §6Essence of Ice I
+         * REGEX-TEST: §6Advanced Mode
+         */
+        private val attributeShardNamePattern by patternGroup.pattern(
+            "item.name.attribute.shard",
+            "§6(?<name>.+?) ?(?<tier>[IVXL]+)?$",
+        )
+
         private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
+
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
@@ -278,15 +296,16 @@ class ItemResolutionQuery {
     }
 
     private fun resolveItemInAttributeMenu(displayName: String): String? {
-        val name = displayName.removeColor().removeAllNonLettersAndNumbers()
-        val split = name.split(" ")
-        val last = split.last()
-        if (!last.isRoman()) return null
-        val tier = if (last.isRoman()) last.romanToDecimal() else 0
-        if (tier == 0) {
-            return "ATTRIBUTE_SHARD_" + split.joinToString("_").uppercase() + ";1"
+        attributeShardNamePattern.matchMatcher(displayName) {
+            val name = group("name").removeAllNonLettersAndNumbers()
+            val tier = groupOrNull("tier")?.romanToDecimal() ?: 0
+            if (name == "Advanced Mode") return null
+            if (tier == 0) {
+                return "ATTRIBUTE_SHARD_" + name.uppercase() + ";1"
+            }
+            return "ATTRIBUTE_SHARD_" + name.uppercase() + ";$tier"
         }
-        return "ATTRIBUTE_SHARD_" + split.dropLast(1).joinToString("_").uppercase() + ";$tier"
+        return null
     }
 
     private fun resolveContextualName(): String? {
