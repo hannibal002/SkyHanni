@@ -63,6 +63,9 @@ enum class ItemCategory {
     SALT,
     TRAP,
     BOOSTER,
+    WATER_SHARD,
+    FOREST_SHARD,
+    COMBAT_SHARD,
 
     NONE,
     ;

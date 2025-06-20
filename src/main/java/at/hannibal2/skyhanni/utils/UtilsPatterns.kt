@@ -17,12 +17,13 @@ object UtilsPatterns {
      * REGEX-TEST: §6§lLEGENDARY DUNGEON BOOTS
      * REGEX-TEST: §5§lEPIC BOOTS
      * REGEX-TEST: §f§lCOMMON
+     * REGEX-TEST: §f§lCOMMON COMBAT SHARD §8(ID C9)
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
         "^(?:§.){2,3}(?:.§. (?:§.){2})?(?:SHINY )?(?<rarity>" +
             enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") } +
-            ") ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?$",
+            ") ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?(?: §8\\(ID \\w\\d+\\))?$",
     )
 
     /**
