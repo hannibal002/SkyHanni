@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.dev
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -21,6 +22,11 @@ class RepoItemEditorConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var editModeEnabled: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Neu Repository", desc = "")
+    @Accordion
+    var repo: NeuRepositoryConfig = NeuRepositoryConfig()
 
     @Expose
     @ConfigOption(
@@ -67,5 +73,7 @@ class RepoItemEditorConfig {
     @Expose
     @ConfigLink(owner = RepoItemEditorConfig::class, field = "editModeEnabled")
     var displayPosition: Position = Position(-300, 140)
+
+
 
 }

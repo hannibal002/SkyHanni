@@ -10,11 +10,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class RepositoryConfig {
+
     @Expose
     @ConfigOption(
         name = "Repo Auto Update",
         desc = "Update the repository on every startup.\n" +
-            "§cOnly disable this if you know what you are doing!"
+            "§cOnly disable this if you know what you are doing!",
     )
     @ConfigEditorBoolean
     var repoAutoUpdate: Boolean = true
