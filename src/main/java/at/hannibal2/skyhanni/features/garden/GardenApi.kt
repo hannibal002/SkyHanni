@@ -284,6 +284,7 @@ object GardenApi {
     private var gardenExperience = listOf<Int>()
     private const val gardenOverflowExp = 10000
 
+    @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"
