@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -22,6 +20,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
@@ -30,8 +29,11 @@ import kotlin.math.min
 //#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
+import java.nio.FloatBuffer
 //#else
 //$$ import net.minecraft.client.render.RenderLayer
+//$$ import com.mojang.blaze3d.systems.RenderSystem
+//$$ import org.joml.Matrix4f
 //#endif
 
 // todo 1.21 impl needed
@@ -71,19 +73,6 @@ object GuiRenderUtils {
 
     fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
         DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
-    }
-
-    private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
-        //#if MC < 1.21
-        val itemRender = Minecraft.getMinecraft().renderItem
-        RenderHelper.enableGUIStandardItemLighting()
-        itemRender.zLevel = -145f
-        itemRender.renderItemAndEffectIntoGUI(item, x, y)
-        itemRender.zLevel = 0f
-        RenderHelper.disableStandardItemLighting()
-        //#else
-        //$$ DrawContextUtils.drawContext.drawItem(item, x, y)
-        //#endif
     }
 
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
@@ -144,7 +133,7 @@ object GuiRenderUtils {
     }
 
     fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
-        renderItemStack(item, x, y)
+        DrawContextUtils.drawItem(item, x, y)
         drawRect(x, y, x + 16, y + 16, color)
     }
 
@@ -315,50 +304,76 @@ object GuiRenderUtils {
         y: Float,
         scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
+        rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
         val isSkull = rescaleSkulls && item.item === Items.skull
 
-        val baseScale = (if (isSkull) 4f / 3f else 1f)
+        val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
+        val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
+        val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
+
+        val baseScale = if (isSkull) (4f / 3f) else 1f
         val finalScale = (baseScale * scaleMultiplier).toFloat()
 
-        val translateX: Float
-        val translateY: Float
-        if (isSkull) {
-            val skullDiff = ((scaleMultiplier) * 2.5).toFloat()
-            translateX = x - skullDiff
-            translateY = y - skullDiff
-        } else {
-            translateX = x
-            translateY = y
+        val (translateX, translateY) = if (isSkull) {
+            val skullDiff = ((scaleMultiplier) * 2.5f).toFloat()
+            x - skullDiff to y - skullDiff
+        } else x to y
+
+        val (hx, hy, hz) = listOf(8f, 8f, 100f)
+
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate(translateX, translateY, -19f)
+            DrawContextUtils.scale(finalScale, finalScale, 0.2f)
+
+            //#if MC < 1.21
+            val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+            DrawContextUtils.pushPop {
+                DrawContextUtils.loadIdentity()
+
+                DrawContextUtils.translate(hx, hy, hz)
+                if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
+                if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
+                if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
+                DrawContextUtils.translate(-hx, -hy, -hz)
+
+                DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+            }
+            DrawContextUtils.multMatrix(savedMV)
+            //#else
+            //$$ val rotMat = Matrix4f().identity()
+            //$$    .translate(hx, hy, hz)
+            //$$    .rotateX(Math.toRadians(rotX.toDouble()).toFloat())
+            //$$    .rotateY(Math.toRadians(rotY.toDouble()).toFloat())
+            //$$    .rotateZ(Math.toRadians(rotZ.toDouble()).toFloat())
+            //$$    .translate(-hx, -hy, -hz)
+            //$$ DrawContextUtils.multMatrix(rotMat)
+            //#endif
+
+            //#if MC < 1.21
+            GL11.glEnable(GL11.GL_NORMALIZE)
+            GL11.glNormal3f(0f, 0f, 1f)
+            //#else
+            //$$ RenderSystem.assertOnRenderThread()
+            //#endif
+
+            RenderHelper.enableGUIStandardItemLighting()
+            //#if MC < 1.21
+            AdjustStandardItemLighting.adjust() // Compensate for z scaling
+            //#endif
+            DrawContextUtils.drawItem(item, 0, 0)
+
+            //#if MC < 1.21
+            RenderHelper.disableStandardItemLighting()
+            //#else
+            //$$ DiffuseLighting.disableGuiDepthLighting()
+            //#endif
+
+            //#if MC < 1.21
+            GL11.glDisable(GL11.GL_NORMALIZE)
+            //#endif
         }
-
-        DrawContextUtils.pushMatrix()
-
-        DrawContextUtils.translate(translateX, translateY, -19f)
-        DrawContextUtils.scale(finalScale, finalScale, 0.2f)
-        //#if MC < 1.21
-        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
-
-        RenderHelper.enableGUIStandardItemLighting()
-        AdjustStandardItemLighting.adjust() // Compensate for z scaling
-
-        try {
-            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error rendering item onto screen",
-                "itemName" to item.displayName,
-                "internalName" to item.getInternalNameOrNull(),
-            )
-        }
-
-        RenderHelper.disableStandardItemLighting()
-        //#else
-        //$$ renderItemStack(item, 0, 0)
-        //#endif
-
-        DrawContextUtils.popMatrix()
     }
 
     //#if MC < 1.21
