@@ -48,26 +48,27 @@ object SkyBlockKickDuration {
         "§cThere was a problem joining SkyBlock, try again in a moment!",
     )
 
+    fun kicked()
+    {
+        kickMessage = false
+        showTime = true
+        lastKickTime = SimpleTimeMark.now()
+    }
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled() || !timeoutKick) return
+        if (!isEnabled() || !(lastKickTime.isFarFuture())) return
 
         if (kickPattern.matches(event.message)) {
             if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
-                kickMessage = false
-                showTime = true
-                timeoutKick = false
-                lastKickTime = SimpleTimeMark.now()
+                kicked()
             } else {
                 kickMessage = true
             }
         }
 
         if (problemJoiningPattern.matches(event.message)) {
-            kickMessage = false
-            showTime = true
-            timeoutKick = false
-            lastKickTime = SimpleTimeMark.now()
+            kicked()
         }
     }
 
@@ -75,10 +76,7 @@ object SkyBlockKickDuration {
     fun onWorldChange() {
         if (!isEnabled()) return
         if (kickMessage) {
-            kickMessage = false
-            showTime = true
-            timeoutKick = true
-            lastKickTime = SimpleTimeMark.now()
+            kicked()
         }
         hasWarned = false
     }
@@ -88,10 +86,10 @@ object SkyBlockKickDuration {
         if (!isEnabled()) return
         if (!SkyBlockUtils.onHypixel) return
         if (!showTime) return
-
         if (SkyBlockUtils.inSkyBlock) {
             showTime = false
-            timeoutKick = true
+            lastKickTime = SimpleTimeMark.farFuture()
+            hasWarned = true
         }
 
         if (lastKickTime.passedSince() > 5.minutes) {
