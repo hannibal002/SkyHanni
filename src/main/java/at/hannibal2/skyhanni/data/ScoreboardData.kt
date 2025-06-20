@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
@@ -136,7 +138,7 @@ object ScoreboardData {
         }
     }
 
-    fun toggleMonitor() {
+    private fun toggleMonitor() {
         monitor = !monitor
         val action = if (monitor) "Enabled" else "Disabled"
         ChatUtils.chat("$action scoreboard monitoring in the console.")
@@ -243,4 +245,15 @@ object ScoreboardData {
         "\uD83C\uDF82",
         "\uD83D\uDD2B",
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shdebugscoreboard") {
+            description =
+                "Monitors the scoreboard changes: " +
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { toggleMonitor() }
+        }
+    }
 }

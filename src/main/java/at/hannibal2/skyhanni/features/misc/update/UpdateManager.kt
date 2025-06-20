@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -177,9 +180,8 @@ object UpdateManager {
 
     private var potentialUpdate: PotentialUpdate? = null
 
-    fun updateCommand(args: Array<String>) {
+    private fun updateCommand(arg: String) {
         val currentStream = SkyHanniMod.feature.about.updateStream.get()
-        val arg = args.firstOrNull() ?: "current"
         val updateStream = when {
             arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
             arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
@@ -200,6 +202,22 @@ object UpdateManager {
             )
         } else {
             checkUpdate(true, updateStream)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdate") {
+            description = "Updates the mod to the specified update stream."
+            category = CommandCategory.USERS_BUG_FIX
+            arg("updateStream", BrigadierArguments.string()) { stream ->
+                callback {
+                    updateCommand(getArg(stream))
+                }
+            }
+            callback {
+                updateCommand("current")
+            }
         }
     }
 }

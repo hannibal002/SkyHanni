@@ -7,9 +7,7 @@
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Float&gt;</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x, y, z)</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
-    <ID>ChainWrapping:Renderable.kt$Renderable.Companion$&amp;&amp;</ID>
     <ID>ChainWrapping:Renderable.kt$Renderable.Companion$||</ID>
-    <ID>CustomImportOrdering:InventoryUtils.kt$import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks import at.hannibal2.skyhanni.events.GuiContainerEvent //#endif import at.hannibal2.skyhanni.test.command.ErrorManager //#if TODO import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory //#endif import at.hannibal2.skyhanni.utils.compat.InventoryCompat.filterNotNullOrEmpty import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull import at.hannibal2.skyhanni.utils.compat.InventoryCompat import at.hannibal2.skyhanni.utils.compat.InventoryCompat.convertEmptyToNull import at.hannibal2.skyhanni.utils.compat.MinecraftCompat import at.hannibal2.skyhanni.utils.compat.normalizeAsArray import at.hannibal2.skyhanni.utils.compat.slotUnderCursor import at.hannibal2.skyhanni.utils.system.PlatformUtils import io.github.moulberry.notenoughupdates.NotEnoughUpdates import net.minecraft.client.Minecraft import net.minecraft.client.gui.inventory.GuiChest import net.minecraft.client.gui.inventory.GuiContainer import net.minecraft.client.gui.inventory.GuiInventory import net.minecraft.client.player.inventory.ContainerLocalMenu import net.minecraft.client.resources.I18n import net.minecraft.entity.player.InventoryPlayer import net.minecraft.inventory.ContainerChest import net.minecraft.inventory.IInventory import net.minecraft.inventory.Slot import net.minecraft.item.ItemStack import kotlin.time.Duration.Companion.seconds</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
     <ID>CyclomaticComplexMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:DungeonHideItems.kt$DungeonHideItems$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onCheckRender(event: CheckRenderEntityEvent&lt;Entity&gt;)</ID>
@@ -27,8 +25,6 @@
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
-    <ID>Indentation:Renderable.kt$Renderable.Companion$ </ID>
-    <ID>Indentation:SlayerApi.kt$SlayerApi$ </ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
     <ID>LargeClass:WorldRenderUtils.kt$WorldRenderUtils</ID>
@@ -38,6 +34,7 @@
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>LongMethod:RepoManager.kt$RepoManager$private fun doTheFetching(command: Boolean)</ID>
+    <ID>LongMethod:UpdateKeybinds.kt$UpdateKeybinds$private fun makeMap(): Map&lt;Int, Int&gt;</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
@@ -64,26 +61,16 @@
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
-    <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$pitch</ID>
-    <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$yaw</ID>
     <ID>NoNameShadowing:RenderableUtils.kt$RenderableUtils${ it != null }</ID>
     <ID>NoNameShadowing:ReplaceRomanNumerals.kt$ReplaceRomanNumerals${ it.isValidRomanNumeral() &amp;&amp; it.removeFormatting().romanToDecimal() != 2000 }</ID>
     <ID>NoNameShadowing:RepoManager.kt$RepoManager${ unsuccessfulConstants.add(it) }</ID>
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
-    <ID>PreprocessingImportOrdering:AlignmentConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:EntityUtils.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:HypixelCommands.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:InquisitorSoundConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:InventoryUtils.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:LaneSwitchSoundSettings.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:LowHealthAlertSoundConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:PlayerSpecificStorage.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:ProfileSpecificStorage.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:TitleAndFooterConfig.kt$//#if TODO</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:BazaarCancelledBuyOrderClipboard.kt$BazaarCancelledBuyOrderClipboard$by patternGroup.pattern( "cancelledmessage", "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?&lt;coins&gt;.*) coins §r§7from cancelling Buy Order!", )</ID>
     <ID>RepoPatternRegexTestMissing:BeaconPower.kt$BeaconPower$by group.pattern( "stat", "§7Current Stat: (?&lt;stat&gt;.+)", )</ID>
@@ -264,18 +251,13 @@
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:TextHelper.kt$TextHelper$(*component.toTypedArray(), separator = separator)</ID>
     <ID>TooManyFunctions:CollectionUtils.kt$CollectionUtils</ID>
-    <ID>TooManyFunctions:ColorUtils.kt$ColorUtils</ID>
     <ID>TooManyFunctions:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator</ID>
     <ID>TooManyFunctions:HypixelCommands.kt$HypixelCommands</ID>
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
-    <ID>TooManyFunctions:LocationUtils.kt$LocationUtils</ID>
-    <ID>TooManyFunctions:LorenzVec.kt$LorenzVec</ID>
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
-    <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
     <ID>TooManyFunctions:WorldRenderUtils.kt$WorldRenderUtils</ID>
-    <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Double::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Int::plus)!!</ID>
@@ -351,7 +333,6 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalPrice!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt$WorldRenderUtils$it.name!!</ID>
-    <ID>UnusedParameter:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$args: Array&lt;String&gt;</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>

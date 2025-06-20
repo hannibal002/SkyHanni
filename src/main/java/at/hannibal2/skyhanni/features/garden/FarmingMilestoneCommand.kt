@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
@@ -11,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object FarmingMilestoneCommand {
 
     fun onCommand(crop: String?, current: String?, target: String?, needsTime: Boolean) {
@@ -96,5 +101,27 @@ object FarmingMilestoneCommand {
         val speed = crop.getSpeed() ?: -1
         val missingTime = (this / speed).seconds
         return "${missingTime.format()}§a"
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shcalccrop") {
+            description = "Calculate how many crops need to be farmed between different crop milestones."
+            category = CommandCategory.USERS_ACTIVE
+            autoComplete { onComplete(it) }
+            callback { onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false) }
+        }
+        event.register("shcalccroptime") {
+            description = "Calculate how long you need to farm crops between different crop milestones."
+            category = CommandCategory.USERS_ACTIVE
+            autoComplete { onComplete(it) }
+            callback { onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true) }
+        }
+        event.register("shcropgoal") {
+            description = "Define a custom milestone goal for a crop."
+            category = CommandCategory.USERS_ACTIVE
+            callback { setGoal(it) }
+            autoComplete { onComplete(it) }
+        }
     }
 }

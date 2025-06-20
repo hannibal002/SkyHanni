@@ -88,7 +88,6 @@ net.minecraft.client.player.LocalPlayer chat() sendChatMessage()
 net.minecraft.client.player.LocalPlayer setExperienceValues() setXPStats()
 
 net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
-net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.WorldRenderer
 net.minecraft.client.renderer.RenderItem net.minecraft.client.renderer.entity.RenderItem
 
 net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
@@ -108,6 +107,8 @@ net.minecraft.client.sounds.SoundManager updateSourceVolume() setSoundLevel()
 net.minecraft.core.BlockPos net.minecraft.util.BlockPos
 net.minecraft.core.Direction net.minecraft.util.EnumFacing
 net.minecraft.core.Rotations net.minecraft.util.Rotations
+
+net.minecraft.core.Direction getNormal() getDirectionVec()
 
 net.minecraft.core.particles.ParticleTypes net.minecraft.util.EnumParticleTypes
 
@@ -268,6 +269,7 @@ net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getE
 
 net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEntityFromWorld()
 
+net.minecraft.network.protocol.game.ServerboundPlayerActionPacket getAction() getStatus()
 net.minecraft.network.protocol.game.ServerboundPlayerActionPacket getPos() getPosition()
 
 net.minecraft.network.protocol.game.ServerboundUseItemOnPacket hitResult.getBlockPos() getPos()
@@ -279,6 +281,8 @@ net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resour
 net.minecraft.sounds.SoundSource net.minecraft.client.audio.SoundCategory
 
 net.minecraft.util.Mth net.minecraft.util.MathHelper
+net.minecraft.util.Mth clamp() clamp_int()
+
 net.minecraft.util.Mth clamp() clamp_int()
 
 net.minecraft.world.SimpleContainer net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -299,28 +303,29 @@ net.minecraft.world.entity.Entity deltaMovement.z motionZ
 net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
 net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
 net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
+net.minecraft.world.entity.Entity getDirection() getHorizontalFacing()
 net.minecraft.world.entity.Entity getEyePosition() getPositionEyes()
 net.minecraft.world.entity.Entity getId() getEntityId()
 net.minecraft.world.entity.Entity getLookAngle() getLookVec()
 net.minecraft.world.entity.Entity getPosition() getPositionVector()
 net.minecraft.world.entity.Entity getUUID() getUniqueID()
-net.minecraft.world.entity.Entity getVehicle() getRidingEntity()
 net.minecraft.world.entity.Entity isOnFire() isBurning()
 net.minecraft.world.entity.Entity isOnGround onGround
-net.minecraft.world.entity.Entity level world
+net.minecraft.world.entity.Entity level worldObj
 net.minecraft.world.entity.Entity position.x posX
 net.minecraft.world.entity.Entity position.y posY
 net.minecraft.world.entity.Entity position.z posZ
 net.minecraft.world.entity.Entity removed isDead
 net.minecraft.world.entity.Entity setCustomName() setCustomNameTag()
 net.minecraft.world.entity.Entity tickCount ticksExisted
+net.minecraft.world.entity.Entity vehicle ridingEntity
 net.minecraft.world.entity.Entity xOld prevPosX
 net.minecraft.world.entity.Entity xRot rotationPitch
+net.minecraft.world.entity.Entity xo lastTickPosX
 net.minecraft.world.entity.Entity yOld prevPosY
 net.minecraft.world.entity.Entity yRot rotationYaw
-net.minecraft.world.entity.Entity zOld prevPosZ
-net.minecraft.world.entity.Entity xo lastTickPosX
 net.minecraft.world.entity.Entity yo lastTickPosY
+net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo lastTickPosZ
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
@@ -361,6 +366,8 @@ net.minecraft.world.entity.decoration.ArmorStand isNoBasePlate() hasNoBasePlate(
 net.minecraft.world.entity.decoration.ArmorStand isShowArms() getShowArms()
 
 net.minecraft.world.entity.item.ItemEntity net.minecraft.entity.item.EntityItem
+
+net.minecraft.world.entity.item.ItemEntity getItem() getEntityItem()
 
 net.minecraft.world.entity.monster.Blaze net.minecraft.entity.monster.EntityBlaze
 net.minecraft.world.entity.monster.CaveSpider net.minecraft.entity.monster.EntityCaveSpider
