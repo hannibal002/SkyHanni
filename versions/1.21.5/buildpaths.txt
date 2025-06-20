@@ -627,6 +627,7 @@ at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypointType.kt
 at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoints.kt
 at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward.kt
 at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker.kt
+at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures.kt
 at.hannibal2.skyhanni.features.minion.MinionUpgradeHelper.kt
 at.hannibal2.skyhanni.features.misc.BetterSignEditing.kt
 at.hannibal2.skyhanni.features.misc.BrewingStandOverlay.kt
@@ -1138,7 +1139,6 @@ at/hannibal2/skyhanni/config/features/mining/MiningEventConfig.kt
 at/hannibal2/skyhanni/config/features/mining/MiningNotificationsConfig.kt
 at/hannibal2/skyhanni/config/features/mining/caverns/DeepCavernsGuideConfig.kt
 at/hannibal2/skyhanni/config/features/mining/dwarves/KingTalismanConfig.kt
-at/hannibal2/skyhanni/config/features/mining/dwarves/DarkMonolithFeatures.kt
 at/hannibal2/skyhanni/config/features/mining/dwarves/DarkMonolithConfig.kt
 at/hannibal2/skyhanni/config/features/mining/glacite/ColdOverlayConfig.kt
 at/hannibal2/skyhanni/config/features/mining/glacite/CorpseLocatorConfig.kt
