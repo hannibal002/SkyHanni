@@ -846,6 +846,7 @@ at.hannibal2.skyhanni.utils.renderables.RenderableUtils.kt
 at.hannibal2.skyhanni.utils.renderables.SearchTextInput.kt
 at.hannibal2.skyhanni.utils.renderables.Searchable.kt
 at.hannibal2.skyhanni.utils.renderables.StringRenderable.kt
+at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable.kt
 at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable.kt
 at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable.kt
 at.hannibal2.skyhanni.utils.repopatterns.CommonPatternInfo.kt
