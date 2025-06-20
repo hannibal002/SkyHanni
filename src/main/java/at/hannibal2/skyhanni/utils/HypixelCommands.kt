@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
 
+@Suppress("TooManyFunctions")
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -71,7 +72,7 @@ object HypixelCommands {
     }
 
     // Do not remove this deprecation tag, as we want to catch all wrong uses of /gfs in the future forever.
-    @Deprecated("do not send /gfs commands manually to hypixel. use GetFromSackApi.")
+    @Deprecated("do not send /gfs commands manually to hypixel", ReplaceWith("GetFromSackApi.getFromSack(internalName, amount)"))
     fun getFromSacks(internalName: NeuInternalName, amount: Int) {
         GetFromSackApi.getFromSack(internalName, amount)
     }
