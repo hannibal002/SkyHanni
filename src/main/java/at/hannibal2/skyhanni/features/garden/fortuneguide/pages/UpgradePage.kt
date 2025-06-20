@@ -68,7 +68,7 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
                 requiredItem.getItemStack(),
                 8.0 / 9.0,
                 verticalAlign = VerticalAlignment.CENTER
-            )
+            ).withTip()
         )
         add(
             Renderable.wrappedString(

@@ -75,14 +75,17 @@ object DrawContextUtils {
         //#endif
     }
 
-    fun multMatrix(matrix: FloatBuffer) {
+    fun multMatrix(buffer: FloatBuffer) {
         //#if MC < 1.21
-        GlStateManager.multMatrix(matrix)
+        GlStateManager.multMatrix(buffer)
         //#else
-        //$$ val matrix4f = Matrix4f(matrix)
-        //$$ drawContext.matrices. multiplyPositionMatrix(matrix4f)
+        //$$ multMatrix(Matrix4f(buffer))
         //#endif
     }
+
+    //#if MC > 1.21
+    //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    //#endif
 
     fun getFloat(pName: Int, params: FloatBuffer) {
         //#if MC < 1.21
