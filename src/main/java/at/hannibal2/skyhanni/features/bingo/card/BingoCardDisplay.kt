@@ -44,10 +44,6 @@ object BingoCardDisplay {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var displayMode = 0
 
-    private fun command() {
-        reload()
-    }
-
     private fun reload() {
         BingoApi.bingoGoals.clear()
     }
@@ -281,7 +277,9 @@ object BingoCardDisplay {
         event.registerBrigadier("shreloadbingodata") {
             description = "Reloads the bingo card data"
             category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { command() }
+            simpleCallback {
+                reload()
+            }
         }
     }
 }

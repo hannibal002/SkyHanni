@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
+@Suppress("TooManyFunctions")
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -71,8 +71,10 @@ object HypixelCommands {
         send("sethome")
     }
 
-    fun getFromSacks(itemName: String, amount: Int) {
-        GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
+    // Do not remove this deprecation tag, as we want to catch all wrong uses of /gfs in the future forever.
+    @Deprecated("do not send /gfs commands manually to hypixel", ReplaceWith("GetFromSackApi.getFromSack(internalName, amount)"))
+    fun getFromSacks(internalName: NeuInternalName, amount: Int) {
+        GetFromSackApi.getFromSack(internalName, amount)
     }
 
     fun widget() {

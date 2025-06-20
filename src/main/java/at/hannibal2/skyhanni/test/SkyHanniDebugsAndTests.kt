@@ -142,7 +142,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun waypoint(args: Array<String>) {
+    private fun waypoint(args: Array<String>) {
         SoundUtils.playBeepSound()
 
         if (args.isEmpty()) {
@@ -164,7 +164,6 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-
         SkyHanniMod.coroutineScope.launch {
             asyncTest(args)
         }
@@ -175,15 +174,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("§fTest successful!")
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    private fun findNullConfig(args: Array<String>) {
-        println("start null finder")
-        findNull(SkyHanniMod.feature, "config")
-        println("stop null finder")
-    }
-
     private fun findNull(obj: Any, path: String) {
-
         val blockedNames = listOf(
             "TRUE",
             "FALSE",
@@ -216,16 +207,6 @@ object SkyHanniDebugsAndTests {
                 findNull(other, newName)
             }
         }
-    }
-
-    private fun resetConfigCommand() {
-        ChatUtils.clickableChat(
-            "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
-            onClick = { resetConfig() },
-            "§eClick to confirm.",
-            prefix = false,
-            oneTimeClick = true,
-        )
     }
 
     private fun resetConfig() {
@@ -345,14 +326,6 @@ object SkyHanniDebugsAndTests {
         )
     }
 
-    private fun whereAmI() {
-        if (SkyBlockUtils.inSkyBlock) {
-            ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
-            return
-        }
-        ChatUtils.chat("§eYou are not in Skyblock.")
-    }
-
     private var lastManualContestDataUpdate = SimpleTimeMark.farPast()
 
     private fun resetContestData() {
@@ -386,33 +359,6 @@ object SkyHanniDebugsAndTests {
         "json" -> "$x:$y:$z" to "json"
         "pathfind" -> "`/shtestwaypoint $x $y $z pathfind`" to "pathfind"
         else -> "LorenzVec($x, $y, $z)" to "LorenzVec"
-    }
-
-    private fun debugVersion() {
-        val name = "SkyHanni ${SkyHanniMod.VERSION}"
-        ChatUtils.chat("§eYou are using $name")
-        OSUtils.copyToClipboard(name)
-    }
-
-    private fun copyItemInternalName() {
-        val hand = InventoryUtils.getItemInHand()
-        if (hand == null) {
-            ChatUtils.userError("No item in hand!")
-            return
-        }
-
-        val internalName = hand.getInternalName().asString()
-        OSUtils.copyToClipboard(internalName)
-        ChatUtils.chat("§eCopied internal name §7$internalName §eto the clipboard!")
-    }
-
-    private fun toggleRender() {
-        globalRender = !globalRender
-        if (globalRender) {
-            ChatUtils.chat("§aEnabled global renderer!")
-        } else {
-            ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
-        }
     }
 
     @HandleEvent(GuiKeyPressEvent::class)
@@ -669,6 +615,7 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
     }
 
+    @Suppress("LongMethod")
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shresetconfig") {
@@ -676,12 +623,24 @@ object SkyHanniDebugsAndTests {
                 "This §cWILL RESET §7your config, but also update the config files " +
                 "(names, description, orderings and stuff)."
             category = CommandCategory.DEVELOPER_TEST
-            callback { resetConfigCommand() }
+            callback {
+                ChatUtils.clickableChat(
+                    "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
+                    onClick = { resetConfig() },
+                    "§eClick to confirm.",
+                    prefix = false,
+                    oneTimeClick = true,
+                )
+            }
         }
         event.registerBrigadier("shversion") {
             description = "Prints the SkyHanni version in the chat"
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { debugVersion() }
+            callback {
+                val name1 = "SkyHanni ${SkyHanniMod.VERSION}"
+                ChatUtils.chat("§eYou are using $name1")
+                OSUtils.copyToClipboard(name1)
+            }
         }
         event.registerBrigadier("shtestgardenvisitors") {
             description = "Test the garden visitor drop statistics"
@@ -691,7 +650,16 @@ object SkyHanniDebugsAndTests {
         event.registerBrigadier("shcopyinternalname") {
             description = "Copies the internal name of the item in hand to the clipboard."
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { copyItemInternalName() }
+            callback {
+                val hand = InventoryUtils.getItemInHand()
+                if (hand == null) {
+                    ChatUtils.userError("No item in hand!")
+                } else {
+                    val internalName = hand.getInternalName().asString()
+                    OSUtils.copyToClipboard(internalName)
+                    ChatUtils.chat("§eCopied internal name §7$internalName §eto the clipboard!")
+                }
+            }
         }
         event.registerBrigadier("shcopylocation") {
             description = "Copies the player location as LorenzVec format to the clipboard"
@@ -706,7 +674,11 @@ object SkyHanniDebugsAndTests {
         event.registerBrigadier("shfindnullconfig") {
             description = "Find config elements that are null and prints them into the console"
             category = CommandCategory.DEVELOPER_TEST
-            legacyCallbackArgs { findNullConfig(it) }
+            legacyCallbackArgs {
+                println("start null finder")
+                findNull(SkyHanniMod.feature, "config")
+                println("stop null finder")
+            }
         }
         event.registerBrigadier("shtestwaypoint") {
             description = "Set a waypoint on that location"
@@ -731,12 +703,25 @@ object SkyHanniDebugsAndTests {
         event.registerBrigadier("shwhereami") {
             description = "Print current island in chat"
             category = CommandCategory.USERS_BUG_FIX
-            callback { whereAmI() }
+            callback {
+                if (SkyBlockUtils.inSkyBlock) {
+                    ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
+                } else {
+                    ChatUtils.chat("§eYou are not in Skyblock.")
+                }
+            }
         }
         event.registerBrigadier("shrendertoggle") {
             description = "Disables/enables the rendering of all skyhanni guis."
             category = CommandCategory.USERS_BUG_FIX
-            callback { toggleRender() }
+            callback {
+                globalRender = !globalRender
+                if (globalRender) {
+                    ChatUtils.chat("§aEnabled global renderer!")
+                } else {
+                    ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
+                }
+            }
         }
     }
 }

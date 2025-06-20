@@ -145,13 +145,6 @@ object HypixelBazaarFetcher {
         }
     }
 
-    private fun fetchNow() {
-        failedAttempts = 0
-        nextFetchIsManual = true
-        nextFetchTime = SimpleTimeMark.now()
-        ChatUtils.chat("Manually updating the bazaar prices right now..")
-    }
-
     private fun canFetch() = SkyBlockUtils.onHypixel && nextFetchTime.isInPast()
 
     @HandleEvent
@@ -159,7 +152,12 @@ object HypixelBazaarFetcher {
         event.registerBrigadier("shupdatebazaarprices") {
             description = "Forcefully updating the bazaar prices right now."
             category = CommandCategory.USERS_BUG_FIX
-            callback { fetchNow() }
+            callback {
+                failedAttempts = 0
+                nextFetchIsManual = true
+                nextFetchTime = SimpleTimeMark.now()
+                ChatUtils.chat("Manually updating the bazaar prices right now..")
+            }
         }
     }
 }
