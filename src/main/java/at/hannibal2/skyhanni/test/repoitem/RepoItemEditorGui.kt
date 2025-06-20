@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.findItemDamage
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchGlint
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -33,7 +34,6 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
-import java.awt.Color
 
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.ComponentUtils
@@ -159,6 +159,37 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         maxScroll = height + offsetY + 50
     }
 
+    private val closeButton = RenderableString("§7Close (discards changes)")
+    private var saveButton = RenderableString("§aSave to local disk")
+    private var removeEnchantsButton = RenderableString("§5Remove enchants")
+    private var addEnchantGlintButton = RenderableString("§6Add enchant glint")
+    private var removeUnderRarityButton = RenderableString("§eRemove lore under rarity")
+
+    private val buttons = listOf(
+        closeButton,
+        saveButton,
+        removeEnchantsButton,
+        addEnchantGlintButton,
+        removeUnderRarityButton,
+    )
+
+    private fun removeEnchants() {
+        //#if MC < 1.8
+        nbtTag.removeTag("ench")
+        //#endif
+        nbtTag.extraAttributes.removeTag("enchantments")
+        hasEnchantGlint = false
+        removeEnchantsButton = RenderableString("§5Removed enchants")
+    }
+
+    private fun addEnchantGlint() {
+        hasEnchantGlint = true
+        //#if MC < 1.21
+        nbtTag.setTag("ench", NBTTagList())
+        //#endif
+        addEnchantGlintButton = RenderableString("§6Added enchant glint")
+    }
+
     override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         drawDefaultBackground(originalMouseY, originalMouseX, partialTicks)
 
@@ -192,9 +223,30 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         }
 
         DrawContextUtils.pushPop {
-            val width = GuiScreenUtils.scaledWindowWidth * 0.50f
-            DrawContextUtils.translate(width, 90f, 0f)
-            GuiRenderUtils.drawRect(-10, -10, 90, 90, Color.GRAY.rgb)
+            DrawContextUtils.translate(400f, 30f, 0f)
+            val tooltipRenderable = mutableListOf<Renderable>()
+            tooltipRenderable.add(RenderableString(displayNameField.getText()))
+            loreField.getText().split("\n").forEach { line ->
+                tooltipRenderable.add(RenderableString(line))
+            }
+            RenderableTooltips.setTooltipForImmediateRender(tooltipRenderable)
+        }
+
+        val width = GuiScreenUtils.scaledWindowWidth * 0.70f
+        DrawContextUtils.translate(width, 10f, 0f)
+        closeButton.render(0, 0)
+        DrawContextUtils.translate(0f, 40f, 0f)
+        saveButton.render(0, 0)
+        DrawContextUtils.translate(0f, 20f, 0f)
+        removeEnchantsButton.render(0, 0)
+        DrawContextUtils.translate(0f, 20f, 0f)
+        addEnchantGlintButton.render(0, 0)
+        DrawContextUtils.translate(0f, 20f, 0f)
+        removeUnderRarityButton.render(0, 0)
+
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate(10f, 40f, 0f)
+            GuiRenderUtils.drawRect(-10, -10, 90, 90, LorenzColor.GRAY.toColor().rgb)
             if (itemToRender != null) {
                 //#if MC < 1.21
                 itemToRender.tagCompound = nbtTag
@@ -204,25 +256,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
                 //#endif
                 Renderable.itemStack(itemToRender, scale = 5.0, highlight = hasEnchantGlint).render(0, 0)
             }
-            DrawContextUtils.translate(-19f, 100f, 0f)
-            val tooltipRenderable = mutableListOf<Renderable>()
-            tooltipRenderable.add(RenderableString(displayNameField.getText()))
-            loreField.getText().split("\n").forEach { line ->
-                tooltipRenderable.add(RenderableString(line))
-            }
-            RenderableTooltips.setTooltipForImmediateRender(tooltipRenderable)
         }
-
-        val width = GuiScreenUtils.scaledWindowWidth * 0.80f
-        DrawContextUtils.translate(width, 10f, 0f)
-        RenderableString("§7Close (discards changes)").render(7, 8)
-        DrawContextUtils.translate(0f, 40f, 0f)
-        RenderableString("§aSave to local disk").render(1, 2)
-        DrawContextUtils.translate(0f, 20f, 0f)
-        RenderableString("§5Remove enchants").render(3, 4)
-        DrawContextUtils.translate(0f, 20f, 0f)
-        RenderableString("§6Add enchant glint").render(5, 6)
-        DrawContextUtils.translate(-width, -90f, 0f)
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
@@ -235,26 +269,17 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         getTextFields().forEach {
             it.mouseClicked(originalMouseX, originalMouseY, mouseButton)
         }
-        val buttonWidth = GuiScreenUtils.scaledWindowWidth * 0.80f
-        if (originalMouseX.toFloat() in buttonWidth..buttonWidth + 50) {
-            if (originalMouseY in 10..30) {
-                InventoryUtils.closeInventory()
-            } else if (originalMouseY in 50..70) {
-                saveItem()
-            } else if (originalMouseY in 70..90) {
-                //#if MC < 1.8
-                nbtTag.removeTag("ench")
-                //#endif
-                nbtTag.extraAttributes.removeTag("enchantments")
-                hasEnchantGlint = false
-            } else if (originalMouseY in 90..110) {
-                hasEnchantGlint = true
-                //#if MC < 1.21
-                nbtTag.setTag("ench", NBTTagList())
-                //#endif
+        val buttonWidth = GuiScreenUtils.scaledWindowWidth * 0.70f
+        val maxWidth = buttonWidth + buttons.maxOf { it.width } + 10
+        if (originalMouseX.toFloat() in buttonWidth..maxWidth) {
+            when (originalMouseY) {
+                in 10..30 -> InventoryUtils.closeInventory()
+                in 50..70 -> saveItem()
+                in 70..90 -> removeEnchants()
+                in 90..110 -> addEnchantGlint()
+                in 110..130 -> adjustLore()
             }
         }
-
     }
 
     override fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
@@ -267,8 +292,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         val delta = MouseCompat.getScrollDelta()
         if (delta == 0) return
         scroll += delta
-        if (scroll > 0) scroll = 0
-        if (scroll < -maxScroll) scroll = -maxScroll
+        scroll = scroll.coerceIn(-maxScroll, 0)
     }
 
     fun adjustLore() {
@@ -282,6 +306,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
                 loreField.setText(newLore.joinToString("\n"))
             }
         }
+        removeUnderRarityButton = RenderableString("§eRemoved lore under rarity")
     }
 
     fun saveItem(message: Boolean = true) {
@@ -307,6 +332,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed to save $internalNameStringField to repo folder!", ignoreErrorCache = true)
         }
+        saveButton = RenderableString("§aSaved to local disk")
     }
 
     private fun getNbtTag(): NBTTagCompound {

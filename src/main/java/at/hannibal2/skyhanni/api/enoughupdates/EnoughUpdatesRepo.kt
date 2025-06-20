@@ -15,7 +15,7 @@ import java.net.URL
 
 object EnoughUpdatesRepo {
 
-    val config get(): NeuRepositoryConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor.repo
+    private val config get(): NeuRepositoryConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor.repo
 
     fun downloadRepo() {
         checkRepoLocation()

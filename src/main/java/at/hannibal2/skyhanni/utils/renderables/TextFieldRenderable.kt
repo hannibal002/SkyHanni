@@ -267,6 +267,9 @@ class TextFieldRenderable(
         //$$     textField.charTyped(typedChar, 0)
         //$$ }
         //#endif
+        if (keyCode == Keyboard.KEY_LEFT || keyCode == Keyboard.KEY_RIGHT) {
+            return
+        }
 
         val cursorPos = textField.cursorPosition
         if (cursorPos > 0) {

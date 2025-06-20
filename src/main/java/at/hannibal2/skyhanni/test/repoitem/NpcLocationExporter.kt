@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -29,7 +30,7 @@ import net.minecraft.util.BlockPos
 @SkyHanniModule
 object NpcLocationExporter {
 
-    val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
+    private val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
 
     private val defaultVillagerSkull: ItemStack by lazy {
         ItemUtils.createSkull(
@@ -42,6 +43,7 @@ object NpcLocationExporter {
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyDown(event: KeyDownEvent) {
         if (!config.editModeEnabled) return
+        if (InventoryUtils.inInventory()) return
         if (event.keyCode != KeyboardManager.MIDDLE_MOUSE) return
         val apiIsland = SkyBlockUtils.currentIsland.islandData?.apiName ?: ""
 

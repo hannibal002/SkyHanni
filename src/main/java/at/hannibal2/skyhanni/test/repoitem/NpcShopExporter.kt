@@ -33,7 +33,7 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object NpcShopExporter {
-    val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
+    private val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
 
     private val patternGroup = RepoPattern.group("dev.repoitemeditor")
 
@@ -47,7 +47,7 @@ object NpcShopExporter {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!RepoItemEditor.config.editModeEnabled) return
+        if (!config.editModeEnabled) return
         val shopSlot = event.inventorySize - 5
         val shopStack = event.inventoryItems[shopSlot]?.orNull() ?: return
         if (!UtilsPatterns.lastLoreLineOfSellPattern.matches(shopStack.getLore().lastOrNull())) return

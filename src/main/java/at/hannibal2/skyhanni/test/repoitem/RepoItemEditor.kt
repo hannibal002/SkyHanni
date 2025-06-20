@@ -38,7 +38,7 @@ import java.nio.charset.StandardCharsets
 @SkyHanniModule
 object RepoItemEditor {
 
-    val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
+    private val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
 
     private val patternGroup = RepoPattern.group("dev.repoitemeditor")
 
@@ -76,8 +76,8 @@ object RepoItemEditor {
         stack.openInEditor(instantSave)
     }
 
-    private fun ItemStack.openInEditor(instantSave: Boolean, message: Boolean = true) {
-        val internalName = getInternalNameOrNull() ?: ErrorManager.skyHanniError(
+    private fun ItemStack.openInEditor(instantSave: Boolean, message: Boolean = true, internalNameOverride: NeuInternalName? = null) {
+        val internalName = internalNameOverride ?: getInternalNameOrNull() ?: ErrorManager.skyHanniError(
             "Cannot open item editor for item with unknown item name",
             "displayName" to displayName,
             "inventoryName" to InventoryUtils.openInventoryName(),
@@ -91,8 +91,13 @@ object RepoItemEditor {
         }
     }
 
-    fun openItemInEditor(stack: ItemStack, instantSave: Boolean = false, message: Boolean = true) {
-        stack.openInEditor(instantSave, message)
+    fun openItemInEditor(
+        stack: ItemStack,
+        instantSave: Boolean = false,
+        message: Boolean = true,
+        internalNameOverride: NeuInternalName? = null,
+    ) {
+        stack.openInEditor(instantSave, message, internalNameOverride)
     }
 
     fun createRepoItemJson(
