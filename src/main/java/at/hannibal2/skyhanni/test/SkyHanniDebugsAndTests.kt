@@ -93,6 +93,7 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
+
     @Suppress("MemberVisibilityCanBePrivate")
     var displayList = emptyList<Renderable>()
 
@@ -128,7 +129,8 @@ object SkyHanniDebugsAndTests {
             return result
         }
 
-    val enabled get() = SkyBlockUtils.onHypixel && SkyHanniMod.feature.dev.debug.enabled
+    @Deprecated(message = "use SkyBlockUtils", ReplaceWith("SkyBlockUtils.debug"))
+    val enabled get() = SkyBlockUtils.debug
 
     private var testLocation: LorenzVec? = null
 
@@ -615,7 +617,7 @@ object SkyHanniDebugsAndTests {
                         Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
                     ),
                     1,
-                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP
+                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
                 ),
             ),
             posLabel = "Item Debug",

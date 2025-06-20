@@ -56,8 +56,7 @@ object CurrentPing {
     @JvmStatic
     fun fixedModApiKickMessage() {
         ChatUtils.debug("Stopped HypixelModApi ping packet error!")
-        if (SkyHanniDebugsAndTests.enabled) {
-            if (SkyBlockUtils.debug) {
+        if (SkyBlockUtils.debug) {
             SoundUtils.playBeepSound()
         }
     }
