@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.data.IslandType
-//#if TODO
 import at.hannibal2.skyhanni.data.ProfileStorageData
-//#endif
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -73,11 +71,7 @@ object DungeonApi {
         private set
     val active get() = started && !completed
 
-    //#if TODO
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-    //#else
-    //$$ val bossStorage: MutableMap<DungeonFloor, Int>? get() = null
-    //#endif
 
     private val patternGroup = RepoPattern.group("dungeon")
     private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
