@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.tracking
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Crop
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.EmbedConfig.InformationType
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Field
 import at.hannibal2.skyhanni.data.Footer
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.Thumbnail
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -98,8 +98,8 @@ object FarmingTracker {
         "You have a God Potion active! (?<length>.+)",
     )
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         if (lastNotification.passedSince() < config.webhook.interval.minutes) return
 
@@ -239,8 +239,8 @@ object FarmingTracker {
         InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue?.roundToInt()
         InformationType.SPEED -> SkyblockStat.SPEED.lastKnownValue?.roundToInt()
         InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownValue?.roundToInt()
-        InformationType.PET -> PetApi.currentPet?.let { pet ->
-            Pet.entries.find { it.toString() == pet.removeColor() }?.petName.orEmpty()
+        InformationType.PET -> CurrentPetApi.currentPet?.let { pet ->
+            Pet.entries.find { it.toString() == pet.cleanName }?.petName.orEmpty()
         }
 
         InformationType.COOKIE_BUFF -> cookieBuffTimer.ifBlank { "<:no:1263210393723998278>" }

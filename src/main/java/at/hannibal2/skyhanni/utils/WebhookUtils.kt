@@ -73,7 +73,7 @@ object WebhookUtils {
         return Payload(
             content = message,
             username = username,
-            avatar_url = avatarUrl,
+            avatarUrl = avatarUrl,
         )
     }
 
@@ -99,7 +99,7 @@ object WebhookUtils {
         return Payload(
             embeds = embeds,
             username = username,
-            avatar_url = avatarUrl,
+            avatarUrl = avatarUrl,
         )
     }
 

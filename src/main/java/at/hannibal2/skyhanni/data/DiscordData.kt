@@ -5,7 +5,7 @@ data class Payload(
     val tts: Boolean? = false,
     val embeds: List<Embed>? = null,
     val username: String? = null,
-    val avatar_url: String? = null
+    val avatarUrl: String? = null,
 )
 
 data class Embed(
@@ -14,13 +14,13 @@ data class Embed(
     val fields: List<Field>,
     val timestamp: String,
     val thumbnail: Thumbnail,
-    val footer: Footer
+    val footer: Footer,
 )
 
 data class Field(
     val name: String,
     val value: String,
-    val inline: Boolean
+    val inline: Boolean,
 )
 
 data class Thumbnail(val url: String)
