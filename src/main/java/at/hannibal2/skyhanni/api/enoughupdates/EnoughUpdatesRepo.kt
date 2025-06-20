@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.api.enoughupdates
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.NeuRepositoryConfig
-import at.hannibal2.skyhanni.config.features.dev.RepoItemEditorConfig
-import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils

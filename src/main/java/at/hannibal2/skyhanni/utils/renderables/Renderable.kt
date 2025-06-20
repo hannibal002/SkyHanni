@@ -300,7 +300,7 @@ interface Renderable {
                                 tips = tipsRender,
                                 stack = stack,
                                 borderColor = color,
-                                snapsToTopIfToLong = snapsToTopIfToLong,
+                                snapsToTopIfTooLong = snapsToTopIfToLong,
                                 spacedTitle = spacedTitle,
                             )
                             DrawContextUtils.popMatrix()

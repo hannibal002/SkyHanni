@@ -28,23 +28,41 @@ object RenderableTooltips {
         }
     }
 
+    /**
+     * Renders at the current gl translation and not relative to the mouse position.
+     */
+    fun setTooltipForImmediateRender(
+        tips: List<Renderable>,
+        stack: ItemStack? = null,
+        borderColor: LorenzColor? = null,
+        snapsToTopIfTooLong: Boolean = true,
+        spacedTitle: Boolean = false,
+    ) {
+        val oldTooltip = tooltip
+        tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfTooLong, spacedTitle)
+        DrawContextUtils.pushPop {
+            drawHoveringText(0, 0)
+        }
+        tooltip = oldTooltip
+    }
+
     fun setTooltipForRender(
         tips: List<Renderable>,
         stack: ItemStack? = null,
         borderColor: LorenzColor? = null,
-        snapsToTopIfToLong: Boolean = true,
+        snapsToTopIfTooLong: Boolean = true,
         spacedTitle: Boolean = false,
     ) {
-        tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfToLong, spacedTitle)
+        tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfTooLong, spacedTitle)
     }
 
-    private fun drawHoveringText() {
+    private fun drawHoveringText(mouseX: Int = GuiScreenUtils.mouseX, mouseY: Int = GuiScreenUtils.mouseY) {
         val tooltip = tooltip ?: return
         val tips = tooltip.tips
         if (tips.isEmpty()) return
 
-        val x = GuiScreenUtils.mouseX + 12
-        val y = GuiScreenUtils.mouseY - if (tips.size > 1) 1 else -7
+        val x = mouseX + 12
+        val y = mouseY - if (tips.size > 1) 1 else -7
         val borderColorStart = tooltip.getBorderColor()
         val isSpacedTitle = tooltip.isSpacedTitle()
 
@@ -54,7 +72,7 @@ object RenderableTooltips {
         val tooltipY = when {
             y < 16 -> 4 // Limit Top
             y + tooltipHeight > GuiScreenUtils.scaledWindowHeight -> {
-                if (tooltip.snapsToTopIfToLong && tooltipHeight + 8 > GuiScreenUtils.scaledWindowHeight)
+                if (tooltip.snapsToTopIfTooLong && tooltipHeight + 8 > GuiScreenUtils.scaledWindowHeight)
                     4 // Snap to Top if to Long
                 else
                     GuiScreenUtils.scaledWindowHeight - tooltipHeight - 6 // Limit Bottom
@@ -142,7 +160,7 @@ private data class DeferredTooltip(
     val tips: List<Renderable>,
     val stack: ItemStack? = null,
     private val borderColor: LorenzColor? = null,
-    val snapsToTopIfToLong: Boolean = true,
+    val snapsToTopIfTooLong: Boolean = true,
     private val spacedTitle: Boolean = false,
 ) {
 

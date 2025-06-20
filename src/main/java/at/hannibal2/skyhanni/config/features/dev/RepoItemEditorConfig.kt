@@ -56,24 +56,21 @@ class RepoItemEditorConfig {
     @ConfigOption(
         name = "Load Inventory as Trades",
         desc = "Keybind will attempt to load the currently open menu as a NPC trades menu.\n" +
-            "§eFor inventories such as the community shop or Anita that are missing the sell item button"
+            "§eFor inventories such as the community shop or Anita that are missing the sell item button",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var loadInventoryAsTradesKeybind: Int = Keyboard.KEY_NONE
 
-    // todo implement
-    // @Expose
-    // @ConfigOption(
-    //     name = "Refresh NBT Keybind",
-    //     desc = "Instantly updates the nbt of the item to match the current file on the computer.",
-    // )
-    // @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    // var refreshNbtKeybind: Int = Keyboard.KEY_NONE
+    @Expose
+    @ConfigOption(
+        name = "Refresh NBT Keybind",
+        desc = "Instantly updates the nbt of the item to match the current file on the computer.",
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    var refreshNbtKeybind: Int = Keyboard.KEY_NONE
 
     @Expose
     @ConfigLink(owner = RepoItemEditorConfig::class, field = "editModeEnabled")
     var displayPosition: Position = Position(-300, 140)
-
-
 
 }

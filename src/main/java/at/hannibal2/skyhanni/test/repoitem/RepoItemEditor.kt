@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.repoitem
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -30,6 +31,9 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 
 @SkyHanniModule
 object RepoItemEditor {
@@ -51,6 +55,16 @@ object RepoItemEditor {
             config.instantEditKeybind.isKeyHeld() -> attemptToOpenInEditor(instantSave = true)
             config.saveRecipeKeybind.isKeyHeld() -> saveRecipe()
             config.loadInventoryAsTradesKeybind.isKeyHeld() -> NpcShopExporter.processCurrentlyOpenInventory()
+            config.refreshNbtKeybind.isKeyHeld() -> {
+                val focussedSlot = slotUnderCursor() ?: return
+                val stack = focussedSlot.stack?.copy() ?: return
+                val internalName = stack.getInternalNameOrNull() ?: ErrorManager.skyHanniError(
+                    "Cannot refresh NBT for item with unknown item name",
+                    "displayName" to stack.displayName,
+                    "inventoryName" to InventoryUtils.openInventoryName(),
+                )
+                refreshNbt(internalName)
+            }
             else -> return
         }
     }
@@ -117,6 +131,8 @@ object RepoItemEditor {
                 additionalInfoArray.add(JsonPrimitive(line))
             }
             baseJson.add("info", additionalInfoArray)
+        } else {
+            baseJson.add("info", JsonArray())
         }
         return baseJson
     }
@@ -177,20 +193,45 @@ object RepoItemEditor {
         ChatUtils.chat("§aSuccessfully saved recipe for ${resultInternalName.asString()} to repo folder!")
     }
 
-    // TODO: Add a command for refreshing nbt of a specific item in the repo
+    private fun refreshNbt(internalName: NeuInternalName) {
+        val file = File(EnoughUpdatesManager.repoLocation, "items/${internalName.asString()}.json")
+        if (!file.exists()) {
+            ChatUtils.chat("§cCould not find item with internal name §e${internalName.asString()}§c.")
+            return
+        }
+        try {
+            InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8).use { reader ->
+                val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
+                val stack = EnoughUpdatesManager.jsonToStack(json, useCache = false)
+                stack.openInEditor(instantSave = true, message = false)
+                ChatUtils.chat("§aSuccessfully refreshed NBT for item §e${internalName.asString()}§a.")
+            }
+
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Error refreshing NBT for item", "internalName" to internalName.asString())
+        }
+    }
+
     // TODO: Also use Empa's pr for tab completion of this
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sheditrepoitem") {
             description = "Open the RepoItemEditor for the specified internal name"
             category = CommandCategory.DEVELOPER_TEST
-            argCallback("internalName", BrigadierArguments.string()) { internalName ->
+            argCallback("internalName", BrigadierArguments.greedyString()) { internalName ->
                 val item = internalName.toInternalName().getItemStackOrNull()
                 if (item == null) {
                     ChatUtils.chat("§cCould not find item with internal name §e$internalName§c.")
                     return@argCallback
                 }
                 item.openInEditor(instantSave = false)
+            }
+        }
+        event.registerBrigadier("shrefreshrepoitem") {
+            description = "Refresh the repo item so that the nbt matches the rest of the data"
+            category = CommandCategory.DEVELOPER_TEST
+            argCallback("internalName", BrigadierArguments.greedyString()) { internalName ->
+                refreshNbt(internalName.toInternalName())
             }
         }
     }

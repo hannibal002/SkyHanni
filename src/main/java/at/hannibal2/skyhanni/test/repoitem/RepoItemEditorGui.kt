@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.TextFieldRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import com.google.gson.JsonObject
@@ -203,6 +204,13 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
                 //#endif
                 Renderable.itemStack(itemToRender, scale = 5.0, highlight = hasEnchantGlint).render(0, 0)
             }
+            DrawContextUtils.translate(-19f, 100f, 0f)
+            val tooltipRenderable = mutableListOf<Renderable>()
+            tooltipRenderable.add(RenderableString(displayNameField.getText()))
+            loreField.getText().split("\n").forEach { line ->
+                tooltipRenderable.add(RenderableString(line))
+            }
+            RenderableTooltips.setTooltipForImmediateRender(tooltipRenderable)
         }
 
         val width = GuiScreenUtils.scaledWindowWidth * 0.80f
@@ -259,7 +267,6 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         val delta = MouseCompat.getScrollDelta()
         if (delta == 0) return
         scroll += delta
-        println(scroll)
         if (scroll > 0) scroll = 0
         if (scroll < -maxScroll) scroll = -maxScroll
     }
@@ -358,7 +365,6 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         //$$     }
         //$$
         //$$     if (nbtTag.get(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.modifiers?.isNotEmpty() == true) {
-        //$$         println("modifiers: ${nbtTag.get(DataComponentTypes.ATTRIBUTE_MODIFIERS)}")
         //$$         tag.putBoolean("overrideMeta", true)
         //$$         tag.put("AttributeModifiers", NbtList())
         //$$     }
