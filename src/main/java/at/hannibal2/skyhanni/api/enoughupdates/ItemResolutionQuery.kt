@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
+import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -277,12 +278,15 @@ class ItemResolutionQuery {
     }
 
     private fun resolveItemInAttributeMenu(displayName: String): String? {
-        var name = displayName.removeColor().removeAllNonLettersAndNumbers()
-        val tier = name.last().toString().romanToDecimal()
-        if (tier == 0) return null
-        name = name.dropLast(1)
-
-        return "ATTRIBUTE_SHARD_" + name.trim().replace(" ", "_") + ";$tier"
+        val name = displayName.removeColor().removeAllNonLettersAndNumbers()
+        val split = name.split(" ")
+        val last = split.last()
+        if (!last.isRoman()) return null
+        val tier = if (last.isRoman()) last.romanToDecimal() else 0
+        if (tier == 0) {
+            return "ATTRIBUTE_SHARD_" + split.joinToString("_").uppercase() + ";1"
+        }
+        return "ATTRIBUTE_SHARD_" + split.dropLast(1).joinToString("_").uppercase() + ";$tier"
     }
 
     private fun resolveContextualName(): String? {
