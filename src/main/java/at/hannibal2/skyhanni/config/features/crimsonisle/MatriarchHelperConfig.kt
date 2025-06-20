@@ -24,9 +24,22 @@ class MatriarchHelperConfig {
     var highlightColor: String = "0:114:126:255:41"
 
     @Expose
-    @ConfigOption(name = "Draw Line", desc = "Draw a line to the lowest Heavy Pearl.")
+    @ConfigOption(name = "Draw Line", desc = "Draw a line to the lowest Heavy Pearl. Further settings below.")
     @ConfigEditorBoolean
     var line: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Simple Line", desc = "Only draws the line between the Heavy Pearls and not to the exit.")
+    @ConfigEditorBoolean
+    var simpleLine: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Shortest Distance",
+        desc = "Uses the shortest Distance instead of height for ordering the pearls. §cNot recommended!",
+    )
+    @ConfigEditorBoolean
+    var useShortestDistance: Boolean = false
 
     @Expose
     @ConfigOption(name = "Line Color", desc = "Color of the line.")

@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -27,8 +27,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -39,9 +41,9 @@ import kotlin.time.Duration.Companion.days
 @SkyHanniModule
 object CaptureFarmingGear {
     private val outdatedItems get() = GardenApi.storage?.fortune?.outdatedItems
-
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: SKILL LEVEL UP Farming 1 ➜ 2
      */
@@ -118,6 +120,7 @@ object CaptureFarmingGear {
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)",
     )
+    // </editor-fold>
 
     private val farmingSets = arrayListOf(
         "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
@@ -131,7 +134,7 @@ object CaptureFarmingGear {
         }
     }
 
-    // TODO upadte armor on equpment/wardeobe update as well
+    // TODO update armor on equipment/wardrobe update as well
     fun captureFarmingGear() {
         for (armor in InventoryUtils.getArmor()) {
             if (armor == null) continue
@@ -197,11 +200,9 @@ object CaptureFarmingGear {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
+        if (event.tryReadPets()) return
+
         val items = event.inventoryItems
-        if (PetApi.isPetMenu(event.inventoryName)) {
-            pets(items, outdatedItems)
-            return
-        }
         when (event.inventoryName) {
             "Your Equipment and Stats" -> equipmentAndStats(items, outdatedItems)
             "Your Skills" -> skills(items, storage)
@@ -211,6 +212,12 @@ object CaptureFarmingGear {
             "Visitor Milestones" -> visitorMilestones(items)
             "Bestiary", "Bestiary ➜ Garden" -> bestiary(items, storage)
         }
+    }
+
+    private fun InventoryFullyOpenedEvent.tryReadPets(): Boolean {
+        if (!PetStorageApi.mainPetMenuNamePattern.matches(inventoryName)) return false
+        pets(inventoryItems, outdatedItems ?: return false)
+        return true
     }
 
     private fun bestiary(
@@ -311,6 +318,7 @@ object CaptureFarmingGear {
         }
     }
 
+    // TODO: Completely get rid of this and use PetStorageApi instead.
     private fun pets(
         items: Map<Int, ItemStack>,
         outdatedItems: MutableMap<FarmingItemType, Boolean>,
@@ -327,6 +335,7 @@ object CaptureFarmingGear {
 
         for ((_, item) in items) {
             if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
+            item.getPetInfo()?.takeIf { it.uniqueId != null } ?: continue
             val (name, rarity) = item.getInternalName().asString().split(";")
             if (name == "ELEPHANT" && rarity.toInt() > highestElephantRarity) {
                 FarmingItemType.ELEPHANT.setItem(item)
