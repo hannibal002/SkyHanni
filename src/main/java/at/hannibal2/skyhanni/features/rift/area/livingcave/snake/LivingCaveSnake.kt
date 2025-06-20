@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave.snake
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.LineDrawer
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.render.LineDrawer
 import net.minecraft.init.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -44,7 +44,7 @@ class LivingCaveSnake(
 
     fun render(event: SkyHanniRenderWorldEvent, currentRole: LivingCaveSnakeFeatures.Role) {
         if (blocks.isEmpty()) return
-        if (LorenzUtils.debug) {
+        if (SkyHanniDebugsAndTests.enabled) {
             event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", isSelected())
         }
 

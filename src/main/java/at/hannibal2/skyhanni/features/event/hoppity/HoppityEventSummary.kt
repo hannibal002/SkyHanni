@@ -43,8 +43,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -53,6 +51,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -148,7 +147,7 @@ object HoppityEventSummary {
         val isEggLocatorEnabled = !liveDisplayConfig.mustHoldEggLocator || InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
         val isInventoryEnabled = liveDisplayConfig.specificInventories.isEmpty() || inMatchingInventory()
 
-        return LorenzUtils.inSkyBlock &&
+        return SkyBlockUtils.inSkyBlock &&
             !isToggledOff &&
             isEnabled &&
             isIslandEnabled &&
@@ -174,7 +173,7 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        onHoppityIsland = LorenzUtils.inSkyBlock && allowedHoppityIslands.any { it.isInIsland() }
+        onHoppityIsland = SkyBlockUtils.inSkyBlock && allowedHoppityIslands.any { it.isCurrent() }
     }
 
     @HandleEvent
@@ -349,7 +348,7 @@ object HoppityEventSummary {
     }
 
     private fun checkLbUpdateWarning() {
-        if (!LorenzUtils.inSkyBlock || !HoppityApi.isHoppityEvent() || !updateCfConfig.enabled) return
+        if (!SkyBlockUtils.inSkyBlock || !HoppityApi.isHoppityEvent() || !updateCfConfig.enabled) return
 
         // Only run if the user has leaderboard stats enabled
         if (!statDisplayList.contains(HoppityStat.LEADERBOARD_CHANGE)) return
@@ -688,35 +687,31 @@ object HoppityEventSummary {
                 }
             }
 
+            fun formatRabbits(
+                stats: HoppityEventStats,
+                transform: (Map.Entry<LorenzRarity, RabbitData>) -> Int,
+                name: String,
+                year: Int,
+                index: Int,
+                statList: MutableList<StatString>,
+            ) = getRabbitsFormat(
+                rarityMap = stats.rabbitsFound.mapValues(transform),
+                name = name,
+                countTriple = stats.getPairTriple(year, index),
+            ) { statList.addStr(it) }
+
+
             put(HoppityStat.NEW_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
-                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.uniques },
-                    name = "Unique",
-                    countTriple = stats.getPairTriple(year, 0),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                formatRabbits(stats, { it.value.uniques }, "Unique", year, index = 0, statList)
             }
 
             put(HoppityStat.DUPLICATE_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
-                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.dupes },
-                    name = "Duplicate",
-                    countTriple = stats.getPairTriple(year, 1),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                formatRabbits(stats, { it.value.dupes }, "Duplicate", year, index = 1, statList)
                 statList.addExtraChocFormatLine(stats.dupeChocolateGained)
             }
 
             put(HoppityStat.STRAY_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
-                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.strays },
-                    name = "Stray",
-                    countTriple = stats.getPairTriple(year, 2),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                formatRabbits(stats, { it.value.strays }, "Stray", year, index = 2, statList)
                 statList.addExtraChocFormatLine(stats.strayChocolateGained)
             }
 
@@ -847,7 +842,7 @@ object HoppityEventSummary {
         return completedEvents * 279 + spawnedThisEvent
     }
 
-    private fun getSpawnedEggCount(year: Int): Int {
+    fun getSpawnedEggCount(year: Int): Int {
         if (year == Int.MAX_VALUE) return getAllTimeSpawnedEggCount()
         val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
         val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
@@ -883,21 +878,22 @@ object HoppityEventSummary {
         rarityMap: Map<LorenzRarity, Int>,
         name: String,
         countTriple: Triple<Int, Int, Int> = Triple(0, 0, 0),
-    ): List<String> {
+        action: (String) -> Unit,
+    ) {
         val (prevCount, currCount, sinceCount) = countTriple
         val rabbitsSum = rarityMap.values.sum()
-        if (rabbitsSum == 0) return emptyList()
+        if (rabbitsSum == 0) return
 
         val sinceFormat = if (sinceCount > 0) " §8+$sinceCount§7" else ""
         val countFormat = if (config.eventSummary.showCountDiff && prevCount != 0 && currCount != 0) {
             " §7($prevCount$sinceFormat -> $currCount)"
         } else ""
 
-        return mutableListOf(
+        listOf(
             "§7$name Rabbits: §f${rabbitsSum.addSeparators()}$countFormat",
             HoppityApi.hoppityRarities.joinToString(" §7-") {
                 " ${it.chatColorCode}${(rarityMap[it] ?: 0).addSeparators()}"
             },
-        )
+        ).forEach(action)
     }
 }

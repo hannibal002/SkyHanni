@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -15,6 +19,7 @@ import net.minecraft.client.audio.PositionedSound
 //$$ import net.minecraft.sound.SoundEvent
 //#endif
 
+@SkyHanniModule
 object SoundUtils {
 
     private val beepSoundCache = mutableMapOf<Float, ISound>()
@@ -89,8 +94,8 @@ object SoundUtils {
         }
 
         val soundName = args[0]
-        val pitch = args.getOrNull(1)?.toFloat() ?: 1.0f
-        val volume = args.getOrNull(2)?.toFloat() ?: 50.0f
+        val pitch = args.getOrNull(1)?.toFloat() ?: 1f
+        val volume = args.getOrNull(2)?.toFloat() ?: 50f
 
         createSound(soundName, pitch, volume).playSound()
     }
@@ -106,6 +111,15 @@ object SoundUtils {
                 sound.playSound()
                 delay(delay)
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shplaysound") {
+            description = "Play the specified sound effect at the given pitch and volume."
+            category = CommandCategory.DEVELOPER_TEST
+            legacyCallbackArgs { command(it) }
         }
     }
 }

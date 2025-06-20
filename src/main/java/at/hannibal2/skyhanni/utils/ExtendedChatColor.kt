@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import java.awt.Color
 
 class ExtendedChatColor(
@@ -19,6 +23,7 @@ class ExtendedChatColor(
         return stringBuilder.toString()
     }
 
+    @SkyHanniModule
     companion object {
 
         fun testCommand() {
@@ -29,6 +34,15 @@ class ExtendedChatColor(
                 string.append("$extendedChatColor§m ")
             }
             ChatUtils.chat(string.toString())
+        }
+
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+            event.registerBrigadier("shtestrainbow") {
+                description = "Sends a rainbow in chat"
+                category = CommandCategory.DEVELOPER_TEST
+                callback { testCommand() }
+            }
         }
     }
 }

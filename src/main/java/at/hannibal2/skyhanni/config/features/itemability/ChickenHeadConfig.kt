@@ -19,7 +19,7 @@ class ChickenHeadConfig {
 
     @Expose
     @ConfigLink(owner = ChickenHeadConfig::class, field = "displayTimer")
-    var position: Position = Position(-372, 73, false, true)
+    var position: Position = Position(-372, 73)
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the 'You laid an egg!' chat message.")

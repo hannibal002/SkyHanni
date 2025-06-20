@@ -34,8 +34,16 @@ class FarmingLaneConfig {
     var distanceDisplay: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Soul Sand Warning",
+        desc = "Show an informational note on distance display while on soul sand, that speed calculations are inaccurate"
+    )
+    @ConfigEditorBoolean
+    var distanceSoulSandWarning: Boolean = true
+
+    @Expose
     @ConfigLink(owner = FarmingLaneConfig::class, field = "distanceDisplay")
-    var distanceDisplayPosition: Position = Position(0, 200, false, true)
+    var distanceDisplayPosition: Position = Position(0, 200)
 
     @Expose
     @ConfigOption(name = "Corner Waypoints", desc = "Show the corner for the current lane in the world.")

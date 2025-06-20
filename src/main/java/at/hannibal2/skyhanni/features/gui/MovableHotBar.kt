@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.transform
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 
 @SkyHanniModule
 object MovableHotBar {
@@ -22,7 +22,7 @@ object MovableHotBar {
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR || !isEnabled()) return
+        if (event.type != RenderLayer.HOTBAR || !isEnabled()) return
         post = true
         DrawContextUtils.pushMatrix()
         val x = GuiScreenUtils.scaledWindowWidth / 2 - 91
@@ -34,7 +34,7 @@ object MovableHotBar {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
-        if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR || !post) return
+        if (event.type != RenderLayer.HOTBAR || !post) return
         DrawContextUtils.popMatrix()
         post = false
     }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -33,7 +34,7 @@ class DungeonConfig {
 
     @Expose
     @ConfigLink(owner = DungeonConfig::class, field = "showMilestonesDisplay")
-    var showMileStonesDisplayPos: Position = Position(10, 10, false, true)
+    var showMileStonesDisplayPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current Dungeon.")
@@ -43,7 +44,7 @@ class DungeonConfig {
 
     @Expose
     @ConfigLink(owner = DungeonConfig::class, field = "deathCounterDisplay")
-    var deathCounterPos: Position = Position(10, 10, false, true)
+    var deathCounterPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Clean End", desc = "")
@@ -69,6 +70,7 @@ class DungeonConfig {
     @ConfigOption(name = "Highlight Teammates", desc = "Highlight Dungeon teammates with a glowing outline.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @OnlyLegacy
     var highlightTeammates: Boolean = true
 
     @Expose

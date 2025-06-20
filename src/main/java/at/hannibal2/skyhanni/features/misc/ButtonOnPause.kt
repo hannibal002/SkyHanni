@@ -10,6 +10,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
+//#if MC > 1.21
+//$$ import net.minecraft.client.gui.widget.ButtonWidget
+//$$ import net.minecraft.text.Text
+//#endif
 
 @SkyHanniModule
 object ButtonOnPause {
@@ -17,6 +21,7 @@ object ButtonOnPause {
     private val config get() = SkyHanniMod.feature.gui
     private val buttonId = System.nanoTime().toInt()
 
+    //#if MC < 1.21
     @HandleEvent
     fun onGuiActionPerformed(event: GuiActionPerformedEvent) {
         if (!LorenzUtils.onHypixel) return
@@ -25,6 +30,7 @@ object ButtonOnPause {
             ConfigGuiManager.openConfigGui()
         }
     }
+    //#endif
 
     @HandleEvent
     fun onInitializeGuiPost(event: InitializeGuiEvent) {
@@ -46,7 +52,13 @@ object ButtonOnPause {
                     y2 = y + 20
                 }
             }
+            //#if MC < 1.21
             event.buttonList.add(GuiButton(buttonId, x, 0.coerceAtLeast(y), 100, 20, "SkyHanni"))
+            //#else
+            //$$ ButtonWidget.builder(Text.of("Skyhanni")) {
+            //$$     ConfigGuiManager.openConfigGui()
+            //$$ }.dimensions(x, 0.coerceAtLeast(y), 100, 20).build()
+            //#endif
         }
     }
 

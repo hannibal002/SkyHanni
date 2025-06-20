@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
-import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
+//#if MC > 1.21
+//$$ import net.minecraft.registry.DynamicRegistryManager
+//#endif
 
+// todo 1.21 impl needed
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
 
     private var scroll = -1.0
@@ -41,20 +41,21 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         val l = (width / 2.0 - w / 2.0).toInt()
         val t = (height / 2.0 - h / 2.0).toInt()
         DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
-        RenderUtils.drawFloatingRectDark(0, 0, w, h)
+        GuiRenderUtils.drawFloatingRectDark(0, 0, w, h)
+        DrawContextUtils.translate(-l + 0.0, -t + 0.0, 0.0)
+        GuiRenderUtils.enableScissor(l + 5, t + 5, w + l - 5, h + t - 5)
+        DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
         DrawContextUtils.translate(5.0, 5.0 - scroll, 0.0)
         val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt()
-        val sr = ScaledResolution(mc)
-        GlScissorStack.push(l + 5, t + 5, w + l - 5, h + t - 5, sr)
 
         for (msg in history) {
             GuiRenderUtils.drawString(msg.actionKind.renderedString, 0, 0, -1)
             msg.actionReason?.let { GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1) }
             var size = drawMultiLineText(msg.message, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             msg.modified?.let {
-                GuiRenderUtils.drawString("§e§lNEW TEXT", 0, size * 10, -1)
+                GuiRenderUtils.drawString("§e§lNEW TEXT", 0, 0, -1)
                 size += drawMultiLineText(it, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             }
             val isHovered = mouseX in 0..w && mouseY in 0..(size * 10)
@@ -64,7 +65,12 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
                 queuedTooltip = msg.hoverExtraInfo
             if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
+                    //#if MC < 1.21
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
+                    //#else
+                    //$$ val serialize = Text.Serializer(DynamicRegistryManager.EMPTY).serialize(msg.message, null, null)
+                    //$$ OSUtils.copyToClipboard(serialize.toString())
+                    //#endif
                     ChatUtils.chat("Copied structured chat line to clipboard", false)
                 } else {
                     val message = msg.message.formattedText.stripHypixelMessage()
@@ -74,17 +80,21 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
             }
             mouseY -= size * 10
         }
-        GlScissorStack.pop(sr)
+        GuiRenderUtils.disableScissor()
         wasMouseButtonDown = isMouseButtonDown
         DrawContextUtils.popMatrix()
         queuedTooltip?.let { tooltip ->
             RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
         }
-        GlStateManager.color(1f, 1f, 1f, 1f)
     }
 
     private fun splitLine(comp: IChatComponent): List<String> {
+        //#if MC < 1.21
         return comp.formattedText.splitLines(w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10)).split("\n")
+        //#else
+        //$$ // todo splitlines kills colour for some reason
+        //$$ return comp.formattedTextCompat().split("\n")
+        //#endif
     }
 
     override fun onInitGui() {

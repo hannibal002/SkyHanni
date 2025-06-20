@@ -70,7 +70,11 @@ object TimiteTracker {
                     }
                 }
             }
+            //#if TODO
             val motes = HIGHLITE.motesNpcPrice()?.times(craftableAmount)?.shortFormat() ?: "0"
+            //#else
+            //$$ val motes = "0"
+            //#endif
             if (craftableAmount > 0) {
                 addSearchString(" §7${craftableAmount.shortFormat()}x ${HIGHLITE.repoItemName} Craftable§7: §5$motes motes")
             }
@@ -115,7 +119,8 @@ object TimiteTracker {
     }
 
     private fun isEnabled() =
-        RiftApi.inMountainTop() && config.tracker &&
+        RiftApi.inMountainTop() &&
+            config.tracker &&
             (!config.onlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
 
     private val timiteItems = listOf(

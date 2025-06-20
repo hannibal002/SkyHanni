@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -17,6 +18,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
+import java.util.Locale
 import java.util.NavigableMap
 import java.util.NavigableSet
 import java.util.UUID
@@ -27,6 +29,8 @@ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
 //#endif
 
+// todo 1.21 impl needed
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
@@ -45,11 +49,8 @@ object StringUtils {
     fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
-        if (isEmpty()) return this
-
-        val lowercase = lowercase()
-        val first = lowercase[0].uppercase()
-        return first + lowercase.substring(1)
+        return this.lowercase(Locale.getDefault())
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
@@ -166,6 +167,7 @@ object StringUtils {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
+
         } else {
             internalCleanPlayerName()
         }
@@ -195,7 +197,7 @@ object StringUtils {
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
-     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * this = the list of strings to join into a string, containing 0 or more elements.
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
@@ -280,6 +282,7 @@ object StringUtils {
     }
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
+    fun String.convertToUnformatted(): String = this.replace("§", "&")
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 
@@ -398,13 +401,9 @@ object StringUtils {
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
         chatComponent = new.asComponent()
-        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value
-        if (hoverEvents.size == 1) chatComponent.hover =
-            //#if MC < 1.21
-            hoverEvents.first().value
-        //#else
-        //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
-        //#endif
+        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value()
+        if (hoverEvents.size == 1) chatComponent.hover = hoverEvents.first().value()
+
     }
 
     private fun IChatComponent.findAllEvents(
@@ -416,16 +415,12 @@ object StringUtils {
         val clickEvent = chatStyle.chatClickEvent
         val hoverEvent = chatStyle.chatHoverEvent
 
-        if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
+        if (clickEvent?.action != null && clickEvents.none { it.value() == clickEvent.value() }) {
             clickEvents.add(clickEvent)
         }
 
         if (hoverEvent?.action != null && hoverEvents.none {
-                //#if MC < 1.21
-                it.value == hoverEvent.value
-                //#else
-                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
-                //#endif
+                it.value() == hoverEvent.value()
             }
         ) {
             hoverEvents.add(hoverEvent)
@@ -458,9 +453,11 @@ object StringUtils {
         return message
     }
 
+    //#if TODO
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
+    //#endif
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
         return asComponent { chatStyle = original.chatStyle }
@@ -492,6 +489,17 @@ object StringUtils {
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""
         return if (string[0] in "aeiou") "an" else "a"
+    }
+
+    fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }
+
+    fun String.splitLastWhitespace(): Pair<String, String> {
+        val lastWhitespaceIndex = lastIndexOf(" ")
+        return if (lastWhitespaceIndex == -1) {
+            "" to this
+        } else {
+            substring(0, lastWhitespaceIndex) to substring(lastWhitespaceIndex + 1)
+        }
     }
 
     fun String.addStrikethorugh(strikethorugh: Boolean = true): String {

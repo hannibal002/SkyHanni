@@ -37,10 +37,11 @@ object CFBlockOpen {
      * REGEX-TEST: /chocolatefactory
      * REGEX-TEST: /chocolatefactory123456789
      * REGEX-TEST: /factory
+     * REGEX-TEST: /CF
      */
     private val commandPattern by RepoPattern.pattern(
         "inventory.chocolatefactory.opencommand",
-        "\\/(?:cf|(?:chocolate)?factory)(?: .*)?",
+        "(?i)\\/(?:cf|(?:chocolate)?factory)(?: .*)?",
     )
 
     /**

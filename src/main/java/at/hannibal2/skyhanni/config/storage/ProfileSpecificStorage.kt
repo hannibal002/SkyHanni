@@ -11,8 +11,10 @@ import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
+//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.generateMaxChestAsList
+//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -38,14 +40,20 @@ import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
+//#endif
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
+//#endif
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+//#endif
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
@@ -61,10 +69,14 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.time.Duration
 
+// todo 1.21 impl needed
 // put everything under its respective feature, the order of the features is the same as in the folder structure
-class ProfileSpecificStorage {
+class ProfileSpecificStorage(
+    @Expose var profileName: String = "",
+) {
     // api
     @Expose
     var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
@@ -108,6 +120,7 @@ class ProfileSpecificStorage {
         @Expose
         var bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
 
+        //#if TODO
         @Expose
         var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
 
@@ -128,6 +141,7 @@ class ProfileSpecificStorage {
             @Expose
             var kismetUsed: Boolean? = null
         }
+        //#endif
     }
 
     @Expose
@@ -572,6 +586,7 @@ class ProfileSpecificStorage {
         var farmingWeight: FarmingWeightConfig = FarmingWeightConfig()
 
         class FarmingWeightConfig {
+            // TODO rename to lastLeaderboard
             @Expose
             var lastFarmingWeightLeaderboard: Int = -1
         }
@@ -645,9 +660,9 @@ class ProfileSpecificStorage {
 
     // - mining
     @Expose
-    var mining: MiningConfig = MiningConfig()
+    var mining: MiningStorage = MiningStorage()
 
-    class MiningConfig {
+    class MiningStorage {
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 
@@ -684,11 +699,13 @@ class ProfileSpecificStorage {
             @Expose
             var mineshaftTotalCount: Int = 0
 
+            //#if TODO
             @Expose
             var blocksBroken: MutableList<PityData> = mutableListOf()
 
             @Expose
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
+            //#endif
         }
 
         @Expose
@@ -734,9 +751,11 @@ class ProfileSpecificStorage {
         @Expose
         var selfKillingAnimals: Int = 0
 
+        //#if TODO
         // TODO change to sh tracker
         @Expose
         var animalRarities: Map<TrapperMobRarity, Int> = enumMapOf()
+        //#endif
     }
 
     @Expose
@@ -797,7 +816,7 @@ class ProfileSpecificStorage {
 
     // data
     @Expose
-    var currentPet: String = ""
+    var currentPetUuid: UUID? = null
 
     @Expose
     var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()

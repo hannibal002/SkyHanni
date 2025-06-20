@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -59,7 +58,10 @@ object SuperpairDataDisplay {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "Experimentation Table") {
             // Render here so they can move it around.
-            config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
+            config.superpairDisplayPosition.renderString(
+                "§6Superpair Experimentation Data",
+                posLabel = "Superpair Experimentation Data",
+            )
         }
         if (ExperimentationTableApi.currentExperiment == null) return
 
@@ -96,6 +98,7 @@ object SuperpairDataDisplay {
         val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return@runDelayed
         val itemName = itemNow.displayName.removeColor()
         val reward = convertToReward(itemNow)
+        //#if TODO
         val itemData = SuperpairItem(slot, reward, itemNow.itemDamage)
         val uncovered = items.keys.maxOrNull() ?: -1
 
@@ -116,6 +119,9 @@ object SuperpairDataDisplay {
             emptySuperpairItem
 
         display = drawDisplay()
+        //#else
+        //$$ // todo fix up item damage once the color compat is merged
+        //#endif
     }
 
     private fun handlePowerUp(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem, uncovered: Int) {
@@ -299,5 +305,5 @@ object SuperpairDataDisplay {
 
     private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this.damage == other.damage
 
-    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.superpairDisplay
+    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isCurrent() && config.superpairDisplay
 }

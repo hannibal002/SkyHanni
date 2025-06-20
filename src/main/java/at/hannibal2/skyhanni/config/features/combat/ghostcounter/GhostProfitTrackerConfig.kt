@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class GhostProfitTrackerConfig {
     @Expose
@@ -39,5 +38,5 @@ class GhostProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = GhostProfitTrackerConfig::class, field = "enabled")
-    var position: Position = Position(50, 50, false, true)
+    var position: Position = Position(50, 50)
 }

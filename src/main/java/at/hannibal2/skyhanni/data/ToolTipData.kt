@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
@@ -35,8 +36,8 @@ object ToolTipData {
     }
 
     @JvmStatic
-    fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
-        ItemHoverEvent(stack, toolTip).post()
+    fun onHover(context: DrawContext, stack: ItemStack, toolTip: MutableList<String>) {
+        ItemHoverEvent(context, stack, toolTip).post()
     }
 
     var lastSlot: Slot? = null

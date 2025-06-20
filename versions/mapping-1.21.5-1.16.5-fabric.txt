@@ -1,4 +1,8 @@
 
+at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+
+at.hannibal2.skyhanni.utils.render.ModernGlStateManager com.mojang.blaze3d.systems.RenderSystem
+
 net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext at.hannibal2.skyhanni.utils.compat.WorldRenderContext
 
 net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawContext
@@ -6,6 +10,8 @@ net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawCont
 net.minecraft.client.gui.hud.ChatHudLine getContent() getChatComponent()
 
 net.minecraft.client.gui.screen.ingame.SignEditScreen blockEntity sign
+
+net.minecraft.client.gui.widget.Widget net.minecraft.client.gui.Drawable
 
 net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.network.ClientPlayerEntity
 
@@ -18,6 +24,9 @@ net.minecraft.client.util.math.MatrixStack push() pushMatrix()
 
 net.minecraft.entity.Entity getEquippedItems() getItemsEquipped()
 net.minecraft.entity.Entity getId() getEntityId()
+net.minecraft.entity.Entity lastX prevX
+net.minecraft.entity.Entity lastY prevY
+net.minecraft.entity.Entity lastZ prevZ
 
 net.minecraft.entity.decoration.ArmorStandEntity shouldShowBasePlate().not() shouldHideBasePlate()
 
@@ -34,7 +43,8 @@ net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket type.getType
 
 net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket
 
+net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket entityId() getId()
+
 net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket getEntityId() getId()
 
 net.minecraft.text.Text net.minecraft.text.LiteralText
-

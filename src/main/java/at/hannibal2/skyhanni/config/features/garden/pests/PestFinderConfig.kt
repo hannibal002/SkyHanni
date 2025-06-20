@@ -48,6 +48,14 @@ class PestFinderConfig {
 
     @Expose
     @ConfigOption(
+        name = "Mute Vacuum",
+        desc = "Mute the pest vacuum when using its right click ability."
+    )
+    @ConfigEditorBoolean
+    var muteVacuum: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Show For Seconds",
         desc = "Show plots border for a given amount of seconds after holding a vacuum.\n" +
             "§e0 = Always show when holding vacuum"

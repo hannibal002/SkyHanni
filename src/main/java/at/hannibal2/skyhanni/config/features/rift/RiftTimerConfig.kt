@@ -30,7 +30,7 @@ class RiftTimerConfig {
 
     @Expose
     @ConfigLink(owner = RiftTimerConfig::class, field = "enabled")
-    var timerPosition: Position = Position(10, 10, false, true)
+    var timerPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Nametag Format", desc = "Format the remaining rift time for other players in their nametag.")

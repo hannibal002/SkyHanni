@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ChatComponentText
@@ -73,13 +72,13 @@ object EntityData {
     }
 
     @JvmStatic
-    fun onRenderCheck(entity: Entity, camera: ICamera, camX: Double, camY: Double, camZ: Double): Boolean {
+    fun onRenderCheck(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
         lastVisibilityCheck[entity]?.let { (time, result) ->
             if (time.passedSince() < 200.milliseconds) {
                 return result
             }
         }
-        val result = CheckRenderEntityEvent(entity, camera, camX, camY, camZ).post()
+        val result = CheckRenderEntityEvent(entity, camX, camY, camZ).post()
         lastVisibilityCheck[entity] = SimpleTimeMark.now() to result
         return result
     }

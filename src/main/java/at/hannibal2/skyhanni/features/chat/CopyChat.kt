@@ -37,7 +37,7 @@ object CopyChat {
 
             KeyboardManager.isShiftKeyDown() -> (ModifyVisualWords.modifyText(formatted)?.removeColor() ?: formatted) to "modified message"
 
-            KeyboardManager.isControlKeyDown() -> chatLine.chatComponent.unformattedText to "line"
+            KeyboardManager.isControlKeyDown() -> chatLine.chatComponent.unformattedText.removeColor() to "line"
 
             else -> formatted.removeColor() to "message"
         }
