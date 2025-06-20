@@ -866,11 +866,15 @@ object RenderUtils {
         // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
         val circleColor = color.addAlpha(255).rgb
 
+        //#if TODO
+        // Not really a TODO, there's an open PR to fix this for 1.21+
+        //  but it does need to be merged in correctly (looking at you, future Daveed)
         DrawContextUtils.pushPop {
             ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
             GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, circleColor)
             ShaderManager.disableShader()
         }
+        //#endif
     }
 
     //#if TODO
