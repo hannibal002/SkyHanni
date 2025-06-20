@@ -18,6 +18,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
+import java.util.Locale
 import java.util.NavigableMap
 import java.util.NavigableSet
 import java.util.UUID
@@ -48,11 +49,8 @@ object StringUtils {
     fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
-        if (isEmpty()) return this
-
-        val lowercase = lowercase()
-        val first = lowercase[0].uppercase()
-        return first + lowercase.substring(1)
+        return this.lowercase(Locale.getDefault())
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
@@ -284,6 +282,7 @@ object StringUtils {
     }
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
+    fun String.convertToUnformatted(): String = this.replace("§", "&")
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 

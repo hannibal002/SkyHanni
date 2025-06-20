@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.gui.GuiComponentWrapper
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
@@ -13,18 +17,25 @@ import io.github.notenoughupdates.moulconfig.xml.XMLUniverse
  */
 class RepoPatternGui private constructor() {
 
+    @SkyHanniModule
     companion object {
 
-        /**
-         * Open the [RepoPatternGui]
-         */
-        fun open() {
-            SkyHanniMod.screenToOpen = GuiComponentWrapper(
-                GuiContext(
-                    XMLUniverse.getDefaultUniverse()
-                        .load(RepoPatternGui(), MyResourceLocation("skyhanni", "gui/regexes.xml"))
-                )
-            )
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+
+            /**
+             * Open the [RepoPatternGui]
+             */
+            event.registerBrigadier("shrepopatterns") {
+                description = "See where regexes are loaded from"
+                category = CommandCategory.DEVELOPER_TEST
+                simpleCallback {
+                    val location = MyResourceLocation("skyhanni", "gui/regexes.xml")
+                    val universe = XMLUniverse.getDefaultUniverse()
+                    val context = GuiContext(universe.load(RepoPatternGui(), location))
+                    SkyHanniMod.screenToOpen = GuiComponentWrapper(context)
+                }
+            }
         }
     }
 

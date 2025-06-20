@@ -3,6 +3,9 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -474,14 +477,22 @@ object SackApi {
 
     fun NeuInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 
-    fun testSackApi(args: Array<String>) {
-        if (args.size == 1) {
-            if (sackListInternalNames.contains(args[0].uppercase())) {
-                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].toInternalName())}")
-            } else {
-                ChatUtils.userError("That item isn't a valid sack item.")
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestsackapi") {
+            description = "Get the amount of an item in sacks according to internal feature SackAPI"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("internalName", BrigadierArguments.string()) { internalName ->
+                callback {
+                    val arg = getArg(internalName)
+                    if (sackListInternalNames.contains(arg.uppercase())) {
+                        ChatUtils.chat("Sack data for $arg: ${fetchSackItem(arg.toInternalName())}")
+                    } else {
+                        ChatUtils.userError("That item isn't a valid sack item.")
+                    }
+                }
             }
-        } else ChatUtils.userError("/shtestsackapi <internal name>")
+        }
     }
 }
 
