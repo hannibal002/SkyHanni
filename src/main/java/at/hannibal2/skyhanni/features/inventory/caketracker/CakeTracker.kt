@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
@@ -118,8 +118,8 @@ object CakeTracker {
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
     private val maxTrackerHeight: Float get() = config.maxHeight.get()
     private val cakeScrollValue = ScrollValue().apply { init(0.0) }
-    private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
-    private val searchOverrideCache: TimeLimitedCache<Pair<Int, Int>, Int> = TimeLimitedCache(5.minutes)
+    private val cakePriceCache = TimeLimitedCache<Int, Double>(5.minutes)
+    private val searchOverrideCache = TimeLimitedCache<Pair<Int, Int>, Int>(5.minutes)
 
     private var currentYear = 0
     private var inCakeInventory = false

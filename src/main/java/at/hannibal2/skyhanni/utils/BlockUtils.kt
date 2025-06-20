@@ -64,8 +64,8 @@ object BlockUtils {
     //$$        RaycastContext(
     //$$            start.toVec3(),
     //$$            end.toVec3(),
-    //$$            RaycastContext.ShapeType.OUTLINE,
-    //$$            RaycastContext.FluidHandling.ANY,
+    //$$            RaycastContext.ShapeType.COLLIDER,
+    //$$            RaycastContext.FluidHandling.NONE,
     //$$            MinecraftCompat.localPlayer,
     //$$        ),
     //$$    )

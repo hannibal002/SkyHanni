@@ -67,6 +67,7 @@ loom {
     if (target == ProjectTarget.MODERN) {
         accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
     }
+    @Suppress("UnstableApiUsage")
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -114,7 +115,7 @@ val devenvMod: Configuration by configurations.creating {
     isVisible = false
 }
 
-val headlessLwjgl by configurations.creating {
+val headlessLwjgl: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
@@ -213,8 +214,8 @@ dependencies {
         isTransitive = false
     }
     // December 29, 2024, 07:30 PM EST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.6.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.6.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -225,7 +226,7 @@ dependencies {
         shadowModImpl(libs.moulconfigModern)
         include(libs.moulconfigModern)
     }
-
+    @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
@@ -268,7 +269,7 @@ afterEvaluate {
     tasks.named("kspKotlin", KspTaskJvm::class) {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
         this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
     }
 }
 
@@ -301,7 +302,7 @@ tasks.processResources {
 }
 
 if (target == ProjectTarget.MAIN) {
-    tasks.create("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).apply {
+    tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
         jvmArgs(
@@ -321,20 +322,20 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
+fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
                 .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
-            kotlin.include(buildPaths)
-            java.include(buildPaths)
+            kotlin.exclude(buildPaths)
+            java.exclude(buildPaths)
         }
     }
 }
-includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
-includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
@@ -437,7 +438,7 @@ preprocess {
     vars.put("TODO", if (skipTodos) 1 else 0)
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
+val sourcesJar by tasks.registering(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
     from(sourceSets.main.get().allSource)

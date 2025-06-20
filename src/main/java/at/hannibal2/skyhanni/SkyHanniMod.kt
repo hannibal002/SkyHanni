@@ -50,7 +50,6 @@ object SkyHanniMod {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
-        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
 
         PreInitFinishedEvent.post()
     }
@@ -58,6 +57,7 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
         MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
@@ -81,9 +81,9 @@ object SkyHanniMod {
                     //#else
                     //$$ MinecraftCompat.localPlayer.closeHandledScreen()
                     //#endif
+                    OtherInventoryData.close(title)
                 }
                 shouldCloseScreen = true
-                OtherInventoryData.close(title)
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null

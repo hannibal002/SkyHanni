@@ -63,6 +63,7 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import net.minecraft.component.type.NbtComponent
@@ -72,6 +73,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import com.mojang.authlib.properties.Property
 //$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
+//$$ import net.minecraft.registry.Registries
 //#endif
 
 @SkyHanniModule
@@ -148,7 +150,16 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> {
+    //$$     val data = cachedData
+    //$$     if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
+    //$$         return data.lastLore
+    //$$     }
+    //$$     val lore = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+    //$$     data.lastLore = lore
+    //$$     data.lastLoreFetchTime = SimpleTimeMark.now()
+    //$$     return lore
+    //$$ }
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -161,7 +172,7 @@ object ItemUtils {
     //#else
     //$$ fun ComponentMap?.getLore(): List<String> {
     //$$     this ?: return emptyList()
-    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) } ?: emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
     //$$ }
     //#endif
 
@@ -741,7 +752,6 @@ object ItemUtils {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestitem") {
@@ -757,7 +767,6 @@ object ItemUtils {
             }
         }
     }
-    //#endif
 
     private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
@@ -929,4 +938,12 @@ object ItemUtils {
 
         return skull
     }
+
+    //#if MC > 1.21
+    //$$ fun ItemStack.getItemModel(): Item? {
+    //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
+    //$$     val item = Registries.ITEM.get(identifier)
+    //$$     return if (item == Items.AIR) null else item
+    //$$ }
+    //#endif
 }

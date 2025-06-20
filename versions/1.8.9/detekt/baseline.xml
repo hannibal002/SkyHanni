@@ -34,7 +34,6 @@
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>LongMethod:RepoManager.kt$RepoManager$private fun doTheFetching(command: Boolean)</ID>
-    <ID>LongMethod:UpdateKeybinds.kt$UpdateKeybinds$private fun makeMap(): Map&lt;Int, Int&gt;</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
@@ -333,6 +332,8 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt$WorldRenderUtils$it.name!!</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
+    <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var x = globalMouseX * scaledWindowWidth / displayWidth</ID>
+    <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var y = globalMouseY * height / displayHeight</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>

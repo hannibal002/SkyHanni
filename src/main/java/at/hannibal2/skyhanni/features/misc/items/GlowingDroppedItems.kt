@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
@@ -41,7 +41,7 @@ object GlowingDroppedItems {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     private fun getEntityOutlineColor(entity: Entity): Int? {
         val item = entity as? EntityItem ?: return null
@@ -60,7 +60,7 @@ object GlowingDroppedItems {
     }
 
     private val isShowcaseArea by RecalculatingValue(1.seconds) {
-        IslandTypeTags.HAS_SHOWCASES.inAny() || LorenzUtils.skyBlockArea in showcaseItemLocations
+        IslandTypeTags.HAS_SHOWCASES.inAny() || SkyBlockUtils.graphArea in showcaseItemLocations
     }
 
     private fun shouldHideShowcaseItem(entity: EntityItem): Boolean {

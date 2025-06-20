@@ -57,12 +57,13 @@ object PlatformUtils {
     }
     //#else
     //$$ private fun getModFromPackage(packageName: String?): ModInstance? {
+    //$$    packageName ?: return null
+    //$$    if (packageName.startsWith("at.hannibal2.skyhanni")) return ModInstance("skyhanni", "SkyHanni", VersionConstants.MOD_VERSION)
     //$$    return null
     //$$ }
     //#endif
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
-
 
     fun isModInstalled(modId: String): Boolean {
         //#if FORGE

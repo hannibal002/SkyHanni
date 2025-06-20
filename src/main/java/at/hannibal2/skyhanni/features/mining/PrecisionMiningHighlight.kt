@@ -40,7 +40,7 @@ object PrecisionMiningHighlight {
             .axisAlignedTo(event.location.clone().add(0.12, 0.12, 0.12))
 
         val blockBoundingBox = mouseOverObject.blockPos.toLorenzVec()
-            .axisAlignedTo(mouseOverObject.blockPos.add(1, 1, 1).toLorenzVec())
+            .axisAlignedTo(mouseOverObject.blockPos.add(1.toDouble(), 1.toDouble(), 1.toDouble()).toLorenzVec())
         if (!blockBoundingBox.intersectsWith(particleBoundingBox)) return
 
         lookingAtParticle = event.type == EnumParticleTypes.VILLAGER_HAPPY

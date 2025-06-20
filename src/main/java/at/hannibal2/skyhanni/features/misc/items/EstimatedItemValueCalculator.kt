@@ -944,7 +944,7 @@ object EstimatedItemValueCalculator {
             // Do not error out on items if their data was changed.
             if (getLore().any { it.contains("This item has unused Gemstones!") }) return null
             ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for $displayName",
+                "Could not find gemstone slot price for ${this.displayName}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,

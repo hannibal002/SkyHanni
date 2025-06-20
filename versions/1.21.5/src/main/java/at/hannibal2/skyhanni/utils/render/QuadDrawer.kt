@@ -32,7 +32,6 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         buf.vertex(newLastPoint.x.toFloat(), newLastPoint.y.toFloat(), newLastPoint.z.toFloat())
             .color(c.red, c.green, c.blue, c.alpha)
 
-        event.vertexConsumers.draw(layer)
         event.matrices.pop()
     }
 

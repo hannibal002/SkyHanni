@@ -10,4 +10,5 @@ class SkyHanniRenderWorldEvent(
     val camera: Camera,
     val vertexConsumers: VertexConsumerProvider.Immediate,
     val partialTicks: Float,
+    var isCurrentlyDeferring: Boolean = true,
 ) : SkyHanniEvent()
