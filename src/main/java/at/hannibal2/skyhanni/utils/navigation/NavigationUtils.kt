@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 object NavigationUtils {
 
     fun getRoute(input: List<GraphNode>, maxIterations: Int = 50, neighborhoodSize: Int = 6): List<LorenzVec> {
+        if (input.isEmpty()) return emptyList()
         val output = calculateTravelingSalesman(input, maxIterations, neighborhoodSize)
 
         if (input.size != output.size) {

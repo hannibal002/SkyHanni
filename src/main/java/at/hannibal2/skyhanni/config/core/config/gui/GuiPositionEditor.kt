@@ -62,7 +62,11 @@ class GuiPositionEditor(
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
             val accessor = oldScreen as AccessorGuiContainer
+            //#if MC < 1.21
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
+            //#else
+            //$$ oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
+            //#endif
         }
 
         GlStateManager.disableLighting()

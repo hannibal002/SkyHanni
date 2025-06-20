@@ -3,15 +3,11 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -34,7 +30,6 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ChatManager {
 
@@ -180,7 +175,6 @@ object ChatManager {
     }
 
     private fun openChatHistoryGui(args: Array<String>) {
-        //#if TODO
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatHistoryGui(getRecentMessageHistory())
         } else {
@@ -192,7 +186,6 @@ object ChatManager {
             }
             ChatHistoryGui(history)
         }
-        //#endif
     }
 
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched
@@ -272,14 +265,12 @@ object ChatManager {
         }
     }
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shchathistory") {
+        event.registerBrigadier("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            callback { openChatHistoryGui(it) }
+            legacyCallbackArgs { openChatHistoryGui(it) }
         }
     }
-    //#endif
 }

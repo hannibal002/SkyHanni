@@ -3,9 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -34,7 +33,6 @@ import net.minecraft.world.WorldSettings
 //$$ import net.minecraft.world.level.GameType
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object TabListData {
     private var tablistCache = emptyList<String>()
@@ -80,7 +78,7 @@ object TabListData {
         }
     }
 
-    fun copyCommand(args: Array<String>) {
+    private fun copyCommand(noColor: Boolean) {
         if (debugCache != null) {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
@@ -91,7 +89,6 @@ object TabListData {
         }
 
         val resultList = mutableListOf<String>()
-        val noColor = args.size == 1 && args[0] == "true"
         for (line in getTabList()) {
             val tabListLine = line.transformIf({ noColor }) { removeColor() }
             if (tabListLine != "") resultList.add("'$tabListLine'")
@@ -198,14 +195,20 @@ object TabListData {
         }
     }
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtesttablist") {
+        event.registerBrigadier("shtesttablist") {
             description = "Set your clipboard as a fake tab list."
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleDebug() }
+            simpleCallback { toggleDebug() }
+        }
+        event.registerBrigadier("shcopytablist") {
+            description = "Copies the tab list data to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("nocolor", BrigadierArguments.bool()) { noColor ->
+                callback { copyCommand(getArg(noColor)) }
+            }
+            simpleCallback { copyCommand(false) }
         }
     }
-    //#endif
 }

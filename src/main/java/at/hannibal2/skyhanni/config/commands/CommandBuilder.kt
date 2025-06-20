@@ -39,7 +39,9 @@ sealed class CommandBuilderBase(override val name: String) : CommandData {
 
 class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O>>(name: String) : CommandBuilderBase(name) {
     lateinit var specifiers: Collection<A>
+    //#if TODO
     lateinit var context: (ComplexCommand<O>) -> O
+    //#endif
 
     private var realDescription: String = ""
 

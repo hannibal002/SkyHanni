@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,7 +17,6 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object NotificationManager {
 
@@ -80,12 +78,14 @@ object NotificationManager {
     //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestnotification") {
+        event.registerBrigadier("shtestnotification") {
             description = "Shows a test notification"
             category = CommandCategory.DEVELOPER_TEST
-            callback {
-                val testingText = it.joinToString(" ").replace("\\n", "\n")
-                queueNotification(SkyHanniNotification(testingText, Duration.INFINITE))
+            arg("notification", BrigadierArguments.greedyString()) {
+                callback {
+                    val testingText = getArg(it).replace("\\n", "\n")
+                    queueNotification(SkyHanniNotification(testingText, Duration.INFINITE))
+                }
             }
         }
     }

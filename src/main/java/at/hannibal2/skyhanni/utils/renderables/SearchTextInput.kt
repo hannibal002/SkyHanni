@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 class SearchTextInput : TextInput() {
 
@@ -32,7 +32,7 @@ class SearchTextInput : TextInput() {
             }
         }
 
-        fun isEnabled() = LorenzUtils.inSkyBlock && config.resetSearchGuiOnClose
+        fun isEnabled() = SkyBlockUtils.inSkyBlock && config.resetSearchGuiOnClose
     }
 
 }

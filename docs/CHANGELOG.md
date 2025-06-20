@@ -7,6 +7,7 @@
 #### Garden
 
 + Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
++ Added option to mute Vacuum in the Garden. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4051)
 
 #### Combat
 
@@ -22,6 +23,7 @@
 + Added Powder Chest Timer in Crystal Hollows. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2204)
     + Despawn timer below every chest, and as GUI display.
     + Chests color-coded to show despawn timer.
++ Added option to mute High Heat Sound in Magma Fields. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2573)
 
 #### GUI
 
@@ -107,6 +109,7 @@
 + Fixed Pest Particle Waypoints. - Empa (https://github.com/hannibal002/SkyHanni/pull/3924)
     + This replaces the Pest Particle Line feature, which was supposed to be a temporary fix when Pest Particle Waypoints was broken.
 + Fixed Custom Scoreboard error when visiting a garden. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3948)
++ Fixed Pest Spawn Timer displaying incorrectly. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4059)
 
 #### Chat
 
@@ -119,6 +122,7 @@
 + Fixed Craft Room Holographic Helper requiring NEU to be installed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3894)
 + Fixed Sun Gecko Helper sometimes not showing up. - Luna (https://github.com/hannibal002/SkyHanni/pull/3920)
 + Fixed Blood Ichor line sometimes not displaying during Rift Slayer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3976)
++ Fixed Rift Feature Enigma Rose's End Flowerpot showing its waypoint when disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4091)
 
 #### Inventory
 
@@ -172,6 +176,10 @@
     + Made private variables public to fix related issue.
     + Cleaned up code.
 + Fixed Fast Fairy Souls Pathfinder not detecting already found fairy souls from the quest menu. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4044)
++ Fixed clicks on Fairy Souls not detected while falling. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4085)
++ Fixed Custom Scoreboard Party Display persisting for 5 minutes after the leader disconnects from a two-player party. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4058)
++ Fixed Fairy Soul Pathfinder sometimes displaying paths from the previous island. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4056)
+    + Switching islands during path calculation triggered the issue.
 
 ### Technical Details
 
@@ -233,6 +241,21 @@
 + Removed `String.toChromaColor()`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4023)
 + Reverted #3821. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4023)
 + Updated MoulConfig to 3.9.0. - nopo (https://github.com/hannibal002/SkyHanni/pull/3903)
++ Added ability to disable config options per version. - nopo (https://github.com/hannibal002/SkyHanni/pull/3931)
++ Added ColoredBlockCompat. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3915)
+    + Supports colored blocks in modern version (glass, wool, stained clay).
++ Added OtherInventoryData and miscellaneous 1.21 updates. - nopo (https://github.com/hannibal002/SkyHanni/pull/3966)
++ Added support for 2025 Balloon Hats in Item Resolution Query. - jani (https://github.com/hannibal002/SkyHanni/pull/4057)
++ Bumped NEU to 2.6.0 in dev environment. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4089)
++ Changed Bucket Trackers to accept a KClass constructor parameter to avoid reflection. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4072)
++ Converted some commands to use Brigadier. - nopo (https://github.com/hannibal002/SkyHanni/pull/3960)
++ Moved all 3D rendering from RenderUtils to WorldRenderUtils. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3970)
+    + Added a bunch of deprecations relating to this.
++ Prevented duplicate function registration across event parameter combinations. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4070)
++ Reduced boilerplate in Cache classes. - Empa (https://github.com/hannibal002/SkyHanni/pull/3992)
++ Reduced duplication in Heat Detection and Custom Scoreboard patterns. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4049)
++ Synchronized Bucket Tracker methods with base trackers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4072)
++ Updated Gradle to 8.14.2. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4088)
 
 ## Version 3.0.0
 

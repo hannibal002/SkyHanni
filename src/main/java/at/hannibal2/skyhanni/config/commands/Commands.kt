@@ -4,12 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
-import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
@@ -27,32 +24,22 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
-import at.hannibal2.skyhanni.test.command.CopyActionBarCommand
-import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
-import at.hannibal2.skyhanni.test.command.CopyItemCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
@@ -70,23 +57,9 @@ object Commands {
         usersBugFix(event)
         devTest(event)
         devDebug(event)
-        internalCommands(event)
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
-        event.register("sh") {
-            aliases = listOf("skyhanni")
-            description = "Opens the main SkyHanni config"
-            callback { ConfigGuiManager.onCommand(it) }
-        }
-        event.register("ff") {
-            description = "Opens the Farming Fortune Guide"
-            callback { FFGuideGui.onCommand() }
-        }
-        event.register("shwords") {
-            description = "Opens the config list for modifying visual words"
-            callback { VisualWordGui.onCommand() }
-        }
         event.register("shnavigate") {
             description = "Using path finder to go to locations"
             callback { NavigationHelper.onCommand(it) }
@@ -219,11 +192,6 @@ object Commands {
     }
 
     private fun usersBugFix(event: CommandRegistrationEvent) {
-        event.register("shupdaterepo") {
-            description = "Download the SkyHanni repo again"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { RepoManager.updateRepo() }
-        }
         event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"
             category = CommandCategory.USERS_BUG_FIX
@@ -244,11 +212,6 @@ object Commands {
             category = CommandCategory.USERS_BUG_FIX
             callback { CaptureFarmingGear.handelCarrolyn(it) }
         }
-        event.register("shrepostatus") {
-            description = "Shows the status of all the mods constants"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { RepoManager.displayRepoStatus(false) }
-        }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
             category = CommandCategory.USERS_BUG_FIX
@@ -259,19 +222,9 @@ object Commands {
             category = CommandCategory.USERS_BUG_FIX
             callback { HypixelBazaarFetcher.fetchNow() }
         }
-        event.register("shedittracker") {
-            description = "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { TrackerManager.commandEditTracker(it) }
-        }
     }
 
     private fun devDebug(event: CommandRegistrationEvent) {
-        event.register("shdebug") {
-            description = "Copies SkyHanni debug data in the clipboard."
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { DebugCommand.command(it) }
-        }
         event.register("shconfig") {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
@@ -355,36 +308,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_DEBUG
             callback { SkyHanniDebugsAndTests.copyLocation(it) }
         }
-        event.register("shcopyentities") {
-            description = "Copies entities in the specified radius around the player to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyNearbyEntitiesCommand.command(it) }
-        }
-        event.register("shcopytablist") {
-            description = "Copies the tab list data to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { TabListData.copyCommand(it) }
-        }
-        event.register("shcopyactionbar") {
-            description = "Copies the action bar to the clipboard, including formatting codes"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyActionBarCommand.command(it) }
-        }
-        event.register("shcopyscoreboard") {
-            description = "Copies the scoreboard data to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyScoreboardCommand.command(it) }
-        }
-        event.register("shcopybossbar") {
-            description = "Copies the name of the bossbar to the clipboard, including formatting codes"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyBossbarCommand.command(it) }
-        }
-        event.register("shcopyitem") {
-            description = "Copies information about the item in hand to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyItemCommand.command() }
-        }
     }
 
     @Suppress("LongMethod")
@@ -393,11 +316,6 @@ object Commands {
             description = "Unused test command."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.testCommand(it) }
-        }
-        event.register("shreloadlocalrepo") {
-            description = "Reloading the local repo data"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { RepoManager.reloadLocalRepo() }
         }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"
@@ -443,14 +361,6 @@ object Commands {
             description = "Manually saving the config"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
-        }
-    }
-
-    private fun internalCommands(event: CommandRegistrationEvent) {
-        event.register("shaction") {
-            description = "Internal command for chat click actions"
-            category = CommandCategory.INTERNAL
-            callback { ChatClickActionManager.onCommand(it) }
         }
     }
 }

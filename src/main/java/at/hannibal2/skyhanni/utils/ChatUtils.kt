@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-//#if TODO
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
-//#endif
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 //#if TODO
@@ -13,12 +11,11 @@ import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-//#if TODO
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-//#endif
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
@@ -62,11 +59,7 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ) {
-        //#if TODO
-        val debug = LorenzUtils.debug
-        //#else
-        //$$ val debug = true
-        //#endif
+        val debug = SkyHanniDebugsAndTests.enabled
         if (debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             consoleLog("[Debug] $message")
         }
@@ -444,7 +437,7 @@ object ChatUtils {
     //$$ fun GuiMessage<Component>.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime).ticks
     //#else
     //$$ val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
-    //$$ fun ChatHudLine.passedSinceSent() = ((MinecraftClient.getInstance().inGameHud.ticks - creationTick) * 50).milliseconds
+    //$$ fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
     //#endif
 
     fun consoleLog(text: String) {

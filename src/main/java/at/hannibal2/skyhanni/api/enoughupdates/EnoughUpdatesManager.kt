@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -55,7 +53,6 @@ import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
 //#endif
 
-// todo 1.21 impl needed
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
@@ -337,7 +334,7 @@ object EnoughUpdatesManager {
             replacements["LVL"] = level.toString()
         } else {
             neuPetsJson?.customPetLeveling?.get(petName)?.let { petLeveling ->
-                val maxLevel = petLeveling.asJsonObject.get("maxLevel")?.asInt ?: 100
+                val maxLevel = petLeveling.maxLevel ?: 100
                 replacements["LVL"] = "1➡$maxLevel"
             } ?: run { replacements["LVL"] = "1➡100" }
         }
@@ -474,24 +471,24 @@ object EnoughUpdatesManager {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         if (!PlatformUtils.isNeuLoaded()) {
-            event.register("neureloadrepo") {
+            event.registerBrigadier("neureloadrepo") {
                 aliases = listOf("shreloadneurepo")
                 description = "Reloads the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
-                callback { reloadRepo() }
+                simpleCallback { reloadRepo() }
             }
-            event.register("neuresetrepo") {
+            event.registerBrigadier("neuresetrepo") {
                 aliases = listOf("shresetneurepo")
                 description = "Redownload the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
-                callback { downloadRepo() }
+                simpleCallback { downloadRepo() }
             }
         }
 
-        event.register("shneurepostatus") {
+        event.registerBrigadier("shneurepostatus") {
             description = "Get the status of the NEU repo"
             category = CommandCategory.DEVELOPER_TEST
-            callback {
+            simpleCallback {
                 val loadedItems = itemMap.size
                 val directorySize = itemCountInRepoFolder()
 

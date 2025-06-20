@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -444,14 +443,14 @@ object HoppityCollectionStats {
 
         residentRabbitPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("island")) ?: return@firstMatcher
-            if (island.isInIsland() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.RESIDENTS)) {
+            if (island.isCurrent() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.RESIDENTS)) {
                 highlightMap[stack.displayName] = HighlightRabbitTypes.RESIDENTS.color
             }
         }
 
         hotspotLocationPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("location")) ?: return@firstMatcher
-            if (island.isInIsland() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.HOTSPOTS)) {
+            if (island.isCurrent() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.HOTSPOTS)) {
                 highlightMap[stack.displayName] = HighlightRabbitTypes.HOTSPOTS.color
             }
         }
