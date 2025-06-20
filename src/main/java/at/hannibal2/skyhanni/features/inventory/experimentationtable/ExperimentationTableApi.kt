@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -244,6 +243,16 @@ object ExperimentationTableApi {
     private val bookPattern by patternGroup.pattern(
         "book",
         "§9(?<enchant>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §dGuardian
+     * REGEX-TEST: §9Guardian§e
+     * REGEX-TEST: §5Guardian
+     */
+    private val guardianPetNamePattern by patternGroup.pattern(
+        "guardianpet",
+        "§(?<color>[956d])Guardian.*",
     )
 
     /**
@@ -465,8 +474,7 @@ object ExperimentationTableApi {
         if (this.endsWith("Superpairs clicks")) return
 
         guardianPetNamePattern.matchMatcher(this) {
-            val color = group("color")[0].toLorenzColor() ?: return@matchMatcher
-            val rarity = LorenzRarity.getByColor(color) ?: return@matchMatcher
+            val rarity = LorenzRarity.getByColorCode(group("color")[0]) ?: return@matchMatcher
             val internalName = "GUARDIAN;${rarity.id}".toInternalName()
             currentExperimentData.addReward(internalName, 1)
             return
