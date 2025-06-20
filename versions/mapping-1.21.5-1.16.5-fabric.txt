@@ -27,6 +27,7 @@ net.minecraft.entity.Entity getId() getEntityId()
 net.minecraft.entity.Entity lastX prevX
 net.minecraft.entity.Entity lastY prevY
 net.minecraft.entity.Entity lastZ prevZ
+net.minecraft.entity.Entity trackedPosition.getPos() getTrackedPosition()
 
 net.minecraft.entity.decoration.ArmorStandEntity shouldShowBasePlate().not() shouldHideBasePlate()
 

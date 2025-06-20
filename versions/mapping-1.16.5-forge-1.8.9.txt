@@ -312,6 +312,9 @@ net.minecraft.world.entity.Entity getUUID() getUniqueID()
 net.minecraft.world.entity.Entity isOnFire() isBurning()
 net.minecraft.world.entity.Entity isOnGround onGround
 net.minecraft.world.entity.Entity level worldObj
+net.minecraft.world.entity.Entity packetCoordinates.x serverPosX
+net.minecraft.world.entity.Entity packetCoordinates.y serverPosY
+net.minecraft.world.entity.Entity packetCoordinates.z serverPosZ
 net.minecraft.world.entity.Entity position.x posX
 net.minecraft.world.entity.Entity position.y posY
 net.minecraft.world.entity.Entity position.z posZ
