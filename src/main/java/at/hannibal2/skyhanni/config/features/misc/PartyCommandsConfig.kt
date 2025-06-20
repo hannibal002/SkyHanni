@@ -8,23 +8,37 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class PartyCommandsConfig {
     @Expose
     @ConfigEditorDropdown
-    @ConfigOption(name = "Party Command Trust Level", desc = "Choose who can run party chat commands.")
+    @ConfigOption(name = "Trust Level", desc = "Choose who can run party chat commands.")
     var requiredTrustLevel: TrustedUser = TrustedUser.FRIENDS
 
     @Expose
     @ConfigEditorBoolean
-    @ConfigOption(name = "Party Transfer", desc = "Automatically transfer the party to people who type §b!ptme")
+    @ConfigOption(name = "Party Transfer", desc = "Automatically transfer the party to people who type §b!ptme§7.")
     var transferCommand: Boolean = false
 
     @Expose
     @ConfigEditorBoolean
-    @ConfigOption(name = "Party Warp", desc = "Automatically warp the party if someone types §b!warp")
+    @ConfigOption(name = "Party Warp", desc = "Automatically warp the party if someone types §b!warp§7.")
     var warpCommand: Boolean = false
 
     @Expose
     @ConfigEditorBoolean
-    @ConfigOption(name = "Party All Invite", desc = "Automatically turn on allinvite if someone types §b!allinv")
+    @ConfigOption(name = "Party All Invite", desc = "Automatically turn on allinvite if someone types §b!allinv§7.")
     var allInviteCommand: Boolean = false
+
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(
+        name = "Ping",
+        desc = "Sends current ping into Party Chat if someone types §b!ping§7.\n" +
+            "§cNote: Will not work correctly with the Hypixel Ping API turned off in Dev."
+    )
+    var pingCommand: Boolean = false
+
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(name = "TPS", desc = "Sends current TPS into Party Chat if someone types §b!tps§7.")
+    var tpsCommand: Boolean = false;
 
     enum class TrustedUser(private val displayName: String) {
         BEST_FRIENDS("Best Friends"),
