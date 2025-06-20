@@ -42,14 +42,5 @@ class ExtendedChatColor(
                 }
             }
         }
-
-        @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
-            event.registerBrigadier("shtestrainbow") {
-                description = "Sends a rainbow in chat"
-                category = CommandCategory.DEVELOPER_TEST
-                callback { testCommand() }
-            }
-        }
     }
 }

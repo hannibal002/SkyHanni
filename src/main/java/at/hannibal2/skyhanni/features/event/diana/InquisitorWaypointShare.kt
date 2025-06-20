@@ -326,13 +326,4 @@ object InquisitorWaypointShare {
             SoundUtils.createSound(name, pitch).playSound()
         }
     }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shtestinquisitor") {
-            description = "Test the inquisitor waypoint share"
-            category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { test() }
-        }
-    }
 }

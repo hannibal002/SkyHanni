@@ -37,15 +37,6 @@ class RepoPatternGui private constructor() {
                 }
             }
         }
-
-        @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
-            event.registerBrigadier("shrepopatterns") {
-                description = "See where regexes are loaded from"
-                category = CommandCategory.DEVELOPER_TEST
-                simpleCallback { open() }
-            }
-        }
     }
 
     @field:Bind

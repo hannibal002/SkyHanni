@@ -290,12 +290,4 @@ object GardenApi {
             }
         }
     }
-
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresetcropspeed") {
-            description = "Resets garden crop speed data and best crop time data"
-            category = CommandCategory.USERS_RESET
-            callback { resetCropSpeed() }
-        }
-    }
 }
