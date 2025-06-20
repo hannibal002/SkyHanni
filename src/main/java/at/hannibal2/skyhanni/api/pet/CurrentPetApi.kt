@@ -27,7 +27,7 @@ object CurrentPetApi {
      */
     private val chatSummonPattern by patternGroup.pattern(
         "chat.summon",
-        "§aYou summoned your §r§(?<rarity>.)(?<pet>[^§]+)(?:§r(?<skin>§. ✦))?§r§a!"
+        "§aYou summoned your §r§(?<rarity>.)(?<pet>[^§]+)(?:§r(?<skin>§. ✦))?§r§a!",
     )
 
     val currentPet: PetData?
@@ -46,7 +46,12 @@ object CurrentPetApi {
         return comparisonResult >= 0
     }
 
-    enum class PetDataAssertionSource { TAB, AUTOPET, MENU }
+    enum class PetDataAssertionSource {
+        TAB,
+        AUTOPET,
+        MENU,
+    }
+
     private val lastAssertion: MutableMap<PetDataAssertionSource, SimpleTimeMark> = enumMapOf()
 
     fun assertFoundCurrentData(petData: PetData, source: PetDataAssertionSource) {

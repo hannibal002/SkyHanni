@@ -60,7 +60,7 @@ object PetStorageApi {
      */
     val mainPetMenuNamePattern by patternGroup.pattern(
         "menu.gui.name",
-        "Pets(?:: \"(?<search>.*)\")?(?: \\((?<currentpage>\\d+)\\/(?<maxpage>\\d+)\\))? ?"
+        "Pets(?:: \"(?<search>.*)\")?(?: \\((?<currentpage>\\d+)\\/(?<maxpage>\\d+)\\))? ?",
     )
 
     /**
@@ -75,7 +75,7 @@ object PetStorageApi {
     @Suppress("MaxLineLength")
     private val petTabWidgetNamePattern by patternGroup.pattern(
         "tab.name",
-        " (?:§.)+\\[Lvl (?<level>[\\d,]+)] (?:(?:§.)+\\[(?:§.)+\\d+(?<altskin>§.✦)\\] )?(?:§.)+§(?<rarity>.)?(?<pet>[\\w ]+)(?:§r(?<skin>§. ✦))?"
+        " (?:§.)+\\[Lvl (?<level>[\\d,]+)] (?:(?:§.)+\\[(?:§.)+\\d+(?<altskin>§.✦)\\] )?(?:§.)+§(?<rarity>.)?(?<pet>[\\w ]+)(?:§r(?<skin>§. ✦))?",
     )
 
     /**
@@ -90,7 +90,7 @@ object PetStorageApi {
     @Suppress("MaxLineLength")
     private val petTabWidgetXpPattern by patternGroup.pattern(
         "tab.xp",
-        " (?:§.)+(?:(?<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:§.|\\/)*(?<next>[\\d,.kM]*) XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)"
+        " (?:§.)+(?:(?<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:§.|\\/)*(?<next>[\\d,.kM]*) XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)",
     )
 
     /**
@@ -101,7 +101,7 @@ object PetStorageApi {
      */
     private val petMenuSelectedPetNamePattern by patternGroup.pattern(
         "menu.selected.name",
-        "(?:§.)+Selected pet: §(?<rarity>[^c])(?<pet>[\\w ]+)(?<skin>§. ✦)?"
+        "(?:§.)+Selected pet: §(?<rarity>[^c])(?<pet>[\\w ]+)(?<skin>§. ✦)?",
     )
 
     /**
@@ -112,7 +112,7 @@ object PetStorageApi {
      */
     private val petMenuSelectedPetProgressPattern by patternGroup.pattern(
         "menu.selected.progress",
-        "(?:§.)+(?:MAX LEVEL|Progress to Level (?<next>\\d+): (?:§.)+(?<percentage>[\\d.]+)%)"
+        "(?:§.)+(?:MAX LEVEL|Progress to Level (?<next>\\d+): (?:§.)+(?<percentage>[\\d.]+)%)",
     )
 
     /**
@@ -124,7 +124,7 @@ object PetStorageApi {
      */
     private val petMenuSelectedPetXpPattern by patternGroup.pattern(
         "menu.selected.xp",
-        "(?:§.|▸| )+(?<current>[\\d,.kM]+)(?: XP|(?:§.|\\/)+(?<next>[\\d,.kM]+))"
+        "(?:§.|▸| )+(?<current>[\\d,.kM]+)(?: XP|(?:§.|\\/)+(?<next>[\\d,.kM]+))",
     )
 
     /**
@@ -136,7 +136,7 @@ object PetStorageApi {
     @Suppress("MaxLineLength")
     private val autoPetMessagePattern by patternGroup.pattern(
         "autopet.message",
-        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?:(?:§.)+\\[(?:§.)+\\d+(?<altskin>§.✦)\\] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+)(?<skin>§. ✦)?§e! §a§lVIEW RULE"
+        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?:(?:§.)+\\[(?:§.)+\\d+(?<altskin>§.✦)\\] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+)(?<skin>§. ✦)?§e! §a§lVIEW RULE",
     )
 
     /**
@@ -144,7 +144,7 @@ object PetStorageApi {
      */
     private val autoPetHoverHeldItemPattern by patternGroup.pattern(
         "autopet.hover.helditem",
-        "§aHeld Item: (?<item>.*)"
+        "§aHeld Item: (?<item>.*)",
     )
     // </editor-fold>
 
@@ -254,6 +254,7 @@ object PetStorageApi {
                     ProfileStorageData.profileSpecific?.currentPetUuid = null
                 }
             }
+
             0 -> { // Left click - if not a shift click, summon/un-summon pet
                 if (KeyboardManager.isShiftKeyDown()) return
                 ProfileStorageData.profileSpecific?.currentPetUuid = when (currentPetUuid) {
@@ -261,6 +262,7 @@ object PetStorageApi {
                     else -> petInfo.uniqueId // Summon
                 }
             }
+
             else -> return
         }
         saveConfig()
@@ -386,7 +388,7 @@ object PetStorageApi {
                     it.displayName != "§7No pet in slot"
                 } ?: return@map null
                 slotItem.getPetInfo()?.uniqueId
-            }
+            },
         )
     }
 
@@ -406,6 +408,6 @@ object PetStorageApi {
         { heldItem == null || it.heldItemInternalName == heldItem },
         { skinTag == null || it.skinTag == skinTag },
         { level == null || it.level == level },
-        { exp == null || abs((it.exp ?: 0.0) - exp) < (exp * expErrorFactor) }
+        { exp == null || abs((it.exp ?: 0.0) - exp) < (exp * expErrorFactor) },
     )
 }
