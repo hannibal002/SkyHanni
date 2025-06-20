@@ -263,7 +263,6 @@ at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker.kt
 at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker.kt
-at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.kt
 at.hannibal2.skyhanni.features.fame.ReminderUtils.kt
 at.hannibal2.skyhanni.features.fishing.FishingApi.kt
