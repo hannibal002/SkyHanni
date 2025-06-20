@@ -38,7 +38,7 @@ class PartyCommandsConfig {
     @Expose
     @ConfigEditorBoolean
     @ConfigOption(name = "TPS", desc = "Sends current TPS into Party Chat if someone types §b!tps§7.")
-    var tpsCommand: Boolean = false;
+    var tpsCommand: Boolean = false
 
     enum class TrustedUser(private val displayName: String) {
         BEST_FRIENDS("Best Friends"),
