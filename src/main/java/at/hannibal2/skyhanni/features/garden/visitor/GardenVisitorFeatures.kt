@@ -53,9 +53,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-//#endif
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
@@ -379,9 +377,7 @@ object GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
-        //#if TODO
         event.parent.drawString(location.up(2.23), text)
-        //#endif
         if (config.rewardWarning.showOverName) {
             val initialOffset = 2.73
             val heightOffset = 0.25
@@ -389,9 +385,7 @@ object GardenVisitorFeatures {
             visitor.getRewardWarningAwards().forEach { reward ->
                 val name = reward.displayName
                 val offset = initialOffset + (counter * heightOffset)
-                //#if TODO
                 event.parent.drawString(location.up(offset), "§c§l! $name §c§l!")
-                //#endif
                 counter++
             }
         }
@@ -690,14 +684,12 @@ object GardenVisitorFeatures {
 
     private fun showGui(): Boolean {
         if (IslandType.HUB.isCurrent()) {
-            //#if TODO
             if (config.shoppingList.inBazaarAlley && SkyBlockUtils.graphArea == "Bazaar Alley") {
                 return true
             }
             if (config.shoppingList.inFarmingAreas && SkyBlockUtils.graphArea == "Farm") {
                 return true
             }
-            //#endif
         }
         if (config.shoppingList.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isCurrent()) return true
         if (hideExtraGuis()) return false

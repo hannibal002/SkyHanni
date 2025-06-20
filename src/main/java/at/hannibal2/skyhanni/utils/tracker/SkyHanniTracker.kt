@@ -7,10 +7,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
-//#if TODO
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -26,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNull
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -89,9 +88,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun renderDisplay(position: Position) {
-        //#if TODO
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
-        //#endif
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
         if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
@@ -111,7 +108,7 @@ open class SkyHanniTracker<Data : TrackerData>(
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
                 if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
-                else buildFinalDisplay(Renderable.verticalContainer(searchables.toRenderable()))
+                else buildFinalDisplay(VerticalContainerRenderable(searchables.toRenderable()))
             }.orEmpty()
             dirty = false
         }
@@ -241,9 +238,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            //#if TODO
             TitleManager.sendTitle("§a+ $itemName", weight = price)
-            //#endif
         }
     }
 

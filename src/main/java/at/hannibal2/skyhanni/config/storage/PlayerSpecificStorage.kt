@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.config.storage
 
-//#if TODO
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
-//#endif
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
@@ -26,18 +24,14 @@ class PlayerSpecificStorage {
     @Expose
     var fameRank: String = "New Player"
 
-    //#if TODO
     @Expose
     var currentChat: CurrentChatDisplay.ChatType? = null
-    //#endif
 
     @Expose
     var nextCityProjectParticipationTime: SimpleTimeMark = farPast()
 
-    //#if TODO
     @Expose
     var communityShopAccountUpgrade: CommunityShopUpgrade? = null
-    //#endif
 
     @Expose
     var guildMembers: MutableList<String> = mutableListOf()
@@ -63,10 +57,8 @@ class PlayerSpecificStorage {
         @Expose
         var tierOneMinionsDone: MutableSet<NeuInternalName> = mutableSetOf()
 
-        //#if TODO
         @Expose
         var goals: MutableMap<Int, BingoGoal> = mutableMapOf()
-        //#endif
     }
 
     @Expose

@@ -10,23 +10,28 @@ import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
+import at.hannibal2.skyhanni.features.misc.CurrentPing
+import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PartyChatCommands {
-
     private val config get() = SkyHanniMod.feature.misc.partyCommands
     private val storage get() = SkyHanniMod.feature.storage
+    private val devConfig get() = SkyHanniMod.feature.dev
 
     data class PartyChatCommand(
         val names: List<String>,
         val isEnabled: () -> Boolean,
-        val requiresPartyLead: Boolean,
+        val requiresPartyLead: Boolean = true,
+        val triggerableBySelf: Boolean = true,
         val executable: (PartyChatEvent) -> Unit,
     )
 
@@ -37,7 +42,7 @@ object PartyChatCommands {
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
             { config.transferCommand },
-            requiresPartyLead = true,
+            triggerableBySelf = false,
             executable = {
                 HypixelCommands.partyTransfer(it.cleanedAuthor)
             },
@@ -45,7 +50,6 @@ object PartyChatCommands {
         PartyChatCommand(
             listOf("pw", "warp", "warpus"),
             { config.warpCommand && lastWarp.passedSince() > 5.seconds },
-            requiresPartyLead = true,
             executable = {
                 lastWarp = SimpleTimeMark.now()
                 HypixelCommands.partyWarp()
@@ -54,10 +58,43 @@ object PartyChatCommands {
         PartyChatCommand(
             listOf("allinv", "allinvite"),
             { config.allInviteCommand && lastAllInvite.passedSince() > 2.seconds },
-            requiresPartyLead = true,
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
                 HypixelCommands.partyAllInvite()
+            },
+        ),
+        PartyChatCommand(
+            listOf("ping"),
+            { config.pingCommand },
+            requiresPartyLead = false,
+            executable = {
+
+                if (!devConfig.hypixelPingApi) {
+
+                    ChatUtils.clickableChat(
+                        "Hypixel Ping Api is disabled, ping command won't work!",
+                        prefixColor = "§c",
+                        onClick = {
+                            devConfig::hypixelPingApi.jumpToEditor()
+                        },
+                        hover = "§eClick to find setting in the config!",
+                    )
+                    return@PartyChatCommand
+                }
+                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms", prefix = true)
+
+            },
+        ),
+        PartyChatCommand(
+            listOf("tps"),
+            { config.tpsCommand },
+            requiresPartyLead = false,
+            executable = {
+                if (TpsCounter.tps != null) {
+                    HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}", prefix = true)
+                } else {
+                    ChatUtils.chat("TPS Command Sent too early to calculate TPS")
+                }
             },
         ),
     )
@@ -92,8 +129,7 @@ object PartyChatCommands {
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         val name = event.cleanedAuthor
-
-        if (name == PlayerUtils.getName()) return
+        if (name == PlayerUtils.getName() && !command.triggerableBySelf) return
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyApi.partyLeader != PlayerUtils.getName()) return
         if (isBlockedUser(name)) {

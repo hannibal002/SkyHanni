@@ -31,20 +31,10 @@ object QuiverWarning {
     private var lastLowQuiverReminder = SimpleTimeMark.farPast()
     private val arrowsInInstance = mutableSetOf<ArrowType>()
 
-    @HandleEvent
-    fun onDungeonComplete(event: DungeonCompleteEvent) {
-        onInstanceComplete()
-    }
-
-    @HandleEvent
-    fun onKuudraComplete(event: KuudraCompleteEvent) {
-        onInstanceComplete()
-    }
-
-    private fun onInstanceComplete() {
-        val arrows = arrowsInInstance
+    @HandleEvent(eventTypes = [DungeonCompleteEvent::class, KuudraCompleteEvent::class])
+    fun onInstanceComplete() {
+        val arrows = arrowsInInstance.filterTo(mutableSetOf()) { it.amount <= config.lowQuiverAmount }
         arrowsInInstance.clear()
-        arrows.filter { it.amount <= config.lowQuiverAmount }
 
         if (arrows.isNotEmpty() && config.reminderAfterRun) {
             DelayedRun.runNextTick {
@@ -85,11 +75,9 @@ object QuiverWarning {
     }
 
     @HandleEvent
-    fun onWorldChange() {
-        arrowsInInstance.clear()
-    }
+    fun onWorldChange() = arrowsInInstance.clear()
 
-    private fun inInstance() = DungeonApi.inDungeon() || KuudraApi.inKuudra()
+    private fun inInstance() = DungeonApi.inDungeon() || KuudraApi.inKuudra
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

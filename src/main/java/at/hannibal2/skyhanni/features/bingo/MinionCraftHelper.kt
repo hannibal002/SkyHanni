@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasHypixelEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -22,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -58,7 +58,7 @@ object MinionCraftHelper {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
         val mainInventory = InventoryUtils.getItemsInOwnInventory()
@@ -242,7 +242,7 @@ object MinionCraftHelper {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
         config.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
@@ -265,7 +265,7 @@ object MinionCraftHelper {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {
