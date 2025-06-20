@@ -32,6 +32,7 @@
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
     <ID>LargeClass:WorldRenderUtils.kt$WorldRenderUtils</ID>
+    <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
     <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>

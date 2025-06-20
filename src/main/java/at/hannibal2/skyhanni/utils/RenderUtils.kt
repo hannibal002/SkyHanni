@@ -715,6 +715,50 @@ object RenderUtils {
     }
 
     /**
+     * Method to draw a rounded rectangle.
+     *
+     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
+     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
+     *
+     * @param color color of rect
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
+     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
+     * It is best kept at its default.
+     */
+    fun drawRoundGradientRect(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        topColor: Int,
+        bottomColor: Int,
+        radius: Int = 10,
+        smoothness: Int = 1,
+    ) {
+        val scaledRes = GuiScreenUtils.scaleFactor
+        val widthIn = width * scaledRes
+        val heightIn = height * scaledRes
+        val xIn = x * scaledRes
+        val yIn = y * scaledRes
+
+        RoundedRectangleShader.scaleFactor = scaledRes.toFloat()
+        RoundedRectangleShader.radius = radius.toFloat()
+        RoundedRectangleShader.smoothness = smoothness.toFloat()
+        RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+
+        DrawContextUtils.pushMatrix()
+        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
+
+        GuiRenderUtils.drawGradientRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
+
+        ShaderManager.disableShader()
+        DrawContextUtils.popMatrix()
+    }
+
+    /**
      * Method to draw the outline of a rounded rectangle with a color gradient. For a single color just pass
      * in the color to both topColor and bottomColor.
      *
