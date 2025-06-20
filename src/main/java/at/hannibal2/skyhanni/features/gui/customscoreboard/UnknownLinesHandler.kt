@@ -74,6 +74,18 @@ object UnknownLinesHandler {
             }
         }
 
+        // Remove agathes contest
+        for (i in 1..2) {
+            unknownLines = unknownLines.filter {
+                sidebarLines.nextAfter(
+                    sidebarLines.firstOrNull { line ->
+                        SBPattern.agathasContestPattern.matches(line)
+                    } ?: "§eAgatha's Contest",
+                    i,
+                ) != it
+            }
+        }
+
         // Remove slayer
         for (i in 1..2) {
             unknownLines = unknownLines.filter {
