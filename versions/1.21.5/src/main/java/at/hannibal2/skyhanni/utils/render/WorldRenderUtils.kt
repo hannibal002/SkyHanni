@@ -14,22 +14,50 @@ import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.BufferBuilder
+import net.minecraft.client.render.LightmapTextureManager
+import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer
+import net.minecraft.client.util.BufferAllocator
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Box
+import org.joml.Matrix4f
 import java.awt.Color
+
 
 object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
-    private fun SkyHanniRenderWorldEvent.renderBeaconBeam(
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
+        this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
+    }
+
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
         z: Double,
         rgb: Int,
     ) {
-        TODO()
+        val camera = context.camera()
+        val matrices = context.matrixStack() ?: return
+        matrices.push()
+        matrices.translate(x - camera.pos.x, y - camera.pos.y, z - camera.pos.z)
+        BeaconBlockEntityRenderer.renderBeam(
+            matrices,
+            context.consumers(),
+            beaconBeam,
+            partialTicks,
+            1f,
+            context.world().time,
+            0,
+            319,
+            rgb,
+            0.2f,
+            0.25f,
+        )
+        matrices.pop()
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -141,13 +169,46 @@ object WorldRenderUtils {
         drawString(location, text, seeThroughBlocks, color)
     }
 
+    private val bufferAllocator: BufferAllocator = BufferAllocator(1536)
+
     fun SkyHanniRenderWorldEvent.drawString(
-        location: LorenzVec,
+        loc: LorenzVec,
         text: String,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
     ) {
-        TODO()
+        val matrix = Matrix4f()
+        val camera = context.camera()
+        val cameraPos = camera.pos
+        val fr = MinecraftClient.getInstance().textRenderer
+
+        val scale = 0.025f
+
+        matrix.translate(
+                (loc.x - cameraPos.getX()).toFloat(),
+                (loc.y - cameraPos.getY()).toFloat(),
+                (loc.z - cameraPos.getZ()).toFloat(),
+            ).rotate(camera.rotation).scale(scale, -scale, scale)
+
+        val x = -fr.getWidth(text) / 2f
+
+        val consumers = VertexConsumerProvider.immediate(bufferAllocator)
+
+        // todo meant to call drawNametag() here
+
+        fr.draw(
+            text,
+            x,
+            0f,
+            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
+            false,
+            matrix,
+            consumers,
+            if (seeThroughBlocks) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
+            0,
+            LightmapTextureManager.MAX_LIGHT_COORDINATE,
+        )
+        consumers.draw()
     }
 
     private fun SkyHanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
@@ -472,7 +533,11 @@ object WorldRenderUtils {
     fun Box.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
-        TODO()
+        if (!entity.isAlive) return entity.getLorenzVec()
+        val x = entity.lastRenderX + (entity.x - entity.lastRenderX) * partialTicks
+        val y = entity.lastRenderY + (entity.y - entity.lastRenderY) * partialTicks
+        val z = entity.lastRenderZ + (entity.z - entity.lastRenderZ) * partialTicks
+        return LorenzVec(x, y, z)
     }
 
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)

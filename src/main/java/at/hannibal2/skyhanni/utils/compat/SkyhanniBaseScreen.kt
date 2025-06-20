@@ -34,7 +34,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$     }
     //#endif
 
-    open fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {}
+    open fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {}
 
     //#if MC < 1.21
     final override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
