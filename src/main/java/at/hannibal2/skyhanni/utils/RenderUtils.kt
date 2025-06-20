@@ -743,6 +743,7 @@ object RenderUtils {
         val xIn = x * scaledRes
         val yIn = y * scaledRes
 
+        //#if TODO
         RoundedRectangleShader.scaleFactor = scaledRes.toFloat()
         RoundedRectangleShader.radius = radius.toFloat()
         RoundedRectangleShader.smoothness = smoothness.toFloat()
@@ -756,6 +757,7 @@ object RenderUtils {
 
         ShaderManager.disableShader()
         DrawContextUtils.popMatrix()
+        //#endif
     }
 
     /**
