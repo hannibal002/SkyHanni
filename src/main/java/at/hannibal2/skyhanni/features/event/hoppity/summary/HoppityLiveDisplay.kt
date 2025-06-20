@@ -42,12 +42,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.renderables.HorizontalRenderableContainer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableContainer
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
-import at.hannibal2.skyhanni.utils.renderables.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -388,12 +388,12 @@ object HoppityLiveDisplay {
     }.toMutableList()
 
     private fun Renderable.isEmpty(): Boolean = this is RenderableString && text.trim().isEmpty() ||
-        this is RenderableContainer && renderables.all { it.isEmpty() }
+        this is ContainerRenderable && renderables.all { it.isEmpty() }
 
     private fun MutableList<Renderable>.tryAddYearSwitchers(statYear: Int) {
         if (!isInInventory()) return
         val renderable = buildYearSwitcherRenderables(statYear) ?: return
-        val container = HorizontalRenderableContainer(
+        val container = HorizontalContainerRenderable(
             renderable,
             spacing = 5,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
