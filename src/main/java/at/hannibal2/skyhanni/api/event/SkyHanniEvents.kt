@@ -60,8 +60,7 @@ object SkyHanniEvents {
                 require(SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
                     "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
                 }
-                return if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) null
-                else options to listOf(eventType as Class<out SkyHanniEvent>)
+                return options to listOf(eventType as Class<out SkyHanniEvent>)
             }
             0 -> {
                 val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
