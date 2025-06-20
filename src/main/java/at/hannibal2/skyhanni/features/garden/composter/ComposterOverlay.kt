@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -540,7 +541,7 @@ object ComposterOverlay {
         }
 
         val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
-            HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
+            GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
             val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
@@ -564,7 +565,7 @@ object ComposterOverlay {
             return
         }
 
-        HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
+        GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
         val havingInTotal = havingInInventory + havingInSacks
         if (itemsNeeded >= havingInTotal) {
             if (SkyBlockUtils.noTradeMode) {

@@ -228,6 +228,40 @@ object CollectionUtils {
         return collection
     }
 
+    inline fun <reified T> MutableIterator<T>.removeIf(predicate: (T) -> Boolean) {
+        while (hasNext()) {
+            if (predicate(next())) this.remove()
+        }
+    }
+
+    fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.iterator().removeIf(predicate)
+
+    /** Removes the first element that matches the given [predicate] in the list. */
+    fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
+        val mutableList = this.toMutableList()
+        val iterator = mutableList.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableList.toList()
+    }
+
+    /** Removes the first element that matches the given [predicate] in the map. */
+    fun <K, V> Map<K, V>.removeFirst(predicate: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
+        val mutableMap = this.toMutableMap()
+        val iterator = mutableMap.entries.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableMap.toMap()
+    }
+
     /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
     inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
         this.remove(newValue)

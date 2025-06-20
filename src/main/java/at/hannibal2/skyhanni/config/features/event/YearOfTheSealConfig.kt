@@ -4,8 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class YearOfTheSealConfig {
     @Expose
@@ -20,4 +23,22 @@ class YearOfTheSealConfig {
     @Expose
     @ConfigLink(owner = YearOfTheSealConfig::class, field = "fishyTreatProfit")
     var fishyTreatProfitPosition: Position = Position(170, 150)
+
+    @Expose
+    @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown (Only works on normal ones, not giant).")
+    @ConfigEditorBoolean
+    @SearchTag("beach")
+    var bouncyBallLine: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Bouncy Ball Line Color", desc = "Color of the Bouncy Ball Line.")
+    @ConfigEditorColour
+    @SearchTag("beach")
+    var bouncyBallLineColor: String = "0:245:255:0:196"
+
+    @Expose
+    @ConfigOption(name = "Bouncy Ball Landing Spot", desc = "Show the spot where the Bouncy Ball will land, and add a counter.")
+    @ConfigEditorBoolean
+    @SearchTag("beach")
+    var bouncyBallLandingSpot: Property<Boolean> = Property.of(true)
 }
