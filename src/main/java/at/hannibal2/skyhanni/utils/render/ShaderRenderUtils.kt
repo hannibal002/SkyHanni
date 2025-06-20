@@ -25,14 +25,13 @@ object ShaderRenderUtils {
      */
     private fun <T : RoundedShader<T>> T.applyBaseSettings(
         radius: Int,
-        width: Int, height: Int,
-        x: Int, y: Int,
+        width: Int, height: Int, x: Int, y: Int,
         smoothness: Float = 0f,
         extraApplies: (T.() -> Unit)? = null,
     ) = this.apply {
         val scaleFactor = GuiScreenUtils.scaleFactor
-        val widthIn: Int = width * scaleFactor
-        val heightIn: Int = height * scaleFactor
+        val widthIn = width * scaleFactor
+        val heightIn = height * scaleFactor
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
