@@ -437,9 +437,7 @@ object RenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
-        //#if TODO
         PatcherFixes.onPlayerEyeLine()
-        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
