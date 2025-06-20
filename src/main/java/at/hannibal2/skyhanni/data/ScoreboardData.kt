@@ -32,8 +32,9 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() =
-        MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
+    val objectiveTitle: String
+        get() =
+            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -81,11 +82,13 @@ object ScoreboardData {
                     dirty = true
                 }
             }
+
             is S3EPacketTeams -> {
                 if (packet.name.startsWith("team_")) {
                     dirty = true
                 }
             }
+
             is S3BPacketScoreboardObjective -> {
                 val type = packet.func_179817_d()
                 if (type != IScoreObjectiveCriteria.EnumRenderType.INTEGER) return
@@ -136,13 +139,6 @@ object ScoreboardData {
             sidebarLinesFormatted = new
             ScoreboardUpdateEvent(new, old).post()
         }
-    }
-
-    private fun toggleMonitor() {
-        monitor = !monitor
-        val action = if (monitor) "Enabled" else "Disabled"
-        ChatUtils.chat("$action scoreboard monitoring in the console.")
-
     }
 
     private fun cleanSB(scoreboard: String) = scoreboard.toCharArray().filter {
@@ -253,7 +249,11 @@ object ScoreboardData {
                 "Monitors the scoreboard changes: " +
                 "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { toggleMonitor() }
+            callback {
+                monitor = !monitor
+                val action = if (monitor) "Enabled" else "Disabled"
+                ChatUtils.chat("$action scoreboard monitoring in the console.")
+            }
         }
     }
 }
