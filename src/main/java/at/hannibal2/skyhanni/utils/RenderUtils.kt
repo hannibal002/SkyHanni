@@ -206,16 +206,16 @@ object RenderUtils {
     ) {
         _drawColor(location, color, beacon, alpha, seeThroughBlocks)
     }
-    //#if TODO
 
+    //#if TODO
     @Deprecated("Use WorldRenderUtils' getViewerPos instead", ReplaceWith("WorldRenderUtils.getViewerPos(partialTicks)"))
     fun getViewerPos(partialTicks: Float) =
         Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
     //#endif
 
-
     @Deprecated("Use WorldRenderUtils' expandBlock instead")
     fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
+
     @Deprecated("Use WorldRenderUtils' inflateBlock instead")
     fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
 
@@ -619,7 +619,6 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    //#if TODO
     /**
      * Method to draw a rounded textured rect.
      *
@@ -656,18 +655,24 @@ object RenderUtils {
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
+        //#if TODO
         RoundedTextureShader.scaleFactor = scaleFactor.toFloat()
         RoundedTextureShader.radius = radius.toFloat()
         RoundedTextureShader.smoothness = smoothness.toFloat()
         RoundedTextureShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedTextureShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        //#endif
 
         DrawContextUtils.pushMatrix()
+        //#if TODO
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
+        //#endif
 
         GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
 
+        //#if TODO
         ShaderManager.disableShader()
+        //#endif
         DrawContextUtils.popMatrix()
     }
 
@@ -691,7 +696,58 @@ object RenderUtils {
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
+        //#if TODO
         RoundedRectangleShader.scaleFactor = scaleFactor.toFloat()
+        RoundedRectangleShader.radius = radius.toFloat()
+        RoundedRectangleShader.smoothness = smoothness.toFloat()
+        RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        //#endif
+
+        DrawContextUtils.pushMatrix()
+        //#if TODO
+        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
+        //#endif
+
+        GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
+
+        //#if TODO
+        ShaderManager.disableShader()
+        //#endif
+        DrawContextUtils.popMatrix()
+    }
+
+    /**
+     * Method to draw a rounded rectangle.
+     *
+     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
+     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
+     *
+     * @param color color of rect
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
+     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
+     * It is best kept at its default.
+     */
+    fun drawRoundGradientRect(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        topColor: Int,
+        bottomColor: Int,
+        radius: Int = 10,
+        smoothness: Int = 1,
+    ) {
+        val scaledRes = GuiScreenUtils.scaleFactor
+        val widthIn = width * scaledRes
+        val heightIn = height * scaledRes
+        val xIn = x * scaledRes
+        val yIn = y * scaledRes
+
+        //#if TODO
+        RoundedRectangleShader.scaleFactor = scaledRes.toFloat()
         RoundedRectangleShader.radius = radius.toFloat()
         RoundedRectangleShader.smoothness = smoothness.toFloat()
         RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
@@ -700,10 +756,11 @@ object RenderUtils {
         DrawContextUtils.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
 
-        GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
+        GuiRenderUtils.drawGradientRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
 
         ShaderManager.disableShader()
         DrawContextUtils.popMatrix()
+        //#endif
     }
 
     /**
@@ -739,6 +796,7 @@ object RenderUtils {
 
         val borderAdjustment = borderThickness / 2
 
+        //#if TODO
         RoundedRectangleOutlineShader.scaleFactor = scaleFactor.toFloat()
         RoundedRectangleOutlineShader.radius = radius.toFloat()
         RoundedRectangleOutlineShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
@@ -749,9 +807,12 @@ object RenderUtils {
         // so the shader can blur the edges accordingly. This is because a 'blurriness' option makes more sense
         // to users than a 'sharpness' option in this context
         RoundedRectangleOutlineShader.borderBlur = max(1 - blur, 0f)
+        //#endif
 
         DrawContextUtils.pushMatrix()
+        //#if TODO
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
+        //#endif
 
         GuiRenderUtils.drawGradientRect(
             x - borderAdjustment,
@@ -762,53 +823,13 @@ object RenderUtils {
             bottomColor,
         )
 
+        //#if TODO
         ShaderManager.disableShader()
+        //#endif
         DrawContextUtils.popMatrix()
     }
 
-    /**
-     * Method to draw a circle.
-     *
-     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
-     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
-     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
-     *
-     * @param x The x-coordinate of the circle's center.
-     * @param y The y-coordinate of the circle's center.
-     * @param radius The circle's radius.
-     * @param color The fill color.
-     * @param angle1 defines the start of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
-     * @param angle2 defines the end of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
-     * @param smoothness smooths out the edge. (In amount of blurred pixels)
-     */
-    fun drawFilledCircle(x: Int, y: Int, radius: Int, color: Color, smoothness: Float = 2.5f, angle1: Float = 7.0f, angle2: Float = 7.0f) {
-        //#if MC < 1.21
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
-        //#else
-        //$$ val scaleFactor = MinecraftClient.getInstance().window.scaleFactor
-        //#endif
-
-        val radiusIn = radius * scaleFactor
-        val xIn = x * scaleFactor
-        val yIn = y * scaleFactor
-
-        CircleShader.scaleFactor = scaleFactor.toFloat()
-        CircleShader.radius = radiusIn.toFloat()
-        CircleShader.smoothness = smoothness
-        CircleShader.centerPos = floatArrayOf((xIn + radiusIn).toFloat(), (yIn + radiusIn).toFloat())
-        CircleShader.angle1 = angle1 - Math.PI.toFloat()
-        CircleShader.angle2 = angle2 - Math.PI.toFloat()
-
-        // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
-        val circleColor = color.addAlpha(255).rgb
-
-        DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
-            GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, circleColor)
-            ShaderManager.disableShader()
-        }
-    }
-
+    //#if TODO
     fun getAlpha(): Float {
         colorBuffer.clear()
         GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)

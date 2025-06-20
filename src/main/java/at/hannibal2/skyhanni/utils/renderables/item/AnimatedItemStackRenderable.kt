@@ -109,7 +109,7 @@ class AnimatedItemStackRenderable(
             y = (posY + currentOffsetY).toFloat(),
             scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
-            rotationDegrees = currentRotation
+            rotationDegrees = currentRotation,
         )
     }
 }

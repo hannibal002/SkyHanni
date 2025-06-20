@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -86,5 +85,5 @@ object ArachneKillTimer {
         arachneSpawnedTime = SimpleTimeMark.farPast()
     }
 
-    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && config.arachneKillTimer
+    fun isEnabled() = IslandType.SPIDER_DEN.isCurrent() && config.arachneKillTimer
 }
