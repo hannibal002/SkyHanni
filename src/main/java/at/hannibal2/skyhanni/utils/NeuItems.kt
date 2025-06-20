@@ -101,7 +101,18 @@ object NeuItems {
 
             map[name] = internalName
             noColor[name.removeColor()] = internalName
-            allInternalNames[rawInternalName] = internalName
+            try {
+                allInternalNames[rawInternalName] = internalName
+            } catch (e: NullPointerException) {
+                ErrorManager.skyHanniError(
+                    "Error loading items from repo",
+                    "internal name" to rawInternalName,
+                    "name" to name,
+                    //#if MC > 1.21
+                    //$$ "stack name" to internalName.getItemStackOrNull()?.name,
+                    //#endif
+                )
+            }
         }
         @Suppress("UNCHECKED_CAST")
         itemNamesWithoutColor = noColor as NavigableMap<String, NeuInternalName>
@@ -261,7 +272,7 @@ object NeuItems {
     fun getRecipes(internalName: NeuInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
     fun neuHasFocus(): Boolean {
-        //#if MC < 1.12
+        //#if MC < 1.16
         if (!PlatformUtils.isNeuLoaded()) return false
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true

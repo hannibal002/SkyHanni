@@ -11,14 +11,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class About {
-    //#if TODO
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are currently running")
     @ConfigVersionDisplay
     @Transient
     var currentVersion: Unit? = null
-    //#endif
 
     @ConfigOption(name = "Check for Updates", desc = "Automatically check for updates on each startup")
     @Expose

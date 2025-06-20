@@ -1,12 +1,18 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.features.inventory.FixIronman
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -132,7 +138,7 @@ object ScoreboardData {
         }
     }
 
-    fun toggleMonitor() {
+    private fun toggleMonitor() {
         monitor = !monitor
         val action = if (monitor) "Enabled" else "Disabled"
         ChatUtils.chat("$action scoreboard monitoring in the console.")
@@ -159,8 +165,66 @@ object ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
         //#else
-        //$$ return list.map { it.formattedTextCompat() }
+        //$$ return list.map { it.formattedTextCompat(true) }
         //#endif
+    }
+
+    /**
+     * Tries to replace a scoreboard line with a modified one
+     * @param text The line to check and possibly replace
+     * @return The replaced line, or null if it should be hidden
+     */
+    fun tryToReplaceScoreboardLine(text: String): String? {
+        try {
+            return tryToReplaceScoreboardLineHarder(text)
+        } catch (t: Throwable) {
+            ErrorManager.logErrorWithData(
+                t,
+                "Error while changing the scoreboard text.",
+                "text" to text,
+            )
+            return text
+        }
+    }
+
+    private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+        if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
+            return null
+        }
+        if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
+            PurseApi.piggyPattern.matchMatcher(text) {
+                val coins = group("coins")
+                return "Purse: $coins"
+            }
+        }
+
+        if (SkyHanniMod.feature.misc.colorMonthNames) {
+            for (season in Season.entries) {
+                if (text.trim().startsWith(season.prefix)) {
+                    return season.colorCode + text
+                }
+            }
+        }
+        FixIronman.fixScoreboard(text)?.let {
+            return it
+        }
+
+        return text
+    }
+
+    enum class Season(val prefix: String, val colorCode: String) {
+        EARLY_SPRING("Early Spring", "§d"),
+        SPRING("Spring", "§d"),
+        LATE_SPRING("Late Spring", "§d"),
+        EARLY_SUMMER("Early Summer", "§6"),
+        SUMMER("Summer", "§6"),
+        LATE_SUMMER("Late Summer", "§6"),
+        EARLY_AUTUMN("Early Autumn", "§e"),
+        AUTUMN("Autumn", "§e"),
+        LATE_AUTUMN("Late Autumn", "§e"),
+        EARLY_WINTER("Early Winter", "§9"),
+        WINTER("Winter", "§9"),
+        LATE_WINTER("Late Winter", "§9")
     }
 
     // TODO USE SH-REPO
@@ -181,4 +245,15 @@ object ScoreboardData {
         "\uD83C\uDF82",
         "\uD83D\uDD2B",
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shdebugscoreboard") {
+            description =
+                "Monitors the scoreboard changes: " +
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { toggleMonitor() }
+        }
+    }
 }

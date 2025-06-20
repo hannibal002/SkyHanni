@@ -419,13 +419,10 @@ this functionality work again on 1.21. If for whatever reason you want the prepr
 
 The different project versions are set up in such a way that each version depends on a slightly older version from which it is then adapted.
 There are two main versions (1.8.9 and 1.21), but there are also a few bridge versions. These exist to make remapping easier since automatic
-name mappings between 1.8.9 and 1.21 do not really exist. This is the current layout for our remaps: First, we remap to 1.12. This still
-largely uses the old rendering system and has a lot of similar names to 1.8.9. As such, only very little needs to be adapted in terms of
-behaviour, and at best, a couple of names need to be updated manually. The big jump is from 1.12 to 1.16. We use 1.16 since we don't want to
-make too large of a jump (which could lead to a lot more missing names), but we still want to jump to a version with Fabric (and specifically
-with Fabric intermediary mappings). We also can't really jump to an earlier version since 1.14 and 1.15 have a really poor Fabric API and
-still have some of the old rendering code, meaning we would need to adapt to two slightly different rendering engines instead of just one
-big rendering change. Despite the preprocessor's best efforts, this version will likely have the most manual mapping changes. Note that we
+name mappings between 1.8.9 and 1.21 do not really exist. This is the current layout for our remaps: First, we remap to 1.16 which is a big
+jump from 1.8.9, but still has a lot of the old rendering code and is still on Forge. We jump to 1.16 because it is a version with Fabric and
+also has Fabric intermediary mappings available. We also can't really jump to an earlier version since 1.14 and 1.15 have a really poor 
+Fabric API. Despite the preprocessor's best efforts, this version will likely have the most manual mapping changes. Note that we
 actually have two projects on 1.16. There is the Forge project, which is the one we remap to first. Then we remap to the corresponding
 Fabric/Yarn mappings. This is because remapping between Searge and Yarn is very inconsistent unless it is done on one and the same version.
 Finally, we remap from 1.16 to 1.21. This is a fairly small change, especially since Fabric intermediary mappings make different names
@@ -434,8 +431,8 @@ between versions very rare. The only real changes that need to be done in this j
 The preprocessor does some built-in remapping (changing names), based on obfuscated names, but sometimes the automatic matching fails. If it
 cannot find a new name (or the name it automatically determines was wrong), you can change the corresponding mapping. In order to make
 this as smooth as possible, it is generally recommended to find the earliest spot at which the mappings deviate. So fixing a mapping on the
-hop from 1.16 to 1.21 is generally not recommended. This is because, while we do not care about 1.12 or 1.16 compiling for its own merit,
-we do care about the automatically inferred name changes from 1.12 to 1.16 and so on, which only work if those versions already have the
+hop from 1.16 to 1.21 is generally not recommended. This is because, while we do not care about 1.16 compiling for its own merit,
+we do care about the automatically inferred name changes from 1.16 to modern, which only work if those versions already have the
 correct names available.
 
 #### A missing/incorrect name
@@ -488,6 +485,10 @@ helpful for places where the return type may have changed across minecraft versi
 same result as on previous versions.
 
 #### Conditional compilation
+
+> [!NOTE]  
+> These examples were written back when we had a 1.12 step in the remapping process. The 1.12 step is no longer used but the same general 
+> principals apply to every other step. If you are confused make sure to look at code to see actual examples of how this works.
 
 In addition to the built-in remapping, there is also the more complicated art of preprocessor directives. Directives allow you to comment or
 uncomment sections of the code depending on the version you are on. Uncommented sections are renamed as usual, so even within those directives,

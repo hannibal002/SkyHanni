@@ -90,7 +90,11 @@ object TrophyFishMessages {
 
         if (config.tooltip) {
             getTooltip(internalName)?.let {
+                //#if MC < 1.21
                 edited.chatStyle = it
+                //#else
+                //$$ edited.getWithStyle(it)
+                //#endif
             }
         }
 

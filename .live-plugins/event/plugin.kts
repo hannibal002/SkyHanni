@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 // depends-on-plugin org.jetbrains.kotlin
+// depends-on-plugin com.intellij.java
 
 fun buildPrimaryNameMap(project: Project): Map<String, String> {
     val result = mutableMapOf<String, String>()

@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -130,4 +132,13 @@ object CropSpeedMeter {
     }
 
     fun isEnabled() = enabled && GardenApi.inGarden()
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcropspeedmeter") {
+            description = "Debugs how many crops you collect over time"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { toggle() }
+        }
+    }
 }

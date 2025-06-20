@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
@@ -19,6 +22,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.compat.hover
 import kotlinx.coroutines.launch
 
+@SkyHanniModule
 object NavigationHelper {
     private val messageId = ChatUtils.getUniqueMessageId()
 
@@ -126,4 +130,11 @@ object NavigationHelper {
         return distances
     }
 
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shnavigate") {
+            description = "Using path finder to go to locations"
+            legacyCallbackArgs { onCommand(it) }
+        }
+    }
 }

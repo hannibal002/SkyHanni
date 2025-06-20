@@ -267,10 +267,10 @@ object ChatManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shchathistory") {
+        event.registerBrigadier("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            callback { openChatHistoryGui(it) }
+            legacyCallbackArgs { openChatHistoryGui(it) }
         }
     }
 }

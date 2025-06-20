@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -12,6 +16,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenCropTimeCommand {
 
     private val config get() = GardenApi.config.moneyPerHours
@@ -70,5 +75,15 @@ object GardenCropTimeCommand {
         }
 
         ChatUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcroptime") {
+            description =
+                "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
+            category = CommandCategory.USERS_ACTIVE
+            legacyCallbackArgs { onCommand(it) }
+        }
     }
 }
