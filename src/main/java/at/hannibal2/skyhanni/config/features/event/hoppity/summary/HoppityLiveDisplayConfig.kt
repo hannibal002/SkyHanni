@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.event.hoppity
+package at.hannibal2.skyhanni.config.features.event.hoppity.summary
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
-class HoppityEventSummaryLiveDisplayConfig {
+class HoppityLiveDisplayConfig {
     @Expose
     @ConfigOption(name = "Show Display", desc = "Show a hoppity stats card in a GUI element.")
     @ConfigEditorBoolean
@@ -64,6 +64,14 @@ class HoppityEventSummaryLiveDisplayConfig {
     )
     @ConfigEditorBoolean
     var showAllTime: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Meal Egg Hover",
+        desc = "Hovering over number of meal eggs found will show a tooltip of which eggs were found how many times."
+    )
+    @ConfigEditorBoolean
+    var mealEggHover: Boolean = true
 
     @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")

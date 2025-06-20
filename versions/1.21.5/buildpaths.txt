@@ -196,6 +196,7 @@ at.hannibal2.skyhanni.events.GuiPositionMovedEvent.kt
 at.hannibal2.skyhanni.events.GuiRenderEvent.kt
 at.hannibal2.skyhanni.events.GuiRenderItemEvent.kt
 at.hannibal2.skyhanni.events.InventoryCloseEvent.kt
+at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent.kt
 at.hannibal2.skyhanni.events.IslandChangeEvent.kt
 at.hannibal2.skyhanni.events.IslandGraphReloadEvent.kt
 at.hannibal2.skyhanni.events.ItemAddEvent.kt
@@ -448,13 +449,14 @@ at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsCompactChat.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared.kt
-at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.kt
 at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler.kt
 at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning.kt
 at.hannibal2.skyhanni.features.event.hoppity.ReplaceHoppityWithContributor.kt
 at.hannibal2.skyhanni.features.event.hoppity.WarpMenuUniques.kt
+at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.kt
+at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityLiveDisplay.kt
 at.hannibal2.skyhanni.features.event.jerry.HighlightJerries.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker.kt
@@ -470,6 +472,7 @@ at.hannibal2.skyhanni.features.event.winter.NewYearCakeReminder.kt
 at.hannibal2.skyhanni.features.event.winter.ReindrakeWarpHelper.kt
 at.hannibal2.skyhanni.features.event.yearoftheseal.FishyTreatProfit.kt
 at.hannibal2.skyhanni.features.fame.CityProjectFeatures.kt
+at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.kt
 at.hannibal2.skyhanni.features.fame.ReminderUtils.kt
 at.hannibal2.skyhanni.features.fame.UpgradeReminder.kt
 at.hannibal2.skyhanni.features.fishing.ChumBucketHider.kt
@@ -843,6 +846,7 @@ at.hannibal2.skyhanni.utils.renderables.RenderableUtils.kt
 at.hannibal2.skyhanni.utils.renderables.SearchTextInput.kt
 at.hannibal2.skyhanni.utils.renderables.Searchable.kt
 at.hannibal2.skyhanni.utils.renderables.StringRenderable.kt
+at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable.kt
 at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable.kt
 at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable.kt
 at.hannibal2.skyhanni.utils.repopatterns.CommonPatternInfo.kt
@@ -982,13 +986,13 @@ at/hannibal2/skyhanni/config/features/event/gifting/GiftingConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityCallWarningConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityChatConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEggsConfig.kt
-at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryCFReminderConfig.kt
-at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryConfig.kt
-at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryLiveDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityStrayTimerConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityUnclaimedEggsConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityWarpMenuConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityWaypointsConfig.kt
+at/hannibal2/skyhanni/config/features/event/hoppity/summary/HoppityEventSummaryCFReminderConfig.kt
+at/hannibal2/skyhanni/config/features/event/hoppity/summary/HoppityEventSummaryConfig.kt
+at/hannibal2/skyhanni/config/features/event/hoppity/summary/HoppityLiveDisplayConfig.kt
 at/hannibal2/skyhanni/config/features/event/waypoints/ChristmasPresentConfig.kt
 at/hannibal2/skyhanni/config/features/event/waypoints/EasterEggConfig.kt
 at/hannibal2/skyhanni/config/features/event/waypoints/HalloweenBasketConfig.kt
@@ -1360,6 +1364,10 @@ at/hannibal2/skyhanni/mixins/hooks/RenderItemHook.kt
 at/hannibal2/skyhanni/mixins/init/BeforeForLoopInjectionPoint.java
 at/hannibal2/skyhanni/mixins/init/SkyhanniMixinPlugin.java
 at/hannibal2/skyhanni/mixins/transformers/MixinClientConnection.java
+at/hannibal2/skyhanni/events/hoppity
+at.hannibal2.skyhanni.events.hoppity.EggFoundEvent.kt
+at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent.kt
+at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent.kt
 at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
 at/hannibal2/skyhanni/skyhannimodule/SkyHanniModule.kt
 at/hannibal2/skyhanni/utils/CircularList.kt
