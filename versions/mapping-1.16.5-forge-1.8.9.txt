@@ -279,6 +279,7 @@ net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resour
 net.minecraft.sounds.SoundSource net.minecraft.client.audio.SoundCategory
 
 net.minecraft.util.Mth net.minecraft.util.MathHelper
+net.minecraft.util.Mth clamp() clamp_int()
 
 net.minecraft.world.SimpleContainer net.minecraft.client.player.inventory.ContainerLocalMenu
 

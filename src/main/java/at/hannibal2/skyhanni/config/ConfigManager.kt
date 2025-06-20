@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -276,6 +277,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
+    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

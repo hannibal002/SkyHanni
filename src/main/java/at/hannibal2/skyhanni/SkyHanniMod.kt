@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -98,6 +99,7 @@ object SkyHanniMod {
     lateinit var knownFeaturesData: KnownFeaturesJson
     lateinit var jacobContestsData: JacobContestsJson
     lateinit var visualWordsData: VisualWordsJson
+    lateinit var petData: PetDataStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")

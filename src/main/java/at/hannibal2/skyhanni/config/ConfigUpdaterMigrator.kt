@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
-//#endif
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
@@ -11,7 +9,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
-// todo 1.21 impl needed
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
@@ -127,9 +124,7 @@ object ConfigUpdaterMigrator {
                 return
             }
             movesPerformed++
-            //#if TODO
             if (np == listOf("#player", "personalBest")) LimboTimeTracker.workaroundMigration(oldElem.asInt)
-            //#endif
             newParentElement.add(np.last(), transform(oldElem.shDeepCopy()))
             logger.log("Moved element from $oldPath to $newPath")
         }
