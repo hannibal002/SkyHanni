@@ -20,12 +20,12 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedClay
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.item.Item
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -184,7 +184,7 @@ object HarpFeatures {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.showNumbers) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
-        if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
+        if (!event.stack.isStainedClay()) return
 
         // Example: §9| §7Click! will select the 9
         val index = buttonColors.indexOfFirst { it == event.stack.displayName[1] }

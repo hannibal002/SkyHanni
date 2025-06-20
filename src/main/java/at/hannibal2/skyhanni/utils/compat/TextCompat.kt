@@ -44,7 +44,9 @@ fun IChatComponent.unformattedTextCompat(): String =
 //$$ iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
 //#endif
 
-fun IChatComponent?.formattedTextCompat(): String =
+@JvmOverloads
+@Suppress("unused")
+fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false): String =
 //#if MC < 1.16
     this?.formattedText.orEmpty()
 //#else
@@ -52,15 +54,32 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$     this ?: return@run ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
-//$$         sb.append(component.style.color?.toChatFormatting()?.toString() ?: "")
+//$$         val chatStyle = component.style.chatStyle()
+//$$         if ((sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
+//$$             sb.append(chatStyle)
+//$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())
+//$$         if (!noExtraResets) {
+//$$             sb.append("§r")
+//$$         } else {
+//$$             if (component == Text.empty()) sb.append("§r")
+//$$         }
 //$$     }
-//$$     sb.toString()
+//$$     sb.toString().removeSuffix("§r").removePrefix("§r")
 //$$ }
 //$$
 //$$ private val textColorLUT = ChatFormatting.entries
 //$$     .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
 //$$     .toMap()
+//$$
+//$$ fun Style.chatStyle() = buildString {
+//$$     color?.let { append(it.toChatFormatting()?.toString() ?: "§r") }
+//$$     if (isBold) append("§l")
+//$$     if (isItalic) append("§o")
+//$$     if (isUnderlined) append("§n")
+//$$     if (isStrikethrough) append("§m")
+//$$     if (isObfuscated) append("§k")
+//$$ }
 //$$
 //$$ fun TextColor.toChatFormatting(): ChatFormatting? {
 //$$     return textColorLUT[this.value]
@@ -201,6 +220,7 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     //#if MC < 1.16
     Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
+    //$$ MinecraftClient.getInstance().inGameHud.chatHud.removeMessage(idToMessageSignature(id))
     //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
     //#endif
 }

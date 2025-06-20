@@ -44,21 +44,4 @@ object SlayerMiniBossFeatures {
             )
         }
     }
-
-    enum class SlayerMiniBossType(vararg names: String) {
-        REVENANT("Revenant Sycophant", "Revenant Champion", "Deformed Revenant", "Atoned Champion", "Atoned Revenant"),
-        TARANTULA("Tarantula Vermin", "Tarantula Beast", "Mutant Tarantula"),
-        SVEN("Pack Enforcer", "Sven Follower", "Sven Alpha"),
-        VOIDLING("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac"),
-        INFERNAL("Flare Demon", "Kindleheart Demon", "Burningsoul Demon"),
-        ;
-
-        val names = names.toSet()
-
-        companion object {
-            private val allNames = entries.flatMap { it.names }.toSet()
-
-            fun isMiniboss(name: String) = name in allNames
-        }
-    }
 }

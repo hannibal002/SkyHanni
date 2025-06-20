@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -131,6 +133,16 @@ object WorldEdit {
             else -> {
                 ChatUtils.chat("Unknown subcommand")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shworldedit") {
+            description = "Select regions in the world"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { command(it) }
+            autoComplete { listOf("copy", "reset", "help", "left", "right") }
         }
     }
 
