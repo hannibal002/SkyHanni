@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.item.ItemStack
 import net.minecraft.util.Vec3
 import java.nio.FloatBuffer
 //#if MC > 1.21
@@ -30,6 +32,9 @@ object DrawContextUtils {
             ErrorManager.crashInDevEnv("drawContext is null")
             ErrorManager.skyHanniError("drawContext is null")
         }
+
+    fun drawItem(item: ItemStack, x: Int, y: Int) =
+        drawContext.drawItem(item, x, y)
 
     fun setContext(context: DrawContext) {
         renderDepth++
