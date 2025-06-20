@@ -43,15 +43,12 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 //#if TODO
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-//#endif
 import io.github.notenoughupdates.moulconfig.ChromaColour
-//#if TODO
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
 //#else
 //$$ import net.minecraft.client.MinecraftClient
-//#endif
 //#endif
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
