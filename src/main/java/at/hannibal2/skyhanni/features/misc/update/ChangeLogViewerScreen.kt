@@ -30,7 +30,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
     private val buttonPanel = HorizontalContainerRenderable(
         listOf(
             Renderable.rectButton(
-                RenderableString("Include Beta's"),
+                RenderableString("Include Betas"),
                 activeColor = ChangelogViewer.primaryColor,
                 startState = ChangelogViewer.shouldShowBeta,
                 onClick = {
@@ -140,7 +140,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                         RenderableString("§aNo changes found", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
                     } else if (!ChangelogViewer.shouldShowBeta) {
                         RenderableString(
-                            "§aOnly Betas where added, turn on \"Include Beta's\"",
+                            "§aOnly Betas where added, turn on \"Include Betas\"",
                             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                         )
                     } else {

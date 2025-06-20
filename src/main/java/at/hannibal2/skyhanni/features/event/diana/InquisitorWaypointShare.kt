@@ -111,13 +111,6 @@ object InquisitorWaypointShare {
         val spawnTime: SimpleTimeMark,
     )
 
-    private var test = false
-
-    fun test() {
-        test = !test
-        ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
-    }
-
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
@@ -331,15 +324,6 @@ object InquisitorWaypointShare {
     fun playUserSound() {
         with(config.sound) {
             SoundUtils.createSound(name, pitch).playSound()
-        }
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shtestinquisitor") {
-            description = "Test the inquisitor waypoint share"
-            category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { test() }
         }
     }
 }

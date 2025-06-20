@@ -12,11 +12,6 @@ object TestBingo {
 
     var testBingo = false
 
-    fun toggle() {
-        testBingo = !testBingo
-        ChatUtils.chat("Test Bingo " + (if (testBingo) "enabled" else "disabled"))
-    }
-
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Bingo Test")
@@ -34,7 +29,10 @@ object TestBingo {
         event.registerBrigadier("shtestbingo") {
             description = "Toggle the test bingo card display mode"
             category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { toggle() }
+            simpleCallback {
+                testBingo = !testBingo
+                ChatUtils.chat("Test Bingo " + (if (testBingo) "enabled" else "disabled"))
+            }
         }
     }
 }

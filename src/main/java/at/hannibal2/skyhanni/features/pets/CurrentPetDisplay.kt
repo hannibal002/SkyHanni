@@ -14,8 +14,8 @@ object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
+    fun onRenderOverlay() {
         if (RiftApi.inRift() || !config.display) return
 
         val displayName = CurrentPetApi.currentPet?.getUserFriendlyName(includeLevel = false) ?: return

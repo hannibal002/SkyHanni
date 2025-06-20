@@ -197,13 +197,6 @@ object GardenApi {
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()
 
-    private fun resetCropSpeed() {
-        storage?.cropsPerSecond?.clear()
-        GardenBestCropTime.reset()
-        updateGardenTool()
-        ChatUtils.chat("Manually reset all crop speed data!")
-    }
-
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
         GardenBestCropTime.reset()
@@ -284,11 +277,17 @@ object GardenApi {
     private var gardenExperience = listOf<Int>()
     private const val gardenOverflowExp = 10000
 
+    @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"
             category = CommandCategory.USERS_RESET
-            callback { resetCropSpeed() }
+            callback {
+                storage?.cropsPerSecond?.clear()
+                GardenBestCropTime.reset()
+                updateGardenTool()
+                ChatUtils.chat("Manually reset all crop speed data!")
+            }
         }
     }
 }
