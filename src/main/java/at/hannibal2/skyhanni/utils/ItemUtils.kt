@@ -16,9 +16,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -76,7 +74,6 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.ProfileComponent
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
@@ -858,9 +855,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-        //#if TODO
         if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
-        //#endif
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()

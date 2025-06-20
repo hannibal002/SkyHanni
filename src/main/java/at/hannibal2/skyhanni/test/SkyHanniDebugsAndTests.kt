@@ -18,11 +18,15 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+//#if TODO
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
+//#endif
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.OreBlock
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -59,6 +63,8 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
@@ -69,12 +75,13 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+//#if FORGE
 import net.minecraftforge.common.MinecraftForge
+//#endif
 import java.io.File
 import java.time.LocalDate
 import java.time.Month
@@ -291,14 +298,18 @@ object SkyHanniDebugsAndTests {
         for (original in modules.toMutableList()) {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
+            //#if FORGE
             MinecraftForge.EVENT_BUS.unregister(original)
+            //#endif
             SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
                 modules.add(original)
+                //#if FORGE
                 MinecraftForge.EVENT_BUS.register(original)
+                //#endif
                 SkyHanniEvents.register(original)
                 println("Registered listener $simpleName")
             } else {
@@ -316,7 +327,9 @@ object SkyHanniDebugsAndTests {
                 for (original in modules.toMutableList()) {
                     val javaClass = original.javaClass
                     val simpleName = javaClass.simpleName
+                    //#if FORGE
                     MinecraftForge.EVENT_BUS.unregister(original)
+                    //#endif
                     SkyHanniEvents.unregister(original)
                     println("Unregistered listener $simpleName")
                 }
@@ -507,7 +520,7 @@ object SkyHanniDebugsAndTests {
             itemRenderDebug()
         }
 
-        if (Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+        if (MinecraftCompat.showDebugHud) {
             if (debugConfig.currentAreaDebug) {
                 config.debugLocationPos.renderString(
                     "Current Area: ${HypixelData.skyBlockArea}",
@@ -516,6 +529,7 @@ object SkyHanniDebugsAndTests {
             }
 
             if (debugConfig.raytracedOreblock) {
+                //#if TODO
                 BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
@@ -524,6 +538,7 @@ object SkyHanniDebugsAndTests {
                         )
                     }
                 }
+                //#endif
             }
         }
 
@@ -546,7 +561,7 @@ object SkyHanniDebugsAndTests {
 
     private fun dragAbleTest() {
         val bone = ItemStack(Items.bone, 1).toDragItem()
-        val leaf = ItemStack(Blocks.leaves, 1).toDragItem()
+        val leaf = ItemStack(BlockCompat.getAllLogs().first(), 1).toDragItem()
 
         config.debugItemPos.renderRenderables(
             listOf(
@@ -606,6 +621,7 @@ object SkyHanniDebugsAndTests {
         )
     }
 
+    //#if TODO
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
         if (!debugConfig.oreEventMessages) return
@@ -613,6 +629,7 @@ object SkyHanniDebugsAndTests {
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
+    //#endif
 
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
