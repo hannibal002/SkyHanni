@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -28,12 +26,11 @@ import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.math.min
-//#if TODO
+//#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
 //#else
-//$$ import net.minecraft.client.render.GuiLighting
 //$$ import net.minecraft.client.render.RenderLayer
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.joml.Matrix4f
@@ -88,24 +85,6 @@ object GuiRenderUtils {
             DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
             newY += 9
         }
-    }
-
-    private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
-        //#if MC < 1.21
-        val itemRender = Minecraft.getMinecraft().renderItem
-        RenderHelper.enableGUIStandardItemLighting()
-        itemRender.zLevel = -145f
-        itemRender.renderItemAndEffectIntoGUI(item, x, y)
-        itemRender.zLevel = 0f
-        RenderHelper.disableStandardItemLighting()
-        //#else
-        //$$ DrawContextUtils.pushPop {
-        //$$     GuiLighting.setupFor3DItems()
-        //$$     DrawContextUtils.translate(0f, 0f, -145f)
-        //$$     DrawContextUtils.drawContext.drawItem(item, x, y)
-        //$$     GuiLighting.disable()
-        //$$ }
-        //#endif
     }
 
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
@@ -166,7 +145,7 @@ object GuiRenderUtils {
     }
 
     fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
-        renderItemStack(item, x, y)
+        DrawContextUtils.drawItem(item, x, y)
         drawRect(x, y, x + 16, y + 16, color)
     }
 
@@ -362,7 +341,7 @@ object GuiRenderUtils {
             DrawContextUtils.translate(translateX, translateY, -19f)
             DrawContextUtils.scale(finalScale, finalScale, 0.2f)
 
-            //#if TODO
+            //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
             DrawContextUtils.pushPop {
                 DrawContextUtils.loadIdentity()
@@ -386,34 +365,25 @@ object GuiRenderUtils {
             //$$ DrawContextUtils.multMatrix(rotMat)
             //#endif
 
-            //#if TODO
+            //#if MC < 1.21
             GL11.glEnable(GL11.GL_NORMALIZE)
             GL11.glNormal3f(0f, 0f, 1f)
-            RenderHelper.enableGUIStandardItemLighting()
-            AdjustStandardItemLighting.adjust() // Compensate for z scaling
             //#else
             //$$ RenderSystem.enableNormalize()
             //$$ RenderSystem.normal3f(0f, 0f, 1f)
-            //$$ GuiLighting.setupFor3DItems()
-            //$$ AdjustStandardItemLighting.adjust()
             //#endif
 
-            try {
-                DrawContextUtils.drawItem(item, 0, 0)
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(
-                    e, "Error rendering item onto screen",
-                    "itemName" to item.displayName,
-                    "internalName" to item.getInternalNameOrNull(),
-                )
-            }
+            RenderHelper.enableGUIStandardItemLighting()
+            //#if MC < 1.21
+            AdjustStandardItemLighting.adjust() // Compensate for z scaling
+            //#endif
 
-            //#if TODO
+            DrawContextUtils.drawItem(item, 0, 0)
+
+            //#if MC < 1.21
             RenderHelper.disableStandardItemLighting()
             GL11.glDisable(GL11.GL_NORMALIZE)
-            RenderHelper.disableStandardItemLighting()
             //#else
-            //$$ GuiLighting.disable()
             //$$ RenderSystem.disableNormalize()
             //#endif
         }
