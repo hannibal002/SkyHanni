@@ -33,7 +33,10 @@ import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
 //#else
+//$$ import net.minecraft.client.render.GuiLighting
 //$$ import net.minecraft.client.render.RenderLayer
+//$$ import com.mojang.blaze3d.systems.RenderSystem
+//$$ import org.joml.Matrix4f
 //#endif
 
 // todo 1.21 impl needed
@@ -84,7 +87,12 @@ object GuiRenderUtils {
         itemRender.zLevel = 0f
         RenderHelper.disableStandardItemLighting()
         //#else
-        //$$ DrawContextUtils.drawContext.drawItem(item, x, y)
+        //$$ DrawContextUtils.pushPop {
+        //$$     GuiLighting.setupFor3DItems()
+        //$$     DrawContextUtils.translate(0f, 0f, -145f)
+        //$$     DrawContextUtils.drawContext.drawItem(item, x, y)
+        //$$     GuiLighting.disable()
+        //$$ }
         //#endif
     }
 
@@ -343,7 +351,6 @@ object GuiRenderUtils {
             DrawContextUtils.scale(finalScale, finalScale, 0.2f)
 
             //#if TODO
-            // Rotation
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
             DrawContextUtils.pushPop {
                 DrawContextUtils.loadIdentity()
@@ -357,14 +364,30 @@ object GuiRenderUtils {
                 DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
             }
             DrawContextUtils.multMatrix(savedMV)
+            //#else
+            //$$ val rotMat = Matrix4f().identity()
+            //$$    .translate(half, half, centerZ)
+            //$$    .rotateX(Math.toRadians(rotX.toDouble()).toFloat())
+            //$$    .rotateY(Math.toRadians(rotY.toDouble()).toFloat())
+            //$$    .rotateZ(Math.toRadians(rotZ.toDouble()).toFloat())
+            //$$    .translate(-half, -half, -centerZ)
+            //$$ DrawContextUtils.multMatrix(rotMat)
+            //#endif
 
+            //#if TODO
             GL11.glEnable(GL11.GL_NORMALIZE)
             GL11.glNormal3f(0f, 0f, 1f)
-
             RenderHelper.enableGUIStandardItemLighting()
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
+            //#else
+            //$$ RenderSystem.enableNormalize()
+            //$$ RenderSystem.normal3f(0f, 0f, 1f)
+            //$$ GuiLighting.setupFor3DItems()
+            //$$ AdjustStandardItemLighting.adjust()
+            //#endif
+
             try {
-                Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+                DrawContextUtils.drawItem(item, 0, 0)
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(
                     e, "Error rendering item onto screen",
@@ -372,11 +395,14 @@ object GuiRenderUtils {
                     "internalName" to item.getInternalNameOrNull(),
                 )
             }
+
+            //#if TODO
             RenderHelper.disableStandardItemLighting()
             GL11.glDisable(GL11.GL_NORMALIZE)
             RenderHelper.disableStandardItemLighting()
             //#else
-            //$$ renderItemStack(item, 0, 0)
+            //$$ GuiLighting.disable()
+            //$$ RenderSystem.disableNormalize()
             //#endif
         }
     }
