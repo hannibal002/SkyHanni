@@ -1,16 +1,13 @@
 package at.hannibal2.skyhanni.config.features.skillprogress
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if TODO
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class AllSkillDisplayConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show a display with all skills progress.")
@@ -18,7 +15,6 @@ class AllSkillDisplayConfig {
     @FeatureToggle
     var enabled: Property<Boolean> = Property.of(false)
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Text", desc = "Choose what skills you want to see in the display.")
     @ConfigEditorDraggableList
@@ -33,5 +29,4 @@ class AllSkillDisplayConfig {
         SkillType.CARPENTRY,
         SkillType.TAMING
     )
-    //#endif
 }

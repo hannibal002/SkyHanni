@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object EasterEggWaypoints {
@@ -132,5 +132,5 @@ object EasterEggWaypoints {
         return a && b && c
     }
 
-    private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
+    private fun isEnabled() = HypixelData.hypixelLive && !SkyBlockUtils.inSkyBlock
 }

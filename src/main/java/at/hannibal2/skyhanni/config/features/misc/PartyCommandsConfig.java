@@ -11,23 +11,34 @@ public class PartyCommandsConfig {
     // TODO remove "default" from name
     @Expose
     @ConfigEditorDropdown
-    @ConfigOption(name = "Party Command Trust Level", desc = "Choose who can run party chat commands.")
+    @ConfigOption(name = "Trust Level", desc = "Choose who can run party chat commands.")
     public @NotNull TrustedUser defaultRequiredTrustLevel = TrustedUser.FRIENDS;
 
     @Expose
     @ConfigEditorBoolean
-    @ConfigOption(name = "Party Transfer", desc = "Automatically transfer the party to people who type §b!ptme")
+    @ConfigOption(name = "Party Transfer", desc = "Automatically transfer the party to people who type §b!ptme§7.")
     public boolean transferCommand = false;
 
     @Expose
     @ConfigEditorBoolean
-    @ConfigOption(name = "Party Warp", desc = "Automatically warp the party if someone types §b!warp")
+    @ConfigOption(name = "Party Warp", desc = "Automatically warp the party if someone types §b!warp§7.")
     public boolean warpCommand = false;
 
     @Expose
     @ConfigEditorBoolean
-    @ConfigOption(name = "Party All Invite", desc = "Automatically turn on allinvite if someone types §b!allinv")
+    @ConfigOption(name = "Party All Invite", desc = "Automatically turn on allinvite if someone types §b!allinv§7.")
     public boolean allInviteCommand = false;
+
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(name = "Ping", desc = "Sends current ping into Party Chat if someone types §b!ping§7.\n" +
+        "§cNote: Will not work correctly with the Hypixel Ping API turned off in Dev.")
+    public boolean pingCommand = false;
+
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(name = "TPS", desc = "Sends current TPS into Party Chat if someone types §b!tps§7.")
+    public boolean tpsCommand = false;
 
     public enum TrustedUser {
         BEST_FRIENDS("Best Friends"),

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import com.google.gson.annotations.Expose
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -279,8 +280,29 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
+fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(serverPosX, serverPosY, serverPosZ)
 
 fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
+
+fun Entity.getPositionLog() = PositionLog(
+    tick = ticksExisted,
+    position = getLorenzVec(),
+    prev = getPrevLorenzVec(),
+    server = getServerLorenzVec(),
+    motion = getMotionLorenzVec(),
+    yaw = rotationYaw,
+    pitch = rotationPitch,
+)
+
+data class PositionLog(
+    @Expose val tick: Int,
+    @Expose val position: LorenzVec,
+    @Expose val prev: LorenzVec,
+    @Expose val server: LorenzVec,
+    @Expose val motion: LorenzVec,
+    @Expose val yaw: Float,
+    @Expose val pitch: Float,
+)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 

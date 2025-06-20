@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden.laneswitch
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropType
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -13,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class FarmingLaneConfig {
     @ConfigOption(
         name = "Create Lanes",
@@ -54,10 +51,8 @@ class FarmingLaneConfig {
     @FeatureToggle
     var cornerWaypoints: Boolean = false
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Ignored Crops", desc = "Add the crops you wish to not setup a lane for.")
     @ConfigEditorDraggableList
     var ignoredCrops: MutableList<CropType> = mutableListOf()
-    //#endif
 }

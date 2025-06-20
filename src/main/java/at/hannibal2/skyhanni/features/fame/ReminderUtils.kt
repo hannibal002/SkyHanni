@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.fame
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.utils.LorenzUtils
 
 object ReminderUtils {
 
@@ -19,7 +19,7 @@ object ReminderUtils {
      */
     fun isBusy(ignoreFarmingContest: Boolean = false): Boolean =
         (DungeonApi.inDungeon() && !DungeonApi.completed) ||
-            LorenzUtils.inKuudraFight ||
+            KuudraApi.inKuudra ||
             (FarmingContestApi.inContest && !ignoreFarmingContest) ||
             RiftApi.inRift() ||
             IslandTypeTags.BUSY.inAny()

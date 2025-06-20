@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -97,9 +98,7 @@ enum class FarmingItemType(
     fun getDisplay(clickEnabled: Boolean = false) = object : Renderable {
 
         val content = Renderable.clickable(
-            Renderable.itemStackWithTip(
-                getItem(), 1.0, 0, 0, false,
-            ),
+            ItemStackRenderable(getItem(), scale = 1.0, xSpacing = 0, ySpacing = 0, rescaleSkulls = false).withTip(),
             onLeftClick = onClick(),
             condition = { clickEnabled },
         )
