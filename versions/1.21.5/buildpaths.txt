@@ -9,6 +9,7 @@ at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery.kt
 at.hannibal2.skyhanni.api.event.GeneratedEventPrimaryFunctionNames.kt
 at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi.kt
+at.hannibal2.skyhanni.api.ExperimentationTableApi.kt
 at.hannibal2.skyhanni.config.ConfigGuiManager.kt
 at.hannibal2.skyhanni.config.ConfigManager.kt
 at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.kt
@@ -343,7 +344,6 @@ at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.kt
 at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData.kt
 at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi.kt
 at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker.kt
-at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableEnums.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationXPOverlay.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsDryStreakDisplay.kt
