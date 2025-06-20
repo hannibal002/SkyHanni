@@ -87,7 +87,7 @@ object SoundUtils {
         plingSound.playSound()
     }
 
-    fun command(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         if (args.isEmpty()) {
             ChatUtils.userError("Specify a sound effect to test")
             return
@@ -119,7 +119,7 @@ object SoundUtils {
         event.registerBrigadier("shplaysound") {
             description = "Play the specified sound effect at the given pitch and volume."
             category = CommandCategory.DEVELOPER_TEST
-            legacyCallbackArgs { command(it) }
+            legacyCallbackArgs { onCommand(it) }
         }
     }
 }

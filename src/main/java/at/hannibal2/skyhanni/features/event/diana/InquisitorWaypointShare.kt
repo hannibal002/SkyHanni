@@ -111,13 +111,6 @@ object InquisitorWaypointShare {
         val spawnTime: SimpleTimeMark,
     )
 
-    private var test = false
-
-    fun test() {
-        test = !test
-        ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
-    }
-
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return

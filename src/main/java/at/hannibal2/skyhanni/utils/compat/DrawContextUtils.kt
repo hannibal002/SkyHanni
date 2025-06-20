@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.item.ItemStack
 import net.minecraft.util.Vec3
+import java.nio.FloatBuffer
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
+//$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
 //#endif
 
@@ -28,6 +31,8 @@ object DrawContextUtils {
             ErrorManager.crashInDevEnv("drawContext is null")
             ErrorManager.skyHanniError("drawContext is null")
         }
+
+    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.drawItem(item, x, y)
 
     fun setContext(context: DrawContext) {
         renderDepth++
@@ -60,6 +65,36 @@ object DrawContextUtils {
         drawContext.matrices.translate(vec)
     }
 
+    fun rotate(angle: Float, x: Number, y: Number, z: Number) {
+        val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
+        //#if MC < 1.21
+        GlStateManager.rotate(angle, xf, yf, zf)
+        //#else
+        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
+        //#endif
+    }
+
+    fun multMatrix(buffer: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.multMatrix(buffer)
+        //#else
+        //$$ multMatrix(Matrix4f(buffer))
+        //#endif
+    }
+
+    //#if MC > 1.21
+    //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    //#endif
+
+    fun getFloat(pName: Int, params: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.getFloat(pName, params)
+        //#else
+        //$$ params.clear()
+        //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
+        //#endif
+    }
+
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
     }
@@ -72,14 +107,6 @@ object DrawContextUtils {
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
         drawContext.matrices.popMatrix()
-    }
-
-    fun rotate(angle: Float, x: Float, y: Float, z: Float) {
-        //#if MC < 1.21
-        GlStateManager.rotate(angle, x, y, z)
-        //#else
-        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
-        //#endif
     }
 
     /**
@@ -110,5 +137,9 @@ object DrawContextUtils {
         scale(x.toFloat(), y.toFloat(), z.toFloat())
         action()
         scale(1 / x.toFloat(), 1 / y.toFloat(), 1 / z.toFloat())
+    }
+
+    fun loadIdentity() {
+        drawContext.matrices.loadIdentity()
     }
 }
