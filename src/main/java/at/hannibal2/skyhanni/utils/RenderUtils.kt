@@ -35,8 +35,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
-//#if TODO
-import net.minecraft.client.gui.ScaledResolution
+//#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
 //#endif
 import net.minecraft.client.renderer.GlStateManager
