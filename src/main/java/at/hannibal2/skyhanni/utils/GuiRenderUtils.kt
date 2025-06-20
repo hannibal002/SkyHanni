@@ -32,12 +32,11 @@ import kotlin.math.min
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
-
 //#else
 //$$ import net.minecraft.client.render.RenderLayer
 //#endif
 
-// todo, some functions need 1.21 impls
+// todo 1.21 impl needed
 /**
  * Some functions taken from NotEnoughUpdates
  */

@@ -81,6 +81,10 @@ object RenderUtils {
     //$$ private val colorBuffer:  FloatBuffer = BufferUtils.createFloatBuffer(16)
     //#endif
 
+    //#if MC < 1.8.9
+    /**
+     * Used for some debugging purposes.
+     */
     val absoluteTranslation
         get() = run {
             matrixBuffer.clear()
@@ -192,8 +196,8 @@ object RenderUtils {
     ) {
         _drawColor(location, color, beacon, alpha, seeThroughBlocks)
     }
-    //#if TODO
 
+    //#if TODO
     @Deprecated("Use WorldRenderUtils' getViewerPos instead", ReplaceWith("WorldRenderUtils.getViewerPos(partialTicks)"))
     fun getViewerPos(partialTicks: Float) =
         Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
@@ -201,6 +205,7 @@ object RenderUtils {
 
     @Deprecated("Use WorldRenderUtils' expandBlock instead")
     fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
+
     @Deprecated("Use WorldRenderUtils' inflateBlock instead")
     fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
 
@@ -433,7 +438,9 @@ object RenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
+        //#if TODO
         PatcherFixes.onPlayerEyeLine()
+        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
