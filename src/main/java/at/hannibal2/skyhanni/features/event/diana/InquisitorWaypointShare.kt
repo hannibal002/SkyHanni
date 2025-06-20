@@ -252,7 +252,7 @@ object InquisitorWaypointShare {
         val messageComponent = packet.chatComponent
 
         val message = messageComponent.formattedText.stripHypixelMessage()
-        //#if MC<1.12
+        //#if MC < 1.16
         if (packet.type.toInt() != 0) return
         //#else
         //$$ if (packet.type.id.toInt() != 0) return

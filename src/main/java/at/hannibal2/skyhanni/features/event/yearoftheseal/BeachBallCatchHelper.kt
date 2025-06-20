@@ -13,10 +13,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -26,6 +22,10 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.LineDrawer
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
@@ -74,7 +74,7 @@ object BeachBallCatchHelper {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val color = config.bouncyBallLineColor.toSpecialColor()
-        RenderUtils.LineDrawer.draw3D(event.partialTicks) {
+        LineDrawer.draw3D(event.partialTicks) {
             predictors.forEach { (_, predict) ->
                 drawPath(predict.prePath, color.darker(), 4, true, bezierPoint = -1.0)
                 drawPath(predict.predictedPath, color, 8, true, bezierPoint = -1.0)
@@ -85,10 +85,10 @@ object BeachBallCatchHelper {
 
     private fun SkyHanniRenderWorldEvent.renderLandingPosition() {
         if (!config.bouncyBallLandingSpot.get()) return
-        val player = exactLocation(MinecraftCompat.localPlayer).add(y = 1)
+        val player = WorldRenderUtils.exactLocation(MinecraftCompat.localPlayer, partialTicks).add(y = 1)
         for ((e, predictor) in predictors.map { EntityUtils.getEntityByID(it.key) to it.value }) {
             val entity = e ?: continue
-            val location = exactLocation(entity).copy(y = player.y)
+            val location = WorldRenderUtils.exactLocation(entity, partialTicks).copy(y = player.y)
             renderBlock(location, player, predictor)
             renderString(predictor, location)
         }

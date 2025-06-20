@@ -133,6 +133,7 @@ object ReforgeHelper {
     }
 
     private fun handleReforgeButtonClick(event: GuiContainerEvent.SlotClickEvent): Boolean {
+        if (reforgeToSearch == null) return false
         if (currentReforge == reforgeToSearch) {
             event.cancel()
             waitForChat.set(false)
@@ -334,7 +335,6 @@ object ReforgeHelper {
 
         val alreadySelected = sortAfter == stat
         val fieldColor = if (alreadySelected) LorenzColor.GRAY else LorenzColor.DARK_GRAY
-
 
         val tips = if (alreadySelected) {
             listOf("§6Sort by", tip)

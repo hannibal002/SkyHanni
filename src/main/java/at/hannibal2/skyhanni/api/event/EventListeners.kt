@@ -2,11 +2,10 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ReflectionUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.util.function.Consumer
 
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
@@ -25,6 +24,9 @@ class EventListeners private constructor(val name: String, private val isGeneric
     }
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
+        require(Modifier.isPublic(method.modifiers)) {
+            "Method ${method.name}() in ${instance.javaClass.name} is not public. Make sure to set it to public."
+        }
         val name = buildListenerName(method)
         val eventConsumer = when (method.parameterCount) {
             0 -> createZeroParameterConsumer(method, instance, options)
@@ -124,16 +126,16 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         init {
             cachedPredicates = buildList {
-                if (options.onlyOnSkyblock) add { _ -> LorenzUtils.inSkyBlock }
+                if (options.onlyOnSkyblock) add { _ -> SkyBlockUtils.inSkyBlock }
 
                 if (options.onlyOnIsland != IslandType.ANY) {
                     val island = options.onlyOnIsland
-                    add { _ -> island.isInIsland() }
+                    add { _ -> island.isCurrent() }
                 }
 
                 if (options.onlyOnIslands.isNotEmpty()) {
                     val set = options.onlyOnIslands.toSet()
-                    add { _ -> inAnyIsland(set) }
+                    add { _ -> SkyBlockUtils.inAnyIsland(set) }
                 }
             }
             // These predicates cant be cached since they depend on info about the actual event

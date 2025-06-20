@@ -14,6 +14,9 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -23,22 +26,23 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object EstimatedItemValue {
 
@@ -107,9 +111,9 @@ object EstimatedItemValue {
         if (inStorage) return
 
         // render the estimated item value over NEU PV
-        GlStateManager.translate(0f, 0f, 200f)
+        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
-        GlStateManager.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f, -200f)
 
         renderedItems++
     }
@@ -131,7 +135,11 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        if (LorenzUtils.debug) {
+        //#if TODO
+        if (SkyHanniDebugsAndTests.enabled) {
+            //#else
+            //$$ if (true) {
+            //#endif
             if (Keyboard.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
@@ -142,6 +150,7 @@ object EstimatedItemValue {
         }
 
         try {
+            // TODO this code needs to be changed around
             config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
@@ -162,7 +171,7 @@ object EstimatedItemValue {
     }
 
     private fun checkCurrentlyVisible(): Boolean {
-        if (!LorenzUtils.inSkyBlock) return false
+        if (!SkyBlockUtils.inSkyBlock) return false
         if (!config.enabled) return false
         if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return false
         if (System.currentTimeMillis() > lastToolTipTime + 200) return false
@@ -300,10 +309,12 @@ object EstimatedItemValue {
     fun renderInNeuStorageOverlay() {
         if (!config.enabled) return
 
+        //#if MC < 1.16
         // render the estimated item value over NEU Storage
-        GlStateManager.translate(0f, 0f, 200f)
+        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
-        GlStateManager.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f, -200f)
         renderedItems++
+        //#endif
     }
 }

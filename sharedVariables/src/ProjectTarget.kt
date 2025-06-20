@@ -16,14 +16,6 @@ enum class ProjectTarget(
         "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
         MappingStyle.SEARGE,
         "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
-        "BRIDGE112",
-    ),
-    BRIDGE112(
-        "1.12.2",
-        MinecraftVersion.MC11202,
-        "de.oceanlabs.mcp:mcp_stable:39-1.12@zip",
-        MappingStyle.SEARGE,
-        "net.minecraftforge:forge:1.12.2-14.23.5.2847",
         "BRIDGE116FORGE",
     ),
     BRIDGE116FORGE(

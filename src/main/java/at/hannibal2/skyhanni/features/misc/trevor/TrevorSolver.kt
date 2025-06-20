@@ -8,9 +8,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
@@ -48,27 +50,27 @@ object TrevorSolver {
     }
 
     fun findMob() {
+        val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
             val isTrevor = MobData.entityToMob[entity]?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
-            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) }
+            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) || it.entityName.contains(name) }
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
                 val currentMob = currentMob ?: run {
                     ErrorManager.skyHanniError(
                         "Found trevor mob but current mob is null",
                         "entity" to entity,
-                        "mobDataMob" to MobData.entityToMob[entity]
+                        "mobDataMob" to MobData.entityToMob[entity],
                     )
                 }
 
                 if (foundID == entity.entityId) {
-                    val dist = entity.position.toLorenzVec().distanceToPlayer()
                     val isOasisMob = currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP
                     if (isOasisMob && mobLocation == TrapperMobArea.OASIS && !isTrevor) return
-                    val canSee = entity.canBeSeen() && dist < currentMob.renderDistance
+                    val canSee = entity.canBeSeen(currentMob.renderDistance) && !entity.isInvisible && !hasBlindness
                     if (canSee) {
                         if (mobLocation != TrapperMobArea.FOUND) {
                             TitleManager.sendTitle("§2Saw ${currentMob.mobName}!")

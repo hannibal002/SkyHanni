@@ -59,7 +59,7 @@ object EntityOutlineRenderer {
         val main = mc.framebuffer
         val frameBuffer = Framebuffer(main.framebufferTextureWidth, main.framebufferTextureHeight, true)
         frameBuffer.setFramebufferFilter(GL11.GL_NEAREST)
-        frameBuffer.setFramebufferColor(0.0f, 0.0f, 0.0f, 0.0f)
+        frameBuffer.setFramebufferColor(0f, 0f, 0f, 0f)
         return frameBuffer
     }
 
@@ -311,9 +311,9 @@ object EntityOutlineRenderer {
     // Only render if renderManager would render and the world is loaded at the entity
 
     private fun outlineColor(color: Int) {
-        BUF_FLOAT_4.put(0, (color shr 16 and 255).toFloat() / 255.0f)
-        BUF_FLOAT_4.put(1, (color shr 8 and 255).toFloat() / 255.0f)
-        BUF_FLOAT_4.put(2, (color and 255).toFloat() / 255.0f)
+        BUF_FLOAT_4.put(0, (color shr 16 and 255).toFloat() / 255f)
+        BUF_FLOAT_4.put(1, (color shr 8 and 255).toFloat() / 255f)
+        BUF_FLOAT_4.put(2, (color and 255).toFloat() / 255f)
         BUF_FLOAT_4.put(3, 1f)
         GL11.glTexEnv(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_COLOR, BUF_FLOAT_4)
     }

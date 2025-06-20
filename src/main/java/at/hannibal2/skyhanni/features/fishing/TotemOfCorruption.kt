@@ -77,7 +77,7 @@ object TotemOfCorruption {
         if (!config.hideParticles) return
 
         for (totem in totems) {
-            if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0.0f) {
+            if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0f) {
                 if (totem.location.distance(event.location) < 4.0) {
                     event.cancel()
                 }

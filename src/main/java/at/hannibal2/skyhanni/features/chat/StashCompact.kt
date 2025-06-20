@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.StashCompact.StashType.Companion.fromGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -95,8 +95,15 @@ object StashCompact {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         joinedProfileAt = SimpleTimeMark.now()
+    }
+
+    @HandleEvent
+    fun onIslandChange() {
+        if (!config.hideDuplicateWarning.worldChangeReset) return
+        currentMessages.clear()
+        lastMessages.clear()
     }
 
     @HandleEvent
@@ -128,7 +135,7 @@ object StashCompact {
             val currentMessage = currentMessages[currentType] ?: return@matchMatcher
             if (currentMessage.materialCount <= config.hideLowWarningsThreshold) return@matchMatcher
             lastMessages[currentType]?.let { lastMessage ->
-                if (config.hideDuplicateCounts && lastMessage == currentMessage) return@matchMatcher
+                if (config.hideDuplicateWarning.enabled && lastMessage == currentMessage) return@matchMatcher
             }
 
             currentMessage.sendCompactedStashMessage()
@@ -167,4 +174,11 @@ object StashCompact {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val base = "chat.filterType.stashMessages"
+
+        event.move(87, "$base.hideDuplicateCounts", "$base.hideDuplicateWarning.enabled")
+    }
 }

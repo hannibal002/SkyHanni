@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -35,31 +37,27 @@ object BurrowWarpHelper {
         if (event.keyCode != config.keyBindWarp) return
         if (Minecraft.getMinecraft().currentScreen != null) return
 
-        currentWarp?.let {
-            if (lastWarpTime.passedSince() > 1.seconds) {
-                lastWarpTime = SimpleTimeMark.now()
-                HypixelCommands.warp(it.name)
-                lastWarp = currentWarp
-                GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
-                TitleManager.conditionallyStopTitle { currentTitle ->
-                    currentTitle.startsWith("§bWarp to ")
-                }
-            }
+        val warp = currentWarp ?: return
+        if (lastWarpTime.passedSince() < 1.seconds) return
+        lastWarpTime = SimpleTimeMark.now()
+        HypixelCommands.warp(warp.name)
+        lastWarp = currentWarp
+        GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
+        TitleManager.conditionallyStopTitle { currentTitle ->
+            currentTitle.startsWith("§bWarp to ")
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (event.message == "§cYou haven't unlocked this fast travel destination!") {
-            if (lastWarpTime.passedSince() < 1.seconds) {
-                lastWarp?.let {
-                    it.unlocked = false
-                    ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
-                    ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
-                    lastWarp = null
-                    currentWarp = null
-                }
-            }
+        if (event.message != "§cYou haven't unlocked this fast travel destination!") return
+        if (lastWarpTime.passedSince() > 1.seconds) return
+        lastWarp?.let {
+            it.unlocked = false
+            ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
+            ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
+            lastWarp = null
+            currentWarp = null
         }
     }
 
@@ -96,7 +94,10 @@ object BurrowWarpHelper {
         debug?.add("target: ${target.printWithAccuracy(1)}")
         val playerLocation = LocationUtils.playerLocation()
         debug?.add("playerLocation: ${playerLocation.printWithAccuracy(1)}")
-        val warpPoint = getNearestWarpPoint(target)
+        val warpPoint = getNearestWarpPoint(target) ?: run {
+            debug?.add("no nearest warp point found (everything disabled/not unlocked with tp scrolls)")
+            return
+        }
         debug?.add("warpPoint: ${warpPoint.displayName}")
 
         val playerDistance = playerLocation.distance(target)
@@ -110,13 +111,20 @@ object BurrowWarpHelper {
         currentWarp = if (setWarpPoint) warpPoint else null
     }
 
-    private fun getNearestWarpPoint(location: LorenzVec) =
+    private fun getNearestWarpPoint(location: LorenzVec): WarpPoint? =
         WarpPoint.entries.filter { it.unlocked && !it.ignored() }.map { it to it.distance(location) }
-            .sorted().first().first
+            .sorted().firstOrNull()?.first
 
-    fun resetDisabledWarps() {
-        WarpPoint.entries.forEach { it.unlocked = true }
-        ChatUtils.chat("Reset disabled burrow warps.")
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetburrowwarps") {
+            description = "Manually resetting disabled diana burrow warp points"
+            category = CommandCategory.USERS_RESET
+            callback {
+                WarpPoint.entries.forEach { point -> point.unlocked = true }
+                ChatUtils.chat("Reset disabled burrow warps.")
+            }
+        }
     }
 
     enum class WarpPoint(
@@ -126,7 +134,6 @@ object BurrowWarpHelper {
         val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
     ) {
-
         HUB("Hub", LorenzVec(-3, 70, -70), 2),
         CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
         CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),

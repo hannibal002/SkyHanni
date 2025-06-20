@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SignUtils
@@ -64,7 +65,7 @@ object GardenOptimalSpeed {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
-        currentSpeed = (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
+        currentSpeed = PlayerUtils.getWalkSpeed()
 
         if (sneaking && !sneakingSince.isInPast()) {
             sneakingSince = SimpleTimeMark.now()

@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.util.AxisAlignedBB
@@ -34,7 +34,7 @@ object LimboTimeTracker {
     private var inFakeLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
-    private var userLuck: Float = 0.0F
+    private var userLuck: Float = 0f
     private const val USER_LUCK_MULTIPLIER = 0.000810185F
     private const val FIRE_MULTIPLIER = 1.01F
     private var onFire = false
@@ -96,7 +96,7 @@ object LimboTimeTracker {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inLimbo) return
-        if (LorenzUtils.inSkyBlock) {
+        if (SkyBlockUtils.inSkyBlock) {
             leaveLimbo()
             return
         }

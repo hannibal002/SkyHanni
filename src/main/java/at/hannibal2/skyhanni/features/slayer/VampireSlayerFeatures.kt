@@ -37,7 +37,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
@@ -270,7 +269,7 @@ object VampireSlayerFeatures {
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
-        for (stand in MinecraftCompat.localWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
+        for (stand in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
             val vec = stand.position.toLorenzVec()
             val distance = vec.distanceToPlayer()
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
@@ -297,13 +296,14 @@ object VampireSlayerFeatures {
                     1.5,
                     ignoreBlocks = false,
                 )
-                for ((player, stand2) in standList) {
+                for ((ichor, boss) in standList) {
                     if (!(configBloodIchor.showLines && isIchor) && !(configKillerSpring.showLines && isSpring)) continue
-                    if (!player.canBeSeen()) continue
-                    if (!stand2.canBeSeen()) continue
+
+                    // ichors are sometimes in the ground
+                    if (!ichor.canBeSeen(vecYOffset = 1.5)) continue
                     event.draw3DLine(
-                        event.exactPlayerEyeLocation(player),
-                        event.exactPlayerEyeLocation(stand2),
+                        event.exactPlayerEyeLocation(boss),
+                        event.exactPlayerEyeLocation(ichor),
                         linesColorStart,
                         3,
                         true,
@@ -332,11 +332,11 @@ object VampireSlayerFeatures {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
-        for (player in EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0)) {
-            if (!player.isHighlighted() || event.type != EnumParticleTypes.ENCHANTMENT_TABLE) continue
-            for (stand in EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0)) {
-                if (stand.hasSkullTexture(KILLER_SPRING_TEXTURE) || stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
-                    standList = standList.editCopy { this[stand] = player }
+        for (boss in EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0)) {
+            if (!boss.isHighlighted() || event.type != EnumParticleTypes.ENCHANTMENT_TABLE) continue
+            for (ichor in EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0)) {
+                if (ichor.hasSkullTexture(KILLER_SPRING_TEXTURE) || ichor.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
+                    standList = standList.editCopy { this[ichor] = boss }
                 }
             }
         }
