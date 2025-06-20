@@ -151,8 +151,11 @@ object HypixelCommands {
         send("party promote $player")
     }
 
-    fun partyChat(message: String) {
-        send("pc $message")
+    fun partyChat(message: String, prefix: Boolean = false) {
+        when (prefix) {
+            false -> send("pc $message")
+            true -> send("pc [SkyHanni] $message")
+        }
     }
 
     fun partyInvite(player: String) {

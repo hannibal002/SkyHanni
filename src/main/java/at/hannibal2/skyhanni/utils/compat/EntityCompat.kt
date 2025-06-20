@@ -32,7 +32,7 @@ fun EntityLivingBase.getAllEquipment() =
 //#if MC < 1.16
     this.inventory
 //#elseif MC < 1.21
-//$$ this.equipmentAndArmor.toList()
+//$$ this.armorSlots
 //#else
 //$$ this.equipment.map.values.toTypedArray()
 //#endif

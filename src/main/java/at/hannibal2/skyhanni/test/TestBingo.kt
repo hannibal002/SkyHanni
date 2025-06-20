@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,6 +26,15 @@ object TestBingo {
             }
         } else {
             event.addIrrelevant("not active.")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestbingo") {
+            description = "Toggle the test bingo card display mode"
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback { toggle() }
         }
     }
 }

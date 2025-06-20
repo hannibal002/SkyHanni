@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -93,7 +93,11 @@ object CarnivalZombieShootout {
                         "helmet" to helmet,
                         "helmet.displayName" to helmet.displayName,
                         "helmet.item" to helmet.item,
+                        //#if MC < 1.21
                         "helmet.unlocalizedName" to helmet.unlocalizedName,
+                        //#else
+                        //$$ "helmet.unlocalizedName" to helmet.item.translationKey,
+                        //#endif
                     )
                     return@mapNotNull null
                 }
@@ -185,5 +189,5 @@ object CarnivalZombieShootout {
 
     private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.item }
 
-    private fun isEnabled() = config.enabled && LorenzUtils.skyBlockArea == "Carnival"
+    private fun isEnabled() = config.enabled && SkyBlockUtils.graphArea == "Carnival"
 }

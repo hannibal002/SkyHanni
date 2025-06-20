@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
@@ -236,6 +238,15 @@ object PestFinder {
         }
 
         plot.sendTeleportTo()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtpinfested") {
+            description = "Teleports you to the nearest infested plot"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { teleportNearestInfestedPlot() }
+        }
     }
 
     fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)

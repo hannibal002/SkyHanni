@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -154,6 +155,11 @@ object SkyHanniMod {
             simpleCallback {
                 openConfigGui()
             }
+        }
+        event.registerBrigadier("shconfigsave") {
+            description = "Manually saving the config"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
         }
     }
 }

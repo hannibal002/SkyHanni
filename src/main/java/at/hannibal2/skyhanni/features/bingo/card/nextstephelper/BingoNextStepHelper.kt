@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.bingo.card.nextstephelper
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -22,11 +24,11 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.SkillLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -78,7 +80,7 @@ object BingoNextStepHelper {
     private var currentSteps = emptyList<NextStep>()
     var currentHelp = emptyList<String>()
 
-    fun command() {
+    private fun command() {
         updateResult(true)
     }
 
@@ -243,7 +245,7 @@ object BingoNextStepHelper {
     private fun updateIslandsVisited() {
         for (step in islands.values) {
             val island = step.island
-            if (island == LorenzUtils.skyBlockIsland) {
+            if (island == SkyBlockUtils.currentIsland) {
                 step.done()
             }
         }
@@ -471,5 +473,14 @@ object BingoNextStepHelper {
         return this
     }
 
-    private fun isEnabled() = LorenzUtils.isBingoProfile && config.enabled
+    private fun isEnabled() = SkyBlockUtils.isBingoProfile && config.enabled
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shprintbingohelper") {
+            description = "Prints the next step helper for the bingo card"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { command() }
+        }
+    }
 }

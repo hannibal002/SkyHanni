@@ -616,7 +616,6 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    //#if TODO
     /**
      * Method to draw a rounded textured rect.
      *
@@ -653,18 +652,24 @@ object RenderUtils {
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
+        //#if TODO
         RoundedTextureShader.scaleFactor = scaleFactor.toFloat()
         RoundedTextureShader.radius = radius.toFloat()
         RoundedTextureShader.smoothness = smoothness.toFloat()
         RoundedTextureShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedTextureShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        //#endif
 
         DrawContextUtils.pushMatrix()
+        //#if TODO
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
+        //#endif
 
         GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
 
+        //#if TODO
         ShaderManager.disableShader()
+        //#endif
         DrawContextUtils.popMatrix()
     }
 
@@ -688,18 +693,24 @@ object RenderUtils {
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
+        //#if TODO
         RoundedRectangleShader.scaleFactor = scaleFactor.toFloat()
         RoundedRectangleShader.radius = radius.toFloat()
         RoundedRectangleShader.smoothness = smoothness.toFloat()
         RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        //#endif
 
         DrawContextUtils.pushMatrix()
+        //#if TODO
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
+        //#endif
 
         GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
 
+        //#if TODO
         ShaderManager.disableShader()
+        //#endif
         DrawContextUtils.popMatrix()
     }
 
@@ -732,6 +743,7 @@ object RenderUtils {
         val xIn = x * scaledRes
         val yIn = y * scaledRes
 
+        //#if TODO
         RoundedRectangleShader.scaleFactor = scaledRes.toFloat()
         RoundedRectangleShader.radius = radius.toFloat()
         RoundedRectangleShader.smoothness = smoothness.toFloat()
@@ -745,6 +757,7 @@ object RenderUtils {
 
         ShaderManager.disableShader()
         DrawContextUtils.popMatrix()
+        //#endif
     }
 
     /**
@@ -780,6 +793,7 @@ object RenderUtils {
 
         val borderAdjustment = borderThickness / 2
 
+        //#if TODO
         RoundedRectangleOutlineShader.scaleFactor = scaleFactor.toFloat()
         RoundedRectangleOutlineShader.radius = radius.toFloat()
         RoundedRectangleOutlineShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
@@ -790,9 +804,12 @@ object RenderUtils {
         // so the shader can blur the edges accordingly. This is because a 'blurriness' option makes more sense
         // to users than a 'sharpness' option in this context
         RoundedRectangleOutlineShader.borderBlur = max(1 - blur, 0f)
+        //#endif
 
         DrawContextUtils.pushMatrix()
+        //#if TODO
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
+        //#endif
 
         GuiRenderUtils.drawGradientRect(
             x - borderAdjustment,
@@ -803,10 +820,13 @@ object RenderUtils {
             bottomColor,
         )
 
+        //#if TODO
         ShaderManager.disableShader()
+        //#endif
         DrawContextUtils.popMatrix()
     }
 
+    //#if TODO
     fun getAlpha(): Float {
         colorBuffer.clear()
         GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)

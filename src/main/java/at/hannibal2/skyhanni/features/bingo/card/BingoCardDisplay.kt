@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -44,7 +44,7 @@ object BingoCardDisplay {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var displayMode = 0
 
-    fun command() {
+    private fun command() {
         reload()
     }
 
@@ -53,7 +53,7 @@ object BingoCardDisplay {
     }
 
     private fun toggleCommand() {
-        if (!LorenzUtils.isBingoProfile) {
+        if (!SkyBlockUtils.isBingoProfile) {
             ChatUtils.userError("This command only works on a bingo profile!")
             return
         }
@@ -219,7 +219,7 @@ object BingoCardDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (!config.enabled) return
 
         val currentlyOpen = canEditDisplay()
@@ -255,7 +255,7 @@ object BingoCardDisplay {
     @HandleEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         update()
     }
 
@@ -273,10 +273,15 @@ object BingoCardDisplay {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shbingotoggle") {
+        event.registerBrigadier("shbingotoggle") {
             description = "Toggle the bingo card display mode"
             category = CommandCategory.USERS_ACTIVE
             callback { toggleCommand() }
+        }
+        event.registerBrigadier("shreloadbingodata") {
+            description = "Reloads the bingo card data"
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback { command() }
         }
     }
 }

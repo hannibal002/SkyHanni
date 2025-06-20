@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage.HotspotRabbitStorage
 import at.hannibal2.skyhanni.data.IslandType
@@ -843,6 +845,15 @@ object HoppityCollectionStats {
             "$bp.showHotspotSummaryInHoppityStats" to "$bp.hoppityCollectionStats.showHotspotSummary",
         ).forEach { (oldPath, newPath) ->
             event.move(67, oldPath, newPath)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetsavedrabbits") {
+            description = "Resets the saved rabbits on this profile."
+            category = CommandCategory.USERS_RESET
+            simpleCallback { resetSavedRabbits() }
         }
     }
 }

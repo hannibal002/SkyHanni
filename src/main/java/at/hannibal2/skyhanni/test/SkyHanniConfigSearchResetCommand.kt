@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -17,6 +21,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
 // TODO in the future change something here
+@SkyHanniModule
 object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
@@ -43,7 +48,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private fun resetCommand(args: Array<String>): String {
+    fun resetCommand(args: Array<String>): String {
         if (args.size != 2) return "§c/shconfig reset <config element>"
         val term = args[1]
         if (term.startsWith("playerSpecific")) return "§cCannot reset playerSpecific! Use §e/shconfig set §cinstead."
@@ -355,5 +360,14 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Runnable) return "<Runnable>"
 
         return toString()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shconfig") {
+            description = "Searches or resets config elements §c(warning, dangerous!)"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { command(it) }
+        }
     }
 }
