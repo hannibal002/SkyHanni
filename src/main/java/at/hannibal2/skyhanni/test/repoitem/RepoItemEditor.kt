@@ -113,7 +113,7 @@ object RepoItemEditor {
         if (itemModel.isNotEmpty()) {
             baseJson.addProperty("itemModel", itemModel)
         }
-        baseJson.addProperty("nbttag", nbtTag.toString())
+        baseJson.addProperty("nbttag", nbtTag.toString().replace("\u0027", ""))
         baseJson.addProperty("damage", damage)
         val jsonLore = JsonArray()
         lore.split("\n").forEach { line ->
@@ -136,6 +136,22 @@ object RepoItemEditor {
         }
         return baseJson
     }
+
+    //#if MC > 1.21
+    //$$ fun convertStringTagListToString(list: net.minecraft.nbt.NbtList): String {
+    //$$     return buildString {
+    //$$         append("[")
+    //$$         for ((index, tag) in list.value.withIndex()) {
+    //$$             if (index != 0) {
+    //$$                 append(",")
+    //$$             }
+    //$$             append("$index:")
+    //$$             append(tag.toString())
+    //$$         }
+    //$$         append("]")
+    //$$     }
+    //$$ }
+    //#endif
 
     fun saveItemToRepo(internalName: NeuInternalName, json: JsonObject) {
         val itemsDir = File(EnoughUpdatesManager.repoLocation, "items")

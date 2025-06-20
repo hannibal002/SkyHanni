@@ -350,12 +350,9 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         //$$         }
         //$$         textures.putString("Value", skullTexture.value)
         //$$
-        //$$         properties.put(
-        //$$             "textures",
-        //$$             NbtList().apply {
-        //$$                 add(textures)
-        //$$             },
-        //$$         )
+        //$$         val texturesList = NbtList().apply { add(textures) }
+        //$$         properties.putString("textures", RepoItemEditor.convertStringTagListToString(texturesList))
+        //$$
         //$$         skullOwner.put("Properties", properties)
         //$$         tag.put("SkullOwner", skullOwner)
         //$$     }
@@ -375,7 +372,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         //$$     }
         //$$
         //$$     val display = NbtCompound()
-        //$$     display.put("Lore", loreList)
+        //$$     display.putString("Lore", RepoItemEditor.convertStringTagListToString(loreList))
         //$$     display.putString("Name", displayNameField.getText())
         //$$     val color = nbtTag.get(DataComponentTypes.DYED_COLOR)?.rgb
         //$$     color?.let {

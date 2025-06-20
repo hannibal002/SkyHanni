@@ -142,12 +142,9 @@ object NpcLocationExporter {
             //$$     }
             //$$     textures.putString("Value", skullTexture.value)
             //$$
-            //$$     properties.put(
-            //$$         "textures",
-            //$$         NbtList().apply {
-            //$$             add(textures)
-            //$$         },
-            //$$     )
+            //$$     val texturesList = NbtList().apply { add(textures) }
+            //$$     properties.putString("textures", RepoItemEditor.convertStringTagListToString(texturesList))
+            //$$
             //$$     skullOwner.put("Properties", properties)
             //$$     nbt.put("SkullOwner", skullOwner)
             //$$ }

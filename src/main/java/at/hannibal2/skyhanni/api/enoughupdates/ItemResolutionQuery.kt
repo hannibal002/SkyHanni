@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
-import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -27,9 +26,9 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Matcher
-
 //#if MC > 1.21
 //$$ import net.minecraft.component.ComponentMap
+//#endif
 
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {

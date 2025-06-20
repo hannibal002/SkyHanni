@@ -27,3 +27,4 @@ extendable class net/minecraft/client/render/RenderLayer$MultiPhase
 accessible field net/minecraft/client/font/BakedGlyph textRenderLayers Lnet/minecraft/client/font/TextRenderLayerSet;
 accessible method net/minecraft/text/TextColor <init> (ILjava/lang/String;)V
 accessible field net/minecraft/client/gui/widget/TextFieldWidget selectionEnd I
+accessible field net/minecraft/nbt/NbtList value Ljava/util/List;
