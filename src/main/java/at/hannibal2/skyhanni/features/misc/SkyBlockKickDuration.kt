@@ -25,6 +25,7 @@ object SkyBlockKickDuration {
     private var showTime = false
     private var lastKickTime = SimpleTimeMark.farPast()
     private var hasWarned = false
+    private var timeoutKick = true
 
     private val patternGroup = RepoPattern.group("misc.kickduration")
 
@@ -49,12 +50,13 @@ object SkyBlockKickDuration {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled() || !showTime) return
+        if (!isEnabled() || !timeoutKick) return
 
         if (kickPattern.matches(event.message)) {
             if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
                 kickMessage = false
                 showTime = true
+                timeoutKick = false
                 lastKickTime = SimpleTimeMark.now()
             } else {
                 kickMessage = true
@@ -64,6 +66,7 @@ object SkyBlockKickDuration {
         if (problemJoiningPattern.matches(event.message)) {
             kickMessage = false
             showTime = true
+            timeoutKick = false
             lastKickTime = SimpleTimeMark.now()
         }
     }
@@ -74,6 +77,7 @@ object SkyBlockKickDuration {
         if (kickMessage) {
             kickMessage = false
             showTime = true
+            timeoutKick = true
             lastKickTime = SimpleTimeMark.now()
         }
         hasWarned = false
@@ -87,6 +91,7 @@ object SkyBlockKickDuration {
 
         if (SkyBlockUtils.inSkyBlock) {
             showTime = false
+            timeoutKick = true
         }
 
         if (lastKickTime.passedSince() > 5.minutes) {
