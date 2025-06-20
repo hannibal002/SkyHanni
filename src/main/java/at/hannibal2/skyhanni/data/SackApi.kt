@@ -486,7 +486,7 @@ object SackApi {
                 callback {
                     val arg = getArg(internalName)
                     if (sackListInternalNames.contains(arg.uppercase())) {
-                        ChatUtils.chat("Sack data for ${arg}: ${fetchSackItem(arg.toInternalName())}")
+                        ChatUtils.chat("Sack data for $arg: ${fetchSackItem(arg.toInternalName())}")
                     } else {
                         ChatUtils.userError("That item isn't a valid sack item.")
                     }

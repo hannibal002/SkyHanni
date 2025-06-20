@@ -382,6 +382,7 @@ object SkillApi {
         storage?.set(skillType, skillInfo)
     }
 
+    @Suppress("ReturnCount")
     private fun onCommand(it: Array<String>) {
         if (it.isEmpty()) {
             commandHelp()
@@ -521,11 +522,11 @@ object SkillApi {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE
             callback { onCommand(it) }
-            autoComplete {
-                when (it.size) {
+            autoComplete {args ->
+                when (args.size) {
                     1 -> listOf("levelwithxp", "xpforlevel", "goal")
-                    2 -> if (it[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
-                        it,
+                    2 -> if (args[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
+                        args,
                         SkillType.entries.map { it.displayName },
                     ) else listOf()
 

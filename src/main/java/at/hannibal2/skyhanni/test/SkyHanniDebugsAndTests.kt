@@ -615,6 +615,7 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
     }
 
+    @Suppress("LongMethod")
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shresetconfig") {
