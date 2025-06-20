@@ -3,8 +3,11 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.Vec3
+import java.nio.FloatBuffer
 //#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
+//$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
 //#endif
 
@@ -12,6 +15,13 @@ import net.minecraft.util.Vec3
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
  */
 object DrawContextUtils {
+
+    // GL11.GL_MODELVIEW_MATRIX
+    const val GL_MODELVIEW_MATRIX = 2982
+    // GL11.GL_PROJECTION_MATRIX
+    const val GL_PROJECTION_MATRIX = 2983
+    // GL11.GL_CURRENT_COLOR
+    const val GL_CURRENT_COLOR = 2816
 
     private var _drawContext: DrawContext? = null
 
@@ -60,6 +70,52 @@ object DrawContextUtils {
         drawContext.matrices.translate(vec)
     }
 
+    fun rotate(angle: Float, x: Number, y: Number, z: Number) {
+        val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
+        //#if MC < 1.21
+        GlStateManager.rotate(angle, xf, yf, zf)
+        //#else
+        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
+        //#endif
+    }
+
+    fun multMatrix(matrix: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.multMatrix(matrix)
+        //#else
+        //$$ val matrix4f = Matrix4f(matrix)
+        //$$ drawContext.matrices. multiplyPositionMatrix(matrix4f)
+        //#endif
+    }
+
+    fun getFloat(pName: Int, params: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.getFloat(pName, params)
+        //#else
+        //$$ params.clear()
+        //$$ when (pName) {
+        //$$     GL_MODELVIEW_MATRIX -> {
+        //$$         val mvEntry = drawContext.matrices.peek()
+        //$$         mvEntry.getPositionMatrix().get(params)
+        //$$     }
+        //$$     GL_PROJECTION_MATRIX -> {
+        //$$         RenderSystem.assertOnRenderThread()
+        //$$         RenderSystem.getProjectionMatrix().get(params)
+        //$$     }
+        //$$     GL_CURRENT_COLOR -> {
+        //$$         RenderSystem.assertOnRenderThread()
+        //$$         val c = RenderSystem.getShaderColor()
+        //$$         params.put(0, c[0])
+        //$$         params.put(1, c[1])
+        //$$         params.put(2, c[2])
+        //$$         params.put(3, c[3])
+        //$$     }
+        //$$     else -> { }
+        //$$ }
+        //$$ params.flip()
+        //#endif
+    }
+
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
     }
@@ -72,14 +128,6 @@ object DrawContextUtils {
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
         drawContext.matrices.popMatrix()
-    }
-
-    fun rotate(angle: Float, x: Float, y: Float, z: Float) {
-        //#if MC < 1.21
-        GlStateManager.rotate(angle, x, y, z)
-        //#else
-        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
-        //#endif
     }
 
     /**
@@ -110,5 +158,9 @@ object DrawContextUtils {
         scale(x.toFloat(), y.toFloat(), z.toFloat())
         action()
         scale(1 / x.toFloat(), 1 / y.toFloat(), 1 / z.toFloat())
+    }
+
+    fun loadIdentity() {
+        drawContext.matrices.loadIdentity()
     }
 }
