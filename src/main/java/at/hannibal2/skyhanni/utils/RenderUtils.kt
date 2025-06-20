@@ -850,7 +850,6 @@ object RenderUtils {
         //#else
         //$$ val scaleFactor = MinecraftClient.getInstance().window.scaleFactor
         //#endif
-        //#endif
 
         DrawContextUtils.popMatrix()
         val radiusIn = radius * scaleFactor
