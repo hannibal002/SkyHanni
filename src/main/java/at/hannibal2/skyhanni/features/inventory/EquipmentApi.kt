@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
@@ -33,8 +33,6 @@ enum class EquipmentSlot(val slot: Int, vararg val categories: ItemCategory) {
 object EquipmentApi {
 
     val inventory = InventoryDetector { it == "Your Equipment and Stats" }
-
-    private val stainedGlassPane = Item.getItemFromBlock(Blocks.stained_glass_pane)
 
     private val storage get() = ProfileStorageData.profileSpecific?.equipment
 
@@ -106,7 +104,7 @@ object EquipmentApi {
     }
 
     private fun handleInventoryItem(slot: EquipmentSlot, itemStack: ItemStack?) {
-        val item = if (itemStack?.item == stainedGlassPane) null else itemStack
+        val item = if (itemStack.isNotEmpty() && !itemStack.isStainedGlassPane()) itemStack else null
         setEquipment(slot, item)
     }
 
