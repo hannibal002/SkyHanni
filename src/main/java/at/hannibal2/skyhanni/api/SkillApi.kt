@@ -94,8 +94,8 @@ object SkillApi {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
@@ -522,7 +522,7 @@ object SkillApi {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE
             callback { onCommand(it) }
-            autoComplete {args ->
+            autoComplete { args ->
                 when (args.size) {
                     1 -> listOf("levelwithxp", "xpforlevel", "goal")
                     2 -> if (args[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
