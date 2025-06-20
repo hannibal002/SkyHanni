@@ -106,7 +106,11 @@ enum class HoppityEggType(
     fun isClaimed() = claimed || hasNotFirstSpawnedYet()
 
     fun hasRemainingSpawns(): Boolean {
+        //#if TODO
         val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
+        //#else
+        //$$ return false
+        //#endif
         // If it's before the last two days of the event, we can assume there are more spawns
         if (hoppityEndMark.timeUntil() > SkyBlockTime.SKYBLOCK_DAY_MILLIS.milliseconds * 2) return true
         // Otherwise we have to check if the next spawn is after the end of the event
