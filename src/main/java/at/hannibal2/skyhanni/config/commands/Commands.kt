@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -61,10 +60,6 @@ object Commands {
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
-        event.register("shwords") {
-            description = "Opens the config list for modifying visual words"
-            callback { VisualWordGui.onCommand() }
-        }
         event.register("shnavigate") {
             description = "Using path finder to go to locations"
             callback { NavigationHelper.onCommand(it) }

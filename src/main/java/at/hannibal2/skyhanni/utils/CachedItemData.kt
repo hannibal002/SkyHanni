@@ -4,8 +4,8 @@ data class CachedItemData(
     // -1 = not loaded
     var petCandies: Int? = -1,
 
-    // "" = not loaded
-    var heldItem: String? = "",
+    // NONE = not loaded
+    var heldItem: NeuInternalName? = NeuInternalName.NONE,
 
     // -1 = not loaded
     var sackInASack: Int? = -1,

@@ -356,6 +356,8 @@ object CollectionUtils {
         return filterKeys { it != null } as Map<K, V>
     }
 
+    fun <K, V> Map<K, V>.containsKeys(vararg keys: K) = keys.all { this.keys.contains(it) }
+
     /**
      * Inserts the element at the index or appends it to the end if out of bounds of the list.
      *
@@ -461,5 +463,18 @@ object CollectionUtils {
         if (size <= cap) return
         val oldestKey = minByOrNull { it.value }?.key ?: return
         remove(oldestKey)
+    }
+
+    fun <T> Collection<T>.firstUniqueByOrNull(
+        vararg predicates: (T) -> Boolean
+    ): T? {
+        var candidates = this
+        for (pred in predicates) {
+            val next = candidates.filter(pred)
+            if (next.isEmpty()) return null
+            else if (next.size == 1) return next.single()
+            candidates = next
+        }
+        return null
     }
 }
