@@ -14,7 +14,6 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestTrapConfig {
 
-    @Expose
     @ConfigOption(
         name = "Display",
         desc = "Display the status of pest traps in a GUI element.\nWill take you to Tab Widget Display to enable.",
