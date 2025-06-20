@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -14,7 +12,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class CFConfig {
     @Expose
     @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all chocolate factory features.")
@@ -28,7 +25,6 @@ class CFConfig {
     @FeatureToggle
     var statsDisplay: Boolean = true
 
-    //#if TODO
     @Expose
     @ConfigOption(
         name = "Stats List",
@@ -54,7 +50,6 @@ class CFConfig {
         CFStat.LEADERBOARD_POS,
         CFStat.TIME_TO_BEST_UPGRADE,
     )
-    //#endif
 
     @Expose
     @ConfigOption(name = "Stray Rabbit Warning", desc = "")

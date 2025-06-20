@@ -12,13 +12,14 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -87,7 +88,7 @@ object MiningEventTracker {
     @HandleEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
         if (!isMiningIsland()) return
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         if (!eventEndTime.isInPast()) {
             return
         }
@@ -126,7 +127,7 @@ object MiningEventTracker {
         if (!config.allowDataSharing) return
 
         // we now ignore mineshaft events.
-        if (IslandType.MINESHAFT.isInIsland()) return
+        if (IslandType.MINESHAFT.isCurrent()) return
         // TODO fix this via regex
         if (eventName == "SLAYER QUEST") return
 
@@ -136,13 +137,13 @@ object MiningEventTracker {
                 Exception("UnknownMiningEvent"), "Unknown mining event detected from string $eventName",
                 "eventName" to eventName,
                 "bossbar" to BossbarData.getBossbar(),
-                "serverType" to LorenzUtils.skyBlockIsland,
+                "serverType" to SkyBlockUtils.currentIsland,
                 "fromChat" to (time == null),
             )
             return
         }
 
-        if (!IslandType.DWARVEN_MINES.isInIsland() && eventType.dwarvenSpecific) return
+        if (!IslandType.DWARVEN_MINES.isCurrent() && eventType.dwarvenSpecific) return
 
         if (lastSentEvent == eventType) return
         lastSentEvent = eventType
@@ -157,11 +158,11 @@ object MiningEventTracker {
         val serverId = HypixelData.serverId ?: return
 
         val miningEventData = MiningEventDataSend(
-            LorenzUtils.skyBlockIsland,
+            SkyBlockUtils.currentIsland,
             serverId,
             eventType,
             timeRemaining.inWholeMilliseconds,
-            LorenzUtils.getPlayerUuid(),
+            PlayerUtils.getUuid(),
         )
         val miningEventJson = ConfigManager.gson.toJson(miningEventData)
 
@@ -182,7 +183,7 @@ object MiningEventTracker {
                 apiName = "Soopy Mining Events",
             )
         } catch (e: IOException) {
-            if (LorenzUtils.debug) {
+            if (SkyHanniDebugsAndTests.enabled) {
                 ErrorManager.logErrorWithData(
                     e, "Sending mining event data was unsuccessful",
                     "sentData" to json,
@@ -218,7 +219,7 @@ object MiningEventTracker {
             } catch (e: Exception) {
                 apiErrorCount++
                 canRequestAt = SimpleTimeMark.now() + 20.minutes
-                if (LorenzUtils.debug) {
+                if (SkyHanniDebugsAndTests.enabled) {
                     ErrorManager.logErrorWithData(
                         e,
                         "Failed to load Mining Event data!",
@@ -261,5 +262,5 @@ object MiningEventTracker {
     }
 
     // ignoring mineshaft here is intentional
-    fun isMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    fun isMiningIsland() = IslandType.DWARVEN_MINES.isCurrent() || IslandType.CRYSTAL_HOLLOWS.isCurrent()
 }
