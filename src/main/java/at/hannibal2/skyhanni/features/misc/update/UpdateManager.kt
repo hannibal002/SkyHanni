@@ -105,6 +105,14 @@ object UpdateManager {
                                 "Check §b/sh download update §afor more info.",
                             config::autoUpdates,
                         )
+                        //#if TODO
+                        ChatUtils.clickableChat(
+                            "§e§lCLICK HERE §r§eto view changes.",
+                            onClick = {
+                                ChangelogViewer.showChangelog(SkyHanniMod.VERSION, it.update.versionName)
+                            },
+                        )
+                        //#endif
                     }
                 } else if (forceDownload) {
                     ChatUtils.chat("§aSkyHanni didn't find a new update.")

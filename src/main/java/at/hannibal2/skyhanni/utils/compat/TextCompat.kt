@@ -44,7 +44,9 @@ fun IChatComponent.unformattedTextCompat(): String =
 //$$ iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
 //#endif
 
-fun IChatComponent?.formattedTextCompat(): String =
+@JvmOverloads
+@Suppress("unused")
+fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false): String =
 //#if MC < 1.16
     this?.formattedText.orEmpty()
 //#else
@@ -57,9 +59,13 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$             sb.append(chatStyle)
 //$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())
-//$$         sb.append("§r")
+//$$         if (!noExtraResets) {
+//$$             sb.append("§r")
+//$$         } else {
+//$$             if (component == Text.empty()) sb.append("§r")
+//$$         }
 //$$     }
-//$$     sb.toString().removeSuffix("§r")
+//$$     sb.toString().removeSuffix("§r").removePrefix("§r")
 //$$ }
 //$$
 //$$ private val textColorLUT = ChatFormatting.entries

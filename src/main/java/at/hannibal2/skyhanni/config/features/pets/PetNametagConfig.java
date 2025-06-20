@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc.pets;
+package at.hannibal2.skyhanni.config.features.pets;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;

@@ -4,15 +4,13 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-//#if TODO
 import at.hannibal2.skyhanni.data.model.Graph
-//#endif
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
@@ -111,7 +109,6 @@ object RenderUtils {
         }
     //#endif
 
-    //#if TODO
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
     }
@@ -138,7 +135,12 @@ object RenderUtils {
         GlStateManager.disableDepth()
         DrawContextUtils.pushMatrix()
         // TODO don't use z
-        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        //#if TODO
+        val zLevel = Minecraft.getMinecraft().renderItem.zLevel
+        //#else
+        //$$ val zLevel = 50f
+        //#endif
+        DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
         DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
@@ -165,7 +167,12 @@ object RenderUtils {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        //#if TODO
+        val zLevel = Minecraft.getMinecraft().renderItem.zLevel
+        //#else
+        //$$ val zLevel = 50f
+        //#endif
+        DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
         GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
@@ -197,12 +204,15 @@ object RenderUtils {
         _drawColor(location, color, beacon, alpha, seeThroughBlocks)
     }
 
+    //#if TODO
     @Deprecated("Use WorldRenderUtils' getViewerPos instead", ReplaceWith("WorldRenderUtils.getViewerPos(partialTicks)"))
     fun getViewerPos(partialTicks: Float) =
         Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
+    //#endif
 
     @Deprecated("Use WorldRenderUtils' expandBlock instead")
     fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
+
     @Deprecated("Use WorldRenderUtils' inflateBlock instead")
     fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
 
@@ -244,7 +254,6 @@ object RenderUtils {
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
-    //#endif
 
     fun Position.transform(): Pair<Int, Int> {
         DrawContextUtils.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
@@ -337,7 +346,6 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    //#if TODO
     @Deprecated("Use WorldRenderUtils' drawCircle instead")
     fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
         _drawCircle(entity, rad, color)
@@ -438,7 +446,9 @@ object RenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
+        //#if TODO
         PatcherFixes.onPlayerEyeLine()
+        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
@@ -606,6 +616,7 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
+    //#if TODO
     /**
      * Method to draw a rounded textured rect.
      *
@@ -693,6 +704,50 @@ object RenderUtils {
     }
 
     /**
+     * Method to draw a rounded rectangle.
+     *
+     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
+     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
+     *
+     * @param color color of rect
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
+     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
+     * It is best kept at its default.
+     */
+    fun drawRoundGradientRect(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        topColor: Int,
+        bottomColor: Int,
+        radius: Int = 10,
+        smoothness: Int = 1,
+    ) {
+        val scaledRes = GuiScreenUtils.scaleFactor
+        val widthIn = width * scaledRes
+        val heightIn = height * scaledRes
+        val xIn = x * scaledRes
+        val yIn = y * scaledRes
+
+        RoundedRectangleShader.scaleFactor = scaledRes.toFloat()
+        RoundedRectangleShader.radius = radius.toFloat()
+        RoundedRectangleShader.smoothness = smoothness.toFloat()
+        RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+
+        DrawContextUtils.pushMatrix()
+        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
+
+        GuiRenderUtils.drawGradientRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
+
+        ShaderManager.disableShader()
+        DrawContextUtils.popMatrix()
+    }
+
+    /**
      * Method to draw the outline of a rounded rectangle with a color gradient. For a single color just pass
      * in the color to both topColor and bottomColor.
      *
@@ -758,7 +813,5 @@ object RenderUtils {
         if (colorBuffer.limit() < 4) return 1f
         return colorBuffer.get(3)
     }
-
-    fun translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
     //#endif
 }

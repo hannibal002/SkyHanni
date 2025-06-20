@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
 import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,5 +44,12 @@ public abstract class MixinHandledScreen {
         ToolTipData.getTooltip(itemStack, tooltip);
         ToolTipData.onHover(drawContext, itemStack, tooltip);
         GuiScreenHookKt.renderToolTip(drawContext, itemStack);
+    }
+
+    @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
+    private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
+            cir.setReturnValue(false);
+        }
     }
 }

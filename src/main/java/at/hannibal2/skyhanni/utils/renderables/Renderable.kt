@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 //#if TODO
 import at.hannibal2.skyhanni.data.GuiData
-import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 //#endif
+import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
@@ -37,9 +37,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
-//#if TODO
 import at.hannibal2.skyhanni.utils.guide.GuideGui
-//#endif
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
@@ -290,9 +288,7 @@ interface Renderable {
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
-                            //#if TODO
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
-                            //#endif
                             DrawContextUtils.pushMatrix()
                             DrawContextUtils.translate(0F, 0F, 400F)
 
@@ -306,9 +302,7 @@ interface Renderable {
                             DrawContextUtils.popMatrix()
                         }
                     } else {
-                        //#if TODO
                         HighlightOnHoverSlot.currentSlots.remove(pair)
-                        //#endif
                     }
                 }
             }
@@ -324,11 +318,7 @@ interface Renderable {
 
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign
-                //#if TODO
-                && guiScreen !is GuideGui<*>
-            //#endif
-            ) {
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null
                     //#if TODO
                     || GuiData.preDrawEventCancelled
@@ -412,15 +402,11 @@ interface Renderable {
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover()
                     hovered.render(posX, posY)
-                    //#if TODO
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
-                    //#endif
                     true
                 } else {
                     unHovered.render(posX, posY)
-                    //#if TODO
                     HighlightOnHoverSlot.currentSlots.remove(pair)
-                    //#endif
                     false
                 }
             }
@@ -743,6 +729,7 @@ interface Renderable {
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
                     textInput.makeActive()
+                    textInput.handle()
                     val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
                     if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && RIGHT_MOUSE.isKeyClicked()) {
                         textInput.clear()
@@ -860,6 +847,54 @@ interface Renderable {
                 this@renderBounds.render(posX, posY)
             }
 
+        }
+
+        fun rectButton(
+            content: Renderable,
+            activeColor: Color,
+            inActiveColor: Color = activeColor.darker(0.4),
+            hoveredColor: (Color) -> Color = { it.darker(0.5) },
+            onClick: (Boolean) -> Unit,
+            onHover: (Boolean) -> Unit = {},
+            button: Int = 0,
+            bypassChecks: Boolean = false,
+            condition: (Boolean) -> Boolean = { true },
+            startState: Boolean = false,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            var state = startState
+
+            val color get() = if (state) activeColor else inActiveColor
+
+            override val width = content.width + padding * 2
+            override val height = content.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                val realColor: Color
+                if (isHovered(posX, posY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
+                    if ((button - 100).isKeyClicked()) {
+                        state = !state
+                        onClick(state)
+                    }
+                    onHover(state)
+                    realColor = hoveredColor(color)
+                } else {
+                    realColor = color
+                }
+                //#if TODO
+                RenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness)
+                //#endif
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                content.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
         }
 
         fun fixedSizeLine(

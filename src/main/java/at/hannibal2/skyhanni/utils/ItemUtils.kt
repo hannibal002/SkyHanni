@@ -5,26 +5,17 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-//#if TODO
 import at.hannibal2.skyhanni.data.NotificationManager
-//#endif
-import at.hannibal2.skyhanni.data.PetApi
-//#if TODO
 import at.hannibal2.skyhanni.data.SkyHanniNotification
-//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -40,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -82,7 +74,6 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.ProfileComponent
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
@@ -157,7 +148,7 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) }  ?: emptyList()
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -170,7 +161,7 @@ object ItemUtils {
     //#else
     //$$ fun ComponentMap?.getLore(): List<String> {
     //$$     this ?: return emptyList()
-    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() } ?: emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) } ?: emptyList()
     //$$ }
     //#endif
 
@@ -439,12 +430,9 @@ object ItemUtils {
     )
 
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
+        if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
+
         val cleanName = this.cleanName()
-
-        if (PetApi.hasPetName(cleanName)) {
-            return getPetRarity(this) to ItemCategory.PET
-        }
-
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
@@ -488,7 +476,6 @@ object ItemUtils {
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-            PetApi.hasPetName(cleanName) -> ItemCategory.PET
             UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
@@ -609,22 +596,18 @@ object ItemUtils {
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.repoItemName: String
         get() {
-            //#if TODO
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
-            //#endif
             return getInternalNameOrNull()?.repoItemName ?: "<null>"
         }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.repoItemNameCompact: String
         get() {
-            //#if TODO
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
-            //#endif
             return getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
         }
 
@@ -669,6 +652,9 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
+        if (this.getItemStackOrNull()?.getPetInfo() != null) {
+            return PetUtils.getCleanPetName(this@grabItemName, colored = true) + " Pet"
+        }
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
         }
@@ -708,10 +694,6 @@ object ItemUtils {
             return ReplaceRomanNumerals.replaceLine(name)
         }
 
-        // hide pet level
-        PetApi.getCleanName(name)?.let {
-            return "$it Pet"
-        }
         return name
     }
 
@@ -868,9 +850,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-        //#if TODO
         if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
-        //#endif
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()
@@ -884,9 +864,7 @@ object ItemUtils {
             "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
             "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
         )
-        //#if TODO
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
-        //#endif
     }
 
     fun NBTTagCompound.getStringList(key: String): List<String> {

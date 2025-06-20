@@ -26,9 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-//#endif
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -52,7 +50,6 @@ import kotlin.time.Duration.Companion.minutes
 private typealias DisplayOrder = CakeTrackerDisplayOrderType
 private typealias DisplayType = CakeTrackerDisplayType
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object CakeTracker {
 
@@ -206,9 +203,7 @@ object CakeTracker {
 
         (event.container as ContainerChest).getUpperItems().forEach { (slot, _) ->
             slotHighlightCache[slot.slotIndex]?.let { color ->
-                //#if TODO
                 slot.highlight(color)
-                //#endif
             }
         }
     }
