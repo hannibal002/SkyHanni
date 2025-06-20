@@ -67,6 +67,7 @@ loom {
     if (target == ProjectTarget.MODERN) {
         accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
     }
+    @Suppress("UnstableApiUsage")
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -114,7 +115,7 @@ val devenvMod: Configuration by configurations.creating {
     isVisible = false
 }
 
-val headlessLwjgl by configurations.creating {
+val headlessLwjgl: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
@@ -187,25 +188,34 @@ dependencies {
     } else if (target == ProjectTarget.MODERN) {
         modImplementation("net.fabricmc:fabric-loader:0.16.13")
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
+        // on fabric everyone be using the kotlin language mod so we don't need to bundle kotlin ourselves
+        modImplementation("net.fabricmc:fabric-language-kotlin:1.13.2+kotlin.2.1.20")
 
         modLocalRuntime(libs.modmenu)
     }
 
-    implementation(kotlin("stdlib-jdk8"))
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
-        exclude(group = "org.jetbrains.kotlin")
+    if (target != ProjectTarget.MODERN) {
+        implementation(kotlin("stdlib-jdk8"))
+        shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
+            exclude(group = "org.jetbrains.kotlin")
+        }
     }
 
     if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
     else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+
+    // Brigadier comes bundled with more recent versions of Minecraft
+    if (target.minecraftVersion == MinecraftVersion.MC189) {
+        shadowImpl("com.mojang:brigadier:1.0.18")
+    }
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
     // December 29, 2024, 07:30 PM EST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.6.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.6.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -214,12 +224,15 @@ dependencies {
         shadowModImpl(libs.moulconfig)
     } else if (target == ProjectTarget.MODERN) {
         shadowModImpl(libs.moulconfigModern)
+        include(libs.moulconfigModern)
     }
-
+    @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
-    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    if (target != ProjectTarget.MODERN) {
+        shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    }
     implementation(libs.hotswapagentforge)
 
     testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
@@ -230,8 +243,11 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
 
     if (target.minecraftVersion == MinecraftVersion.MC189) {
-        compileOnly(libs.hypixelmodapi)
+        compileOnly(libs.hypixelmodapi.forge)
         shadowImpl(libs.hypixelmodapitweaker)
+    } else if (target == ProjectTarget.MODERN) {
+        modImplementation(libs.hypixelmodapi)
+        include(libs.hypixelmodapi.fabric)
     }
 
     // getting clock offset
@@ -286,7 +302,7 @@ tasks.processResources {
 }
 
 if (target == ProjectTarget.MAIN) {
-    tasks.create("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).apply {
+    tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
         jvmArgs(
@@ -422,7 +438,7 @@ preprocess {
     vars.put("TODO", if (skipTodos) 1 else 0)
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
+val sourcesJar by tasks.registering(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
     from(sourceSets.main.get().allSource)

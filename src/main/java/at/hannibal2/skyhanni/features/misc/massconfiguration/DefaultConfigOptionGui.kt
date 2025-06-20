@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
@@ -160,7 +161,7 @@ class DefaultConfigOptionGui(
                     "§7Hold shift to show all options",
                 )
 
-                if (isShiftKeyDown()) {
+                if (KeyboardManager.isShiftKeyDown()) {
                     hoveringTextToDraw = listOf(
                         "§e${cat.name}",
                         "§7${cat.description}",

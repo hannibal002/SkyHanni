@@ -127,7 +127,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         if (filterScoreboardErrors(event)) return Filter.Result.DENY
 
         if (!config.printUnfilteredDebugs) return Filter.Result.ACCEPT
-        if (!config.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyBlock) return Filter.Result.ACCEPT
+        if (!config.printUnfilteredDebugsOutsideSkyBlock && !SkyBlockUtils.inSkyBlock) return Filter.Result.ACCEPT
         if (formattedMessage == "filtered console: ") return Filter.Result.ACCEPT
 
         debug(" ")

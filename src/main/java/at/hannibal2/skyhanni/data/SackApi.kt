@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -132,7 +131,7 @@ object SackApi {
      * have only one render display function
      */
     //
-    val sackItem = mutableMapOf<String, SackOtherItem>()
+    val sackItem = mutableMapOf<NeuInternalName, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
     private val stackList = mutableMapOf<Int, ItemStack>()
@@ -284,7 +283,7 @@ object SackApi {
                 internalName.getSackPrice(stored).coerceAtLeast(0)
             }
             item.slot = key
-            sackItem[value.displayName] = item
+            sackItem[internalName] = item
         }
     }
 
@@ -350,7 +349,7 @@ object SackApi {
         updateSacks(sackEvent)
         sackEvent.post()
         if (chatConfig.hideSacksChange) {
-            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isInIsland())) {
+            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isCurrent())) {
                 event.blockedReason = "sacks_change"
             }
         }

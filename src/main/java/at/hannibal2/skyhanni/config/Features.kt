@@ -17,10 +17,9 @@ import at.hannibal2.skyhanni.config.features.misc.MiscConfig
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
-//#if TODO
 import at.hannibal2.skyhanni.config.storage.Storage
-import at.hannibal2.skyhanni.utils.LorenzUtils.isAprilFoolsDay
-//#endif
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.VersionConstants
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
@@ -29,7 +28,6 @@ import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
-// todo 1.21 impl needed
 class Features : Config() {
     private val discord = MyResourceLocation("skyhanni", "social/discord.png")
     private val github = MyResourceLocation("skyhanni", "social/github.png")
@@ -41,9 +39,7 @@ class Features : Config() {
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
-        //#if TODO
-        if (isAprilFoolsDay) return HorizontalAlign.RIGHT
-        //#endif
+        if (SkyHanniDebugsAndTests.isAprilFoolsDay) return HorizontalAlign.RIGHT
         return super.alignCategory(category, isSelected)
     }
 
@@ -60,11 +56,7 @@ class Features : Config() {
     }
 
     override fun getTitle(): String {
-        //#if TODO
-        val modName = if (isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
-        //#else
-        //$$ val modName = "SkyHanni"
-        //#endif
+        val modName = if (SkyHanniDebugsAndTests.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
         return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
 
@@ -145,12 +137,14 @@ class Features : Config() {
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
     var dev: DevConfig = DevConfig()
 
-    //#if TODO
     @Expose
     var storage: Storage = Storage()
 
     @Expose
     @Suppress("unused")
     var lastVersion: Int = ConfigUpdaterMigrator.CONFIG_VERSION
-    //#endif
+
+    @Expose
+    @Suppress("unused")
+    var lastMinecraftVersion: String = VersionConstants.MC_VERSION
 }

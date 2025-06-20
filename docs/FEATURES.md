@@ -827,6 +827,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Warns when pests are about to spawn.
 + Added Pest Spawn Time Message. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3343)
     + Sends a chat message showing how long it took for a pest to spawn.
++ Added option to mute Vacuum in the Garden. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4051)
 
 </details>
 <details open><summary>
@@ -930,6 +931,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays countdown until Timite/Obsolite expires.
 + Added Timite Tracker for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
     + Shows collected ores, time gained from mining, profit for raw ores, and Highlite profit.
++ Added drop location for Rose'End Flowerpot Enigma Soul on second moving platform. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4004)
 
 </details>
 <details open><summary>
@@ -1002,6 +1004,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added a chat filter, profit per run, and profit tracker for Crystal Nucleus runs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2285)
 + Added /shblockstrength. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2778)
     + Displays how many ticks are needed to break any block with your mining speed.
++ Added Powder Chest Timer in Crystal Hollows. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2204)
+    + Despawn timer below every chest, and as GUI display.
+    + Chests color-coded to show despawn timer.
++ Added option to mute High Heat Sound in Magma Fields. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2573)
 
 </details>
 <details open><summary>
@@ -1595,6 +1601,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Fruit Bowl Player Highlighter and Stats Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3394)
 + Added Frog Mask Warning. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3449)
     + Displays a warning when foraging in an incorrect park region while wearing a Frog Mask.
++ Added option to widen Config GUI. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4033)
++ Added config search for "Item Warning" via "Tracker Title" or "Drop Title". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4046)
 
 </details>
 <details open><summary>

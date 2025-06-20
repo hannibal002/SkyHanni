@@ -1,20 +1,24 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
@@ -22,8 +26,6 @@ import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
 import java.io.File
@@ -65,11 +67,12 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
     private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
 
+    @SkyHanniModule
     companion object {
 
         @JvmStatic
         fun onCommand() {
-            if (!LorenzUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel) {
                 ChatUtils.userError("You need to join Hypixel to use this feature!")
             } else {
                 if (sbeConfigPath.exists()) drawImport = true
@@ -95,6 +98,14 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 uuid = "e4ace6de-0629-4719-aea3-3e113314dd3f",
                 value = SkullTextureHolder.getTexture("DOWN_ARROW"),
             )
+        }
+
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+            event.registerBrigadier("shwords") {
+                description = "Opens the config list for modifying visual words"
+                callback { onCommand() }
+            }
         }
     }
 
@@ -199,9 +210,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 }
 
                 val statusBlock = if (phrase.enabled) {
-                    ItemStack(Blocks.stained_hardened_clay, 1, 13)
+                    ColoredBlockCompat.GREEN.createStainedClay()
                 } else {
-                    ItemStack(Blocks.stained_hardened_clay, 1, 14)
+                    ColoredBlockCompat.RED.createStainedClay()
                 }
 
                 DrawContextUtils.scale(inverseScale, inverseScale, 1f)

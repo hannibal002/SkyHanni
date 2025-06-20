@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import java.text.SimpleDateFormat
@@ -164,7 +164,7 @@ object TimeUtils {
         /**
          * We replace the line here, because the user might want color month names
          */
-        return tryToReplaceScoreboardLine(
+        return ScoreboardData.tryToReplaceScoreboardLine(
             if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
                 "$datePart, $timePart"
             } else {

@@ -18,6 +18,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
+import java.util.Locale
 import java.util.NavigableMap
 import java.util.NavigableSet
 import java.util.UUID
@@ -29,6 +30,7 @@ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#endif
 
 // todo 1.21 impl needed
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
@@ -47,11 +49,8 @@ object StringUtils {
     fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
-        if (isEmpty()) return this
-
-        val lowercase = lowercase()
-        val first = lowercase[0].uppercase()
-        return first + lowercase.substring(1)
+        return this.lowercase(Locale.getDefault())
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
@@ -198,7 +197,7 @@ object StringUtils {
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
-     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * this = the list of strings to join into a string, containing 0 or more elements.
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
@@ -283,6 +282,7 @@ object StringUtils {
     }
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
+    fun String.convertToUnformatted(): String = this.replace("§", "&")
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 
@@ -489,6 +489,17 @@ object StringUtils {
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""
         return if (string[0] in "aeiou") "an" else "a"
+    }
+
+    fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }
+
+    fun String.splitLastWhitespace(): Pair<String, String> {
+        val lastWhitespaceIndex = lastIndexOf(" ")
+        return if (lastWhitespaceIndex == -1) {
+            "" to this
+        } else {
+            substring(0, lastWhitespaceIndex) to substring(lastWhitespaceIndex + 1)
+        }
     }
 
     fun String.addStrikethorugh(strikethorugh: Boolean = true): String {

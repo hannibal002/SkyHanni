@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 //#if MC < 1.21
 import net.minecraft.client.gui.inventory.GuiEditSign;
 //#else
-//$$ import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen
+//$$ import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 //#endif
 
 //#if MC < 1.21
