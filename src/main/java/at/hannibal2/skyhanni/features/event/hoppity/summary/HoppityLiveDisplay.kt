@@ -219,7 +219,7 @@ object HoppityLiveDisplay {
 
     private fun getFoundPercentFormat(
         amountFound: Int,
-        amountTotal: Int
+        amountTotal: Int,
     ): Pair<String, LorenzColor> {
         if (amountTotal == 0) return "0%" to LorenzColor.RED
 
@@ -367,7 +367,7 @@ object HoppityLiveDisplay {
                 if (isEmpty) buildEmptyFallback(isCurrentEvent).map {
                     RenderableString(it.string)
                 } else renderableList
-            }
+            },
     )
 
     private fun MappedStatStrings.mapToRenderables(
@@ -375,7 +375,7 @@ object HoppityLiveDisplay {
         statYear: Int,
     ): MutableList<Renderable> = map { (stat, statStrings) ->
         val baseRenderable = VerticalContainerRenderable(
-            statStrings.map { RenderableString(it.string) }
+            statStrings.map { RenderableString(it.string) },
         )
         renderableOverridesOperationList[stat]?.invoke(
             RenderableOverrideOperation(
@@ -383,7 +383,7 @@ object HoppityLiveDisplay {
                 baseRenderable = baseRenderable,
                 stats = stats,
                 year = statYear,
-            )
+            ),
         ) ?: baseRenderable
     }.toMutableList()
 

@@ -68,7 +68,7 @@ class HoppityLiveDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Meal Egg Hover",
-        desc = "Hovering over number of meal eggs found will show a tooltip of which eggs were found how many times."
+        desc = "Hovering over number of meal eggs found will show a tooltip of which eggs were found how many times.",
     )
     @ConfigEditorBoolean
     var mealEggHover: Boolean = true
