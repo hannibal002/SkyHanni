@@ -15,13 +15,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -92,8 +91,8 @@ object KingTalismanHelper {
     private var farDisplay = ""
     private var display = emptyList<String>()
 
-    private fun isNearby() = IslandType.DWARVEN_MINES.isInIsland() &&
-        LorenzUtils.skyBlockArea == "Royal Palace" &&
+    private fun isNearby() = IslandType.DWARVEN_MINES.isCurrent() &&
+        SkyBlockUtils.graphArea == "Royal Palace" &&
         kingLocation.distanceToPlayer() < 10
 
     @HandleEvent
@@ -131,8 +130,8 @@ object KingTalismanHelper {
     }
 
     fun isEnabled() = config.enabled &&
-        LorenzUtils.inSkyBlock &&
-        (IslandType.DWARVEN_MINES.isInIsland() || config.outsideMines)
+        SkyBlockUtils.inSkyBlock &&
+        (IslandType.DWARVEN_MINES.isCurrent() || config.outsideMines)
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
