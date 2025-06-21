@@ -11,10 +11,8 @@ import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
-//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.generateMaxChestAsList
-//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -42,8 +40,8 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 //#endif
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-//#if TODO
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 //#endif
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
@@ -123,7 +121,6 @@ class ProfileSpecificStorage(
         @Expose
         var bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
 
-        //#if TODO
         @Expose
         var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
 
@@ -144,7 +141,6 @@ class ProfileSpecificStorage(
             @Expose
             var kismetUsed: Boolean? = null
         }
-        //#endif
     }
 
     @Expose
@@ -654,10 +650,8 @@ class ProfileSpecificStorage(
     var wardrobe: WardrobeStorage = WardrobeStorage()
 
     class WardrobeStorage {
-        //#if TODO
         @Expose
         var data: MutableMap<Int, WardrobeData> = mutableMapOf()
-        //#endif
 
         @Expose
         var currentSlot: Int? = null

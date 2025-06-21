@@ -25,6 +25,10 @@ import com.google.gson.TypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
+//#if MC < 1.21
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybindL
+//#endif
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -298,7 +302,14 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
             extraPath = categoryParent.split(".").last() + "."
         }
         extraPath += processedOption.getPath()
-        //#if TODO
+        if (default is GuiOptionEditorKeybind) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#if MC < 1.21
+        if (default is GuiOptionEditorKeybindL) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#endif
         if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
             return GuiOptionEditorBlocked(default)
         }
@@ -312,7 +323,6 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
                 return GuiOptionEditorHidden(default)
             }
         }
-        //#endif
         return default
     }
 }

@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.data.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -143,12 +145,19 @@ object HypixelBazaarFetcher {
         }
     }
 
-    fun fetchNow() {
-        failedAttempts = 0
-        nextFetchIsManual = true
-        nextFetchTime = SimpleTimeMark.now()
-        ChatUtils.chat("Manually updating the bazaar prices right now..")
-    }
-
     private fun canFetch() = SkyBlockUtils.onHypixel && nextFetchTime.isInPast()
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdatebazaarprices") {
+            description = "Forcefully updating the bazaar prices right now."
+            category = CommandCategory.USERS_BUG_FIX
+            callback {
+                failedAttempts = 0
+                nextFetchIsManual = true
+                nextFetchTime = SimpleTimeMark.now()
+                ChatUtils.chat("Manually updating the bazaar prices right now..")
+            }
+        }
+    }
 }

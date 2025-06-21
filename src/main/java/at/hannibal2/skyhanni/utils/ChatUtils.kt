@@ -340,6 +340,12 @@ object ChatUtils {
         }
     }
 
+    @HandleEvent
+    fun onSendMessage(event: MessageSendToServerEvent) {
+        if (event.senderIsSkyhanni()) return
+        lastMessageSent = SimpleTimeMark.now()
+    }
+
     fun deleteNextMessage(
         reason: String,
         predicate: (String) -> Boolean,

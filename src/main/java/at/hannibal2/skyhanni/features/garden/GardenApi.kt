@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -195,13 +197,6 @@ object GardenApi {
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()
 
-    fun resetCropSpeed() {
-        storage?.cropsPerSecond?.clear()
-        GardenBestCropTime.reset()
-        updateGardenTool()
-        ChatUtils.chat("Manually reset all crop speed data!")
-    }
-
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
         GardenBestCropTime.reset()
@@ -281,4 +276,18 @@ object GardenApi {
 
     private var gardenExperience = listOf<Int>()
     private const val gardenOverflowExp = 10000
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetcropspeed") {
+            description = "Resets garden crop speed data and best crop time data"
+            category = CommandCategory.USERS_RESET
+            callback {
+                storage?.cropsPerSecond?.clear()
+                GardenBestCropTime.reset()
+                updateGardenTool()
+                ChatUtils.chat("Manually reset all crop speed data!")
+            }
+        }
+    }
 }

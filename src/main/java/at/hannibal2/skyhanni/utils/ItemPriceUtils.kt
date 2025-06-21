@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
@@ -101,7 +104,7 @@ object ItemPriceUtils {
         return HypixelItemApi.getNpcPrice(this)
     }
 
-    fun debugItemPrice(args: Array<String>) {
+    private fun debugItemPrice(args: String?) {
         val internalName = getItemOrFromHand(args)
         if (internalName == null) {
             ChatUtils.userError("Hold an item in hand or do /shdebugprice <item name/id>")
@@ -135,9 +138,8 @@ object ItemPriceUtils {
     }
 
     // TODO move either into inventory utils or new command utils
-    fun getItemOrFromHand(args: Array<String>): NeuInternalName? {
-        val name = args.joinToString(" ")
-        return if (name.isEmpty()) {
+    private fun getItemOrFromHand(name: String?): NeuInternalName? {
+        return if (name.isNullOrEmpty()) {
             InventoryUtils.getItemInHand()?.getInternalName()
         } else {
             NeuInternalName.fromItemNameOrInternalName(name)
@@ -189,5 +191,21 @@ object ItemPriceUtils {
     fun Number.formatCoin(gray: Boolean = false): String {
         val color = if (gray) "§7" else "§6"
         return color + shortFormat()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shdebugprice") {
+            description = "Debug different price sources for an item."
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("internalName", BrigadierArguments.string()) { internalName ->
+                callback {
+                    debugItemPrice(getArg(internalName))
+                }
+            }
+            simpleCallback {
+                debugItemPrice(null)
+            }
+        }
     }
 }
