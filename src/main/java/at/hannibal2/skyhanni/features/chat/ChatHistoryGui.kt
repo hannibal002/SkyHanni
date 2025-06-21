@@ -18,7 +18,6 @@ import net.minecraft.util.IChatComponent
 //$$ import net.minecraft.registry.DynamicRegistryManager
 //#endif
 
-// todo 1.21 impl needed
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
 
     private var scroll = -1.0
@@ -89,12 +88,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
     }
 
     private fun splitLine(comp: IChatComponent): List<String> {
-        //#if MC < 1.21
         return comp.formattedText.splitLines(w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10)).split("\n")
-        //#else
-        //$$ // todo splitlines kills colour for some reason
-        //$$ return comp.formattedTextCompat().split("\n")
-        //#endif
     }
 
     override fun onInitGui() {

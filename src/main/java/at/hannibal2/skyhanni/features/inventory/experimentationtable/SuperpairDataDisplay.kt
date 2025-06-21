@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -156,8 +157,7 @@ object SuperpairDataDisplay {
         val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return@runDelayed
         val itemName = itemNow.displayName.removeColor()
         val reward = itemNow.convertToReward()
-        //#if TODO
-        val itemData = SuperpairItem(slot, reward, itemNow.itemDamage)
+        val itemData = SuperpairItem(slot, reward, DyeCompat.toDamage(itemNow))
         val uncovered = items.keys.maxOrNull() ?: -1
 
         if (isWaiting(itemName)) return@runDelayed
@@ -176,9 +176,6 @@ object SuperpairDataDisplay {
             items[uncovered + 2] = emptySuperpairItem
 
         display = drawDisplay()
-        //#else
-        //$$ // todo fix up item damage once the color compat is merged
-        //#endif
     }
 
     private fun handlePowerUp(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem, uncovered: Int) {
