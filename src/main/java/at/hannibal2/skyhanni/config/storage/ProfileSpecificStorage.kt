@@ -309,19 +309,12 @@ class ProfileSpecificStorage(
         @Expose
         var hotChocolateMixinExpiry = farPast()
 
-        class HitmanStatsStorage {
-            @Expose
-            var availableHitmanEggs: Int = 0
-
-            @Expose
-            var singleSlotCooldownMark: SimpleTimeMark? = null
-
-            @Expose
-            var allSlotsCooldownMark: SimpleTimeMark? = null
-
-            @Expose
-            var purchasedHitmanSlots: Int = 0
-        }
+        data class HitmanStatsStorage(
+            @Expose var availableHitmanEggs: Int = 0,
+            @Expose var singleSlotCooldownMark: SimpleTimeMark? = null,
+            @Expose var allSlotsCooldownMark: SimpleTimeMark? = null,
+            @Expose var purchasedHitmanSlots: Int = 0,
+        ) : ResettableStorageSet()
 
         @Expose
         var hitmanStats: HitmanStatsStorage = HitmanStatsStorage()
