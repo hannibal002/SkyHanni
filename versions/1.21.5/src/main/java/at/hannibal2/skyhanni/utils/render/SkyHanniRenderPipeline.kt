@@ -22,7 +22,7 @@ enum class SkyHanniRenderPipeline(
     fragmentShaderPath: String? = vertexShaderPath,
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
-    depthWrite: Boolean? = false,
+    depthWrite: Boolean? = true,
     depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
 ) {
     LINES(
@@ -125,7 +125,7 @@ enum class SkyHanniRenderPipeline(
                 depthWrite?.let { bool ->
                     withDepthWrite(bool)
                     if (bool) withDepthTestFunction(depthTestFunction)
-                    else withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                    else withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
                 }
             }
             .build()
