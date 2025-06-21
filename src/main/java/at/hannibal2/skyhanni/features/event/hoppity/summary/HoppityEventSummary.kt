@@ -462,7 +462,7 @@ object HoppityEventSummary {
 
     private val EMPTY_STATS = setOf(
         HoppityStat.EMPTY_1, HoppityStat.EMPTY_2,
-        HoppityStat.EMPTY_3, HoppityStat.EMPTY_4
+        HoppityStat.EMPTY_3, HoppityStat.EMPTY_4,
     )
 
     fun getMappedStatStrings(stats: HoppityEventStats, eventYear: Int): MappedStatStrings = statDisplayList.mapNotNull { stat ->
@@ -490,7 +490,7 @@ object HoppityEventSummary {
         return mutableListOf(
             StatString("", false),
             StatString("§c§lNothing to show!"),
-            StatString("§c§oFind some eggs $timeFmt!")
+            StatString("§c§oFind some eggs $timeFmt!"),
         )
     }
 
@@ -503,7 +503,7 @@ object HoppityEventSummary {
 
         val finalStatList = if (statList.isEmpty() || statList.all { it.string.isBlank() }) {
             buildEmptyFallback(
-                isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == currentSbYear
+                isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == currentSbYear,
             ).toMutableList()
         } else statList
 
@@ -546,6 +546,7 @@ object HoppityEventSummary {
                 it.key to it.value.toInt()
             }.toMap()
         }
+
         else -> getSpawnedEggCounts(year)
     }
 
@@ -568,6 +569,7 @@ object HoppityEventSummary {
             HoppityEggType.DEJEUNER to 46,
             HoppityEggType.SUPPER to 46,
         )
+
         else -> {
             val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
             val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
