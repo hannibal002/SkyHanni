@@ -35,6 +35,11 @@ object ModernIslandExceptions {
                 Mob(baseEntity, Mob.Type.BASIC, name = "Mochibear"),
             )
 
+        baseEntity is PandaEntity && baseEntity.productGene == PandaEntity.Gene.NORMAL ->
+            MobData.MobResult.found(
+                Mob(baseEntity, Mob.Type.BASIC, name = "Bambuleaf"),
+            )
+
         baseEntity is AxolotlEntity ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Coralot"),

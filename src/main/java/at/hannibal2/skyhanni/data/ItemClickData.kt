@@ -51,6 +51,8 @@ object ItemClickData {
             //$$ }
             //#endif
 
+            //#if MC < 1.21
+            // MixinClientPlayerInteractionManager posts this on 1.21
             packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
                 val position = packet.position.toLorenzVec()
                 val blockClickCancelled =
@@ -59,6 +61,7 @@ object ItemClickData {
                     if (blockClickCancelled) it.cancel()
                 }.post()
             }
+            //#endif
 
             packet is C0APacketAnimation -> {
                 ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
