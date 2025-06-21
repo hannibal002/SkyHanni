@@ -13,7 +13,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class CustomScoreboardConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show a custom scoreboard instead of the vanilla one.")

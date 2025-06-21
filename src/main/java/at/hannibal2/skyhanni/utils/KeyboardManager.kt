@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
@@ -16,10 +17,8 @@ import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
 import at.hannibal2.skyhanni.data.model.TextInput
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import org.lwjgl.input.Mouse
 //#else
-//$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
 
@@ -224,7 +223,7 @@ object KeyboardManager {
         false
     }
 
-    fun getKeyName(keyCode: Int): String = KeybindHelper.getKeyName(keyCode)
+    fun getKeyName(keyCode: Int): String = IMinecraft.instance.getKeyName(keyCode)
 
     object WasdInputMatrix : Iterable<KeyBinding> {
         operator fun contains(keyBinding: KeyBinding) = when (keyBinding) {

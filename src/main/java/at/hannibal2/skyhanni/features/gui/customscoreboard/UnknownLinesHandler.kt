@@ -38,7 +38,6 @@ object UnknownLinesHandler {
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
-        //#if TODO
         val patternsToExclude = CustomScoreboard.activePatterns.toMutableList()
 
         if (::remoteOnlyPatterns.isInitialized) {
@@ -148,15 +147,10 @@ object UnknownLinesHandler {
                 warn(recentAlarms.first().line, "5 different lines in 5 seconds")
             }
         }
-        //#else
-        //$$ return
-        //#endif
     }
 
     private fun warn(line: String, reason: String) {
-        //#if TODO
         if (!CustomScoreboard.config.unknownLinesWarning) return
-        //#endif
         ErrorManager.logErrorWithData(
             // line included in chat message to not cache a previous message
             Exception(line),
@@ -165,9 +159,7 @@ object UnknownLinesHandler {
             "reason" to reason,
             "Island" to SkyBlockUtils.currentIsland,
             "Area" to HypixelData.skyBlockArea,
-            //#if TODO
             "Loaded Patterns" to CustomScoreboard.activePatterns.size,
-            //#endif
             "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
             noStackTrace = true,
             betaOnly = true,

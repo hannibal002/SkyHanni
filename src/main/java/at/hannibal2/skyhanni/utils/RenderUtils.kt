@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCircle
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawDynamicText
@@ -35,7 +34,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -346,11 +344,6 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    @Deprecated("Use WorldRenderUtils' drawCircle instead")
-    fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
-        _drawCircle(entity, rad, color)
-    }
-
     @Deprecated("Use WorldRenderUtils' drawCylinderInWorld instead")
     fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
@@ -389,8 +382,9 @@ object RenderUtils {
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereInWorld(color, location.x, location.y, location.z, radius)
+        _drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereInWorld instead")
@@ -400,8 +394,9 @@ object RenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereInWorld(color, x, y, z, radius)
+        _drawSphereInWorld(color, x, y, z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereWireframeInWorld instead")
@@ -409,8 +404,9 @@ object RenderUtils {
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
+        _drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereWireframeInWorld instead")
@@ -420,8 +416,9 @@ object RenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereWireframeInWorld(color, x, y, z, radius)
+        _drawSphereWireframeInWorld(color, x, y, z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawDynamicText instead")
@@ -444,11 +441,10 @@ object RenderUtils {
 
     @Deprecated("Use WorldRenderUtils' exactLocation instead")
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+        // TODO cache once per frame
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
-        //#if TODO
         PatcherFixes.onPlayerEyeLine()
-        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
@@ -472,14 +468,6 @@ object RenderUtils {
     @Deprecated("Use WorldRenderUtils' exactLocation instead")
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         return WorldRenderUtils.exactLocation(entity, partialTicks)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawWireframeBoundingBox instead")
-    fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
-        aabb: AxisAlignedBB,
-        color: Color,
-    ) {
-        _drawWireframeBoundingBox(aabb, color)
     }
 
     @Deprecated("Use WorldRenderUtils' draw3DPathWithWaypoint instead")
@@ -549,11 +537,11 @@ object RenderUtils {
     @Deprecated("Use WorldRenderUtils' drawHitbox instead")
     fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
-        lineWidth: Int,
         color: Color,
-        depth: Boolean,
+        lineWidth: Int = 3,
+        depth: Boolean = true,
     ) {
-        _drawHitbox(boundingBox, lineWidth, color, depth)
+        _drawHitbox(boundingBox, color, lineWidth, depth)
     }
 
     fun chromaColor(

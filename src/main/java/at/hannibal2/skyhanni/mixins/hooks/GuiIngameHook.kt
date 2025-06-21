@@ -3,17 +3,36 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.data.ScoreboardData
 import net.minecraft.client.gui.FontRenderer
 
+//#if MC > 1.21
+//$$ import net.minecraft.text.Text
+//$$ import net.minecraft.client.gui.DrawContext
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+//#endif
+
 object GuiIngameHook {
 
     @JvmStatic
     fun drawString(
-        instance: FontRenderer,
+        fr: FontRenderer,
+        //#if MC < 1.21
         text: String,
+        //#else
+        //$$ drawContext: DrawContext,
+        //$$ text: Text,
+        //#endif
         x: Int,
         y: Int,
         color: Int,
+//#if MC < 1.21
     ) = ScoreboardData.tryToReplaceScoreboardLine(text)?.let {
-        instance.drawString(it, x, y, color)
+        //#else
+        //$$ ) = ScoreboardData.tryToReplaceScoreboardLine(text.formattedTextCompat())?.let {
+        //#endif
+        //#if MC < 1.21
+        fr.drawString(it, x, y, color)
+        //#else
+        //$$ drawContext.drawText(fr, it, x, y, color, false)
+        //#endif
     } ?: 0
 
 }
