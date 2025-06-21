@@ -7,17 +7,16 @@ import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Crop
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.EmbedConfig.InformationType
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Pet
+import at.hannibal2.skyhanni.data.BitsApi.cookieBuffTime
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Field
 import at.hannibal2.skyhanni.data.Footer
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.Thumbnail
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.contest.ContestBracket
 import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.BRONZE
@@ -33,13 +32,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.WebhookUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.TimeZone
@@ -49,54 +44,13 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object FarmingTracker {
 
-    val config get() = SkyHanniMod.feature.garden.tracking
+    private val config get() = SkyHanniMod.feature.garden.tracking
+    private val godPotionTimer get() = ProfileStorageData.profileSpecific?.godPotExpiry
 
     var status = "Offline"
     private var lastNotification = SimpleTimeMark.farPast()
-    private var farmingSince = SimpleTimeMark.farFuture()
     private var playerFaceURL = ""
-    private var cookieBuffTimer = ""
-    private var godPotionTimer = ""
-    private var activeAnitaBuff = ""
     private val currentCrop: Crop? = null
-    private var currentPlacement = 0.0
-
-    private val patternGroup = RepoPattern.group("garden.tracking")
-
-    /**
-     * REGEX-TEST:  ☘ Cocoa Beans
-     * REGEX-TEST:  ☘ Mushroom
-     */
-    private val tablistUpcomingContestPattern by patternGroup.pattern(
-        "tablist.contest.upcoming",
-        "^ ☘ (?<crop>.+)\$",
-    )
-
-    /**
-     * REGEX-TEST:  ☘ Wheat ◆ Top 0.2%
-     * REGEX-TEST:  ○ Wheat ◆ Top 0.2%
-     */
-    private val tablistActiveContestPattern by patternGroup.pattern(
-        "tablist.contest.active",
-        "^ (?<boost>[☘○]) (?<crop>.+) ◆ Top (?<placement>\\S+)%\$",
-    )
-
-    /**
-     * REGEX-TEST:  Cookie Buff: 28h
-     * REGEX-TEST:  God Potion: 6m
-     */
-    private val tablistEffectsPattern by patternGroup.pattern(
-        "tablist.effects",
-        "^ (?<type>Cookie Buff|God Potion): (?<duration>.+)\$",
-    )
-
-    /**
-     * REGEX-TEST: You have a God Potion active! 32 Minutes
-     */
-    private val tablistFooterGodPotionPattern by patternGroup.pattern(
-        "tablist.footer.godpotion",
-        "You have a God Potion active! (?<length>.+)",
-    )
 
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
@@ -127,66 +81,8 @@ object FarmingTracker {
         if (success) lastNotification = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onWidgetUpdated(event: WidgetUpdateEvent) {
-        if (!isEnabled() && SkyBlockUtils.inSkyBlock) return
-
-        val widget = event.widget
-        val widgetLines = event.widget.lines.map { it.removeColor() }
-        if (widgetLines.isEmpty()) return
-
-        when (widget) {
-            TabWidget.JACOB_CONTEST -> {
-                if (widgetLines[1].contains("Starts In:")) {
-                    tablistUpcomingContestPattern.matchAll(widgetLines) {
-                        getCropEnum(group("crop"))?.let { cropEnum ->
-                            activeAnitaBuff = cropEnum.display + cropEnum.emoji
-                        }
-                    }
-                } else {
-                    tablistActiveContestPattern.matchAll(widgetLines) {
-                        currentPlacement = group("placement").toDouble()
-                        if (group("boost") == "☘") activeAnitaBuff = group("crop")
-                    }
-                }
-            }
-
-            TabWidget.ACTIVE_EFFECTS -> tablistEffectsPattern.matchAll(widgetLines) {
-                when (group("type")) {
-                    "Cookie Buff" -> cookieBuffTimer = group("duration")
-                    "God Potion" -> godPotionTimer = group("duration")
-                }
-            }
-
-            else -> {}
-        }
-    }
-
-    @HandleEvent
-    fun onFooterUpdated(event: TablistFooterUpdateEvent) {
-        if (!isEnabled() && SkyBlockUtils.inSkyBlock) return
-
-        val footerLines = event.footer.removeColor().lines()
-
-        cookieBuffTimer = footerLines.indexOfFirst { it.contains("Cookie Buff") }
-            .takeIf { it != -1 && it + 1 <= footerLines.lastIndex }
-            ?.let { footerLines[it + 1] }
-            ?.takeUnless { it.contains("Not active!") }
-            ?: "<:no:1263210393723998278>"
-
-        if (
-            footerLines.any { it.contains("No effects active.") } ||
-            footerLines.none { tablistFooterGodPotionPattern.matches(it) }
-        ) {
-            godPotionTimer = "<:no:1263210393723998278>"
-        } else tablistFooterGodPotionPattern.matchAll(footerLines) {
-            godPotionTimer = group("length")
-        }
-    }
-
     fun prepareAndSendEmbed(status: String): Boolean {
         playerFaceURL = playerFaceURL.ifBlank { ApiUtils.getPlayerSkin(config.embed.bodyPart, 12) }
-        updateFarmingSince(status)
 
         val color = resolveColor(status)
         val fields = collectFields(status)
@@ -201,14 +97,6 @@ object FarmingTracker {
         val username = "[FARMING TRACKER] ${PlayerUtils.getName()}"
 
         return sendOrEditMessage(embed, threadID, username)
-    }
-
-    private fun updateFarmingSince(status: String) {
-        if (status == "Farming" && farmingSince.isInFuture()) {
-            farmingSince = SimpleTimeMark.now()
-        } else if (status != "Farming") {
-            farmingSince = SimpleTimeMark.farFuture()
-        }
     }
 
     private fun resolveColor(status: String): Int {
@@ -243,10 +131,10 @@ object FarmingTracker {
             Pet.entries.find { it.toString() == pet.cleanName }?.petName.orEmpty()
         }
 
-        InformationType.COOKIE_BUFF -> cookieBuffTimer.ifBlank { "<:no:1263210393723998278>" }
-        InformationType.GOD_POTION -> godPotionTimer.ifBlank { "<:no:1263210393723998278>" }
-        InformationType.JACOBS_CONTEST -> if (!FarmingContestApi.inContest) "" else {
-            convertPlacement(currentPlacement)?.let { "$currentPlacement% ${it.emoji}" }.orEmpty()
+        InformationType.COOKIE_BUFF -> cookieBuffTime?.takeIf { it.isInFuture() }?.timeUntil()?.toString() ?: "<:no:1263210393723998278>"
+        InformationType.GOD_POTION -> godPotionTimer?.takeIf { it.isInFuture() }?.timeUntil()?.toString() ?: "<:no:1263210393723998278>"
+        InformationType.JACOBS_CONTEST -> if (!FarmingContestApi.inContest) "" else with(FarmingContestApi.contestData) {
+            "${placement}% ($collected)${bracket?.emoji?.let { " $it" } ?: ""}"
         }
 
         InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { crop ->
@@ -254,9 +142,9 @@ object FarmingTracker {
                 .takeUnless { status == "Idle" || status == "Offline" }
         }
 
-        InformationType.ANITA_BUFF -> activeAnitaBuff.ifBlank { "<:no:1263210393723998278>" }
+        InformationType.ANITA_BUFF -> FarmingContestApi.anitaBuffCrop?.cropName?.let { getCropEnum(it) }
         InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.roundTo(2).takeUnless { it == 0.0 }
-        InformationType.FARMING_SINCE -> if (farmingSince.isInFuture()) "" else farmingSince.passedSince()
+        InformationType.FARMING_SINCE -> if (GardenApi.farmingSince.isInFuture()) "" else GardenApi.farmingSince.passedSince()
     }
 
     private fun InformationType.getFieldDisplayName(): String {
