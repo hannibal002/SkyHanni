@@ -180,7 +180,7 @@ object CFStrayWarning {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!CFApi.inChocolateFactory || !warningConfig.blockClosing) return
-        if (event.slotId in destructiveSlots) {
+        if (event.slot?.slotNumber in destructiveSlots) {
             event.cancel()
             preventCloseTitle()
         }
