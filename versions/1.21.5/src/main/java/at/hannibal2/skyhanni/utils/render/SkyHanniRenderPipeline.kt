@@ -22,59 +22,60 @@ enum class SkyHanniRenderPipeline(
     fragmentShaderPath: String? = vertexShaderPath,
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
-    depthWrite: Boolean? = true,
+    depthWrite: Boolean = true,
     depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
 ) {
     LINES(
         snippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET,
         vFormat = VertexFormats.POSITION_COLOR_NORMAL,
         vDrawMode = VertexFormat.DrawMode.LINES,
-        depthWrite = true,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET,
         vFormat = VertexFormats.POSITION_COLOR_NORMAL,
         vDrawMode = VertexFormat.DrawMode.LINES,
+        depthWrite = false,
     ),
     FILLED(
         snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP,
-        depthWrite = true,
     ),
     FILLED_XRAY(
         snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP,
+        depthWrite = false,
     ),
     TRIANGLES(
         snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLES,
-        depthWrite = true,
     ),
     TRIANGLES_XRAY(
         snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLES,
+        depthWrite = false,
     ),
     TRIANGLE_FAN(
         snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN,
-        depthWrite = true,
     ),
     TRIANGLE_FAN_XRAY(
         snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
         vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN,
+        depthWrite = false,
     ),
     QUADS(
         snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
-        depthWrite = true,
     ),
     QUADS_XRAY(
         snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+        depthWrite = false,
     ),
     ROUNDED_RECT(
         snippet = RenderPipelines.MATRICES_SNIPPET,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect",
         uniforms = getCommonRoundedUniforms(),
+        depthWrite = false,
     ),
     ROUNDED_TEXTURED_RECT(
         snippet = RenderPipelines.MATRICES_SNIPPET,
@@ -83,6 +84,7 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "rounded_texture",
         sampler = "textureSampler",
         uniforms = getCommonRoundedUniforms(),
+        depthWrite = false,
     ),
     ROUNDED_RECT_OUTLINE(
         snippet = RenderPipelines.MATRICES_SNIPPET,
@@ -93,6 +95,7 @@ enum class SkyHanniRenderPipeline(
             "borderThickness" to UniformType.FLOAT,
             "borderBlur" to UniformType.FLOAT,
         ),
+        depthWrite = false,
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_SNIPPET,
@@ -122,11 +125,9 @@ enum class SkyHanniRenderPipeline(
                 fragmentShaderPath?.let { withFragmentShader(Identifier.of(SkyHanniMod.MODID, it)) }
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
-                depthWrite?.let { bool ->
-                    withDepthWrite(bool)
-                    if (bool) withDepthTestFunction(depthTestFunction)
-                    else withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-                }
+                withDepthWrite(depthWrite)
+                if (depthWrite) withDepthTestFunction(depthTestFunction)
+                else withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             }
             .build()
     )
