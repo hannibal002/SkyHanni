@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.item.ItemStack
 import net.minecraft.util.Vec3
 import java.nio.FloatBuffer
 //#if MC > 1.21
@@ -38,6 +39,8 @@ object DrawContextUtils {
             ErrorManager.crashInDevEnv("drawContext is null")
             ErrorManager.skyHanniError("drawContext is null")
         }
+
+    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.drawItem(item, x, y)
 
     fun setContext(context: DrawContext) {
         renderDepth++
@@ -79,40 +82,24 @@ object DrawContextUtils {
         //#endif
     }
 
-    fun multMatrix(matrix: FloatBuffer) {
+    fun multMatrix(buffer: FloatBuffer) {
         //#if MC < 1.21
-        GlStateManager.multMatrix(matrix)
+        GlStateManager.multMatrix(buffer)
         //#else
-        //$$ val matrix4f = Matrix4f(matrix)
-        //$$ drawContext.matrices. multiplyPositionMatrix(matrix4f)
+        //$$ multMatrix(Matrix4f(buffer))
         //#endif
     }
+
+    //#if MC > 1.21
+    //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    //#endif
 
     fun getFloat(pName: Int, params: FloatBuffer) {
         //#if MC < 1.21
         GlStateManager.getFloat(pName, params)
         //#else
         //$$ params.clear()
-        //$$ when (pName) {
-        //$$     GL_MODELVIEW_MATRIX -> {
-        //$$         val mvEntry = drawContext.matrices.peek()
-        //$$         mvEntry.getPositionMatrix().get(params)
-        //$$     }
-        //$$     GL_PROJECTION_MATRIX -> {
-        //$$         RenderSystem.assertOnRenderThread()
-        //$$         RenderSystem.getProjectionMatrix().get(params)
-        //$$     }
-        //$$     GL_CURRENT_COLOR -> {
-        //$$         RenderSystem.assertOnRenderThread()
-        //$$         val c = RenderSystem.getShaderColor()
-        //$$         params.put(0, c[0])
-        //$$         params.put(1, c[1])
-        //$$         params.put(2, c[2])
-        //$$         params.put(3, c[3])
-        //$$     }
-        //$$     else -> { }
-        //$$ }
-        //$$ params.flip()
+        //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
         //#endif
     }
 

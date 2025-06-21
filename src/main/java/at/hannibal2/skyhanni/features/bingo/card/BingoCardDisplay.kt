@@ -281,7 +281,9 @@ object BingoCardDisplay {
         event.registerBrigadier("shreloadbingodata") {
             description = "Reloads the bingo card data"
             category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { command() }
+            simpleCallback {
+                reload()
+            }
         }
     }
 }

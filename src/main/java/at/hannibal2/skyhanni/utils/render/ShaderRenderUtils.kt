@@ -159,4 +159,46 @@ object ShaderRenderUtils {
         //$$ RoundedShapeDrawer.drawRoundedRectOutline(left, top, right, bottom, topColor, bottomColor)
         //#endif
     }
+
+    /**
+     * Method to draw a rounded rectangle.
+     *
+     * **NOTE:** If you are using [DrawContextUtils.translate] or [DrawContextUtils.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
+     * is called **BEFORE** [DrawContextUtils.scale], otherwise the rectangle will not be rendered correctly
+     *
+     * @param topColor the color of the top of the rectangle
+     * @param bottomColor the color of the bottom of the rectangle
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
+     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
+     * It is best kept at its default.
+     */
+    fun drawRoundGradientRect(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        topColor: Int,
+        bottomColor: Int,
+        radius: Int = 10,
+        smoothness: Float = 1f,
+    ) {
+        RoundedRectangleShader.applyBaseSettings(radius, width, height, x, y, smoothness)
+
+        val left = x - 5
+        val top = y - 5
+        val right = x + width + 5
+        val bottom = y + height + 5
+
+        //#if MC < 1.21
+        DrawContextUtils.pushPop {
+            ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
+            GuiRenderUtils.drawGradientRect(left, top, right, bottom, topColor, bottomColor)
+            ShaderManager.disableShader()
+        }
+        //#else
+        //$$ RoundedShapeDrawer.drawRoundedRect(left, top, right, bottom, topColor, bottomColor)
+        //#endif
+    }
 }

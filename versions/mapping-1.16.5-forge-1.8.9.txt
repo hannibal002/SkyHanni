@@ -295,6 +295,7 @@ net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resour
 net.minecraft.sounds.SoundSource net.minecraft.client.audio.SoundCategory
 
 net.minecraft.util.Mth net.minecraft.util.MathHelper
+net.minecraft.util.Mth clamp() clamp_int()
 
 net.minecraft.util.Mth clamp() clamp_int()
 net.minecraft.util.Mth floor() floor_float()
@@ -327,6 +328,9 @@ net.minecraft.world.entity.Entity getUUID() getUniqueID()
 net.minecraft.world.entity.Entity isOnFire() isBurning()
 net.minecraft.world.entity.Entity isOnGround onGround
 net.minecraft.world.entity.Entity level worldObj
+net.minecraft.world.entity.Entity packetCoordinates.x serverPosX
+net.minecraft.world.entity.Entity packetCoordinates.y serverPosY
+net.minecraft.world.entity.Entity packetCoordinates.z serverPosZ
 net.minecraft.world.entity.Entity position.x posX
 net.minecraft.world.entity.Entity position.y posY
 net.minecraft.world.entity.Entity position.z posZ

@@ -29,6 +29,24 @@
 
 + Added option to widen Config GUI. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4033)
 
+#### Chat
+
++ Added party commands !ping and !tps. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4001)
+    + Customizable trigger permissions for party commands.
+
+#### Inventory
+
++ Added option to highlight Current Pet in menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
+
+#### Misc
+
++ Added Bouncy Beach Balls features. - Thunderblade + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3432)
+    + Predictive Line, Landing Spot and Current Counter.
+    + Works only with Bouncy Beach Balls, not with Giant Bouncy Beach Ball yet.
++ Added In-Game Changelog Viewer. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1636)
+    + Clickable chat option shows on new update or first join with new version.
+    + Works with `/shchangelog <old version> <new version>`.
+
 ### Improvements
 
 #### Garden
@@ -43,6 +61,7 @@
 #### Commands
 
 + Added autocomplete for the `Shorten /warp` option. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3856)
++ Added Self-Trigger option for party commands !allinvite, !warp, !ping and !tps. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4001)
 
 #### GUIs
 
@@ -67,10 +86,16 @@
 #### Hoppity
 
 + Hide "total" Hoppity Stats from chat when no duplicates found in Compact Hitman Message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3998)
++ Added Meal Egg Breakdown on hover in Hoppity Live Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
 
 #### Combat
 
 + Added Gemstone tracking to Ghost Tracker for Gemstone Gauntlet kills. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3971)
+
+#### Crimson
+
++ Added more Matriarch Helper options. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4100)
+    + Exit path and sort Heavy Pearls by distance instead of height.
 
 #### Misc
 
@@ -116,6 +141,7 @@
 + Fixed chat error after sharing Jacob contests. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3893)
 + Fixed rare error messages in compact chat features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3982)
 + Fixed chat display when guild chat is disabled. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4022)
++ Fixed Hypixel Lobby chat filter failing on pet consumable messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4104)
 
 #### Rift
 
@@ -123,6 +149,7 @@
 + Fixed Sun Gecko Helper sometimes not showing up. - Luna (https://github.com/hannibal002/SkyHanni/pull/3920)
 + Fixed Blood Ichor line sometimes not displaying during Rift Slayer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3976)
 + Fixed Rift Feature Enigma Rose's End Flowerpot showing its waypoint when disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4091)
++ Fixed Timite Helper showing incorrect info on all blocks. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4106)
 
 #### Inventory
 
@@ -135,6 +162,7 @@
 + Fixed Block Strength Guide blocking inventories in Rift, Kuudra, and Dungeons. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3934)
 + Fixed blocks mined by Pickobulus not being detected on non-Cold Islands. - Empa (https://github.com/hannibal002/SkyHanni/pull/3979)
 + Fixed HOTM Level Stacksize not working. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4043)
++ Fixed rare error in Powder Chest Timer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4105)
 
 #### Fishing
 
@@ -144,6 +172,7 @@
 #### Hoppity
 
 + Fixed incorrect order for Unclaimed Eggs when set to Meal Order. - Luna (https://github.com/hannibal002/SkyHanni/pull/3958)
++ Fixed Hoppity Event Stats showing wrong data at event start. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
 
 #### Carnival
 
@@ -153,6 +182,10 @@
 #### GUI
 
 + Fixed TabWidget Eyes Placed so it will show dragon spawned and egg respawning. - G0dwhitelight (https://github.com/hannibal002/SkyHanni/pull/3991)
+
+#### Slayer
+
++ Fixed rare error opening Slayer Menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4096)
 
 #### Misc
 
@@ -180,6 +213,7 @@
 + Fixed Custom Scoreboard Party Display persisting for 5 minutes after the leader disconnects from a two-player party. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4058)
 + Fixed Fairy Soul Pathfinder sometimes displaying paths from the previous island. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4056)
     + Switching islands during path calculation triggered the issue.
++ Fixed best-friend detection in chat messages. - FlyMode (https://github.com/hannibal002/SkyHanni/pull/4084)
 
 ### Technical Details
 
@@ -256,6 +290,30 @@
 + Reduced duplication in Heat Detection and Custom Scoreboard patterns. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4049)
 + Synchronized Bucket Tracker methods with base trackers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4072)
 + Updated Gradle to 8.14.2. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4088)
++ Added Galatea Lines to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4037)
++ Added per-profile pet storage. - martimavocado + Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
+    + Stored pets in pets.json instead of config to reduce JSON size.
++ Added requireDevEnv function. - Empa (https://github.com/hannibal002/SkyHanni/pull/4099)
++ Added spin and bounce for ItemStack Renderables. - Daveed + Thunderblade73 + nea (https://github.com/hannibal002/SkyHanni/pull/4073)
++ Cleaned up CF API, BingoApi, SkyhanniRenderWorldEvent and SkyhanniDebugsAndTests for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4017)
++ Continued 1.21 support. - nopo (https://github.com/hannibal002/SkyHanni/pull/4018)
++ Enabled GardenApi and miscellaneous files for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4014)
++ Fixed /gfs command processing inconsistency. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4006)
++ Fixed InventoryFullyOpenedEvent firing; item parsing and graph areas now work for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4016)
++ Fixed Multiple Event Types not working. - Empa (https://github.com/hannibal002/SkyHanni/pull/4103)
++ Improved Keybind Upgrader, additional commands and mouse compatibility. - nopo (https://github.com/hannibal002/SkyHanni/pull/4019)
++ Improved rendering for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3995)
++ Reduced Lorenz Utils, enabled more files for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4020)
++ Refined /shcopyitem format. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4098)
++ Removed and deprecated some Renderable functions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4073)
+    + `Renderable.itemStack()` replaced with `ItemStackRenderable`.
+    + Deprecation of `Renderable.itemStack()`.
+    + Replace Renderable.itemStackWithTip() with `.withTip()` on `ItemStackRenderable`.
++ Removed season border detection and other unused Season/Time code. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
++ Split HoppityStatsSummary and HoppityLiveDisplay into separate classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
++ Started porting pets to their own config category. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
++ Updated Renderables for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4009)
++ Updated SackApi, GardenApi, PestApi, FishingApi and TitleManager for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4012)
 
 ## Version 3.0.0
 

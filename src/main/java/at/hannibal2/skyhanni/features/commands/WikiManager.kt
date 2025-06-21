@@ -137,7 +137,7 @@ object WikiManager {
         event.registerBrigadier("shfandomwikithis") {
             description = "Searches the fandom wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
-            legacyCallbackArgs { otherWikiCommands(it, true, true) }
+            legacyCallbackArgs { otherWikiCommands(it, useFandom = true, wikithis = true) }
         }
         event.registerBrigadier("shofficialwiki") {
             description = "Searches the official wiki with SkyHanni's own method."

@@ -804,12 +804,6 @@ object HoppityCollectionStats {
         }
     }
 
-    // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
-    fun resetSavedRabbits() {
-        loggedRabbits.clear()
-        ChatUtils.chat("Reset saved rabbit data.")
-    }
-
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
 
     enum class RabbitCollectionRarity(
@@ -850,10 +844,14 @@ object HoppityCollectionStats {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
+        // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
         event.registerBrigadier("shresetsavedrabbits") {
             description = "Resets the saved rabbits on this profile."
             category = CommandCategory.USERS_RESET
-            simpleCallback { resetSavedRabbits() }
+            simpleCallback {
+                loggedRabbits.clear()
+                ChatUtils.chat("Reset saved rabbit data.")
+            }
         }
     }
 }
