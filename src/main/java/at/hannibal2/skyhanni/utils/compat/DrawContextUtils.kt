@@ -40,8 +40,7 @@ object DrawContextUtils {
             ErrorManager.skyHanniError("drawContext is null")
         }
 
-    fun drawItem(item: ItemStack, x: Int, y: Int) =
-        drawContext.drawItem(item, x, y)
+    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.drawItem(item, x, y)
 
     fun setContext(context: DrawContext) {
         renderDepth++
@@ -100,26 +99,7 @@ object DrawContextUtils {
         GlStateManager.getFloat(pName, params)
         //#else
         //$$ params.clear()
-        //$$ when (pName) {
-        //$$     GL_MODELVIEW_MATRIX -> {
-        //$$         val mvEntry = drawContext.matrices.peek()
-        //$$         mvEntry.getPositionMatrix().get(params)
-        //$$     }
-        //$$     GL_PROJECTION_MATRIX -> {
-        //$$         RenderSystem.assertOnRenderThread()
-        //$$         RenderSystem.getProjectionMatrix().get(params)
-        //$$     }
-        //$$     GL_CURRENT_COLOR -> {
-        //$$         RenderSystem.assertOnRenderThread()
-        //$$         val c = RenderSystem.getShaderColor()
-        //$$         params.put(0, c[0])
-        //$$         params.put(1, c[1])
-        //$$         params.put(2, c[2])
-        //$$         params.put(3, c[3])
-        //$$     }
-        //$$     else -> { }
-        //$$ }
-        //$$ params.flip()
+        //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
         //#endif
     }
 

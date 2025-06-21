@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -118,7 +117,7 @@ object DungeonLividFinder {
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inLividBossRoom()) return
         if (event.location != blockLocation) return
-        if (!event.location.getBlockAt().isWool()) return
+        if (!event.newState.isWool()) return
 
         val newColor = event.newState.getBlockColor()
         color = newColor
