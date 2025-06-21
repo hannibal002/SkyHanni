@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,6 +40,8 @@ object HoppityEggsManager {
     private val unclaimedEggsConfig get() = config.unclaimedEggs
     private val waypointsConfig get() = config.waypoints
     private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
+    private val nextEggMessageId = ChatUtils.getUniqueMessageId()
+    private val nextHuntMessageId = ChatUtils.getUniqueMessageId()
 
     // <editor-fold desc="Patterns">
     /**
@@ -182,10 +186,10 @@ object HoppityEggsManager {
     private fun SkyHanniChatEvent.sendNextEggAvailable() {
         val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
         val currentYear = SkyBlockTime.now().year
-        val spawnedEggs = HoppityEventSummary.getSpawnedEggCount(currentYear)
+        val spawnedEggs = HoppityEventSummary.getSpawnedEggCounts(currentYear).sumAllValues().toInt()
         when (spawnedEggs) {
             279 -> sendNextHuntIn("No more eggs will spawn this event")
-            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
+            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.", messageId = nextEggMessageId)
         }
         blockedReason = "hoppity_egg"
     }
@@ -195,7 +199,7 @@ object HoppityEggsManager {
     ) {
         val currentYear = SkyBlockTime.now().year
         val timeUntil = SkyBlockTime(currentYear + 1).toTimeMark().timeUntil()
-        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
+        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.", messageId = nextHuntMessageId)
         blockedReason = "hoppity_egg"
     }
 
