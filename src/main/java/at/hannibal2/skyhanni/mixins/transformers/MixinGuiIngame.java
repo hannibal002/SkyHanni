@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiIngame;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +12,6 @@ public class MixinGuiIngame {
 
     @Redirect(method = "renderScoreboard", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/FontRenderer;drawString(Ljava/lang/String;III)I"))
     private int renderItemOverlayPost(FontRenderer instance, String text, int x, int y, int color) {
-        return GuiIngameHookKt.drawString(instance, text, x, y, color);
+        return GuiIngameHook.drawString(instance, text, x, y, color);
     }
 }

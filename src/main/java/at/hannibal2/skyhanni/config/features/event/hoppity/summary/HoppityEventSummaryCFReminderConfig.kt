@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.event.hoppity
+package at.hannibal2.skyhanni.config.features.event.hoppity.summary
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
