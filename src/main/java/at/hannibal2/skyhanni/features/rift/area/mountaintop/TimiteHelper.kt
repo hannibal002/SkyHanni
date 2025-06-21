@@ -58,8 +58,8 @@ object TimiteHelper {
         currentPos = event.position
         currentBlockState = event.getBlockState
 
-        val block = event.getBlockState.block
-        if (!block.isStainedGlassPane(ColoredBlockCompat.BLUE) && !block.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) return
+        val blockState = event.getBlockState
+        if (!blockState.isStainedGlassPane(ColoredBlockCompat.BLUE) && !blockState.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) return
 
         if (lastClick + 300.milliseconds > SimpleTimeMark.now()) {
             lastClick = SimpleTimeMark.now()
@@ -79,7 +79,7 @@ object TimiteHelper {
         }
         if (holdingClick.isFarPast()) return
 
-        if (currentBlockState?.block?.isStainedGlassPane() != true) return
+        if (currentBlockState?.isStainedGlassPane() != true) return
 
         val time = if (doubleTimeShooting) 1800 else 2000
         val timeLeft = holdingClick + time.milliseconds
@@ -98,7 +98,7 @@ object TimiteHelper {
         val map = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
             distance = 15,
-            condition = { it.block.isStainedGlassPane() },
+            condition = { it.isStainedGlassPane() },
         )
 
         for ((loc, state) in map) {
@@ -112,7 +112,7 @@ object TimiteHelper {
             val state = iterator.next().key.getBlockStateAt()
             if (state.block == Blocks.air) {
                 iterator.remove()
-            } else if (state.block.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) {
+            } else if (state.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) {
                 iterator.remove()
             }
         }
