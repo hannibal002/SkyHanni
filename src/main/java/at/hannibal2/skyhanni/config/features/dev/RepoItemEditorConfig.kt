@@ -30,6 +30,14 @@ class RepoItemEditorConfig {
 
     @Expose
     @ConfigOption(
+        name = "Highlight Missing Repo Items",
+        desc = "Highlights each item in the current inventory that is not in your current NEU repo."
+    )
+    @ConfigEditorBoolean
+    var highlightMissingRepo: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Edit Mode Keybind",
         desc = "Keybind to open the repo item editor GUI.",
     )

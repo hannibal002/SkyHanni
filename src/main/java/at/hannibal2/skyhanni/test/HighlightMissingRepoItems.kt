@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.dev.RepoItemEditorConfig
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -17,9 +18,11 @@ import net.minecraft.inventory.Slot
 @SkyHanniModule
 object HighlightMissingRepoItems {
 
+    private val config get(): RepoItemEditorConfig = SkyHanniMod.feature.dev.devTool.repoItemEditor
+
     @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!SkyHanniMod.feature.dev.debug.highlightMissingRepo) return
+        if (!config.highlightMissingRepo) return
 
         val gui = event.gui
 
@@ -45,5 +48,6 @@ object HighlightMissingRepoItems {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.highlightMissingRepo", "dev.debug.highlightMissingRepo")
+        event.move(89, "dev.debug.highlightMissingRepo", "dev.devTool.repoItemEditor.highlightMissingRepo")
     }
 }
