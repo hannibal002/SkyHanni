@@ -26,7 +26,9 @@ import java.util.regex.Matcher
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#else
-//$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
+//$$ import net.minecraft.client.util.ChatMessages
+//$$ import net.minecraft.text.TextColor
+//$$ import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 //#endif
 
 // todo 1.21 impl needed
@@ -189,11 +191,49 @@ object StringUtils {
     //#if FORGE
     fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getMinecraft().fontRendererObj).splitText(
         //#else
-        //$$ fun String.splitLines(width: Int): String = ModernFontRenderer(MinecraftClient.getInstance().textRenderer).splitText(
+        //$$ fun String.splitLines(width: Int): String = splitText(
         //#endif
         this,
         width,
     ).joinToString("\n") { it.removePrefix("§r") }
+
+    //#if MC > 1.21
+    //$$ private fun splitText(text: String, width: Int): List<String> {
+    //$$     val lines = ChatMessages.breakRenderedChatMessageLines(Text.literal(text), width, MinecraftClient.getInstance().textRenderer)
+    //$$     val strings: MutableList<String> = ArrayList(lines.size)
+    //$$     for (line in lines) {
+    //$$         var newLine = ""
+    //$$         var lastColor: TextColor? = null
+    //$$         var lastFormatting = ""
+    //$$         line.accept { index, style, codePoint ->
+    //$$             val color = style.color
+    //$$             if (color != lastColor) {
+    //$$                 lastColor = color
+    //$$                 lastFormatting = ""
+    //$$                 if (color != null) {
+    //$$                     newLine += color.toChatFormatting()
+    //$$                 }
+    //$$             }
+    //$$             var newFormatting = ""
+    //$$             if (style.isBold) newFormatting = "§l"
+    //$$             else if (style.isItalic) newFormatting = "§o"
+    //$$             else if (style.isUnderlined) newFormatting = "§n"
+    //$$             else if (style.isStrikethrough) newFormatting = "§m"
+    //$$             else if (style.isObfuscated) newFormatting = "§k"
+    //$$             else newFormatting = ""
+    //$$
+    //$$             if (newFormatting != lastFormatting) {
+    //$$                 lastFormatting = newFormatting
+    //$$                 newLine += newFormatting
+    //$$             }
+    //$$             newLine += codePoint.toChar()
+    //$$             true
+    //$$         }
+    //$$         strings.add(newLine)
+    //$$     }
+    //$$     return strings
+    //$$ }
+    //#endif
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
