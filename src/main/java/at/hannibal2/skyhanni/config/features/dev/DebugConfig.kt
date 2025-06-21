@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
@@ -195,6 +196,24 @@ class DebugConfig {
     @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
     @ConfigEditorBoolean
     var dvdLogo: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Item Stack", desc = "Enable the test Item Stack Renderable")
+    @ConfigEditorBoolean
+    var itemStack: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "itemStack")
+    var itemStackPosition: Position = Position(-200, 300)
+
+    @Expose
+    @ConfigOption(name = "Animated Item Stack", desc = "Enable the test Animated Item Stack Renderable")
+    @ConfigEditorBoolean
+    var animatedItemStack: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
+    var animatedItemStackPosition: Position = Position(-300, 300)
 
     // Does not have a config element!
     @Expose
