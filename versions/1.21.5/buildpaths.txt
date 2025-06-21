@@ -137,7 +137,7 @@ at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent.kt
 at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent.kt
 at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent.kt
 at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree.kt
-at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson.java
+at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson.kt
 at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson.kt
 at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson.kt
@@ -514,6 +514,7 @@ at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi.kt
 at.hannibal2.skyhanni.features.garden.contest.FarmingContestPhase.kt
 at.hannibal2.skyhanni.features.garden.contest.FarmingPersonalBestGain.kt
 at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory.kt
+at.hannibal2.skyhanni.features.garden.contest.EliteDevApi.kt
 at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker.kt
 at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay.kt
 at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter.kt
@@ -753,6 +754,7 @@ at.hannibal2.skyhanni.utils.ComponentUtils.kt
 at.hannibal2.skyhanni.utils.ComputerEnvDebug.kt
 at.hannibal2.skyhanni.utils.ConfigUtils.kt
 at.hannibal2.skyhanni.utils.DelayedRun.kt
+at.hannibal2.skyhanni.utils.DialogUtils.kt
 at.hannibal2.skyhanni.utils.DisplayTableEntry.kt
 at.hannibal2.skyhanni.utils.EntityUtils.kt
 at.hannibal2.skyhanni.utils.EssenceUtils.kt
