@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -102,15 +105,6 @@ object ComposterOverlay {
         private set(value) {
             GardenApi.storage?.composterCurrentFuelItem = value
         }
-
-    fun onCommand(args: Array<String>) {
-        if (args.size != 1) {
-            ChatUtils.userError("Usage: /shtestcomposter <offset>")
-            return
-        }
-        testOffset = args[0].toInt()
-        ChatUtils.chat("Composter test offset set to $testOffset.")
-    }
 
     private val COMPOST = "COMPOST".toInternalName()
     private val BIOFUEL = "BIOFUEL".toInternalName()
@@ -546,7 +540,7 @@ object ComposterOverlay {
         }
 
         val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
-            HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
+            GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
             val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
@@ -570,7 +564,7 @@ object ComposterOverlay {
             return
         }
 
-        HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
+        GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
         val havingInTotal = havingInInventory + havingInSacks
         if (itemsNeeded >= havingInTotal) {
             if (SkyBlockUtils.noTradeMode) {
@@ -715,6 +709,22 @@ object ComposterOverlay {
             val tabListData = ComposterApi.tabListData
             for ((a, b) in tabListData) {
                 add("tabListData $a: $b")
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestcomposter") {
+            description = "Test the composter overlay"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs {
+                if (it.size != 1) {
+                    ChatUtils.userError("Usage: /shtestcomposter <offset>")
+                } else {
+                    testOffset = it[0].toInt()
+                    ChatUtils.chat("Composter test offset set to $testOffset.")
+                }
             }
         }
     }

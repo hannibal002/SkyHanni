@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
@@ -13,6 +14,8 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$ net.minecraft.network.chat.TextComponent.EMPTY
     //#endif
 ) {
+
+    val mc: Minecraft = Minecraft.getMinecraft()
 
     //#if MC < 1.21
     final override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -34,7 +37,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$     }
     //#endif
 
-    open fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {}
+    open fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {}
 
     //#if MC < 1.21
     final override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {

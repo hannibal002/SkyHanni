@@ -18,6 +18,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
+import java.util.Locale
 import java.util.NavigableMap
 import java.util.NavigableSet
 import java.util.UUID
@@ -25,7 +26,9 @@ import java.util.regex.Matcher
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#else
-//$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
+//$$ import net.minecraft.client.util.ChatMessages
+//$$ import net.minecraft.text.TextColor
+//$$ import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 //#endif
 
 // todo 1.21 impl needed
@@ -48,11 +51,8 @@ object StringUtils {
     fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
-        if (isEmpty()) return this
-
-        val lowercase = lowercase()
-        val first = lowercase[0].uppercase()
-        return first + lowercase.substring(1)
+        return this.lowercase(Locale.getDefault())
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
@@ -191,11 +191,49 @@ object StringUtils {
     //#if FORGE
     fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getMinecraft().fontRendererObj).splitText(
         //#else
-        //$$ fun String.splitLines(width: Int): String = ModernFontRenderer(MinecraftClient.getInstance().textRenderer).splitText(
+        //$$ fun String.splitLines(width: Int): String = splitText(
         //#endif
         this,
         width,
     ).joinToString("\n") { it.removePrefix("§r") }
+
+    //#if MC > 1.21
+    //$$ private fun splitText(text: String, width: Int): List<String> {
+    //$$     val lines = ChatMessages.breakRenderedChatMessageLines(Text.literal(text), width, MinecraftClient.getInstance().textRenderer)
+    //$$     val strings: MutableList<String> = ArrayList(lines.size)
+    //$$     for (line in lines) {
+    //$$         var newLine = ""
+    //$$         var lastColor: TextColor? = null
+    //$$         var lastFormatting = ""
+    //$$         line.accept { index, style, codePoint ->
+    //$$             val color = style.color
+    //$$             if (color != lastColor) {
+    //$$                 lastColor = color
+    //$$                 lastFormatting = ""
+    //$$                 if (color != null) {
+    //$$                     newLine += color.toChatFormatting()
+    //$$                 }
+    //$$             }
+    //$$             var newFormatting = ""
+    //$$             if (style.isBold) newFormatting = "§l"
+    //$$             else if (style.isItalic) newFormatting = "§o"
+    //$$             else if (style.isUnderlined) newFormatting = "§n"
+    //$$             else if (style.isStrikethrough) newFormatting = "§m"
+    //$$             else if (style.isObfuscated) newFormatting = "§k"
+    //$$             else newFormatting = ""
+    //$$
+    //$$             if (newFormatting != lastFormatting) {
+    //$$                 lastFormatting = newFormatting
+    //$$                 newLine += newFormatting
+    //$$             }
+    //$$             newLine += codePoint.toChar()
+    //$$             true
+    //$$         }
+    //$$         strings.add(newLine)
+    //$$     }
+    //$$     return strings
+    //$$ }
+    //#endif
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
@@ -284,6 +322,7 @@ object StringUtils {
     }
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
+    fun String.convertToUnformatted(): String = this.replace("§", "&")
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 
@@ -454,11 +493,9 @@ object StringUtils {
         return message
     }
 
-    //#if TODO
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
-    //#endif
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
         return asComponent { chatStyle = original.chatStyle }

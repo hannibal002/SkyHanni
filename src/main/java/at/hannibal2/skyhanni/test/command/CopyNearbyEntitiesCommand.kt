@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
+import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
@@ -20,7 +22,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -36,6 +37,7 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
@@ -93,10 +95,10 @@ object CopyNearbyEntitiesCommand {
                 }
 
                 if (entity is EntityPlayer) {
-                    val inventory = entity.inventory
-                    if (inventory != null) {
+                    val armor = entity.getArmorInventory()
+                    if (armor != null) {
                         add("armor:")
-                        for ((i, itemStack) in inventory.armorInventory.withIndex()) {
+                        for ((i, itemStack) in armor.withIndex()) {
                             val name = itemStack?.displayName ?: "null"
                             add("-  at: $i: $name")
                         }
@@ -135,6 +137,7 @@ object CopyNearbyEntitiesCommand {
         add("EntityArmorStand:")
         val headRotation = entity.headRotation.toLorenzVec()
         val bodyRotation = entity.bodyRotation.toLorenzVec()
+        //#if TODO
         add("-  headRotation: $headRotation")
         add("-  bodyRotation: $bodyRotation")
 
@@ -143,6 +146,7 @@ object CopyNearbyEntitiesCommand {
             add("-  id $id ($stack)")
             printItemStackData(stack)
         }
+        //#endif
     }
 
     private fun MutableList<String>.addEnderman(entity: EntityEnderman) {
@@ -197,10 +201,14 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.addCreeper(entity: EntityCreeper) {
         add("EntityCreeper:")
+        //#if MC < 1.16
         val creeperState = entity.creeperState
+        //#endif
         val ignite = entity.hasIgnited()
         val powered = entity.powered
+        //#if MC < 1.16
         add("-  creeperState: '$creeperState'")
+        //#endif
         add("-  ignite: '$ignite'")
         add("-  powered: '$powered'")
     }

@@ -2,16 +2,18 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+//#if TODO
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+// todo 1.21 impl needed
 enum class HoppityEggType(
     val mealName: String,
     val mealColor: String,
@@ -46,12 +48,20 @@ enum class HoppityEggType(
 
     private fun spawnsToday(): Boolean {
         val sbTimeNow = SkyBlockTime.now()
+        //#if TODO
         return altDay == sbTimeNow.isAlternateDay()
+        //#else
+        //$$return false
+        //#endif
     }
 
     fun spawnedToday(): Boolean {
         val sbTimeNow = SkyBlockTime.now()
+        //#if TODO
         return altDay == sbTimeNow.isAlternateDay() && sbTimeNow.hour >= resetsAt
+        //#else
+        //$$return false
+        //#endif
     }
 
     fun alreadyResetToday(): Boolean {
@@ -75,14 +85,16 @@ enum class HoppityEggType(
             hour = resetsAt,
             minute = 0,
             second = 0,
-        ).asTimeMark().also {
+        ).toTimeMark().also {
             nextSpawnCache[this] = it
         }
     }
 
     fun markClaimed(mark: SimpleTimeMark? = null) {
         claimed = true
+        //#if TODO
         mark?.let { profileStorage?.mealLastFound?.set(this, it) }
+        //#endif
     }
 
     fun markSpawned(setLastReset: Boolean = false) {
@@ -93,11 +105,15 @@ enum class HoppityEggType(
     fun isClaimed() = claimed || hasNotFirstSpawnedYet()
 
     fun hasRemainingSpawns(): Boolean {
+        //#if TODO
         val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
         // If it's before the last two days of the event, we can assume there are more spawns
         if (hoppityEndMark.timeUntil() > SkyBlockTime.SKYBLOCK_DAY_MILLIS.milliseconds * 2) return true
         // Otherwise we have to check if the next spawn is after the end of the event
         return timeUntil < hoppityEndMark.timeUntil()
+        //#else
+        //$$ return false
+        //#endif
     }
 
     fun hasNotFirstSpawnedYet(): Boolean {
@@ -110,11 +126,13 @@ enum class HoppityEggType(
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
         private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
             postUpdate = { key, value ->
+                //#if TODO
                 val newMark = value ?: run {
                     profileStorage?.mealNextSpawn?.remove(key)
                     return@ObservableMutableMap
                 }
                 profileStorage?.mealNextSpawn?.set(key, newMark)
+                //#endif
             },
         )
         val resettingEntries = entries.filter { it.resetsAt != -1 }.sortedBy { it.resetsAt }

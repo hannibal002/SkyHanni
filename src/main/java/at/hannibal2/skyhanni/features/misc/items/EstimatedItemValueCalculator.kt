@@ -4,17 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-//#endif
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
@@ -85,7 +81,6 @@ import net.minecraft.item.ItemStack
 import java.util.Locale
 import kotlin.math.max
 
-// todo 1.21 impl needed
 // TODO split into smaller sub classes
 @Suppress("LargeClass")
 object EstimatedItemValueCalculator {
@@ -93,11 +88,7 @@ object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     var starChange = 0
-        //#if TODO
         get() = if (SkyHanniDebugsAndTests.enabled) field else 0
-    //#else
-    //$$ get() = field
-    //#endif
 
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
@@ -739,9 +730,7 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            //#if TODO
             if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
-            //#endif
 
             val enchantmentName = "$rawName;$level".toInternalName()
 

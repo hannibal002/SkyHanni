@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -357,5 +356,5 @@ object TrevorFeatures {
         val colorCode = baseColor.getChatColor()
     }
 
-    fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
+    fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isCurrent()
 }

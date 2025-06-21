@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.events.hoppity
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+//#if TODO
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
+//#endif
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 
+// todo 1.21 impl needed
 class RabbitFoundEvent(
     val eggType: HoppityEggType,
     val duplicate: Boolean,
@@ -11,12 +14,14 @@ class RabbitFoundEvent(
     val chocGained: Long = 0,
 ) : SkyHanniEvent() {
 
+    //#if TODO
     constructor(dataSet: HoppityApi.HoppityStateDataSet) : this(
         dataSet.lastMeal ?: HoppityEggType.BREAKFAST,
         dataSet.duplicate,
         dataSet.lastName,
         dataSet.lastDuplicateAmount ?: 0,
     )
+    //#endif
 
     override fun toString(): String =
         "§fType§7: ${eggType.coloredName}\n§fDuplicate§7: §b$duplicate\n§fRabbit§7: $rabbitName\n§fChoc Gained§7: §6$chocGained"

@@ -334,7 +334,7 @@ object EnoughUpdatesManager {
             replacements["LVL"] = level.toString()
         } else {
             neuPetsJson?.customPetLeveling?.get(petName)?.let { petLeveling ->
-                val maxLevel = petLeveling.asJsonObject.get("maxLevel")?.asInt ?: 100
+                val maxLevel = petLeveling.maxLevel ?: 100
                 replacements["LVL"] = "1➡$maxLevel"
             } ?: run { replacements["LVL"] = "1➡100" }
         }

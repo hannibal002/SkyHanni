@@ -1,24 +1,31 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
 import net.fabricmc.fabric.api.client.rendering.v1.LayeredDrawerWrapper
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderTickCounter
+import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
-
 
 @SkyHanniModule
 object RenderEvents {
-
 
     private val LAYER: Identifier = Identifier.of("skyhanni", "layer")
 
     init {
 
         // SkyHanniRenderWorldEvent
+        WorldRenderEvents.AFTER_TRANSLUCENT.register { event ->
+            val immediateVertexConsumers = event.consumers() as? VertexConsumerProvider.Immediate ?: return@register
+            val stack = event.matrixStack() ?: MatrixStack()
+            SkyHanniRenderWorldEvent(stack, event.camera(), immediateVertexConsumers, event.tickCounter().getTickProgress(true)).post()
+        }
 
         // ScreenDrawnEvent
 
@@ -28,7 +35,7 @@ object RenderEvents {
                 layeredDrawer.attachLayerBefore(
                     IdentifiedLayer.HOTBAR_AND_BARS,
                     LAYER,
-                    this::postEvent,
+                    this::postHotbarLayerEvent,
                 )
             },
         )
@@ -37,8 +44,6 @@ object RenderEvents {
         // GameOverlayRenderPostEvent
 
         // GuiScreenOpenEvent
-
-        // GuiKeyPressEvent
 
         // GuiMouseInputEvent
 
@@ -50,7 +55,7 @@ object RenderEvents {
 
     }
 
-    private fun postEvent(context: DrawContext, ticks: RenderTickCounter) {
+    private fun postHotbarLayerEvent(context: DrawContext, ticks: RenderTickCounter) {
         GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
     }
 
