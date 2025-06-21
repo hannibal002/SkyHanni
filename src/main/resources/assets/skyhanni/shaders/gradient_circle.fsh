@@ -24,31 +24,30 @@ void main() {
 
     vec2 cords = gl_FragCoord.xy;
     vec2 newCenterPos = vec2(
-    (centerPos.x + radius * (xScale - 1.0)) + xTranslation * scaleFactor,
-    (centerPos.y - radius * (yScale - 1.0)) - yTranslation * scaleFactor
+        (centerPos.x + radius * (xScale - 1.0)) + xTranslation * scaleFactor,
+        (centerPos.y - radius * (yScale - 1.0)) - yTranslation * scaleFactor
     );
     vec2 adjusted = cords - newCenterPos;
-
-    float intAngle = atan(adjusted.y, adjusted.x);
-    intAngle = mod(intAngle + tau, tau);
 
     float newRadius = radius * min(xScale, yScale);
     float dist2 = pow(adjusted.x, 2.0) + pow(adjusted.y, 2.0);
     float smoothed = 1.0 - smoothstep(
-    pow(newRadius - smoothness, 2.0),
-    pow(newRadius, 2.0),
-    dist2
+        pow(newRadius - smoothness, 2.0),
+        pow(newRadius, 2.0),
+        dist2
     );
     if (smoothed <= 0.0) discard;
 
+    float intAngle = atan(adjusted.y, adjusted.x);
+    intAngle = mod(intAngle + tau, tau);
     float angleOffset = mod(intAngle - angle + tau, tau);
     float angularLength = progress * tau;
 
     float angleSoft = smoothness / radius;
     float angleAlpha = 1.0 - smoothstep(
-    angularLength - angleSoft,
-    angularLength,
-    angleOffset
+        angularLength - angleSoft,
+        angularLength,
+        angleOffset
     );
 
     float finalAlpha = smoothed * angleAlpha;
