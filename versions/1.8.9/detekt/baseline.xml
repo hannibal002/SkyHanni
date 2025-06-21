@@ -28,6 +28,7 @@
     <ID>EmptyClassBlock:ModernPatterns.kt$ModernPatterns${ }</ID>
     <ID>FunctionOnlyReturningConstant:ItemUtils.kt$ItemUtils$fun ItemStack.getItemModel(): Item?</ID>
     <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
+    <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
     <ID>LargeClass:WorldRenderUtils.kt$WorldRenderUtils</ID>
