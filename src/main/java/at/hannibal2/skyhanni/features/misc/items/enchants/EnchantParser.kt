@@ -16,12 +16,13 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.createHoverEvent
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -425,7 +426,7 @@ object EnchantParser {
 
         // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
         val chatComponentText = text.asComponent()
-        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText)
+        val hoverEvent = createHoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText) ?: return
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
@@ -468,7 +469,7 @@ object EnchantParser {
     // We don't check if the main toggle here since we still need to go into
     // the parseEnchants method to deal with hiding vanilla enchants
     // and enchant descriptions
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = SkyBlockUtils.inSkyBlock
 
     private fun markCacheDirty() {
         loreCache.configChanged = true

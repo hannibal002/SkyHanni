@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
@@ -153,6 +155,14 @@ object SkyHanniMod {
             }
             simpleCallback {
                 openConfigGui()
+            }
+        }
+        event.registerBrigadier("shconfigsave") {
+            description = "Manually saving the config"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                ChatUtils.chat("Manually saved the config!")
+                configManager.saveConfig(ConfigFileType.FEATURES, "manual-command")
             }
         }
     }

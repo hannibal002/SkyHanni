@@ -231,7 +231,7 @@ object IslandAreas {
                 buildDisplay?.addSearchString("§cThere is only one area in $islandName,")
                 buildDisplay?.addSearchString("§cnothing else to navigate to!")
             } else {
-                buildDisplay?.addSearchString("§cThere is no $islandName area data avaliable yet!")
+                buildDisplay?.addSearchString("§cThere is no $islandName area data available yet!")
             }
         }
         buildDisplay?.let {

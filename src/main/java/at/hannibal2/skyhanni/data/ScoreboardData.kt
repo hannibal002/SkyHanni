@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
@@ -30,8 +32,9 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() =
-        MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
+    val objectiveTitle: String
+        get() =
+            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -79,11 +82,13 @@ object ScoreboardData {
                     dirty = true
                 }
             }
+
             is S3EPacketTeams -> {
                 if (packet.name.startsWith("team_")) {
                     dirty = true
                 }
             }
+
             is S3BPacketScoreboardObjective -> {
                 val type = packet.func_179817_d()
                 if (type != IScoreObjectiveCriteria.EnumRenderType.INTEGER) return
@@ -134,13 +139,6 @@ object ScoreboardData {
             sidebarLinesFormatted = new
             ScoreboardUpdateEvent(new, old).post()
         }
-    }
-
-    fun toggleMonitor() {
-        monitor = !monitor
-        val action = if (monitor) "Enabled" else "Disabled"
-        ChatUtils.chat("$action scoreboard monitoring in the console.")
-
     }
 
     private fun cleanSB(scoreboard: String) = scoreboard.toCharArray().filter {
@@ -243,4 +241,19 @@ object ScoreboardData {
         "\uD83C\uDF82",
         "\uD83D\uDD2B",
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shdebugscoreboard") {
+            description =
+                "Monitors the scoreboard changes: " +
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                monitor = !monitor
+                val action = if (monitor) "Enabled" else "Disabled"
+                ChatUtils.chat("$action scoreboard monitoring in the console.")
+            }
+        }
+    }
 }
