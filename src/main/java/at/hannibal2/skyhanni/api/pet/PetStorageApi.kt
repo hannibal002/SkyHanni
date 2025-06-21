@@ -435,7 +435,7 @@ object PetStorageApi {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        fun PetData.formatForDebug() = fauxInternalName.asString() + ":<lvl${level}>:" + uuid.toString()
+        fun PetData.formatForDebug() = fauxInternalName.asString() + ":<lvl$level>:" + uuid.toString()
         event.title("PetStorageApi")
         event.addIrrelevant {
             val petStorage = petStorage ?: return@addIrrelevant
