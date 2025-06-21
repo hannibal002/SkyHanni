@@ -53,8 +53,8 @@ object FarmingContestApi {
     )
 
     /**
-     * REGEX-TEST:  ☘ Wheat ◆ Top 0.2%
-     * REGEX-TEST:  ○ Wheat ◆ Top 0.2%
+     * REGEX-TEST:  §r§6☘ §r§fNether Wart §r§f◆ Top §r§e95.3%
+     * REGEX-TEST:  §r§e○ §r§fPumpkin §r§f◆ Top §r§c52.4%
      */
     private val tablistActiveContestPattern by patternGroup.pattern(
         "tablist.contest.active",

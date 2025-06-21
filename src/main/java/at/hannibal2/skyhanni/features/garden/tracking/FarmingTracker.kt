@@ -134,7 +134,7 @@ object FarmingTracker {
         InformationType.COOKIE_BUFF -> cookieBuffTime?.takeIf { it.isInFuture() }?.timeUntil()?.toString() ?: "<:no:1263210393723998278>"
         InformationType.GOD_POTION -> godPotionTimer?.takeIf { it.isInFuture() }?.timeUntil()?.toString() ?: "<:no:1263210393723998278>"
         InformationType.JACOBS_CONTEST -> if (!FarmingContestApi.inContest) "" else with(FarmingContestApi.contestData) {
-            "${placement}% ($collected)${bracket?.emoji?.let { " $it" } ?: ""}"
+            "$placement% ($collected)${bracket?.emoji?.let { " $it" }.orEmpty()}"
         }
 
         InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { crop ->
