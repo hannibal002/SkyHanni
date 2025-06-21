@@ -88,7 +88,7 @@ object NbtCompat {
 //$$     return this.getString(key).getOrNull() ?: ""
 //$$ }
 //$$
-//$$ fun NbtCompound.getIntOrDefault(key: String): Int {
+//$$ fun NbtCompound.getIntOrDefault(key: String?): Int {
 //$$     return this.getInt(key).getOrNull() ?: 0
 //$$ }
 //$$

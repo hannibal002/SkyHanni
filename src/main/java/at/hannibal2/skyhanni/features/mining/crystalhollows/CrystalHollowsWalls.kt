@@ -97,23 +97,23 @@ object CrystalHollowsWalls {
         }
     }
 
-    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(true, false, Area.JUNGLE.color, Area.PRECURSOR.color)
     }
 
-    private fun drawJungle(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawJungle(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(true, true, Area.GOBLIN.color, Area.MITHRIL.color)
     }
 
-    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(false, false, Area.MITHRIL.color, Area.GOBLIN.color)
     }
 
-    private fun drawMithril(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawMithril(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(false, true, Area.PRECURSOR.color, Area.JUNGLE.color)
     }
 
-    private fun drawHeat(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawHeat(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         val heatHeight = HEAT_HEIGHT.shiftNY()
         draw(
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
@@ -134,7 +134,7 @@ object CrystalHollowsWalls {
         val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) =
             nucleusBBInflate.getCornersAtHeight(nucleusBBInflate.maxY)
 
-        QuadDrawer.draw3D(event.partialTicks) {
+        QuadDrawer.draw3D(event) {
             draw(
                 southEastCorner,
                 southWestCorner,

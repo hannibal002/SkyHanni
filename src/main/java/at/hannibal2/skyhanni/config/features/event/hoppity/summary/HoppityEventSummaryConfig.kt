@@ -47,8 +47,8 @@ class HoppityEventSummaryConfig {
             HoppityStat.EMPTY_3,
             HoppityStat.TIME_IN_CF,
             HoppityStat.RABBIT_THE_FISH_FINDS,
-            HoppityStat.LEADERBOARD_CHANGE
-        )
+            HoppityStat.LEADERBOARD_CHANGE,
+        ),
     )
 
     @Suppress("MaxLineLength")
@@ -76,7 +76,7 @@ class HoppityEventSummaryConfig {
     @ConfigOption(
         name = "Show Count Diff",
         desc = "Store and display the count of Uniques/Duplicates next to their respective rabbit count.\n" +
-            ".e.g. §7Unique Rabbits: §f5 §7(270 -> 275)"
+            ".e.g. §7Unique Rabbits: §f5 §7(270 -> 275)",
     )
     @ConfigEditorBoolean
     var showCountDiff: Boolean = false

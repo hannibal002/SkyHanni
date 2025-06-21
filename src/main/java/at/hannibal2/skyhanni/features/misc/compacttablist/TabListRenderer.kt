@@ -21,6 +21,7 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object TabListRenderer {
 
@@ -177,6 +178,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
+                        //#if TODO
                         minecraft.textureManager.bindTexture(playerInfo.locationSkin)
                         GlStateManager.color(1f, 1f, 1f, 1f)
                         Gui.drawScaledCustomSizeModalRect(middleX, middleY, 8f, 8f, 8, 8, 8, 8, 64f, 64f)
@@ -185,6 +187,7 @@ object TabListRenderer {
                         if (player != null && player.isWearing(EnumPlayerModelParts.HAT)) {
                             Gui.drawScaledCustomSizeModalRect(middleX, middleY, 40f, 8f, 8, 8, 8, 8, 64f, 64f)
                         }
+                        //#endif
                     }
                     middleX += 8 + 2
                 }

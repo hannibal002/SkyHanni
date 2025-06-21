@@ -140,8 +140,8 @@ object HoppityEggsManager {
     private var latestWaypointOnclick: () -> Unit = {}
     private var syncedFromConfig: Boolean = false
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         if (!HoppityApi.isHoppityEvent()) return
         resettingEntries.forEach {
             val lastFound = profileStorage?.mealLastFound?.get(it) ?: SimpleTimeMark.farFuture()
@@ -195,7 +195,7 @@ object HoppityEggsManager {
     }
 
     private fun SkyHanniChatEvent.sendNextHuntIn(
-        reason: String = "Hoppity's Hunt is not active"
+        reason: String = "Hoppity's Hunt is not active",
     ) {
         val currentYear = SkyBlockTime.now().year
         val timeUntil = SkyBlockTime(currentYear + 1).toTimeMark().timeUntil()
@@ -258,8 +258,8 @@ object HoppityEggsManager {
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         checkSpawned()
         if (!isActive()) return
         checkWarn()
