@@ -421,21 +421,12 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     }
 }
 
-val skipTodos by lazy {
-    val prop = Properties()
-    val file = rootProject.file(".gradle/private.properties")
-    if (file.exists()) {
-        file.inputStream().use(prop::load)
-    }
-    (prop["skyhanni.skipPreprocessTodos"] as? String)?.toBoolean() ?: false
-}
-
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
-    vars.put("TODO", if (skipTodos) 1 else 0)
+    vars.put("TODO", 0)
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
