@@ -13,10 +13,8 @@ import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 
-
 @SkyHanniModule
 object RenderEvents {
-
 
     private val LAYER: Identifier = Identifier.of("skyhanni", "layer")
 

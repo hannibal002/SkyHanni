@@ -29,7 +29,6 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
                 .color(line.color.red, line.color.green, line.color.blue, line.color.alpha)
         }
 
-        event.vertexConsumers.draw(layer)
         queuedLines.clear()
     }
 
