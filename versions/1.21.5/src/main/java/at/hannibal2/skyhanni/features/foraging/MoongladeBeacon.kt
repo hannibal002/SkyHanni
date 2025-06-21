@@ -140,7 +140,7 @@ object MoongladeBeacon {
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inInventory) return
-        if (event.soundName != "block.note_block.bass") return
+        if (event.soundName != "note.bassattack") return
         val pitch = pitchMap[event.pitch] ?: return
         if (upgradingStrength) return
         if (normalTuning.targetPitch == null) return
