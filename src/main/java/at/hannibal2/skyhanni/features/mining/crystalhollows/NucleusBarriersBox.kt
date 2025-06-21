@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.util.AxisAlignedBB
 
@@ -74,7 +74,7 @@ object NucleusBarriersBox {
                 }
 
                 BoundingBoxType.OUTLINE -> {
-                    event.drawWireframeBoundingBox(
+                    event.drawHitbox(
                         crystal.boundingBox,
                         crystal.configColorOption.get().toSpecialColor(),
                     )

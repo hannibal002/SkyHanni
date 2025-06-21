@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 
@@ -87,7 +87,7 @@ object SulphurSkitterBox {
             }
 
             SulphurSkitterBoxConfig.BoxType.WIREFRAME -> {
-                event.drawWireframeBoundingBox(axis, color)
+                event.drawHitbox(axis, color)
             }
         }
     }
