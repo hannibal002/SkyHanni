@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
