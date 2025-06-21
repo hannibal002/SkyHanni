@@ -135,7 +135,7 @@ enum class SkyHanniRenderPipeline(
                 uniforms.forEach(this::withUniform)
                 withDepthWrite(depthWrite)
                 withDepthTestFunction(depthTestFunction)
-            }.build()
+            }.build(),
     )
 
     operator fun invoke(): RenderPipeline = _pipe
