@@ -67,8 +67,6 @@
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:InquisitorSoundConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:LaneSwitchSoundSettings.kt$//#if TODO</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
@@ -258,6 +256,7 @@
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
+    <ID>TooManyFunctions:TextCompat.kt$at.hannibal2.skyhanni.utils.compat.TextCompat.kt</ID>
     <ID>TooManyFunctions:WorldRenderUtils.kt$WorldRenderUtils</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Double::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
