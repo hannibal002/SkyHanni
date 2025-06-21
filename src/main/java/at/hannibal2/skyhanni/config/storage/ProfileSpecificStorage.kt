@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 //#if TODO
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
 //#endif
+import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
@@ -84,6 +85,9 @@ class ProfileSpecificStorage(
 
     @Expose
     var totalSkyBlockXP: Int? = null
+
+    @Expose
+    var crimsonIsleFaction: FactionType? = null
 
     // features
     // - combat
