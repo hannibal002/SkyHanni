@@ -1,15 +1,18 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.shader.CircleShader
+import at.hannibal2.skyhanni.shader.GradientCircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
 import kotlin.math.max
@@ -238,9 +241,6 @@ object ShaderRenderUtils {
             this.angle2 = angle2 - Math.PI.toFloat()
         }
 
-        // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
-        val circleColor = color.addAlpha(255).rgb
-
         val left = x - 5
         val top = y - 5
         val right = x + (radius * 2) + 5
@@ -249,11 +249,61 @@ object ShaderRenderUtils {
         //#if MC < 1.21
         DrawContextUtils.pushPop {
             ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
-            GuiRenderUtils.drawRect(left, top, right, bottom, circleColor)
+            GuiRenderUtils.drawRect(left, top, right, bottom, color.rgb)
             ShaderManager.disableShader()
         }
         //#else
-        //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, circleColor)
+        //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, color.rgb)
+        //#endif
+    }
+
+    /**
+     * Method to draw a gradient circle.
+     *
+     * **NOTE:** If you are using [DrawContextUtils.translate] or [DrawContextUtils.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
+     * is called **BEFORE** [DrawContextUtils.scale], otherwise the rectangle will not be rendered correctly
+     *
+     * @param x The x-coordinate of the circle's center.
+     * @param y The y-coordinate of the circle's center.
+     * @param radius The circle's radius.
+     * @param startColor The start color of the gradient.
+     * @param endColor The end color of the gradient.
+     * @param angle defines the angle of the gradient
+     * @param smoothness smooths out the edge. (In amount of blurred pixels)
+     */
+    fun drawGradientFilledCircle(
+        x: Int,
+        y: Int,
+        startColor: ChromaColour,
+        endColor: ChromaColour,
+        progress: Float,
+        time: Float,
+        radius: Int = 10,
+        smoothness: Float = 1.5f,
+        angle: Float = 180f,
+        reverse: Boolean = false,
+    ) {
+        val diameter = radius * 2
+
+        GradientCircleShader.applyBaseSettings(radius * GuiScreenUtils.scaleFactor, diameter, diameter, x, y, smoothness) {
+            this.angle = angle - Math.PI.toFloat()
+            this.reverse = if (reverse) 1 else 0
+            this.progress = progress
+            this.time = time
+        }
+
+        val left = x - 5
+        val top = y - 5
+        val right = x + (radius * 2) + 5
+        val bottom = y + (radius * 2) + 5
+
+        //#if MC < 1.21
+        ShaderManager.enableShader(ShaderManager.Shaders.GRADIENT_CIRCLE)
+        GuiRenderUtils.drawGradientRect(left, top, right, bottom, startColor.toColor().rgb, endColor.toColor().rgb)
+        ShaderManager.disableShader()
+        //#else
+        //$$ RoundedShapeDrawer.drawGradientCircle(left, top, right, bottom, startColor, endColor)
         //#endif
     }
 }

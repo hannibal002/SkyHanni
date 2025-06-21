@@ -115,6 +115,20 @@ enum class SkyHanniRenderPipeline(
             "angle2" to UniformType.FLOAT,
         ),
     ),
+    GRADIENT_CIRCLE(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "gradient_circle",
+        uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+            "angle" to UniformType.FLOAT,
+            "startColor" to UniformType.VEC4,
+            "endColor" to UniformType.VEC4,
+            "progress" to UniformType.FLOAT,
+            "time" to UniformType.FLOAT,
+            "reverse" to UniformType.INT,
+        )
+    ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_SNIPPET,
         vFormat = VertexFormats.POSITION_COLOR,
