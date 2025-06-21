@@ -34,7 +34,7 @@ class MessageFilterConfig {
     var soloStats: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Fairy Dialogue", desc = "Hide the dialogue when a fairy is killed.")
+    @ConfigOption(name = "Fairy Dialog", desc = "Hide the dialog when a fairy is killed.")
     @ConfigEditorBoolean
     @FeatureToggle
     var fairy: Boolean = false

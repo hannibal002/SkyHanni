@@ -47,7 +47,7 @@ class ChatConfig {
 
     enum class DungeonMessageTypes(private val displayName: String) {
         PREPARE("§bPreparation"),
-        START("§aClass Buffs §r/ §cMort Dialogue"),
+        START("§aClass Buffs §r/ §cMort Dialog"),
         AMBIENCE("§bAmbience"),
         PICKUP("§ePickup"),
         REMINDER("§cReminder"),
