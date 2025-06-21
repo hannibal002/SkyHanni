@@ -89,15 +89,18 @@ object EquipmentApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Equipment")
         event.addIrrelevant {
-            val storage = storage ?: return@addIrrelevant
+            val storage = storage ?: run {
+                add("storage is null")
+                return@addIrrelevant
+            }
             add("Equipment:")
             storage.slots.forEach { item ->
-                val name = item?.displayName.toString()
+                val name = item?.displayName
                 add(" - $name")
             }
             add("Rift Equipment:")
             storage.riftSlots.forEach { item ->
-                val name = item?.displayName.toString()
+                val name = item?.displayName
                 add(" - $name")
             }
         }
@@ -109,5 +112,4 @@ object EquipmentApi {
     }
 
     fun getEmptyEquipment(): MutableList<ItemStack?> = EquipmentSlot.entries.mapTo(mutableListOf()) { null }
-
 }
