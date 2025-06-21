@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.laneswitch
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
@@ -39,6 +40,7 @@ class FarmingLaneConfig {
         desc = "Show an informational note on distance display while on soul sand, that speed calculations are inaccurate"
     )
     @ConfigEditorBoolean
+    @OnlyLegacy
     var distanceSoulSandWarning: Boolean = true
 
     @Expose
