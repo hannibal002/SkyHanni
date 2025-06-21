@@ -270,6 +270,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Trade Value Overlay. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
     + Doesn't suppport coins.
 + Added Evolving Item time remaining in lore (Bottle of Jyrre, Dark Cacao Truffle, etc.). - Obsidian (https://github.com/hannibal002/SkyHanni/pull/3614)
++ Added option to highlight Current Pet in menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
 
 </details>
 <details open><summary>
@@ -1206,6 +1207,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Use a negative amount to remove items.
 + Added Shorten /warp option. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3524)
     + `/gold` warps to Gold Mines, `/crimson` to Crimson Isles, etc.
++ Added party commands !ping and !tps. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4001)
+    + Customizable trigger permissions for party commands.
 
 </details>
 <details open><summary>
@@ -1603,6 +1606,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays a warning when foraging in an incorrect park region while wearing a Frog Mask.
 + Added option to widen Config GUI. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4033)
 + Added config search for "Item Warning" via "Tracker Title" or "Drop Title". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4046)
++ Added Bouncy Beach Balls features. - Thunderblade + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3432)
+    + Predictive Line, Landing Spot and Current Counter.
+    + Works only with Bouncy Beach Balls, not with Giant Bouncy Beach Ball yet.
++ Added In-Game Changelog Viewer. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1636)
+    + Clickable chat option shows on new update or first join with new version.
+    + Works with `/shchangelog <old version> <new version>`.
 
 </details>
 <details open><summary>
