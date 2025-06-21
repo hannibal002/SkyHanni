@@ -26,7 +26,7 @@ public class MixinFluidRenderHandlerRegistry {
     private void getButLava(Fluid fluid, CallbackInfoReturnable<FluidRenderHandler> cir) {
         if (LavaReplacement.isActive()) {
             if (fluid == Fluids.LAVA) cir.setReturnValue(handlers.get(Fluids.WATER));
-            else if (fluid == Fluids.FLOWING_LAVA) cir.setReturnValue(handlers.get(Fluids.FLOWING_LAVA));
+            else if (fluid == Fluids.FLOWING_LAVA) cir.setReturnValue(handlers.get(Fluids.FLOWING_WATER));
         }
     }
 
