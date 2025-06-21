@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.player.Action
+import at.hannibal2.skyhanni.events.player.ClickAction
 import at.hannibal2.skyhanni.events.player.PlayerInteractionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -115,7 +115,7 @@ object MinionFeatures {
     @HandleEvent
     fun onPlayerInteraction(event: PlayerInteractionEvent) {
         if (!isEnabled()) return
-        if (event.action != Action.RIGHT_CLICK_BLOCK) return
+        if (event.action != ClickAction.RIGHT_CLICK_BLOCK) return
 
         //#if MC < 1.21
         val vec = event.face
