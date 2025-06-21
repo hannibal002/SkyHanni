@@ -355,7 +355,7 @@ class TextFieldRenderable(
             val colorCodes = textNC.count { it == '¶' }
             val beforeCursor = text.substring(0, textField.cursorPosition + (colorCodes * 2))
             val lineIndex = beforeCursor.count { it == '\n' }
-            val lineText = beforeCursor.split("\n").lastOrNull() ?: ""
+            val lineText = beforeCursor.split("\n").lastOrNull().orEmpty()
             val cursorX = xStartOffset + getStringWidth0(lineText)
             val cursorY = (height - 8) / 2 + lineIndex * extraSize
             GuiRenderUtils.drawRect(cursorX, cursorY - 1, cursorX + 1, cursorY + 9, LorenzColor.WHITE.toColor().rgb)

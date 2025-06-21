@@ -27,7 +27,6 @@
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
     <ID>EmptyClassBlock:ModernPatterns.kt$ModernPatterns${ }</ID>
     <ID>FunctionOnlyReturningConstant:ItemUtils.kt$ItemUtils$fun ItemStack.getItemModel(): Item?</ID>
-    <ID>Indentation:NeuRepositoryConfig.kt$NeuRepositoryConfig$ </ID>
     <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
@@ -244,7 +243,6 @@
     <ID>ReturnCount:PurseApi.kt$PurseApi$private fun getCause(diff: Double): PurseChangeCause</ID>
     <ID>ReturnCount:QuestLoader.kt$QuestLoader$private fun addQuest(name: String, state: QuestState, needAmount: Int): Quest</ID>
     <ID>ReturnCount:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$private suspend fun setCommand(args: Array&lt;String&gt;): String</ID>
-    <ID>SpacingAroundCurly:AttributeShardExporter.kt$AttributeShardExporter$}</ID>
     <ID>SpacingAroundCurly:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$}</ID>
     <ID>SpreadOperator:ItemUtils.kt$ItemUtils$(tag, displayName, *lore.toTypedArray())</ID>
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
@@ -336,22 +334,10 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt$WorldRenderUtils$it.name!!</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
-    <ID>UseOrEmpty:NpcLocationExporter.kt$NpcLocationExporter$SkyBlockUtils.currentIsland.islandData?.apiName ?: ""</ID>
-    <ID>UseOrEmpty:TextFieldRenderable.kt$TextFieldRenderable$beforeCursor.split("\n").lastOrNull() ?: ""</ID>
     <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var x = globalMouseX * scaledWindowWidth / displayWidth</ID>
     <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var y = globalMouseY * height / displayHeight</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var additionalInfoField = TextFieldRenderable()</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var clickCommandField = TextFieldRenderable()</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var craftTextField = TextFieldRenderable()</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var damageField = TextFieldRenderable()</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var displayNameField = TextFieldRenderable(fixItemName(underlyingStack.displayName))</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var infoTypeField = TextFieldRenderable()</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var internalNameStringField = TextFieldRenderable(internalName.asString())</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var itemModelField = TextFieldRenderable()</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var loreField = TextFieldRenderable(underlyingStack.getLore().joinToString("\n"))</ID>
-    <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var minecraftItemIdField = TextFieldRenderable()</ID>
     <ID>VarCouldBeVal:RepoItemEditorGui.kt$RepoItemEditorGui$private var nbtTag = underlyingStack.tagCompound</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt$RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>

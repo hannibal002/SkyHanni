@@ -14,7 +14,7 @@ class NeuRepositoryConfig {
     @ConfigOption(
         name = "NEU Repo Auto Update",
         desc = "Update the NEU repository on every startup.\n" +
-                "§cOnly disable this if you know what you are doing!",
+            "§cOnly disable this if you know what you are doing!",
     )
     @ConfigEditorBoolean
     var repoAutoUpdate: Boolean = true

@@ -45,7 +45,7 @@ object NpcLocationExporter {
         if (!config.editModeEnabled) return
         if (InventoryUtils.inInventory()) return
         if (event.keyCode != KeyboardManager.MIDDLE_MOUSE) return
-        val apiIsland = SkyBlockUtils.currentIsland.islandData?.apiName ?: ""
+        val apiIsland = SkyBlockUtils.currentIsland.islandData?.apiName.orEmpty()
 
         if (apiIsland.isBlank()) {
             ChatUtils.chat("§cCouldn't determine your current island!")
@@ -66,7 +66,7 @@ object NpcLocationExporter {
     }
 
     fun processMobAsNpc(mob: Mob): RepoNpcData {
-        val island = SkyBlockUtils.currentIsland.islandData?.apiName ?: ""
+        val island = SkyBlockUtils.currentIsland.islandData?.apiName.orEmpty()
         val npcEntity = mob.baseEntity
         val npcLocation = npcEntity.position
 

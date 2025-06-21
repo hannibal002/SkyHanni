@@ -98,7 +98,7 @@ object AttributeShardExporter {
         val newLore = this.getLore().map { line ->
             if (shardPerkPattern.matches(line)) {
                 "${line.removeSuffix("I")}${tier.toRoman()}"
-            }else {
+            } else {
                 line.replace(oldNumber, newNumber)
             }
         }

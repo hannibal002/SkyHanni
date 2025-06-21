@@ -45,16 +45,16 @@ import net.minecraft.nbt.NBTTagList
 class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStack) : SkyhanniBaseScreen() {
 
     private val baseJson = EnoughUpdatesManager.getItemById(internalName.asString()) ?: JsonObject()
-    private var internalNameStringField = TextFieldRenderable(internalName.asString())
-    private var displayNameField = TextFieldRenderable(fixItemName(underlyingStack.displayName))
-    private var minecraftItemIdField = TextFieldRenderable()
-    private var itemModelField = TextFieldRenderable()
-    private var loreField = TextFieldRenderable(underlyingStack.getLore().joinToString("\n"))
-    private var craftTextField = TextFieldRenderable()
-    private var infoTypeField = TextFieldRenderable()
-    private var additionalInfoField = TextFieldRenderable()
-    private var clickCommandField = TextFieldRenderable()
-    private var damageField = TextFieldRenderable()
+    private val internalNameStringField = TextFieldRenderable(internalName.asString())
+    private val displayNameField = TextFieldRenderable(fixItemName(underlyingStack.displayName))
+    private val minecraftItemIdField = TextFieldRenderable()
+    private val itemModelField = TextFieldRenderable()
+    private val loreField = TextFieldRenderable(underlyingStack.getLore().joinToString("\n"))
+    private val craftTextField = TextFieldRenderable()
+    private val infoTypeField = TextFieldRenderable()
+    private val additionalInfoField = TextFieldRenderable()
+    private val clickCommandField = TextFieldRenderable()
+    private val damageField = TextFieldRenderable()
     private var hasEnchantGlint = underlyingStack.hasEnchGlint()
 
     private var nbtTag = underlyingStack.tagCompound
