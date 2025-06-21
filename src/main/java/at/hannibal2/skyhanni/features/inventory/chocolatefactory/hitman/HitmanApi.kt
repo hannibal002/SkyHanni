@@ -11,10 +11,12 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.res
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.inPartialMinutes
 import kotlin.math.ceil
 import kotlin.time.Duration
@@ -47,11 +49,10 @@ object HitmanApi {
      * Get the time until the given number of slots are available.
      */
     private fun HitmanStatsStorage.getTimeToNumSlots(numSlots: Int): Duration {
-        if (availableHitmanEggs >= numSlots) return Duration.ZERO
-        val currentSlots = getOpenSlots().takeIf { it < numSlots } ?: return Duration.ZERO
+        if (getOpenSlots() + availableHitmanEggs >= numSlots) return Duration.ZERO
         val slotCooldown = singleSlotCooldownMark ?: return Duration.ZERO
         // Determine how many slots are on cooldown, -1 to account for the current slot (partial time)
-        val slotsOnCooldown = numSlots - currentSlots - 1
+        val slotsOnCooldown = numSlots - getOpenSlots() - availableHitmanEggs - 1
         return slotCooldown.timeUntil() + (slotsOnCooldown * MINUTES_PER_DAY).minutes
     }
 
@@ -163,9 +164,10 @@ object HitmanApi {
      */
     fun HitmanStatsStorage.getTimeToFull(): Pair<Duration, Boolean> {
         val eventEndMark = HoppityApi.getEventEndMark() ?: return Pair(Duration.ZERO, false)
+        val expansionMax = purchasedHitmanSlots - availableHitmanEggs
 
         var slotsToFill = getOpenSlots().takeIf { it > 0 } ?: return Pair(Duration.ZERO, false)
-        repeat(20) { // Runaway protection
+        repeat(10) { // Runaway protection
             // Calculate time needed to fill this many slots
             val timeToFill = getTimeToHuntCount(slotsToFill)
 
@@ -177,7 +179,7 @@ object HitmanApi {
 
             // If we didn't get any extra slots, or we have enough slots to fill, we're done
             // Otherwise set the adjusted number of slots we can fill
-            slotsToFill = (getOpenSlots() + extraSlotsInTime).coerceAtMost(purchasedHitmanSlots).takeIf { newVal ->
+            slotsToFill = (getOpenSlots() + extraSlotsInTime).coerceAtMost(expansionMax).takeIf { newVal ->
                 newVal != slotsToFill && extraSlotsInTime != 0
             } ?: return Pair(timeToFill, false)
         }
@@ -196,7 +198,7 @@ object HitmanApi {
         val eventEndMark = HoppityApi.getEventEndMark() ?: return Pair(Duration.ZERO, false)
 
         val timeToSlots = getTimeToNumSlots(purchasedHitmanSlots)
-        val timeToHunt = getTimeToHuntCount(purchasedHitmanSlots - availableHitmanEggs)
+        val timeToHunt = getTimeToHuntCount(getOpenSlots())
 
         // Figure out which timer is the inhibitor
         val longerTime = if (timeToSlots > timeToHunt) timeToSlots else timeToHunt
