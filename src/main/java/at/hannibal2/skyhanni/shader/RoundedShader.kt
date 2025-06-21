@@ -66,12 +66,15 @@ object CircleShader : RoundedShader<CircleShader>("circle", "circle") {
         registerUniform(Uniform.UniformType.FLOAT, "angle2") { angle2 }
     }
 }
-object GradientCircleShader : RoundedShader<GradientCircleShader>("gradient_circle", "gradient_circle") {
+object RadialGradientCircleShader : RoundedShader<RadialGradientCircleShader>(
+    "radial_gradient_circle",
+    "radial_gradient_circle"
+) {
     var angle: Float = 0f
     var startColor: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)
     var endColor: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)
     var progress: Float = 0f
-    var time: Float = 0f
+    var phaseOffset: Float = 0f
     var reverse: Int = 0
 
     override fun registerUniforms() {
@@ -80,7 +83,7 @@ object GradientCircleShader : RoundedShader<GradientCircleShader>("gradient_circ
         registerUniform(Uniform.UniformType.VEC4, "startColor") { startColor }
         registerUniform(Uniform.UniformType.VEC4, "endColor") { endColor }
         registerUniform(Uniform.UniformType.FLOAT, "progress") { progress }
-        registerUniform(Uniform.UniformType.FLOAT, "time") { time }
+        registerUniform(Uniform.UniformType.FLOAT, "phaseOffset") { phaseOffset }
         registerUniform(Uniform.UniformType.INT, "reverse") { reverse }
     }
 }

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.features.chroma.StandardChromaShader
 import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.shader.CircleShader
-import at.hannibal2.skyhanni.shader.GradientCircleShader
+import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
@@ -34,7 +34,7 @@ object ShaderManager {
         ROUNDED_TEXTURE(RoundedTextureShader.INSTANCE),
         DARKEN(DarkenShader.INSTANCE),
         CIRCLE(CircleShader.INSTANCE),
-        GRADIENT_CIRCLE(GradientCircleShader.INSTANCE),
+        RADIAL_GRADIENT_CIRCLE(RadialGradientCircleShader.INSTANCE),
         ;
 
         fun enableShader() = enableShader(this)

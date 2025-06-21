@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.shader.CircleShader
-import at.hannibal2.skyhanni.shader.GradientCircleShader
+import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
@@ -268,7 +268,7 @@ object ShaderRenderUtils {
     }
 
     /**
-     * Method to draw a gradient circle.
+     * Method to draw a radial gradient circle.
      *
      * **NOTE:** If you are using [DrawContextUtils.translate] or [DrawContextUtils.scale]
      * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
@@ -279,29 +279,32 @@ object ShaderRenderUtils {
      * @param radius The circle's radius.
      * @param startColor The start color of the gradient.
      * @param endColor The end color of the gradient.
-     * @param angle defines the angle of the gradient
+     * @param angle defines the angle of the gradient.
+     * @param progress the progress of the gradient (0.0 to 1.0)
+     * @param phaseOffset the phase offset of the gradient (0.0 to 360.0)
      * @param smoothness smooths out the edge. (In amount of blurred pixels)
+     * @param reverse if true, the gradient will be reversed
      */
-    fun drawGradientFilledCircle(
+    fun drawRadialGradientFilledCircle(
         x: Int,
         y: Int,
+        radius: Int = 10,
         startColor: ChromaColour,
         endColor: ChromaColour,
-        progress: Float,
-        time: Float,
-        radius: Int = 10,
-        smoothness: Float = 1.5f,
         angle: Float = 180f,
+        progress: Float,
+        phaseOffset: Float,
+        smoothness: Float = 1.5f,
         reverse: Boolean = false,
     ) {
         val radiusIn = radius * GuiScreenUtils.scaleFactor
-        val diameterIn = radiusIn * 2
+        val diameter = radius * 2
 
-        GradientCircleShader.applyBaseSettings(radiusIn, diameterIn, diameterIn, x, y, smoothness) {
+        RadialGradientCircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
             this.angle = angle - Math.PI.toFloat()
             this.reverse = if (reverse) 1 else 0
             this.progress = progress
-            this.time = time
+            this.phaseOffset = phaseOffset
             //#if MC < 1.21
             this.startColor = startColor.destructToFloatArray()
             this.endColor = endColor.destructToFloatArray()
@@ -315,7 +318,7 @@ object ShaderRenderUtils {
 
         //#if MC < 1.21
         DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.GRADIENT_CIRCLE)
+            ShaderManager.enableShader(ShaderManager.Shaders.RADIAL_GRADIENT_CIRCLE)
             GuiRenderUtils.drawRect(left, top, right, bottom, LorenzColor.WHITE.toColor().rgb)
             ShaderManager.disableShader()
         }

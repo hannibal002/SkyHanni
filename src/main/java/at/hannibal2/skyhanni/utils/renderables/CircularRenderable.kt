@@ -38,31 +38,22 @@ open class CircularRenderable(
     }
 }
 
-class GradientCircularRenderable(
+class RadialGradientCircularRenderable(
     radius: Int,
     private val startColor: ChromaColour,
     private val endColor: ChromaColour,
     private val smoothness: Float = 1f,
-    filledPercentage: Double = 100.0,
     private val gradientAngle: Float = 180f,
     private val gradientSpeed: Float = 0.5f,
     private val reverse: Boolean = false,
+    phaseOffSet: Float = 0f,
+    gradientProgress: Float = 0f,
     horizontalAlignment: HorizontalAlignment = HorizontalAlignment.CENTER,
     verticalAlignment: VerticalAlignment = VerticalAlignment.CENTER,
-) : CircularRenderable(
-    backgroundColor = startColor,
-    radius = radius,
-    smoothness = smoothness,
-    filledPercentage = filledPercentage,
-    unfilledColor = endColor,
-    horizontalAlignment = horizontalAlignment,
-    verticalAlignment = verticalAlignment,
-) {
+) : CircularRenderable(startColor, radius, smoothness, 100.0, endColor, horizontalAlignment, verticalAlignment) {
     private var lastTime = SimpleTimeMark.now()
-    // Bounded to 0 -> 360
-    private var gradientProgress: Float = 0f
-    // Bounded to 0 -> 1
-    private var timeProgress: Float = 0f
+    private var gradientProgress: Float = gradientProgress % 360f // Bounded to 0 -> 360
+    private var phaseOffset: Float = phaseOffSet % 1f // Bounded to 0 -> 1
 
     private fun generateNextGradientProgress(deltaTime: Double): Float {
         gradientProgress += (gradientSpeed * deltaTime).toFloat()
@@ -70,26 +61,26 @@ class GradientCircularRenderable(
         return gradientProgress
     }
 
-    private fun generateNextTimeProgress(deltaTime: Double): Float {
-        timeProgress += (gradientSpeed * deltaTime).toFloat()
-        timeProgress %= 1f
-        return timeProgress
+    private fun generateNextPhaseOffset(deltaTime: Double): Float {
+        phaseOffset += (gradientSpeed * deltaTime).toFloat()
+        phaseOffset %= 1f
+        return phaseOffset
     }
 
     override fun render(posX: Int, posY: Int) {
         val dt = (SimpleTimeMark.now() - lastTime).inPartialSeconds
         lastTime = SimpleTimeMark.now()
         gradientProgress = generateNextGradientProgress(dt)
-        timeProgress = generateNextTimeProgress(dt)
+        phaseOffset = generateNextPhaseOffset(dt)
 
-        ShaderRenderUtils.drawGradientFilledCircle(
+        ShaderRenderUtils.drawRadialGradientFilledCircle(
             x = posX,
             y = posY,
+            radius = radius,
             startColor = startColor,
             endColor = endColor,
             progress = gradientProgress,
-            time = timeProgress,
-            radius = radius,
+            phaseOffset = phaseOffset,
             smoothness = smoothness,
             angle = gradientAngle,
             reverse = reverse,

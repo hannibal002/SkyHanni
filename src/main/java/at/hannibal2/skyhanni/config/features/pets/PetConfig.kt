@@ -25,15 +25,6 @@ class PetConfig {
     val displayPos: Position = Position(-330, -15)
 
     @Expose
-    @ConfigOption(name = "Test", desc = "")
-    @ConfigEditorBoolean
-    var test: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = PetConfig::class, field = "test")
-    val testPos: Position = Position(-330, 200)
-
-    @Expose
     @ConfigOption(name = "Pet Experience Tooltip", desc = "")
     @Accordion
     val petExperienceToolTip: PetExperienceToolTipConfig = PetExperienceToolTipConfig()

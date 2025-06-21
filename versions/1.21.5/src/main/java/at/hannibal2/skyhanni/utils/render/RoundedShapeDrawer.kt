@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.shader.CircleShader
-import at.hannibal2.skyhanni.shader.GradientCircleShader
+import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
@@ -13,7 +13,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BufferBuilder
 import net.minecraft.util.Identifier
-import java.awt.Color
 
 object RoundedShapeDrawer {
 
@@ -134,8 +133,8 @@ object RoundedShapeDrawer {
     }
 
     fun drawGradientCircle(left: Int, top: Int, right: Int, bottom: Int, startColor: ChromaColour, endColor: ChromaColour) =
-        GradientCircleShader.performVQuadAndUniforms(
-            SkyHanniRenderPipeline.GRADIENT_CIRCLE(),
+        RadialGradientCircleShader.performVQuadAndUniforms(
+            SkyHanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
                 { color(startColor.toColor().rgb ) },
@@ -148,8 +147,8 @@ object RoundedShapeDrawer {
             val ec = endColor.destructToFloatArray()
             setUniform("startColor", sc[0], sc[1], sc[2], sc[3])
             setUniform("endColor", ec[0], ec[1], ec[2], ec[3])
-            setUniform("angle", GradientCircleShader.angle)
-            setUniform("progress", GradientCircleShader.progress)
-            setUniform("time", GradientCircleShader.time)
+            setUniform("angle", RadialGradientCircleShader.angle)
+            setUniform("progress", RadialGradientCircleShader.progress)
+            setUniform("phaseOffset", RadialGradientCircleShader.phaseOffset)
         }
 }

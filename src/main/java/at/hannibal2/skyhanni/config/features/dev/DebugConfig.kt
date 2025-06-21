@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
@@ -195,6 +196,15 @@ class DebugConfig {
     @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
     @ConfigEditorBoolean
     var dvdLogo: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Radial Gradient", desc = "Enable the test Radial Gradient Renderable")
+    @ConfigEditorBoolean
+    var radialGradient: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "radialGradient")
+    val radialGradientPos: Position = Position(-330, 200)
 
     // Does not have a config element!
     @Expose
