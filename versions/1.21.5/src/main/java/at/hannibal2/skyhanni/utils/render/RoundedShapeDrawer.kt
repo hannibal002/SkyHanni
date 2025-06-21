@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
-import at.hannibal2.skyhanni.features.misc.RoundedShader
-import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
+import at.hannibal2.skyhanni.shader.CircleShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleShader
+import at.hannibal2.skyhanni.shader.RoundedShader
+import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.MinecraftClient
