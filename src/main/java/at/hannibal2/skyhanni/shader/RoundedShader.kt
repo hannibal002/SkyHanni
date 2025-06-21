@@ -74,11 +74,6 @@ object GradientCircleShader : RoundedShader<GradientCircleShader>("gradient_circ
     var time: Float = 0f
     var reverse: Int = 0
 
-    //#if MC > 1.21
-    //$$ val startColorM4f: Matrix4f get() = Matrix4f(FloatBuffer.wrap(startColor))
-    //$$ val endColorM4f: Matrix4f get() = Matrix4f(FloatBuffer.wrap(endColor))
-    //#endif
-
     override fun registerUniforms() {
         super.applyBaseUniforms(hasSmoothness = true, hasHalfSize = false)
         registerUniform(Uniform.UniformType.FLOAT, "angle") { angle }

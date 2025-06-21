@@ -7,16 +7,29 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.renderables.GradientCircularRenderable
 
 @SkyHanniModule
 object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets
 
+    private val gradientCircularRenderable by lazy {
+        GradientCircularRenderable(
+            startColor = LorenzColor.BLUE.toChromaColor(),
+            endColor = LorenzColor.AQUA.toChromaColor(),
+            radius = 20,
+        )
+    }
+
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
         if (RiftApi.inRift() || !config.display) return
+
+        config.testPos.renderRenderable(gradientCircularRenderable, "Gradient Circle")
 
         val displayName = CurrentPetApi.currentPet?.getUserFriendlyName(includeLevel = false) ?: return
         config.displayPos.renderString(displayName, posLabel = "Current Pet")

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
@@ -21,6 +22,16 @@ import kotlin.math.max
 //#endif
 
 object ShaderRenderUtils {
+
+    /**
+     * Returns a float array representation of the [ChromaColour].
+     */
+    fun ChromaColour.destructToFloatArray(): FloatArray = floatArrayOf(
+        this.toColor().red.toFloat() / 255f,
+        this.toColor().green.toFloat() / 255f,
+        this.toColor().blue.toFloat() / 255f,
+        this.alpha.toFloat() / 255f
+    )
 
     /**
      * Helper method to assist with setting up the shader for drawing rounded shapes.
@@ -283,13 +294,18 @@ object ShaderRenderUtils {
         angle: Float = 180f,
         reverse: Boolean = false,
     ) {
-        val diameter = radius * 2
+        val radiusIn = radius * GuiScreenUtils.scaleFactor
+        val diameterIn = radiusIn * 2
 
-        GradientCircleShader.applyBaseSettings(radius * GuiScreenUtils.scaleFactor, diameter, diameter, x, y, smoothness) {
+        GradientCircleShader.applyBaseSettings(radiusIn, diameterIn, diameterIn, x, y, smoothness) {
             this.angle = angle - Math.PI.toFloat()
             this.reverse = if (reverse) 1 else 0
             this.progress = progress
             this.time = time
+            //#if MC < 1.21
+            this.startColor = startColor.destructToFloatArray()
+            this.endColor = endColor.destructToFloatArray()
+            //#endif
         }
 
         val left = x - 5
@@ -298,9 +314,11 @@ object ShaderRenderUtils {
         val bottom = y + (radius * 2) + 5
 
         //#if MC < 1.21
-        ShaderManager.enableShader(ShaderManager.Shaders.GRADIENT_CIRCLE)
-        GuiRenderUtils.drawGradientRect(left, top, right, bottom, startColor.toColor().rgb, endColor.toColor().rgb)
-        ShaderManager.disableShader()
+        DrawContextUtils.pushPop {
+            ShaderManager.enableShader(ShaderManager.Shaders.GRADIENT_CIRCLE)
+            GuiRenderUtils.drawRect(left, top, right, bottom, LorenzColor.WHITE.toColor().rgb)
+            ShaderManager.disableShader()
+        }
         //#else
         //$$ RoundedShapeDrawer.drawGradientCircle(left, top, right, bottom, startColor, endColor)
         //#endif
