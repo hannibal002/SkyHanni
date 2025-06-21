@@ -12,22 +12,16 @@ import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
 import com.google.gson.annotations.Expose
 import java.util.UUID
 
-class PetDataStorage {
-    @Expose
-    val players: MutableMap<UUID, PlayerSpecific> = mutableMapOf()
-
-    class PlayerSpecific {
-        @Expose
-        val profiles: MutableMap<String, ProfileSpecific> = mutableMapOf()
-    }
-
-    class ProfileSpecific {
-        @Expose
-        val pets: MutableList<PetData> = mutableListOf()
-
-        @Expose
-        val expSharePets: MutableList<UUID?> = mutableListOf()
-    }
+data class PetDataStorage(
+    @Expose val players: MutableMap<UUID, PlayerSpecific> = mutableMapOf(),
+) {
+    data class PlayerSpecific(
+        @Expose val profiles: MutableMap<String, ProfileSpecific> = mutableMapOf(),
+    )
+    data class ProfileSpecific(
+        @Expose val pets: MutableList<PetData> = mutableListOf(),
+        @Expose val expSharePets: MutableList<UUID?> = mutableListOf(),
+    )
 }
 
 @KSerializable

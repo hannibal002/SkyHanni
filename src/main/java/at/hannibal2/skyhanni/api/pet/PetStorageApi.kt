@@ -3,7 +3,10 @@ package at.hannibal2.skyhanni.api.pet
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.PetData
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -13,6 +16,8 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -411,6 +416,22 @@ object PetStorageApi {
         { level == null || it.level == level },
         { exp == null || abs((it.exp ?: 0.0) - exp) < (exp * expErrorFactor) },
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetpetstorage") {
+            description = "Removes all pets from SkyHanni's storage"
+            category = CommandCategory.USERS_RESET
+            callback {
+                ProfileStorageData.petProfiles = PetDataStorage.ProfileSpecific()
+                ChatUtils.clickableChat(
+                    "Cleared all pets from storage. Re-open the §b/pet §emenu to re-populate it.",
+                    onClick = { HypixelCommands.pet() },
+                    hover = "Click to re-open the pet menu",
+                )
+            }
+        }
+    }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
