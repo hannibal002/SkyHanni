@@ -22,6 +22,7 @@ class AvoidBritishSpelling(config: Config) : SkyHanniRule(config) {
     private val scannedWords = mapOf(
         "colour" to "color",
         "armour" to "armor",
+        "dialogue" to "dialog",
     )
 
     override fun visitStringTemplateExpression(expression: KtStringTemplateExpression) {
