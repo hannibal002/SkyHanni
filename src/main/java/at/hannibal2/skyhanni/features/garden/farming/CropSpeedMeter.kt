@@ -118,12 +118,6 @@ object CropSpeedMeter {
         currentBlocks++
     }
 
-    fun toggle() {
-        enabled = !enabled
-        ChatUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
-        startCrops = emptyMap()
-    }
-
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
@@ -138,7 +132,11 @@ object CropSpeedMeter {
         event.registerBrigadier("shcropspeedmeter") {
             description = "Debugs how many crops you collect over time"
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { toggle() }
+            callback {
+                enabled = !enabled
+                ChatUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
+                startCrops = emptyMap()
+            }
         }
     }
 }

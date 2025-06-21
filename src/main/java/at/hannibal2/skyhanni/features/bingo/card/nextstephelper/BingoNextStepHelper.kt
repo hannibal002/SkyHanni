@@ -80,10 +80,6 @@ object BingoNextStepHelper {
     private var currentSteps = emptyList<NextStep>()
     var currentHelp = emptyList<String>()
 
-    private fun command() {
-        updateResult(true)
-    }
-
     private fun updateResult(print: Boolean = false) {
         if (print) println()
         currentSteps = listOf()
@@ -480,7 +476,9 @@ object BingoNextStepHelper {
         event.registerBrigadier("shprintbingohelper") {
             description = "Prints the next step helper for the bingo card"
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { command() }
+            callback {
+                updateResult(true)
+            }
         }
     }
 }

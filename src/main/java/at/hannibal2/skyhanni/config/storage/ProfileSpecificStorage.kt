@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -61,10 +62,13 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.time.Duration
 
 // put everything under its respective feature, the order of the features is the same as in the folder structure
-class ProfileSpecificStorage {
+class ProfileSpecificStorage(
+    @Expose var profileName: String = "",
+) {
     // api
     @Expose
     var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
@@ -644,6 +648,17 @@ class ProfileSpecificStorage {
         var currentSlot: Int? = null
     }
 
+    @Expose
+    var equipment: EquipmentStorage = EquipmentStorage()
+
+    class EquipmentStorage {
+        @Expose
+        var slots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+
+        @Expose
+        var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+    }
+
     // - mining
     @Expose
     var mining: MiningStorage = MiningStorage()
@@ -798,7 +813,7 @@ class ProfileSpecificStorage {
 
     // data
     @Expose
-    var currentPet: String = ""
+    var currentPetUuid: UUID? = null
 
     @Expose
     var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()

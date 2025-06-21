@@ -26,22 +26,20 @@ class ExtendedChatColor(
     @SkyHanniModule
     companion object {
 
-        fun testCommand() {
-            val string = StringBuilder()
-            for (i in (0 until 100)) {
-                val color = Color.HSBtoRGB(i / 100F, 1f, 1f)
-                val extendedChatColor = ExtendedChatColor(color, false)
-                string.append("$extendedChatColor§m ")
-            }
-            ChatUtils.chat(string.toString())
-        }
-
         @HandleEvent
         fun onCommandRegistration(event: CommandRegistrationEvent) {
             event.registerBrigadier("shtestrainbow") {
                 description = "Sends a rainbow in chat"
                 category = CommandCategory.DEVELOPER_TEST
-                callback { testCommand() }
+                callback {
+                    val string = StringBuilder()
+                    for (i in (0 until 100)) {
+                        val color = Color.HSBtoRGB(i / 100F, 1f, 1f)
+                        val extendedChatColor = ExtendedChatColor(color, false)
+                        string.append("$extendedChatColor§m ")
+                    }
+                    ChatUtils.chat(string.toString())
+                }
             }
         }
     }

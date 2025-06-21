@@ -21,7 +21,7 @@ object GardenCropTimeCommand {
 
     private val config get() = GardenApi.config.moneyPerHours
 
-    fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         if (!config.display) {
             ChatUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return

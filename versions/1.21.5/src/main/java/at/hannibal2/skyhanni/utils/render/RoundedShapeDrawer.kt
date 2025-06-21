@@ -96,4 +96,16 @@ object RoundedShapeDrawer {
             setUniform("borderThickness", RoundedRectangleOutlineShader.borderThickness)
             setUniform("borderBlur", RoundedRectangleOutlineShader.borderBlur)
         }
+
+    fun drawRoundedRect(left: Int, top: Int, right: Int, bottom: Int, topColor: Int, bottomColor: Int) =
+        RoundedRectangleShader.performVQuadAndUniforms(
+            SkyHanniRenderPipeline.ROUNDED_RECT(),
+            x1 = left, y1 = top, x2 = right, y2 = bottom,
+            postVertexOps = listOf(
+                { color(topColor) },
+                { color(bottomColor) },
+                { color(bottomColor) },
+                { color(topColor) },
+            ),
+        )
 }
