@@ -232,8 +232,8 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             RenderableTooltips.setTooltipForImmediateRender(tooltipRenderable)
         }
 
-        val width = GuiScreenUtils.scaledWindowWidth * 0.70f
-        DrawContextUtils.translate(width, 10f, 0f)
+        val width = GuiScreenUtils.scaledWindowWidth * 0.8f
+        DrawContextUtils.translate(width, 10f, 500f)
         closeButton.render(0, 0)
         DrawContextUtils.translate(0f, 40f, 0f)
         saveButton.render(0, 0)
@@ -243,6 +243,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         addEnchantGlintButton.render(0, 0)
         DrawContextUtils.translate(0f, 20f, 0f)
         removeUnderRarityButton.render(0, 0)
+        DrawContextUtils.translate(0f, 0f, -500f)
 
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(10f, 40f, 0f)
@@ -269,7 +270,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         getTextFields().forEach {
             it.mouseClicked(originalMouseX, originalMouseY, mouseButton)
         }
-        val buttonWidth = GuiScreenUtils.scaledWindowWidth * 0.70f
+        val buttonWidth = GuiScreenUtils.scaledWindowWidth * 0.8f
         val maxWidth = buttonWidth + buttons.maxOf { it.width } + 10
         if (originalMouseX.toFloat() in buttonWidth..maxWidth) {
             when (originalMouseY) {
