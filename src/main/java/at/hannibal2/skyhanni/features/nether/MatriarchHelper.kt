@@ -138,7 +138,7 @@ object MatriarchHelper {
                     prePoint = point
                 }
             } else {
-                LineDrawer.draw3D(event, 10, true) {
+                LineDrawer.draw3D(event, lineWidth = 10, depth = true) {
                     drawPath(
                         listOf(prePoint) + path, color, bezierPoint = -1.0,
                     )

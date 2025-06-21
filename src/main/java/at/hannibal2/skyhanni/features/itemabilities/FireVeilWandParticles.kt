@@ -55,7 +55,7 @@ object FireVeilWandParticles {
         if (lastClick.passedSince() > 5.5.seconds) return
 
         val color = config.displayColor.toSpecialColor()
-        event.drawCircleWireframe(MinecraftCompat.localPlayer, 3.5, color)
+        event.drawCircleWireframe(MinecraftCompat.localPlayer, rad = 3.5, color)
     }
 
     @HandleEvent

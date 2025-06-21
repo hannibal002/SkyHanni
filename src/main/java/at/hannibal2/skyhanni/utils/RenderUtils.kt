@@ -441,6 +441,7 @@ object RenderUtils {
 
     @Deprecated("Use WorldRenderUtils' exactLocation instead")
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+        // TODO cache once per frame
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
         PatcherFixes.onPlayerEyeLine()
