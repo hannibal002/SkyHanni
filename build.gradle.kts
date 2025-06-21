@@ -191,7 +191,7 @@ dependencies {
         // on fabric everyone be using the kotlin language mod so we don't need to bundle kotlin ourselves
         modImplementation("net.fabricmc:fabric-language-kotlin:1.13.2+kotlin.2.1.20")
 
-        modLocalRuntime(libs.modmenu)
+        modImplementation(libs.modmenu)
     }
 
     if (target != ProjectTarget.MODERN) {

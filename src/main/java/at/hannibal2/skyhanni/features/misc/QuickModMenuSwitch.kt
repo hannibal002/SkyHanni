@@ -20,7 +20,9 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
+//#if FORGE
 import net.minecraftforge.client.ClientCommandHandler
+//#endif
 
 @SkyHanniModule
 object QuickModMenuSwitch {
@@ -152,7 +154,9 @@ object QuickModMenuSwitch {
         currentlyOpeningMod = mod.name
         update()
         try {
+            //#if FORGE
             ClientCommandHandler.instance.executeCommand(MinecraftCompat.localPlayer, "/" + mod.command)
+            //#endif
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }

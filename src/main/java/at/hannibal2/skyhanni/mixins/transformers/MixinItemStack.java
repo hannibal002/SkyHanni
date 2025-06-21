@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//#if TODO
+//#if MC < 1.21
 import at.hannibal2.skyhanni.data.ToolTipData;
 //#endif
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData;
@@ -27,7 +27,7 @@ public class MixinItemStack implements ItemStackCachedData {
         return skyhanni_cachedData;
     }
 
-    //#if TODO
+    //#if MC < 1.21
     @Inject(method = "getTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/event/ForgeEventFactory;onItemTooltip(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/EntityPlayer;Ljava/util/List;Z)Lnet/minecraftforge/event/entity/player/ItemTooltipEvent;", shift = At.Shift.BEFORE, remap = false), locals = LocalCapture.CAPTURE_FAILHARD)
     public void getTooltip(EntityPlayer playerIn, boolean advanced, CallbackInfoReturnable<List<String>> cir, List<String> list) {
         ItemStack stack = (ItemStack) (Object) this;

@@ -40,6 +40,8 @@ object HoppityEggsManager {
     private val unclaimedEggsConfig get() = config.unclaimedEggs
     private val waypointsConfig get() = config.waypoints
     private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
+    private val nextEggMessageId = ChatUtils.getUniqueMessageId()
+    private val nextHuntMessageId = ChatUtils.getUniqueMessageId()
 
     // <editor-fold desc="Patterns">
     /**
@@ -138,8 +140,8 @@ object HoppityEggsManager {
     private var latestWaypointOnclick: () -> Unit = {}
     private var syncedFromConfig: Boolean = false
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         if (!HoppityApi.isHoppityEvent()) return
         resettingEntries.forEach {
             val lastFound = profileStorage?.mealLastFound?.get(it) ?: SimpleTimeMark.farFuture()
@@ -187,17 +189,17 @@ object HoppityEggsManager {
         val spawnedEggs = HoppityEventSummary.getSpawnedEggCounts(currentYear).sumAllValues().toInt()
         when (spawnedEggs) {
             279 -> sendNextHuntIn("No more eggs will spawn this event")
-            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
+            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.", messageId = nextEggMessageId)
         }
         blockedReason = "hoppity_egg"
     }
 
     private fun SkyHanniChatEvent.sendNextHuntIn(
-        reason: String = "Hoppity's Hunt is not active"
+        reason: String = "Hoppity's Hunt is not active",
     ) {
         val currentYear = SkyBlockTime.now().year
         val timeUntil = SkyBlockTime(currentYear + 1).toTimeMark().timeUntil()
-        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
+        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.", messageId = nextHuntMessageId)
         blockedReason = "hoppity_egg"
     }
 
@@ -256,8 +258,8 @@ object HoppityEggsManager {
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         checkSpawned()
         if (!isActive()) return
         checkWarn()

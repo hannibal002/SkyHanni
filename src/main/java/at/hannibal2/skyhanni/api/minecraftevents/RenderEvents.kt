@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.api.minecraftevents
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
+import at.hannibal2.skyhanni.events.render.OverlayType
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
@@ -87,7 +88,7 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderBlockOverlay(event: RenderBlockOverlayEvent) {
-        if (BlockOverlayRenderEvent(event.overlayType).post()) {
+        if (BlockOverlayRenderEvent(OverlayType.fromForge(event.overlayType)).post()) {
             event.isCanceled = true
         }
     }

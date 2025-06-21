@@ -100,7 +100,7 @@ object CFStrayWarning {
     }
 
     private fun GuiContainerEvent.getEventChest(): ContainerChest? =
-        gui.inventorySlots as? ContainerChest
+        container as? ContainerChest
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = getEventChest() ?: return
