@@ -19,7 +19,7 @@ object ParticleHider {
 
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (MinecraftCompat.localPlayerOrNull == null) return
+        if (!MinecraftCompat.localPlayerExists) return
         val distanceToPlayer = event.distanceToPlayer
         if (SkyHanniMod.feature.misc.particleHiders.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
             event.cancel()
