@@ -40,6 +40,8 @@ object HoppityEggsManager {
     private val unclaimedEggsConfig get() = config.unclaimedEggs
     private val waypointsConfig get() = config.waypoints
     private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
+    private val nextEggMessageId = ChatUtils.getUniqueMessageId()
+    private val nextHuntMessageId = ChatUtils.getUniqueMessageId()
 
     // <editor-fold desc="Patterns">
     /**
@@ -187,7 +189,7 @@ object HoppityEggsManager {
         val spawnedEggs = HoppityEventSummary.getSpawnedEggCounts(currentYear).sumAllValues().toInt()
         when (spawnedEggs) {
             279 -> sendNextHuntIn("No more eggs will spawn this event")
-            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
+            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.", messageId = nextEggMessageId)
         }
         blockedReason = "hoppity_egg"
     }
@@ -197,7 +199,7 @@ object HoppityEggsManager {
     ) {
         val currentYear = SkyBlockTime.now().year
         val timeUntil = SkyBlockTime(currentYear + 1).toTimeMark().timeUntil()
-        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
+        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.", messageId = nextHuntMessageId)
         blockedReason = "hoppity_egg"
     }
 

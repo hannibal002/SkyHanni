@@ -75,6 +75,18 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
+    fun drawStrings(strings: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        drawStrings(strings.split("\n"), x, y, color, shadow)
+    }
+
+    fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        var newY = y
+        for (string in strings) {
+            DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
+            newY += 9
+        }
+    }
+
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
         left <= x && x < left + width && top <= y && y < top + height
 
