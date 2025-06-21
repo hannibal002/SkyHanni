@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.event.hoppity
+package at.hannibal2.skyhanni.config.features.event.hoppity.summary
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -20,7 +20,7 @@ class HoppityEventSummaryConfig {
     @Expose
     @Accordion
     @ConfigOption(name = "Live Display", desc = "")
-    var liveDisplay: HoppityEventSummaryLiveDisplayConfig = HoppityEventSummaryLiveDisplayConfig()
+    var liveDisplay: HoppityLiveDisplayConfig = HoppityLiveDisplayConfig()
 
     @Expose
     @Accordion

@@ -26,13 +26,6 @@ object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
 
-    fun command(args: Array<String>) {
-        SkyHanniMod.coroutineScope.launch {
-            ChatUtils.chat(runCommand(args))
-        }
-        lastCommand = args
-    }
-
     private suspend fun runCommand(args: Array<String>): String {
         if (args.isEmpty()) {
             return "§cThis is a powerful config-edit command, only use it if you know what you are doing!"
@@ -367,7 +360,12 @@ object SkyHanniConfigSearchResetCommand {
         event.registerBrigadier("shconfig") {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs { command(it) }
+            legacyCallbackArgs {
+                SkyHanniMod.coroutineScope.launch {
+                    ChatUtils.chat(runCommand(it))
+                }
+                lastCommand = it
+            }
         }
     }
 }

@@ -219,7 +219,7 @@ object PestFinder {
         }
     }
 
-    fun teleportNearestInfestedPlot() {
+    private fun teleportNearestInfestedPlot() {
         // need to check again for the command
         if (!GardenApi.inGarden()) {
             ChatUtils.userError("This command only works while on the Garden!")
