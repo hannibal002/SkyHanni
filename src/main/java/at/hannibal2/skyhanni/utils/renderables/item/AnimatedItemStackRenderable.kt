@@ -85,16 +85,10 @@ class AnimatedItemStackRenderable(
         if (bounceSpeed == 0.0 || (upwardBounce == 0 && downwardBounce == 0)) return 0.0
 
         val t = (SimpleTimeMark.now() - startTime).inPartialSeconds
-        // time to go up _and_ down once (seconds):
-        val period = (upwardBounce + downwardBounce) * 2 / bounceSpeed
-        // angle from 0 → 2π over one full cycle
+        val period = (upwardBounce + downwardBounce) * 2.0 / bounceSpeed
         val theta = (t % period) / period * (2 * Math.PI)
-        // build an asymmetric sine:
-        //   maps -1..1  →  -downwardBounce...upwardBounce
-        val amplitude = upwardBounce + downwardBounce
-        val offset = sin(theta) * (amplitude / 2)
-        val rest = (upwardBounce - downwardBounce) / 2
-        return offset + rest
+        val sinTheta = sin(theta)
+        return if (sinTheta >= 0) sinTheta * upwardBounce else sinTheta * downwardBounce
     }
 
     override fun render(posX: Int, posY: Int) {

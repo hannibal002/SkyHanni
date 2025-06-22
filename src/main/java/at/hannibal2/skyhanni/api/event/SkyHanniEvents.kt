@@ -62,6 +62,7 @@ object SkyHanniEvents {
                 }
                 return options to listOf(eventType as Class<out SkyHanniEvent>)
             }
+
             0 -> {
                 val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
                 if (primaryFunctionEventType != null) {
@@ -100,6 +101,9 @@ object SkyHanniEvents {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        //#if MC > 1.21
+        //$$ try {
+        //#endif
         val list = handlers.values.toMutableList()
 
         for (second in seconds) {
@@ -119,7 +123,11 @@ object SkyHanniEvents {
                 }
             }
         }
-
+        //#if MC > 1.21
+        //$$ } catch (_: Exception) {
+        //$$ // ignore this error on 1.21 for now
+        //$$ }
+        //#endif
     }
 
     class EventInvokeData(var oldValue: Long, var diff: Long)

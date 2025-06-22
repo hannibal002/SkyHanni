@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -127,7 +127,7 @@ object SlayerQuestWarning {
         // workaround for rift mob that is unrelated to slayer
         if (entity.name == "Oubliette Guard") return false
         // workaround for Bladesoul in  Crimson Isle
-        if (LorenzUtils.skyBlockArea == "Stronghold" && entity.name == "Skeleton") return false
+        if (SkyBlockUtils.scoreboardArea == "Stronghold" && entity.name == "Skeleton") return false
 
         val isSlayer = slayerType.clazz.isInstance(entity)
         if (!isSlayer) return false

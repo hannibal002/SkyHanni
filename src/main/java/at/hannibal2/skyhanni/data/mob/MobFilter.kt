@@ -185,6 +185,8 @@ object MobFilter {
         "§e§lBLACKSMITH",
         "§e§lSHOP",
         "§e§lTREASURES",
+        "§c§lQUEST",
+        "§e§lQUEST",
     )
 
     fun Entity.isSkyBlockMob(): Boolean = when {
