@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
@@ -222,7 +221,7 @@ object ErrorManager {
         val extraDataString = getExtraDataOrCached(extraData)
         val rawMessage = message.removeColor()
         val shVersion = SkyHanniMod.VERSION
-        val mcVersion = VersionConstants.MC_VERSION
+        val mcVersion = PlatformUtils.MC_VERSION
         errorMessages[randomId] = "```\nSkyHanni $shVersion $mcVersion: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
             "```\nSkyHanni $shVersion $mcVersion: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
