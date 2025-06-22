@@ -370,7 +370,7 @@ object GuiRenderUtils {
                 DrawContextUtils.translate(-hx, -hy, -hz)
 
                 //#if MC < 1.21
-                DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+                GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
                 //#else
                 //$$ savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
                 //#endif
