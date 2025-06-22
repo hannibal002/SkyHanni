@@ -10,12 +10,7 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
-//#if TODO
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
-import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.shader.CircleShader
-//#endif
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -26,41 +21,40 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCircle
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-//#if TODO
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-//#endif
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
-//#if TODO
 import net.minecraft.client.gui.ScaledResolution
+//#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
 //#endif
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
-import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+//#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
+//$$ import org.lwjgl.BufferUtils
+//#endif
 
 @Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {
@@ -85,32 +79,35 @@ object RenderUtils {
         override fun toString() = value
     }
 
-    //#if TODO
+    //#if MC < 1.21
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     //#endif
 
-    //#if MC < 1.8.9
     /**
      * Used for some debugging purposes.
      */
     val absoluteTranslation
         get() = run {
+            //#if MC < 1.21
             matrixBuffer.clear()
-
             GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
-
             val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
-
             val xTranslate = read[12].toInt()
             val yTranslate = read[13].toInt()
             val zTranslate = read[14].toInt()
-
             matrixBuffer.flip()
-
+            //#else
+            //$$ RenderSystem.assertOnRenderThread()
+            //$$ val posMatrix = DrawContextUtils.drawContext.matrices.peek().positionMatrix
+            //$$ val tmp = org.joml.Vector3f()
+            //$$ posMatrix.getTranslation(tmp)
+            //$$ val xTranslate = tmp.x.toInt()
+            //$$ val yTranslate = tmp.y.toInt()
+            //$$ val zTranslate = tmp.z.toInt()
+            //#endif
             Triple(xTranslate, yTranslate, zTranslate)
         }
-    //#endif
 
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -133,7 +130,7 @@ object RenderUtils {
         highlight(color, x, y)
     }
 
-    fun highlight(color: Color, x: Int, y: Int) {
+    private fun highlight(color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         DrawContextUtils.pushMatrix()
@@ -349,11 +346,6 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    @Deprecated("Use WorldRenderUtils' drawCircle instead")
-    fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
-        _drawCircle(entity, rad, color)
-    }
-
     @Deprecated("Use WorldRenderUtils' drawCylinderInWorld instead")
     fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
@@ -392,8 +384,9 @@ object RenderUtils {
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereInWorld(color, location.x, location.y, location.z, radius)
+        _drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereInWorld instead")
@@ -403,8 +396,9 @@ object RenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereInWorld(color, x, y, z, radius)
+        _drawSphereInWorld(color, x, y, z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereWireframeInWorld instead")
@@ -412,8 +406,9 @@ object RenderUtils {
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
+        _drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereWireframeInWorld instead")
@@ -423,8 +418,9 @@ object RenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereWireframeInWorld(color, x, y, z, radius)
+        _drawSphereWireframeInWorld(color, x, y, z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawDynamicText instead")
@@ -447,11 +443,10 @@ object RenderUtils {
 
     @Deprecated("Use WorldRenderUtils' exactLocation instead")
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+        // TODO cache once per frame
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
-        //#if TODO
         PatcherFixes.onPlayerEyeLine()
-        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
@@ -468,21 +463,14 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
+    @Deprecated("Use WorldRenderUtils' drawLineToEye instead")
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        _draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
+        _drawLineToEye(location, color, lineWidth, depth)
     }
 
     @Deprecated("Use WorldRenderUtils' exactLocation instead")
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         return WorldRenderUtils.exactLocation(entity, partialTicks)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawWireframeBoundingBox instead")
-    fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
-        aabb: AxisAlignedBB,
-        color: Color,
-    ) {
-        _drawWireframeBoundingBox(aabb, color)
     }
 
     @Deprecated("Use WorldRenderUtils' draw3DPathWithWaypoint instead")
@@ -552,11 +540,11 @@ object RenderUtils {
     @Deprecated("Use WorldRenderUtils' drawHitbox instead")
     fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
-        lineWidth: Int,
         color: Color,
-        depth: Boolean,
+        lineWidth: Int = 3,
+        depth: Boolean = true,
     ) {
-        _drawHitbox(boundingBox, lineWidth, color, depth)
+        _drawHitbox(boundingBox, color, lineWidth, depth)
     }
 
     fun chromaColor(
@@ -605,228 +593,18 @@ object RenderUtils {
         GlStateManager.disableDepth()
         GlStateManager.disableBlend()
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 0f)
-        DrawContextUtils.scale(scale, scale, 1f)
-        GuiRenderUtils.drawString(text, 0f, 0f, 16777215)
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 200f)
+            DrawContextUtils.scale(scale, scale, 1f)
+            GuiRenderUtils.drawString(text, 0f, 0f, 16777215)
 
-        val reverseScale = 1 / scale
+            val reverseScale = 1 / scale
 
-        DrawContextUtils.scale(reverseScale, reverseScale, 1f)
-        DrawContextUtils.popMatrix()
+            DrawContextUtils.scale(reverseScale, reverseScale, 1f)
+        }
 
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
-    }
-
-    /**
-     * Method to draw a rounded textured rect.
-     *
-     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
-     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
-     * is called **BEFORE** [GlStateManager.scale], otherwise the textured rect will not be rendered correctly
-     *
-     * @param filter the texture filter to use
-     * @param radius the radius of the corners (default 10), NOTE: If you pass less than 1 it will just draw as a normal textured rect
-     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
-     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
-     * It is best kept at its default.
-     */
-    fun drawRoundTexturedRect(
-        x: Int,
-        y: Int,
-        width: Int,
-        height: Int,
-        filter: Int,
-        radius: Int = 10,
-        smoothness: Int = 1,
-        texture: ResourceLocation,
-        alpha: Float = 1f,
-    ) {
-        // if radius is 0 then just draw a normal textured rect
-        if (radius <= 0) {
-            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
-            return
-        }
-
-        val scaleFactor = GuiScreenUtils.scaleFactor
-        val widthIn = width * scaleFactor
-        val heightIn = height * scaleFactor
-        val xIn = x * scaleFactor
-        val yIn = y * scaleFactor
-
-        //#if TODO
-        RoundedTextureShader.scaleFactor = scaleFactor.toFloat()
-        RoundedTextureShader.radius = radius.toFloat()
-        RoundedTextureShader.smoothness = smoothness.toFloat()
-        RoundedTextureShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
-        RoundedTextureShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
-        //#endif
-
-        DrawContextUtils.pushMatrix()
-        //#if TODO
-        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
-        //#endif
-
-        GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
-
-        //#if TODO
-        ShaderManager.disableShader()
-        //#endif
-        DrawContextUtils.popMatrix()
-    }
-
-    /**
-     * Method to draw a rounded rectangle.
-     *
-     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
-     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
-     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
-     *
-     * @param color color of rect
-     * @param radius the radius of the corners (default 10)
-     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
-     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
-     * It is best kept at its default.
-     */
-    fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Int = 1) {
-        val scaleFactor = GuiScreenUtils.scaleFactor
-        val widthIn = width * scaleFactor
-        val heightIn = height * scaleFactor
-        val xIn = x * scaleFactor
-        val yIn = y * scaleFactor
-
-        //#if TODO
-        RoundedRectangleShader.scaleFactor = scaleFactor.toFloat()
-        RoundedRectangleShader.radius = radius.toFloat()
-        RoundedRectangleShader.smoothness = smoothness.toFloat()
-        RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
-        RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
-        //#endif
-
-        DrawContextUtils.pushMatrix()
-        //#if TODO
-        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
-        //#endif
-
-        GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
-
-        //#if TODO
-        ShaderManager.disableShader()
-        //#endif
-        DrawContextUtils.popMatrix()
-    }
-
-    /**
-     * Method to draw a rounded rectangle.
-     *
-     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
-     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
-     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
-     *
-     * @param color color of rect
-     * @param radius the radius of the corners (default 10)
-     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
-     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
-     * It is best kept at its default.
-     */
-    fun drawRoundGradientRect(
-        x: Int,
-        y: Int,
-        width: Int,
-        height: Int,
-        topColor: Int,
-        bottomColor: Int,
-        radius: Int = 10,
-        smoothness: Int = 1,
-    ) {
-        val scaledRes = GuiScreenUtils.scaleFactor
-        val widthIn = width * scaledRes
-        val heightIn = height * scaledRes
-        val xIn = x * scaledRes
-        val yIn = y * scaledRes
-
-        //#if TODO
-        RoundedRectangleShader.scaleFactor = scaledRes.toFloat()
-        RoundedRectangleShader.radius = radius.toFloat()
-        RoundedRectangleShader.smoothness = smoothness.toFloat()
-        RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
-        RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
-
-        DrawContextUtils.pushMatrix()
-        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
-
-        GuiRenderUtils.drawGradientRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
-
-        ShaderManager.disableShader()
-        DrawContextUtils.popMatrix()
-        //#endif
-    }
-
-    /**
-     * Method to draw the outline of a rounded rectangle with a color gradient. For a single color just pass
-     * in the color to both topColor and bottomColor.
-     *
-     * This is *not* a method that draws a rounded rectangle **with** an outline, rather, this draws **only** the outline.
-     *
-     * **NOTE:** The same notices given from [drawRoundRect] should be acknowledged with this method also.
-     *
-     * @param topColor color of the top of the outline
-     * @param bottomColor color of the bottom of the outline
-     * @param borderThickness the thickness of the border
-     * @param radius radius of the corners of the rectangle (default 10)
-     * @param blur the amount to blur the outline (default 0.7f)
-     */
-    fun drawRoundRectOutline(
-        x: Int,
-        y: Int,
-        width: Int,
-        height: Int,
-        topColor: Int,
-        bottomColor: Int,
-        borderThickness: Int,
-        radius: Int = 10,
-        blur: Float = 0.7f,
-    ) {
-        val scaleFactor = GuiScreenUtils.scaleFactor
-        val widthIn = width * scaleFactor
-        val heightIn = height * scaleFactor
-        val xIn = x * scaleFactor
-        val yIn = y * scaleFactor
-
-        val borderAdjustment = borderThickness / 2
-
-        //#if TODO
-        RoundedRectangleOutlineShader.scaleFactor = scaleFactor.toFloat()
-        RoundedRectangleOutlineShader.radius = radius.toFloat()
-        RoundedRectangleOutlineShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
-        RoundedRectangleOutlineShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
-        RoundedRectangleOutlineShader.borderThickness = borderThickness.toFloat()
-        // The blur argument is a bit misleading, the greater the value the more sharp the edges of the
-        // outline will be and the smaller the value the blurrier. So we take the difference from 1
-        // so the shader can blur the edges accordingly. This is because a 'blurriness' option makes more sense
-        // to users than a 'sharpness' option in this context
-        RoundedRectangleOutlineShader.borderBlur = max(1 - blur, 0f)
-        //#endif
-
-        DrawContextUtils.pushMatrix()
-        //#if TODO
-        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
-        //#endif
-
-        GuiRenderUtils.drawGradientRect(
-            x - borderAdjustment,
-            y - borderAdjustment,
-            x + width + borderAdjustment,
-            y + height + borderAdjustment,
-            topColor,
-            bottomColor,
-        )
-
-        //#if TODO
-        ShaderManager.disableShader()
-        //#endif
-        DrawContextUtils.popMatrix()
     }
 
     /**
@@ -881,7 +659,7 @@ object RenderUtils {
         //#endif
     }
 
-    //#if TODO
+    //#if MC < 1.21
     fun getAlpha(): Float {
         colorBuffer.clear()
         GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)

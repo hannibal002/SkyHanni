@@ -91,7 +91,7 @@ object ComputerTimeOffset {
         timeInfo.computeDetails()
         timeInfo.offset.milliseconds
     } catch (e: Exception) {
-        if (LorenzUtils.inSkyBlock && config.warnAboutPcTimeOffset) ErrorManager.logErrorWithData(
+        if (SkyBlockUtils.inSkyBlock && config.warnAboutPcTimeOffset) ErrorManager.logErrorWithData(
             e, "Failed to get NTP offset",
             "server" to ntpServer,
         )
@@ -125,7 +125,7 @@ object ComputerTimeOffset {
     }
 
     private fun tryDisplayOffset(wasOffsetBefore: Boolean) {
-        if (!config.warnAboutPcTimeOffset || !LorenzUtils.onHypixel) return
+        if (!config.warnAboutPcTimeOffset || !SkyBlockUtils.onHypixel) return
         val offsetMillis = offsetMillis ?: return
         if (offsetMillis.absoluteValue < 5.seconds) {
             if (wasOffsetBefore) {
