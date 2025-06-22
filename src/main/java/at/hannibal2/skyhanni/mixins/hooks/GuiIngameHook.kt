@@ -13,7 +13,7 @@ object GuiIngameHook {
 
     @JvmStatic
     fun drawString(
-        fr: FontRenderer,
+        renderer: FontRenderer,
         //#if MC < 1.21
         text: String,
         //#else
@@ -29,9 +29,9 @@ object GuiIngameHook {
         //$$ ) = ScoreboardData.tryToReplaceScoreboardLine(text.formattedTextCompat())?.let {
         //#endif
         //#if MC < 1.21
-        fr.drawString(it, x, y, color)
+        renderer.drawString(it, x, y, color)
         //#else
-        //$$ drawContext.drawText(fr, it, x, y, color, false)
+        //$$ drawContext.drawText(renderer, it, x, y, color, false)
         //#endif
     } ?: 0
 

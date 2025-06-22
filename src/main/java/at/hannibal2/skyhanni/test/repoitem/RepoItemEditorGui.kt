@@ -43,7 +43,8 @@ import net.minecraft.nbt.NBTTagList
 //$$ import net.minecraft.component.type.NbtComponent
 //#endif
 
-class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStack, needsItemIdFixed: Boolean = false) : SkyhanniBaseScreen() {
+class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStack, needsItemIdFixed: Boolean = false) :
+    SkyhanniBaseScreen() {
 
     private val baseJson = EnoughUpdatesManager.getItemById(internalName.asString()) ?: JsonObject()
     private val internalNameStringField = TextFieldRenderable(internalName.asString())
