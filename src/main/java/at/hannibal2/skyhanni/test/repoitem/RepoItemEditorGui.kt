@@ -157,7 +157,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             }
             height += renderable.height + 2
         }
-        maxScroll = height + offsetY + 50
+        maxScroll = height - 250
     }
 
     private val closeButton = RenderableString("§7Close (discards changes)")
