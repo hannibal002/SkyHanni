@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.Vec3
 import kotlin.math.sin
+import kotlin.time.Duration
 
 /**
  * A data class that defines the bouncing behavior of an item stack.
@@ -91,11 +92,8 @@ class AnimatedItemStackRenderable(
         return if (sinTheta >= 0) sinTheta * upwardBounce else sinTheta * downwardBounce
     }
 
-    override fun render(posX: Int, posY: Int) {
-
-        val dt = (SimpleTimeMark.now() - lastTime).inPartialSeconds
-        lastTime = SimpleTimeMark.now()
-        currentRotation = generateNextRotation(dt)
+    override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
+        currentRotation = generateNextRotation(deltaTime.inPartialSeconds)
         val currentOffsetY = bounce.calculateBounce()
 
         stack.renderOnScreen(
