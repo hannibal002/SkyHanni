@@ -23,7 +23,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
+import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -37,11 +39,10 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         var searchRadius = 10
         if (args.size == 1) {
             searchRadius = args[0].toInt()
@@ -113,6 +114,13 @@ object CopyNearbyEntitiesCommand {
                     is EntityOtherPlayerMP -> addOtherPlayer(entity)
                     is EntityCreeper -> addCreeper(entity)
                     is EntityWither -> addWither(entity)
+                    //#if MC > 1.21
+                    //$$ is net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity -> addItemDisplayEntity(entity)
+                    //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
+                    //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
+                    //$$ is net.minecraft.entity.passive.PandaEntity -> addPanda(entity)
+                    //$$ is net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity -> addBlockDisplayEntity(entity)
+                    //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
                     add("MobInfo: ")
@@ -137,16 +145,15 @@ object CopyNearbyEntitiesCommand {
         add("EntityArmorStand:")
         val headRotation = entity.headRotation.toLorenzVec()
         val bodyRotation = entity.bodyRotation.toLorenzVec()
-        //#if TODO
         add("-  headRotation: $headRotation")
         add("-  bodyRotation: $bodyRotation")
 
         add("-  inventory:")
-        for ((id, stack) in entity.inventory.withIndex()) {
-            add("-  id $id ($stack)")
-            printItemStackData(stack)
+        for ((id, stack) in entity.getInventoryItems().withIndex()) {
+            val adjustedStack = stack.orNull()
+            add("-  id $id ($adjustedStack)")
+            printItemStackData(adjustedStack)
         }
-        //#endif
     }
 
     private fun MutableList<String>.addEnderman(entity: EntityEnderman) {
@@ -220,6 +227,53 @@ object CopyNearbyEntitiesCommand {
         add("-  invulTime: '$invulTime'")
         add("-  armored: '$isArmored'")
     }
+
+    //#if MC > 1.21
+    //$$ private fun MutableList<String>.addItemDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity) {
+    //$$     add("EntityItemDisplay:")
+    //$$     val stack = entity.itemStack
+    //$$     val rotation = entity.rotationVector
+    //$$
+    //$$     add("-  itemStack:")
+    //$$     printItemStackData(stack)
+    //$$     add("-  rotation: $rotation")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addTropicalFish(entity: net.minecraft.entity.passive.TropicalFishEntity) {
+    //$$     add("EntityTropicalFish:")
+    //$$     val variety = entity.variety
+    //$$     val patternColor = entity.patternColor
+    //$$     val baseColor = entity.baseColor
+    //$$     add("-  variety: $variety")
+    //$$     add("-  patternColor: $patternColor")
+    //$$     add("-  baseColor: $baseColor")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addShulker(entity: net.minecraft.entity.mob.ShulkerEntity) {
+    //$$     add("EntityShulker:")
+    //$$     val color = entity.color
+    //$$     val attachedFace = entity.attachedFace
+    //$$     add("-  color: $color")
+    //$$     add("-  attachedFace: $attachedFace")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addPanda(entity: net.minecraft.entity.passive.PandaEntity) {
+    //$$     add("EntityPanda:")
+    //$$     val mainGene = entity.mainGene
+    //$$     val hiddenGene = entity.hiddenGene
+    //$$     add("-  mainGene: $mainGene")
+    //$$     add("-  hiddenGene: $hiddenGene")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addBlockDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity) {
+    //$$     add("EntityBlockDisplay:")
+    //$$     val block = entity.blockState.block
+    //$$     val rotation = entity.rotationVector
+    //$$
+    //$$     add("-  block: ${block.name.formattedTextCompat()}")
+    //$$     add("-  rotation: $rotation")
+    //$$ }
+    //#endif
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {
