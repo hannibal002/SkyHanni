@@ -275,22 +275,6 @@ object MineshaftPityDisplay {
                 update()
             }
         }
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresetmineshaftpitystats") {
-            description = "Resets the mineshaft pity display stats"
-            category = CommandCategory.USERS_RESET
-            simpleCallback { fullResetCounter() }
-        }
-    }
-
-    private fun fullResetCounter() {
-        resetCounter()
-        mineshaftTotalBlocks = 0
-        mineshaftTotalCount = 0
-        sessionMineshafts = 0
-        lastMineshaftSpawn = SimpleTimeMark.farPast()
-        update()
     }
 
     @HandleEvent
