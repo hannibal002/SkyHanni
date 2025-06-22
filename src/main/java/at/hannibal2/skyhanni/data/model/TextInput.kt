@@ -92,12 +92,22 @@ open class TextInput {
             }
         }
 
-        fun onGuiInput(ci: CallbackInfo) {
+        fun onGuiInput(
+            //#if MC < 1.21
+            ci: CallbackInfo
+            //#else
+            //$$ ci: CallbackInfoReturnable<Boolean>
+            //#endif
+        ) {
             if (activeInstance != null) {
                 if (Keyboard.KEY_ESCAPE.isKeyHeld()) {
                     disable()
                 } else {
+                    //#if MC < 1.21
                     ci.cancel()
+                    //#else
+                    //$$ ci.setReturnValue(false)
+                    //#endif
                 }
                 return
             }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.GuiData;
 import at.hannibal2.skyhanni.data.ToolTipData;
+import at.hannibal2.skyhanni.data.model.TextInput;
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
@@ -60,6 +61,7 @@ public abstract class MixinHandledScreen {
 
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+        TextInput.Companion.onGuiInput(cir);
         if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
             cir.setReturnValue(false);
         }

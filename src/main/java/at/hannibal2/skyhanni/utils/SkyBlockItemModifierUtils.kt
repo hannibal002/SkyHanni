@@ -87,6 +87,9 @@ object SkyBlockItemModifierUtils {
         @Expose val noMove: Boolean,
         @Expose val extraData: JsonObject? = null,
     ) {
+        @Suppress("PropertyName")
+        @Deprecated("Do not use, does not reflect Tier Boost, use PetData(petInfo).fauxInternalName instead")
+        val _internalName = "$type;${tier.id}".toInternalName()
         val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
         fun getSkinVariantIndex() = skin?.let {
             extraData?.entrySet()?.firstOrNull { json ->
@@ -135,7 +138,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getPetInfo(): PetInfo? =
         ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), PetInfo::class.java)
 
-    fun ItemStack.getPetLevel(): Int = PetUtils.xpToLevel(getPetInfo()?.exp ?: 0.0, getInternalName())
+    fun ItemStack.getPetLevel(): Int = getPetInfo()?.let(PetUtils::xpToLevel) ?: 1
 
     fun ItemStack.getMaxPetLevel(): Int = PetUtils.getMaxLevel(getInternalName())
 

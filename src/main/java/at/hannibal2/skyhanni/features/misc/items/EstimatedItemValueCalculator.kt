@@ -696,6 +696,21 @@ object EstimatedItemValueCalculator {
 
     }
 
+    private fun addBoosters(stack: ItemStack, list: MutableList<String>): Double {
+        val boosters = stack.readBoosters()
+        if (boosters.isEmpty()) return 0.0
+
+        val (totalPrice, names) = getTotalAndNames(boosters)
+
+        if (names.isNotEmpty()) {
+            list.add("§7Boosters: ${totalPrice.formatCoin()}")
+            list += names
+        }
+
+        return totalPrice
+
+    }
+
     private fun ItemStack.getEnchantmentItems(): Pair<Double, List<String>>? {
         val enchantments = getHypixelEnchantments() ?: return null
         val data = EstimatedItemValue.itemValueCalculationData ?: return null
