@@ -138,9 +138,9 @@ object MatriarchHelper {
                     prePoint = point
                 }
             } else {
-                LineDrawer.draw3D(event.partialTicks) {
+                LineDrawer.draw3D(event, lineWidth = 10, depth = true) {
                     drawPath(
-                        listOf(prePoint) + path, color, 10, true, bezierPoint = -1.0,
+                        listOf(prePoint) + path, color, bezierPoint = -1.0,
                     )
                 }
             }
@@ -152,5 +152,5 @@ object MatriarchHelper {
         exitNode = null
     }
 
-    fun isEnabled() = config.enabled
+    private fun isEnabled() = config.enabled
 }

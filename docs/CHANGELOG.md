@@ -46,6 +46,7 @@
 + Added In-Game Changelog Viewer. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1636)
     + Clickable chat option shows on new update or first join with new version.
     + Works with `/shchangelog <old version> <new version>`.
++ Added support for Fabric 1.21.5. - nopo and CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4038)
 
 ### Improvements
 
@@ -72,6 +73,7 @@
 
 + Added option to receive stash item reminders on world change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3836)
     + Only applicable if stash compact is on and duplicate counts are hidden.
++ Added Foraging Item Boosters to Estimated Item Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/4038)
 
 #### Mining
 
@@ -87,6 +89,8 @@
 
 + Hide "total" Hoppity Stats from chat when no duplicates found in Compact Hitman Message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3998)
 + Added Meal Egg Breakdown on hover in Hoppity Live Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
++ Messages for EggLocator failures now replace previous message. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4109)
+    + "Next egg available in..." and "Hoppity's hunt is not active...".
 
 #### Combat
 
@@ -114,6 +118,8 @@
     + Only First Kick Counts for Rejoin cooldown so this makes rejoin notification more accurate.
 + Made non-God-Pot effects read from Tab List widget. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3986)
 + Added config search for "Item Warning" via "Tracker Title" or "Drop Title". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4046)
++ Added Salts to Non God Pot Effects. - nopo (https://github.com/hannibal002/SkyHanni/pull/4038)
++ Improved /gfs queuing on Alpha. - nopo (https://github.com/hannibal002/SkyHanni/pull/4122)
 
 ### Fixes
 
@@ -156,6 +162,8 @@
 + Fixed Reforge Helper locking when nothing is selected. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3907)
 + Fixed display of Craftable Item List and Graph Node Editor. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3914)
 + Fixed Aquamarine Gemstone not showing in Sacks Overlay when a filter was selected. - jani (https://github.com/hannibal002/SkyHanni/pull/3989)
++ Fixed Hitman calculations in Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4111)
++ Fixed Pet-Level stack size display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4121)
 
 #### Mining
 
@@ -163,6 +171,7 @@
 + Fixed blocks mined by Pickobulus not being detected on non-Cold Islands. - Empa (https://github.com/hannibal002/SkyHanni/pull/3979)
 + Fixed HOTM Level Stacksize not working. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4043)
 + Fixed rare error in Powder Chest Timer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4105)
++ Fixed Powder Chest Timer error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4126)
 
 #### Fishing
 
@@ -214,6 +223,8 @@
 + Fixed Fairy Soul Pathfinder sometimes displaying paths from the previous island. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4056)
     + Switching islands during path calculation triggered the issue.
 + Fixed best-friend detection in chat messages. - FlyMode (https://github.com/hannibal002/SkyHanni/pull/4084)
++ Fixed Lobby Kick Timer. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4107)
++ Fixed ParticleHider issue on initial world join. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4118)
 
 ### Technical Details
 
@@ -314,6 +325,14 @@
 + Started porting pets to their own config category. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
 + Updated Renderables for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4009)
 + Updated SackApi, GardenApi, PestApi, FishingApi and TitleManager for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4012)
++ Added debug logging for PetStorageApi. - Davee (https://github.com/hannibal002/SkyHanni/pull/4114)
++ Added EquipmentApi. - Empa (https://github.com/hannibal002/SkyHanni/pull/3842)
++ Added Pet Storage reset command. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4114)
++ Added rendering code for modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4113)
++ Cleaned up Hoppity-related classes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4108)
++ Enabled 3D rendering on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4030)
++ Improved 1.21 compatibility. - nopo (https://github.com/hannibal002/SkyHanni/pull/4028)
++ Improved 1.21 compatibility. - nopo (https://github.com/hannibal002/SkyHanni/pull/4030)
 
 ## Version 3.0.0
 

@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -40,6 +41,10 @@ object FarmingContestApi {
         "sidebarcrop",
         "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*",
     )
+    private val bulkClaimFarmingPattern by patternGroup.pattern(
+        "bulkclaim",
+        "§7Claim multiple farming contest",
+    )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
     private var internalContest = false
@@ -48,6 +53,7 @@ object FarmingContestApi {
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false
+        private set
 
     init {
         ContestBracket.entries.forEach { it.bracketPattern }
@@ -108,11 +114,12 @@ object FarmingContestApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName == "Your Contests") {
-            inInventory = true
-        }
+        if (event.inventoryName != "Your Contests") return
+        val bulkClaimStack = event.inventoryItems[50] ?: return
+        if (!bulkClaimFarmingPattern.matches(bulkClaimStack.getLore().first())) return
+        inInventory = true
     }
 
     @HandleEvent

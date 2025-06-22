@@ -47,25 +47,25 @@ object EntityEvents {
 
     @SubscribeEvent
     fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
-        if (SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z).post()) {
+        if (SkyHanniRenderEntityEvent.Pre(event.entity, event.x, event.y, event.z).post()) {
             event.isCanceled = true
         }
     }
 
     @SubscribeEvent
     fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
-        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
+        SkyHanniRenderEntityEvent.Post(event.entity, event.x, event.y, event.z).post()
     }
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPre(event: RenderLivingEvent.Specials.Pre<*>) {
-        if (SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z).post()) {
+        if (SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.x, event.y, event.z).post()) {
             event.isCanceled = true
         }
     }
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
-        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
+        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.x, event.y, event.z).post()
     }
 }
