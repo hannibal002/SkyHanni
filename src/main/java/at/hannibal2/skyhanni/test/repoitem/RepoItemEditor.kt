@@ -119,7 +119,15 @@ object RepoItemEditor {
         if (itemModel.isNotEmpty()) {
             baseJson.addProperty("itemModel", itemModel)
         }
-        baseJson.addProperty("nbttag", nbtTag.toString().replace("\u0027[", "[").replace("]\u0027", "]"))
+        val fixedNbtTagString = nbtTag.toString()
+            //#if MC > 1.21
+            //$$ .replace("\u0027[", "[")
+            //$$ .replace("]\u0027", "]")
+            //$$ .replace("\\\u0027", "\u0027")
+            //$$ .replace("\\\\", "\\")
+        //#endif
+
+        baseJson.addProperty("nbttag", fixedNbtTagString)
         baseJson.addProperty("damage", damage)
         val jsonLore = JsonArray()
         lore.split("\n").forEach { line ->
@@ -152,7 +160,13 @@ object RepoItemEditor {
     //$$                 append(",")
     //$$             }
     //$$             append("$index:")
-    //$$             append(tag.toString())
+    //$$             var toString = tag.toString()
+    //$$             if (toString.startsWith("\u0027")) {
+    //$$                 toString = toString.removePrefix("\u0027").removeSuffix("\u0027")
+    //$$                 toString = toString.replace("\"", "\\\"")
+    //$$                 toString = "\"$toString\""
+    //$$             }
+    //$$             append(toString)
     //$$         }
     //$$         append("]")
     //$$     }
