@@ -29,7 +29,7 @@ object PlatformUtils {
     //#else
     //$$ val MC_VERSION: String = net.minecraft.SharedConstants.getGameVersion().name
     //#endif
-    const val IS_LEGACY: Boolean = MC_VERSION == "1.8.9"
+    const val IS_LEGACY: Boolean = VersionConstants.MC_VERSION == "1.8.9"
 
     val isDevEnvironment: Boolean by lazy {
         //#if MC < 1.16
