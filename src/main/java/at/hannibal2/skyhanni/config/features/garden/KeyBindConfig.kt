@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if TODO
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds
-//#endif
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -13,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
-// todo 1.21 impl needed
 class KeyBindConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool in your hand.")
@@ -26,7 +23,6 @@ class KeyBindConfig {
     @ConfigEditorBoolean
     var excludeBarn: Boolean = false
 
-    //#if TODO
     @ConfigOption(name = "Disable All", desc = "Disable all keys.")
     @ConfigEditorButton(buttonText = "Disable")
     var presetDisable: Runnable = Runnable(GardenCustomKeybinds::disableAll)
@@ -34,7 +30,6 @@ class KeyBindConfig {
     @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
     @ConfigEditorButton(buttonText = "Default")
     var presetDefault: Runnable = Runnable(GardenCustomKeybinds::defaultAll)
-    //#endif
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")

@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -201,8 +202,8 @@ object CFStrayTracker {
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
             if (rarity == LEGENDARY) tip += extractGoldenTypesCaught(data)
-            Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.partyModeReplace().split("\n"))
-        } ?: Renderable.string(lineFormat)
+            Renderable.hoverTips(RenderableString(lineFormat), tips = tip.partyModeReplace().split("\n"))
+        } ?: RenderableString(lineFormat)
         return renderable.toSearchable(rarity.toString())
     }
 
@@ -278,8 +279,8 @@ object CFStrayTracker {
         return true
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)
@@ -310,16 +311,16 @@ object CFStrayTracker {
         ) { config.strayRabbitTracker && isEnabled() }
     }
 
-    @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(InventoryFullyOpenedEvent::class)
+    fun onInventoryFullyOpened() {
         if (!isEnabled()) return
         // Force a refresh for party mode
         if (CFApi.inChocolateFactory && config.partyMode.get()) tracker.update()
         tracker.firstUpdate()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         if (!isEnabled()) return
         tracker.update() // Make sure we don't stay in party mode
     }
@@ -350,8 +351,8 @@ object CFStrayTracker {
         }
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         config.partyMode.onToggle(tracker::update)
     }
 
