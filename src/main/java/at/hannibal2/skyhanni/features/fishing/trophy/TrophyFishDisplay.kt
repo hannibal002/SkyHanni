@@ -286,6 +286,6 @@ object TrophyFishDisplay {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val base = "fishing.trophyFishing.display"
-        event.move(88, "$base.requireHunterArmor", "$base.requireArmor")
+        event.move(89, "$base.requireHunterArmor", "$base.requireArmor")
     }
 }
