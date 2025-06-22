@@ -9,6 +9,7 @@ import java.util.Queue
 import java.util.WeakHashMap
 import kotlin.math.ceil
 
+@Suppress("TooManyFunctions")
 object CollectionUtils {
 
     inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
@@ -468,7 +469,7 @@ object CollectionUtils {
     }
 
     fun <T> Collection<T>.firstUniqueByOrNull(
-        vararg predicates: (T) -> Boolean
+        vararg predicates: (T) -> Boolean,
     ): T? {
         var candidates = this
         for (pred in predicates) {

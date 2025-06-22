@@ -122,7 +122,7 @@ object GetFromSackApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMessageToServer(event: MessageSendToServerEvent) {
-        if (!config.queuedGFS && !config.bazaarGFS) return
+        if ((!config.queuedGFS && !config.bazaarGFS) || SkyBlockUtils.isOnAlphaServer) return
         if (!event.isCommand(commandsWithSlash)) return
         val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
         queuedHandler(replacedEvent)
@@ -138,7 +138,7 @@ object GetFromSackApi {
     }
 
     private fun queuedHandler(event: MessageSendToServerEvent) {
-        if (!config.queuedGFS) return
+        if (!config.queuedGFS || SkyBlockUtils.isOnAlphaServer) return
         if (event.senderIsSkyhanni()) return
 
         val (result, stack) = commandValidator(event.splitMessage.drop(1))

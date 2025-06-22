@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
 import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -37,7 +38,7 @@ object CopyChat {
 
             KeyboardManager.isShiftKeyDown() -> (ModifyVisualWords.modifyText(formatted)?.removeColor() ?: formatted) to "modified message"
 
-            KeyboardManager.isControlKeyDown() -> chatLine.chatComponent.unformattedText.removeColor() to "line"
+            KeyboardManager.isControlKeyDown() -> chatLine.chatMessage.removeColor() to "line"
 
             else -> formatted.removeColor() to "message"
         }

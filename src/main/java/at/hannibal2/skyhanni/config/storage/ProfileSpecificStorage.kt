@@ -35,23 +35,19 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
-//#if TODO
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
-//#endif
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
-//#if TODO
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
-//#endif
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
-//#endif
+import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
@@ -70,7 +66,6 @@ import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
 
-// todo 1.21 impl needed
 // put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage(
     @Expose var profileName: String = "",
@@ -81,6 +76,9 @@ class ProfileSpecificStorage(
 
     @Expose
     var totalSkyBlockXP: Int? = null
+
+    @Expose
+    var crimsonIsleFaction: FactionType? = null
 
     // features
     // - combat
@@ -305,19 +303,12 @@ class ProfileSpecificStorage(
         @Expose
         var hotChocolateMixinExpiry = farPast()
 
-        class HitmanStatsStorage {
-            @Expose
-            var availableHitmanEggs: Int = 0
-
-            @Expose
-            var singleSlotCooldownMark: SimpleTimeMark? = null
-
-            @Expose
-            var allSlotsCooldownMark: SimpleTimeMark? = null
-
-            @Expose
-            var purchasedHitmanSlots: Int = 0
-        }
+        data class HitmanStatsStorage(
+            @Expose var availableHitmanEggs: Int = 0,
+            @Expose var singleSlotCooldownMark: SimpleTimeMark? = null,
+            @Expose var allSlotsCooldownMark: SimpleTimeMark? = null,
+            @Expose var purchasedHitmanSlots: Int = 0,
+        ) : ResettableStorageSet()
 
         @Expose
         var hitmanStats: HitmanStatsStorage = HitmanStatsStorage()
@@ -654,6 +645,17 @@ class ProfileSpecificStorage(
         var currentSlot: Int? = null
     }
 
+    @Expose
+    var equipment: EquipmentStorage = EquipmentStorage()
+
+    class EquipmentStorage {
+        @Expose
+        var slots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+
+        @Expose
+        var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+    }
+
     // - mining
     @Expose
     var mining: MiningStorage = MiningStorage()
@@ -695,13 +697,11 @@ class ProfileSpecificStorage(
             @Expose
             var mineshaftTotalCount: Int = 0
 
-            //#if TODO
             @Expose
             var blocksBroken: MutableList<PityData> = mutableListOf()
 
             @Expose
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
-            //#endif
         }
 
         @Expose
@@ -747,11 +747,9 @@ class ProfileSpecificStorage(
         @Expose
         var selfKillingAnimals: Int = 0
 
-        //#if TODO
         // TODO change to sh tracker
         @Expose
         var animalRarities: Map<TrapperMobRarity, Int> = enumMapOf()
-        //#endif
     }
 
     @Expose
