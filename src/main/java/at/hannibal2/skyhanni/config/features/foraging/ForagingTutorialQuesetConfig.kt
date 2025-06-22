@@ -14,7 +14,7 @@ class ForagingTutorialQuesetConfig {
     var enabled: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Suggest to enable", desc = "When useful, suggest in chat to enable this feature")
+    @ConfigOption(name = "Suggest to enable", desc = "When useful, suggest in chat to enable this feature.")
     @ConfigEditorBoolean
     var suggestToEnable: Boolean = true
 }
