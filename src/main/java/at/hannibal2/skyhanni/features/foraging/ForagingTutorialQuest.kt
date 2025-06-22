@@ -44,7 +44,7 @@ object ForagingTutorialQuest {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onPlayerSpawn(event: MobEvent.Spawn.DisplayNpc) {
         if (event.mob.name == "§cRequires §6Foraging Tutorial Quest") {
             firstStep()
