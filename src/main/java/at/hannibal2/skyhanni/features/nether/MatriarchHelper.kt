@@ -152,5 +152,5 @@ object MatriarchHelper {
         exitNode = null
     }
 
-    fun isEnabled() = config.enabled && IslandType.CRIMSON_ISLE.isCurrent()
+    private fun isEnabled() = config.enabled
 }

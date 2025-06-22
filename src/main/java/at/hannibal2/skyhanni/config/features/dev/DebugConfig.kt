@@ -198,7 +198,7 @@ class DebugConfig {
     var dvdLogo: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Item Stack", desc = "Enable the test Item Stack Renderable")
+    @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
     @ConfigEditorBoolean
     var itemStack: Boolean = false
 

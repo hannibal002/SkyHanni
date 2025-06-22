@@ -222,6 +222,7 @@ object ChatFilter {
         "§cYou currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!".toPattern(),
     )
 
+    // TODO update patterns for 1.21
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
         "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),

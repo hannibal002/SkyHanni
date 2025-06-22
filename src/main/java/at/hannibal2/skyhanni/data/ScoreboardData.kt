@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
@@ -187,9 +188,11 @@ object ScoreboardData {
     }
 
     private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+        //#if MC < 1.21
         if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
             return null
         }
+        //#endif
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")

@@ -265,14 +265,14 @@ object CroesusChestTracker {
         event.registerBrigadier("shresetkismet") {
             description = "Resets the saved values of the applied kismet feathers in Croesus"
             category = CommandCategory.USERS_RESET
-            simpleCallback { resetChest() }
+            simpleCallback {
+                croesusChests?.let {
+                    it.clear()
+                    it.addAll(generateMaxChest())
+                    ChatUtils.chat("Kismet State was Reset!")
+                }
+            }
         }
-    }
-
-    private fun resetChest() = croesusChests?.let {
-        it.clear()
-        it.addAll(generateMaxChest())
-        ChatUtils.chat("Kismet State was Reset!")
     }
 
     @JvmStatic
