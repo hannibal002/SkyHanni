@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.projectile.EntitySmallFireball
 import net.minecraft.util.EnumParticleTypes
@@ -18,6 +19,7 @@ object ParticleHider {
 
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
+        if (!MinecraftCompat.localPlayerExists) return
         val distanceToPlayer = event.distanceToPlayer
         if (SkyHanniMod.feature.misc.particleHiders.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
             event.cancel()

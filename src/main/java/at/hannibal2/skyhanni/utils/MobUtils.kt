@@ -25,7 +25,7 @@ object MobUtils {
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
     fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? EntityArmorStand
 
-    fun getNextEntity(entity: Entity, offset: Int) = EntityUtils.getEntityByID(entity.entityId + offset)
+    fun getNextEntity(entity: Entity, offset: Int): Entity? = EntityUtils.getEntityByID(entity.entityId + offset)
 
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
@@ -73,11 +73,12 @@ object MobUtils {
         rayTraceForMobs(entity, partialTicks, offset)?.firstOrNull()
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
-        val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
         //#if MC < 1.21
+        val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         //#else
         //$$ val look = entity.rotationVector.toLorenzVec().normalize()
+        //$$ val pos = entity.eyePos.toLorenzVec() + offset
         //#endif
         val possibleEntities = MobData.entityToMob.filterKeys {
             it !is EntityArmorStand &&

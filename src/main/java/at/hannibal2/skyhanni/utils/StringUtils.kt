@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -17,15 +18,20 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
+import java.util.Locale
 import java.util.NavigableMap
+import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#else
-//$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
+//$$ import net.minecraft.client.util.ChatMessages
+//$$ import net.minecraft.text.TextColor
+//$$ import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 //#endif
 
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
@@ -44,11 +50,8 @@ object StringUtils {
     fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
-        if (isEmpty()) return this
-
-        val lowercase = lowercase()
-        val first = lowercase[0].uppercase()
-        return first + lowercase.substring(1)
+        return this.lowercase(Locale.getDefault())
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
@@ -134,6 +137,12 @@ object StringUtils {
         return map.subMap(prefix, true, lastKey, false)
     }
 
+    fun subMapOfStringsStartingWith(prefix: String, map: NavigableSet<String>): NavigableSet<String> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subSet(prefix, true, lastKey, false)
+    }
+
     fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
@@ -150,7 +159,7 @@ object StringUtils {
             split[1].removeColor()
         } else {
             split[0].removeColor()
-        }
+        }.removeSuffix("'s")
     }
 
     fun String.cleanPlayerName(displayName: Boolean = false): String {
@@ -159,6 +168,7 @@ object StringUtils {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
+
         } else {
             internalCleanPlayerName()
         }
@@ -182,15 +192,53 @@ object StringUtils {
     //#if FORGE
     fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getMinecraft().fontRendererObj).splitText(
         //#else
-        //$$ fun String.splitLines(width: Int): String = ModernFontRenderer(MinecraftClient.getInstance().textRenderer).splitText(
+        //$$ fun String.splitLines(width: Int): String = splitText(
         //#endif
         this,
         width,
     ).joinToString("\n") { it.removePrefix("§r") }
 
+    //#if MC > 1.21
+    //$$ private fun splitText(text: String, width: Int): List<String> {
+    //$$     val lines = ChatMessages.breakRenderedChatMessageLines(Text.literal(text), width, MinecraftClient.getInstance().textRenderer)
+    //$$     val strings: MutableList<String> = ArrayList(lines.size)
+    //$$     for (line in lines) {
+    //$$         var newLine = ""
+    //$$         var lastColor: TextColor? = null
+    //$$         var lastFormatting = ""
+    //$$         line.accept { index, style, codePoint ->
+    //$$             val color = style.color
+    //$$             if (color != lastColor) {
+    //$$                 lastColor = color
+    //$$                 lastFormatting = ""
+    //$$                 if (color != null) {
+    //$$                     newLine += color.toChatFormatting()
+    //$$                 }
+    //$$             }
+    //$$             var newFormatting = ""
+    //$$             if (style.isBold) newFormatting = "§l"
+    //$$             else if (style.isItalic) newFormatting = "§o"
+    //$$             else if (style.isUnderlined) newFormatting = "§n"
+    //$$             else if (style.isStrikethrough) newFormatting = "§m"
+    //$$             else if (style.isObfuscated) newFormatting = "§k"
+    //$$             else newFormatting = ""
+    //$$
+    //$$             if (newFormatting != lastFormatting) {
+    //$$                 lastFormatting = newFormatting
+    //$$                 newLine += newFormatting
+    //$$             }
+    //$$             newLine += codePoint.toChar()
+    //$$             true
+    //$$         }
+    //$$         strings.add(newLine)
+    //$$     }
+    //$$     return strings
+    //$$ }
+    //#endif
+
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
-     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * this = the list of strings to join into a string, containing 0 or more elements.
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
@@ -202,6 +250,8 @@ object StringUtils {
         val allButLast = this.subList(0, lastIndex).joinToString("$delimiterColor, ")
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
+
+    fun String.pluralize(number: Int) = pluralize(number, this)
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
@@ -273,6 +323,7 @@ object StringUtils {
     }
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
+    fun String.convertToUnformatted(): String = this.replace("§", "&")
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 
@@ -391,13 +442,9 @@ object StringUtils {
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
         chatComponent = new.asComponent()
-        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value
-        if (hoverEvents.size == 1) chatComponent.hover =
-            //#if MC < 1.21
-            hoverEvents.first().value
-        //#else
-        //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
-        //#endif
+        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value()
+        if (hoverEvents.size == 1) chatComponent.hover = hoverEvents.first().value()
+
     }
 
     private fun IChatComponent.findAllEvents(
@@ -409,16 +456,12 @@ object StringUtils {
         val clickEvent = chatStyle.chatClickEvent
         val hoverEvent = chatStyle.chatHoverEvent
 
-        if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
+        if (clickEvent?.action != null && clickEvents.none { it.value() == clickEvent.value() }) {
             clickEvents.add(clickEvent)
         }
 
         if (hoverEvent?.action != null && hoverEvents.none {
-                //#if MC < 1.21
-                it.value == hoverEvent.value
-                //#else
-                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
-                //#endif
+                it.value() == hoverEvent.value()
             }
         ) {
             hoverEvents.add(hoverEvent)
@@ -485,6 +528,17 @@ object StringUtils {
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""
         return if (string[0] in "aeiou") "an" else "a"
+    }
+
+    fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }
+
+    fun String.splitLastWhitespace(): Pair<String, String> {
+        val lastWhitespaceIndex = lastIndexOf(" ")
+        return if (lastWhitespaceIndex == -1) {
+            "" to this
+        } else {
+            substring(0, lastWhitespaceIndex) to substring(lastWhitespaceIndex + 1)
+        }
     }
 
     fun String.addStrikethorugh(strikethorugh: Boolean = true): String {

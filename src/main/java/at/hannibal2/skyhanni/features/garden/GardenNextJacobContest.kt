@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -30,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -43,8 +43,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JButton
@@ -54,6 +54,7 @@ import javax.swing.UIManager
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -103,9 +104,9 @@ object GardenNextJacobContest {
 
     private var lastWarningTime = SimpleTimeMark.farPast()
     private var loadedContestsYear = -1
-    private var nextContestsAvailableAt = -1L
+    private var nextContestsAvailableAt = SimpleTimeMark.farPast()
 
-    var lastFetchAttempted = 0L
+    var lastFetchAttempted = SimpleTimeMark.farPast()
     var isFetchingContests = false
     var fetchedFromElite = false
     private var isSendingContests = false
@@ -224,12 +225,8 @@ object GardenNextJacobContest {
                 contests.clear()
             }
             // Contests are available now, make sure system knows this
-            if (nextContestsAvailableAt > System.currentTimeMillis()) {
-                nextContestsAvailableAt = System.currentTimeMillis() - 1
-                fetchContestsIfAble()
-            }
-            if (nextContestsAvailableAt == -1L) {
-                nextContestsAvailableAt = System.currentTimeMillis() - 1
+            if (nextContestsAvailableAt.isInFuture() || nextContestsAvailableAt.isFarPast()) {
+                nextContestsAvailableAt = SimpleTimeMark.now() - 1.milliseconds
                 fetchContestsIfAble()
             }
         }
@@ -256,7 +253,7 @@ object GardenNextJacobContest {
 
         // If contests were just fully saved
         if (contests.size == MAX_CONTESTS_PER_YEAR) {
-            nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toMillis()
+            nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
 
             if (isSendEnabled()) {
                 if (!askToSendContests()) {
@@ -332,10 +329,10 @@ object GardenNextJacobContest {
     private fun update() {
         nextContestCrops.clear()
 
-        if (nextContestsAvailableAt == -1L) {
+        if (nextContestsAvailableAt.isFarPast()) {
             val currentDate = SkyBlockTime.now()
             if (currentDate.month <= 1 && currentDate.day <= 1) {
-                nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 1).toMillis()
+                nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 1).toTimeMark()
             }
         }
 
@@ -436,13 +433,13 @@ object GardenNextJacobContest {
         lastWarningTime = SimpleTimeMark.now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         ChatUtils.chat("Next farming contest: $cropText")
-        TitleManager.sendTitle("§eFarming Contest!", duration = 5.seconds)
+        TitleManager.sendTitle("§eFarming Contest!")
         SoundUtils.playBeepSound()
 
         val cropTextNoColor = crops.joinToString(", ") {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
-        if (config.warnPopup && !Display.isActive()) {
+        if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow("<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>")
             }
@@ -520,8 +517,8 @@ object GardenNextJacobContest {
 
     private fun isEnabled() =
         config.display && (
-            (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)) ||
-                (OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock)
+            (SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)) ||
+                (OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock)
             )
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
@@ -534,14 +531,13 @@ object GardenNextJacobContest {
     private fun fetchContestsIfAble() {
         if (isFetchingContests || contests.size == MAX_CONTESTS_PER_YEAR || !isFetchEnabled()) return
         // Allows retries every 10 minutes when it's after 1 day into the new year
-        val currentMills = System.currentTimeMillis()
-        if (lastFetchAttempted + 600_000 > currentMills || currentMills < nextContestsAvailableAt) return
+        if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInPast()) return
 
         isFetchingContests = true
 
         SkyHanniMod.launchIOCoroutine {
             fetchUpcomingContests()
-            lastFetchAttempted = System.currentTimeMillis()
+            lastFetchAttempted = SimpleTimeMark.now()
             isFetchingContests = false
         }
     }
@@ -585,7 +581,7 @@ object GardenNextJacobContest {
 
                 contests = newContests
                 fetchedFromElite = true
-                nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toMillis()
+                nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
                 loadedContestsYear = SkyBlockTime.now().year
 
                 saveConfig()

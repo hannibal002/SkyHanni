@@ -18,10 +18,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,10 +37,11 @@ object CFBlockOpen {
      * REGEX-TEST: /chocolatefactory
      * REGEX-TEST: /chocolatefactory123456789
      * REGEX-TEST: /factory
+     * REGEX-TEST: /CF
      */
     private val commandPattern by RepoPattern.pattern(
         "inventory.chocolatefactory.opencommand",
-        "\\/(?:cf|(?:chocolate)?factory)(?: .*)?",
+        "(?i)\\/(?:cf|(?:chocolate)?factory)(?: .*)?",
     )
 
     /**
@@ -81,7 +82,7 @@ object CFBlockOpen {
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!commandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
-        if (LorenzUtils.isBingoProfile) return
+        if (SkyBlockUtils.isBingoProfile) return
 
         tryBlock().takeIf { it != TryBlockResult.SUCCESS } ?: return
         commandSentTimer = SimpleTimeMark.now()
@@ -130,7 +131,7 @@ object CFBlockOpen {
             val godPotExpiryTime = profileStorage?.godPotExpiry ?: SimpleTimeMark.farPast()
             if (mixinExpiryTime.isInPast()) {
                 ChatUtils.clickToActionOrDisable(
-                    "§cBlocked opening the Chocolate Factory without a §dHot Chocolate Mix §cactive! " +
+                    "§cBlocked opening the Chocolate Factory without a §dHot Chocolate Mixin §cactive! " +
                         "§7You may need to open §c/effects §7to refresh mixin status.",
                     config::hotChocolateMixinRequirement,
                     actionName = "search AH for mixin",

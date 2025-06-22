@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import org.lwjgl.input.Keyboard
@@ -89,5 +89,5 @@ object PowderPerHotmPerk {
         override fun toString() = str
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory && (config.powderSpent || config.powderFor10Levels)
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && HotmData.inInventory && (config.powderSpent || config.powderFor10Levels)
 }

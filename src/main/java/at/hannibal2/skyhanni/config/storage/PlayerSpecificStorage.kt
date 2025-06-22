@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -22,6 +23,9 @@ class PlayerSpecificStorage {
 
     @Expose
     var fameRank: String = "New Player"
+
+    @Expose
+    var currentChat: CurrentChatDisplay.ChatType? = null
 
     @Expose
     var nextCityProjectParticipationTime: SimpleTimeMark = farPast()

@@ -13,14 +13,13 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
@@ -121,13 +120,6 @@ object ComposterDisplay {
             }
         }
 
-        for (type in DataType.entries) {
-            if (!newData.containsKey(type)) {
-                tabListData = emptyMap()
-                return
-            }
-        }
-
         tabListData = newData
     }
 
@@ -141,7 +133,7 @@ object ComposterDisplay {
             if (config.notifyLow.title) {
                 TitleManager.sendTitle("§cYour Organic Matter is low", duration = 4.seconds)
             }
-            ChatUtils.chat("§cYour Organic Matter is low!")
+            ChatUtils.chat("§cYour Organic Matter is low!", replaceSameMessage = true)
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
         }
 
@@ -149,15 +141,15 @@ object ComposterDisplay {
             if (config.notifyLow.title) {
                 TitleManager.sendTitle("§cYour Fuel is low", duration = 4.seconds)
             }
-            ChatUtils.chat("§cYour Fuel is low!")
+            ChatUtils.chat("§cYour Fuel is low!", replaceSameMessage = true)
             storage.informedAboutLowFuel = 5.0.minutes.fromNow()
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
+        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenApi.inGarden() && config.displayEnabled) {
             config.displayPos.renderRenderable(display, posLabel = "Composter Display")
@@ -182,8 +174,8 @@ object ComposterDisplay {
             } else "?"
         } ?: "§cJoin SkyBlock to show composter timer."
 
-        val inSB = LorenzUtils.inSkyBlock && config.displayOutsideGarden
-        val outsideSB = !LorenzUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
+        val inSB = SkyBlockUtils.inSkyBlock && config.displayOutsideGarden
+        val outsideSB = !SkyBlockUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
         if (!GardenApi.inGarden() && (inSB || outsideSB)) {
             val outsideGardenDisplay = Renderable.line {
                 addItemStack(bucket)
@@ -194,19 +186,19 @@ object ComposterDisplay {
     }
 
     private fun warn(warningMessage: String) {
-        if (!config.warnAlmostClose) return
+        if (!config.warnAlmostEmpty) return
         val storage = GardenApi.storage ?: return
 
         if (ReminderUtils.isBusy()) return
 
-        if (storage.lastComposterEmptyWarningTime.passedSince() >= 2.0.minutes) return
+        if (storage.lastComposterEmptyWarningTime.passedSince() < 2.0.minutes) return
         storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
-        if (IslandType.GARDEN.isInIsland()) {
-            ChatUtils.chat(warningMessage)
+        if (IslandType.GARDEN.isCurrent()) {
+            ChatUtils.chat(warningMessage, replaceSameMessage = true)
         } else {
             ChatUtils.clickToActionOrDisable(
                 warningMessage,
-                config::warnAlmostClose,
+                config::warnAlmostEmpty,
                 actionName = "warp to the Garden",
                 action = { HypixelCommands.warp("garden") },
             )
@@ -226,5 +218,7 @@ object ComposterDisplay {
         event.move(3, "garden.composterNotifyLowTitle", "garden.composters.notifyLow.title")
         event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composters.notifyLow.organicMatter")
         event.move(3, "garden.composterNotifyLowFuel", "garden.composters.notifyLow.fuel")
+
+        event.move(85, "garden.composters.warnAlmostClose", "garden.composters.warnAlmostEmpty")
     }
 }

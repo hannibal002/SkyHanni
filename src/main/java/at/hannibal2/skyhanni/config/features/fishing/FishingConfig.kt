@@ -78,7 +78,7 @@ class FishingConfig {
 
     @Expose
     @ConfigLink(owner = FishingConfig::class, field = "sharkFishCounter")
-    var sharkFishCounterPos: Position = Position(10, 10, false, true)
+    var sharkFishCounterPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

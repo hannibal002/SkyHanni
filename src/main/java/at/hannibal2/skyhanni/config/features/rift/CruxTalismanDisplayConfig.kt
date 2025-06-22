@@ -28,5 +28,5 @@ class CruxTalismanDisplayConfig {
 
     @Expose
     @ConfigLink(owner = CruxTalismanDisplayConfig::class, field = "enabled")
-    var position: Position = Position(144, 139, false, true)
+    var position: Position = Position(144, 139)
 }

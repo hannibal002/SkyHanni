@@ -15,11 +15,11 @@ import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
@@ -64,9 +65,8 @@ object FlareDisplay {
         if (!enabled) return
 
         if (config.flashScreen && activeWarning) {
-            val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
+            val alpha = ((2 + sin(SimpleTimeMark.now().toMillis() / 1000.0)) * 255 / 4).toInt().coerceIn(0..255)
             GuiRenderUtils.drawRect(
-                event.context,
                 0,
                 0,
                 GuiScreenUtils.displayWidth,
@@ -193,7 +193,7 @@ object FlareDisplay {
                 }
 
                 FlareConfig.OutlineType.CIRCLE -> {
-                    RenderUtils.drawCircle(entity, event.partialTicks, 40.0, color)
+                    event.drawCircleWireframe(entity, 40.0, color)
                 }
 
                 else -> {}

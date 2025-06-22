@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -23,6 +24,7 @@ class RenderDisplayHelper(
     private val outsideInventory: Boolean = false,
     private val inOwnInventory: Boolean = false,
     private val condition: () -> Boolean,
+    private val onlyOnIsland: IslandType? = null,
     private val onRender: () -> Unit,
 ) {
 
@@ -68,11 +70,13 @@ class RenderDisplayHelper(
     }
 
     private fun checkCondition(): Boolean = try {
-        condition()
+        condition() && checkIslandCondition()
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(e, "Failed to check render display condition")
         false
     }
+
+    private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isCurrent()
 
     private fun render() {
         try {

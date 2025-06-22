@@ -67,10 +67,9 @@ open class SkyHanniTracker<Data : TrackerData>(
     )
 
     fun modify(modifyFunction: (Data) -> Unit) {
-        getSharedTracker()?.let {
-            it.modify(modifyFunction)
-            update()
-        }
+        val sharedTracker = getSharedTracker() ?: return
+        sharedTracker.modify(modifyFunction)
+        update()
     }
 
     fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
@@ -79,17 +78,12 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
-    private fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
-        getSharedTracker()?.let {
-            it.tryModify(mode, modifyFunction)
-            update()
-        }
-    }
-
     fun modifyEachMode(modifyFunction: (Data) -> Unit) {
-        DisplayMode.entries.forEach {
-            tryModify(it, modifyFunction)
+        val sharedTracker = getSharedTracker() ?: return
+        DisplayMode.entries.forEach { mode ->
+            sharedTracker.tryModify(mode, modifyFunction)
         }
+        update()
     }
 
     fun renderDisplay(position: Position) {
@@ -243,7 +237,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            TitleManager.sendTitle("§a+ $itemName", duration = 5.seconds, weight = price)
+            TitleManager.sendTitle("§a+ $itemName", weight = price)
         }
     }
 

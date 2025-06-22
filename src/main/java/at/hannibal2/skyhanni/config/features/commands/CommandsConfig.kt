@@ -50,6 +50,15 @@ class CommandsConfig {
     @FeatureToggle
     var partyKickReason: Boolean = true
 
+    @ConfigOption(
+        name = "Shorten §e/warp",
+        desc = "Allows warping without the need for the §ewarp §7prefix.\n(§e/warp wizard §7-> §e/wizard§7)"
+    )
+    @Expose
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shortenWarp: Boolean = false
+
     @Expose
     @ConfigOption(name = "Replace §e/warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
     @ConfigEditorBoolean

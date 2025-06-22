@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object NoBitsWarning {
@@ -24,12 +23,11 @@ object NoBitsWarning {
 
             ChatUtils.clickableChat(
                 "§bNo Bits Available! §eClick to buy booster cookies on the bazaar.",
-                onClick = {
-                    HypixelCommands.bazaar("booster cookie")
-                }, "§eClick to run /bz booster cookie!"
+                onClick = { HypixelCommands.bazaar("booster cookie") },
+                hover = "§eClick to run /bz booster cookie!",
             )
             // TODO use reminder utils
-            TitleManager.sendTitle("§bNo Bits Available", duration = 5.seconds)
+            TitleManager.sendTitle("§bNo Bits Available")
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
         }
 

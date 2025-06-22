@@ -7,10 +7,8 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -140,15 +138,9 @@ object MythologicalCreatureTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled },
+            condition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
             onRender = {
-                // TODO move this into condition
-                val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
-                if (!DianaApi.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
-                if (spadeInHand) {
-                    tracker.firstUpdate()
-                }
-
+                if (DianaApi.hasSpadeInHand()) tracker.firstUpdate()
                 tracker.renderDisplay(config.position)
             },
         )

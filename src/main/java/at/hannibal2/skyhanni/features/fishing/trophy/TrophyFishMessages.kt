@@ -90,7 +90,11 @@ object TrophyFishMessages {
 
         if (config.tooltip) {
             getTooltip(internalName)?.let {
+                //#if MC < 1.21
                 edited.chatStyle = it
+                //#else
+                //$$ edited.getWithStyle(it)
+                //#endif
             }
         }
 
@@ -103,7 +107,7 @@ object TrophyFishMessages {
 
     private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
         val text = "$displayName $displayRarity §8$amount§c!"
-        TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
+        TitleManager.sendTitle(text)
     }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =

@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -97,7 +97,6 @@ object HoppityCallWarning {
         // Shift the alpha value 24 bits to the left to position it in the color's alpha channel.
         val shiftedRandomAlpha = randomizationAlphaInt shl 24
         GuiRenderUtils.drawRect(
-            event.context,
             0,
             0,
             GuiScreenUtils.displayWidth,
@@ -145,5 +144,5 @@ object HoppityCallWarning {
         nextWarningTime = null
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
@@ -29,14 +30,14 @@ object AnvilApi {
             if (!inventory.isInside()) return@runNextTick
             for (slot in InventoryUtils.getItemsInOpenChestWithNull()) {
                 if (slot.slotNumber == 29) {
-                    val left = slot.stack
+                    val left = slot.stack.orNull()
                     if (this.left?.getInternalName() != left?.getInternalName()) {
                         this.left = left
                         postEvent()
                     }
                 }
                 if (slot.slotNumber == 33) {
-                    val right = slot.stack
+                    val right = slot.stack.orNull()
                     if (this.right?.getInternalName() != right?.getInternalName()) {
                         this.right = right
                         postEvent()

@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -23,7 +23,7 @@ object SkyBlockKickDuration {
 
     private var kickMessage = false
     private var showTime = false
-    private var lastKickTime = SimpleTimeMark.farPast()
+    private var lastKickTime = SimpleTimeMark.farFuture()
     private var hasWarned = false
 
     private val patternGroup = RepoPattern.group("misc.kickduration")
@@ -47,50 +47,46 @@ object SkyBlockKickDuration {
         "§cThere was a problem joining SkyBlock, try again in a moment!",
     )
 
+    private fun kicked() {
+        kickMessage = false
+        showTime = true
+        lastKickTime = SimpleTimeMark.now()
+    }
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || !(lastKickTime.isFarFuture())) return
 
         if (kickPattern.matches(event.message)) {
-            if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
-                kickMessage = false
-                showTime = true
-                lastKickTime = SimpleTimeMark.now()
+            if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
+                kicked()
             } else {
                 kickMessage = true
             }
         }
 
         if (problemJoiningPattern.matches(event.message)) {
-            kickMessage = false
-            showTime = true
-            lastKickTime = SimpleTimeMark.now()
+            kicked()
         }
     }
 
-    @HandleEvent
-    fun onWorldChange() {
-        if (!isEnabled()) return
-        if (kickMessage) {
-            kickMessage = false
-            showTime = true
-            lastKickTime = SimpleTimeMark.now()
-        }
+    private fun notKicked() {
+        showTime = false
+        lastKickTime = SimpleTimeMark.farFuture()
         hasWarned = false
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
         if (!showTime) return
-
-        if (LorenzUtils.inSkyBlock) {
-            showTime = false
+        if (SkyBlockUtils.inSkyBlock) {
+            notKicked()
         }
 
         if (lastKickTime.passedSince() > 5.minutes) {
-            showTime = false
+            notKicked()
         }
 
         if (lastKickTime.passedSince() > config.warnTime.get().seconds) {
@@ -102,7 +98,7 @@ object SkyBlockKickDuration {
 
         val format = lastKickTime.passedSince().format()
         config.position.renderString(
-            "§cLast kicked from SkyBlock §b$format ago",
+            "§cKicked from SkyBlock §b$format ago",
             posLabel = "SkyBlock Kick Duration",
         )
     }

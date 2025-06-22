@@ -26,12 +26,13 @@ import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -94,16 +95,16 @@ object CustomWardrobe {
                 .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
-        event.context.matrices.pushMatrix()
-        event.context.matrices.translate(0f, 0f, 100f)
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(0f, 0f, 100f)
 
         position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
-            event.context.matrices.translate(0f, 0f, 400f)
+            DrawContextUtils.translate(0f, 0f, 400f)
             EstimatedItemValue.tryRendering()
         }
-        event.context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         event.cancel()
     }
 
@@ -276,10 +277,16 @@ object CustomWardrobe {
         val fakePlayer = FakePlayer()
         var scale = playerWidth
 
-        //#if MC < 1.12
+        //#if MC < 1.16
         fakePlayer.inventory.armorInventory = slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
         //#else
-        //$$ fakePlayer.inventory.armorInventory.addAll(slot.armor.map { it?.copy()?.removeEnchants() }.reversed())
+        //$$ for (equipment in net.minecraft.entity.player.PlayerInventory.EQUIPMENT_SLOTS.values) {
+        //$$     val armorOrdinal = equipment.ordinal - 2
+        //$$     if (armorOrdinal < 0 || armorOrdinal > 3) continue
+        //$$     var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
+        //$$     if (stack == null) stack = ItemStack.EMPTY
+        //$$     fakePlayer.inventory.equipment.put(equipment, stack)
+        //$$ }
         //#endif
 
         val playerColor = if (!slot.isInCurrentPage()) {
@@ -638,7 +645,7 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
 
     fun centerString(
         text: String,

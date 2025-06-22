@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.inventory.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -37,15 +36,15 @@ object VisitorRewardWarning {
         val blockReason = visitor.blockReason ?: return
 
         if (blockReason.blockRefusing) {
-            renderColor(event.context, refuseOfferSlot, acceptOfferSlot, LorenzColor.GREEN)
+            renderColor(refuseOfferSlot, acceptOfferSlot, LorenzColor.GREEN)
         } else {
-            renderColor(event.context, acceptOfferSlot, refuseOfferSlot, LorenzColor.RED)
+            renderColor(acceptOfferSlot, refuseOfferSlot, LorenzColor.RED)
         }
     }
 
-    private fun renderColor(context: DrawContext, backgroundSlot: Slot?, outlineSlot: Slot?, outlineColor: LorenzColor) {
+    private fun renderColor(backgroundSlot: Slot?, outlineSlot: Slot?, outlineColor: LorenzColor) {
         if (!config.bypassKey.isKeyHeld() && backgroundSlot != null) {
-            backgroundSlot.highlight(context, LorenzColor.DARK_GRAY.addOpacity(config.opacity))
+            backgroundSlot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
         }
         if (config.optionOutline && outlineSlot != null) {
             outlineSlot.drawBorder(outlineColor.addOpacity(200))

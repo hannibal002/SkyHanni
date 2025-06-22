@@ -3,20 +3,22 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -27,6 +29,8 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
+
+    private var inArea = false
 
     //  Repo group and patterns
     private val patternGroup = RepoPattern.group("dungeon.finder")
@@ -379,7 +383,7 @@ object DungeonFinderFeatures {
         if (!inInventory) return
 
         event.container.inventorySlots.associateWith { highlightParty[it.slotNumber] }.forEach { (slot, color) ->
-            color?.let { slot.highlight(event.context, it) }
+            color?.let { slot.highlight(it) }
         }
     }
 
@@ -396,5 +400,10 @@ object DungeonFinderFeatures {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockArea == "Dungeon Hub"
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inArea = IslandType.DUNGEON_HUB.isCurrent() && event.area == "no_area"
+    }
+
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && inArea
 }

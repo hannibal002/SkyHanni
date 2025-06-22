@@ -37,5 +37,5 @@ class MayorOverlayConfig {
 
     @Expose
     @ConfigLink(owner = MayorOverlayConfig::class, field = "enabled")
-    var position: Position = Position(10, 10, false, true)
+    var position: Position = Position(10, 10)
 }

@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.IslandType
@@ -15,6 +17,7 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Comp
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -24,12 +27,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.annotations.Expose
-import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -226,22 +229,28 @@ object MineshaftPityDisplay {
             MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
-        display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
+        display = listOf(
+            Renderable.verticalContainer(
+                config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
+                spacing = 2,
+            ),
+        )
     }
 
     init {
         RenderDisplayHelper(
-            condition = { isDisplayEnabled() },
+            condition = {
+                return@RenderDisplayHelper if (display.isEmpty()) {
+                    update()
+                    false
+                } else isDisplayEnabled()
+            },
             outsideInventory = true,
         ) {
-            // TODO dont do this logic in render, do this in tick
-            display.ifEmpty { update() }
-            if (display.isNotEmpty()) {
-                config.position.renderRenderables(
-                    listOf(Renderable.verticalContainer(display, 2)),
-                    posLabel = "Mineshaft Pity Display",
-                )
-            }
+            config.position.renderRenderables(
+                display,
+                posLabel = "Mineshaft Pity Display",
+            )
         }
     }
 
@@ -251,13 +260,21 @@ object MineshaftPityDisplay {
         update()
     }
 
-    fun fullResetCounter() {
-        resetCounter()
-        mineshaftTotalBlocks = 0
-        mineshaftTotalCount = 0
-        sessionMineshafts = 0
-        lastMineshaftSpawn = SimpleTimeMark.farPast()
-        update()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetmineshaftpitystats") {
+            description = "Resets the mineshaft pity display stats"
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                ChatUtils.chat("Reset the mineshaft pity display stats!")
+                resetCounter()
+                mineshaftTotalBlocks = 0
+                mineshaftTotalCount = 0
+                sessionMineshafts = 0
+                lastMineshaftSpawn = SimpleTimeMark.farPast()
+                update()
+            }
+        }
     }
 
     @HandleEvent
@@ -299,14 +316,14 @@ object MineshaftPityDisplay {
             "Mithril",
             listOf(OreType.MITHRIL),
             2,
-            ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata),
+            ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
         ),
 
         GEMSTONE(
             "Gemstone",
             OreType.entries.filter { it.isGemstone() },
             4,
-            ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata),
+            ColoredBlockCompat.BLUE.createGlassStack(),
         ),
         GLACITE(
             "Glacite",
@@ -331,7 +348,7 @@ object MineshaftPityDisplay {
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata),
+            BlockCompat.createSmoothDiorite(),
         ),
         ;
 

@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class BroodmotherConfig {
     @Expose
@@ -71,5 +70,5 @@ class BroodmotherConfig {
 
     @Expose
     @ConfigLink(owner = BroodmotherConfig::class, field = "countdown")
-    var countdownPosition: Position = Position(10, 10, false, true)
+    var countdownPosition: Position = Position(10, 10)
 }

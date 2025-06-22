@@ -9,16 +9,18 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFungiCutterMode
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object WrongFungiCutterWarning {
 
     private var mode = FungiMode.UNKNOWN
-    private var lastPlaySoundTime = 0L
+    private var lastPlaySoundTime = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -49,8 +51,8 @@ object WrongFungiCutterWarning {
         if (!GardenApi.config.fungiCutterWarn) return
 
         TitleManager.sendTitle("§cWrong Fungi Cutter Mode!", duration = 2.seconds)
-        if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
-            lastPlaySoundTime = System.currentTimeMillis()
+        if (lastPlaySoundTime.passedSince() > 300.milliseconds) {
+            lastPlaySoundTime = SimpleTimeMark.now()
             SoundUtils.playBeepSound()
         }
     }

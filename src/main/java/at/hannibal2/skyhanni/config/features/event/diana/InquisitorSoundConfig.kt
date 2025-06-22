@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
-import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
+import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -16,8 +16,8 @@ class InquisitorSoundConfig {
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the sound.")
-    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
-    var pitch: Float = 1.0f
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2f, minStep = 0.1f)
+    var pitch: Float = 1f
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
@@ -25,9 +25,5 @@ class InquisitorSoundConfig {
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
-    @Suppress("MaxLineLength")
-    var listOfSounds: Runnable =
-        Runnable {
-            openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments")
-        }
+    var listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 }

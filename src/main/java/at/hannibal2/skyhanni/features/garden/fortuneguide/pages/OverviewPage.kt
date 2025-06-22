@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 

@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import kotlin.math.pow
 
 private fun calculateCoreOfTheMountainLoot(level: Int): Map<HotmReward, Double> = buildMap {
@@ -398,6 +399,9 @@ enum class HotmData(
     var slot: Slot? = null
         private set
 
+    var item: ItemStack? = null
+        private set
+
     fun getLevelUpCost() = costFun(rawLevel)
 
     fun getReward() = if (enabled) rewardFun(activeLevel) else emptyMap()
@@ -576,6 +580,7 @@ enum class HotmData(
 
             val entry = entries.firstOrNull { it.guiNamePattern.matches(item.displayName) } ?: return
             entry.slot = this
+            entry.item = item
 
             val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
 
@@ -699,7 +704,10 @@ enum class HotmData(
         fun onInventoryClose(event: InventoryCloseEvent) {
             if (!inInventory) return
             inInventory = false
-            entries.forEach { it.slot = null }
+            entries.forEach {
+                it.slot = null
+                it.item = null
+            }
             heartItem = null
         }
 

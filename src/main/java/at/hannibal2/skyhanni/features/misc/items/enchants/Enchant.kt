@@ -19,6 +19,8 @@ import net.minecraft.item.ItemStack
 import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
+
+    // TODO move this away. split json data from logic
     @Expose
     var nbtName = ""
 
@@ -53,7 +55,11 @@ open class Enchant : Comparable<Enchant> {
 
         // TODO when chroma is disabled maybe use the neu chroma style instead of gold
         if (color.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
-        return color.get().getChatColor()
+
+        val chatColor = color.get().getChatColor()
+        return if ((level >= maxLevel || color == config.perfectEnchantColor) && config.boldPerfectEnchant.get()) {
+            "$chatColor§l"
+        } else chatColor
     }
 
     /**

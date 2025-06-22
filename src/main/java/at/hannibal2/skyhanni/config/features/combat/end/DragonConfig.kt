@@ -15,7 +15,7 @@ class DragonConfig {
     var dragonProfitTracker: DragonProfitTrackerConfig = DragonProfitTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Superior Notification", desc = "Notifies you with an Title that an superior dragon spawned.")
+    @ConfigOption(name = "Superior Notification", desc = "Show a title when a Superior Dragon spawns.")
     @ConfigEditorBoolean
     @FeatureToggle
     var superiorNotify: Boolean = true

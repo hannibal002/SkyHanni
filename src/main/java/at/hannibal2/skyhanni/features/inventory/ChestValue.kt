@@ -19,13 +19,16 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -50,8 +53,8 @@ object ChestValue {
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onBackgroundDraw() {
         if (!isEnabled()) return
         if (DungeonApi.inDungeon() && !config.enableInDungeons) return
         if (!inOwnInventory) {
@@ -69,7 +72,7 @@ object ChestValue {
         }
     }
 
-    fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
+    private fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -81,16 +84,16 @@ object ChestValue {
         update()
     }
 
-    @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    @HandleEvent(InventoryOpenEvent::class)
+    fun onInventoryOpen() {
         if (!isEnabled()) return
         if (inInventory) {
             update()
         }
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         chestItems = emptyMap()
     }
 
@@ -103,28 +106,28 @@ object ChestValue {
 
         if (chestItems.isEmpty()) return@buildList
 
-        addList()
+        val values = chestItems.values
+        addToList(values, featureName())
         addButton()
     }
 
-    private fun MutableList<Renderable>.addList() {
-        val sortedList = sortedList()
+    fun MutableList<Renderable>.addToList(values: Collection<ChestItem>, featureName: String) {
+        val sortedList = sortedList(values)
         var totalPrice = 0.0
         var rendered = 0
-
         val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
-        addString("§7${featureName()}: §o(Showing $amountShowing of ${sortedList.size} items)")
-
+        addString("§7$featureName: §o(Showing $amountShowing of ${sortedList.size} items)")
         for ((index, amount, stack, total, tips) in sortedList) {
             totalPrice += total
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-            val name = "${stack.repoItemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val displayName = stack.repoItemNameCompact
+            val name = "${displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay) "$name $price"
-            else "${stack.repoItemName} §7x$amount: §6${total.formatPrice()}"
+            else "$displayName §7x$amount: §6${total.formatPrice()}"
 
             addLine {
                 val renderable = Renderable.hoverTips(
@@ -142,10 +145,10 @@ object ChestValue {
         addString("§aTotal value: §6${totalPrice.formatPrice()} coins")
     }
 
-    private fun sortedList() = when (config.sortingType) {
-        SortingTypeEntry.DESCENDING -> chestItems.values.sortedByDescending { it.total }
-        SortingTypeEntry.ASCENDING -> chestItems.values.sortedBy { it.total }
-        else -> chestItems.values.sortedByDescending { it.total }
+    private fun sortedList(values: Collection<ChestItem>): List<ChestItem> = when (config.sortingType) {
+        SortingTypeEntry.DESCENDING -> values.sortedByDescending { it.total }
+        SortingTypeEntry.ASCENDING -> values.sortedBy { it.total }
+        else -> values.sortedByDescending { it.total }
     }
 
     private fun MutableList<Renderable>.addButton() {
@@ -196,25 +199,32 @@ object ChestValue {
                 put(it.slotIndex, it.stack)
             }
         }
-        val items = mutableMapOf<String, ChestItem>()
+        chestItems = createItems(stacks)
+    }
+
+    fun createItems(stacks: Map<Int, ItemStack>) = buildMap<String, ChestItem> {
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
             val list = mutableListOf<String>()
-            var total = EstimatedItemValueCalculator.calculate(stack, list).first
+            var total = if (internalName == NeuInternalName.SKYBLOCK_COIN) {
+                "§8(?<value>.*)".toPattern().matchMatcher(stack.getLore().last()) {
+                    group("value").formatDouble()
+                } ?: error("Could not read coin value from trade item")
+            } else EstimatedItemValueCalculator.calculate(stack, list).first
+
             val key = "$internalName+$total"
             if (stack.item == Items.enchanted_book)
                 total /= 2
             list.add("§aTotal: §6§l${total.formatPrice()} coins")
             if (total == 0.0) continue
-            val item = items.getOrPut(key) {
+            val item = getOrPut(key) {
                 ChestItem(mutableListOf(), 0, stack, 0.0, list)
             }
             item.index.add(i)
             item.amount += stack.stackSize
             item.total += total * stack.stackSize
         }
-        chestItems = items
     }
 
     private fun Double.formatPrice(): String {
@@ -227,6 +237,7 @@ object ChestValue {
         }
     }
 
+    @Suppress("ReturnCount")
     private fun isValidStorage(): Boolean {
         if (inOwnInventory) return true
         val name = InventoryUtils.openInventoryName().removeColor()
@@ -242,14 +253,14 @@ object ChestValue {
             return true
         }
 
-        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
+        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isCurrent()
         // TODO: Use repo for this
         return InventoryUtils.isInNormalChest() || inMinion || name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
         val mc = Minecraft.getMinecraft()
-        val spaceWidth = mc.fontRendererObj.getCharWidth(char)
+        val spaceWidth = mc.fontRendererObj.getStringWidth(char.toString())
 
         var currentString = this
         var currentLength = mc.fontRendererObj.getStringWidth(currentString)
@@ -270,7 +281,7 @@ object ChestValue {
         return currentString
     }
 
-    private data class ChestItem(
+    data class ChestItem(
         val index: MutableList<Int>,
         var amount: Int,
         val stack: ItemStack,
@@ -278,7 +289,7 @@ object ChestValue {
         val tips: MutableList<String>,
     )
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

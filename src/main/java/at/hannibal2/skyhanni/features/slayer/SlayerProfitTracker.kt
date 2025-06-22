@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -19,7 +18,6 @@ import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -27,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -42,7 +41,7 @@ import com.google.gson.annotations.Expose
 @SkyHanniModule
 object SlayerProfitTracker {
 
-    private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
+    private val config get() = SlayerApi.config.itemProfitTracker
 
     private var category = ""
     private val categoryName get() = ReplaceRomanNumerals.replaceLine(category)
@@ -263,7 +262,7 @@ object SlayerProfitTracker {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     fun resetCommand() {
         if (category == "") {

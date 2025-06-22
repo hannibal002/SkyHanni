@@ -45,8 +45,8 @@ class SecretChimeConfig {
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the secret chime sound.")
-    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
-    var soundPitch: Float = 1.0f
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2f, minStep = 0.1f)
+    var soundPitch: Float = 1f
 
     @ConfigOption(
         name = "Sounds",

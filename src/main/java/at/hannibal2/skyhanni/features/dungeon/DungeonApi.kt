@@ -21,12 +21,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -38,9 +38,11 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object DungeonApi {
 
+    // TODO repo patterns
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
     private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
 
@@ -112,6 +114,18 @@ object DungeonApi {
         "§r§r§7No Buffs active\\. Find them by exploring the Dungeon!§r",
     )
 
+    /**
+     * REGEX-TEST: §8[§r§9319§r§8] §r§bEmpa_ §r§7α §r§f(§r§dMage XXXIV§r§f)
+     * REGEX-TEST: §8[§r§5393§r§8] §r§c[§r§fYOUTUBE§r§c] Remittal§r§f §r§7Σ§r§7♲ §r§f(§r§dMage XL§r§f)
+     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dMage XXXVI§r§f)
+     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dDEAD§r§f)
+     */
+    @Suppress("MaxLineLength")
+    val playerDungeonTeamPattern by patternGroup.pattern(
+        "tablist.playerteam",
+        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) §r§f\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$",
+    )
+
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
         POWER(0),
@@ -128,7 +142,7 @@ object DungeonApi {
         }
     }
 
-    fun inDungeon(): Boolean = IslandType.CATACOMBS.isInIsland()
+    fun inDungeon(): Boolean = IslandType.CATACOMBS.isCurrent()
 
     fun isOneOf(vararg floors: String): Boolean = dungeonFloor?.equalsOneOf(*floors) == true
 
@@ -207,7 +221,7 @@ object DungeonApi {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
-        val playerTeam = event.tabList.find { it.contains(LorenzUtils.getPlayerName()) }?.removeColor() ?: return
+        val playerTeam = event.tabList.find { it.contains(PlayerUtils.getName()) }?.removeColor() ?: return
         for (dungeonClass in DungeonClass.entries) {
             if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
@@ -235,6 +249,7 @@ object DungeonApi {
                 }
             }
         }
+
     }
 
     @HandleEvent
@@ -246,6 +261,7 @@ object DungeonApi {
         playerClass = null
         playerClassLevel = -1
         completed = false
+        playerTeamClasses.clear()
         time = ""
         roomId = null
         DungeonBlessings.reset()
@@ -371,6 +387,13 @@ object DungeonApi {
         HEALER("Healer"),
         MAGE("Mage"),
         TANK("Tank"),
+        ;
+
+        companion object {
+            fun getByClassName(className: String): DungeonClass? {
+                return DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
+            }
+        }
     }
 
     enum class DungeonChest(val inventory: String) {
@@ -408,5 +431,49 @@ object DungeonApi {
             else -> return
         }
         DungeonBlockClickEvent(position, blockType).post()
+    }
+
+    data class TeamMember(
+        val username: String,
+        val dungeonClass: DungeonClass? = null,
+        val classLevel: Int = 0,
+        val playerDead: Boolean = false,
+    )
+
+    private val playerTeamClasses: MutableList<TeamMember> = mutableListOf()
+
+    fun getPlayerInfo(username: String): TeamMember =
+        playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
+
+    @HandleEvent
+    fun onTabUpdate(event: TabListUpdateEvent) {
+        if (!inDungeon() || !started || completed) return
+
+        val updatedTeamMembers = mutableListOf<TeamMember>()
+
+        playerDungeonTeamPattern.matchAll(event.tabList) {
+            val username = group("playerName").removeColor()
+            val dungeonClassName = group("className")
+            val classLevel = group("classLevel")
+            val playerDead = group("playerDead") == "DEAD"
+            val oldPlayerData = getPlayerInfo(username)
+            val dungeonClass = if (playerDead) oldPlayerData.dungeonClass
+            else DungeonClass.getByClassName(dungeonClassName) ?: oldPlayerData.dungeonClass
+            val dungeonClassLevel = if (playerDead) oldPlayerData.classLevel else classLevel.romanToDecimalIfNecessary()
+
+            updatedTeamMembers.add(
+                TeamMember(
+                    username = username,
+                    dungeonClass = dungeonClass,
+                    classLevel = dungeonClassLevel,
+                    playerDead = playerDead,
+                ),
+            )
+        }
+
+        playerTeamClasses.apply {
+            clear()
+            addAll(updatedTeamMembers)
+        }
     }
 }

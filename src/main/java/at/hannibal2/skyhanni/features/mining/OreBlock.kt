@@ -44,7 +44,7 @@ enum class OreBlock(
 ) {
     // MITHRIL
     LOW_TIER_MITHRIL(::isLowTierMithril, { inDwarvenMines || inGlacite }, OreCategory.DWARVEN_METAL),
-    MID_TIER_MITHRIL(Blocks.prismarine, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
+    MID_TIER_MITHRIL(::isMidTierMithril, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
     HIGH_TIER_MITHRIL(::isHighTierMithril, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
 
     // TITANIUM
@@ -97,6 +97,7 @@ enum class OreBlock(
     PURE_REDSTONE(Blocks.redstone_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
     PURE_EMERALD(Blocks.emerald_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
     PURE_DIAMOND(Blocks.diamond_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
+    PURE_QUARTZ(Blocks.quartz_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
 
     // GEMSTONES
     RUBY(EnumDyeColor.RED, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
@@ -136,6 +137,12 @@ enum class OreBlock(
         else -> round((strength * 30.0) / speed).toInt()
     }
 
+    /**
+     * Assume below softcap
+     */
+    fun speedNeededForNextTick(currentSpeed: Double): Double =
+        (strength * 30) / (miningTicks(currentSpeed) - 0.5) - currentSpeed
+
     constructor(block: Block, checkArea: () -> Boolean, category: OreCategory, hasInitSound: Boolean = true) :
         this({ it.block == block }, checkArea, category, hasInitSound)
 
@@ -158,6 +165,14 @@ private fun isLowTierMithril(state: IBlockState): Boolean = when (state.block) {
     //$$ Blocks.CYAN_TERRACOTTA -> true
     //#endif
     else -> false
+}
+
+private fun isMidTierMithril(state: IBlockState): Boolean {
+    //#if MC < 1.16
+    return state.block == Blocks.prismarine
+    //#else
+    //$$ return state.block == Blocks.PRISMARINE || state.block == Blocks.PRISMARINE_BRICKS || state.block == Blocks.DARK_PRISMARINE
+    //#endif
 }
 
 private fun isHighTierMithril(state: IBlockState): Boolean {
@@ -265,7 +280,7 @@ private fun isHighTierUmber(state: IBlockState): Boolean =
     //#if MC < 1.16
     (state.block == Blocks.double_stone_slab2 && state.getValue(BlockStoneSlabNew.VARIANT) == BlockStoneSlabNew.EnumType.RED_SANDSTONE)
 //#else
-//$$ state.block == Blocks.RED_SANDSTONE_SLAB
+//$$ state.block == Blocks.SMOOTH_RED_SANDSTONE
 //#endif
 
 private fun isLowTierTungstenTunnels(state: IBlockState): Boolean =

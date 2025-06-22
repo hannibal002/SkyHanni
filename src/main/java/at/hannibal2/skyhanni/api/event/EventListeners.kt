@@ -2,11 +2,10 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ReflectionUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.util.function.Consumer
 
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
@@ -25,12 +24,15 @@ class EventListeners private constructor(val name: String, private val isGeneric
     }
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
+        require(Modifier.isPublic(method.modifiers)) {
+            "Method ${method.name}() in ${instance.javaClass.name} is not public. Make sure to set it to public."
+        }
         val name = buildListenerName(method)
         val eventConsumer = when (method.parameterCount) {
-            0 -> createZeroParameterConsumer(method, instance, options)
+            0 -> createZeroParameterConsumer(method, instance)
             1 -> createSingleParameterConsumer(method, instance)
             else -> throw IllegalArgumentException(
-                "Method ${method.name} must have either 0 or 1 parameters."
+                "Method ${method.name} must have either 0 or 1 parameters.",
             )
         }
         val generic = if (isGeneric) resolveGenericType(method) else null
@@ -44,50 +46,30 @@ class EventListeners private constructor(val name: String, private val isGeneric
             prefix = "(",
             postfix = ")",
             separator = ", ",
-            transform = Class<*>::getTypeName
+            transform = Class<*>::getTypeName,
         ).toString()
 
         return "${method.declaringClass.name}.${method.name}$paramTypesString"
     }
 
-    private fun createZeroParameterConsumer(method: Method, instance: Any, options: HandleEvent): (Any) -> Unit {
-        if (options.eventTypes.isNotEmpty()) {
-            options.eventTypes.onEach { kClass ->
-                require(SkyHanniEvent::class.java.isAssignableFrom(kClass.java)) {
-                    "Each event in eventTypes in @HandleEvent must extend SkyHanniEvent. Provided: $kClass"
-                }
-            }
-        } else if (options.eventType == SkyHanniEvent::class) {
-            require(SkyHanniEvents.eventPrimaryFunctionNames.containsKey(method.name)) {
-                "Method ${method.name} has no parameters and no eventType was provided, " +
-                    "and no matching primary function name was found in eventPrimaryFunctionNames.\n" +
-                    "eventPrimaryFunctionNames: ${SkyHanniEvents.eventPrimaryFunctionNames}" +
-                    "\nMethod: ${method.name} in ${method.declaringClass.name}"
-            }
-        } else {
-            require(SkyHanniEvent::class.java.isAssignableFrom(options.eventType.java)) {
-                "eventType in @HandleEvent must extend SkyHanniEvent. Provided: ${options.eventType.java}"
-            }
-        }
-
-        return { _: Any -> method.invoke(instance) }
+    private fun createZeroParameterConsumer(method: Method, instance: Any): (Any) -> Unit {
+        val runnable = ReflectionUtils.createRunnableFromMethod(instance, method)
+        return { _: Any -> runnable.run() }
     }
 
     private fun createSingleParameterConsumer(method: Method, instance: Any): (Any) -> Unit {
-        require(SkyHanniEvent::class.java.isAssignableFrom(method.parameterTypes[0])) {
-            "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
-        }
-        return { event -> method.invoke(instance, event) }
+        val consumer = ReflectionUtils.createConsumerFromMethod(instance, method)
+        return { event -> consumer.accept(event) }
     }
 
     private fun resolveGenericType(method: Method): Class<*> =
         method.genericParameterTypes.getOrNull(0)?.let { genericType ->
             ReflectionUtils.resolveUpperBoundSuperClassGenericParameter(
                 genericType,
-                GenericSkyHanniEvent::class.java.typeParameters[0]
+                GenericSkyHanniEvent::class.java.typeParameters[0],
             ) ?: error(
                 "Generic event handler type parameter is not present in " +
-                    "event class hierarchy for type $genericType"
+                    "event class hierarchy for type $genericType",
             )
         } ?: error("Method ${method.name} does not have a generic parameter type.")
 
@@ -121,16 +103,16 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         init {
             cachedPredicates = buildList {
-                if (options.onlyOnSkyblock) add { _ -> LorenzUtils.inSkyBlock }
+                if (options.onlyOnSkyblock) add { _ -> SkyBlockUtils.inSkyBlock }
 
                 if (options.onlyOnIsland != IslandType.ANY) {
                     val island = options.onlyOnIsland
-                    add { _ -> island.isInIsland() }
+                    add { _ -> island.isCurrent() }
                 }
 
                 if (options.onlyOnIslands.isNotEmpty()) {
                     val set = options.onlyOnIslands.toSet()
-                    add { _ -> inAnyIsland(set) }
+                    add { _ -> SkyBlockUtils.inAnyIsland(set) }
                 }
             }
             // These predicates cant be cached since they depend on info about the actual event

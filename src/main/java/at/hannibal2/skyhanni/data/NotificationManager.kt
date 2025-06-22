@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
@@ -45,18 +45,18 @@ object NotificationManager {
         val midX = GuiScreenUtils.scaledWindowWidth / 2
         val topY = (GuiScreenUtils.scaledWindowHeight * 0.75 - notification.height / 2).toInt()
 
-        RenderUtils.drawFloatingRectDark(midX - notification.width / 2, topY, notification.width, notification.height)
+        GuiRenderUtils.drawFloatingRectDark(midX - notification.width / 2, topY, notification.width, notification.height)
         val closeTextWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(CLOSE_TEXT)
 
-        GuiRenderUtils.drawString(event.context, CLOSE_TEXT, midX + notification.width / 2 - 3 - closeTextWidth, topY + 4)
+        GuiRenderUtils.drawString(CLOSE_TEXT, midX + notification.width / 2 - 3 - closeTextWidth, topY + 4)
 
         if (notification.length.isFinite()) {
             val remainingTime = "§8" + notification.endTime.timeUntil().format()
-            GuiRenderUtils.drawString(event.context, remainingTime, midX - notification.width / 2 + 4, topY + 4)
+            GuiRenderUtils.drawString(remainingTime, midX - notification.width / 2 + 4, topY + 4)
         }
 
         notification.message.forEachIndexed { index, line ->
-            GuiRenderUtils.drawStringCentered(event.context, "§7$line", midX, topY + 19 + index * 10)
+            GuiRenderUtils.drawStringCentered("§7$line", midX, topY + 19 + index * 10)
         }
     }
 
@@ -77,12 +77,14 @@ object NotificationManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestnotification") {
+        event.registerBrigadier("shtestnotification") {
             description = "Shows a test notification"
             category = CommandCategory.DEVELOPER_TEST
-            callback {
-                val testingText = it.joinToString(" ").replace("\\n", "\n")
-                queueNotification(SkyHanniNotification(testingText, Duration.INFINITE))
+            arg("notification", BrigadierArguments.greedyString()) {
+                callback {
+                    val testingText = getArg(it).replace("\\n", "\n")
+                    queueNotification(SkyHanniNotification(testingText, Duration.INFINITE))
+                }
             }
         }
     }

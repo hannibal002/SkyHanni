@@ -18,6 +18,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
 class GuiConfig {
@@ -142,7 +143,7 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "realTime")
-    var realTimePosition: Position = Position(10, 10, false, true)
+    var realTimePosition: Position = Position(10, 10)
 
     @Expose
     @Category(name = "Cosmetic", desc = "Cosmetics Settings")
@@ -156,11 +157,19 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "tpsDisplay")
-    var tpsDisplayPosition: Position = Position(10, 10, false, true)
+    var tpsDisplayPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     @FeatureToggle
     var configButtonOnPause: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Widen Config", desc = "Make SkyHanni's config window wider. (~1.5x)")
+    @ConfigEditorBoolean
+    val widenConfig: Property<Boolean> = Property.of(false)
+
+    @Expose
+    var titlePosition: Position = Position(0, 160)
 }
