@@ -25,6 +25,8 @@
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
+    <ID>EmptyClassBlock:ModernPatterns.kt$ModernPatterns${ }</ID>
+    <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
     <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
@@ -56,6 +58,7 @@
     <ID>MemberNameEqualsClassName:PestSpawn.kt$PestSpawn$private fun pestSpawn(amount: Int, plotNames: List&lt;String&gt;, unknownAmount: Boolean)</ID>
     <ID>MemberNameEqualsClassName:Shimmy.kt$Shimmy.Companion$private fun shimmy(source: Any?, fieldName: String): Any?</ID>
     <ID>MemberNameEqualsClassName:TestBingo.kt$TestBingo$var testBingo = false</ID>
+    <ID>NoEmptyClassBody:ModernPatterns.kt$ModernPatterns${ }</ID>
     <ID>NoNameShadowing:ContributorManager.kt$ContributorManager${ it.isAllowed() }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
@@ -188,7 +191,7 @@
     <ID>RepoPatternRegexTestMissing:SprayFeatures.kt$SprayFeatures$by RepoPattern.pattern( "garden.spray.material", "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?&lt;spray&gt;.*)§r§7!", )</ID>
     <ID>RepoPatternRegexTestMissing:TabListReader.kt$TabListReader$by patternGroup.pattern( "upgrades", "(?&lt;firstPart&gt;§e[A-Za-z ]+)(?&lt;secondPart&gt; §f[\\w ]+)" )</ID>
     <ID>RepoPatternRegexTestMissing:TabListReader.kt$TabListReader$by patternGroup.pattern( "winterpowerups", "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*" )</ID>
-    <ID>RepoPatternRegexTestMissing:TabListRenderer.kt$TabListRenderer$by RepoPattern.pattern( "tablist.firesaletitle", "§.§lFire Sales: §r§f\\([0-9]+\\)" )</ID>
+    <ID>RepoPatternRegexTestMissing:TabListRenderer.kt$TabListRenderer$by RepoPattern.pattern( "tablist.firesaletitle", "§.§lFire Sales: §r§f\\([0-9]+\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:TeleportPadInventoryNumber.kt$TeleportPadInventoryNumber$by RepoPattern.pattern( "misc.teleportpad.number", "§.(?&lt;number&gt;.*) teleport pad" )</ID>
     <ID>RepoPatternRegexTestMissing:TerracottaPhase.kt$TerracottaPhase$by patternGroup.pattern( "start", "§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!", )</ID>
     <ID>RepoPatternRegexTestMissing:TestCopyBestiaryValues.kt$TestCopyBestiaryValues$by RepoPattern.pattern( "test.bestiary.type", "\\[Lv(?&lt;lvl&gt;.*)] (?&lt;text&gt;.*)" )</ID>
@@ -249,6 +252,7 @@
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
+    <ID>TooManyFunctions:OreBlock.kt$at.hannibal2.skyhanni.features.mining.OreBlock.kt</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
     <ID>TooManyFunctions:TextCompat.kt$at.hannibal2.skyhanni.utils.compat.TextCompat.kt</ID>
     <ID>TooManyFunctions:WorldRenderUtils.kt$WorldRenderUtils</ID>
@@ -328,6 +332,8 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt$WorldRenderUtils$it.name!!</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
+    <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var x = globalMouseX * scaledWindowWidth / displayWidth</ID>
+    <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var y = globalMouseY * height / displayHeight</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>

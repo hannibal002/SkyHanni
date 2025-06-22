@@ -230,7 +230,11 @@ enum class ColoredBlockCompat(
         val newState = state ?: Blocks.stained_glass.defaultState
         return newState.withProperty(BlockCarpet.COLOR, getDyeColor())
         //#else
-        //$$ return this.glassBlock.defaultState
+        //$$ if (state == null) return this.glassBlock.defaultState
+        //$$ if (state.isStainedGlassPane()) {
+        //$$     return this.glassPaneBlock.getStateWithProperties(state)
+        //$$ }
+        //$$ return this.glassBlock.getStateWithProperties(state)
         //#endif
     }
 
@@ -321,7 +325,7 @@ enum class ColoredBlockCompat(
             meta ?: return true
             return getValue(BlockStainedGlass.COLOR).metadata == meta
             //#else
-            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this == it.glassBlock }
+            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this.block == it.glassBlock }
             //#endif
         }
 
@@ -334,7 +338,7 @@ enum class ColoredBlockCompat(
             meta ?: return true
             return getValue(BlockStainedGlass.COLOR).metadata == meta
             //#else
-            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this == it.glassPaneBlock }
+            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this.block == it.glassPaneBlock }
             //#endif
         }
 
@@ -347,7 +351,7 @@ enum class ColoredBlockCompat(
             meta ?: return true
             return getValue(BlockStainedGlass.COLOR).metadata == meta
             //#else
-            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this == it.woolBlock }
+            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this.block == it.woolBlock }
             //#endif
         }
 
@@ -360,7 +364,7 @@ enum class ColoredBlockCompat(
             meta ?: return true
             return getValue(BlockStainedGlass.COLOR).metadata == meta
             //#else
-            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this == it.clayBlock }
+            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this.block == it.clayBlock }
             //#endif
         }
 

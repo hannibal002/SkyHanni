@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 //#endif
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
@@ -35,6 +34,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.guide.GuideGui
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
@@ -60,6 +60,10 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
+//$$ import net.minecraft.client.render.RenderLayer
+//#endif
 
 // todo 1.21 impl needed
 @Suppress("TooManyFunctions")
@@ -768,52 +772,73 @@ interface Renderable {
                 if (texture == null) {
                     GuiRenderUtils.drawRect(0, 0, width, height, 0xFF43464B.toInt())
 
-                    if (useChroma) {
-                        //#if TODO
-                        ChromaShaderManager.begin(ChromaType.STANDARD)
-                        //#endif
-                    }
+                    //#if MC < 1.21
+                    if (useChroma) ChromaShaderManager.begin(ChromaType.STANDARD)
+                    //#endif
 
                     val factor = 0.2
                     val bgColor = if (useChroma) Color.GRAY.darker() else color
                     GuiRenderUtils.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
+                    //#if MC < 1.21
                     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
+                    //#else
+                    //$$ if (useChroma) {
+                    //$$     DrawContextUtils.drawContext.fill(SkyHanniRenderLayers.getChromaStandard(), 1, 1, progress, height - 1, color.rgb)
+                    //$$ } else {
+                    //$$     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
+                    //$$ }
+                    //#endif
 
-                    if (useChroma) {
-                        //#if TODO
-                        ChromaShaderManager.end()
-                        //#endif
-                    }
+                    //#if MC < 1.21
+                    if (useChroma) ChromaShaderManager.end()
+                    //#endif
                 } else {
-                    val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
-                        0, 64,
-                    ) else Pair(0, 0)
+                    val scale = 0.00390625f
 
+                    val (uMin, vMin) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK)
+                        Pair(0f, 64f * scale) else Pair(0f, 0f)
+                    val (uMax, vMax) = Pair(uMin + (width * scale), vMin + (height * scale))
+
+                    //#if MC < 1.21
                     GuiRenderUtils.drawTexturedRect(
-                        posX, posY, width, height, textureX.toFloat(), textureY.toFloat(),
-                        (textureX + width).toFloat(), (textureY + height).toFloat(), createResourceLocation(texture.path),
+                        posX, posY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
                         alpha = 1f, filter = GL11.GL_NEAREST
                     )
+                    //#else
+                    //$$ DrawContextUtils.drawContext.drawGuiTexture(RenderLayer::getGuiTextured, createResourceLocation("hud/experience_bar_background"),
+                    //$$     posX.toInt(), posY.toInt(), width, height)
+                    //#endif
 
                     if (useChroma) {
-                        //#if TODO
-                        ChromaShaderManager.begin(ChromaType.TEXTURED)
-                        //#endif
                         GlStateManager.color(1f, 1f, 1f, 1f)
+                        //#if MC < 1.21
+                        ChromaShaderManager.begin(ChromaType.TEXTURED)
+                        GuiRenderUtils.drawTexturedRect(
+                            posX, posY, progress, height, uMin, uMin + (progress * scale),
+                            vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
+                            alpha = 1f, filter = GL11.GL_NEAREST
+                        )
+                        //#else
+                        //$$ DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers::getChromaTextured, createResourceLocation("hud/experience_bar_progress"),
+                        //$$     width, height, 0, 0, posX.toInt(), posY.toInt(), progress, height)
+                        //#endif
                     } else {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
-                    }
-                    GuiRenderUtils.drawTexturedRect(
-                        posX, posY, progress, height, textureX.toFloat(), (textureY + height).toFloat(),
-                        (textureX + progress).toFloat(), (textureY + height + height).toFloat(), createResourceLocation(texture.path),
-                        alpha = 1f, filter = GL11.GL_NEAREST
-                    )
-
-                    if (useChroma) {
-                        //#if TODO
-                        ChromaShaderManager.end()
+                        //#if MC < 1.21
+                        GuiRenderUtils.drawTexturedRect(
+                            posX, posY, progress, height, uMin, uMin + (progress * scale),
+                            vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
+                            alpha = 1f, filter = GL11.GL_NEAREST
+                        )
+                        //#else
+                        //$$ DrawContextUtils.drawContext.drawGuiTexture(RenderLayer::getGuiTextured, createResourceLocation("hud/experience_bar_progress"),
+                        //$$     width, height, 0, 0, posX.toInt(), posY.toInt(), progress, height)
                         //#endif
                     }
+
+                    //#if MC < 1.21
+                    if (useChroma) ChromaShaderManager.end()
+                    //#endif
                 }
             }
         }
@@ -870,9 +895,7 @@ interface Renderable {
                 } else {
                     realColor = color
                 }
-                //#if TODO
-                RenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness)
-                //#endif
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 content.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
@@ -1448,9 +1471,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                //#if TODO
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-                //#endif
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
@@ -1478,7 +1499,7 @@ interface Renderable {
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
 
-                RenderUtils.drawRoundRectOutline(
+                ShaderRenderUtils.drawRoundRectOutline(
                     0,
                     0,
                     width,
@@ -1500,6 +1521,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
             radius: Int = 0,
+            smoothness: Float = 0f,
         ) = object : Renderable {
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
@@ -1507,13 +1529,14 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                RenderUtils.drawRoundTexturedRect(
+                ShaderRenderUtils.drawRoundTexturedRect(
                     0,
                     0,
                     width,
                     height,
                     GL11.GL_NEAREST,
                     radius,
+                    smoothness,
                     texture = texture,
                     alpha = alpha / 255f,
                 )
@@ -1571,8 +1594,8 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-                RenderUtils.drawRoundRectOutline(
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                ShaderRenderUtils.drawRoundRectOutline(
                     0,
                     0,
                     width,
@@ -1612,9 +1635,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.color(1f, 1f, 1f, 1f)
-                //#if TODO
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
-                //#endif
                 val mouse = currentRenderPassMousePosition ?: return
                 val mouseXRelativeToPlayer = if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
                 val mouseYRelativeToPlayer = if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
@@ -1629,6 +1650,7 @@ interface Renderable {
                     player,
                 )
                 //#else
+                //$$ DrawContextUtils.translate(-35f, -125f, 0f)
                 //$$ drawEntity(
                 //$$     DrawContextUtils.drawContext,
                 //$$     playerX,
@@ -1637,10 +1659,11 @@ interface Renderable {
                 //$$     playerY + height,
                 //$$     entityScale,
                 //$$     0.0625f,
-                //$$     mouseXRelativeToPlayer,
-                //$$     mouseYRelativeToPlayer,
+                //$$     -mouseXRelativeToPlayer,
+                //$$     -mouseYRelativeToPlayer,
                 //$$     player
                 //$$ )
+                //$$ DrawContextUtils.translate(35f, 125f, 0f)
                 //#endif
                 DrawContextUtils.translate(0f, 0f, -100f)
             }

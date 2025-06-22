@@ -4,10 +4,15 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import org.lwjgl.opengl.ARBFragmentShader
 import org.lwjgl.opengl.ARBShaderObjects
 import org.lwjgl.opengl.ARBVertexShader
-import org.lwjgl.opengl.ContextCapabilities
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20
+//#if MC < 1.21
+import org.lwjgl.opengl.ContextCapabilities
 import org.lwjgl.opengl.GLContext
+//#else
+//$$ import org.lwjgl.opengl.GL
+//$$ import org.lwjgl.opengl.GLCapabilities
+//#endif
 
 /**
  * Class to check shaders support, OpenGL capabilities, and shader helper functions
@@ -28,7 +33,11 @@ object ShaderHelper {
     var GL_FRAGMENT_SHADER: Int
 
     init {
+        //#if MC < 1.21
         val capabilities: ContextCapabilities = GLContext.getCapabilities()
+        //#else
+        //$$ val capabilities: GLCapabilities = GL.getCapabilities()
+        //#endif
 
         // Check OpenGL 2.0 Capabilities
         val openGL20supported = capabilities.OpenGL20

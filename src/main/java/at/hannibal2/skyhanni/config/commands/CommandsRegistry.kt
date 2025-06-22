@@ -50,8 +50,9 @@ object CommandsRegistry {
         ClientCommandHandler.instance.registerCommand(command)
         //#else
         //$$ val original = dispatcher.register(builder as LiteralArgumentBuilder<Any?>)
+        //$$ this.node = original
         //$$ aliases.forEach {
-        //$$     dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original))
+        //$$     dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original).executes(original.command))
         //$$ }
         //#endif
         addBuilder(builders)

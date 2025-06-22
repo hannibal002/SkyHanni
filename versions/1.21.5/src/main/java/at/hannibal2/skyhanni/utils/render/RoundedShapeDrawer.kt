@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.features.misc.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
@@ -13,7 +12,7 @@ import net.minecraft.util.Identifier
 
 object RoundedShapeDrawer {
 
-    private fun <T: at.hannibal2.skyhanni.shader.RoundedShader<T>> T.performBaseUniforms(
+    private fun <T: RoundedShader<T>> T.performBaseUniforms(
         renderPass: RenderPass,
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,

@@ -333,35 +333,49 @@ object GuiRenderUtils {
             x - skullDiff to y - skullDiff
         } else x to y
 
+        //#if MC < 1.21
         val (hx, hy, hz) = listOf(8f, 8f, 100f)
+        val (zT, zS) = listOf(-19f, 0.2f)
+        //#else
+        //$$ val (hx, hy, hz) = listOf(8f, 8f, 148f)
+        //$$ val (zT, zS) = listOf(-95f, 1f)
+        //#endif
 
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate(translateX, translateY, -19f)
-            DrawContextUtils.scale(finalScale, finalScale, 0.2f)
+            DrawContextUtils.translate(translateX, translateY, zT)
+            DrawContextUtils.scale(finalScale, finalScale, zS)
 
             //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+            //#else
+            //$$ RenderSystem.assertOnRenderThread()
+            //$$ lateinit var savedMV: Matrix4f
+            //#endif
+
             DrawContextUtils.pushPop {
                 DrawContextUtils.loadIdentity()
-
                 DrawContextUtils.translate(hx, hy, hz)
+
+                //#if MC < 1.21
                 if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
                 if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
                 if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
+                //#else
+                //$$ val (rotXD, rotYD, rotZD) = listOf(rotX, rotY, rotZ).map { it * (Math.PI.toFloat() / 180f) }
+                //$$ if (rotXD != 0f) DrawContextUtils.rotate(rotXD, 1f, 0f, 0f)
+                //$$ if (rotYD != 0f) DrawContextUtils.rotate(rotYD, 0f, 1f, 0f)
+                //$$ if (rotZD != 0f) DrawContextUtils.rotate(rotZD, 0f, 0f, 1f)
+                //#endif
+
                 DrawContextUtils.translate(-hx, -hy, -hz)
 
-                DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+                //#if MC < 1.21
+                GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+                //#else
+                //$$ savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
+                //#endif
             }
             DrawContextUtils.multMatrix(savedMV)
-            //#else
-            //$$ val rotMat = Matrix4f().identity()
-            //$$    .translate(hx, hy, hz)
-            //$$    .rotateX(Math.toRadians(rotX.toDouble()).toFloat())
-            //$$    .rotateY(Math.toRadians(rotY.toDouble()).toFloat())
-            //$$    .rotateZ(Math.toRadians(rotZ.toDouble()).toFloat())
-            //$$    .translate(-hx, -hy, -hz)
-            //$$ DrawContextUtils.multMatrix(rotMat)
-            //#endif
 
             //#if MC < 1.21
             GL11.glEnable(GL11.GL_NORMALIZE)
@@ -371,9 +385,11 @@ object GuiRenderUtils {
             //#endif
 
             RenderHelper.enableGUIStandardItemLighting()
+
             //#if MC < 1.21
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
             //#endif
+
             DrawContextUtils.drawItem(item, 0, 0)
 
             //#if MC < 1.21

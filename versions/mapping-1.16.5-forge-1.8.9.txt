@@ -22,6 +22,7 @@ net.minecraft.client.KeyMapping net.minecraft.client.settings.KeyBinding
 net.minecraft.client.Options net.minecraft.client.settings.GameSettings
 
 net.minecraft.client.KeyMapping boundKey.getCode() getKeyCode()
+net.minecraft.client.KeyMapping consumeClick() isPressed()
 net.minecraft.client.KeyMapping isDown() isKeyDown()
 net.minecraft.client.KeyMapping releaseAll() unPressAllKeys()
 
@@ -52,6 +53,7 @@ net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNe
 net.minecraft.client.gui.components.Widget net.minecraft.client.gui.GuiButton
 
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
+net.minecraft.client.gui.components.ChatComponent chatScrollbarPos scrollPos
 net.minecraft.client.gui.components.ChatComponent getLinesPerPage() getLineCount()
 net.minecraft.client.gui.components.ChatComponent getScale() getChatScale()
 net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
@@ -68,8 +70,6 @@ net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.
 net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
 net.minecraft.client.gui.screens.inventory.SignEditScreen net.minecraft.client.gui.inventory.GuiEditSign
 
-net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots
-
 net.minecraft.client.gui.screens.inventory.SignEditScreen line editLine
 net.minecraft.client.gui.screens.inventory.SignEditScreen sign tileSign
 
@@ -81,6 +81,7 @@ net.minecraft.client.multiplayer.ClientLevel players() getPlayers()
 
 net.minecraft.client.multiplayer.PlayerInfo getGameMode() getGameType()
 net.minecraft.client.multiplayer.PlayerInfo getProfile() getGameProfile()
+net.minecraft.client.multiplayer.PlayerInfo getSkinLocation() getLocationSkin()
 net.minecraft.client.multiplayer.PlayerInfo getTeam() getPlayerTeam()
 
 net.minecraft.client.player.AbstractClientPlayer net.minecraft.client.entity.AbstractClientPlayer
@@ -97,6 +98,8 @@ net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
 
 net.minecraft.client.renderer.block.model.IBakedModel net.minecraft.client.resources.model.IBakedModel
 
+net.minecraft.client.renderer.culling.Frustum net.minecraft.client.renderer.culling.ICamera
+
 net.minecraft.client.renderer.entity.EntityRenderDispatcher net.minecraft.client.renderer.entity.RenderManager
 net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.renderer.entity.RendererLivingEntity
 
@@ -110,6 +113,8 @@ net.minecraft.client.sounds.SoundManager updateSourceVolume() setSoundLevel()
 net.minecraft.core.BlockPos net.minecraft.util.BlockPos
 net.minecraft.core.Direction net.minecraft.util.EnumFacing
 net.minecraft.core.Rotations net.minecraft.util.Rotations
+
+net.minecraft.core.BlockPos betweenClosed() getAllInBox()
 
 net.minecraft.core.Direction getNormal() getDirectionVec()
 
@@ -284,7 +289,6 @@ net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resour
 net.minecraft.sounds.SoundSource net.minecraft.client.audio.SoundCategory
 
 net.minecraft.util.Mth net.minecraft.util.MathHelper
-net.minecraft.util.Mth clamp() clamp_int()
 
 net.minecraft.util.Mth clamp() clamp_int()
 net.minecraft.util.Mth floor() floor_float()
@@ -429,13 +433,14 @@ net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
+net.minecraft.world.inventory.AbstractContainerMenu getItems() getInventory()
 net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
 
 net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
 
 net.minecraft.world.inventory.Slot getItem() getStack()
 net.minecraft.world.inventory.Slot hasItem() getHasStack()
-net.minecraft.world.inventory.Slot index slotNumber
+net.minecraft.world.inventory.Slot id slotNumber
 net.minecraft.world.inventory.Slot x xDisplayPosition
 net.minecraft.world.inventory.Slot y yDisplayPosition
 
@@ -867,10 +872,14 @@ net.minecraft.world.level.block.state.properties.IntegerProperty net.minecraft.b
 
 net.minecraft.world.phys.AABB net.minecraft.util.AxisAlignedBB
 net.minecraft.world.phys.HitResult net.minecraft.util.MovingObjectPosition
-net.minecraft.world.phys.HitResult$Type net.minecraft.util.math.RayTraceResult$MovingObjectType
+net.minecraft.world.phys.HitResult$Type net.minecraft.util.MovingObjectPosition$MovingObjectType
 net.minecraft.world.phys.Vec3 net.minecraft.util.Vec3
 
 net.minecraft.world.phys.AABB contains() isVecInside()
+net.minecraft.world.phys.AABB intersects() intersectsWith()
+
+net.minecraft.world.phys.HitResult getLocation() getBlockPos()
+net.minecraft.world.phys.HitResult type typeOfHit
 
 net.minecraft.world.phys.Vec3 distanceToSqr() squareDistanceTo()
 net.minecraft.world.phys.Vec3 x xCoord

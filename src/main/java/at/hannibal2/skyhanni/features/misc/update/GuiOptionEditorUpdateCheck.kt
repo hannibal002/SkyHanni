@@ -93,14 +93,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         if (!isInside(getChangelogPosition(width - 20), height = 30, changelog)) return false
 
         if (UpdateManager.updateState != UpdateManager.UpdateState.NONE)
-            UpdateManager.getNextVersion()
-                ?.let {
-                    //#if TODO
-                    ChangelogViewer.showChangelog(currentVersion, it)
-                    //#else
-                    //$$ null
-                    //#endif
-                }
+            UpdateManager.getNextVersion()?.let { ChangelogViewer.showChangelog(currentVersion, it) }
                 ?: ErrorManager.logErrorStateWithData(
                     "Can't get Changelog because of internal error",
                     "UpdateManager.getNextVersion is null even though updateState is != NONE",
