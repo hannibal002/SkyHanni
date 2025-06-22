@@ -41,6 +41,10 @@ import java.util.TimeZone
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.minutes
 
+// This module sends status updates (like stats and buffs) to a user-defined Discord webhook.
+// Only the data selected by the user in the config is sent.
+// No tokens, session data, passwords, or account information is ever accessed or sent.
+
 @SkyHanniModule
 object FarmingTracker {
 
@@ -52,6 +56,7 @@ object FarmingTracker {
     private var playerFaceURL = ""
     private val currentCrop: Crop? = null
 
+    // Sends embed periodically
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
         if (!isEnabled()) return
@@ -70,6 +75,7 @@ object FarmingTracker {
         if (success) lastNotification = SimpleTimeMark.now() else ChatUtils.chat("§cCouldn't send embed (Farming Tracker).")
     }
 
+    // Sends an embed when disconnecting from a server
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
         status = "Offline"
@@ -81,6 +87,7 @@ object FarmingTracker {
         if (success) lastNotification = SimpleTimeMark.now()
     }
 
+    // Prepares and sends the embed to the configured webhook
     fun prepareAndSendEmbed(status: String): Boolean {
         playerFaceURL = playerFaceURL.ifBlank { ApiUtils.getPlayerSkin(config.embed.bodyPart, 12) }
 
@@ -93,7 +100,7 @@ object FarmingTracker {
         }
 
         val embed = buildEmbed(status, color, fields)
-        val threadID = config.threadId.ifBlank { null }
+        val threadID = config.webhook.threadId.ifBlank { null }
         val username = "[FARMING TRACKER] ${PlayerUtils.getName()}"
 
         return sendOrEditMessage(embed, threadID, username)
@@ -121,6 +128,7 @@ object FarmingTracker {
         return Field(name, value, inline = true)
     }
 
+    // Returns the value for a given information type
     private fun InformationType.resolveValue(status: String): Any? = when (this) {
         InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue?.roundToInt()
         InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue?.roundToInt()
@@ -163,6 +171,7 @@ object FarmingTracker {
         )
     }
 
+    // Builds the actual embed to send
     private fun buildEmbed(status: String, color: Int, fields: List<Field>): Embed {
         val time = SimpleTimeMark.now().let {
             SimpleTimeMark(it.toMillis() - TimeZone.getDefault().getOffset(it.toMillis()))
@@ -178,6 +187,7 @@ object FarmingTracker {
         )
     }
 
+    // Sends the embed to the webhook
     private fun sendOrEditMessage(embed: Embed, threadID: String?, username: String): Boolean {
         return when (config.messageType) {
             MessageType.NEW_MESSAGE -> WebhookUtils.sendEmbedsToWebhook(config.webhook.url, listOf(embed), threadID, username)

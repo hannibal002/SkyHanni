@@ -3,11 +3,14 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.ApiUtils.SkinBodyPart
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -15,6 +18,28 @@ import java.util.Locale
 
 
 class TrackingConfig {
+
+    @ConfigOption(
+        name = "§cNotice",
+        desc = "This feature allows you to send your in-game farming stats to a Discord webhook " +
+            "that §6YOU §7choose. §4NO §7sensitive data, e.g. session tokens, is ever collected or sent.",
+    )
+    @ConfigEditorInfoText
+    var notice: String = ""
+
+    @ConfigOption(
+        name = "Source",
+        desc = "Click to open the source code for this feature.\n" +
+            "§l§cWarning: Clicking this will open a webpage in your browser.",
+    )
+    @ConfigEditorButton(buttonText = "OPEN")
+    var sourceCodeUrl: Runnable = Runnable {
+        OSUtils.openBrowser(
+            "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/" +
+                "hannibal2/skyhanni/features/garden/tracking/FarmingTracker.kt",
+        )
+    }
+
     @Expose
     @ConfigOption(name = "Webhook Settings", desc = "")
     @Accordion
@@ -25,6 +50,14 @@ class TrackingConfig {
         @ConfigOption(name = "URL", desc = "The URL of the webhook.")
         @ConfigEditorText
         var url: String = ""
+
+        @Expose
+        @ConfigOption(
+            name = "Thread ID",
+            desc = "If you want the message to be sent to a thread in the webhook channel put it's id here, otherwise leave blank.",
+        )
+        @ConfigEditorText
+        var threadId: String = ""
 
         @Expose
         @ConfigOption(name = "Interval", desc = "The interval in which status updated will be sent.")
@@ -80,14 +113,6 @@ class TrackingConfig {
         @ConfigEditorDropdown
         var color: LorenzColor = LorenzColor.YELLOW
     }
-
-    @Expose
-    @ConfigOption(
-        name = "Thread ID",
-        desc = "If you want the message to be sent to a thread in the webhook channel put it's id here, otherwise leave blank.",
-    )
-    @ConfigEditorText
-    var threadId: String = ""
 
     @Expose
     @ConfigOption(name = "Message Type", desc = "Choose which way the status will be sent.")
