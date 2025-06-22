@@ -150,8 +150,8 @@ enum class SkyblockStat(
     PRESSURE_RESISTANCE("§9❍", " *Pressure Resistance: §r§9❍$VALUE_PATTERN", " *§9❍ Pressure Resistance §f$VALUE_PATTERN"),
     PULL("§bᛷ", " *Pull: §r§bᛷ$VALUE_PATTERN", " *§bᛷ Pull §f$VALUE_PATTERN"),
     HUNTER_FORTUNE("§d☘", " *Hunter Fortune: §r§d☘$VALUE_PATTERN", " *§d☘ Hunter Fortune §f$VALUE_PATTERN"),
-    FIG_FORTUNE("§6☘", "*Fig Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Fig Fortune §f$VALUE_PATTERN"),
-    MANGROVE_FORTUNE("§6☘", "*Mangrove Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mangrove Fortune §f$VALUE_PATTERN"),
+    FIG_FORTUNE("§6☘", " *Fig Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Fig Fortune §f$VALUE_PATTERN"),
+    MANGROVE_FORTUNE("§6☘", " *Mangrove Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mangrove Fortune §f$VALUE_PATTERN"),
 
     UNKNOWN("§c?", "", "")
     ;
