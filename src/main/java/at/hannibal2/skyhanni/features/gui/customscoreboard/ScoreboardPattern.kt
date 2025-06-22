@@ -338,7 +338,7 @@ object ScoreboardPattern {
      */
     val miningEventPattern by miningSB.pattern(
         "miningevent",
-        "Event: §.§L.*",
+        "Event: §.§[lL].*",
     )
 
     /**

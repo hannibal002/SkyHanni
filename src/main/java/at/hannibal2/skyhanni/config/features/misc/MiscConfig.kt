@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
@@ -217,12 +218,12 @@ class MiscConfig {
     @FeatureToggle
     var xpInInventory: Boolean = true
 
-    // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(
         name = "Red Scoreboard Numbers",
         desc = "Hide the red scoreboard numbers on the right side of the screen."
     )
+    @OnlyLegacy
     @ConfigEditorBoolean
     @FeatureToggle
     var hideScoreboardNumbers: Boolean = false
