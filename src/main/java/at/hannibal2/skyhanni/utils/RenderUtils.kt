@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 //#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
 //#endif
@@ -623,11 +622,7 @@ object RenderUtils {
      * @param smoothness smooths out the edge. (In amount of blurred pixels)
      */
     fun drawFilledCircle(x: Int, y: Int, radius: Int, color: Color, smoothness: Float = 2.5f, angle1: Float = 7.0f, angle2: Float = 7.0f) {
-        //#if MC < 1.21
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
-        //#else
-        //$$ val scaleFactor = MinecraftClient.getInstance().window.scaleFactor
-        //#endif
+        val scaleFactor = GuiScreenUtils.scaleFactor
 
         DrawContextUtils.popMatrix()
         val radiusIn = radius * scaleFactor
