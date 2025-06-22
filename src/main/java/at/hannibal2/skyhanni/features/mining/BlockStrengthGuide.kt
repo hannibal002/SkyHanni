@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
@@ -85,7 +86,7 @@ object BlockStrengthGuide {
             ),
         ),
         TITANIUM(
-            { ItemStack(Blocks.stone, 1, net.minecraft.block.BlockStone.EnumType.DIORITE_SMOOTH.metadata) },
+            { BlockCompat.createSmoothDiorite() },
             setOf(OreBlock.HIGH_TIER_MITHRIL),
         ),
         GRAY_MITHRIL(
@@ -513,11 +514,11 @@ object BlockStrengthGuide {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shblockstrength") {
+        event.registerBrigadier("shblockstrength") {
             description = "Shows how many ticks you need to break any block with your mining speed."
             category = CommandCategory.MAIN
             aliases = listOf("shminingspeed")
-            callback { onCommand() }
+            simpleCallback { onCommand() }
         }
     }
 }

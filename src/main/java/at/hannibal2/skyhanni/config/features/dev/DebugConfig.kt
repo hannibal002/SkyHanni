@@ -210,6 +210,24 @@ class DebugConfig {
     @ConfigLink(owner = DebugConfig::class, field = "orbital")
     var orbitalPosition: Position = Position(200, 200)
 
+    @Expose
+    @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
+    @ConfigEditorBoolean
+    var itemStack: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "itemStack")
+    var itemStackPosition: Position = Position(-200, 300)
+
+    @Expose
+    @ConfigOption(name = "Animated Item Stack", desc = "Enable the test Animated Item Stack Renderable")
+    @ConfigEditorBoolean
+    var animatedItemStack: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
+    var animatedItemStackPosition: Position = Position(-300, 300)
+
     // Does not have a config element!
     @Expose
     var trackSoundPosition: Position = Position(0, 0)

@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 
 @SkyHanniModule
@@ -43,8 +43,8 @@ object AtmosphericFilterDisplay {
         append(season.getPerk(config.abbreviatePerk))
     }
 
-    private fun isEnabled() = LorenzUtils.onHypixel && config.enabled && (
-        (OutsideSBFeature.ATMOSPHERIC_FILTER.isSelected() && !LorenzUtils.inSkyBlock) ||
-            (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.outsideGarden))
+    private fun isEnabled() = SkyBlockUtils.onHypixel && config.enabled && (
+        (OutsideSBFeature.ATMOSPHERIC_FILTER.isSelected() && !SkyBlockUtils.inSkyBlock) ||
+            (SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.outsideGarden))
         )
 }

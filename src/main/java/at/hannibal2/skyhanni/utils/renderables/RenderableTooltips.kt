@@ -24,7 +24,7 @@ object RenderableTooltips {
         if (event.startPhase) {
             tooltip = null
         } else {
-            drawHoveringText()
+            DrawContextUtils.pushPop { drawHoveringText() }
         }
     }
 

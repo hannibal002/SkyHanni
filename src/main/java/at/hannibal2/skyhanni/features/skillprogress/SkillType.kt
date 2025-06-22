@@ -21,6 +21,7 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
     //#else
     //$$ TAMING("Taming", Items.POLAR_BEAR_SPAWN_EGG, 60),
     //#endif
+    HUNTING("Hunting", Items.lead, 25),
     ;
 
     constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, Item.getItemFromBlock(block), maxLevel)
