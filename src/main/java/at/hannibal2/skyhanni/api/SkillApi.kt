@@ -94,8 +94,8 @@ object SkillApi {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
@@ -382,7 +382,8 @@ object SkillApi {
         storage?.set(skillType, skillInfo)
     }
 
-    fun onCommand(it: Array<String>) {
+    @Suppress("ReturnCount")
+    private fun onCommand(it: Array<String>) {
         if (it.isEmpty()) {
             commandHelp()
             return
@@ -476,18 +477,6 @@ object SkillApi {
         commandHelp()
     }
 
-    fun onComplete(strings: Array<String>): List<String> {
-        return when (strings.size) {
-            1 -> listOf("levelwithxp", "xpforlevel", "goal")
-            2 -> if (strings[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
-                strings,
-                SkillType.entries.map { it.displayName },
-            ) else listOf()
-
-            else -> listOf()
-        }
-    }
-
     private fun commandHelp() {
         ChatUtils.chat(
             listOf(
@@ -533,7 +522,17 @@ object SkillApi {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE
             callback { onCommand(it) }
-            autoComplete { onComplete(it) }
+            autoComplete { args ->
+                when (args.size) {
+                    1 -> listOf("levelwithxp", "xpforlevel", "goal")
+                    2 -> if (args[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
+                        args,
+                        SkillType.entries.map { it.displayName },
+                    ) else listOf()
+
+                    else -> listOf()
+                }
+            }
         }
     }
 }

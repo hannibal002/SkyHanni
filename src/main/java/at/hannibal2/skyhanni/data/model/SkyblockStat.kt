@@ -100,6 +100,8 @@ enum class SkyblockStat(
     RUNECRAFTING_WISDOM("§3☯", " *Runecrafting Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Runecrafting Wisdom §f$VALUE_PATTERN"),
     SOCIAL_WISDOM("§3☯", " *Social Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Social Wisdom §f$VALUE_PATTERN"),
     TAMING_WISDOM("§3☯", " *Taming Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Taming Wisdom §f$VALUE_PATTERN"),
+    HUNTING_WISDOM("§3☯", " *Hunting Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Hunting Wisdom §f$VALUE_PATTERN"),
+
     MINING_SPEED("§6⸕", " *Mining Speed: §r§6⸕$VALUE_PATTERN", " *§6⸕ Mining Speed §f$VALUE_PATTERN"),
     BREAKING_POWER("§2Ⓟ", "", " *§2Ⓟ Breaking Power §f$VALUE_PATTERN"),
     PRISTINE("§5✧", " *Pristine: §r§5✧$VALUE_PATTERN", " *§5✧ Pristine §f$VALUE_PATTERN"),
@@ -142,6 +144,14 @@ enum class SkyblockStat(
     BLOCK_FORTUNE("§6☘", " *Block Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Block Fortune §f$VALUE_PATTERN"),
     GEMSTONE_FORTUNE("§6☘", " *Gemstone Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Gemstone Fortune §f$VALUE_PATTERN"),
     HEAT_RESISTANCE("§c♨", " *Heat Resistance: §r§c♨$VALUE_PATTERN", " *§c♨ Heat Resistance §f$VALUE_PATTERN"),
+
+    SWEEP("§2∮", " *Sweep: §r§2∮$VALUE_PATTERN", " *§2∮ Sweep §f$VALUE_PATTERN"),
+    RESPIRATION("§3⚶", " *Respiration: §r§3⚶$VALUE_PATTERN", " *§3⚶ Respiration §f$VALUE_PATTERN"),
+    PRESSURE_RESISTANCE("§9❍", " *Pressure Resistance: §r§9❍$VALUE_PATTERN", " *§9❍ Pressure Resistance §f$VALUE_PATTERN"),
+    PULL("§bᛷ", " *Pull: §r§bᛷ$VALUE_PATTERN", " *§bᛷ Pull §f$VALUE_PATTERN"),
+    HUNTER_FORTUNE("§d☘", " *Hunter Fortune: §r§d☘$VALUE_PATTERN", " *§d☘ Hunter Fortune §f$VALUE_PATTERN"),
+    FIG_FORTUNE("§6☘", " *Fig Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Fig Fortune §f$VALUE_PATTERN"),
+    MANGROVE_FORTUNE("§6☘", " *Mangrove Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mangrove Fortune §f$VALUE_PATTERN"),
 
     UNKNOWN("§c?", "", "")
     ;

@@ -39,7 +39,7 @@ object NavigationHelper {
         GraphNodeTag.CRIMSON_MINIBOSS,
     )
 
-    fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         if (args.size == 3) {
             args.map { it.toDoubleOrNull() }.takeIfAllNotNull()?.let {
                 val location = it.toLorenzVec()

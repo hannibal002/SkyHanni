@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -54,14 +52,12 @@ object DefaultConfigFeatures {
                 onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
                 "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!",
             )
-            //#if TODO
             ChatUtils.clickableChat(
                 "Click here to see the changelog.",
                 onClick = {
                     ChangelogViewer.showChangelog(lastVersion, SkyHanniMod.VERSION)
                 },
             )
-            //#endif
         }
     }
 

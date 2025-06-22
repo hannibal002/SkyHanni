@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-//#if TODO
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
+//#if MC < 1.21
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,7 +35,6 @@ import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ChatUtils {
 
@@ -282,7 +281,7 @@ object ChatUtils {
 
     private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
 
-    //#if TODO
+    //#if MC < 1.21
     var chatLines: MutableList<ChatLine>
         get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
         set(value) {
@@ -294,6 +293,18 @@ object ChatUtils {
         set(value) {
             (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
         }
+    //#else
+    //$$ var chatLines: MutableList<ChatHudLine>
+    //$$     get() = chatGui.messages
+    //$$     set(value) {
+    //$$         chatGui.messages = value
+    //$$     }
+    //$$
+    //$$ var drawnChatLines: MutableList<ChatHudLine.Visible>
+    //$$     get() = chatGui.visibleMessages
+    //$$     set(value) {
+    //$$         chatGui.visibleMessages = value
+    //$$     }
     //#endif
 
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
@@ -302,10 +313,8 @@ object ChatUtils {
         reason: String,
         predicate: (ChatLine) -> Boolean,
     ) {
-        //#if TODO
         chatLines.editChatLine(component, predicate, reason)
         refreshChat()
-        //#endif
     }
 
     /**
@@ -316,10 +325,8 @@ object ChatUtils {
         amount: Int = 1,
         predicate: (ChatLine) -> Boolean,
     ) {
-        //#if TODO
         chatLines.deleteChatLine(amount, reason, predicate)
         refreshChat()
-        //#endif
     }
 
     private fun refreshChat() {
@@ -423,14 +430,14 @@ object ChatUtils {
         )
     }
 
-    //#if MC < 1.16
-    val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
     var ChatLine.fullComponent: IChatComponent
         get() = (this as ChatLineData).skyHanni_fullComponent
         set(value) {
             (this as ChatLineData).skyHanni_fullComponent = value
         }
 
+    //#if MC < 1.16
+    val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
     fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
     //#elseif MC < 1.21
     //$$ val GuiMessage<Component>.chatMessage get() = message.formattedTextCompat().stripHypixelMessage()

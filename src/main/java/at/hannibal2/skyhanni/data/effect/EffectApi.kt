@@ -110,6 +110,16 @@ object EffectApi {
         "tab.effects",
         " *(?:§.)*(?<effect>§.[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:§.|[: ])+(?<time>[dhms0-9 ]+)(?:§.)*"
     )
+
+    /**
+     * REGEX-TEST: §r§5Lushlilac Bonbon§r§f: §r§a12h
+     * REGEX-TEST: §r§5Prime Lushlilac Bonbon§r§f: §r§a18h
+     * REGEX-TEST: §r§5Prime Lushlilac Bonbon§r§f: §r§a17h 58m
+     */
+    private val saltTabPattern by RepoPattern.pattern(
+        "tab.salts",
+        " (?<effect>(?:§.)*[\\w\\-' ]+(?:§.)*)*: *(?:§.)*(?<time>[dhms0-9 ]+)"
+    )
     // </editor-fold>
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
@@ -204,12 +214,12 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun WidgetUpdateEvent.readEffects() {
-        if (!isWidget(TabWidget.ACTIVE_EFFECTS)) return
-        godPotTabPattern.firstMatcher(lines) {
+    fun readEffects(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.ACTIVE_EFFECTS)) return
+        godPotTabPattern.firstMatcher(event.lines) {
             profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
         }
-        lines.readNonGodPotEffects()
+        event.lines.readNonGodPotEffects()
     }
 
     private fun List<String>.readNonGodPotEffects() = tabEffectPattern.matchAll(this) {
@@ -225,10 +235,10 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun WidgetUpdateEvent.readPestRepellent() {
-        if (!isWidget(TabWidget.PESTS)) return
+    fun readPestRepellent(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PESTS)) return
 
-        repellentPattern.firstMatcher(lines) {
+        repellentPattern.firstMatcher(event.lines) {
             // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
             val time = group("time")?.toIntOrNull() ?: return@firstMatcher
             val tier = group("tier")
@@ -239,6 +249,19 @@ object EffectApi {
                 else -> return@firstMatcher
             }
             EffectDurationChangeEvent(propTier, EffectDurationChangeType.SET, duration).post()
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    fun readSalts(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.SALTS)) return
+        saltTabPattern.firstMatcher(event.lines) {
+            val effect = group("effect")
+            val duration = TimeUtils.getDuration(group("time"))
+            val salt = NonGodPotEffect.entries.firstOrNull {
+                it.tabListName == effect
+            } ?: return@firstMatcher
+            EffectDurationChangeEvent(salt, EffectDurationChangeType.SET, duration).post()
         }
     }
 

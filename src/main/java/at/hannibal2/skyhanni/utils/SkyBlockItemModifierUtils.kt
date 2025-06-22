@@ -24,6 +24,7 @@ import java.util.UUID
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.item.Items
+//$$ import kotlin.time.Duration.Companion.seconds
 //#endif
 
 @Suppress("TooManyFunctions")
@@ -275,7 +276,10 @@ object SkyBlockItemModifierUtils {
         return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
     }
     //#else
+    //$$ private val identifierPattern = "[a-z0-9_\\-.:]+".toRegex()
+    //$$
     //$$ fun isVanillaItem(itemId: String): Boolean {
+    //$$     if (!identifierPattern.matches(itemId)) return false
     //$$     return Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
     //$$ }
     //#endif
@@ -337,7 +341,16 @@ object SkyBlockItemModifierUtils {
     //#if MC < 1.21
     fun ItemStack.getExtraAttributes(): NBTTagCompound? = tagCompound?.extraAttributes
     //#else
-    //$$ fun ItemStack.getExtraAttributes(): NbtCompound? = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
+    //$$ fun ItemStack.getExtraAttributes(): NbtCompound? {
+    //$$    val data = cachedData
+    //$$    if (data.lastExtraAttributesFetchTime.passedSince() < 0.1.seconds) {
+    //$$        return data.lastExtraAttributes
+    //$$    }
+    //$$    val extraAttributes = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
+    //$$    data.lastExtraAttributes = extraAttributes
+    //$$    data.lastExtraAttributesFetchTime = SimpleTimeMark.now()
+    //$$    return extraAttributes
+    //$$ }
     //#endif
 
     class GemstoneSlot(private val type: GemstoneType, private val quality: GemstoneQuality) {

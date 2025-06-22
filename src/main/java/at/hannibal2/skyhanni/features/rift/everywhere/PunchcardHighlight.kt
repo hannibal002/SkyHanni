@@ -156,7 +156,7 @@ object PunchcardHighlight {
         RenderLivingEntityHelper.removeEntityColor(entity)
     }
 
-    fun onResetCommand() {
+    private fun onResetCommand() {
         playerList.clear()
         playerQueue.clear()
         if (config.reverse.get()) {

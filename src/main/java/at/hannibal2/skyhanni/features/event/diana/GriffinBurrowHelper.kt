@@ -118,12 +118,6 @@ object GriffinBurrowHelper {
         loadTestGriffinSpots()
     }
 
-    fun testGriffinSpots() {
-        testGriffinSpots = !testGriffinSpots
-        val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
-        ChatUtils.chat("Test Griffin Spots $state§e.")
-    }
-
     private fun loadTestGriffinSpots() {
         if (!testGriffinSpots) return
         val center = LocationUtils.playerLocation().toBlockPos().toLorenzVec()
@@ -503,7 +497,11 @@ object GriffinBurrowHelper {
         event.registerBrigadier("shtestgriffinspots") {
             description = "Show potential griffin spots around you."
             category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { testGriffinSpots() }
+            simpleCallback {
+                testGriffinSpots = !testGriffinSpots
+                val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
+                ChatUtils.chat("Test Griffin Spots $state§e.")
+            }
         }
     }
 }

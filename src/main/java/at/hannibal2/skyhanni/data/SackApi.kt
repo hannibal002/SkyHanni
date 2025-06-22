@@ -477,14 +477,6 @@ object SackApi {
 
     fun NeuInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 
-    private fun testSackApi(args: String) {
-        if (sackListInternalNames.contains(args.uppercase())) {
-            ChatUtils.chat("Sack data for $args: ${fetchSackItem(args.toInternalName())}")
-        } else {
-            ChatUtils.userError("That item isn't a valid sack item.")
-        }
-    }
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestsackapi") {
@@ -492,7 +484,12 @@ object SackApi {
             category = CommandCategory.DEVELOPER_DEBUG
             arg("internalName", BrigadierArguments.string()) { internalName ->
                 callback {
-                    testSackApi(getArg(internalName))
+                    val arg = getArg(internalName)
+                    if (sackListInternalNames.contains(arg.uppercase())) {
+                        ChatUtils.chat("Sack data for $arg: ${fetchSackItem(arg.toInternalName())}")
+                    } else {
+                        ChatUtils.userError("That item isn't a valid sack item.")
+                    }
                 }
             }
         }
