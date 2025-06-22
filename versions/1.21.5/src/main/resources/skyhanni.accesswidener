@@ -13,3 +13,5 @@ accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPa
 accessible field net/minecraft/entity/player/PlayerInventory equipment Lnet/minecraft/entity/EntityEquipment;
 accessible field net/minecraft/util/hit/BlockHitResult missed Z
 accessible class net/minecraft/client/gui/hud/ChatHud$RemovalQueuedMessage
+accessible field net/minecraft/client/gui/hud/ChatHud messages Ljava/util/List;
+accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util/List;

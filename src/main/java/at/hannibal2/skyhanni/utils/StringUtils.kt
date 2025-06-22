@@ -493,11 +493,9 @@ object StringUtils {
         return message
     }
 
-    //#if TODO
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
-    //#endif
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
         return asComponent { chatStyle = original.chatStyle }
