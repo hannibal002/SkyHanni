@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 
@@ -102,7 +102,7 @@ object TradeValue {
         }
     }
 
-    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled(): Boolean = SkyBlockUtils.inSkyBlock && config.enabled
 
     enum class TradeSide {
         YOU,

@@ -20,6 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object UpdateKeybinds {
 
+    @Suppress("LongMethod")
     private fun makeMap(): Map<Int, Int> {
         // keys are keycode on 1.8, values are keycode on 1.21
         val map = mutableMapOf<Int, Int>()
@@ -138,6 +139,8 @@ object UpdateKeybinds {
         map[-100] = 0
         map[-99] = 1
         map[-98] = 2
+        map[-97] = 3
+        map[-96] = 4
         return map
     }
 

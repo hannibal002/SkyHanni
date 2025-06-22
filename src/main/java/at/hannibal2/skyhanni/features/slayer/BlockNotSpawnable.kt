@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -37,5 +37,5 @@ object BlockNotSpawnable {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.blockNotSpawnable
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.blockNotSpawnable
 }

@@ -380,9 +380,7 @@ object HoppityApi {
         if (hoppityDataSet.lastMeal == null) return
 
         if (hoppityDataSet.hoppityMessages.size != 3) return
-        //#if TODO
         RabbitFoundEvent(hoppityDataSet).post()
-        //#endif
         hoppityDataSet.reset()
     }
 }
