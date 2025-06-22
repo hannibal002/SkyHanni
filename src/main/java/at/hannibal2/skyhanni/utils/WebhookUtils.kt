@@ -13,6 +13,7 @@ object WebhookUtils {
 
     private const val SKYHANNI_URL =
         "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true"
+    private const val ERROR_PREFIX = "Farming Tracker error!"
 
     private var lastMessageID: Long? = null
 
@@ -48,12 +49,12 @@ object WebhookUtils {
     private fun checkIfWebhookValid(webhookUrl: String): Boolean {
         return when {
             webhookUrl.isEmpty() || webhookUrl == "?wait=true" -> {
-                LorenzDebug.log("Missing webhook url.")
+                LorenzDebug.log("$ERROR_PREFIX Missing webhook url.")
                 false
             }
 
             !webhookPattern.matches(webhookUrl) -> {
-                ChatUtils.debug("Webhook url is invalid -> $webhookUrl")
+                ChatUtils.debug("$ERROR_PREFIX Webhook url is invalid -> $webhookUrl")
                 false
             }
 
@@ -81,7 +82,7 @@ object WebhookUtils {
         embeds.any { embed ->
             embed.fields.filter { it.value.isEmpty() }
                 .onEach { field ->
-                    LorenzDebug.log("Field ${field.name} has empty value ${field.value}")
+                    LorenzDebug.log("$ERROR_PREFIX Field ${field.name} has empty value ${field.value}")
                 }
                 .isNotEmpty()
         }
@@ -93,7 +94,10 @@ object WebhookUtils {
         avatarUrl: String?,
     ): Payload? {
         if (!checkIfWebhookValid(finalUrl)) return null
-        if (embeds.isEmpty()) return null
+        if (embeds.isEmpty()) {
+            ChatUtils.userError("$ERROR_PREFIX Embeds are empty.")
+            return null
+        }
         if (checkForEmptyEmbeds(embeds)) return null
 
         return Payload(
