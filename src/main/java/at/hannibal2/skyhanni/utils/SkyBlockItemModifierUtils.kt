@@ -71,8 +71,6 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
-    private val TIER_BOOST = "PET_ITEM_TIER_BOOST".toInternalName()
-
     data class PetInfo(
         @Expose val type: String,
         @Expose val active: Boolean,
@@ -89,6 +87,7 @@ object SkyBlockItemModifierUtils {
         @Expose val noMove: Boolean,
         @Expose val extraData: JsonObject? = null,
     ) {
+        @Suppress("PropertyName")
         @Deprecated("Do not use, does not reflect Tier Boost, use PetData(petInfo).fauxInternalName instead")
         val _internalName = "$type;${tier.id}".toInternalName()
         val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
