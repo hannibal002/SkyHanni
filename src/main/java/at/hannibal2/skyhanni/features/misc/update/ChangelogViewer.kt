@@ -142,7 +142,9 @@ object ChangelogViewer {
         event.registerComplex("shchangelog") {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
+            //#if TODO
             context = { CommandContext() }
+            //#endif
             specifiers = listOf<CommandArgument<CommandContext>>(
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of the versions until this, " +

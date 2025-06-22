@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 // scoreboard
@@ -24,5 +23,5 @@ object ScoreboardEventKuudra : ScoreboardEvent() {
         ScoreboardPattern.submergesPattern,
     )
 
-    override fun showIsland() = IslandType.KUUDRA_ARENA.isInIsland()
+    override fun showIsland() = IslandType.KUUDRA_ARENA.isCurrent()
 }

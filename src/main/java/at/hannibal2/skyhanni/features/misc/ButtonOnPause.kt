@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.render.gui.GuiActionPerformedEvent
 import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 //#if MC > 1.21
@@ -24,7 +24,7 @@ object ButtonOnPause {
     //#if MC < 1.21
     @HandleEvent
     fun onGuiActionPerformed(event: GuiActionPerformedEvent) {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
 
         if (config.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
             ConfigGuiManager.openConfigGui()
@@ -34,7 +34,7 @@ object ButtonOnPause {
 
     @HandleEvent
     fun onInitializeGuiPost(event: InitializeGuiEvent) {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
 
         if (config.configButtonOnPause && event.gui is GuiIngameMenu) {
             val x = event.gui.width - 105
