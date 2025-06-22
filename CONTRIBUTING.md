@@ -412,8 +412,7 @@ If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in 
 Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
 
 You may notice some `//#if TODO` comments in the code, these are preprocessor comments that we are using to signify that we need to make 
-this functionality work again on 1.21. If for whatever reason you want the preprocessor to ignore these comments, you can add 
-`skyhanni.skipPreprocessTodos=true` to your `.gradle/private.properties` file. This will make the preprocessor ignore all `//#if TODO` comments.
+this functionality work again on 1.21.
 
 ### Improving mappings
 

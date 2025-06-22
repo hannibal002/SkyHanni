@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.init.Items
 
 @SkyHanniModule
@@ -23,6 +23,6 @@ object UltimateEnchantStar {
         event.renderObjects += RenderObject("§d✦", -10, -10)
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.ultimateEnchantStar
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.ultimateEnchantStar
 
 }

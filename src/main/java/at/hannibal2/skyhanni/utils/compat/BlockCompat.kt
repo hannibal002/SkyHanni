@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 
 object BlockCompat {
     fun getAllLogs(): List<Block> {
@@ -12,6 +13,14 @@ object BlockCompat {
         //$$ logs.addModernLogs()
         //#endif
         return logs
+    }
+
+    fun createSmoothDiorite(): ItemStack {
+        //#if MC < 1.21
+        return ItemStack(Blocks.stone, 1, net.minecraft.block.BlockStone.EnumType.DIORITE_SMOOTH.metadata)
+        //#else
+        //$$ return ItemStack(Blocks.POLISHED_DIORITE)
+        //#endif
     }
 }
 

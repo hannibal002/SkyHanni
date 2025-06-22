@@ -10,6 +10,7 @@ import java.util.WeakHashMap
 import java.util.regex.Pattern
 import kotlin.math.ceil
 
+@Suppress("TooManyFunctions")
 object CollectionUtils {
 
     inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
@@ -281,6 +282,8 @@ object CollectionUtils {
 
     fun <T, C : Collection<T>> C.takeIfNotEmpty(): C? = takeIf { it.isNotEmpty() }
 
+    fun <K, V> Map<K, V>.takeIfNotEmpty(): Map<K, V>? = takeIf { it.isNotEmpty() }
+
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
     fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>) = this.toSet() == other.toSet()
@@ -467,7 +470,7 @@ object CollectionUtils {
     }
 
     fun <T> Collection<T>.firstUniqueByOrNull(
-        vararg predicates: (T) -> Boolean
+        vararg predicates: (T) -> Boolean,
     ): T? {
         var candidates = this
         for (pred in predicates) {

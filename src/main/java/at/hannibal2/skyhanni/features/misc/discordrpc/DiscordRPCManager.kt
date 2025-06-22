@@ -206,7 +206,10 @@ object DiscordRPCManager {
         // the player joins SkyBlock but only running it again once they join and leave.
         if (started || !isEnabled()) return
         if (SkyBlockUtils.inSkyBlock) {
+            // todo discord rpc doesnt connect on 1.21
+            //#if TODO
             start()
+            //#endif
             started = true
         }
     }

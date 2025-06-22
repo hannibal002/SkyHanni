@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
@@ -70,5 +70,5 @@ object FavoritePowerStone {
         inInventory = false
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null && config.favoritePowerStone
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && storage != null && config.favoritePowerStone
 }

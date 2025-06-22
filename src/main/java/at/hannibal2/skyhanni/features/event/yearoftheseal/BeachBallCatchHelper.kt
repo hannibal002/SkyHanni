@@ -74,10 +74,10 @@ object BeachBallCatchHelper {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val color = config.bouncyBallLineColor.toSpecialColor()
-        LineDrawer.draw3D(event.partialTicks) {
+        LineDrawer.draw3D(event, 4, true) {
             predictors.forEach { (_, predict) ->
-                drawPath(predict.prePath, color.darker(), 4, true, bezierPoint = -1.0)
-                drawPath(predict.predictedPath, color, 8, true, bezierPoint = -1.0)
+                drawPath(predict.prePath, color.darker(), bezierPoint = -1.0)
+                drawPath(predict.predictedPath, color, bezierPoint = -1.0)
             }
         }
         event.renderLandingPosition()

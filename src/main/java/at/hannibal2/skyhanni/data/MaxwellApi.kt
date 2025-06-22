@@ -6,10 +6,8 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-//#if TODO
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -170,12 +168,10 @@ object MaxwellApi {
         chatPowerUnlockedPattern.tryReadPower(message)
         if (!tuningAutoAssignedPattern.matches(event.message)) return
         if (tunings.isNullOrEmpty()) return
-        //#if TODO
         with(CustomScoreboard.config) {
             if (!enabled.get() || ScoreboardConfigElement.TUNING !in scoreboardEntries.get()) return
             ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
         }
-        //#endif
     }
 
     private fun Pattern.tryReadPower(message: String) {

@@ -19,8 +19,8 @@ public class MixinClientConnection {
         new PacketReceivedEvent(packet).post();
     }
 
-    @Inject(method = "sendInternal", at = @At(value = "HEAD"), cancellable = true)
-    private void sendPacket(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo ci) {
+    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;Z)V", at = @At(value = "HEAD"), cancellable = true)
+    private void sendPacketNew(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo ci) {
         if (new PacketSentEvent(packet).post()) {
             ci.cancel();
         }
