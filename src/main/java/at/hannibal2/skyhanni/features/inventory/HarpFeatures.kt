@@ -28,6 +28,9 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
+//#endif
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 @SkyHanniModule
@@ -118,6 +121,7 @@ object HarpFeatures {
         val height = GuiScreenUtils.scaledWindowHeight
         minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
         //#else
+        //$$ RenderSystem.assertOnRenderThread()
         //$$ minecraft.window.calculateScaleFactor(minecraft.options.guiScale.value, minecraft.forcesUnicodeFont())
         //#endif
     }

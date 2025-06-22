@@ -71,6 +71,7 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
+    @KSerializable
     data class PetInfo(
         @Expose val type: String,
         @Expose val active: Boolean,
