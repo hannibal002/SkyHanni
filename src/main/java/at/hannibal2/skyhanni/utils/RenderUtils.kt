@@ -91,7 +91,7 @@ object RenderUtils {
         get() = run {
             //#if MC < 1.21
             matrixBuffer.clear()
-            DrawContextUtils.getFloat(DrawContextUtils.GL_MODELVIEW_MATRIX, matrixBuffer)
+            GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
             val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
             val xTranslate = read[12].toInt()
             val yTranslate = read[13].toInt()
@@ -607,10 +607,12 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
+    //#if MC < 1.21
     fun getAlpha(): Float {
         colorBuffer.clear()
-        DrawContextUtils.getFloat(DrawContextUtils.GL_CURRENT_COLOR, colorBuffer)
+        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)
         if (colorBuffer.limit() < 4) return 1f
         return colorBuffer.get(3)
     }
+    //#endif
 }
