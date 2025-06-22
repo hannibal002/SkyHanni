@@ -136,7 +136,6 @@ object HarpFeatures {
     fun onDisconnect(event: ClientDisconnectEvent) {
         if (!config.guiScale) return
         unSetGuiScale()
-
     }
 
     @HandleEvent
@@ -149,16 +148,28 @@ object HarpFeatures {
     private var isGuiScaled = false
 
     private fun setGuiScale() {
+        //#if MC > 1.21
+        //$$ MinecraftClient.getInstance().execute {
+        //#endif
         guiSetting = getMinecraftGuiScale()
         setMinecraftGuiScale(0)
         isGuiScaled = true
         updateScale()
+        //#if MC > 1.21
+        //$$ }
+        //#endif
     }
 
     private fun unSetGuiScale() {
         if (!isGuiScaled) return
+        //#if MC > 1.21
+        //$$ MinecraftClient.getInstance().execute {
+        //#endif
         setMinecraftGuiScale(guiSetting)
         isGuiScaled = false
+        //#if MC > 1.21
+        //$$ }
+        //#endif
     }
 
     private fun getMinecraftGuiScale(): Int {
@@ -166,6 +177,7 @@ object HarpFeatures {
         //#if MC < 1.21
         return gameSettings.guiScale
         //#else
+        //$$ RenderSystem.assertOnRenderThread()
         //$$ return gameSettings.guiScale.value
         //#endif
     }
@@ -175,6 +187,7 @@ object HarpFeatures {
         //#if MC < 1.21
         gameSettings.guiScale = scale
         //#else
+        //$$ RenderSystem.assertOnRenderThread()
         //$$ gameSettings.guiScale.value = scale
         //#endif
     }
