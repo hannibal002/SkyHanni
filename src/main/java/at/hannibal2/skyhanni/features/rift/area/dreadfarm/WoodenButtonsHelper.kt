@@ -108,7 +108,12 @@ object WoodenButtonsHelper {
         if (!checkButtons()) return
 
         val location = event.position
-        if (location.getBlockAt() == Blocks.wooden_button && !hitButtons.contains(location)) {
+        //#if MC < 1.16
+        val oakButtonBlock = Blocks.wooden_button
+        //#else
+        //$$ val oakButtonBlock = Blocks.OAK_BUTTON
+        //#endif
+        if (location.getBlockAt() == oakButtonBlock && !hitButtons.contains(location)) {
             lastHitButton = event.position
         }
     }

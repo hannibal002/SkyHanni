@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage.HotspotRabbitStorage
 import at.hannibal2.skyhanni.data.IslandType
@@ -28,7 +30,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -444,14 +445,14 @@ object HoppityCollectionStats {
 
         residentRabbitPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("island")) ?: return@firstMatcher
-            if (island.isInIsland() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.RESIDENTS)) {
+            if (island.isCurrent() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.RESIDENTS)) {
                 highlightMap[stack.displayName] = HighlightRabbitTypes.RESIDENTS.color
             }
         }
 
         hotspotLocationPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("location")) ?: return@firstMatcher
-            if (island.isInIsland() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.HOTSPOTS)) {
+            if (island.isCurrent() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.HOTSPOTS)) {
                 highlightMap[stack.displayName] = HighlightRabbitTypes.HOTSPOTS.color
             }
         }
@@ -803,12 +804,6 @@ object HoppityCollectionStats {
         }
     }
 
-    // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
-    fun resetSavedRabbits() {
-        loggedRabbits.clear()
-        ChatUtils.chat("Reset saved rabbit data.")
-    }
-
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
 
     enum class RabbitCollectionRarity(
@@ -844,6 +839,19 @@ object HoppityCollectionStats {
             "$bp.showHotspotSummaryInHoppityStats" to "$bp.hoppityCollectionStats.showHotspotSummary",
         ).forEach { (oldPath, newPath) ->
             event.move(67, oldPath, newPath)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
+        event.registerBrigadier("shresetsavedrabbits") {
+            description = "Resets the saved rabbits on this profile."
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                loggedRabbits.clear()
+                ChatUtils.chat("Reset saved rabbit data.")
+            }
         }
     }
 }
