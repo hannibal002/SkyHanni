@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import com.google.gson.annotations.Expose
 import java.util.UUID
 
@@ -44,6 +45,15 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
+    constructor(petInfo: SkyBlockItemModifierUtils.PetInfo) : this(
+        petInfo._internalName,
+        petInfo.properSkinItem,
+        petInfo.getSkinVariantIndex(),
+        petInfo.heldItem,
+        petInfo.exp,
+        petInfo.uniqueId
+    )
+
     private val tierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidHigherTier()
     private val properPetName = PetUtils.getPetProperName(petInternalName)
     private val specifiedRarity = PetUtils.getPetRarity(petInternalName) ?: LorenzRarity.COMMON

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
@@ -132,10 +133,18 @@ object PetUtils {
             .sumOf { it.toDouble() }
     }
 
-    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int {
+    fun xpToLevel(petInfo: SkyBlockItemModifierUtils.PetInfo): Int = PetData(petInfo).level
+
+    /**
+     * DO NOT USE THIS METHOD UNLESS YOU ARE SURE YOU HAVE A FAUX INTERNAL NAME!
+     * Converts total XP to a pet level.
+     * @param totalXp The total XP of the pet.
+     * @param petFauxInternalName The internal name of the pet, reflecting tier boost properly.
+     */
+    fun xpToLevel(totalXp: Double, petFauxInternalName: NeuInternalName): Int {
         var xp = totalXp.takeIf { it > 0 } ?: return 1
-        val rarityOffset = getRarityOffset(petInternalName) ?: return 1
-        val xpList = getFullLevelingTree(petInternalName)
+        val rarityOffset = getRarityOffset(petFauxInternalName) ?: return 1
+        val xpList = getFullLevelingTree(petFauxInternalName)
 
         var level = 1
         for (i in 0 + rarityOffset until xpList.size) {
