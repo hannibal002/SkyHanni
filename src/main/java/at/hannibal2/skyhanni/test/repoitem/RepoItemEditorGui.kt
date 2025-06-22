@@ -43,7 +43,7 @@ import net.minecraft.nbt.NBTTagList
 //$$ import net.minecraft.component.type.NbtComponent
 //#endif
 
-class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStack) : SkyhanniBaseScreen() {
+class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStack, needsItemIdFixed: Boolean = false) : SkyhanniBaseScreen() {
 
     private val baseJson = EnoughUpdatesManager.getItemById(internalName.asString()) ?: JsonObject()
     private val internalNameStringField = TextFieldRenderable(internalName.asString())
@@ -107,6 +107,12 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         infoTypeField.setText(baseJson.get("infoType")?.asString.orEmpty())
         additionalInfoField.setText(baseJson.get("info")?.asJsonArray?.joinToString("\n") { it.asString }.orEmpty())
         clickCommandField.setText(baseJson.get("clickcommand")?.asString.orEmpty())
+
+        if (needsItemIdFixed) {
+            baseJson.get("itemId")?.asString?.let { minecraftItemIdField.setText(it) }
+            baseJson.get("itemModel")?.asString?.let { itemModelField.setText(it) }
+            baseJson.get("damage")?.asInt?.let { damageField.setText(it.toString()) }
+        }
     }
 
     private val renderableList = listOf(
@@ -366,6 +372,12 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             nbtTag.removeTag("ench")
         }
 
+        if (itemModelField.getText().isNotEmpty()) {
+            nbtTag.setString("itemModel", itemModelField.getText())
+        } else {
+            nbtTag.removeTag("itemModel")
+        }
+
         val loreList = NBTTagList()
         loreField.getText().split("\n").forEach { line ->
             loreList.appendString(line)
@@ -384,6 +396,10 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         //$$     tag.putInt("HideFlags", 254)
         //$$     if (hasEnchantGlint) {
         //$$         tag.put("ench", NbtList())
+        //$$     }
+        //$$
+        //$$     if (itemModelField.getText().isNotEmpty()) {
+        //$$         tag.putString("ItemModel", itemModelField.getText())
         //$$     }
         //$$
         //$$     nbtTag.get(DataComponentTypes.PROFILE)?.let {

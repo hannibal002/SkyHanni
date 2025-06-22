@@ -86,17 +86,19 @@ object RepoItemEditor {
 
     private fun attemptToOpenInEditor(instantSave: Boolean) {
         val focussedSlot = slotUnderCursor() ?: return
-        val stack = focussedSlot.stack?.copy() ?: return
+        val stack = focussedSlot.stack?.orNull()?.copy() ?: return
         stack.openInEditor(instantSave)
     }
 
-    private fun ItemStack.openInEditor(instantSave: Boolean, message: Boolean = true, internalNameOverride: NeuInternalName? = null) {
+    private fun ItemStack.openInEditor(
+        instantSave: Boolean, message: Boolean = true, internalNameOverride: NeuInternalName? = null, needsItemIdFixed: Boolean = false,
+    ) {
         val internalName = internalNameOverride ?: getInternalNameOrNull() ?: ErrorManager.skyHanniError(
             "Cannot open item editor for item with unknown item name",
             "displayName" to displayName,
             "inventoryName" to InventoryUtils.openInventoryName(),
         )
-        val screen = RepoItemEditorGui(internalName, this)
+        val screen = RepoItemEditorGui(internalName, this, needsItemIdFixed)
         if (instantSave) {
             screen.removeLoreUnderRarity()
             screen.saveItem(message)
@@ -252,8 +254,9 @@ object RepoItemEditor {
         try {
             InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8).use { reader ->
                 val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
+                RepoManager.writeJson(json, file)
                 val stack = EnoughUpdatesManager.jsonToStack(json, useCache = false)
-                stack.openInEditor(instantSave = true, message = false)
+                stack.openInEditor(instantSave = true, message = false, needsItemIdFixed = true)
                 ChatUtils.chat("§aSuccessfully refreshed NBT for item §e${internalName.asString()}§a.")
             }
 
