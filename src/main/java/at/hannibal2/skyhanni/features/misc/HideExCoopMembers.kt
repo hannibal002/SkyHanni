@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.CollectionApi
+import at.hannibal2.skyhanni.api.CollectionApi.getCorrectedName
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -10,8 +12,8 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -19,6 +21,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.isPlayerName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object HideExCoopMembers {
@@ -27,7 +30,6 @@ object HideExCoopMembers {
     private val storage get() = ProfileStorageData.profileSpecific
 
     private val historicMembersInventory = InventoryDetector { name -> inventoryPattern.matches(name) }
-    private val collectionInventory = InventoryDetector { name -> collectionInventoryPattern.matches(name) }
 
     private var changedSlotNumber: Int? = null
 
@@ -41,70 +43,44 @@ object HideExCoopMembers {
         "Historic Members",
     )
 
-    /**
-     * REGEX-TEST: Farming Collections
-     * REGEX-TEST: Carrot Collection
-     */
-    private val collectionInventoryPattern by patternGroup.pattern(
-        "inventory.collections",
-        ".+ Collections?",
-    )
-
-    /**
-     * REGEX-TEST: §b[MVP§f+§b] oxsss§7: §e1.9M
-     * REGEX-TEST: §a[VIP] oxsss§7: §e0
-     * REGEX-TEST: §7oxsss§7: §e0
-     */
-    private val collectedPattern by patternGroup.pattern(
-        "inventory.collections.collected",
-        "(?:§.\\[[^]]+(?:§\\++§b)?] |§7)(?<name>[^§]{2,16})§7: §e(?<amount>.+)",
-    )
-
-    /**
-     * REGEX-TEST: §7Progress to Raw Chicken IX: §e25.7§6%
-     * REGEX-TEST: §7Total Collected: §e1,917,287
-     */
-    private val dontDisplayMaxedPattern by patternGroup.pattern(
-        "inventory.collections.displaymaxed",
-        "§7(?:Progress to .+|Total Collected: .+)",
-    )
-
     @HandleEvent
     fun onTooltip(event: ToolTipEvent) {
-        if (!config.hideExCoopMembers || !collectionInventory.isInside()) return
+        if (!config.hideExCoopMembers || !CollectionApi.collectionInventory.isInside()) return
         val hiddenMembers = storage?.hiddenCoopMembers.takeIf { !it.isNullOrEmpty() } ?: return
 
-        event.toolTip = event.toolTipRemovedPrefix().handleTooltip(hiddenMembers)
+        event.toolTip = event.toolTipRemovedPrefix().handleTooltip(hiddenMembers, event.itemStack)
         changedSlotNumber = event.slot.slotNumber
     }
 
-    private fun List<String>.handleTooltip(storage: MutableSet<String>): MutableList<String> = this.toMutableList().apply {
+    private fun List<String>.handleTooltip(storage: MutableSet<String>, item: ItemStack): MutableList<String> = this.toMutableList().apply {
         val coopIndex = indexOf("§7Co-op Contributions:")
         if (coopIndex == -1) return@apply
 
+        val internalName = item.getInternalName().getCorrectedName()
+        val totalCollected = CollectionApi.getCollectionCounter(internalName) ?: 0L
+
         var remainingPlayers = 0
-        var totalCollected = 0
-        val itemsToRemove = mutableListOf<Int>()
+        val linesToRemove = mutableListOf<Int>()
 
         drop(coopIndex).forEachIndexed { index, line ->
             if (line.isBlank()) return@forEachIndexed
 
-            collectedPattern.matchMatcher(line) {
+            CollectionApi.playerCounterPattern.matchMatcher(line) {
                 if (group("name") in storage) {
-                    itemsToRemove.add(coopIndex + index)
+                    linesToRemove.add(coopIndex + index)
                 } else {
                     remainingPlayers++
                 }
-
-                totalCollected += group("amount").formatInt()
             }
         }
 
-        itemsToRemove.sortedDescending().forEach { removeAt(it - 1) }
+        linesToRemove.sortedDescending().forEach { removeAt(it - 1) }
 
         if (remainingPlayers >= 2) return this
 
-        if (!dontDisplayMaxedPattern.anyMatches(this)) {
+        val notMaxed = CollectionApi.collectionNotMaxedPattern.anyMatches(this)
+
+        if (!notMaxed) {
             if (coopIndex + 1 < size) this[coopIndex + 1] = "§7Total collected: §e${totalCollected.addSeparators()}"
             if (coopIndex < size) this[coopIndex] = "§a§lCOLLECTION MAXED OUT!"
         } else {
