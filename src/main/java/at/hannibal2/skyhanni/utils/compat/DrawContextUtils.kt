@@ -17,13 +17,6 @@ import java.nio.FloatBuffer
  */
 object DrawContextUtils {
 
-    // GL11.GL_MODELVIEW_MATRIX
-    const val GL_MODELVIEW_MATRIX = 2982
-    // GL11.GL_PROJECTION_MATRIX
-    const val GL_PROJECTION_MATRIX = 2983
-    // GL11.GL_CURRENT_COLOR
-    const val GL_CURRENT_COLOR = 2816
-
     private var _drawContext: DrawContext? = null
 
     /**
@@ -93,15 +86,6 @@ object DrawContextUtils {
     //#if MC > 1.21
     //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
     //#endif
-
-    fun getFloat(pName: Int, params: FloatBuffer) {
-        //#if MC < 1.21
-        GlStateManager.getFloat(pName, params)
-        //#else
-        //$$ params.clear()
-        //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
-        //#endif
-    }
 
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
