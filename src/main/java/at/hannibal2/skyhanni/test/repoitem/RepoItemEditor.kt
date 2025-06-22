@@ -47,6 +47,20 @@ object RepoItemEditor {
         "§aCrafting Table",
     )
 
+    /**
+     * REGEX-TEST: §7Gear Score: §d587 §8(1411)
+     * REGEX-TEST: §7Damage: §c+214.4 §e(+20) §8(+568)
+     * REGEX-TEST: §7Strength: §c+60 §e(+20) §9(+40) §8(+170.4)
+     * REGEX-TEST: §7Bonus Attack Speed: §c+5% §9(+5%) §8(+7%)
+     * REGEX-TEST: §7Intelligence: §a+424 §9(+100) §8(+1,136)
+     * REGEX-FAIL: §7Intelligence: §a+90 §9(+80) §d(+10)
+     * REGEX-FAIL: §7Bonus Attack Speed: §c+3% §9(+3%)
+     */
+    val loreDungeonStatsPattern by patternGroup.pattern(
+        "lore.dungeonstats",
+        ".*(?<dungeonStats>\\s§8\\(.*\\)\$)",
+    )
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.editModeEnabled) return
@@ -84,7 +98,7 @@ object RepoItemEditor {
         )
         val screen = RepoItemEditorGui(internalName, this)
         if (instantSave) {
-            screen.adjustLore()
+            screen.removeLoreUnderRarity()
             screen.saveItem(message)
         } else {
             SkyHanniMod.screenToOpen = screen
@@ -120,11 +134,11 @@ object RepoItemEditor {
             baseJson.addProperty("itemModel", itemModel)
         }
         val fixedNbtTagString = nbtTag.toString()
-            //#if MC > 1.21
-            //$$ .replace("\u0027[", "[")
-            //$$ .replace("]\u0027", "]")
-            //$$ .replace("\\\u0027", "\u0027")
-            //$$ .replace("\\\\", "\\")
+        //#if MC > 1.21
+        //$$ .replace("\u0027[", "[")
+        //$$ .replace("]\u0027", "]")
+        //$$ .replace("\\\u0027", "\u0027")
+        //$$ .replace("\\\\", "\\")
         //#endif
 
         baseJson.addProperty("nbttag", fixedNbtTagString)

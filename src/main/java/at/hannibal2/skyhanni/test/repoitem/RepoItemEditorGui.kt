@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchGlint
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -164,6 +165,7 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
     private var removeEnchantsButton = RenderableString("§5Remove enchants")
     private var addEnchantGlintButton = RenderableString("§6Add enchant glint")
     private var removeUnderRarityButton = RenderableString("§eRemove lore under rarity")
+    private var removeDungeonStatsButton = RenderableString("§cRemove dungeon stats")
 
     private val buttons = listOf(
         closeButton,
@@ -171,24 +173,8 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         removeEnchantsButton,
         addEnchantGlintButton,
         removeUnderRarityButton,
+        removeDungeonStatsButton,
     )
-
-    private fun removeEnchants() {
-        //#if MC < 1.8
-        nbtTag.removeTag("ench")
-        //#endif
-        nbtTag.extraAttributes.removeTag("enchantments")
-        hasEnchantGlint = false
-        removeEnchantsButton = RenderableString("§5Removed enchants")
-    }
-
-    private fun addEnchantGlint() {
-        hasEnchantGlint = true
-        //#if MC < 1.21
-        nbtTag.setTag("ench", NBTTagList())
-        //#endif
-        addEnchantGlintButton = RenderableString("§6Added enchant glint")
-    }
 
     override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         drawDefaultBackground(originalMouseY, originalMouseX, partialTicks)
@@ -243,6 +229,8 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         addEnchantGlintButton.render(0, 0)
         DrawContextUtils.translate(0f, 20f, 0f)
         removeUnderRarityButton.render(0, 0)
+        DrawContextUtils.translate(0f, 20f, 0f)
+        removeDungeonStatsButton.render(0, 0)
         DrawContextUtils.translate(0f, 0f, -500f)
 
         DrawContextUtils.pushPop {
@@ -266,23 +254,6 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         }
     }
 
-    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
-        getTextFields().forEach {
-            it.mouseClicked(originalMouseX, originalMouseY, mouseButton)
-        }
-        val buttonWidth = GuiScreenUtils.scaledWindowWidth * 0.8f
-        val maxWidth = buttonWidth + buttons.maxOf { it.width } + 10
-        if (originalMouseX.toFloat() in buttonWidth..maxWidth) {
-            when (originalMouseY) {
-                in 10..30 -> InventoryUtils.closeInventory()
-                in 50..70 -> saveItem()
-                in 70..90 -> removeEnchants()
-                in 90..110 -> addEnchantGlint()
-                in 110..130 -> adjustLore()
-            }
-        }
-    }
-
     override fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
         getTextFields().forEach {
             it.mouseClickMove(originalMouseX, originalMouseY)
@@ -296,7 +267,42 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
         scroll = scroll.coerceIn(-maxScroll, 0)
     }
 
-    fun adjustLore() {
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
+        getTextFields().forEach {
+            it.mouseClicked(originalMouseX, originalMouseY, mouseButton)
+        }
+        val buttonWidth = GuiScreenUtils.scaledWindowWidth * 0.8f
+        val maxWidth = buttonWidth + buttons.maxOf { it.width } + 10
+        if (originalMouseX.toFloat() in buttonWidth..maxWidth) {
+            when (originalMouseY) {
+                in 10..30 -> InventoryUtils.closeInventory()
+                in 50..70 -> saveItem()
+                in 70..90 -> removeEnchants()
+                in 90..110 -> addEnchantGlint()
+                in 110..130 -> removeLoreUnderRarity()
+                in 130..150 -> removeDungeonStats()
+            }
+        }
+    }
+
+    private fun removeEnchants() {
+        //#if MC < 1.8
+        nbtTag.removeTag("ench")
+        //#endif
+        nbtTag.extraAttributes.removeTag("enchantments")
+        hasEnchantGlint = false
+        removeEnchantsButton = RenderableString("§5Removed enchants")
+    }
+
+    private fun addEnchantGlint() {
+        hasEnchantGlint = true
+        //#if MC < 1.21
+        nbtTag.setTag("ench", NBTTagList())
+        //#endif
+        addEnchantGlintButton = RenderableString("§6Added enchant glint")
+    }
+
+    fun removeLoreUnderRarity() {
         val loreList = loreField.getText().split("\n")
         val newLore = mutableListOf<String>()
         for (line in loreList) {
@@ -308,6 +314,21 @@ class RepoItemEditorGui(internalName: NeuInternalName, underlyingStack: ItemStac
             }
         }
         removeUnderRarityButton = RenderableString("§eRemoved lore under rarity")
+    }
+
+    private fun removeDungeonStats() {
+        val loreList = loreField.getText().split("\n")
+        val newLore = mutableListOf<String>()
+        for (line in loreList) {
+            RepoItemEditor.loreDungeonStatsPattern.matchMatcher(line) {
+                val dungeonStats = group("dungeonStats")
+                newLore.add(line.replace(dungeonStats, ""))
+            } ?: run {
+                newLore.add(line)
+            }
+        }
+        loreField.setText(newLore.joinToString("\n"))
+        removeDungeonStatsButton = RenderableString("§cRemoved dungeon stats")
     }
 
     fun saveItem(message: Boolean = true) {
