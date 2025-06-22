@@ -94,15 +94,6 @@ object DrawContextUtils {
     //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
     //#endif
 
-    fun getFloat(pName: Int, params: FloatBuffer) {
-        //#if MC < 1.21
-        GlStateManager.getFloat(pName, params)
-        //#else
-        //$$ params.clear()
-        //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
-        //#endif
-    }
-
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
     }

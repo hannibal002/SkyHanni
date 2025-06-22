@@ -108,7 +108,7 @@ object PowderChestTimer {
     }
 
     private fun drawDisplay(): String? {
-        if (chests.isEmpty()) return null
+        val chests = chests.takeIf { it.isNotEmpty() }?.toMap() ?: return null
 
         val count = chests.size
         val name = StringUtils.pluralize(count, "chest")
@@ -123,11 +123,11 @@ object PowderChestTimer {
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        if (chests.isEmpty()) return
+        val chests = chests.takeIf { it.isNotEmpty() }?.toMap() ?: return
 
-        event.renderChests()
+        event.renderChests(chests)
 
-        val chestToConnect = sortChests()
+        val chestToConnect = sortChests(chests)
         if (chestToConnect.isEmpty()) return
 
         event.drawFirstLine(chestToConnect)
@@ -155,7 +155,7 @@ object PowderChestTimer {
         }
     }
 
-    private fun sortChests(): List<Map.Entry<LorenzVec, SimpleTimeMark>> {
+    private fun sortChests(chests: Map<LorenzVec, SimpleTimeMark>): List<Map.Entry<LorenzVec, SimpleTimeMark>> {
         val sortedChests = when (config.lineMode) {
             PowderChestTimerConfig.LineMode.OLDEST -> chests.entries.sortedBy { it.value.timeUntil() }
             PowderChestTimerConfig.LineMode.NEAREST -> chests.entries.sortedBy { it.key.distanceToPlayer() }
@@ -165,7 +165,7 @@ object PowderChestTimer {
         return sortedChests.take(config.drawLineToChestAmount)
     }
 
-    private fun SkyHanniRenderWorldEvent.renderChests() {
+    private fun SkyHanniRenderWorldEvent.renderChests(chests: Map<LorenzVec, SimpleTimeMark>) {
         val playerY = LocationUtils.playerLocation().y
         for ((loc, time) in chests) {
             val timeLeft = time.timeUntil()

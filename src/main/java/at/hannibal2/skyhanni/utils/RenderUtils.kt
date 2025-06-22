@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 //#if MC < 1.21
@@ -42,11 +43,13 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
+import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 //#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.lwjgl.BufferUtils
 //#endif
 
@@ -86,18 +89,23 @@ object RenderUtils {
      */
     val absoluteTranslation
         get() = run {
+            //#if MC < 1.21
             matrixBuffer.clear()
-
             DrawContextUtils.getFloat(DrawContextUtils.GL_MODELVIEW_MATRIX, matrixBuffer)
-
             val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
-
             val xTranslate = read[12].toInt()
             val yTranslate = read[13].toInt()
             val zTranslate = read[14].toInt()
-
             matrixBuffer.flip()
-
+            //#else
+            //$$ RenderSystem.assertOnRenderThread()
+            //$$ val posMatrix = DrawContextUtils.drawContext.matrices.peek().positionMatrix
+            //$$ val tmp = org.joml.Vector3f()
+            //$$ posMatrix.getTranslation(tmp)
+            //$$ val xTranslate = tmp.x.toInt()
+            //$$ val yTranslate = tmp.y.toInt()
+            //$$ val zTranslate = tmp.z.toInt()
+            //#endif
             Triple(xTranslate, yTranslate, zTranslate)
         }
 
@@ -122,7 +130,7 @@ object RenderUtils {
         highlight(color, x, y)
     }
 
-    fun highlight(color: Color, x: Int, y: Int) {
+    private fun highlight(color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         DrawContextUtils.pushMatrix()
@@ -585,15 +593,15 @@ object RenderUtils {
         GlStateManager.disableDepth()
         GlStateManager.disableBlend()
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 200f)
-        DrawContextUtils.scale(scale, scale, 1f)
-        GuiRenderUtils.drawString(text, 0f, 0f, 16777215)
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 200f)
+            DrawContextUtils.scale(scale, scale, 1f)
+            GuiRenderUtils.drawString(text, 0f, 0f, 16777215)
 
-        val reverseScale = 1 / scale
+            val reverseScale = 1 / scale
 
-        DrawContextUtils.scale(reverseScale, reverseScale, 1f)
-        DrawContextUtils.popMatrix()
+            DrawContextUtils.scale(reverseScale, reverseScale, 1f)
+        }
 
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()

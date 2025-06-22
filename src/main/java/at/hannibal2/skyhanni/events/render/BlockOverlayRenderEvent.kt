@@ -10,7 +10,7 @@ enum class OverlayType {
     WATER;
 
     companion object {
-        //#if MC < 1.21
+        //#if FORGE
         fun fromForge(old: net.minecraftforge.client.event.RenderBlockOverlayEvent.OverlayType): OverlayType {
             return entries[old.ordinal]
         }

@@ -12,6 +12,7 @@ at.hannibal2.skyhanni.test.NeuDependencyTest.kt
 
 at.hannibal2.skyhanni.tweaker.SkyHanniTweaker.java
 at.hannibal2.skyhanni.tweaker.ModLoadingTweaker.java
+at.hannibal2.skyhanni.tweaker.TweakerUtils.java
 
 at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer.java
