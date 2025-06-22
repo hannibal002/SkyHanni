@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
@@ -9,10 +10,12 @@ import net.minecraft.client.gui.GuiScreen
 abstract class SkyhanniBaseScreen : GuiScreen(
     //#if MC > 1.20
     //$$ net.minecraft.text.Text.empty()
-    //#elseif MC > 1.12
+    //#elseif MC > 1.16
     //$$ net.minecraft.network.chat.TextComponent.EMPTY
     //#endif
 ) {
+
+    val mc: Minecraft = Minecraft.getMinecraft()
 
     //#if MC < 1.21
     final override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -28,9 +31,13 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$    onDrawScreen(mouseX, mouseY, delta)
     //$$    DrawContextUtils.clearContext()
     //$$ }
+    //$$
+    //$$ override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+    //$$         this.renderDarkening(context)
+    //$$     }
     //#endif
 
-    open fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {}
+    open fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {}
 
     //#if MC < 1.21
     final override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
@@ -40,6 +47,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //#else
     //$$ override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
     //$$     onMouseClicked(mouseX.toInt(), mouseY.toInt(), mouseButton)
+    //$$     onHandleMouseInput()
     //$$     return super.mouseClicked(mouseX, mouseY, mouseButton)
     //$$ }
     //#endif
@@ -53,13 +61,17 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     }
     //#else
     //$$ override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-    //$$     // TODO confirm if keyCode.toChar() is correct
-    //$$     onKeyTyped(keyCode.toChar(), keyCode)
+    //$$     onKeyTyped(null, keyCode)
     //$$     return super.keyPressed(keyCode, scanCode, modifiers)
+    //$$ }
+    //$$
+    //$$ override fun charTyped(chr: Char, modifiers: Int): Boolean {
+    //$$     onKeyTyped(chr, null)
+    //$$     return super.charTyped(chr, modifiers)
     //$$ }
     //#endif
 
-    open fun onKeyTyped(typedChar: Char, keyCode: Int) {}
+    open fun onKeyTyped(typedChar: Char?, keyCode: Int?) {}
 
     //#if MC < 1.21
     final override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
@@ -69,6 +81,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //#else
     //$$ override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
     //$$     onMouseReleased(mouseX.toInt(), mouseY.toInt(), button)
+    //$$     onHandleMouseInput()
     //$$     return super.mouseReleased(mouseX, mouseY, button)
     //$$ }
     //#endif
@@ -84,6 +97,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$ override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
     //$$     // TODO there is no timeSince last click in modern
     //$$     onMouseClickMove(mouseX.toInt(), mouseY.toInt(), button, 0L)
+    //$$     onHandleMouseInput()
     //$$     return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
     //$$ }
     //#endif
@@ -96,7 +110,15 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         onHandleMouseInput()
     }
     //#else
-    //$$ //TODO this is gone on 1.21
+    //$$ override fun mouseMoved(mouseX: Double, mouseY: Double) {
+    //$$     onHandleMouseInput()
+    //$$     super.mouseMoved(mouseX, mouseY)
+    //$$ }
+    //$$
+    //$$ override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
+    //$$     onHandleMouseInput()
+    //$$     return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
+    //$$ }
     //#endif
 
     open fun onHandleMouseInput() {}
@@ -133,7 +155,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         //#if MC < 1.21
         drawDefaultBackground()
         //#else
-        //$$ renderBackground(DrawContextUtils.drawContext, mouseX, mouseY, partialTicks)
+        //$$ renderDarkening(DrawContextUtils.drawContext)
         //#endif
     }
 }

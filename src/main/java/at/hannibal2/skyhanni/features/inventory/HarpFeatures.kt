@@ -20,12 +20,12 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedClay
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.item.Item
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -113,9 +113,13 @@ object HarpFeatures {
         }
         // Copied from Minecraft Code to update the scale
         val minecraft = Minecraft.getMinecraft()
+        //#if MC < 1.21
         val width = GuiScreenUtils.scaledWindowWidth
         val height = GuiScreenUtils.scaledWindowHeight
         minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
+        //#else
+        //$$ minecraft.window.calculateScaleFactor(minecraft.options.guiScale.value, minecraft.forcesUnicodeFont())
+        //#endif
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -141,17 +145,34 @@ object HarpFeatures {
     private var isGuiScaled = false
 
     private fun setGuiScale() {
-        val gameSettings = Minecraft.getMinecraft().gameSettings
-        guiSetting = gameSettings.guiScale
-        gameSettings.guiScale = 0
+        guiSetting = getMinecraftGuiScale()
+        setMinecraftGuiScale(0)
         isGuiScaled = true
         updateScale()
     }
 
     private fun unSetGuiScale() {
         if (!isGuiScaled) return
-        Minecraft.getMinecraft().gameSettings.guiScale = guiSetting
+        setMinecraftGuiScale(guiSetting)
         isGuiScaled = false
+    }
+
+    private fun getMinecraftGuiScale(): Int {
+        val gameSettings = Minecraft.getMinecraft().gameSettings
+        //#if MC < 1.21
+        return gameSettings.guiScale
+        //#else
+        //$$ return gameSettings.guiScale.value
+        //#endif
+    }
+
+    private fun setMinecraftGuiScale(scale: Int) {
+        val gameSettings = Minecraft.getMinecraft().gameSettings
+        //#if MC < 1.21
+        gameSettings.guiScale = scale
+        //#else
+        //$$ gameSettings.guiScale.value = scale
+        //#endif
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -171,9 +192,16 @@ object HarpFeatures {
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.slotNumber != CLOSE_BUTTON_SLOT) return
         if (openTime.passedSince() > 2.seconds) return
-        event.container.inventory.filterNotNull().indexOfFirst {
+        //#if MC < 1.21
+        val indexOfFirst = event.container.inventory.filterNotNull().indexOfFirst {
             songSelectedPattern.anyMatches(it.getLore())
-        }.takeIf { it != -1 }?.let {
+        }
+        //#else
+        //$$ val indexOfFirst = event.container.slots.filterNotNull().indexOfFirst {
+        //$$          songSelectedPattern.anyMatches(it.stack.getLore())
+        //$$      }
+        //#endif
+        indexOfFirst.takeIf { it != -1 }?.let {
             val clickType = event.clickType?.id ?: return
             event.cancel()
             InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, clickType)
@@ -184,7 +212,7 @@ object HarpFeatures {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.showNumbers) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
-        if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
+        if (!event.stack.isStainedClay()) return
 
         // Example: §9| §7Click! will select the 9
         val index = buttonColors.indexOfFirst { it == event.stack.displayName[1] }

@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -158,7 +158,7 @@ object PartyApi {
             ChatUtils.chat(" §a- §7$member" + if (partyLeader == member) " §a(Leader)" else "", false)
         }
 
-        if (partyLeader == LorenzUtils.getPlayerName()) {
+        if (partyLeader == PlayerUtils.getName()) {
             ChatUtils.chat("§aYou are leader")
         }
 
@@ -187,7 +187,7 @@ object PartyApi {
         othersJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             if (partyMembers.isEmpty()) {
-                partyLeader = LorenzUtils.getPlayerName()
+                partyLeader = PlayerUtils.getName()
             }
             addPlayer(name)
         }
@@ -242,7 +242,8 @@ object PartyApi {
         if (message == "§eYou left the party." ||
             message == "§cThe party was disbanded because all invites expired and the party was empty." ||
             message == "§cYou are not currently in a party." ||
-            message == "§cYou are not in a party."
+            message == "§cYou are not in a party." ||
+            message == "§cThe party was disbanded because the party leader disconnected."
         ) {
             partyLeft()
         }
@@ -274,7 +275,7 @@ object PartyApi {
 
     private fun addPlayer(playerName: String) {
         if (partyMembers.contains(playerName)) return
-        if (playerName == LorenzUtils.getPlayerName()) return
+        if (playerName == PlayerUtils.getName()) return
         partyMembers.add(playerName)
     }
 
@@ -307,7 +308,7 @@ object PartyApi {
                 }
             }
 
-            if (partyLeader == LorenzUtils.getPlayerName()) {
+            if (partyLeader == PlayerUtils.getName()) {
                 add("")
                 add("You are leader")
             }

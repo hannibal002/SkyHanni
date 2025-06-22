@@ -7,23 +7,25 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
@@ -61,11 +63,11 @@ object CarnivalZombieShootout {
         " {29}Zombie Shootout",
     )
 
-    enum class ZombieType(val points: Int, val helmet: String, val color: Color) {
-        LEATHER(30, "Leather Cap", Color(165, 42, 42)), // Brown
-        IRON(50, "Iron Helmet", Color(192, 192, 192)), // Silver
-        GOLD(80, "Golden Helmet", Color(255, 215, 0)), // Gold
-        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) // Diamond
+    enum class ZombieType(val points: Int, val helmet: Item, val color: Color) {
+        LEATHER(30, Items.leather_helmet, Color(165, 42, 42)), // Brown
+        IRON(50, Items.iron_helmet, Color(192, 192, 192)), // Silver
+        GOLD(80, Items.golden_helmet, Color(255, 215, 0)), // Gold
+        DIAMOND(120, Items.diamond_helmet, Color(44, 214, 250)) // Diamond
     }
 
     @HandleEvent
@@ -73,7 +75,7 @@ object CarnivalZombieShootout {
         if (!isEnabled() || !started || (!config.coloredHitboxes && !config.coloredLines)) return
 
         lamp?.let {
-            if (config.coloredLines) event.draw3DLine(event.exactPlayerEyeLocation(), it.pos.add(0.0, 0.5, 0.0), Color.RED, 3, false)
+            if (config.coloredLines) event.drawLineToEye(it.pos.add(0.0, 0.5, 0.0), Color.RED, 3, false)
             if (config.coloredHitboxes) event.drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1f)
         }
 
@@ -83,7 +85,21 @@ object CarnivalZombieShootout {
             val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
                 if (zombie.health <= 0) return@mapNotNull null
                 val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
-                val type = toType(helmet) ?: return@mapNotNull null
+                val type = toType(helmet) ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not identify Zombie Shootout type",
+                        "zombie type for zombie entitiy helmet is null",
+                        "helmet" to helmet,
+                        "helmet.displayName" to helmet.displayName,
+                        "helmet.item" to helmet.item,
+                        //#if MC < 1.21
+                        "helmet.unlocalizedName" to helmet.unlocalizedName,
+                        //#else
+                        //$$ "helmet.unlocalizedName" to helmet.item.translationKey,
+                        //#endif
+                    )
+                    return@mapNotNull null
+                }
                 zombie to type
             }.toMap()
 
@@ -107,8 +123,8 @@ object CarnivalZombieShootout {
 
             event.drawHitbox(
                 boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
-                lineWidth = 3,
                 type.color,
+                lineWidth = 3,
                 depth = false,
             )
         }
@@ -170,7 +186,7 @@ object CarnivalZombieShootout {
         }
     }
 
-    private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.displayName }
+    private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.item }
 
-    private fun isEnabled() = config.enabled && LorenzUtils.skyBlockArea == "Carnival"
+    private fun isEnabled() = config.enabled && SkyBlockUtils.graphArea == "Carnival"
 }

@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -99,7 +99,7 @@ object SuperpairDataDisplay {
         val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return@runDelayed
         val itemName = itemNow.displayName.removeColor()
         val reward = convertToReward(itemNow)
-        val itemData = SuperpairItem(slot, reward, itemNow.itemDamage)
+        val itemData = SuperpairItem(slot, reward, DyeCompat.toDamage(itemNow))
         val uncovered = items.keys.maxOrNull() ?: -1
 
         if (isWaiting(itemName)) return@runDelayed
@@ -302,5 +302,5 @@ object SuperpairDataDisplay {
 
     private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this.damage == other.damage
 
-    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.superpairDisplay
+    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isCurrent() && config.superpairDisplay
 }
