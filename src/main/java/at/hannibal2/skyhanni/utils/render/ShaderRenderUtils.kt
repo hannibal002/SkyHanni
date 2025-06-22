@@ -40,7 +40,6 @@ object ShaderRenderUtils {
         this.smoothness = smoothness
         this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
-
         //#if MC > 1.21
         //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
         //#endif

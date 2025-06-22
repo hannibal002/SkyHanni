@@ -79,9 +79,6 @@ object RenderUtils {
     //#if MC < 1.21
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    //#else
-    //$$ private val matrixBuffer: FloatBuffer = BufferUtils.createFloatBuffer(16)
-    //$$ private val colorBuffer:  FloatBuffer = BufferUtils.createFloatBuffer(16)
     //#endif
 
     /**
