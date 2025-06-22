@@ -106,13 +106,12 @@ object EnoughUpdatesManager {
     }
 
     fun reloadDataForItem(internalName: NeuInternalName, newData: JsonObject) {
-        // TODO implement this function properly
-        // A few neuItems maps need to be updated
         NeuItems.allInternalNames.remove(internalName.asString())
         itemStackCache.remove(internalName.asString())
         displayNameCache.remove(internalName.asString())
 
         itemMap[internalName.asString()] = newData
+        NeuItems.allInternalNames[internalName.asString()] = internalName
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
