@@ -250,8 +250,10 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     //#if MC < 1.16
     Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
-    //$$ MinecraftClient.getInstance().inGameHud.chatHud.removeMessage(idToMessageSignature(id))
-    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
+    //$$ MinecraftClient.getInstance().execute {
+    //$$    MinecraftClient.getInstance().inGameHud.chatHud.removeMessage(idToMessageSignature(id))
+    //$$    MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
+    //$$ }
     //#endif
 }
 
