@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 @SkyHanniModule
@@ -21,5 +21,5 @@ object InWaterDisplay {
         config.inWaterPosition.renderStrings(listOf(text), posLabel = "In Water Display")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.inWaterDisplay
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.inWaterDisplay
 }

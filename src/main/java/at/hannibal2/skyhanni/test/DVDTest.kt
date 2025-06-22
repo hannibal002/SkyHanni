@@ -7,18 +7,19 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.DVDLogoRenderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 
 @SkyHanniModule
 object DVDTest {
 
     private val dvdRenderable by lazy {
         DVDLogoRenderable(
-            renderable = Renderable.string("§zDVD Logo Test", scale = 3.0),
+            renderable = RenderableString("§zDVD Logo Test", scale = 3.0),
+            movementSpeed = 80f,
         )
     }
 
-    private val position = Position(0, 0)
+    private val position = Position(200, 200)
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
@@ -13,6 +14,8 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$ net.minecraft.network.chat.TextComponent.EMPTY
     //#endif
 ) {
+
+    val mc: Minecraft = Minecraft.getMinecraft()
 
     //#if MC < 1.21
     final override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -44,6 +47,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //#else
     //$$ override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
     //$$     onMouseClicked(mouseX.toInt(), mouseY.toInt(), mouseButton)
+    //$$     onHandleMouseInput()
     //$$     return super.mouseClicked(mouseX, mouseY, mouseButton)
     //$$ }
     //#endif
@@ -57,13 +61,17 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     }
     //#else
     //$$ override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-    //$$     // TODO confirm if keyCode.toChar() is correct
-    //$$     onKeyTyped(keyCode.toChar(), keyCode)
+    //$$     onKeyTyped(null, keyCode)
     //$$     return super.keyPressed(keyCode, scanCode, modifiers)
+    //$$ }
+    //$$
+    //$$ override fun charTyped(chr: Char, modifiers: Int): Boolean {
+    //$$     onKeyTyped(chr, null)
+    //$$     return super.charTyped(chr, modifiers)
     //$$ }
     //#endif
 
-    open fun onKeyTyped(typedChar: Char, keyCode: Int) {}
+    open fun onKeyTyped(typedChar: Char?, keyCode: Int?) {}
 
     //#if MC < 1.21
     final override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
@@ -73,6 +81,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //#else
     //$$ override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
     //$$     onMouseReleased(mouseX.toInt(), mouseY.toInt(), button)
+    //$$     onHandleMouseInput()
     //$$     return super.mouseReleased(mouseX, mouseY, button)
     //$$ }
     //#endif
@@ -88,6 +97,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$ override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
     //$$     // TODO there is no timeSince last click in modern
     //$$     onMouseClickMove(mouseX.toInt(), mouseY.toInt(), button, 0L)
+    //$$     onHandleMouseInput()
     //$$     return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
     //$$ }
     //#endif
