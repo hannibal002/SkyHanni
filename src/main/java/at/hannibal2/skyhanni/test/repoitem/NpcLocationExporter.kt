@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import com.google.gson.JsonObject
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.item.ItemStack
@@ -43,7 +44,7 @@ object NpcLocationExporter {
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyDown(event: KeyDownEvent) {
         if (!config.editModeEnabled) return
-        if (InventoryUtils.inInventory()) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
         if (event.keyCode != KeyboardManager.MIDDLE_MOUSE) return
         val apiIsland = SkyBlockUtils.currentIsland.islandData?.apiName.orEmpty()
 
