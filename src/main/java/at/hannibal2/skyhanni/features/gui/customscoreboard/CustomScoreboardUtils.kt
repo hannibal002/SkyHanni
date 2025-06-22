@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 object CustomScoreboardUtils {
 
     fun formatNumberDisplay(text: String, number: String, color: String): String {
-        val formattedNumber = if (LorenzUtils.isAprilFoolsDay) {
+        val formattedNumber = if (SkyHanniDebugsAndTests.isAprilFoolsDay) {
             "-$number"
         } else {
             number

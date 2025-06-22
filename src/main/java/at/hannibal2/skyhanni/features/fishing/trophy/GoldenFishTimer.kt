@@ -114,7 +114,7 @@ object GoldenFishTimer {
     private val goldenFishSkullItem by lazy {
         ItemUtils.createSkull(
             displayName = "§6Golden Fish",
-            uuid = "b7fdbe67cd004683b9fa9e3e17738254",
+            uuid = "b7fdbe67-cd00-4683-b9fa-9e3e17738254",
             value = GOLDEN_FISH_SKULL_TEXTURE,
         )
     }

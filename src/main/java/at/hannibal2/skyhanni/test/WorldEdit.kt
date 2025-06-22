@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import java.awt.Color
@@ -77,13 +77,13 @@ object WorldEdit {
         if (!isEnabled()) return
 
         leftPos?.let { l ->
-            event.drawWireframeBoundingBox(
+            event.drawHitbox(
                 funAABB(l, l).expandBlock(),
                 Color.RED,
             )
         }
         rightPos?.let { r ->
-            event.drawWireframeBoundingBox(
+            event.drawHitbox(
                 funAABB(r, r).expandBlock(),
                 Color.BLUE,
             )

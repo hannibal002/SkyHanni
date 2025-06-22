@@ -24,6 +24,9 @@ import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//#endif
 
 @SkyHanniModule
 object ScoreboardData {
@@ -161,7 +164,7 @@ object ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
         //#else
-        //$$ return list.map { it.formattedTextCompat(true) }
+        //$$ return list.map { it.formattedTextCompatLessResets() }
         //#endif
     }
 
@@ -184,9 +187,11 @@ object ScoreboardData {
     }
 
     private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+        //#if MC < 1.21
         if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
             return null
         }
+        //#endif
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")
