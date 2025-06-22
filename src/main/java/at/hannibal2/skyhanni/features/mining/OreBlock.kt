@@ -44,7 +44,7 @@ enum class OreBlock(
 ) {
     // MITHRIL
     LOW_TIER_MITHRIL(::isLowTierMithril, { inDwarvenMines || inGlacite }, OreCategory.DWARVEN_METAL),
-    MID_TIER_MITHRIL(Blocks.prismarine, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
+    MID_TIER_MITHRIL(::isMidTierMithril, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
     HIGH_TIER_MITHRIL(::isHighTierMithril, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
 
     // TITANIUM
@@ -167,6 +167,14 @@ private fun isLowTierMithril(state: IBlockState): Boolean = when (state.block) {
     else -> false
 }
 
+private fun isMidTierMithril(state: IBlockState): Boolean {
+    //#if MC < 1.16
+    return state.block == Blocks.prismarine
+    //#else
+    //$$ return state.block == Blocks.PRISMARINE || state.block == Blocks.PRISMARINE_BRICKS || state.block == Blocks.DARK_PRISMARINE
+    //#endif
+}
+
 private fun isHighTierMithril(state: IBlockState): Boolean {
     //#if MC < 1.16
     return (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.LIGHT_BLUE)
@@ -272,7 +280,7 @@ private fun isHighTierUmber(state: IBlockState): Boolean =
     //#if MC < 1.16
     (state.block == Blocks.double_stone_slab2 && state.getValue(BlockStoneSlabNew.VARIANT) == BlockStoneSlabNew.EnumType.RED_SANDSTONE)
 //#else
-//$$ state.block == Blocks.RED_SANDSTONE_SLAB
+//$$ state.block == Blocks.SMOOTH_RED_SANDSTONE
 //#endif
 
 private fun isLowTierTungstenTunnels(state: IBlockState): Boolean =

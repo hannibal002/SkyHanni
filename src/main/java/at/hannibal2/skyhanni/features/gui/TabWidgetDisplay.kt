@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 
 enum class TabWidgetDisplay(
@@ -59,7 +59,7 @@ enum class TabWidgetDisplay(
     companion object {
 
         private val config get() = SkyHanniMod.feature.gui.tabWidget
-        private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+        private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

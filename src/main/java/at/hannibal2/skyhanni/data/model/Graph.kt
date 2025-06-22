@@ -37,6 +37,10 @@ value class Graph(
 
     override fun lastIndexOf(element: GraphNode) = nodes.lastIndexOf(element)
 
+    fun getTags(tag: GraphNodeTag) = nodes.filter { it.hasTag(tag) }
+    fun getTags(vararg tag: GraphNodeTag) = nodes.filter { node -> tag.all { node.hasTag(it) } }
+    fun getName(name: String) = nodes.filter { it.name == name }
+
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
             { out, value ->
