@@ -58,7 +58,6 @@ fun IChatComponent.unformattedTextCompat(): String =
 
 // has to be a separate function for pattern mappings
 fun IChatComponent?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
-
 fun IChatComponent?.formattedTextCompatWithStartingWhiteColorCode(): String = this.formattedTextCompat(removeStartingWhiteColorCode = false)
 
 @JvmOverloads
