@@ -75,7 +75,7 @@ object SkyBlockItemModifierUtils {
     @KSerializable
     data class PetInfo(
         @Expose val type: String,
-        @Expose val active: Boolean,
+        @Expose val active: Boolean? = null,
         @Expose val exp: Double,
         @Expose val tier: LorenzRarity,
         @Expose val hideInfo: Boolean = false,
