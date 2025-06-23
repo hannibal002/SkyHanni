@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.foraging
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -10,6 +11,7 @@ class MoongladeBeaconConfig {
 
     @Expose
     @ConfigOption(name = "Beacon Solver", desc = "Shows which slots to click on to solve the beacon.")
+    @FeatureToggle
     @ConfigEditorBoolean
     var enabled: Boolean = true
 
@@ -17,6 +19,12 @@ class MoongladeBeaconConfig {
     @ConfigOption(name = "Use Middle Click", desc = "Click on slots with middle click to speed up interactions.")
     @ConfigEditorBoolean
     var useMiddleClick: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Alert when ready", desc = "Sends a title when the moonglade beacon is ready to be activated.")
+    @FeatureToggle
+    @ConfigEditorBoolean
+    var beaconAlert: Boolean = true
 
     @Expose
     @ConfigLink(owner = MoongladeBeaconConfig::class, field = "enabled")
