@@ -230,9 +230,9 @@ object ShaderRenderUtils {
         angle2: Float = 7.0f
     ) {
         val radiusIn = radius * GuiScreenUtils.scaleFactor
-        val diameterIn = radiusIn * 2
+        val diameter = radius * 2
 
-        CircleShader.applyBaseSettings(radiusIn, diameterIn, diameterIn, x, y, smoothness) {
+        CircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
             this.angle1 = angle1 - Math.PI.toFloat()
             this.angle2 = angle2 - Math.PI.toFloat()
         }
