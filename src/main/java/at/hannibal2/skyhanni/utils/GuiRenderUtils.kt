@@ -325,7 +325,11 @@ object GuiRenderUtils {
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
         val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
 
+        //#if MC < 1.21
         val baseScale = if (isSkull) (4f / 3f) else 1f
+        //#else
+        //$$ val baseScale = if (isSkull) (5f / 4f) else 1f
+        //#endif
         val finalScale = (baseScale * scaleMultiplier).toFloat()
 
         val (translateX, translateY) = if (isSkull) {
