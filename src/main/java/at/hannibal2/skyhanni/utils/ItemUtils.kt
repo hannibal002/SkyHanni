@@ -204,7 +204,7 @@ object ItemUtils {
     //#else
     //$$ fun getDisplayName(compound: ComponentMap?): String? {
     //$$     compound ?: return null
-    //$$     val name = compound.get(DataComponentTypes.CUSTOM_NAME)?.formattedTextCompat()
+    //$$     val name = compound.get(DataComponentTypes.CUSTOM_NAME)?.formattedTextCompatWithStartingWhiteColorCode()
     //$$     if (name.isNullOrEmpty()) return null
     //$$     return name
     //$$ }
