@@ -58,6 +58,14 @@ enum class ItemCategory {
     BLOCK,
     DWARVEN_METAL,
     GEMSTONE,
+    LASSO,
+    FISHING_NET,
+    SALT,
+    TRAP,
+    BOOSTER,
+    WATER_SHARD,
+    FOREST_SHARD,
+    COMBAT_SHARD,
 
     NONE,
     ;

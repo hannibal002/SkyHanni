@@ -3,16 +3,15 @@ package at.hannibal2.skyhanni.utils.shader
 import at.hannibal2.skyhanni.features.chroma.StandardChromaShader
 import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
 import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
-import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleShader
+import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
 import org.apache.commons.lang3.StringUtils
-import org.lwjgl.opengl.OpenGLException
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -31,7 +30,7 @@ object ShaderManager {
         ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE),
         ROUNDED_RECT_OUTLINE(RoundedRectangleOutlineShader.INSTANCE),
         ROUNDED_TEXTURE(RoundedTextureShader.INSTANCE),
-        DARKEN(DarkenShader.INSTANCE)
+        DARKEN(DarkenShader.INSTANCE),
         ;
 
         fun enableShader() = enableShader(this)
@@ -65,7 +64,11 @@ object ShaderManager {
 
         val source = StringBuilder()
 
+        //#if MC < 1.21
         val inputStream = Minecraft.getMinecraft().resourceManager.getResource(resourceLocation).inputStream
+        //#else
+        //$$ val inputStream = MinecraftClient.getInstance().resourceManager.getResource(resourceLocation).get().inputStream
+        //#endif
         BufferedReader(InputStreamReader(inputStream)).forEachLine {
             source.append(it).append("\n")
         }
@@ -81,7 +84,7 @@ object ShaderManager {
 
             if (inWorld()) {
                 ErrorManager.logErrorWithData(
-                    OpenGLException("Shader compilation error."),
+                    Exception("Shader compilation error."),
                     errorMessage,
                     "GLSL Compilation Error:\n" to errorLog,
                 )

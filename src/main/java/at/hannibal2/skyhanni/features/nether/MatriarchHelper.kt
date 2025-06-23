@@ -152,5 +152,5 @@ object MatriarchHelper {
         exitNode = null
     }
 
-    fun isEnabled() = config.enabled
+    private fun isEnabled() = config.enabled
 }

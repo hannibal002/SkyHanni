@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.OnlyLegacy;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
@@ -217,6 +218,7 @@ public class MiscConfig {
     // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
+    @OnlyLegacy
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideScoreboardNumbers = false;
@@ -297,6 +299,7 @@ public class MiscConfig {
         name = "Fix Patcher Lines",
         desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else."
     )
+    @OnlyLegacy
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixPatcherLines = true;

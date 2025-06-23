@@ -17,6 +17,7 @@ net.minecraft.client.option.Perspective net.minecraft.client.CameraType
 
 net.minecraft.client.option.KeyBinding isPressed() isDown()
 net.minecraft.client.option.KeyBinding unpressAll() releaseAll()
+net.minecraft.client.option.KeyBinding wasPressed() consumeClick()
 
 net.minecraft.client.option.Perspective isFrontView() isMirrored()
 
@@ -43,6 +44,7 @@ net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket net.minecraft.network.pr
 net.minecraft.screen.ScreenHandler net.minecraft.world.inventory.AbstractContainerMenu
 
 net.minecraft.screen.ScreenHandler getSlot() getSlot()
+net.minecraft.screen.ScreenHandler getStacks() getItems()
 net.minecraft.screen.ScreenHandler syncId containerId
 
 net.minecraft.screen.slot.Slot net.minecraft.world.inventory.Slot

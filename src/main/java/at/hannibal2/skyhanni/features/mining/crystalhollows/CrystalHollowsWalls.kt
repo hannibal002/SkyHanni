@@ -7,13 +7,12 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.inflateBlock
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.QuadDrawer
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 
@@ -71,7 +70,7 @@ object CrystalHollowsWalls {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        val position = RenderUtils.getViewerPos(event.partialTicks)
+        val position = WorldRenderUtils.getViewerPos(event.partialTicks)
         when {
             position.y < HEAT_HEIGHT + yViewOffset -> drawHeat(event)
             nucleusBBOffsetY.isVecInside(position.toVec3()) -> {
@@ -297,5 +296,5 @@ object CrystalHollowsWalls {
         )
     }
 
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isCurrent()
 }
