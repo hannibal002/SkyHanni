@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
@@ -14,6 +15,7 @@ object BetterSignEditing {
     @HandleEvent
     fun onTick() {
         if (!SkyBlockUtils.onHypixel) return
+        if (!PlatformUtils.IS_LEGACY) return
         if (!SkyHanniMod.feature.misc.betterSignEditing) return
 
         val gui = Minecraft.getMinecraft().currentScreen
