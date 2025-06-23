@@ -104,7 +104,8 @@ object MoongladeBeacon {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        inInventory = event.inventoryName == "Tune Frequency" || event.inventoryName == "Upgrade Signal Strength"
+        // todo doesnt work in the upgrading menu atm
+        inInventory = event.inventoryName == "Tune Frequency" // || event.inventoryName == "Upgrade Signal Strength"
         if (!inInventory) return
         if (event.inventoryName == "Upgrade Signal Strength") {
             upgradingStrength = true
