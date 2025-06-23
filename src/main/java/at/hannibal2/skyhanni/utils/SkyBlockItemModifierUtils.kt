@@ -146,7 +146,7 @@ object SkyBlockItemModifierUtils {
 
         try {
             return ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             ErrorManager.skyHanniError(
                 "Failed to parse pet info for item: ${displayName.removeColor()}",
                 "exception" to e.message,
