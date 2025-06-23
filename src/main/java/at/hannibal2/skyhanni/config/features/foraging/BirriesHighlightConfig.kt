@@ -22,7 +22,7 @@ class BirriesHighlightConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Highlight Birries", desc = "Highlights nearby Birries")
+    @ConfigOption(name = "Color", desc = "Color for the Birries highlight")
     @ConfigEditorColour
     @OnlyModern
     @SearchTag("tadpole tad pole poll")
