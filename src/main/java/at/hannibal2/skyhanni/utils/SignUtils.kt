@@ -19,7 +19,11 @@ object SignUtils {
     fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
+        //#if MC < 1.21
         gui.text[line] = text.asComponent()
+        //#else
+        //$$ gui.tileSign.setText(gui.tileSign.frontText.withMessage(line, text.asComponent()), true)
+        //#endif
     }
 
     private fun addTextIntoSign(addedText: String) {
@@ -28,7 +32,11 @@ object SignUtils {
         val lines = gui.text
         val index = gui.editLine
         val text = lines[index].unformattedText + addedText
+        //#if MC < 1.21
         lines[index] = text.capAtMinecraftLength(91).asComponent()
+        //#else
+        //$$ gui.tileSign.setText(gui.tileSign.frontText.withMessage(index, text.capAtMinecraftLength(91).asComponent()), true)
+        //#endif
     }
 
     fun checkDeleting(gui: GuiScreen?) {
