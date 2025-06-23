@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
@@ -46,8 +47,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
@@ -157,13 +161,17 @@ object ItemDisplayOverlayFeatures {
             return "§b$year"
         }
 
-        if (PET_LEVEL.isSelected()) {
-            if (item.getItemCategoryOrNull() == ItemCategory.PET) {
-                val level = item.getPetLevel()
-                if (level != ItemUtils.maxPetLevel(itemName)) {
-                    return level.toString()
-                }
-            }
+        if (PET_LEVEL.isSelected() && item.getItemCategoryOrNull() == ItemCategory.PET) {
+            item.getPetInfo()?.takeIf {
+                // 0.0 Would probably work, but rounding errors can occur
+                // due to hypixel's imprecision in storage.
+                it.exp > 10.0 || PetStorageApi.mainPetMenuNamePattern.matches(
+                    InventoryUtils.openInventoryName()
+                )
+            } ?: return null
+            val level = item.getPetLevel()
+            val maxLevel = item.getMaxPetLevel()
+            if (level != maxLevel) return level.toString()
         }
 
         if (MINION_TIER.isSelected() && itemName.contains(" Minion ") &&

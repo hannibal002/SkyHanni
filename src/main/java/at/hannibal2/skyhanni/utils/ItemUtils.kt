@@ -309,7 +309,7 @@ object ItemUtils {
     fun ItemStack.isEnchanted(): Boolean =
         //#if MC < 1.21
         isItemEnchanted
-        //#else
+    //#else
     //$$ hasEnchantments() || this.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) == true
     //#endif
 

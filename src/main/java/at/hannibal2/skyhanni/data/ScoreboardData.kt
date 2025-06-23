@@ -187,9 +187,11 @@ object ScoreboardData {
     }
 
     private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+        //#if MC < 1.21
         if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
             return null
         }
+        //#endif
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")

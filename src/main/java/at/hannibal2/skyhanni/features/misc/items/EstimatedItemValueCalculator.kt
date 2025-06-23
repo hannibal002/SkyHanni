@@ -681,9 +681,7 @@ object EstimatedItemValueCalculator {
 
     private fun addBoosters(stack: ItemStack, list: MutableList<String>): Double {
         val boosters = stack.readBoosters()
-        if (boosters.isEmpty()) {
-            return 0.0
-        }
+        if (boosters.isEmpty()) return 0.0
 
         val (totalPrice, names) = getTotalAndNames(boosters)
 
