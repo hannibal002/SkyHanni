@@ -328,7 +328,7 @@ object GuiRenderUtils {
         //#if MC < 1.21
         val baseScale = if (isSkull) (4f / 3f) else 1f
         //#else
-        //$$ val baseScale = if (isSkull) 2f else 1f
+        //$$ val baseScale = 1f
         //#endif
         val finalScale = (baseScale * scaleMultiplier).toFloat()
 
