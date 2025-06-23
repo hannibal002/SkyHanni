@@ -343,7 +343,6 @@ object GuiRenderUtils {
 
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(translateX, translateY, zT)
-            DrawContextUtils.scale(finalScale, finalScale, zS)
 
             //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
@@ -375,6 +374,9 @@ object GuiRenderUtils {
                 //$$ savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
                 //#endif
             }
+
+            DrawContextUtils.scale(finalScale, finalScale, zS)
+
             DrawContextUtils.multMatrix(savedMV)
 
             //#if MC < 1.21
