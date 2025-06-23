@@ -7,9 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -24,6 +22,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
+import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
@@ -33,7 +32,6 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ChatManager {
 
@@ -109,9 +107,7 @@ object ChatManager {
 
     @HandleEvent
     fun onSendMessageToServerPacket(event: PacketSentEvent) {
-        val packet = event.packet as? C01PacketChatMessage ?: return
-
-        val message = packet.message
+        val message = getMessageFromPacket(event.packet) ?: return
         val component = message.asComponent()
         val originatingModCall = event.findOriginatingModCall()
         val originatingModContainer = originatingModCall?.getClassInstance()?.getModInstance()
@@ -144,6 +140,16 @@ object ChatManager {
         }
     }
 
+    private fun getMessageFromPacket(packet: Packet<*>): String? {
+        return when (packet) {
+            is C01PacketChatMessage -> packet.message
+            //#if MC > 1.21
+            //$$ is net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket -> "/${packet.command}"
+            //#endif
+            else -> null
+        }
+    }
+
     /**
      * If the message is modified return the modified message otherwise return null.
      * If the message is cancelled return true.
@@ -153,7 +159,7 @@ object ChatManager {
         val message = component.formattedText.stripHypixelMessage()
         var cancelled = false
 
-        if (message.startsWith("§f{\"server\":\"")) {
+        if (message.startsWith("§f{\"server\":\"") || message.startsWith("{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
             if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
                 cancelled = true
@@ -199,7 +205,6 @@ object ChatManager {
     }
 
     private fun openChatHistoryGui(args: Array<String>) {
-        //#if TODO
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatHistoryGui(getRecentMessageHistory())
         } else {
@@ -211,7 +216,6 @@ object ChatManager {
             }
             ChatHistoryGui(history)
         }
-        //#endif
     }
 
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched

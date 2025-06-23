@@ -21,21 +21,26 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils.slots
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.21
+//$$ import net.minecraft.server.world.ServerWorld
+//#endif
 
 @SkyHanniModule
 object VisitorListener {
@@ -59,7 +64,12 @@ object VisitorListener {
         val packet = event.packet
         if (packet !is C02PacketUseEntity) return
 
+        //#if MC < 1.21
         val entity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
+        //#else
+        //$$ val world = MinecraftCompat.localPlayer.world
+        //$$ val entity = world.getEntityById(packet.entityId) ?: return
+        //#endif
         val entityId = entity.entityId
 
         lastClickedNpc = entityId
@@ -74,7 +84,7 @@ object VisitorListener {
 
         val visitorsInTab = VisitorApi.visitorsInTabList(event.lines)
 
-        if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() > 2.seconds) {
             for (visitor in VisitorApi.getVisitors()) {
                 val name = visitor.visitorName
                 val removed = name !in visitorsInTab
@@ -127,8 +137,8 @@ object VisitorListener {
         if (!config.acceptHotkey.isKeyHeld()) return
         val inventory = event.guiContainer as? AccessorGuiContainer ?: return
         inventory as GuiContainer
-        val slot = inventory.inventorySlots.getSlot(29)
-        inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
+        val slot = inventory.slots()[29]
+        InventoryCompat.clickInventorySlot(slot.slotIndex, mouseButton = 0, mode = 0)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

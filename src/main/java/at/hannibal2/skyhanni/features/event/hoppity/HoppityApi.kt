@@ -4,11 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
@@ -40,18 +44,18 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SkyblockSeasonModifier
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.init.Blocks
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import net.minecraft.init.Items
 import net.minecraft.inventory.Slot
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object HoppityApi {
 
@@ -140,25 +144,29 @@ object HoppityApi {
     val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()
     private val processedStraySlots = mutableMapOf<Int, String>()
-    private val miscProcessableItemTypes by lazy {
-        listOf(Items.skull, Item.getItemFromBlock(Blocks.stained_glass_pane))
-    }
 
     private var checkNextInvOpen = false
     private var lastHoppityCallAccept: SimpleTimeMark? = null
+    private var allowedHoppityIslands: Set<IslandType> = setOf()
+    private var onHoppityIsland: Boolean = false
 
     // If there is a time since lastHoppityCallAccept, we can assume this is an abiphone call
     private fun getBoughtType(): HoppityEggType = if (lastHoppityCallAccept != null) BOUGHT_ABIPHONE else BOUGHT
 
+    fun onHoppityIsland() = onHoppityIsland
+
     fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+
+    // First event was year 346 -> #1, 20th event was year 365, etc.
+    fun getHoppityEventNumber(skyblockYear: Int): Int = (skyblockYear - 345)
 
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) getEventEndMark(SkyBlockTime.now().year) else null
 
     fun getEventEndMark(year: Int) =
-        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeasonModifier.EARLY).asTimeMark()
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeasonModifier.EARLY).toTimeMark()
 
     fun getEventStartMark(year: Int) =
-        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeasonModifier.EARLY).asTimeMark()
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeasonModifier.EARLY).toTimeMark()
 
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
@@ -192,7 +200,7 @@ object HoppityApi {
 
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
-        stack != null && stack.item != null && stack.item in miscProcessableItemTypes &&
+        stack != null && stack.item != null && (stack.item == Items.skull || stack.isStainedGlassPane()) &&
             stack.displayName.isNotEmpty() && stack.getLore().isNotEmpty()
 
     private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent, note: String? = null) {
@@ -204,6 +212,16 @@ object HoppityApi {
     }
 
     @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        allowedHoppityIslands = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").apiEggLocations.keys.toSet()
+    }
+
+    @HandleEvent(IslandChangeEvent::class)
+    fun onIslandChange() {
+        onHoppityIsland = SkyBlockUtils.inSkyBlock && allowedHoppityIslands.any { it.isCurrent() }
+    }
+
+    @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!checkNextInvOpen) return
         checkNextInvOpen = false
@@ -211,8 +229,8 @@ object HoppityApi {
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         processedStraySlots.clear()
         if (lastHoppityCallAccept == null) return
         DelayedRun.runDelayed(1.seconds) {

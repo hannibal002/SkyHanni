@@ -39,6 +39,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
@@ -47,7 +49,6 @@ import at.hannibal2.skyhanni.utils.renderables.WrappedRenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.math.ceil
@@ -85,11 +86,11 @@ object BlockStrengthGuide {
             ),
         ),
         TITANIUM(
-            { ItemStack(Blocks.stone, 1, net.minecraft.block.BlockStone.EnumType.DIORITE_SMOOTH.metadata) },
+            { BlockCompat.createSmoothDiorite() },
             setOf(OreBlock.HIGH_TIER_MITHRIL),
         ),
         GRAY_MITHRIL(
-            { ItemStack(Blocks.wool, 1, EnumDyeColor.GRAY.metadata) },
+            { ColoredBlockCompat.GRAY.createWoolStack() },
             setOf(OreBlock.LOW_TIER_MITHRIL),
         ),
         GREEN_MITHRIL(
@@ -97,7 +98,7 @@ object BlockStrengthGuide {
             setOf(OreBlock.MID_TIER_MITHRIL),
         ),
         BLUE_MITHRIL(
-            { ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata) },
+            { ColoredBlockCompat.LIGHT_BLUE.createWoolStack() },
             setOf(OreBlock.HIGH_TIER_MITHRIL),
         ),
         TUNGSTEN_UMBER(
@@ -120,27 +121,27 @@ object BlockStrengthGuide {
             setOf(OreBlock.OBSIDIAN),
         ),
         RUBY(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.RED.metadata) },
+            { ColoredBlockCompat.RED.createGlassStack() },
             setOf(OreBlock.RUBY),
         ),
         NUCLEUS_GEMSTONES(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.LIGHT_BLUE.metadata) },
+            { ColoredBlockCompat.LIGHT_BLUE.createGlassStack() },
             setOf(OreBlock.AMBER, OreBlock.AMETHYST, OreBlock.JADE, OreBlock.SAPPHIRE),
         ),
         OPAL(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.WHITE.metadata) },
+            { ColoredBlockCompat.WHITE.createGlassStack() },
             setOf(OreBlock.OPAL),
         ),
         TOPAZ(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.YELLOW.metadata) },
+            { ColoredBlockCompat.YELLOW.createGlassStack() },
             setOf(OreBlock.TOPAZ),
         ),
         JASPER(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.MAGENTA.metadata) },
+            { ColoredBlockCompat.MAGENTA.createGlassStack() },
             setOf(OreBlock.JASPER),
         ),
         TUNNEL_GEMSTONES(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLACK.metadata) },
+            { ColoredBlockCompat.BLACK.createGlassStack() },
             setOf(OreBlock.ONYX, OreBlock.PERIDOT, OreBlock.CITRINE, OreBlock.AQUAMARINE),
         ),
         HARD_STONE(
@@ -513,11 +514,11 @@ object BlockStrengthGuide {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shblockstrength") {
+        event.registerBrigadier("shblockstrength") {
             description = "Shows how many ticks you need to break any block with your mining speed."
             category = CommandCategory.MAIN
             aliases = listOf("shminingspeed")
-            callback { onCommand() }
+            simpleCallback { onCommand() }
         }
     }
 }

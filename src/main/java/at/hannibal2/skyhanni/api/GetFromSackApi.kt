@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuCalculator
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
@@ -122,7 +122,7 @@ object GetFromSackApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMessageToServer(event: MessageSendToServerEvent) {
-        if (!config.queuedGFS && !config.bazaarGFS) return
+        if ((!config.queuedGFS && !config.bazaarGFS) || SkyBlockUtils.isOnAlphaServer) return
         if (!event.isCommand(commandsWithSlash)) return
         val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
         queuedHandler(replacedEvent)
@@ -138,7 +138,7 @@ object GetFromSackApi {
     }
 
     private fun queuedHandler(event: MessageSendToServerEvent) {
-        if (!config.queuedGFS) return
+        if (!config.queuedGFS || SkyBlockUtils.isOnAlphaServer) return
         if (event.senderIsSkyhanni()) return
 
         val (result, stack) = commandValidator(event.splitMessage.drop(1))
@@ -155,7 +155,7 @@ object GetFromSackApi {
 
     private fun bazaarHandler(event: MessageSendToServerEvent) {
         if (event.isCancelled) return
-        if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
+        if (!config.bazaarGFS || SkyBlockUtils.noTradeMode) return
         lastItemStack = commandValidator(event.splitMessage.drop(1)).second
     }
 
@@ -200,7 +200,7 @@ object GetFromSackApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
+        if (!config.bazaarGFS || SkyBlockUtils.noTradeMode) return
         val stack = lastItemStack ?: return
         val message = event.message
         fromSacksChatPattern.matchMatcher(message) {

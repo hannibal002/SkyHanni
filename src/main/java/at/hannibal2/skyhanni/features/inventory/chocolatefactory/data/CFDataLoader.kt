@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -435,24 +436,26 @@ object CFDataLoader {
     private fun processHitmanItem(item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
+        val newStats = ProfileSpecificStorage.CFStorage.HitmanStatsStorage()
         for (line in item.getLore()) {
             hitmanAvailableEggsPattern.matchMatcher(line) {
-                profileStorage.hitmanStats.availableHitmanEggs = group("amount").formatInt()
+                newStats.availableHitmanEggs = group("amount").formatInt()
             }
             hitmanSingleSlotCooldownPattern.matchMatcher(line) {
                 val timeUntilSlot = TimeUtils.getDuration(group("duration"))
                 val nextSlot = (SimpleTimeMark.now() + timeUntilSlot)
-                profileStorage.hitmanStats.singleSlotCooldownMark = nextSlot
+                newStats.singleSlotCooldownMark = nextSlot
             }
             hitmanAllSlotsCooldownPattern.matchMatcher(line) {
                 val timeUntilAllSlots = TimeUtils.getDuration(group("duration"))
                 val nextAllSlots = (SimpleTimeMark.now() + timeUntilAllSlots)
-                profileStorage.hitmanStats.allSlotsCooldownMark = nextAllSlots
+                newStats.allSlotsCooldownMark = nextAllSlots
             }
             hitmanPurchasedSlotsPattern.matchMatcher(line) {
-                profileStorage.hitmanStats.purchasedHitmanSlots = group("amount").formatInt()
+                newStats.purchasedHitmanSlots = group("amount").formatInt()
             }
         }
+        profileStorage.hitmanStats = newStats
     }
 
     private fun processInventory(list: MutableList<CFUpgrade>, inventory: Map<Int, ItemStack>) {
