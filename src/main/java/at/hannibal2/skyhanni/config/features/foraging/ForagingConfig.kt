@@ -27,10 +27,6 @@ class ForagingConfig {
     @Accordion
     var moongladeBeacon = MoongladeBeaconConfig()
 
-
-
-
-
     @Expose
     @ConfigOption(name = "Birries Highlight", desc = "")
     @OnlyModern
