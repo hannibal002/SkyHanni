@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -23,15 +24,15 @@ object ForagingTutorialQuest {
     private var lastParkWarpAttempt = SimpleTimeMark.farPast()
     private var lastSuggestion = SimpleTimeMark.farPast()
 
-    enum class Quest(val questName: String, val npcName: String, val npcLocation: LorenzVec) {
-        FIRST("Foraging Tutorial", "Lumber Jack", LorenzVec(-221.2, 73.0, -14.9)),
+    private enum class Quest(val questName: String, val npcName: String, val npcLocation: LorenzVec) {
+        FIRST("Foraging Tutorial", "Lumber Jack", LorenzVec(-112.2, 73.0, -36.9)),
         SECOND("Into the Woods", "Charlie", LorenzVec(-275.9, 80.0, -17.1)),
         THIRD("A Helping Hand", "Kelly", LorenzVec(-350.8, 94.0, 31.7)),
         FOURTH("The Campfire Cult", "Ryan", LorenzVec(-362.7, 102.0, -90.5)),
         FIFTH("The Rebuild", "Melody", LorenzVec(-412.3, 109.0, 70.2)),
     }
 
-    enum class NextQuest(val nextPortal: LorenzVec, val endingMessage: String) {
+    private enum class NextQuest(val nextPortal: LorenzVec, val endingMessage: String) {
         SECOND(LorenzVec(-312.1, 81.0, -9.0), "Can you maybe look for her in the §aSpruce Woods§f?"),
         THIRD(LorenzVec(-361.2, 90.0, -14.8), "§cCult Meeting §fthere §c§lRIGHT NOW§f!"),
         FOURTH_LAST(LorenzVec(-397.3, 98.0, -37.5), "§rYou completed each §6Trial of Fire§f! §aCongratulations!"),
@@ -64,7 +65,7 @@ object ForagingTutorialQuest {
                 }
             }
         }
-        if (IslandType.HUB.isCurrent()) {
+        if (IslandType.HUB.isCurrent() || IslandType.THE_PARK.isCurrent()) {
             "§cYou must complete the §r§6(?<quest>.*) Quest §r§cto use this!".toPattern().matchMatcher(event.message) {
                 stepByName(group("quest"))
             }
@@ -92,17 +93,17 @@ object ForagingTutorialQuest {
     }
 
     private fun goToNext(quest: NextQuest) {
-        if (!config.enabled) return
+        if (!isEnabled()) return
         ChatUtils.chat("Go to next phase!")
         IslandGraphs.pathFind(
             quest.nextPortal,
             "Next Quest",
-            condition = { config.enabled },
+            condition = { isEnabled() },
         )
     }
 
     private fun start(step: Quest) {
-        if (!config.enabled) {
+        if (!isEnabled()) {
             suggest(step)
             return
         }
@@ -110,7 +111,7 @@ object ForagingTutorialQuest {
         IslandGraphs.pathFind(
             step.npcLocation,
             step.npcName,
-            condition = { config.enabled },
+            condition = { isEnabled() },
         )
     }
 
@@ -122,6 +123,10 @@ object ForagingTutorialQuest {
         ChatUtils.clickableChat(
             "Do you want to have help solving the Foraging Tutorial Quest? Click here!",
             onClick = {
+                if (PlatformUtils.IS_LEGACY) {
+                    ChatUtils.chat("§cYou need to be on a modern version of Minecraft to use this feature!")
+                    return@clickableChat
+                }
                 config.enabled = true
                 start(step)
             },
@@ -135,5 +140,5 @@ object ForagingTutorialQuest {
         )
     }
 
-    fun isEnalbed() = config.enabled
+    private fun isEnabled() = config.enabled && !PlatformUtils.IS_LEGACY
 }

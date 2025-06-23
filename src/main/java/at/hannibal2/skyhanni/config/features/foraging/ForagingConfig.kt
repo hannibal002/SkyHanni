@@ -24,6 +24,6 @@ class ForagingConfig {
     @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
     @Accordion
-    val tutorialQuest: ForagingTutorialQuesetConfig = ForagingTutorialQuesetConfig()
+    val tutorialQuest: ForagingTutorialQuestConfig = ForagingTutorialQuestConfig()
 
 }
