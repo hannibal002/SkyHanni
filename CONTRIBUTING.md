@@ -359,6 +359,18 @@ a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with s
 
 ## 1.21 / Modern version development
 
+### TLDR
+
+How to make it work:
+1. Go to `.gradle/`.
+2. Create a text file `private.properties`.
+3. Write `skyhanni.multi-version=compile` into the file.
+4. Reload Gradle.
+5. Go into newly Created Run Config `Minecraft Client (:1.21.5)`.
+6. Change the java version from `8` to `21 Temurin`.
+
+### Technical Explanation
+
 You might have noticed that while the SkyHanni source code is found in `src/`, the actual tasks for compiling, building and running the mod
 are located in a subproject called `1.8.9`. This is because SkyHanni is preparing for the eventual fall of 1.8.9 (via the foraging update or
 otherwise).
