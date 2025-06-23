@@ -20,38 +20,11 @@ data class SkyBlockTime(
 ) : Comparable<SkyBlockTime> {
 
     val monthName get() = monthName(month)
-    val dayName get() = "$day${daySuffix(day)}"
 
     fun toTimeMark(): SimpleTimeMark = SimpleTimeMark(toMillis())
 
     fun toMillis(): Long =
         calculateTimeInSkyBlockMillis(year, month, day, hour, minute, second) + SKYBLOCK_EPOCH_START_MILLIS
-
-    fun getSeason(): SkyblockSeason = when (month) {
-        in 1..3 -> SkyblockSeason.SPRING
-        in 4..6 -> SkyblockSeason.SUMMER
-        in 7..9 -> SkyblockSeason.AUTUMN
-        else -> SkyblockSeason.WINTER
-    }
-
-    fun getSeasonModifier(): SkyblockSeasonModifier = when ((month - 1) % 3) {
-        0 -> SkyblockSeasonModifier.EARLY
-        1 -> SkyblockSeasonModifier.NONE
-        2 -> SkyblockSeasonModifier.LATE
-        else -> SkyblockSeasonModifier.NONE
-    }
-
-    private val seasonBorders: List<List<IntRange>> = listOf(
-        listOf(1..1, 1..1, 0..0, 0..0, 0..5), // First border set
-        listOf(12..12, 31..31, 23..23, 59..59, 55..59), // End border set
-    )
-
-    fun isSeasonBorder(): Boolean {
-        val currentValues = listOf(month, day, hour, minute, second)
-        return seasonBorders.any { borderSet ->
-            borderSet.zip(currentValues).all { (range, value) -> value in range }
-        }
-    }
 
     override fun compareTo(other: SkyBlockTime): Int {
         return when {

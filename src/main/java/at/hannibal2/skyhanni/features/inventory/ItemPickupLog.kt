@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-//#if TODO
 import at.hannibal2.skyhanni.events.SackChangeEvent
-//#endif
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -37,7 +35,6 @@ import java.util.Objects
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ItemPickupLog {
     enum class DisplayLayout(private val display: String, val renderable: (PickupEntry, String) -> Renderable) {
@@ -62,7 +59,13 @@ object ItemPickupLog {
         ),
         ITEM_NAME(
             "§d[:3] TransRights's Cake Soul",
-            { entry, _ -> Renderable.string(entry.name) },
+            { entry, _ ->
+                var name = entry.name
+                if (entry.name == "Air") {
+                    name = entry.neuInternalName?.repoItemName ?: "?"
+                }
+                Renderable.string(name)
+            },
         ),
         ;
 
@@ -114,7 +117,6 @@ object ItemPickupLog {
         itemsRemovedFromInventory.clear()
     }
 
-    //#if TODO
     @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled() || !config.sack) return
@@ -126,7 +128,6 @@ object ItemPickupLog {
             updateItem(itemStack.hash(), item, it.delta < 0)
         }
     }
-    //#endif
 
     @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {

@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 object NavigationUtils {
 
@@ -18,7 +18,7 @@ object NavigationUtils {
                 "calculateTravelingSalesman could not reach all goals",
                 "input" to input.size,
                 "output" to output.size,
-                "island" to LorenzUtils.skyBlockIsland,
+                "island" to SkyBlockUtils.currentIsland,
             )
         }
 

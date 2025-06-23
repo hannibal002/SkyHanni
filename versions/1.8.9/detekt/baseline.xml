@@ -25,16 +25,15 @@
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
+    <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
     <ID>LargeClass:WorldRenderUtils.kt$WorldRenderUtils</ID>
-    <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
     <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>LongMethod:RepoManager.kt$RepoManager$private fun doTheFetching(command: Boolean)</ID>
-    <ID>LongMethod:UpdateKeybinds.kt$UpdateKeybinds$private fun makeMap(): Map&lt;Int, Int&gt;</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
@@ -57,6 +56,7 @@
     <ID>MemberNameEqualsClassName:PestSpawn.kt$PestSpawn$private fun pestSpawn(amount: Int, plotNames: List&lt;String&gt;, unknownAmount: Boolean)</ID>
     <ID>MemberNameEqualsClassName:Shimmy.kt$Shimmy.Companion$private fun shimmy(source: Any?, fieldName: String): Any?</ID>
     <ID>MemberNameEqualsClassName:TestBingo.kt$TestBingo$var testBingo = false</ID>
+    <ID>NoEmptyClassBody:ModernPatterns.kt$ModernPatterns${ }</ID>
     <ID>NoNameShadowing:ContributorManager.kt$ContributorManager${ it.isAllowed() }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
@@ -66,11 +66,6 @@
     <ID>NoNameShadowing:RepoManager.kt$RepoManager${ unsuccessfulConstants.add(it) }</ID>
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
-    <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:InquisitorSoundConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:LaneSwitchSoundSettings.kt$//#if TODO</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:BazaarCancelledBuyOrderClipboard.kt$BazaarCancelledBuyOrderClipboard$by patternGroup.pattern( "cancelledmessage", "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?&lt;coins&gt;.*) coins §r§7from cancelling Buy Order!", )</ID>
     <ID>RepoPatternRegexTestMissing:BeaconPower.kt$BeaconPower$by group.pattern( "stat", "§7Current Stat: (?&lt;stat&gt;.+)", )</ID>
@@ -194,7 +189,7 @@
     <ID>RepoPatternRegexTestMissing:SprayFeatures.kt$SprayFeatures$by RepoPattern.pattern( "garden.spray.material", "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?&lt;spray&gt;.*)§r§7!", )</ID>
     <ID>RepoPatternRegexTestMissing:TabListReader.kt$TabListReader$by patternGroup.pattern( "upgrades", "(?&lt;firstPart&gt;§e[A-Za-z ]+)(?&lt;secondPart&gt; §f[\\w ]+)" )</ID>
     <ID>RepoPatternRegexTestMissing:TabListReader.kt$TabListReader$by patternGroup.pattern( "winterpowerups", "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*" )</ID>
-    <ID>RepoPatternRegexTestMissing:TabListRenderer.kt$TabListRenderer$by RepoPattern.pattern( "tablist.firesaletitle", "§.§lFire Sales: §r§f\\([0-9]+\\)" )</ID>
+    <ID>RepoPatternRegexTestMissing:TabListRenderer.kt$TabListRenderer$by RepoPattern.pattern( "tablist.firesaletitle", "§.§lFire Sales: §r§f\\([0-9]+\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:TeleportPadInventoryNumber.kt$TeleportPadInventoryNumber$by RepoPattern.pattern( "misc.teleportpad.number", "§.(?&lt;number&gt;.*) teleport pad" )</ID>
     <ID>RepoPatternRegexTestMissing:TerracottaPhase.kt$TerracottaPhase$by patternGroup.pattern( "start", "§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!", )</ID>
     <ID>RepoPatternRegexTestMissing:TestCopyBestiaryValues.kt$TestCopyBestiaryValues$by RepoPattern.pattern( "test.bestiary.type", "\\[Lv(?&lt;lvl&gt;.*)] (?&lt;text&gt;.*)" )</ID>
@@ -244,19 +239,20 @@
     <ID>ReturnCount:PowderMiningChatFilter.kt$PowderMiningChatFilter$@Suppress("CyclomaticComplexMethod") fun block(message: String): String?</ID>
     <ID>ReturnCount:PurseApi.kt$PurseApi$private fun getCause(diff: Double): PurseChangeCause</ID>
     <ID>ReturnCount:QuestLoader.kt$QuestLoader$private fun addQuest(name: String, state: QuestState, needAmount: Int): Quest</ID>
-    <ID>ReturnCount:SkillApi.kt$SkillApi$fun onCommand(it: Array&lt;String&gt;)</ID>
     <ID>ReturnCount:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$private suspend fun setCommand(args: Array&lt;String&gt;): String</ID>
     <ID>SpacingAroundCurly:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$}</ID>
     <ID>SpreadOperator:ItemUtils.kt$ItemUtils$(tag, displayName, *lore.toTypedArray())</ID>
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:TextHelper.kt$TextHelper$(*component.toTypedArray(), separator = separator)</ID>
-    <ID>TooManyFunctions:CollectionUtils.kt$CollectionUtils</ID>
     <ID>TooManyFunctions:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator</ID>
-    <ID>TooManyFunctions:HypixelCommands.kt$HypixelCommands</ID>
+    <ID>TooManyFunctions:GuiRenderUtils.kt$GuiRenderUtils</ID>
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
+    <ID>TooManyFunctions:OreBlock.kt$at.hannibal2.skyhanni.features.mining.OreBlock.kt</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
+    <ID>TooManyFunctions:SkyhanniBaseScreen.kt$SkyhanniBaseScreen : GuiScreen</ID>
+    <ID>TooManyFunctions:TextCompat.kt$at.hannibal2.skyhanni.utils.compat.TextCompat.kt</ID>
     <ID>TooManyFunctions:WorldRenderUtils.kt$WorldRenderUtils</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Double::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
@@ -334,6 +330,8 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt$WorldRenderUtils$it.name!!</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
+    <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var x = globalMouseX * scaledWindowWidth / displayWidth</ID>
+    <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var y = globalMouseY * height / displayHeight</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>

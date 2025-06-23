@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
@@ -51,7 +52,6 @@ object SkyHanniMod {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
-        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
 
         PreInitFinishedEvent.post()
     }
@@ -59,6 +59,7 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
         MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
@@ -76,8 +77,15 @@ object SkyHanniMod {
             screenTicks++
             if (screenTicks == 5) {
                 val title = InventoryUtils.openInventoryName()
-                MinecraftCompat.localPlayer.closeScreen()
-                OtherInventoryData.close(title)
+                if (shouldCloseScreen) {
+                    //#if MC < 1.21
+                    MinecraftCompat.localPlayer.closeScreen()
+                    //#else
+                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
+                    //#endif
+                    OtherInventoryData.close(title)
+                }
+                shouldCloseScreen = true
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null
@@ -123,6 +131,7 @@ object SkyHanniMod {
     }
 
     var screenToOpen: GuiScreen? = null
+    var shouldCloseScreen: Boolean = true
     private var screenTicks = 0
     fun consoleLog(message: String) {
         logger.log(Level.INFO, message)
@@ -159,7 +168,10 @@ object SkyHanniMod {
         event.registerBrigadier("shconfigsave") {
             description = "Manually saving the config"
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
+            simpleCallback {
+                ChatUtils.chat("Manually saved the config!")
+                configManager.saveConfig(ConfigFileType.FEATURES, "manual-command")
+            }
         }
     }
 }

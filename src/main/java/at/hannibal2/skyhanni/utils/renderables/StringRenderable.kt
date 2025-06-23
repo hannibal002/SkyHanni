@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import java.awt.Color
 
-// todo 1.21 impl needed
 open class RenderableString(
     val text: String,
     val scale: Double = 1.0,
@@ -43,25 +43,7 @@ class WrappedRenderableString(
 ) {
     private val fontRenderer: FontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
     val map by lazy {
-        //#if TODO
-        // TODO do not use minecraft, as it this native one does not work properly
-        var pre: Map<String, Int>
-        var localWidth = width
-        var iteration = 0
-        while (true) {
-            pre = fontRenderer.listFormattedStringToWidth(
-                text, (localWidth / scale).toInt(),
-            ).associateWith { fontRenderer.getStringWidth(it) }
-            if (pre.none { it.value > width }) {
-                break
-            }
-            iteration++
-            localWidth = (width - iteration * width * 0.01).toInt()
-        }
-        pre
-        //#else
-        //$$ listOf(text).associateWith { fontRenderer.getWidth(text) }
-        //#endif
+        text.splitLines((width / scale).toInt()).split("\n").associateWith { fontRenderer.getStringWidth(text) }
     }
 
     override val width by lazy { (rawWidth * scale).toInt() + 1 }

@@ -4,13 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
+//#if MC > 1.16
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//#endif
 
 @SkyHanniModule
 object PetNametag {
@@ -30,7 +33,14 @@ object PetNametag {
     fun onNameTagRender(event: EntityDisplayNameEvent<EntityArmorStand>) {
         if (!isEnabled()) return
 
-        petNametagPattern.matchMatcher(event.chatComponent.unformattedText) {
+        val standName: String =
+            //#if MC < 1.16
+            event.chatComponent.unformattedText
+        //#else
+        //$$ event.chatComponent.formattedTextCompatLessResets()
+        //#endif
+
+        petNametagPattern.matchMatcher(standName) {
             val start = group("start")
             val lvl = group("lvl").formatInt()
             val rarity = group("rarity")
@@ -51,5 +61,5 @@ object PetNametag {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && (config.hidePetLevel || config.hideMaxPetLevel)
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && (config.hidePetLevel || config.hideMaxPetLevel)
 }
