@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.config.features.foraging
 
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -19,5 +21,12 @@ class ForagingConfig {
     @ConfigEditorInfoText
     var notice: String = ""
 
+
+
+    @Expose
+    @ConfigOption(name = "Birries Highlight", desc = "")
+    @OnlyModern
+    @Accordion
+    var birriesHighlight = BirriesHighlightConfig()
 
 }
