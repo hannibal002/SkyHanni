@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -863,7 +864,7 @@ interface Renderable {
             hoveredColor: (Color) -> Color = { it.darker(0.5) },
             onClick: (Boolean) -> Unit,
             onHover: (Boolean) -> Unit = {},
-            button: Int = 0,
+            button: Int = KeyboardManager.LEFT_MOUSE,
             bypassChecks: Boolean = false,
             condition: (Boolean) -> Boolean = { true },
             startState: Boolean = false,
@@ -886,7 +887,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 val realColor: Color
                 if (isHovered(posX, posY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
-                    if ((button - 100).isKeyClicked()) {
+                    if (button.isKeyClicked()) {
                         state = !state
                         onClick(state)
                     }
