@@ -84,8 +84,8 @@ object SkyBlockItemModifierUtils {
         @Deprecated("Some pets do not have uuids, use uniqueId instead", replaceWith = ReplaceWith("uniqueId"))
         @Expose val uuid: UUID? = null,
         @Expose val uniqueId: UUID? = null, // Only null when pet is read from a shop, or another non-"owned" source
-        @Expose val hideRightClick: Boolean,
-        @Expose val noMove: Boolean,
+        @Expose val hideRightClick: Boolean? = null,
+        @Expose val noMove: Boolean? = null,
         @Expose val extraData: JsonObject? = null,
     ) {
         @Suppress("PropertyName")
