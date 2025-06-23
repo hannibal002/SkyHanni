@@ -76,6 +76,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
+import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
@@ -127,6 +128,7 @@ object EstimatedItemValueCalculator {
 
         // dynamic
         ::addAbilityScrolls,
+        ::addBoosters,
         ::addDrillUpgrades,
         ::addGemstoneSlotUnlockCost,
         ::addGemstones,
@@ -677,6 +679,21 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
+    private fun addBoosters(stack: ItemStack, list: MutableList<String>): Double {
+        val boosters = stack.readBoosters()
+        if (boosters.isEmpty()) return 0.0
+
+        val (totalPrice, names) = getTotalAndNames(boosters)
+
+        if (names.isNotEmpty()) {
+            list.add("§7Boosters: ${totalPrice.formatCoin()}")
+            list += names
+        }
+
+        return totalPrice
+
+    }
+
     private fun ItemStack.getEnchantmentItems(): Pair<Double, List<String>>? {
         val enchantments = getHypixelEnchantments() ?: return null
         val data = EstimatedItemValue.itemValueCalculationData ?: return null
@@ -925,7 +942,7 @@ object EstimatedItemValueCalculator {
             // Do not error out on items if their data was changed.
             if (getLore().any { it.contains("This item has unused Gemstones!") }) return null
             ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for $displayName",
+                "Could not find gemstone slot price for ${this.displayName}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
@@ -936,6 +953,19 @@ object EstimatedItemValueCalculator {
         }
 
         return unlockedSlots
+    }
+
+    private fun ItemStack.readBoosters(): List<NeuInternalName> {
+        val list = NbtCompat.getStringTagList(extraAttributes, "boosters")
+        if (list.tagCount() == 0) return emptyList()
+        val boosters = mutableListOf<NeuInternalName>()
+        for (i in 0..list.tagCount()) {
+            var internalName = list.getStringTagAt(i)
+            if (internalName.isBlank()) continue
+            internalName += "_BOOSTER"
+            boosters.add(internalName.toInternalName())
+        }
+        return boosters
     }
 
     private fun NeuInternalName.getPrice(): Double = getPriceOrNull() ?: 0.0

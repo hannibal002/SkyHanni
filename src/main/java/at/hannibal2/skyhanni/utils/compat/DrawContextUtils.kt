@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.Vec3
 import java.nio.FloatBuffer
 //#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
@@ -85,15 +86,6 @@ object DrawContextUtils {
     //#if MC > 1.21
     //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
     //#endif
-
-    fun getFloat(pName: Int, params: FloatBuffer) {
-        //#if MC < 1.21
-        GlStateManager.getFloat(pName, params)
-        //#else
-        //$$ params.clear()
-        //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
-        //#endif
-    }
 
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)

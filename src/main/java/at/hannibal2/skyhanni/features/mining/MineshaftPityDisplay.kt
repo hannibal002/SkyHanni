@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.IslandType
@@ -15,6 +17,7 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Comp
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -257,13 +260,21 @@ object MineshaftPityDisplay {
         update()
     }
 
-    fun fullResetCounter() {
-        resetCounter()
-        mineshaftTotalBlocks = 0
-        mineshaftTotalCount = 0
-        sessionMineshafts = 0
-        lastMineshaftSpawn = SimpleTimeMark.farPast()
-        update()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetmineshaftpitystats") {
+            description = "Resets the mineshaft pity display stats"
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                ChatUtils.chat("Reset the mineshaft pity display stats!")
+                resetCounter()
+                mineshaftTotalBlocks = 0
+                mineshaftTotalCount = 0
+                sessionMineshafts = 0
+                lastMineshaftSpawn = SimpleTimeMark.farPast()
+                update()
+            }
+        }
     }
 
     @HandleEvent
@@ -337,7 +348,7 @@ object MineshaftPityDisplay {
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            BlockCompat.createSmoothDiorite()
+            BlockCompat.createSmoothDiorite(),
         ),
         ;
 

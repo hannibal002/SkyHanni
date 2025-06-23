@@ -90,6 +90,7 @@ object GuiEditManager {
 
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
+        SkyHanniMod.shouldCloseScreen = false
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
             2,

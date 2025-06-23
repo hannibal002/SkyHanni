@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.json.Shimmy
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlin.time.Duration.Companion.INFINITE
 
 @SkyHanniModule
@@ -29,7 +29,7 @@ object EnforcedConfigValues {
         enforcedValues = constant.filter {
             SkyHanniMod.modVersion <= it.affectedVersion
         }.filter {
-            it.affectedMinecraftVersions?.contains(VersionConstants.MC_VERSION) ?: true
+            it.affectedMinecraftVersions?.contains(PlatformUtils.MC_VERSION) ?: true
         }
         if (oldEnforcedValues == enforcedValues) return
         hasSentPSAsOnce = false
