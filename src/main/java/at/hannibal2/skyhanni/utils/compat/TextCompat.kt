@@ -239,13 +239,24 @@ fun addChatMessageToChat(message: IChatComponent) {
     //#endif
 }
 
+//#if MC > 1.21
+//$$ val deletionQueue = mutableSetOf<Int>()
+//#endif
+
 fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
-    //#if MC < 1.16
+    //#if MC < 1.21
     Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
-    //$$ MinecraftClient.getInstance().execute {
-    //$$    MinecraftClient.getInstance().inGameHud.chatHud.removeMessage(idToMessageSignature(id))
-    //$$    MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
+    //$$ if (deletionQueue.contains(id)) return
+    //$$ deletionQueue.add(id)
+    //$$ val client = MinecraftClient.getInstance()
+    //$$ val chatHud = client.inGameHud.chatHud
+    //$$ val signature = idToMessageSignature(id)
+    //$$ val indicator = MessageIndicator.system()
+    //$$ client.execute {
+    //$$ 	chatHud.removeMessage(signature)
+    //$$ 	chatHud.addMessage(component, signature, indicator)
+    //$$ 	deletionQueue.remove(id)
     //$$ }
     //#endif
 }
