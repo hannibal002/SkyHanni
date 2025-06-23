@@ -30,9 +30,7 @@ object ComputerEnvDebug {
         launcher(event)
         ram(event)
         uptime(event)
-        //#if MC == 1.8.9
         performanceMods(event)
-        //#endif
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
