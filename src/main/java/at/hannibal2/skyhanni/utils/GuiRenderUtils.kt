@@ -325,7 +325,11 @@ object GuiRenderUtils {
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
         val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
 
+        //#if MC < 1.21
         val baseScale = if (isSkull) (4f / 3f) else 1f
+        //#else
+        //$$ val baseScale = if (isSkull) 2f else 1f
+        //#endif
         val finalScale = (baseScale * scaleMultiplier).toFloat()
 
         val (translateX, translateY) = if (isSkull) {
@@ -343,6 +347,7 @@ object GuiRenderUtils {
 
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(translateX, translateY, zT)
+            DrawContextUtils.scale(finalScale, finalScale, zS)
 
             //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
@@ -374,9 +379,6 @@ object GuiRenderUtils {
                 //$$ savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
                 //#endif
             }
-
-            DrawContextUtils.scale(finalScale, finalScale, zS)
-
             DrawContextUtils.multMatrix(savedMV)
 
             //#if MC < 1.21
