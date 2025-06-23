@@ -24,6 +24,13 @@ class ForagingConfig {
     @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
     @Accordion
+    @OnlyModern
     val tutorialQuest: ForagingTutorialQuestConfig = ForagingTutorialQuestConfig()
+
+    @Expose
+    @ConfigOption(name = "Birries Highlight", desc = "")
+    @OnlyModern
+    @Accordion
+    var birriesHighlight = BirriesHighlightConfig()
 
 }

@@ -11,13 +11,11 @@ class ForagingTutorialQuestConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show where to go to unlock foraging islands.")
     @ConfigEditorBoolean
-    @OnlyModern
     @FeatureToggle
     var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Suggest to enable", desc = "When useful, suggest in chat to enable this feature.")
     @ConfigEditorBoolean
-    @OnlyModern
     var suggestToEnable: Boolean = true
 }

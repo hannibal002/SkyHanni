@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi;
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
@@ -56,6 +57,10 @@ public abstract class MixinHandledScreen {
 
     @ModifyArg(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), index = 1)
     private List<Text> renderBackground(List<Text> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) DrawContext drawContext) {
+        if (WardrobeApi.INSTANCE.getInCustomWardrobe()) {
+            textTooltip.clear();
+            return textTooltip;
+        }
         return ToolTipData.processModernTooltip(drawContext, itemStack, textTooltip);
     }
 
