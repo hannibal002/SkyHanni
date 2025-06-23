@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -21,6 +22,30 @@ object ForagingTutorialQuest {
 
     private var lastParkWarpAttempt = SimpleTimeMark.farPast()
     private var lastSuggestion = SimpleTimeMark.farPast()
+
+    enum class Quest(val questName: String, val npcName: String, val npcLocation: LorenzVec) {
+        FIRST("Foraging Tutorial", "Lumber Jack", LorenzVec(-221.2, 73.0, -14.9)),
+        SECOND("Into the Woods", "Charlie", LorenzVec(-275.9, 80.0, -17.1)),
+        THIRD("A Helping Hand", "Kelly", LorenzVec(-350.8, 94.0, 31.7)),
+        FOURTH("The Campfire Cult", "Ryan", LorenzVec(-362.7, 102.0, -90.5)),
+        FIFTH("The Rebuild", "Melody", LorenzVec(-412.3, 109.0, 70.2)),
+    }
+
+    enum class NextQuest(val nextPortal: LorenzVec, val endingMessage: String) {
+        SECOND(LorenzVec(-312.1, 81.0, -9.0), "Can you maybe look for her in the §aSpruce Woods§f?"),
+        THIRD(LorenzVec(-361.2, 90.0, -14.8), "§cCult Meeting §fthere §c§lRIGHT NOW§f!"),
+        FOURTH_LAST(LorenzVec(-397.3, 98.0, -37.5), "§rYou completed each §6Trial of Fire§f! §aCongratulations!"),
+        FIFTH(LorenzVec(-436.4, 110.5, -14.4), " §rTalk to me again if you ever want to give my §dHarp §fa try!"),
+        SIXTH_FIRST(LorenzVec(-435.5, 110.0, -13.5), "§r§fIt will take me some time to assemble them, so you should §acome back later§f."),
+        SIXTH_SECOND(LorenzVec(-466.8, 120.0, -41.6), "  §r§fTalk to Molbert"),
+        SIXTH_THIRD(LorenzVec(-465.9, 119.0, -53.8), "Once you find the ideal spots, go ahead and deploy them."),
+        SIXTH_FOURTH(LorenzVec(-448.8, 120.0, -64.3), "§aPlaced trap §r§7(§r§e1§r§7/§r§a3§r§7)"),
+        SIXTH_FIFTH(LorenzVec(-439.8, 122.0, -91.3), "LorenzVec(-448.8, 120.0, -64.3)"),
+        SIXTH_SIXTH(LorenzVec(-466.8, 120.0, -43.4), "§aPlaced trap §r§7(§r§a3§r§7/§r§a3§r§7)"),
+        SIXTH_SEVENTH(LorenzVec(-435.5, 110.0, -13.5), "/§r§a3§r§7)"),
+        SIXTH_8(LorenzVec(-450.5, 120.0, -64.9), "  §r§fTalk to Molbert"),
+        SEVEN(LorenzVec(-485.3, 116.5, -40.7), " §rI hope you forgive me after this and we can still be §6friends§f."),
+    }
 
     @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
@@ -34,39 +59,62 @@ object ForagingTutorialQuest {
     fun onChat(event: SystemMessageEvent) {
         if (event.message == "§cYou don't have the requirements to use this warp!") {
             if (lastParkWarpAttempt.passedSince() < 1.seconds) {
-                firstStep()
+                EntityMovementData.onNextTeleport(IslandType.HUB) {
+                    start(Quest.FIRST)
+                }
             }
         }
         if (IslandType.HUB.isCurrent()) {
-            if (event.message == "§cYou must complete the §r§6Foraging Tutorial Quest §r§cto use this!") {
-                firstStep()
+            "§cYou must complete the §r§6(?<quest>.*) Quest §r§cto use this!".toPattern().matchMatcher(event.message) {
+                stepByName(group("quest"))
+            }
+        }
+        for (step in NextQuest.entries) {
+            if (event.message.endsWith(step.endingMessage)) {
+                goToNext(step)
             }
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onPlayerSpawn(event: MobEvent.Spawn.DisplayNpc) {
-        if (event.mob.name == "§cRequires §6Foraging Tutorial Quest") {
-            firstStep()
+    private fun stepByName(quest: String) {
+        for (step in Quest.entries) {
+            if (step.questName == quest) {
+                start(step)
+            }
         }
     }
 
-    private fun firstStep() {
+    @HandleEvent
+    fun onPlayerSpawn(event: MobEvent.Spawn.DisplayNpc) {
+        "§cRequires §6(?<quest>.*) Quest".toPattern().matchMatcher(event.mob.name) {
+            stepByName(group("quest"))
+        }
+    }
+
+    private fun goToNext(quest: NextQuest) {
+        if (!config.enabled) return
+        ChatUtils.chat("Go to next phase!")
+        IslandGraphs.pathFind(
+            quest.nextPortal,
+            "Next Quest",
+            condition = { config.enabled },
+        )
+    }
+
+    private fun start(step: Quest) {
         if (!config.enabled) {
-            suggest()
+            suggest(step)
             return
         }
-        EntityMovementData.onNextTeleport(IslandType.HUB) {
-            ChatUtils.chat("Go to Lumber Jack and start the Foraging Quest!")
-            IslandGraphs.pathFind(
-                LorenzVec(-221.2, 73.0, -14.9),
-                "Lumber Jack",
-                condition = { config.enabled },
-            )
-        }
+        ChatUtils.chat("Go to ${step.npcName} and start the ${step.questName} quest!")
+        IslandGraphs.pathFind(
+            step.npcLocation,
+            step.npcName,
+            condition = { config.enabled },
+        )
     }
 
-    private fun suggest() {
+    private fun suggest(step: Quest) {
         if (!config.suggestToEnable) return
         if (lastSuggestion.passedSince() < 10.minutes) return
 
@@ -75,7 +123,7 @@ object ForagingTutorialQuest {
             "Do you want to have help solving the Foraging Tutorial Quest? Click here!",
             onClick = {
                 config.enabled = true
-                firstStep()
+                start(step)
             },
         )
         ChatUtils.clickableChat(
