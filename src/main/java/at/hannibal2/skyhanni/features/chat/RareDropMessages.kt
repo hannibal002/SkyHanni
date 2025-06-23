@@ -16,12 +16,12 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -124,7 +124,7 @@ object RareDropMessages {
         val internalName = event.internalName
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.ENCHANTED_BOOK) return
-        if (inAnyIsland(ignoredBookIslands)) return
+        if (SkyBlockUtils.inAnyIsland(ignoredBookIslands)) return
 
         val itemName = internalName.repoItemName
         var anyRecentMessage = false

@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
+import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
@@ -86,9 +87,7 @@ object ChatManager {
 
     @HandleEvent
     fun onSendMessageToServerPacket(event: PacketSentEvent) {
-        val packet = event.packet as? C01PacketChatMessage ?: return
-
-        val message = packet.message
+        val message = getMessageFromPacket(event.packet) ?: return
         val component = message.asComponent()
         val originatingModCall = event.findOriginatingModCall()
         val originatingModContainer = originatingModCall?.getClassInstance()?.getModInstance()
@@ -118,6 +117,16 @@ object ChatManager {
         ) {
             event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
+        }
+    }
+
+    private fun getMessageFromPacket(packet: Packet<*>): String? {
+        return when (packet) {
+            is C01PacketChatMessage -> packet.message
+            //#if MC > 1.21
+            //$$ is net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket -> "/${packet.command}"
+            //#endif
+            else -> null
         }
     }
 

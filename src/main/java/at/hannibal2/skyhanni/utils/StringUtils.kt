@@ -31,7 +31,6 @@ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //$$ import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 //#endif
 
-// todo 1.21 impl needed
 @Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
