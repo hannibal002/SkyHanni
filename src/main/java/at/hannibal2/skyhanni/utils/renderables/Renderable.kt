@@ -1660,8 +1660,8 @@ interface Renderable {
                 //$$     playerY + height,
                 //$$     entityScale,
                 //$$     0.0625f,
-                //$$     -mouseXRelativeToPlayer,
-                //$$     -mouseYRelativeToPlayer,
+                //$$     -mouseXRelativeToPlayer + if (followMouse) 70f else 0f,
+                //$$     -mouseYRelativeToPlayer + if (followMouse) 195f else 0f,
                 //$$     player
                 //$$ )
                 //$$ DrawContextUtils.translate(35f, 125f, 0f)
