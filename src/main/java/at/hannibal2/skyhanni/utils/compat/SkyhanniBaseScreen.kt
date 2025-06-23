@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiScreen
 //$$ import net.minecraft.client.gui.DrawContext
 //#endif
 
-@Suppress("UnusedParameter")
+@Suppress("UnusedParameter", "LargeClass")
 abstract class SkyhanniBaseScreen : GuiScreen(
     //#if MC > 1.20
     //$$ net.minecraft.text.Text.empty()
