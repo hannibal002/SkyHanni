@@ -25,11 +25,9 @@ import net.minecraft.util.ChatComponentText
 //$$ import kotlin.math.abs
 //$$ import net.minecraft.text.TranslatableTextContent
 //#endif
-
 //#if MC > 1.16
 //$$ private val unformattedTextCache = java.util.WeakHashMap<Component, String>()
 //$$ private val formattedTextCache = java.util.WeakHashMap<Component, String>()
-//$$ private val formattedTextNoResetsCache = java.util.WeakHashMap<Component, String>()
 //#endif
 
 fun IChatComponent.unformattedTextForChatCompat(): String {
@@ -59,33 +57,28 @@ fun IChatComponent.unformattedTextCompat(): String =
 //#endif
 
 // has to be a separate function for pattern mappings
-fun IChatComponent?.formattedTextCompatLessResets(): String = this.formattedTextCompat(true)
+fun IChatComponent?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
+fun IChatComponent?.formattedTextCompatWithStartingWhiteColorCode(): String = this.formattedTextCompat(removeStartingWhiteColorCode = false)
 
 @JvmOverloads
 @Suppress("unused")
-fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false): String =
+fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, removeStartingWhiteColorCode: Boolean = true): String =
 //#if MC < 1.16
     this?.formattedText.orEmpty()
 //#else
 //$$ run {
 //$$     this ?: return@run ""
-//$$     if (noExtraResets) {
-//$$         formattedTextNoResetsCache.getOrPut(this) {
-//$$             computeFormattedTextCompat(true)
-//$$         }
-//$$     } else {
-//$$         formattedTextCache.getOrPut(this) {
-//$$             computeFormattedTextCompat(false)
-//$$         }
+//$$     formattedTextCache.getOrPut(this) {
+//$$         computeFormattedTextCompat(noExtraResets, removeStartingWhiteColorCode)
 //$$     }
 //$$ }
 //$$
-//$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean): String {
+//$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, removeStartingWhiteColorCode: Boolean): String {
 //$$     this ?: return ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
 //$$         val chatStyle = component.style.chatStyle()
-//$$         if ((sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
+//$$         if (!removeStartingWhiteColorCode || (sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
 //$$             sb.append(chatStyle)
 //$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())
