@@ -204,7 +204,7 @@ class DebugConfig {
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "itemStack")
-    var itemStackPosition: Position = Position(-200, 300)
+    val itemStackPosition: Position = Position(-200, 300)
 
     @Expose
     @ConfigOption(name = "Animated Item Stack", desc = "Enable the test Animated Item Stack Renderable")
@@ -213,7 +213,7 @@ class DebugConfig {
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
-    var animatedItemStackPosition: Position = Position(-300, 300)
+    val animatedItemStackPosition: Position = Position(-300, 300)
 
     // Does not have a config element!
     @Expose
