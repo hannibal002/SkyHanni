@@ -9,16 +9,26 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
  */
 @SkyHanniModule
 object ModernPatterns {
+
+    /**
+     * REGEX-TEST: §7Current color: §a§4Red
+     */
     val beaconCurrentColorPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.color",
         "§7Current color: §a(?<color>.+)",
     )
 
+    /**
+     * REGEX-TEST: §7Current speed: §a3
+     */
     val beaconCurrentSpeedPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.speed",
         "§7Current speed: §a(?<speed>\\d)",
     )
 
+    /**
+     * REGEX-TEST: §7Current pitch: §aLow
+     */
     val beaconCurrentPitchPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.pitch",
         "§7Current pitch: §a(?<pitch>.+)",
