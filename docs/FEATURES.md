@@ -1013,6 +1013,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 </details>
 <details open><summary>
 
+## Foraging
+
++ Added Foraging Quest Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4130)
+    + Shows paths to useful locations for unlocking the 1.21 Foraging island.
++ Added Moonglade Beacon Ready Alert. - nopo (https://github.com/hannibal002/SkyHanni/pull/4135)
++ Added Moonglade Beacon Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4135)
++ Highlight the small Birries in Galatea. - nopo (https://github.com/hannibal002/SkyHanni/pull/4137)
+
 ## Events
 
 </summary>
@@ -1612,6 +1620,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added In-Game Changelog Viewer. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1636)
     + Clickable chat option shows on new update or first join with new version.
     + Works with `/shchangelog <old version> <new version>`.
++ Added support for Fabric 1.21.5. - nopo and CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4038)
 
 </details>
 <details open><summary>

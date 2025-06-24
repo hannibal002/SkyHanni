@@ -16,6 +16,7 @@ data class NeuNbtInfoJson(
     @Expose @SerializedName("Explosion") val explosion: JsonObject?,
     @Expose @SerializedName("CustomPotionEffects") val customPotionEffects: List<JsonObject>?,
     @Expose @SerializedName("ench") val enchantments: List<JsonObject>?,
+    @Expose @SerializedName("ItemModel") val itemModel: String?,
     @Expose val overrideMeta: NbtBoolean?,
     @Expose val generation: Int?,
     @Expose val resolved: NbtBoolean?,

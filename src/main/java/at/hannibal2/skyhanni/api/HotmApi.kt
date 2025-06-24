@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -52,8 +52,8 @@ object HotmApi {
 
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern
 
-        private val storage: ProfileSpecificStorage.MiningStorage.PowderStorage?
-            get() = ProfileStorageData.profileSpecific?.mining?.powder?.getOrPut(this, ProfileSpecificStorage.MiningStorage::PowderStorage)
+        private val storage: ProfileSpecificStorage.PowderStorage?
+            get() = ProfileStorageData.profileSpecific?.mining?.powder?.getOrPut(this, ProfileSpecificStorage::PowderStorage)
 
         var current: Long
             get() = storage?.available ?: 0L
