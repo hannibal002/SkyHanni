@@ -69,7 +69,7 @@ class TrevorTheTrapperConfig {
 
     @Expose
     @ConfigLink(owner = TrevorTheTrapperConfig::class, field = "dataTracker")
-    var position: Position = Position(10, 80)
+    val position: Position = Position(10, 80)
 
     @Expose
     @ConfigOption(
