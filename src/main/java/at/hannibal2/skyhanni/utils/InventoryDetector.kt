@@ -27,14 +27,6 @@ class InventoryDetector(
         checkInventoryName = { name -> pattern.matches(name) }
     )
 
-    constructor(
-        pattern: Pattern,
-        openInventory: (String) -> Unit = {},
-    ) : this(
-        openInventory,
-        checkInventoryName = { name -> pattern.matches(name) }
-    )
-
     init {
         detectors.add(this)
     }
