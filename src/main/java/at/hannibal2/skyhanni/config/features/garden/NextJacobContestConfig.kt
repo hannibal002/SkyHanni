@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -58,7 +59,7 @@ class NextJacobContestConfig {
         desc = "Set the color of the highlight for the current boosted crop.",
     )
     @ConfigEditorColour
-    var additionalBoostedHighlightColor: String = "0:80:0:255:0"
+    val additionalBoostedHighlightColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, a = 80)
 
     @Expose
     @ConfigOption(

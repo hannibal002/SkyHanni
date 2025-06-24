@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -31,6 +33,7 @@ object ModifyVisualWords {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords
+        (Minecraft.getMinecraft().ingameGUI.chatGUI as Any as AccessorMixinGuiNewChat).refreshChat_skyhanni()
     }
 
     @HandleEvent
@@ -49,13 +52,16 @@ object ModifyVisualWords {
         }
     }
 
+    var changeWords = true
+
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
         if (!SkyBlockUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
         if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
+        if (!changeWords) return originalText
 
-        if (userModifiedWords.isEmpty()) {
+        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)
             update()
         }
