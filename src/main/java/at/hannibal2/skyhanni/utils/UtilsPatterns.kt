@@ -154,6 +154,15 @@ object UtilsPatterns {
         "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",
     )
 
+    /**
+     * REGEX-TEST: oxsss
+     * REGEX-TEST: Gillsplash
+     */
+    val playerNamePattern by patternGroup.pattern(
+        "string.playername",
+        "[a-zA-Z0-9_]{2,16}",
+    )
+
     val shopOptionsPattern by patternGroup.pattern(
         "inventory.shopoptions",
         "Shop Trading Options",

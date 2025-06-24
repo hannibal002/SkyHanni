@@ -7,7 +7,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.inPartialSeconds
+import net.minecraft.item.ItemStack
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -25,8 +28,10 @@ enum class ItemAbility(
     private val ignoreMageCooldownReduction: Boolean = false,
 ) {
     // TODO add into repo
-
-    HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true),
+    WITHER_IMPACT(5, ignoreMageCooldownReduction = true),
+    WITHER_SHIELD_SCROLL(10, ignoreMageCooldownReduction = true, alternativePosition = true),
+    SHADOW_WARP_SCROLL(10),
+    IMPLOSION_SCROLL(10),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
     GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
@@ -124,9 +129,24 @@ enum class ItemAbility(
 
     companion object {
 
+        private val WITHER_SCROLLS = setOf(WITHER_SHIELD_SCROLL, SHADOW_WARP_SCROLL, IMPLOSION_SCROLL)
+
         fun getByInternalName(internalName: NeuInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
+
+        fun getAllAbilityScrolls(itemStack: ItemStack?): Set<ItemAbility> =
+            itemStack?.getAbilityScrolls()?.takeIfNotEmpty()?.getAllAbilityScrolls().orEmpty()
+
+        private fun List<NeuInternalName>.getAllAbilityScrolls(): Set<ItemAbility> = WITHER_SCROLLS
+            .filter { ability -> ability.internalNames.any { it in this } }
+            .toMutableSet()
+            .apply {
+                if (size == 3) {
+                    clear()
+                    add(WITHER_IMPACT)
+                }
+            }
 
         fun ItemAbility.getMultiplier(): Double {
             return getMageCooldownReduction() ?: 1.0
