@@ -61,7 +61,7 @@ object ModifyVisualWords {
         if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
         if (!changeWords) return originalText
 
-        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNullOrEmpty()) {
+        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)
             update()
         }
