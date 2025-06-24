@@ -467,8 +467,10 @@ class MiscConfig {
     var transparentTooltips: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Hide Co-op Member Collections", desc = "Hides specific co-op members from collections.\n" +
-        "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) to update the list."
+    @ConfigOption(
+        name = "Hide Co-op Member Collections",
+        desc = "Hides specific co-op members from collections.\n" +
+            "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) to update the list."
     )
     @ConfigEditorBoolean
     @FeatureToggle
