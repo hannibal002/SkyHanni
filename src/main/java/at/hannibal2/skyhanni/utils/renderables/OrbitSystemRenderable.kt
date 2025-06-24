@@ -10,6 +10,7 @@ import kotlin.math.sin
 
 enum class OrbitDirection { CLOCKWISE, COUNTER_CLOCKWISE }
 
+// A renderable that has other renderables orbiting it, configurable.
 class OrbitSystemRenderable(
     private val mainBody: Renderable,
     /**
