@@ -1,33 +1,37 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawHitbox
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -40,7 +44,7 @@ object CarnivalZombieShootout {
     private data class Lamp(var pos: LorenzVec, var time: SimpleTimeMark)
     private data class Zombie(val entity: EntityZombie, val type: ZombieType)
 
-    private var content = Renderable.horizontalContainer(listOf())
+    private var content = HorizontalContainerRenderable(listOf())
     private var drawZombies = listOf<Zombie>()
     private val zombieTimes = mutableMapOf<Zombie, SimpleTimeMark>()
     private var maxType = ZombieType.LEATHER
@@ -65,15 +69,15 @@ object CarnivalZombieShootout {
         " {29}Zombie Shootout",
     )
 
-    enum class ZombieType(val points: Int, val helmet: String, val color: Color, val lifetime: Duration) {
-        LEATHER(30, "Leather Cap", Color(165, 42, 42), 8.seconds), // Brown
-        IRON(50, "Iron Helmet", Color(192, 192, 192), 7.seconds), // Silver
-        GOLD(80, "Golden Helmet", Color(255, 215, 0), 6.seconds), // Gold
-        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250), 5.seconds) // Diamond
+    enum class ZombieType(val points: Int, val helmet: Item, val color: Color, val lifetime: Duration) {
+        LEATHER(30, Items.leather_helmet, Color(165, 42, 42), 8.seconds), // Brown
+        IRON(50, Items.iron_helmet, Color(192, 192, 192), 7.seconds), // Silver
+        GOLD(80, Items.golden_helmet, Color(255, 215, 0), 6.seconds), // Gold
+        DIAMOND(120, Items.diamond_helmet, Color(44, 214, 250), 5.seconds) // Diamond
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || (!config.coloredHitboxes && !config.coloredLines && !config.zombieTimer)) return
 
         if (config.zombieTimer) {
@@ -127,22 +131,22 @@ object CarnivalZombieShootout {
 
                 event.drawHitbox(
                     boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
-                    lineWidth = 3,
                     type.color,
+                    lineWidth = 3,
                     depth = false,
                 )
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !config.lampTimer) return
 
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !started) return
 
@@ -156,9 +160,9 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!config.enabled || LorenzUtils.skyBlockArea != "Carnival") return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!config.enabled || HypixelData.skyBlockArea != "Carnival") return
 
         val message = event.message.removeColor()
 
@@ -169,8 +173,8 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || (!config.coloredHitboxes && !config.zombieTimer && !config.lampTimer) || !event.isMod(2)) return
 
         if (config.coloredHitboxes || config.zombieTimer) {
@@ -180,7 +184,7 @@ object CarnivalZombieShootout {
         if (config.lampTimer) {
             content = lamp?.let {
                 updateContent(it.time)
-            } ?: Renderable.horizontalContainer(listOf())
+            } ?: HorizontalContainerRenderable(listOf())
         }
     }
 
@@ -202,15 +206,15 @@ object CarnivalZombieShootout {
         }
     }
 
-    private fun updateContent(time: SimpleTimeMark): Renderable {
+    private fun updateContent(time: SimpleTimeMark): HorizontalContainerRenderable {
         val lamp = ItemStack(Blocks.redstone_lamp)
         val timer = 6.seconds - time.passedSince()
         val prefix = determinePrefix(timer, 6.seconds, 4.seconds, 2.seconds)
 
-        return Renderable.horizontalContainer(
+        return HorizontalContainerRenderable(
             listOf(
-                Renderable.itemStack(lamp),
-                Renderable.string("§6Disappears in $prefix$timer"),
+                ItemStackRenderable(lamp),
+                RenderableString("§6Disappears in $prefix$timer"),
             ),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -232,7 +236,7 @@ object CarnivalZombieShootout {
             else -> "§c"
         }
 
-    private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.displayName }
+    private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.item }
 
-    private fun isEnabled() = config.enabled && LorenzUtils.skyBlockArea == "Carnival" && started
+    private fun isEnabled() = config.enabled && HypixelData.skyBlockArea == "Carnival" && started
 }
