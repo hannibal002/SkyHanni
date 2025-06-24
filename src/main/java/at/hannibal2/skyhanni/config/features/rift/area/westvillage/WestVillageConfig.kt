@@ -8,20 +8,20 @@ class WestVillageConfig {
     @ConfigOption(name = "Vermin Tracker", desc = "Track all vermins collected.")
     @Accordion
     @Expose
-    var verminTracker: VerminTrackerConfig = VerminTrackerConfig()
+    val verminTracker: VerminTrackerConfig = VerminTrackerConfig()
 
     @ConfigOption(name = "Vermin Highlighter", desc = "Highlight vermins.")
     @Accordion
     @Expose
-    var verminHighlight: VerminHighlightConfig = VerminHighlightConfig()
+    val verminHighlight: VerminHighlightConfig = VerminHighlightConfig()
 
     @ConfigOption(name = "Gunther's Race", desc = "")
     @Accordion
     @Expose
-    var gunthersRace: GunthersRaceConfig = GunthersRaceConfig()
+    val gunthersRace: GunthersRaceConfig = GunthersRaceConfig()
 
     @ConfigOption(name = "Kloon Hacking", desc = "")
     @Accordion
     @Expose
-    var hacking: KloonHackingConfig = KloonHackingConfig()
+    val hacking: KloonHackingConfig = KloonHackingConfig()
 }

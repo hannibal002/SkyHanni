@@ -16,6 +16,7 @@ at.hannibal2.skyhanni.tweaker.TweakerUtils.java
 
 at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer.java
+at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRender.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket.java
