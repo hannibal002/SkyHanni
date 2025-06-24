@@ -65,7 +65,13 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun foregroundDrawn(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
+        if (!PlatformUtils.IS_LEGACY) {
+            context.matrices.translate(0.0, 0.0, 200.0)
+        }
         GuiContainerEvent.ForegroundDrawnEvent(context, gui, container, mouseX, mouseY, partialTicks).post()
+        if (!PlatformUtils.IS_LEGACY) {
+            context.matrices.translate(0.0, 0.0, -200.0)
+        }
     }
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {
