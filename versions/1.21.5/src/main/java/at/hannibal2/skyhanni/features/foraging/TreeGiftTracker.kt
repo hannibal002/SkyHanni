@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
@@ -36,6 +38,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.text.Text
 import kotlin.collections.emptySet
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TreeGiftTracker {
@@ -265,10 +268,29 @@ object TreeGiftTracker {
         }
     }
 
+    private val rangedItems: MutableSet<NeuInternalName> = mutableSetOf()
+
+    @HandleEvent
+    fun onSackChange(event: SackChangeEvent) {
+        if (lastTreeGiftAt.passedSince() >= 30.seconds) return
+        val lastTreeType = treeType ?: return
+        event.sackChanges.filter {
+            it.delta > 0 && it.internalName in rangedItems
+        }.forEach {
+            tracker.addItem(
+                lastTreeType,
+                it.internalName,
+                it.delta,
+                command = false
+            )
+        }
+    }
+
     // Chat FSM
     private var openLootLoop = false
     private var openBonusGiftLoop = false
     private var treeType: TreeType? = null
+    private var lastTreeGiftAt: SimpleTimeMark = SimpleTimeMark.farPast()
     private val loot = mutableMapOf<NeuInternalName, Int>()
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
@@ -280,7 +302,10 @@ object TreeGiftTracker {
     private fun SkyHanniChatEvent.tryReadLoot() {
         openCloseRewardPattern.matchMatcher(message) {
             openLootLoop = !openLootLoop
-            if (openLootLoop) openBonusGiftLoop = false
+            if (openLootLoop) {
+                openBonusGiftLoop = false
+                lastTreeGiftAt = SimpleTimeMark.now()
+            }
             if (config.hideChats) blockedReason = "TREE_GIFT"
         }
         if (!openLootLoop) return
@@ -331,7 +356,12 @@ object TreeGiftTracker {
             val (item, amountString) = hoverRewardPattern.matchMatcher(line) {
                 group("item") to group("amount")
             } ?: return@forEach
-            if (amountString.contains("-")) return@forEach // Skip ranges like "0-2" (for now)
+            if (amountString.contains("-")) {
+                NeuInternalName.fromItemNameOrNull(item)?.let {
+                    rangedItems.add(it)
+                }
+                return@forEach
+            } // Skip ranges like "0-2" (for now)
             val amount = amountString.formatIntOrNull() ?: return@forEach
             when (item) {
                 "HOTF Experience" -> return@forEach tracker.modify {
