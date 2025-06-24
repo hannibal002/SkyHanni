@@ -75,8 +75,8 @@ object SkyBlockItemModifierUtils {
     @KSerializable
     data class PetInfo(
         @Expose val type: String,
-        @Expose val active: Boolean? = null,
-        @Expose val exp: Double,
+        @Expose val active: Boolean = false,
+        @Expose val exp: Double = 0.0,
         @Expose val tier: LorenzRarity,
         @Expose val hideInfo: Boolean = false,
         @Expose val heldItem: NeuInternalName? = null,
@@ -138,21 +138,18 @@ object SkyBlockItemModifierUtils {
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
     fun ItemStack.getPetInfo(): PetInfo? {
+        // Repo pets will always return null for PetInfo, don't even attempt to parse it
+        if (displayName.contains("→")) return null
         val petInfoJson = getExtraAttributes()?.takeIf {
             it.hasKey("petInfo")
         }?.getString("petInfo")?.takeIf {
             it.isNotEmpty()
         } ?: return null
 
-        try {
-            return ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
+        return try {
+            ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
         } catch (e: Exception) {
-            ErrorManager.skyHanniError(
-                "Failed to parse pet info for item: ${displayName.removeColor()}",
-                "exception" to e.message,
-                "extraAttributes" to extraAttributes.toString(),
-                "petInfoJson" to petInfoJson,
-            )
+            null
         }
     }
 
