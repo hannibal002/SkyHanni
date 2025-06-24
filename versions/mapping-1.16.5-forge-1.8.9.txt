@@ -199,6 +199,7 @@ net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.ne
 net.minecraft.network.protocol.game.ClientboundOpenScreenPacket net.minecraft.network.play.server.S2DPacketOpenWindow
 net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket net.minecraft.network.play.server.S38PacketPlayerListItem
 net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket net.minecraft.network.play.server.S13PacketDestroyEntities
+net.minecraft.network.protocol.game.ClientboundRotateHeadPacket net.minecraft.network.play.server.S19PacketEntityHeadLook
 net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket net.minecraft.network.play.server.S22PacketMultiBlockChange
 net.minecraft.network.protocol.game.ClientboundSetBorderPacket net.minecraft.network.play.server.S44PacketWorldBorder
 net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket net.minecraft.network.play.server.S1CPacketEntityMetadata
