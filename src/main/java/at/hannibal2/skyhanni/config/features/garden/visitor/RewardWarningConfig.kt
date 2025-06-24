@@ -38,7 +38,7 @@ class RewardWarningConfig {
     @Expose
     @ConfigOption(name = "Items", desc = "Warn for these reward item visitor drops.")
     @ConfigEditorDraggableList
-    var drops: MutableList<VisitorReward> = mutableListOf(
+    val drops: MutableList<VisitorReward> = mutableListOf(
         VisitorReward.OVERGROWN_GRASS,
         VisitorReward.GREEN_BANDANA,
         VisitorReward.DEDICATION,
