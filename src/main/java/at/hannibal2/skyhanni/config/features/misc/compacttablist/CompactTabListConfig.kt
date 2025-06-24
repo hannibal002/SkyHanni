@@ -18,7 +18,7 @@ class CompactTabListConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -50,5 +50,5 @@ class CompactTabListConfig {
     @Expose
     @ConfigOption(name = "Advanced Player List", desc = "")
     @Accordion
-    var advancedPlayerList: AdvancedPlayerListConfig = AdvancedPlayerListConfig()
+    val advancedPlayerList: AdvancedPlayerListConfig = AdvancedPlayerListConfig()
 }

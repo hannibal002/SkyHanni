@@ -21,7 +21,7 @@ class EnchantedClockConfig {
     @Expose
     @ConfigOption(name = "Reminder Boosts", desc = "List of boost types to remind about.")
     @ConfigEditorDraggableList
-    var reminderBoosts: MutableList<SimpleBoostType> = mutableListOf(
+    val reminderBoosts: MutableList<SimpleBoostType> = mutableListOf(
         SimpleBoostType.MINIONS,
         SimpleBoostType.CHOCOLATE_FACTORY,
         SimpleBoostType.PET_TRAINING,

@@ -23,9 +23,9 @@ class KickDurationConfig {
     @Expose
     @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a SkyBlock kick.")
     @ConfigEditorSlider(minValue = 5f, maxValue = 300f, minStep = 1f)
-    var warnTime: Property<Int> = Property.of(60)
+    val warnTime: Property<Int> = Property.of(60)
 
     @Expose
     @ConfigLink(owner = KickDurationConfig::class, field = "enabled")
-    var position: Position = Position(400, 200, 1.3f)
+    val position: Position = Position(400, 200, 1.3f)
 }

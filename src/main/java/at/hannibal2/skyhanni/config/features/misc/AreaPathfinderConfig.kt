@@ -17,7 +17,7 @@ class AreaPathfinderConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Show Always", desc = "Show the list always, also while outside of an inventory.")
@@ -27,14 +27,14 @@ class AreaPathfinderConfig {
     @Expose
     @ConfigOption(name = "Current Area", desc = "Show the name of the current area at the top of the list")
     @ConfigEditorBoolean
-    var includeCurrentArea: Property<Boolean> = Property.of(false)
+    val includeCurrentArea: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Path Color", desc = "Change the color of the path.")
     @ConfigEditorColour
-    var color: Property<String> = Property.of("0:245:85:255:85")
+    val color: Property<String> = Property.of("0:245:85:255:85")
 
     @Expose
     @ConfigLink(owner = AreaPathfinderConfig::class, field = "enabled")
-    var position: Position = Position(-350, 100)
+    val position: Position = Position(-350, 100)
 }

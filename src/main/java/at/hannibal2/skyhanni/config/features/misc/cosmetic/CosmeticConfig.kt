@@ -8,10 +8,10 @@ class CosmeticConfig {
     @Expose
     @ConfigOption(name = "Following Line", desc = "")
     @Accordion
-    var followingLine: FollowingLineConfig = FollowingLineConfig()
+    val followingLine: FollowingLineConfig = FollowingLineConfig()
 
     @Expose
     @ConfigOption(name = "Arrow Trail", desc = "")
     @Accordion
-    var arrowTrail: ArrowTrailConfig = ArrowTrailConfig()
+    val arrowTrail: ArrowTrailConfig = ArrowTrailConfig()
 }

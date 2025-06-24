@@ -10,7 +10,7 @@ class AreaNavigationConfig {
     @Expose
     @ConfigOption(name = "Area Path Finder", desc = "")
     @Accordion
-    var pathfinder: AreaPathfinderConfig = AreaPathfinderConfig()
+    val pathfinder: AreaPathfinderConfig = AreaPathfinderConfig()
 
     @Expose
     @ConfigOption(name = "In World", desc = "Shows the area names in world")

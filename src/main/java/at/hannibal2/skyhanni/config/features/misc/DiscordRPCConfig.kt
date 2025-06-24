@@ -16,22 +16,22 @@ class DiscordRPCConfig {
     @ConfigOption(name = "Enable Discord RPC", desc = "Details about your SkyBlock session displayed through Discord.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
     @ConfigEditorDropdown
-    var firstLine: Property<LineEntry> = Property.of(LineEntry.NOTHING)
+    val firstLine: Property<LineEntry> = Property.of(LineEntry.NOTHING)
 
     @Expose
     @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
     @ConfigEditorDropdown
-    var secondLine: Property<LineEntry> = Property.of(LineEntry.NOTHING)
+    val secondLine: Property<LineEntry> = Property.of(LineEntry.NOTHING)
 
     @Expose
     @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
     @ConfigEditorText
-    var customText: Property<String> = Property.of("")
+    val customText: Property<String> = Property.of("")
 
     @Expose
     @ConfigOption(
@@ -40,7 +40,7 @@ class DiscordRPCConfig {
             "two are triggered at the same time (higher up means higher priority)."
     )
     @ConfigEditorDraggableList
-    var autoPriority: MutableList<PriorityEntry> = mutableListOf(
+    val autoPriority: MutableList<PriorityEntry> = mutableListOf(
         PriorityEntry.CROP_MILESTONES,
         PriorityEntry.SLAYER,
         PriorityEntry.STACKING_ENCHANT,
@@ -69,17 +69,17 @@ class DiscordRPCConfig {
         desc = "What to show when none of your \"Dynamic Priority\" statuses are active."
     )
     @ConfigEditorDropdown
-    var auto: Property<LineEntry> = Property.of(LineEntry.NOTHING)
+    val auto: Property<LineEntry> = Property.of(LineEntry.NOTHING)
 
     @Expose
     @ConfigOption(name = "Show Button for SkyCrypt", desc = "Add a button to the RPC that opens your SkyCrypt profile.")
     @ConfigEditorBoolean
-    var showSkyCryptButton: Property<Boolean> = Property.of(true)
+    val showSkyCryptButton: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Show Button for EliteBot", desc = "Add a button to the RPC that opens your EliteBot profile.")
     @ConfigEditorBoolean
-    var showEliteBotButton: Property<Boolean> = Property.of(true)
+    val showEliteBotButton: Property<Boolean> = Property.of(true)
 
     enum class LineEntry(
         private val displayName: String,

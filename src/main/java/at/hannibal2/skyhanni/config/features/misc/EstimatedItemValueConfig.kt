@@ -39,17 +39,17 @@ class EstimatedItemValueConfig {
     @Expose
     @ConfigOption(name = "Enchantments Cap", desc = "Only show the top # most expensive enchantments.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
-    var enchantmentsCap: Property<Int> = Property.of(7)
+    val enchantmentsCap: Property<Int> = Property.of(7)
 
     @Expose
     @ConfigOption(name = "Star Material Cap", desc = "Only show the top # most expensive parts of star prices.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 15f, minStep = 1f)
-    var starMaterialCap: Property<Int> = Property.of(3)
+    val starMaterialCap: Property<Int> = Property.of(3)
 
     @Expose
     @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
     @ConfigEditorBoolean
-    var exactPrice: Property<Boolean> = Property.of(false)
+    val exactPrice: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
@@ -60,17 +60,17 @@ class EstimatedItemValueConfig {
     @Expose
     @ConfigOption(name = "Ignore Helmet Skins", desc = "Ignore helmet Skins from the total value.")
     @ConfigEditorBoolean
-    var ignoreHelmetSkins: Property<Boolean> = Property.of(false)
+    val ignoreHelmetSkins: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Ignore Armor Dyes", desc = "Ignore Armor Dyes from the total value.")
     @ConfigEditorBoolean
-    var ignoreArmorDyes: Property<Boolean> = Property.of(false)
+    val ignoreArmorDyes: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Ignore Runes", desc = "Ignore Runes from the total value.")
     @ConfigEditorBoolean
-    var ignoreRunes: Property<Boolean> = Property.of(false)
+    val ignoreRunes: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -78,7 +78,7 @@ class EstimatedItemValueConfig {
         desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
     )
     @ConfigEditorDropdown
-    var priceSource: Property<ItemPriceSource> = Property.of(ItemPriceSource.BAZAAR_INSTANT_SELL)
+    val priceSource: Property<ItemPriceSource> = Property.of(ItemPriceSource.BAZAAR_INSTANT_SELL)
 
     enum class BazaarPriceSource(private val displayName: String) {
         INSTANT_BUY("Instant Buy"),
@@ -96,9 +96,9 @@ class EstimatedItemValueConfig {
             "buying multiple low tier items and combining them."
     )
     @ConfigEditorBoolean
-    var useAttributeComposite: Property<Boolean> = Property.of(false)
+    val useAttributeComposite: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig::class, field = "enabled")
-    var position: Position = Position(140, 90)
+    val position: Position = Position(140, 90)
 }
