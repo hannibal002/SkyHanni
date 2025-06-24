@@ -20,6 +20,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import java.util.Locale
 import java.util.UUID
+import kotlin.time.Duration.Companion.minutes
 
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
@@ -137,9 +138,13 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
+    val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
+    var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
+
     fun ItemStack.getPetInfo(): PetInfo? {
+        val colorlessName = displayName.removeColor()
         // Repo pets will always return null for PetInfo, don't even attempt to parse it
-        if (displayName.contains("→")) return null
+        if (colorlessName.contains("→")) return null
         val petInfoJson = getExtraAttributes()?.takeIf {
             it.hasKey("petInfo")
         }?.getString("petInfo")?.takeIf {
@@ -149,7 +154,15 @@ object SkyBlockItemModifierUtils {
         return try {
             ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
         } catch (e: Exception) {
-            null
+            val added = warnedAboutPetParseFailure.add(colorlessName)
+            if (!added || lastWarnedParseFailure.passedSince() <= 1.minutes) return null
+            lastWarnedParseFailure = SimpleTimeMark.now()
+            ErrorManager.skyHanniError(
+                "Failed to parse pet info for item: $colorlessName",
+                "exception" to e.message,
+                "extraAttributes" to extraAttributes.toString(),
+                "petInfoJson" to petInfoJson,
+            )
         }
     }
 
