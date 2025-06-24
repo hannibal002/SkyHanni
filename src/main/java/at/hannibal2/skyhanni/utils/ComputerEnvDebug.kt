@@ -223,10 +223,10 @@ object ComputerEnvDebug {
 
     private fun performanceMods(event: DebugDataCollectEvent) {
         if (PlatformUtils.isDevEnvironment) return
+        event.title("Performance Mods")
         //#if MC < 1.21
         val hasOptifine = FMLClientHandler.instance().hasOptifine()
         val hasPatcher = Loader.isModLoaded("patcher")
-        event.title("Performance Mods")
         if (!hasOptifine || !hasPatcher) {
             event.addData {
                 add("Optifine is ${if (hasOptifine) "" else "not"} installed")
@@ -245,7 +245,6 @@ object ComputerEnvDebug {
             }
         }
         //#else
-        //$$ event.title("Performance Mods")
         //$$ val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
         //$$ if (!hasSodium) {
         //$$     event.addData {
