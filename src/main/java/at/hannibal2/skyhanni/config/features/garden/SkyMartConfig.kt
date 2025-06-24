@@ -22,9 +22,10 @@ class SkyMartConfig {
     @ConfigEditorSlider(minValue = 0.3f, maxValue = 5f, minStep = 0.1f)
     var itemScale: Double = 1.0
 
+    // TODO move to an accordion for Copper Price Config, rename to position
     @Expose
     @ConfigLink(owner = SkyMartConfig::class, field = "copperPrice")
-    var copperPricePos: Position = Position(211, 132)
+    val copperPricePos: Position = Position(211, 132)
 
     @Expose
     @ConfigOption(

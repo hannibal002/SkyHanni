@@ -16,42 +16,42 @@ class DisplayConfig {
     @Expose
     @ConfigOption(name = "Alignment Options", desc = "")
     @Accordion
-    var alignment: AlignmentConfig = AlignmentConfig()
+    val alignment: AlignmentConfig = AlignmentConfig()
 
     @Expose
     @ConfigOption(name = "Arrow Options", desc = "")
     @Accordion
-    var arrow: ArrowConfig = ArrowConfig()
+    val arrow: ArrowConfig = ArrowConfig()
 
     @Expose
     @ConfigOption(name = "Chunked Stats Options", desc = "")
     @Accordion
-    var chunkedStats: ChunkedStatsConfig = ChunkedStatsConfig()
+    val chunkedStats: ChunkedStatsConfig = ChunkedStatsConfig()
 
     @Expose
     @ConfigOption(name = "Events Options", desc = "")
     @Accordion
-    var events: EventsConfig = EventsConfig()
+    val events: EventsConfig = EventsConfig()
 
     @Expose
     @ConfigOption(name = "Maxwell Options", desc = "")
     @Accordion
-    var maxwell: MaxwellConfig = MaxwellConfig()
+    val maxwell: MaxwellConfig = MaxwellConfig()
 
     @Expose
     @ConfigOption(name = "Mayor Options", desc = "")
     @Accordion
-    var mayor: MayorConfig = MayorConfig()
+    val mayor: MayorConfig = MayorConfig()
 
     @Expose
     @ConfigOption(name = "Party Options", desc = "")
     @Accordion
-    var party: PartyConfig = PartyConfig()
+    val party: PartyConfig = PartyConfig()
 
     @Expose
     @ConfigOption(name = "Title and Footer Options", desc = "")
     @Accordion
-    var titleAndFooter: TitleAndFooterConfig = TitleAndFooterConfig()
+    val titleAndFooter: TitleAndFooterConfig = TitleAndFooterConfig()
 
     @Expose
     @ConfigOption(
@@ -61,7 +61,7 @@ class DisplayConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideVanillaScoreboard: Property<Boolean> = Property.of(true)
+    val hideVanillaScoreboard: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Show earned/lost", desc = "Show the amount you earned/lost on any Number display.")

@@ -4,18 +4,19 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 
-class HotmTree {
+
+class HotxTree {
 
     @Expose
-    val perks = mutableMapOf<String, HotmPerk>()
+    val perks = mutableMapOf<String, HotxPerk>()
 
-    fun deepCopy(): HotmTree {
+    fun deepCopy(): HotxTree {
         val gson = Gson()
         val json = gson.toJson(this)
-        return gson.fromJson<HotmTree>(json)
+        return gson.fromJson<HotxTree>(json)
     }
 
-    class HotmPerk {
+    class HotxPerk {
 
         @Expose
         var level: Int = 0
