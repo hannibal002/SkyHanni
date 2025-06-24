@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
-// import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
+import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
 import java.util.OptionalDouble
 import java.util.concurrent.ConcurrentHashMap
 import net.minecraft.client.render.RenderLayer
@@ -88,7 +88,7 @@ object SkyHanniRenderLayers {
         MultiPhaseParameters.builder().build(false),
     )
 
-    /* private val CHROMA_STANDARD: MultiPhase = ChromaRenderLayer(
+    private val CHROMA_STANDARD: MultiPhase = ChromaRenderLayer(
         "skyhanni_standard_chroma",
         RenderLayer.CUTOUT_BUFFER_SIZE,
         false,
@@ -108,7 +108,7 @@ object SkyHanniRenderLayers {
             .texture(RenderPhase.Texture(texture, TriState.FALSE, false))
             .build(false)
         )
-    } */
+    }
 
     private fun createLineRenderLayer(lineWidth: Double, throughWalls: Boolean): MultiPhase {
         val pipeLine = if (throughWalls) SkyHanniRenderPipeline.LINES_XRAY() else SkyHanniRenderPipeline.LINES()
@@ -148,7 +148,7 @@ object SkyHanniRenderLayers {
         }
     }
 
-    /* fun getChromaStandard() = CHROMA_STANDARD
+    fun getChromaStandard() = CHROMA_STANDARD
 
-    fun getChromaTextured(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier) */
+    fun getChromaTextured(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
 }

@@ -1,9 +1,22 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.other.DisplayInfo
+import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.PropertiesInfo
+import at.hannibal2.skyhanni.data.jsonobjects.other.SkullOwnerInfo
+import at.hannibal2.skyhanni.data.jsonobjects.other.TextureInfo
 import at.hannibal2.skyhanni.data.jsonobjects.other.toGameProfile
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import com.google.gson.JsonObject
 import com.mojang.serialization.JsonOps
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.DyedColorComponent
@@ -11,13 +24,18 @@ import net.minecraft.component.type.NbtComponent
 import net.minecraft.component.type.ProfileComponent
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtOps
+import net.minecraft.util.Identifier
 import net.minecraft.util.Unit
+import kotlin.jvm.optionals.getOrNull
 
 object ComponentUtils {
     fun convertToComponents(stack: ItemStack, nbtInfo: NeuNbtInfoJson?) {
         nbtInfo ?: return
-        if (nbtInfo.extraAttributes != null) {
-            val extraAttributes = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, nbtInfo.extraAttributes).asCompound().get()
+        nbtInfo.extraAttributes?.let { extraJson ->
+            val extraAttributes = JsonOps.INSTANCE
+                .convertTo(NbtOps.INSTANCE, extraJson)
+                .asCompound()
+                .get()
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(extraAttributes))
         }
         if (nbtInfo.enchantments?.isNotEmpty() == true) {
@@ -26,6 +44,7 @@ object ComponentUtils {
         if (nbtInfo.unbreakable?.boolean == true) {
             stack.set(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE)
         }
+        nbtInfo.itemModel?.let { stack.set(DataComponentTypes.ITEM_MODEL, Identifier.of(it)) }
         if (nbtInfo.display != null) {
             val display = nbtInfo.display
             if (display.color != null) {
@@ -36,6 +55,9 @@ object ComponentUtils {
             } else {
                 ErrorManager.skyHanniError("stack display name is null", "extra attributes" to nbtInfo.extraAttributes)
             }
+            if (display.lore != null) {
+                stack.setLore(display.lore)
+            }
         }
         if (nbtInfo.skullOwner != null) {
             val skullOwner = nbtInfo.skullOwner
@@ -44,8 +66,55 @@ object ComponentUtils {
 
     }
 
+    fun convertToNeuNbtInfoJson(stack: ItemStack): JsonObject {
+        val isUnbreakable = NbtBoolean(stack.contains(DataComponentTypes.UNBREAKABLE))
+        val profile = stack.get(DataComponentTypes.PROFILE)
+        val profileProperties = profile?.properties?.get("textures")?.firstOrNull()
+        val value = profileProperties?.value
+        val signature = profileProperties?.signature
+        val propertiesInfo = PropertiesInfo(listOf(TextureInfo(value = value, signature = signature)))
+        val uuid = profile?.id?.getOrNull() ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
+        val skullOwner = SkullOwnerInfo(
+            uuid = uuid.toString(),
+            properties = propertiesInfo,
+            hypixelPopulated = NbtBoolean(true),
+            name = profile?.name?.getOrNull(),
+        )
+        val lore = stack.getLore()
+        val color = stack.get(DataComponentTypes.DYED_COLOR)?.rgb
+        val displayInfo = DisplayInfo(name = stack.name.formattedTextCompat(), lore = lore, color = color)
+        val customData = stack.get(DataComponentTypes.CUSTOM_DATA)
+        val itemModel = stack.getItemModel()?.getIdentifierString()
+        val extraAttributes: JsonObject? = if (customData != null) {
+            NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, customData.copyNbt()).asJsonObject
+        } else {
+            null
+        }
+        val enchants = if (stack.contains(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE)) listOf(JsonObject()) else null
+
+        val nbt = NeuNbtInfoJson(
+            hideFlags = 254,
+            unbreakable = isUnbreakable,
+            skullOwner = skullOwner,
+            display = displayInfo,
+            extraAttributes = extraAttributes,
+            explosion = null,
+            customPotionEffects = null,
+            enchantments = enchants,
+            overrideMeta = NbtBoolean(true),
+            itemModel = itemModel,
+            generation = null,
+            resolved = null,
+        )
+        return ConfigManager.gson.toJsonTree(nbt).asJsonObject
+    }
+
     fun convertMinecraftIdToModern(id: String, damage: Int): String {
-        return "minecraft:" + convertMinecraftIdToModern2(id, damage)
+        val convertMinecraftIdToModern2 = convertMinecraftIdToModern2(id, damage)
+        if (convertMinecraftIdToModern2 == id && damage > 0) {
+            println("Unconverted minecraft id with damage above 0. id: $id damage: $damage")
+        }
+        return "minecraft:$convertMinecraftIdToModern2"
     }
 
     private fun convertMinecraftIdToModern2(id: String, damage: Int): String {
@@ -182,6 +251,7 @@ object ComponentUtils {
                 else -> strippedId
             }
 
+            strippedId == "snow" -> "snow_block"
             strippedId == "snow_layer" -> "snow"
             strippedId == "wooden_slab" -> getWood(damage) + "_slab"
             strippedId == "stone_slab2" -> "red_sandstone_slab"
@@ -198,6 +268,8 @@ object ComponentUtils {
                 0 -> "infested_stone"
                 else -> strippedId
             }
+
+            strippedId == "sand" && damage == 1 -> "red_sand"
 
             else -> strippedId
         }

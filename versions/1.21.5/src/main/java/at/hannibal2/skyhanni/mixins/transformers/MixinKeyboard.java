@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.events.minecraft.CharEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
@@ -42,5 +43,11 @@ public class MixinKeyboard {
             new KeyPressEvent(key).post();
         }
         if (action == 2) new KeyPressEvent(key).post();
+    }
+
+    @Inject(method = "onChar", at = @At("HEAD"))
+    private void onChar(long window, int codePoint, int modifiers, CallbackInfo ci) {
+        if (MinecraftClient.getInstance().player == null) return;
+        new CharEvent(codePoint).post();
     }
 }

@@ -72,7 +72,7 @@ enum class DyeCompat(
     WHITE(
         15,
         //#if MC > 1.16
-        //$$ Items.WHITE_DYE
+        //$$ Items.BONE_MEAL
         //#endif
     ),
     ORANGE(
@@ -138,13 +138,13 @@ enum class DyeCompat(
     BLUE(
         4,
         //#if MC > 1.16
-        //$$ Items.BLUE_DYE
+        //$$ Items.LAPIS_LAZULI
         //#endif
     ),
     BROWN(
         3,
         //#if MC > 1.16
-        //$$ Items.BROWN_DYE
+        //$$ Items.COCOA_BEANS
         //#endif
     ),
     GREEN(
@@ -187,7 +187,7 @@ enum class DyeCompat(
                 //#if MC < 1.16
                 return this.item == Items.dye
                 //#else
-                //$$ return this.item is DyeItem
+                //$$ return entries.firstOrNull { this.item == item } != null
                 //#endif
             }
 

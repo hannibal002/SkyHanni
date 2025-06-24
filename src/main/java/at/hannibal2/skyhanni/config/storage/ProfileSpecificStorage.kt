@@ -35,9 +35,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
-//#if TODO
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
-//#endif
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -49,6 +47,7 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
@@ -77,6 +76,9 @@ class ProfileSpecificStorage(
 
     @Expose
     var totalSkyBlockXP: Int? = null
+
+    @Expose
+    var crimsonIsleFaction: FactionType? = null
 
     // features
     // - combat
@@ -643,7 +645,6 @@ class ProfileSpecificStorage(
         var currentSlot: Int? = null
     }
 
-    //#if TODO
     @Expose
     var equipment: EquipmentStorage = EquipmentStorage()
 
@@ -654,7 +655,6 @@ class ProfileSpecificStorage(
         @Expose
         var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
     }
-    //#endif
 
     // - mining
     @Expose
@@ -881,4 +881,7 @@ class ProfileSpecificStorage(
         @Expose var cakesEaten: Int? = -1,
         @Expose var soulsFound: Int = 0,
     )
+
+    @Expose
+    var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
 }

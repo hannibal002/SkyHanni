@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -24,6 +25,7 @@ import java.util.UUID
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.item.Items
+//$$ import kotlin.time.Duration.Companion.seconds
 //#endif
 
 @Suppress("TooManyFunctions")
@@ -70,9 +72,10 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
+    @KSerializable
     data class PetInfo(
         @Expose val type: String,
-        @Expose val active: Boolean,
+        @Expose val active: Boolean? = null,
         @Expose val exp: Double,
         @Expose val tier: LorenzRarity,
         @Expose val hideInfo: Boolean = false,
@@ -82,10 +85,13 @@ object SkyBlockItemModifierUtils {
         @Deprecated("Some pets do not have uuids, use uniqueId instead", replaceWith = ReplaceWith("uniqueId"))
         @Expose val uuid: UUID? = null,
         @Expose val uniqueId: UUID? = null, // Only null when pet is read from a shop, or another non-"owned" source
-        @Expose val hideRightClick: Boolean,
-        @Expose val noMove: Boolean,
+        @Expose val hideRightClick: Boolean? = null,
+        @Expose val noMove: Boolean? = null,
         @Expose val extraData: JsonObject? = null,
     ) {
+        @Suppress("PropertyName")
+        @Deprecated("Do not use, does not reflect Tier Boost, use PetData(petInfo).fauxInternalName instead")
+        val _internalName = "$type;${tier.id}".toInternalName()
         val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
         fun getSkinVariantIndex() = skin?.let {
             extraData?.entrySet()?.firstOrNull { json ->
@@ -131,10 +137,26 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    fun ItemStack.getPetInfo(): PetInfo? =
-        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), PetInfo::class.java)
+    fun ItemStack.getPetInfo(): PetInfo? {
+        val petInfoJson = getExtraAttributes()?.takeIf {
+            it.hasKey("petInfo")
+        }?.getString("petInfo")?.takeIf {
+            it.isNotEmpty()
+        } ?: return null
 
-    fun ItemStack.getPetLevel(): Int = PetUtils.xpToLevel(getPetInfo()?.exp ?: 0.0, getInternalName())
+        try {
+            return ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
+        } catch (e: Exception) {
+            ErrorManager.skyHanniError(
+                "Failed to parse pet info for item: ${displayName.removeColor()}",
+                "exception" to e.message,
+                "extraAttributes" to extraAttributes.toString(),
+                "petInfoJson" to petInfoJson,
+            )
+        }
+    }
+
+    fun ItemStack.getPetLevel(): Int = getPetInfo()?.let(PetUtils::xpToLevel) ?: 1
 
     fun ItemStack.getMaxPetLevel(): Int = PetUtils.getMaxLevel(getInternalName())
 
@@ -275,7 +297,10 @@ object SkyBlockItemModifierUtils {
         return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
     }
     //#else
+    //$$ private val identifierPattern = "[a-z0-9_\\-.:]+".toRegex()
+    //$$
     //$$ fun isVanillaItem(itemId: String): Boolean {
+    //$$     if (!identifierPattern.matches(itemId)) return false
     //$$     return Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
     //$$ }
     //#endif
@@ -337,7 +362,16 @@ object SkyBlockItemModifierUtils {
     //#if MC < 1.21
     fun ItemStack.getExtraAttributes(): NBTTagCompound? = tagCompound?.extraAttributes
     //#else
-    //$$ fun ItemStack.getExtraAttributes(): NbtCompound? = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
+    //$$ fun ItemStack.getExtraAttributes(): NbtCompound? {
+    //$$    val data = cachedData
+    //$$    if (data.lastExtraAttributesFetchTime.passedSince() < 0.1.seconds) {
+    //$$        return data.lastExtraAttributes
+    //$$    }
+    //$$    val extraAttributes = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
+    //$$    data.lastExtraAttributes = extraAttributes
+    //$$    data.lastExtraAttributesFetchTime = SimpleTimeMark.now()
+    //$$    return extraAttributes
+    //$$ }
     //#endif
 
     class GemstoneSlot(private val type: GemstoneType, private val quality: GemstoneQuality) {

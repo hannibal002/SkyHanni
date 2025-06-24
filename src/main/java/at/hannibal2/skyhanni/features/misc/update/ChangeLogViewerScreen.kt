@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -66,7 +67,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
         val height = 4 * this.height / 5
         val xTranslate = this.width / 10
         val yTranslate = this.height / 10
-        RenderUtils.drawRoundGradientRect(
+        ShaderRenderUtils.drawRoundGradientRect(
             xTranslate - 2,
             yTranslate - 2,
             width + 4,

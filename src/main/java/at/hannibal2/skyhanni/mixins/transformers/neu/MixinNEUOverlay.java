@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.skyhanni.mixins.transformers.neu;
 
 import at.hannibal2.skyhanni.events.NeuRenderEvent;
 import io.github.moulberry.notenoughupdates.NEUOverlay;
