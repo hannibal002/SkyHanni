@@ -15,7 +15,7 @@ class DebugMobConfig {
     @Expose
     @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection.")
     @Accordion
-    var mobDetection: MobDetection = MobDetection()
+    val mobDetection: MobDetection = MobDetection()
 
     enum class HowToShow(val displayName: String) {
         OFF("Off"),
