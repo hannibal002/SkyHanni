@@ -332,14 +332,7 @@ object SkyHanniDebugsAndTests {
         }
         lastManualContestDataUpdate = SimpleTimeMark.now()
 
-        GardenNextJacobContest.contests.clear()
-        GardenNextJacobContest.fetchedFromElite = false
-        GardenNextJacobContest.isFetchingContests = true
-        SkyHanniMod.coroutineScope.launch {
-            GardenNextJacobContest.fetchUpcomingContests()
-            GardenNextJacobContest.lastFetchAttempted = SimpleTimeMark.now()
-            GardenNextJacobContest.isFetchingContests = false
-        }
+        GardenNextJacobContest.resetContestData()
     }
 
     private fun copyLocation(args: Array<String>) {
