@@ -101,7 +101,7 @@ object NonGodPotEffectDisplay {
             if (time.ended) continue
             if (effect == NonGodPotEffect.INVISIBILITY) continue
 
-            if (effect.isMixin && !config.nonGodPotEffectShowMixins) continue
+            if (effect.isMixin && !config.showMixins) continue
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
             val format = remaining.format(TimeUnit.HOUR)
@@ -180,6 +180,7 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
         event.move(90, "misc.potionEffect.nonGodPotEffectPos", "misc.potionEffect.position")
         event.move(90, "misc.potionEffect.nonGodPotEffectDisplay", "misc.potionEffect.displayEnabled")
+        event.move(90, "misc.potionEfect.nonGodPotEffectShowMixins", "misc.potionEffect.showMixins")
         event.move(90, "misc.potionEffect", "misc.nonGodPotEffect")
     }
 

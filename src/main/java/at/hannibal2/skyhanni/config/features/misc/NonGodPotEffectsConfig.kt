@@ -24,7 +24,7 @@ class NonGodPotEffectsConfig {
     @ConfigOption(name = "Show Mixins", desc = "Include God Pot mixins in the Non God Pot Effects display.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var nonGodPotEffectShowMixins: Boolean = false
+    var showMixins: Boolean = false
 
     @Expose
     @ConfigOption(name = "Expire Warning", desc = "Sends a title when one of the Non God Pot Effects is expiring.")
@@ -48,5 +48,5 @@ class NonGodPotEffectsConfig {
 
     @Expose
     @ConfigLink(owner = NonGodPotEffectsConfig::class, field = "displayEnabled")
-    var position: Position = Position(10, 10)
+    val position: Position = Position(10, 10)
 }
