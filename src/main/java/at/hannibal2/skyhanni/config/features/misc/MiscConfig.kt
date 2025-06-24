@@ -47,6 +47,10 @@ class MiscConfig {
     @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
     val areaNavigation: AreaNavigationConfig = AreaNavigationConfig()
 
+    @Expose
+    @Category(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
+    val pathfinding: PathfindConfig = PathfindConfig()
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
@@ -267,6 +271,7 @@ class MiscConfig {
         desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs."
     )
     @ConfigEditorBoolean
+    @OnlyLegacy
     @FeatureToggle
     var betterSignEditing: Boolean = true
 
@@ -460,6 +465,14 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     var transparentTooltips: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hide Co-op Member Collections", desc = "Hides specific co-op members from collections.\n" +
+        "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) to update the list."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideExCoopMembers: Boolean = false
 
     @Expose
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
