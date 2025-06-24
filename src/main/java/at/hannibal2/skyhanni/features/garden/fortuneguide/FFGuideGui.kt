@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -20,11 +23,12 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
     override val sizeX = 360
     override val sizeY = 225
 
+    @SkyHanniModule
     companion object {
 
         @JvmStatic
         fun onCommand() {
-            if (!LorenzUtils.inSkyBlock) {
+            if (!SkyBlockUtils.inSkyBlock) {
                 ChatUtils.userError("Join SkyBlock to open the fortune guide!")
             } else {
                 open()
@@ -43,6 +47,14 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
             with(Minecraft.getMinecraft().currentScreen) {
                 if (this !is FFGuideGui) return
                 this.refreshPage()
+            }
+        }
+
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+            event.registerBrigadier("ff") {
+                description = "Opens the Farming Fortune Guide"
+                callback { onCommand() }
             }
         }
     }

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -41,7 +41,7 @@ object ChumBucketHider {
 
         // First text line
         if (name.endsWith("'s Chum Bucket") || name.endsWith("'s Chumcap Bucket")) {
-            if (name.contains(LorenzUtils.getPlayerName()) && !config.hideOwn.get()) return
+            if (name.contains(PlayerUtils.getName()) && !config.hideOwn.get()) return
             titleEntity.add(entity)
             hiddenEntities.add(entity)
             event.cancel()

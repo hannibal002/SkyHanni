@@ -45,7 +45,7 @@ class ComposterConfig {
         desc = "Change the minimum amount of organic matter items on the organic matter overlay have."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 20_000f, minStep = 1000f)
-    var minimumOrganicMatter: Property<Double> = Property.of(1_000.0)
+    val minimumOrganicMatter: Property<Double> = Property.of(1_000.0)
 
     enum class RetrieveFromEntry(
         private val displayName: String,
@@ -61,11 +61,11 @@ class ComposterConfig {
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    var overlayOrganicMatterPos: Position = Position(140, 152)
+    val overlayOrganicMatterPos: Position = Position(140, 152)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    var overlayFuelExtrasPos: Position = Position(-320, 152)
+    val overlayFuelExtrasPos: Position = Position(-320, 152)
 
     @Expose
     @ConfigOption(name = "Composter Display", desc = "Display the Composter data from the tab list as GUI element.")
@@ -119,13 +119,13 @@ class ComposterConfig {
     @Expose
     @ConfigOption(name = "Notification When Low Composter", desc = "")
     @Accordion
-    var notifyLow: NotifyLowConfig = NotifyLowConfig()
+    val notifyLow: NotifyLowConfig = NotifyLowConfig()
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "displayEnabled")
-    var displayPos: Position = Position(-390, 10)
+    val displayPos: Position = Position(-390, 10)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "displayEnabled")
-    var outsideGardenPos: Position = Position(-363, 13)
+    val outsideGardenPos: Position = Position(-363, 13)
 }
