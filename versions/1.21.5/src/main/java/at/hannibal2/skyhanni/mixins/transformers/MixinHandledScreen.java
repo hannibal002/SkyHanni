@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(HandledScreen.class)
@@ -58,8 +59,7 @@ public abstract class MixinHandledScreen {
     @ModifyArg(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), index = 1)
     private List<Text> renderBackground(List<Text> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) DrawContext drawContext) {
         if (WardrobeApi.INSTANCE.getInCustomWardrobe()) {
-            textTooltip.clear();
-            return textTooltip;
+            return new ArrayList<>();
         }
         return ToolTipData.processModernTooltip(drawContext, itemStack, textTooltip);
     }

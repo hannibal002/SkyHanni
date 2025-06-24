@@ -1013,6 +1013,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 </details>
 <details open><summary>
 
+## Foraging
+
++ Added Foraging Quest Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4130)
+    + Shows paths to useful locations for unlocking the 1.21 Foraging island.
++ Added Moonglade Beacon Ready Alert. - nopo (https://github.com/hannibal002/SkyHanni/pull/4135)
++ Added Moonglade Beacon Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4135)
++ Highlight the small Birries in Galatea. - nopo (https://github.com/hannibal002/SkyHanni/pull/4137)
+
 ## Events
 
 </summary>
