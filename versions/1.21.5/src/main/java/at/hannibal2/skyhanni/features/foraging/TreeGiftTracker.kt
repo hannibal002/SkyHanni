@@ -37,7 +37,6 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.text.Text
-import kotlin.collections.emptySet
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -327,7 +326,8 @@ object TreeGiftTracker {
         }
 
         rewardsGainedPattern.matchMatcher(message) {
-            chatComponent.getHoverLootPairs().forEach { (item, amount) ->
+            val dataSibling = chatComponent.siblings.firstOrNull() ?: return@matchMatcher
+            dataSibling.getHoverLootPairs().forEach { (item, amount) ->
                 loot.addOrPut(item, amount)
             }
         }
@@ -350,32 +350,32 @@ object TreeGiftTracker {
     }
 
     private fun Text.getHoverLootPairs(): Set<Pair<NeuInternalName, Int>> = buildSet {
-        val treeType = treeType ?: return emptySet()
-        val joinedLines = hover.formattedTextCompat() + hover?.siblings?.joinToString { it.formattedTextCompat() }
+        val treeType = treeType ?: return this
+        val joinedLines = hover?.formattedTextCompat() + hover?.siblings?.joinToString("") { it.formattedTextCompat() }
         joinedLines.split("\n").forEach { line ->
             val (item, amountString) = hoverRewardPattern.matchMatcher(line) {
                 group("item") to group("amount")
             } ?: return@forEach
             if (amountString.contains("-")) {
                 NeuInternalName.fromItemNameOrNull(item)?.let {
+                    // Skip ranges like "0-2" (for now), handle from sack changes
                     rangedItems.add(it)
                 }
                 return@forEach
-            } // Skip ranges like "0-2" (for now)
+            }
             val amount = amountString.formatIntOrNull() ?: return@forEach
             when (item) {
-                "HOTF Experience" -> return@forEach tracker.modify {
+                "HOTF Experience" -> tracker.modify {
                     it.hotfExperience.addOrPut(treeType, amount.toLong())
                 }
-                "Foraging Experience" -> return@forEach tracker.modify {
+                "Foraging Experience" -> tracker.modify {
                     it.foragingExperience.addOrPut(treeType, amount.toLong())
                 }
-                "Forest Whispers" -> return@forEach tracker.modify {
+                "Forest Whispers" -> tracker.modify {
                     it.forestWhispers.addOrPut(treeType, amount.toLong())
                 }
-                else -> {
-                    val itemInternalName = NeuInternalName.fromItemNameOrNull(item) ?: return@forEach
-                    add(itemInternalName to amount)
+                else -> NeuInternalName.fromItemNameOrNull(item)?.let {
+                    add(it to amount)
                 }
             }
         }
