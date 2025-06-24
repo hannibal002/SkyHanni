@@ -265,8 +265,8 @@ object TitleManager {
         }
     }
 
-    @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    @HandleEvent(WorldChangeEvent::class)
+    fun onWorldChange() {
         titleLocationQueues.forEach { queue ->
             val (location, titleQueue) = queue
             titleLocationQueues[location] = titleQueue.copyWithFilter { !it.discardOnWorldChange }
@@ -296,8 +296,8 @@ object TitleManager {
         }
     }
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
         TitleLocation.entries.filter {
             it.activationRequirement.invoke()
         }.forEach { location ->
