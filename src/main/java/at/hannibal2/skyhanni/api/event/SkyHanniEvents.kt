@@ -1,67 +1,172 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.data.MinecraftData
+import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import java.lang.reflect.Method
 
 @SkyHanniModule
 object SkyHanniEvents {
 
-    private val listeners: MutableMap<Class<*>, EventListeners> = mutableMapOf()
-    private val handlers: MutableMap<Class<*>, EventHandler<*>> = mutableMapOf()
+    private val listeners: MutableMap<Class<out SkyHanniEvent>, EventListeners> = mutableMapOf()
+    private val handlers: MutableMap<Class<out SkyHanniEvent>, EventHandler<out SkyHanniEvent>> = mutableMapOf()
     private var disabledHandlers = emptySet<String>()
     private var disabledHandlerInvokers = emptySet<String>()
 
-    fun init(instances: List<Any>) {
-        instances.forEach { instance ->
-            instance.javaClass.declaredMethods.forEach {
-                registerMethod(it, instance)
-            }
+    fun init(instances: List<Any>) = instances.forEach(::register)
+
+    fun register(instance: Any) {
+        instance.javaClass.declaredMethods.forEach {
+            registerMethod(it, instance)
         }
     }
+
+    fun unregister(instance: Any) = instance.javaClass.declaredMethods.forEach(::unregisterMethod)
 
     @Suppress("UNCHECKED_CAST")
     fun <T : SkyHanniEvent> getEventHandler(event: Class<T>): EventHandler<T> = handlers.getOrPut(event) {
         EventHandler(
             event,
-            getEventClasses(event).mapNotNull { listeners[it] }.flatMap(EventListeners::getListeners)
+            getEventClasses(event).mapNotNull { listeners[it] }.flatMap(EventListeners::getListeners),
         )
     } as EventHandler<T>
 
     fun isDisabledHandler(handler: String): Boolean = handler in disabledHandlers
     fun isDisabledInvoker(invoker: String): Boolean = invoker in disabledHandlerInvokers
 
-    @Suppress("UNCHECKED_CAST")
     private fun registerMethod(method: Method, instance: Any) {
-        if (method.parameterCount != 1) return
-        val options = method.getAnnotation(HandleEvent::class.java) ?: return
-        val event = method.parameterTypes[0]
-        if (!SkyHanniEvent::class.java.isAssignableFrom(event)) return
-        listeners.getOrPut(event as Class<SkyHanniEvent>) { EventListeners(event) }
-            .addListener(method, instance, options)
+        val (options, eventTypes) = getEventData(method) ?: return
+        eventTypes.forEach { eventType ->
+            listeners.getOrPut(eventType) { EventListeners(eventType) }
+                .addListener(method, instance, options)
+        }
     }
 
-    @SubscribeEvent
-    fun onRepoLoad(event: RepositoryReloadEvent) {
+    @JvmStatic
+    val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
+        GeneratedEventPrimaryFunctionNames.map
+
+    @Suppress("UNCHECKED_CAST")
+    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+        val options = method.getAnnotation(HandleEvent::class.java) ?: return null
+        when (method.parameterCount) {
+            1 -> {
+                val eventType = method.parameterTypes.first()
+                require(SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+                    "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
+                }
+                return options to listOf(eventType as Class<out SkyHanniEvent>)
+            }
+
+            0 -> {
+                val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
+                if (primaryFunctionEventType != null) {
+                    return options to listOf(primaryFunctionEventType)
+                }
+                if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
+                require(options.eventTypes.isNotEmpty()) {
+                    "Method ${method.name} must have at least one event type specified in @HandleEvent."
+                }
+                return options to options.eventTypes.map { it.java }
+            }
+        }
+        return null
+    }
+
+    private fun unregisterMethod(method: Method) {
+        val (_, eventTypes) = getEventData(method) ?: return
+        eventTypes.forEach { event ->
+            unregisterHandler(event)
+            listeners.values.forEach { it.removeListener(method) }
+        }
+    }
+
+    private fun unregisterHandler(clazz: Class<out SkyHanniEvent>) {
+        this.handlers.removeIfKey { it.isAssignableFrom(clazz) }
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         disabledHandlers = data.disabledHandlers
         disabledHandlerInvokers = data.disabledInvokers
     }
 
-    @SubscribeEvent
+    val seconds = listOf(10, 60, 60 * 5)
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        //#if MC > 1.21
+        //$$ try {
+        //#endif
+        val list = handlers.values.toMutableList()
+
+        for (second in seconds) {
+            if (event.repeatSeconds(second)) {
+
+                for (handler in list) {
+                    val log = handler.invokeLog
+                    val current = log.invokeCount
+
+                    val storage = log.overTimeLog[second]
+                    if (storage == null) {
+                        log.overTimeLog[second] = EventInvokeData(current, 0)
+                    } else {
+                        storage.diff = current - storage.oldValue
+                        storage.oldValue = current
+                    }
+                }
+            }
+        }
+        //#if MC > 1.21
+        //$$ } catch (_: Exception) {
+        //$$ // ignore this error on 1.21 for now
+        //$$ }
+        //#endif
+    }
+
+    class EventInvokeData(var oldValue: Long, var diff: Long)
+
+    class EventInvokeLog {
+
+        var invokeCount: Long = 0L
+
+        var overTimeLog = mutableMapOf<Int, EventInvokeData>()
+    }
+
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Events")
         event.addIrrelevant {
-            handlers.values.toMutableList()
-                .filter { it.invokeCount > 0 }
-                .sortedWith(compareBy({ -it.invokeCount }, { it.name }))
+            add("- <event name> (<total invoke count> invokes per second: <last 10s, 60s, 5m, total>)")
+            handlers.values
+                .filter { it.invokeLog.invokeCount > 0 }
+                .sortedWith(compareBy({ -it.invokeLog.invokeCount }, { it.name }))
                 .forEach {
-                    add("- ${it.name} (${it.invokeCount.addSeparators()} ${it.invokeCount / (MinecraftData.totalTicks / 20)}/s)")
+                    val log = it.invokeLog
+
+                    add(
+                        buildString {
+                            append("- ${it.name} ")
+                            append(log.invokeCount.addSeparators())
+
+                            for (second in seconds) {
+                                val totalDiff = log.overTimeLog[second]?.diff ?: 0
+                                val perSecond = totalDiff / second
+                                append(" ")
+                                append("${perSecond.addSeparators()}/s")
+                            }
+
+                            append(" ")
+                            append("${(log.invokeCount / (ClientEvents.totalTicks / 20)).addSeparators()}/s")
+
+                        },
+                    )
                 }
         }
     }
@@ -74,10 +179,12 @@ object SkyHanniEvents {
         classes.add(clazz)
 
         var current = clazz
+        @Suppress("LoopWithTooManyJumpStatements")
         while (current.superclass != null) {
             val superClass = current.superclass
             if (superClass == SkyHanniEvent::class.java) break
             if (superClass == GenericSkyHanniEvent::class.java) break
+            if (superClass == RenderingSkyHanniEvent::class.java) break
             if (superClass == CancellableSkyHanniEvent::class.java) break
             classes.add(superClass)
             current = superClass

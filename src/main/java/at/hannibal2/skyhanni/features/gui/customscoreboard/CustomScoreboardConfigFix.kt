@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -7,7 +8,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CustomScoreboardConfigFix {
@@ -20,7 +20,7 @@ object CustomScoreboardConfigFix {
     private const val TITLE_AND_FOOTER_KEY = "$DISPLAY_PREFIX.titleAndFooter"
     private const val EVENT_ENTRIES_KEY = "$DISPLAY_PREFIX.events.eventEntries"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
 
         event.move(28, "$DISPLAY_CONFIG_PREFIX.showAllActiveEvents", "$EVENTS_CONFIG_KEY.showAllActiveEvents")
@@ -51,11 +51,7 @@ object CustomScoreboardConfigFix {
             event.move(31, oldKey, newKey)
         }
 
-        event.transform(37, EVENT_ENTRIES_KEY) {
-            it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardConfigEventElement.QUEUE.name))
-            }
-        }
+        event.addEvent(37, ScoreboardConfigEventElement.QUEUE)
 
         event.transform(40, EVENT_ENTRIES_KEY) { element ->
             replaceElements(element, listOf("HOT_DOG_CONTEST", "EFFIGIES"), ScoreboardConfigEventElement.RIFT.name)
@@ -74,18 +70,9 @@ object CustomScoreboardConfigFix {
             )
         }
 
-        event.transform(50, EVENT_ENTRIES_KEY) {
-            it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardConfigEventElement.ANNIVERSARY.name))
-                add(JsonPrimitive(ScoreboardConfigEventElement.CARNIVAL.name))
-            }
-        }
+        event.addEvent(50, ScoreboardConfigEventElement.ANNIVERSARY, ScoreboardConfigEventElement.CARNIVAL)
 
-        event.transform(51, EVENT_ENTRIES_KEY) {
-            it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardConfigEventElement.NEW_YEAR.name))
-            }
-        }
+        event.addEvent(51, ScoreboardConfigEventElement.NEW_YEAR)
 
         event.move(57, "$TITLE_AND_FOOTER_KEY.useHypixelTitleAnimation", "$TITLE_AND_FOOTER_KEY.useCustomTitle") {
             JsonPrimitive(!it.asBoolean)
@@ -101,6 +88,25 @@ object CustomScoreboardConfigFix {
         }
         listOf("alignTitle", "alignFooter").forEach { key ->
             event.move(63, "$TITLE_AND_FOOTER_KEY.alignTitleAndFooter", "$TITLE_AND_FOOTER_KEY.$key")
+        }
+        event.move(69, "$DISPLAY_PREFIX.hideCoinsDifference", "$DISPLAY_PREFIX.showNumberDifference")
+        event.move(83, "$DISPLAY_PREFIX.displayNumbersFirst", "$DISPLAY_PREFIX.numberDisplayFormat") {
+            JsonPrimitive(
+                if (it.asBoolean) CustomScoreboardUtils.NumberDisplayFormat.COLOR_TEXT_NUMBER.name
+                else CustomScoreboardUtils.NumberDisplayFormat.TEXT_COLOR_NUMBER.name,
+            )
+        }
+
+        event.addEvent(88, ScoreboardConfigEventElement.GALATEA)
+    }
+
+    private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {
+        transform(version, EVENT_ENTRIES_KEY) { element ->
+            element.asJsonArray.apply {
+                keys.forEach { key ->
+                    add(JsonPrimitive(key.name))
+                }
+            }
         }
     }
 

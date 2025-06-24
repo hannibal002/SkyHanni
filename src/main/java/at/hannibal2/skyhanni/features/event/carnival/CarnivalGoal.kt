@@ -6,22 +6,21 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 
 private val patternGroup = RepoPattern.group("event.carnival.goals")
@@ -170,12 +169,12 @@ enum class CarnivalGoal(
         private fun getEntry(item: Item, lore: List<String>): CarnivalGoal? =
             entries.filter { it.type.item == item }.firstOrNull { it.lorePattern.matches(lore.firstOrNull()) }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
             dirty = true
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             if (!isEnabled()) return
             if (!inventoryPattern.matches(event.inventoryName)) return
@@ -187,8 +186,8 @@ enum class CarnivalGoal(
             }
         }
 
-        @SubscribeEvent
-        fun onLorenzChat(event: LorenzChatEvent) {
+        @HandleEvent
+        fun onChat(event: SkyHanniChatEvent) {
             if (!isEnabled()) return
             entries.firstOrNull { it.chatPattern.matches(event.message) }?.isReached = true
         }
@@ -196,8 +195,8 @@ enum class CarnivalGoal(
         private var display = emptyList<Renderable>()
         private var inCarnival = false
 
-        @SubscribeEvent
-        fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        @HandleEvent
+        fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (dirty) {
                 display = buildList {
@@ -214,7 +213,7 @@ enum class CarnivalGoal(
         }
 
         fun isEnabled() =
-            LorenzUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
+            SkyBlockUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
 
         private enum class GoalType(val item: Item, display: String) {
             FRUIT_DIGGING(Item.getItemFromBlock(Blocks.sand), "§6Fruit Digging"),

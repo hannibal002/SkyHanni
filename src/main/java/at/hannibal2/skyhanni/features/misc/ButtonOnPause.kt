@@ -1,14 +1,19 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.render.gui.GuiActionPerformedEvent
+import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+//#if MC > 1.21
+//$$ import net.minecraft.client.gui.widget.ButtonWidget
+//$$ import net.minecraft.text.Text
+//#endif
 
 @SkyHanniModule
 object ButtonOnPause {
@@ -16,18 +21,20 @@ object ButtonOnPause {
     private val config get() = SkyHanniMod.feature.gui
     private val buttonId = System.nanoTime().toInt()
 
-    @SubscribeEvent
-    fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
-        if (!LorenzUtils.onHypixel) return
+    //#if MC < 1.21
+    @HandleEvent
+    fun onGuiActionPerformed(event: GuiActionPerformedEvent) {
+        if (!SkyBlockUtils.onHypixel) return
 
         if (config.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
             ConfigGuiManager.openConfigGui()
         }
     }
+    //#endif
 
-    @SubscribeEvent
-    fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
-        if (!LorenzUtils.onHypixel) return
+    @HandleEvent
+    fun onInitializeGuiPost(event: InitializeGuiEvent) {
+        if (!SkyBlockUtils.onHypixel) return
 
         if (config.configButtonOnPause && event.gui is GuiIngameMenu) {
             val x = event.gui.width - 105
@@ -45,11 +52,17 @@ object ButtonOnPause {
                     y2 = y + 20
                 }
             }
+            //#if MC < 1.21
             event.buttonList.add(GuiButton(buttonId, x, 0.coerceAtLeast(y), 100, 20, "SkyHanni"))
+            //#else
+            //$$ ButtonWidget.builder(Text.of("Skyhanni")) {
+            //$$     ConfigGuiManager.openConfigGui()
+            //$$ }.dimensions(x, 0.coerceAtLeast(y), 100, 20).build()
+            //#endif
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.configButtonOnPause", "gui.configButtonOnPause")
     }

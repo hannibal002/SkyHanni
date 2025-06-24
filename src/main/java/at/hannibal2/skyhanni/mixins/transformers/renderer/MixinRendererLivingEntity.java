@@ -23,7 +23,7 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
 
     @Inject(method = "getColorMultiplier", at = @At("HEAD"), cancellable = true)
     private void setColorMultiplier(T entity, float lightBrightness, float partialTickTime, CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(RenderLivingEntityHelper.internalSetColorMultiplier(entity));
+        cir.setReturnValue(RenderLivingEntityHelper.internalSetColorMultiplier(entity, 0));
     }
 
     @Redirect(method = "setBrightness", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;hurtTime:I", opcode = Opcodes.GETFIELD))
@@ -33,7 +33,7 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
 
     @Inject(method = "renderLayers", at = @At("HEAD"), cancellable = true)
     private void onRenderLayersPre(T entity, float p_177093_2_, float p_177093_3_, float partialTicks, float p_177093_5_, float p_177093_6_, float p_177093_7_, float p_177093_8_, CallbackInfo ci) {
-        if (new EntityRenderLayersEvent.Pre<>(entity).postAndCatch()) {
+        if (new EntityRenderLayersEvent.Pre<>(entity).post()) {
             ci.cancel();
         }
     }

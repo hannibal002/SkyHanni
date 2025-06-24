@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 
 // scoreboard
 // scoreboard update event
@@ -24,6 +24,12 @@ object ScoreboardElementObjective : ScoreboardElement() {
     }
 
     override val configLine = "Objective:\n§eStar SkyHanni on Github"
+
+    override val elementPatterns = listOf(
+        ScoreboardPattern.objectivePattern,
+        ScoreboardPattern.thirdObjectiveLinePattern,
+        ScoreboardPattern.wtfAreThoseLinesPattern,
+    )
 }
 
 // click: open the objective page (i think a command should exist)

@@ -20,7 +20,11 @@ object ItemStackTypeAdapterFactory : TypeAdapterFactory {
                 }
 
                 override fun read(reader: JsonReader): ItemStack {
+                    //#if MC < 1.16
                     return ItemStack.loadItemStackFromNBT(nbtCompoundTypeAdapter.read(reader))
+                    //#else
+                    //$$ return ItemStack(nbtCompoundTypeAdapter.read(reader))
+                    //#endif
                 }
             } as TypeAdapter<T>
         }

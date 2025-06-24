@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(FontRenderer.class)
 public abstract class ExtendedColorPatch {
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract void setColor(float r, float g, float b, float a2);
 
     @Shadow
@@ -84,7 +84,8 @@ public abstract class ExtendedColorPatch {
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/FontRenderer;setColor(FFFF)V",
             ordinal = 0,
-            shift = At.Shift.AFTER
+            shift = At.Shift.AFTER,
+            remap = false
         ),
         locals = LocalCapture.CAPTURE_FAILHARD
     )
@@ -112,10 +113,10 @@ public abstract class ExtendedColorPatch {
             textColor = skyhanni$colorSR;
             int shadowDivisor = shadow ? 4 : 1;
             setColor(
-                (skyhanni$colorSR >> 16 & 0xFF) / 255.0f / shadowDivisor,
-                (skyhanni$colorSR >> 8 & 0xFF) / 255.0f / shadowDivisor,
-                (skyhanni$colorSR & 0xFF) / 255.0f / shadowDivisor,
-                (skyhanni$colorState == 8 ? (skyhanni$colorSR >> 24 & 0xFF) / 255.0f : this.alpha)
+                (skyhanni$colorSR >> 16 & 0xFF) / 255f / shadowDivisor,
+                (skyhanni$colorSR >> 8 & 0xFF) / 255f / shadowDivisor,
+                (skyhanni$colorSR & 0xFF) / 255f / shadowDivisor,
+                (skyhanni$colorState == 8 ? (skyhanni$colorSR >> 24 & 0xFF) / 255f : this.alpha)
             );
             skyhanni$colorState = -1;
         } else if (0 <= hexCode && skyhanni$colorState != -1) {

@@ -2,8 +2,11 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
@@ -13,20 +16,21 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-//#if MC<1.12
+//#if MC < 1.16
 import net.minecraft.world.WorldSettings
 //#else
-//$$ import net.minecraft.world.GameType
+//$$ import net.minecraft.world.level.GameType
 //#endif
 
 @SkyHanniModule
@@ -45,7 +49,23 @@ object TabListData {
     fun getHeader() = header
     fun getFooter() = footer
 
-    fun toggleDebug() {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Tab List Debug Cache")
+        debugCache?.let {
+            event.addData {
+                add("debug active!")
+                add("lines: (${it.size})")
+                for (line in it) {
+                    add(" '$line'")
+                }
+            }
+        } ?: run {
+            event.addIrrelevant("not active.")
+        }
+    }
+
+    private fun toggleDebug() {
         if (debugCache != null) {
             ChatUtils.chat("Disabled tab list debug.")
             debugCache = null
@@ -58,18 +78,17 @@ object TabListData {
         }
     }
 
-    fun copyCommand(args: Array<String>) {
+    private fun copyCommand(noColor: Boolean) {
         if (debugCache != null) {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
                 onClick = { toggleDebug() },
-                "§eClick to disable!"
+                "§eClick to disable!",
             )
             return
         }
 
         val resultList = mutableListOf<String>()
-        val noColor = args.size == 1 && args[0] == "true"
         for (line in getTabList()) {
             val tabListLine = line.transformIf({ noColor }) { removeColor() }
             if (tabListLine != "") resultList.add("'$tabListLine'")
@@ -96,12 +115,12 @@ object TabListData {
             val team1 = o1.playerTeam
             val team2 = o2.playerTeam
             return ComparisonChain.start().compareTrueFirst(
-                //#if MC<1.12
+                //#if MC < 1.16
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
-                o2.gameType != WorldSettings.GameType.SPECTATOR
+                o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
-                //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR
+                //$$ o1.gameMode != GameType.SPECTATOR,
+                //$$ o2.gameMode != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(
@@ -113,20 +132,25 @@ object TabListData {
     }
 
     private fun readTabList(): List<String>? {
-        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return null
-        //#if MC<1.16
-        val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
+        val player = MinecraftCompat.localPlayerOrNull ?: return null
+        //#if MC < 1.16
+        val players = playerOrdering.sortedCopy(player.sendQueue.playerInfoMap)
         //#else
-        //$$ val players = playerOrdering.sortedCopy(thePlayer.connection.onlinePlayers)
+        //$$ val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
         //#endif
         val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
-            result.add(LorenzUtils.stripVanillaMessage(name))
+            //#if MC < 1.16
+            result.add(name.stripHypixelMessage())
+            //#else
+            //$$ result.add(name.formattedTextCompat().stripHypixelMessage())
+            //#endif
         }
         tabListGuard = false
-        return result.dropLast(1)
+        return if (result.size < 80) result.dropLast(1)
+        else result.subList(0, 80)
     }
 
     var dirty = false
@@ -138,16 +162,16 @@ object TabListData {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick() {
         if (!dirty) return
         dirty = false
 
         val tabList = readTabList() ?: return
         if (tablistCache != tabList) {
             tablistCache = tabList
-            TabListUpdateEvent(getTabList()).postAndCatch()
-            if (!LorenzUtils.onHypixel) {
+            TabListUpdateEvent(getTabList()).post()
+            if (!SkyBlockUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
         }
@@ -157,17 +181,34 @@ object TabListData {
 
         val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
-            TablistFooterUpdateEvent(tabFooter).postAndCatch()
+            TablistFooterUpdateEvent(tabFooter).post()
         }
         footer = tabFooter
     }
 
     private fun workaroundDelayedTabListUpdateAgain() {
         DelayedRun.runDelayed(2.seconds) {
-            if (LorenzUtils.onHypixel) {
+            if (SkyBlockUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).postAndCatch()
+                TabListUpdateEvent(getTabList()).post()
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtesttablist") {
+            description = "Set your clipboard as a fake tab list."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { toggleDebug() }
+        }
+        event.registerBrigadier("shcopytablist") {
+            description = "Copies the tab list data to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("nocolor", BrigadierArguments.bool()) { noColor ->
+                callback { copyCommand(getArg(noColor)) }
+            }
+            simpleCallback { copyCommand(false) }
         }
     }
 }

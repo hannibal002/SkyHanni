@@ -1,18 +1,21 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.EntityMoveEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -20,15 +23,15 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object DungeonHideItems {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
-    private val hideParticles = mutableMapOf<EntityArmorStand, Long>()
-    private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, Long>()
+    private val hideParticles = mutableMapOf<EntityArmorStand, SimpleTimeMark>()
+    private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, SimpleTimeMark>()
 
     private val SOUL_WEAVER_HIDER by lazy { SkullTextureHolder.getTexture("DUNGEONS_SOUL_WEAVER") }
     private val BLESSING_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_BLESSING") }
@@ -41,10 +44,8 @@ object DungeonHideItems {
 
     private fun isSkeletonSkull(entity: EntityArmorStand): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
 
         if (entity is EntityItem) {
@@ -60,7 +61,7 @@ object DungeonHideItems {
 
         if (entity !is EntityArmorStand) return
 
-        val head = entity.inventory[4]
+        val head = entity.getStandHelmet()
         val skullTexture = head?.getSkullTexture()
         if (config.hideSuperboomTNT) {
             if (entity.name.startsWith("§9Superboom TNT")) {
@@ -69,7 +70,7 @@ object DungeonHideItems {
 
             if (head != null && head.cleanName() == "Superboom TNT") {
                 event.cancel()
-                hideParticles[entity] = System.currentTimeMillis()
+                hideParticles[entity] = SimpleTimeMark.now()
             }
         }
 
@@ -90,14 +91,14 @@ object DungeonHideItems {
 
             if (skullTexture == REVIVE_STONE_TEXTURE) {
                 event.cancel()
-                hideParticles[entity] = System.currentTimeMillis()
+                hideParticles[entity] = SimpleTimeMark.now()
             }
         }
 
         if (config.hidePremiumFlesh) {
             if (entity.name == "§9Premium Flesh") {
                 event.cancel()
-                hideParticles[entity] = System.currentTimeMillis()
+                hideParticles[entity] = SimpleTimeMark.now()
             }
 
             if (skullTexture == PREMIUM_FLESH_TEXTURE) {
@@ -108,10 +109,8 @@ object DungeonHideItems {
         if (isSkeletonSkull(entity)) {
             EntityMovementData.addToTrack(entity)
             if (config.hideSkeletonSkull) {
-                val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-                if (lastMove + 100 > System.currentTimeMillis()) {
-                    return
-                }
+                val lastMove = movingSkeletonSkulls[entity] ?: SimpleTimeMark.farPast()
+                if (lastMove.passedSince() < 100.milliseconds) return
                 event.cancel()
             }
         }
@@ -129,15 +128,14 @@ object DungeonHideItems {
                 DAMAGE_ORB_TEXTURE,
                 -> {
                     event.cancel()
-                    hideParticles[entity] = System.currentTimeMillis()
+                    hideParticles[entity] = SimpleTimeMark.now()
                     return
                 }
             }
         }
 
         if (config.hideHealerFairy) {
-            // Healer Fairy texture is stored in id 0, not id 4 for some reasons.
-            if (entity.inventory[0]?.getSkullTexture() == HEALER_FAIRY_TEXTURE) {
+            if (entity.holdingSkullTexture(HEALER_FAIRY_TEXTURE)) {
                 event.cancel()
                 return
             }
@@ -151,13 +149,12 @@ object DungeonHideItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!DungeonAPI.inDungeon()) return
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location
-        for (armorStand in hideParticles.filter { it.value + 100 > System.currentTimeMillis() }.map { it.key }) {
+        for (armorStand in hideParticles.filterValues { it.passedSince() < 100.milliseconds }.keys) {
             val distance = packetLocation.distance(armorStand.getLorenzVec())
             if (distance < 2) {
                 if (event.type == EnumParticleTypes.FIREWORKS_SPARK) {
@@ -170,34 +167,32 @@ object DungeonHideItems {
         }
     }
 
-    @SubscribeEvent
-    fun onEntityMove(event: EntityMoveEvent) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onArmoStandMove(event: EntityMoveEvent<EntityArmorStand>) {
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (isSkeletonSkull(entity)) {
-            movingSkeletonSkulls[entity] = System.currentTimeMillis()
+            movingSkeletonSkulls[entity] = SimpleTimeMark.now()
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.GOLD.toColor().withAlpha(60)
+                LorenzColor.GOLD.toColor().addAlpha(60),
             ) { shouldColorMovingSkull(entity) }
         }
     }
 
     private fun shouldColorMovingSkull(entity: Entity) =
-        SkyHanniMod.feature.dungeon.highlightSkeletonSkull && movingSkeletonSkulls[entity]?.let {
-            it + 200 > System.currentTimeMillis()
-        } ?: false
+        SkyHanniMod.feature.dungeon.highlightSkeletonSkull &&
+            movingSkeletonSkulls[entity]?.let {
+                it.passedSince() < 200.milliseconds
+            } ?: false
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         hideParticles.clear()
         movingSkeletonSkulls.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.hideSuperboomTNT", "dungeon.objectHider.hideSuperboomTNT")
         event.move(3, "dungeon.hideBlessing", "dungeon.objectHider.hideBlessing")

@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
+import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PlayerChatModifier {
@@ -22,7 +23,7 @@ object PlayerChatModifier {
         patterns.add("§[7ab6](\\w{2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         event.applyIfPossible { cutMessage(it) }
     }
@@ -33,7 +34,7 @@ object PlayerChatModifier {
         }
         val clickEvent = chatComponent.chatStyle.chatClickEvent ?: return
         clickEvent.action ?: return
-        if (clickEvents.any { it.value == clickEvent.value }) return
+        if (clickEvents.any { it.value() == clickEvent.value() }) return
         clickEvents.add(clickEvent)
     }
 
@@ -43,7 +44,7 @@ object PlayerChatModifier {
         }
         val hoverEvent = chatComponent.chatStyle.chatHoverEvent ?: return
         hoverEvent.action ?: return
-        if (hoverEvents.any { it.value == hoverEvent.value }) return
+        if (hoverEvents.any { it.value() == hoverEvent.value() }) return
         hoverEvents.add(hoverEvent)
     }
 
@@ -63,7 +64,7 @@ object PlayerChatModifier {
         return string
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.playerRankHider", "chat.playerMessage.playerRankHider")
         event.move(3, "chat.chatFilter", "chat.playerMessage.chatFilter")

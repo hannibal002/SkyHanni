@@ -27,5 +27,5 @@ public class QuickModMenuSwitchConfig {
 
     @Expose
     @ConfigLink(owner = QuickModMenuSwitchConfig.class, field = "enabled")
-    public Position pos = new Position(-178, 143, false, true);
+    public Position pos = new Position(-178, 143);
 }

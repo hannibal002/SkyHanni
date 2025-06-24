@@ -16,14 +16,6 @@ enum class ProjectTarget(
         "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
         MappingStyle.SEARGE,
         "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
-        "BRIDGE112",
-    ),
-    BRIDGE112(
-        "1.12.2",
-        MinecraftVersion.MC11202,
-        "de.oceanlabs.mcp:mcp_stable:39-1.12@zip",
-        MappingStyle.SEARGE,
-        "net.minecraftforge:forge:1.12.2-14.23.5.2847",
         "BRIDGE116FORGE",
     ),
     BRIDGE116FORGE(
@@ -35,7 +27,7 @@ enum class ProjectTarget(
         "BRIDGE116FABRIC",
     ),
     BRIDGE116FABRIC(
-        "1.16.5",
+        "1.16.5-fabric",
         MinecraftVersion.MC11605,
         yarn("1.16.5+build.10"),
         MappingStyle.YARN,
@@ -43,9 +35,9 @@ enum class ProjectTarget(
         "MODERN",
     ),
     MODERN(
-        "1.21",
-        MinecraftVersion.MC121,
-        yarn("1.21+build.9"),
+        "1.21.5",
+        MinecraftVersion.MC12105,
+        yarn("1.21.5+build.1"),
         MappingStyle.YARN,
         null,
         null,

@@ -1,177 +1,90 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
-import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
-import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.utils.ColorUtils.component1
+import at.hannibal2.skyhanni.utils.ColorUtils.component2
+import at.hannibal2.skyhanni.utils.ColorUtils.component3
+import at.hannibal2.skyhanni.utils.ColorUtils.component4
+import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
+import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.item.ItemStack
+import net.minecraft.util.ResourceLocation
+import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
-import kotlin.math.ceil
 import kotlin.math.min
+//#if MC < 1.21
+import net.minecraft.client.renderer.GLAllocation
+import net.minecraft.client.renderer.OpenGlHelper
+import java.nio.FloatBuffer
+//#else
+//$$ import net.minecraft.client.render.RenderLayer
+//$$ import com.mojang.blaze3d.systems.RenderSystem
+//$$ import org.joml.Matrix4f
+//#endif
 
+// todo 1.21 impl needed
 /**
  * Some functions taken from NotEnoughUpdates
  */
-// TODO cleanup of redundant functions
+@Suppress("UnusedParameter")
 object GuiRenderUtils {
 
-    fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, color: Int) {
+    private val fr: FontRenderer get() = Minecraft.getMinecraft().fontRendererObj
+
+    private fun drawStringCentered(str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
+        str ?: return
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
-        GL11.glTranslatef(x2, y2, 0f)
-        fr.drawString(str, 0f, 0f, color, shadow)
-        GL11.glTranslatef(-x2, -y2, 0f)
-    }
-
-    fun drawString(str: String, x: Float, y: Float) {
-        Minecraft.getMinecraft().fontRendererObj.drawString(str, x, y, 0xffffff, true)
-    }
-
-    fun drawString(str: String, x: Int, y: Int) {
-        Minecraft.getMinecraft().fontRendererObj.drawString(str, x.toFloat(), y.toFloat(), 0xffffff, true)
-    }
-
-    fun drawTwoLineString(str: String, x: Float, y: Float) {
-        val desiredSplitIndex = str.length / 2
-        var splitIndex = -1
-        var lastColorCode = ""
-
-        for (i in desiredSplitIndex downTo 0) {
-            if (str[i] == ' ') {
-                splitIndex = i
-                break
-            }
-        }
-
-        if (splitIndex == -1) {
-            splitIndex = desiredSplitIndex
-        }
-        for (i in 0 until desiredSplitIndex) {
-            if (str[i] == '§' && i + 1 < str.length) {
-                lastColorCode = str.substring(i, i + 2)
-            }
-        }
-
-        val firstString = str.substring(0, splitIndex).trim()
-        val secondString = lastColorCode + str.substring(splitIndex).trim()
-
-        Minecraft.getMinecraft().fontRendererObj.drawString(firstString, x, y - 5, 0xffffff, true)
-        Minecraft.getMinecraft().fontRendererObj.drawString(secondString, x, y + 5, 0xffffff, true)
+        DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
-        drawStringCentered(
-            str, Minecraft.getMinecraft().fontRendererObj, x.toFloat(), y.toFloat(), true, 0xffffff,
-        )
+        drawStringCentered(str, x.toFloat(), y.toFloat(), true, 0xffffff)
     }
 
-    fun drawStringCentered(str: String?, x: Float, y: Float) {
-        drawStringCentered(str, x.toInt(), y.toInt())
+    fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
+        DrawContextUtils.pushMatrix()
+        val strLength = fr.getStringWidth(text)
+        val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
+        DrawContextUtils.translate(x, y, 0f)
+        DrawContextUtils.scale(factor, factor, 1f)
+        drawString(text, -strLength / 2, -fr.FONT_HEIGHT / 2, color, shadow)
+        DrawContextUtils.popMatrix()
     }
 
-    fun renderItemStack(item: ItemStack, x: Int, y: Int) {
-        val itemRender = Minecraft.getMinecraft().renderItem
-        RenderHelper.enableGUIStandardItemLighting()
-        itemRender.zLevel = -145f
-        itemRender.renderItemAndEffectIntoGUI(item, x, y)
-        itemRender.zLevel = 0f
-        RenderHelper.disableStandardItemLighting()
+    fun drawString(str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
-    // Code taken and edited from NEU
-    private fun drawTooltip(
-        textLines: List<String>,
-        mouseX: Int,
-        mouseY: Int,
-        screenHeight: Int,
-        fr: FontRenderer,
-    ) {
-        if (textLines.isNotEmpty()) {
-            val borderColor = StringUtils.getColor(textLines[0], 0x505000FF)
+    fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
+    }
 
-            GlStateManager.disableRescaleNormal()
-            RenderHelper.disableStandardItemLighting()
-            GlStateManager.disableLighting()
-            GlStateManager.enableDepth()
-            var tooltipTextWidth = 0
+    fun drawStrings(strings: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        drawStrings(strings.split("\n"), x, y, color, shadow)
+    }
 
-            for (textLine in textLines) {
-                val textLineWidth: Int = fr.getStringWidth(textLine)
-                if (textLineWidth > tooltipTextWidth) {
-                    tooltipTextWidth = textLineWidth
-                }
-            }
-
-            val tooltipX = mouseX + 12
-            var tooltipY = mouseY - 12
-            var tooltipHeight = 8
-
-            if (textLines.size > 1) tooltipHeight += (textLines.size - 1) * 10 + 2
-            GlStateManager.translate(0f, 0f, 100f)
-            if (tooltipY + tooltipHeight + 6 > screenHeight) tooltipY = screenHeight - tooltipHeight - 6
-            // main background
-            GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, -0xfeffff0,
-            )
-
-            // borders
-            GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3 + 1, tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor,
-            )
-
-            GuiScreen.drawRect(
-                tooltipX + tooltipTextWidth + 2,
-                tooltipY - 3 + 1,
-                tooltipX + tooltipTextWidth + 3,
-                tooltipY + tooltipHeight + 3 - 1,
-                borderColor,
-            )
-
-            GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColor,
-            )
-
-            GuiScreen.drawRect(
-                tooltipX - 3,
-                tooltipY + tooltipHeight + 2,
-                tooltipX + tooltipTextWidth + 3,
-                tooltipY + tooltipHeight + 3,
-                borderColor,
-            )
-            GlStateManager.translate(0f, 0f, -100f)
-            GlStateManager.disableDepth()
-
-            for (line in textLines) {
-                fr.drawString(line, tooltipX.toFloat(), tooltipY.toFloat(), 0xffffff, true)
-
-                tooltipY += if (line == textLines[0]) 12 else 10
-            }
-
-            GlStateManager.enableDepth()
-            GlStateManager.enableLighting()
-            GlStateManager.enableRescaleNormal()
-            RenderHelper.enableStandardItemLighting()
+    fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        var newY = y
+        for (string in strings) {
+            DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
+            newY += 9
         }
-        GlStateManager.disableLighting()
-    }
-
-    fun drawTooltip(textLines: List<String>, mouseX: Int, mouseY: Int, screenHeight: Int) {
-        drawTooltip(textLines, mouseX, mouseY, screenHeight, Minecraft.getMinecraft().fontRendererObj)
     }
 
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
@@ -217,19 +130,8 @@ object GuiRenderUtils {
         )
     }
 
-    private fun barColorGradient(double: Double): Int {
-        var newDouble = (double - .5) * 2
-        if (newDouble < 0) newDouble = 0.0
-        return Color((255 * (1 - newDouble)).toInt(), (255 * newDouble).toInt(), 0).rgb
-    }
-
-    fun Int.darkenColor(): Int {
-        val color = Color(this)
-        return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
-    }
-
     fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
-        GuiScreen.drawRect(
+        drawRect(
             (left * inverseScale).toInt(),
             (top * inverseScale).toInt(),
             (right * inverseScale).toInt(),
@@ -238,96 +140,28 @@ object GuiRenderUtils {
         )
     }
 
+    fun drawRect(left: Int, top: Int, right: Int, bottom: Int, color: Int) {
+        DrawContextUtils.drawContext.fill(left, top, right, bottom, color)
+    }
+
     fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
-        renderItemStack(item, x, y)
-        GuiScreen.drawRect(x, y, x + 16, y + 16, color)
+        DrawContextUtils.drawItem(item, x, y)
+        drawRect(x, y, x + 16, y + 16, color)
     }
 
-    // Taken and edited from NEU <- it's broken
-    fun renderTexturedBar(
-        x: Float,
-        y: Float,
-        xSize: Float,
-        completed: Float,
-        color: Color,
-        useChroma: Boolean,
-        texture: SkillProgressBarConfig.TexturedBar.UsedTexture,
-        height: Float,
-    ) {
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, 0f)
-        val w = xSize.toInt()
-        val w_2 = w / 2
-        val k = min(w.toDouble(), ceil((completed * w).toDouble())).toInt()
-        val vanilla = texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK
-        val vMinEmpty = if (vanilla) 64 / 256f else 0f
-        val vMaxEmpty = if (vanilla) 69 / 256f else .5f
-        val vMinFilled = if (vanilla) 69 / 256f else .5f
-        val vMaxFilled = if (vanilla) 74 / 256f else 1f
-
-        if (useChroma) {
-            ChromaShaderManager.begin(ChromaType.TEXTURED)
-            GlStateManager.color(
-                Color.LIGHT_GRAY.darker().red / 255f,
-                Color.LIGHT_GRAY.darker().green / 255f,
-                Color.LIGHT_GRAY.darker().blue / 255f,
-                1f,
-            )
-        } else {
-            GlStateManager.color(color.darker().red / 255f, color.darker().green / 255f, color.darker().blue / 255f, 1f)
-        }
-
-        drawTexturedRect(x, y, w_2.toFloat(), height, 0f, w_2 / xSize, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
-        drawTexturedRect(x + w_2, y, w_2.toFloat(), height, 1 - w_2 / xSize, 1f, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
-
-        if (useChroma) {
-            GlStateManager.color(Color.WHITE.red / 255f, Color.WHITE.green / 255f, Color.WHITE.blue / 255f, 1f)
-        } else {
-            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
-        }
-
-        if (k > 0) {
-            val uMax = w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat()
-            val width = w_2.coerceAtMost(k).toFloat()
-            drawTexturedRect(x, y, width, height, 0f, uMax, vMinFilled, vMaxFilled, GL11.GL_NEAREST)
-            if (completed > 0.5f) {
-                drawTexturedRect(
-                    x + w_2,
-                    y,
-                    (k - w_2).toFloat(),
-                    height,
-                    1 - w_2 / xSize,
-                    1 + (k - w) / xSize,
-                    vMinFilled,
-                    vMaxFilled,
-                    GL11.GL_NEAREST,
-                )
-            }
-        }
-        if (useChroma) {
-            ChromaShaderManager.end()
-        }
-        GlStateManager.popMatrix()
-    }
-
-    /**@Mojang */
+    /** @Mojang */
     fun drawGradientRect(
         left: Int,
         top: Int,
         right: Int,
         bottom: Int,
-        startColor: Int,
-        endColor: Int,
-        zLevel: Double,
+        startColor: Int = -0xfeffff0,
+        endColor: Int = -0xfeffff0,
+        zLevel: Double = 0.0,
     ) {
-        val f = (startColor shr 24 and 255).toFloat() / 255.0f
-        val g = (startColor shr 16 and 255).toFloat() / 255.0f
-        val h = (startColor shr 8 and 255).toFloat() / 255.0f
-        val i = (startColor and 255).toFloat() / 255.0f
-        val j = (endColor shr 24 and 255).toFloat() / 255.0f
-        val k = (endColor shr 16 and 255).toFloat() / 255.0f
-        val l = (endColor shr 8 and 255).toFloat() / 255.0f
-        val m = (endColor and 255).toFloat() / 255.0f
+        val (startAlpha, startRed, startGreen, startBlue) = Color(startColor, true)
+        val (endAlpha, endRed, endGreen, endBlue) = Color(endColor, true)
+        //#if MC < 1.21
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
@@ -336,21 +170,34 @@ object GuiRenderUtils {
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldRenderer.pos(right.toDouble(), top.toDouble(), zLevel).color(g, h, i, f).endVertex()
-        worldRenderer.pos(left.toDouble(), top.toDouble(), zLevel).color(g, h, i, f).endVertex()
-        worldRenderer.pos(left.toDouble(), bottom.toDouble(), zLevel).color(k, l, m, j).endVertex()
-        worldRenderer.pos(right.toDouble(), bottom.toDouble(), zLevel).color(k, l, m, j).endVertex()
+        worldRenderer.pos(right.toDouble(), top.toDouble(), zLevel)
+            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
+        worldRenderer.pos(left.toDouble(), top.toDouble(), zLevel)
+            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
+        worldRenderer.pos(left.toDouble(), bottom.toDouble(), zLevel)
+            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
+        worldRenderer.pos(right.toDouble(), bottom.toDouble(), zLevel)
+            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
         tessellator.draw()
         GlStateManager.shadeModel(7424)
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
+        //#else
+        //$$ DrawContextUtils.drawContext.fillGradient(left, top, right, bottom, startColor, endColor)
+        //#endif
     }
 
-    fun drawTexturedRect(x: Float, y: Float) {
-        with(ScaledResolution(Minecraft.getMinecraft())) {
-            drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), filter = GL11.GL_NEAREST)
-        }
+    fun drawTexturedRect(x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
+        drawTexturedRect(
+            x,
+            y,
+            GuiScreenUtils.scaledWindowWidth.toFloat(),
+            GuiScreenUtils.scaledWindowHeight.toFloat(),
+            filter = GL11.GL_NEAREST,
+            texture = texture,
+            alpha = alpha,
+        )
     }
 
     fun drawTexturedRect(
@@ -362,13 +209,27 @@ object GuiRenderUtils {
         uMax: Float = 1f,
         vMin: Float = 0f,
         vMax: Float = 1f,
+        texture: ResourceLocation,
+        alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {
-        drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), uMin, uMax, vMin, vMax, filter)
+        drawTexturedRect(
+            x.toFloat(),
+            y.toFloat(),
+            width.toFloat(),
+            height.toFloat(),
+            uMin,
+            uMax,
+            vMin,
+            vMax,
+            texture,
+            alpha,
+            filter,
+        )
     }
 
     // Taken from NEU
-    fun drawTexturedRect(
+    private fun drawTexturedRect(
         x: Float,
         y: Float,
         width: Float,
@@ -377,8 +238,13 @@ object GuiRenderUtils {
         uMax: Float = 1f,
         vMin: Float = 0f,
         vMax: Float = 1f,
+        texture: ResourceLocation,
+        alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {
+        //#if MC < 1.21
+        Minecraft.getMinecraft().textureManager.bindTexture(texture)
+        GlStateManager.color(1f, 1f, 1f, alpha)
         GlStateManager.enableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
@@ -400,5 +266,166 @@ object GuiRenderUtils {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST)
 
         GlStateManager.disableBlend()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        //#else
+        //$$ DrawContextUtils.drawContext.drawTexture(RenderLayer::getGuiTextured, texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        //#endif
     }
+
+    fun enableScissor(left: Int, top: Int, right: Int, bottom: Int) {
+        DrawContextUtils.drawContext.enableScissor(left, top, right, bottom)
+    }
+
+    fun disableScissor() {
+        DrawContextUtils.drawContext.disableScissor()
+    }
+
+    fun drawFloatingRectDark(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        //#if MC < 1.21
+        var alpha = -0x10000000
+
+        if (!OpenGlHelper.isFramebufferEnabled()) {
+            alpha = -0x1000000
+        }
+        //#else
+        //$$ val alpha = -0x1000000
+        //#endif
+
+        val main = alpha or 0x202026
+        val light = -0xcfcfca
+        val dark = -0xefefea
+        drawRect(x, y, x + 1, y + height, light) // Left
+        drawRect(x + 1, y, x + width, y + 1, light) // Top1
+        drawRect(x + width - 1, y + 1, x + width, y + height, dark) // Right
+        drawRect(x + 1, y + height - 1, x + width - 1, y + height, dark) // Bottom
+        drawRect(x + 1, y + 1, x + width - 1, y + height - 1, main) // Middle
+        if (shadow) {
+            drawRect(x + width, y + 2, x + width + 2, y + height + 2, 0x70000000) // Right shadow
+            drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow
+        }
+    }
+
+    fun ItemStack.renderOnScreen(
+        x: Float,
+        y: Float,
+        scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
+        rescaleSkulls: Boolean = true,
+        rotationDegrees: Vec3? = null,
+    ) {
+        val item = checkBlinkItem()
+        val isSkull = rescaleSkulls && item.isSkull()
+
+        val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
+        val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
+        val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
+
+        //#if MC < 1.21
+        val baseScale = if (isSkull) (4f / 3f) else 1f
+        //#else
+        //$$ val baseScale = if (isSkull) (5f / 4f) else 1f
+        //#endif
+        val finalScale = (baseScale * scaleMultiplier).toFloat()
+
+        val (translateX, translateY) = if (isSkull) {
+            val skullDiff = ((scaleMultiplier) * 2.5f).toFloat()
+            x - skullDiff to y - skullDiff
+        } else x to y
+
+        //#if MC < 1.21
+        val (hx, hy, hz) = listOf(8f, 8f, 100f)
+        val (zT, zS) = listOf(-19f, 0.2f)
+        //#else
+        //$$ val (hx, hy, hz) = listOf(8f, 8f, 148f)
+        //$$ val (zT, zS) = listOf(-95f, 1f)
+        //#endif
+
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate(translateX, translateY, zT)
+            DrawContextUtils.scale(finalScale, finalScale, zS)
+
+            //#if MC < 1.21
+            val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+            //#else
+            //$$ RenderSystem.assertOnRenderThread()
+            //$$ lateinit var savedMV: Matrix4f
+            //#endif
+
+            DrawContextUtils.pushPop {
+                DrawContextUtils.loadIdentity()
+                DrawContextUtils.translate(hx, hy, hz)
+
+                //#if MC < 1.21
+                if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
+                if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
+                if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
+                //#else
+                //$$ val (rotXD, rotYD, rotZD) = listOf(rotX, rotY, rotZ).map { it * (Math.PI.toFloat() / 180f) }
+                //$$ if (rotXD != 0f) DrawContextUtils.rotate(rotXD, 1f, 0f, 0f)
+                //$$ if (rotYD != 0f) DrawContextUtils.rotate(rotYD, 0f, 1f, 0f)
+                //$$ if (rotZD != 0f) DrawContextUtils.rotate(rotZD, 0f, 0f, 1f)
+                //#endif
+
+                DrawContextUtils.translate(-hx, -hy, -hz)
+
+                //#if MC < 1.21
+                GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+                //#else
+                //$$ savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
+                //#endif
+            }
+            DrawContextUtils.multMatrix(savedMV)
+
+            //#if MC < 1.21
+            GL11.glEnable(GL11.GL_NORMALIZE)
+            GL11.glNormal3f(0f, 0f, 1f)
+            //#else
+            //$$ RenderSystem.assertOnRenderThread()
+            //#endif
+
+            RenderHelper.enableGUIStandardItemLighting()
+
+            //#if MC < 1.21
+            AdjustStandardItemLighting.adjust() // Compensate for z scaling
+            //#endif
+
+            DrawContextUtils.drawItem(item, 0, 0)
+
+            //#if MC < 1.21
+            RenderHelper.disableStandardItemLighting()
+            //#else
+            //$$ DiffuseLighting.disableGuiDepthLighting()
+            //#endif
+
+            //#if MC < 1.21
+            GL11.glDisable(GL11.GL_NORMALIZE)
+            //#endif
+        }
+    }
+
+    //#if MC < 1.21
+    private object AdjustStandardItemLighting {
+
+        private const val lightScaling = 2.47f // Adjust as needed
+        private const val g = 0.6f // Original Value taken from RenderHelper
+        private const val lightIntensity = lightScaling * g
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16)
+
+        init {
+            itemLightBuffer.clear()
+            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1f)
+            itemLightBuffer.flip()
+        }
+
+        fun adjust() {
+            GL11.glLight(16384, 4609, itemLightBuffer)
+            GL11.glLight(16385, 4609, itemLightBuffer)
+        }
+    }
+    //#endif
 }
