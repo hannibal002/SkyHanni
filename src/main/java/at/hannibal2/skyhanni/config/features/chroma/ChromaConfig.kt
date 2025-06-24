@@ -38,7 +38,6 @@ class ChromaConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.01f)
     var chromaSaturation: Float = 0.75f
 
-    @Suppress("StorageVarOrVal")
     @Expose
     @ConfigOption(name = "Chroma Direction", desc = "Change the slant and direction of the chroma.")
     @ConfigEditorDropdown

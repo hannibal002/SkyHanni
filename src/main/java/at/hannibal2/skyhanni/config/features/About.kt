@@ -28,11 +28,10 @@ class About {
     @ConfigEditorBoolean
     var fullAutoUpdates: Boolean = false
 
-    @Suppress("StorageVarOrVal")
     @ConfigOption(name = "Update Stream", desc = "How frequently you want updates for SkyHanni")
     @Expose
     @ConfigEditorDropdown
-    var updateStream: Property<UpdateStream> = Property.of(UpdateStream.RELEASES)
+    val updateStream: Property<UpdateStream> = Property.of(UpdateStream.RELEASES)
 
     @ConfigOption(name = "Used Software", desc = "Information about used software and licenses")
     @Accordion
