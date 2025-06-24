@@ -19,7 +19,7 @@ class BarnTimerConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(true)
+    val enabled: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -32,17 +32,17 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(name = "Worm Fishing", desc = "Show the Barn Fishing Timer in the Crystal Hollows.")
     @ConfigEditorBoolean
-    var crystalHollows: Property<Boolean> = Property.of(true)
+    val crystalHollows: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Lava Fishing", desc = "Show the Barn Fishing Timer in the Crimson Isle.")
     @ConfigEditorBoolean
-    var crimsonIsle: Property<Boolean> = Property.of(true)
+    val crimsonIsle: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Winter Fishing", desc = "Show the Barn Fishing Timer on the Jerry's Workshop island.")
     @ConfigEditorBoolean
-    var winterIsland: Property<Boolean> = Property.of(true)
+    val winterIsland: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -50,7 +50,7 @@ class BarnTimerConfig {
         desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit."
     )
     @ConfigEditorBoolean
-    var forStranded: Property<Boolean> = Property.of(true)
+    val forStranded: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -82,5 +82,5 @@ class BarnTimerConfig {
 
     @Expose
     @ConfigLink(owner = BarnTimerConfig::class, field = "enabled")
-    var pos: Position = Position(10, 10)
+    val pos: Position = Position(10, 10)
 }
