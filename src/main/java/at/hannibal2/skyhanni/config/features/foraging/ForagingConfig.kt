@@ -25,7 +25,7 @@ class ForagingConfig {
 
     @Expose
     @Category(name = "HotF", desc = "Settings for Heart of the Forest.")
-    var hotf: HotfConfig = HotfConfig()
+    val hotf: HotfConfig = HotfConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")

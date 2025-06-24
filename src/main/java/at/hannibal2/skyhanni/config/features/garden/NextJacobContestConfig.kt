@@ -59,7 +59,7 @@ class NextJacobContestConfig {
         desc = "Set the color of the highlight for the current boosted crop.",
     )
     @ConfigEditorColour
-    val additionalBoostedHighlightColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, a = 80)
+    var additionalBoostedHighlightColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, a = 80)
 
     @Expose
     @ConfigOption(
