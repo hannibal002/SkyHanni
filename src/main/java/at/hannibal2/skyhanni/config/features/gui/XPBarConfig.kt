@@ -26,7 +26,7 @@ class XPBarConfig {
 
     @Expose
     @ConfigLink(owner = XPBarConfig::class, field = "enabled")
-    var position: Position = Position(20, 20)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Outside Skyblock", desc = "Shows the XP bar outside of SkyBlock.")
