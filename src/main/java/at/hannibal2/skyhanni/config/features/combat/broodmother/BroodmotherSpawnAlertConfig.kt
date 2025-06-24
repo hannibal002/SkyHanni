@@ -21,7 +21,7 @@ class BroodmotherSpawnAlertConfig {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    var testSound: Runnable = Runnable(BroodmotherFeatures::playTestSound)
+    val testSound: Runnable = Runnable(BroodmotherFeatures::playTestSound)
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")
@@ -30,7 +30,7 @@ class BroodmotherSpawnAlertConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    var sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 
     @Expose
     @ConfigOption(name = "Text", desc = "The text with color to be displayed as the title notification.")

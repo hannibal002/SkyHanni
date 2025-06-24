@@ -12,43 +12,43 @@ class PestsConfig {
     @Expose
     @ConfigOption(name = "Pest Spawn", desc = "")
     @Accordion
-    var pestSpawn: PestSpawnConfig = PestSpawnConfig()
+    val pestSpawn: PestSpawnConfig = PestSpawnConfig()
 
     @Expose
     @ConfigOption(name = "Pest Finder", desc = "")
     @Accordion
-    var pestFinder: PestFinderConfig = PestFinderConfig()
+    val pestFinder: PestFinderConfig = PestFinderConfig()
 
     // TODO rename to waypoint
     @Expose
     @ConfigOption(name = "Pest Waypoint", desc = "")
     @Accordion
-    var pestWaypoint: PestWaypointConfig = PestWaypointConfig()
+    val pestWaypoint: PestWaypointConfig = PestWaypointConfig()
 
     @Expose
     @ConfigOption(name = "Pest Timer", desc = "")
     @Accordion
-    var pestTimer: PestTimerConfig = PestTimerConfig()
+    val pestTimer: PestTimerConfig = PestTimerConfig()
 
     @Expose
     @ConfigOption(name = "Pest Profit Tracker", desc = "")
     @Accordion
-    var pestProfitTacker: PestProfitTrackerConfig = PestProfitTrackerConfig()
+    val pestProfitTacker: PestProfitTrackerConfig = PestProfitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Spray", desc = "")
     @Accordion
-    var spray: SprayConfig = SprayConfig()
+    val spray: SprayConfig = SprayConfig()
 
     @ConfigOption(name = "Stereo Harmony", desc = "")
     @Accordion
     @Expose
-    var stereoHarmony: StereoHarmonyConfig = StereoHarmonyConfig()
+    val stereoHarmony: StereoHarmonyConfig = StereoHarmonyConfig()
 
     @ConfigOption(name = "Pesthunter Profit Display", desc = "")
     @Accordion
     @Expose
-    var pesthunterShop: PesthunterShopConfig = PesthunterShopConfig()
+    val pesthunterShop: PesthunterShopConfig = PesthunterShopConfig()
 
     @Expose
     @ConfigOption(name = "Bonus Chance Display", desc = "Displays your bonus pest chance and if it is enabled or not.")
@@ -58,6 +58,6 @@ class PestsConfig {
 
     @Expose
     @ConfigLink(owner = PestsConfig::class, field = "pestChanceDisplay")
-    var pestChanceDisplayPosition: Position = Position(5, -115)
+    val pestChanceDisplayPosition: Position = Position(5, -115)
 }
 

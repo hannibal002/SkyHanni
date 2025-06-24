@@ -28,5 +28,5 @@ class MotesConfig {
     @Expose
     @ConfigOption(name = "Inventory Value", desc = "")
     @Accordion
-    var inventoryValue: RiftInventoryValueConfig = RiftInventoryValueConfig()
+    val inventoryValue: RiftInventoryValueConfig = RiftInventoryValueConfig()
 }

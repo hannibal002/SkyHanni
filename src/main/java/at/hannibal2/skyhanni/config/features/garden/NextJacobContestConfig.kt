@@ -59,7 +59,7 @@ class NextJacobContestConfig {
         desc = "Set the color of the highlight for the current boosted crop.",
     )
     @ConfigEditorColour
-    val additionalBoostedHighlightColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, a = 80)
+    var additionalBoostedHighlightColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, a = 80)
 
     @Expose
     @ConfigOption(
@@ -103,9 +103,10 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(name = "Warn For", desc = "Only warn for these crops.")
     @ConfigEditorDraggableList
-    var warnFor: MutableList<CropType> = CropType.entries.toMutableList()
+    val warnFor: MutableList<CropType> = CropType.entries.toMutableList()
 
+    // Todo rename to position
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
-    var pos: Position = Position(-200, 10)
+    val pos: Position = Position(-200, 10)
 }

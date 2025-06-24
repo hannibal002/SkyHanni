@@ -20,10 +20,10 @@ class DreadfarmConfig {
     @ConfigOption(name = "Volt Crux", desc = "")
     @Accordion
     @Expose
-    var voltCrux: VoltCruxConfig = VoltCruxConfig()
+    val voltCrux: VoltCruxConfig = VoltCruxConfig()
 
     @ConfigOption(name = "Wilted Berberis", desc = "")
     @Accordion
     @Expose
-    var wiltedBerberis: WiltedBerberisConfig = WiltedBerberisConfig()
+    val wiltedBerberis: WiltedBerberisConfig = WiltedBerberisConfig()
 }

@@ -43,9 +43,9 @@ class AtmosphericFilterDisplayConfig {
 
     @Expose
     @ConfigLink(owner = AtmosphericFilterDisplayConfig::class, field = "enabled")
-    var position: Position = Position(10, 10, true)
+    val position: Position = Position(10, 10, true)
 
     @Expose
     @ConfigLink(owner = AtmosphericFilterDisplayConfig::class, field = "outsideGarden")
-    var positionOutside: Position = Position(20, 20, true)
+    val positionOutside: Position = Position(20, 20, true)
 }

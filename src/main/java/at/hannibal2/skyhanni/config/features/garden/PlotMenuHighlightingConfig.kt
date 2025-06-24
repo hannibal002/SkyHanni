@@ -18,7 +18,7 @@ class PlotMenuHighlightingConfig {
     @Expose
     @ConfigOption(name = "Statuses", desc = "Change which statuses are enabled, and the hierarchy of them.")
     @ConfigEditorDraggableList
-    var deskPlotStatusTypes: MutableList<PlotStatusType> = mutableListOf(
+    val deskPlotStatusTypes: MutableList<PlotStatusType> = mutableListOf(
         PlotStatusType.CURRENT,
         PlotStatusType.PESTS,
         PlotStatusType.SPRAYS,
