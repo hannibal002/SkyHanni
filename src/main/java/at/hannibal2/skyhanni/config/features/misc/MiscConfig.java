@@ -52,7 +52,7 @@ public class MiscConfig {
     public AreaNavigationConfig areaNavigation = new AreaNavigationConfig();
 
     @Expose
-    @Category(name = "Pathfinding", desc = "General settings for Pathfinding in different features.")
+    @Category(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
     public PathfindConfig pathfinding = new PathfindConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
