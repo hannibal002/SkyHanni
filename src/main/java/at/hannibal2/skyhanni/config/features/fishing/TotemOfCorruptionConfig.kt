@@ -21,7 +21,7 @@ class TotemOfCorruptionConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var showOverlay: Property<Boolean> = Property.of(true)
+    val showOverlay: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -75,5 +75,5 @@ class TotemOfCorruptionConfig {
 
     @Expose
     @ConfigLink(owner = TotemOfCorruptionConfig::class, field = "showOverlay")
-    var position: Position = Position(50, 20)
+    val position: Position = Position(50, 20)
 }

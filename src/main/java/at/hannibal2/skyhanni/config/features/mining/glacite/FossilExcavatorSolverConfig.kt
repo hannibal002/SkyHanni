@@ -29,5 +29,5 @@ class FossilExcavatorSolverConfig {
 
     @Expose
     @ConfigLink(owner = FossilExcavatorSolverConfig::class, field = "enabled")
-    var position: Position = Position(183, 212)
+    val position: Position = Position(183, 212)
 }

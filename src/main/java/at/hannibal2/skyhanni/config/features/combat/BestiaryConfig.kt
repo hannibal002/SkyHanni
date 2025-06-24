@@ -16,6 +16,7 @@ class BestiaryConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
+    @Suppress("StorageVarOrVal")
     @Expose
     @ConfigOption(name = "Number format", desc = "Short: 1.1k\nLong: 1.100")
     @ConfigEditorDropdown
@@ -30,6 +31,7 @@ class BestiaryConfig {
         override fun toString() = displayName
     }
 
+    @Suppress("StorageVarOrVal")
     @Expose
     @ConfigOption(name = "Display type", desc = "Choose what the display should show")
     @ConfigEditorDropdown
@@ -61,5 +63,5 @@ class BestiaryConfig {
 
     @Expose
     @ConfigLink(owner = BestiaryConfig::class, field = "enabled")
-    var position: Position = Position(100, 100)
+    val position: Position = Position(100, 100)
 }
