@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import com.google.gson.annotations.Expose
 
+// todo move back to TreeGiftTracker when 1.8 is no longer supported
 @SkyHanniModule
 @Suppress("unused")
 object TreeGiftTrackerLegacy {
