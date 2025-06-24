@@ -256,6 +256,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Better Sign Editing", desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
     @ConfigEditorBoolean
+    @OnlyLegacy
     @FeatureToggle
     public boolean betterSignEditing = true;
 

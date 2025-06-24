@@ -26,3 +26,6 @@ accessible method net/minecraft/client/render/RenderLayer$MultiPhase <init> (Lja
 extendable class net/minecraft/client/render/RenderLayer$MultiPhase
 accessible field net/minecraft/client/font/BakedGlyph textRenderLayers Lnet/minecraft/client/font/TextRenderLayerSet;
 accessible method net/minecraft/text/TextColor <init> (ILjava/lang/String;)V
+accessible field net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen text Lnet/minecraft/block/entity/SignText;
+accessible field net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen currentRow I
+accessible method net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen setCurrentRowMessage (Ljava/lang/String;)V

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
+
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
 //#endif
@@ -30,7 +31,11 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$ }
     //$$
     //$$ override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, deltaTicks: Float) {
-    //$$     this.renderDarkening(context)
+    //$$     try {
+    //$$         this.renderDarkening(context)
+    //$$     } catch (e: Exception) {
+    //$$         ErrorManager.logErrorWithData(e, "Error while rendering background", "screen" to this)
+    //$$     }
     //$$ }
     //#endif
 
@@ -43,6 +48,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         }
         DrawContextUtils.clearContext()
     }
+
     open fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {}
 
     //#if MC < 1.21
@@ -65,6 +71,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
             ErrorManager.logErrorWithData(e, "Error while clicking mouse", "screen" to this)
         }
     }
+
     open fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {}
 
     //#if MC < 1.21
@@ -91,6 +98,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
             ErrorManager.logErrorWithData(e, "Error while typing key", "screen" to this)
         }
     }
+
     open fun onKeyTyped(typedChar: Char?, keyCode: Int?) {}
 
     //#if MC < 1.21
@@ -113,6 +121,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
             ErrorManager.logErrorWithData(e, "Error while releasing mouse", "screen" to this)
         }
     }
+
     open fun onMouseReleased(originalMouseX: Int, originalMouseY: Int, state: Int) {}
 
     //#if MC < 1.21
@@ -136,6 +145,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
             ErrorManager.logErrorWithData(e, "Error while clicking and moving mouse", "screen" to this)
         }
     }
+
     open fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {}
 
     //#if MC < 1.21
@@ -162,6 +172,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
             ErrorManager.logErrorWithData(e, "Error while handling mouse input", "screen" to this)
         }
     }
+
     open fun onHandleMouseInput() {}
 
     //#if MC < 1.21
@@ -183,6 +194,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
             ErrorManager.logErrorWithData(e, "Error while closing GUI", "screen" to this)
         }
     }
+
     open fun guiClosed() {}
 
     //#if MC < 1.21
@@ -204,6 +216,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
             ErrorManager.logErrorWithData(e, "Error while initializing GUI", "screen" to this)
         }
     }
+
     open fun onInitGui() {}
 
     fun drawDefaultBackground(mouseX: Int, mouseY: Int, partialTicks: Float) {
