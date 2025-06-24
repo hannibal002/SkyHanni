@@ -16,9 +16,14 @@ class TreeGiftTrackerConfig {
     var enabled: Boolean = true
 
     @Expose
-    @OnlyModern
     @ConfigLink(owner = TreeGiftTrackerConfig::class, field = "enabled")
     val position: Position = Position(-300, 300)
+
+    @Expose
+    @ConfigOption(name = "Hide Chats", desc = "Hide the chat messages when you receive a tree gift.")
+    @ConfigEditorBoolean
+    @OnlyModern
+    var hideChats: Boolean = true
 
     @Expose
     @ConfigOption(name = "Only Holding Axe", desc = "Only show the tracker while holding an axe.")
@@ -27,7 +32,7 @@ class TreeGiftTrackerConfig {
     var onlyHoldingAxe: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show Entire Trees", desc = "Estimate how many entire trees you have chopped down, using percentage summing.")
+    @ConfigOption(name = "Show Whole Trees", desc = "Estimate how many full trees you have chopped down, using percentage summing.")
     @ConfigEditorBoolean
     @OnlyModern
     var showWholeTrees: Boolean = true
