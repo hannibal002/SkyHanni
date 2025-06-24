@@ -934,6 +934,15 @@ object ItemUtils {
         return skull
     }
 
+    fun ItemStack.isSkull(): Boolean {
+        //#if MC < 1.21
+        return item === Items.skull
+        //#else
+        //$$ val hasItemModel = this.getItemModel() != null
+        //$$ return item == Items.PLAYER_HEAD && !hasItemModel
+        //#endif
+    }
+
     //#if MC > 1.21
     //$$ fun ItemStack.getItemModel(): Item? {
     //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
