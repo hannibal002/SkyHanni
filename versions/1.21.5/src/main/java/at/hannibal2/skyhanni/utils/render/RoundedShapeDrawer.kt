@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
+import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BufferBuilder
 import net.minecraft.util.Identifier
@@ -65,7 +66,10 @@ object RoundedShapeDrawer {
             postVertexOps = listOf { color(color) },
         )
 
-    fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: Identifier) =
+    fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: Identifier) {
+        val glTex = MinecraftClient.getInstance().textureManager.getTexture(texture).glTexture
+        RenderSystem.assertOnRenderThread()
+        RenderSystem.setShaderTexture(0, glTex)
         RoundedTextureShader.performVQuadAndUniforms(
             SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
@@ -76,9 +80,9 @@ object RoundedShapeDrawer {
                 { texture(1f, 0f) },
             )
         ) {
-            val glTexture = MinecraftClient.getInstance().textureManager.getTexture(texture).glTexture
-            bindSampler("textureSampler", glTexture)
+            bindSampler("textureSampler", glTex)
         }
+    }
 
 
     fun drawRoundedRectOutline(left: Int, top: Int, right: Int, bottom: Int, topColor: Int, bottomColor: Int) =

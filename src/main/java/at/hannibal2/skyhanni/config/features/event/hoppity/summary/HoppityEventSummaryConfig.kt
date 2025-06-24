@@ -20,21 +20,21 @@ class HoppityEventSummaryConfig {
     @Expose
     @Accordion
     @ConfigOption(name = "Live Display", desc = "")
-    var liveDisplay: HoppityLiveDisplayConfig = HoppityLiveDisplayConfig()
+    val liveDisplay: HoppityLiveDisplayConfig = HoppityLiveDisplayConfig()
 
     @Expose
     @Accordion
     @ConfigOption(name = "Update CF Reminders", desc = "")
-    var cfReminder: HoppityEventSummaryCFReminderConfig = HoppityEventSummaryCFReminderConfig()
+    val cfReminder: HoppityEventSummaryCFReminderConfig = HoppityEventSummaryCFReminderConfig()
 
     @Expose
     @ConfigLink(owner = HoppityEventSummaryConfig::class, field = "liveDisplay")
-    var liveDisplayPosition: Position = Position(0, 0)
+    val liveDisplayPosition: Position = Position(0, 0)
 
     @Expose
     @ConfigOption(name = "Stats List", desc = "Drag text to change what displays in the summary card.")
     @ConfigEditorDraggableList
-    var statDisplayList: Property<MutableList<HoppityStat>> = Property.of(
+    val statDisplayList: Property<MutableList<HoppityStat>> = Property.of(
         mutableListOf(
             HoppityStat.MEAL_EGGS_FOUND,
             HoppityStat.HOPPITY_RABBITS_BOUGHT,

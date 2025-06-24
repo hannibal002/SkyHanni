@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -104,17 +103,6 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    private val bannedItemsPattern by patternGroup.list(
-        "banneditems",
-        "SKYBLOCK_MENU",
-        "CANCEL_PARKOUR_ITEM",
-        "CANCEL_RACE_ITEM",
-        "MAXOR_ENERGY_CRYSTAL",
-        "ELLE_SUPPLIES",
-        "ELLE_FUEL_CELL",
-    )
-    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().toInternalName() }
-
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
@@ -137,7 +125,7 @@ object ItemPickupLog {
             val itemStack = (it.internalName.getItemStack())
             val item = PickupEntry(itemStack.dynamicName(), it.delta.absoluteValue.toLong(), it.internalName)
 
-            updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
+            updateItem(itemStack.hash(), item, it.delta < 0)
         }
     }
 
@@ -145,7 +133,7 @@ object ItemPickupLog {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
-        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
+        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), event.coins < 0)
     }
 
     @HandleEvent
@@ -158,7 +146,8 @@ object ItemPickupLog {
         if (!InventoryUtils.inInventory()) {
             itemList.clear()
 
-            val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
+            val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, _ -> i != 8 }
+                ?.filterNotNull().orEmpty().toMutableList()
             val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
 
             if (cursorItem != null) {
@@ -195,9 +184,7 @@ object ItemPickupLog {
     }
 
     // TODO merge with ItemAddInInventoryEvent
-    private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
-        if (isBannedItem(item)) return
-
+    private fun updateItem(hash: Int, itemInfo: PickupEntry, removed: Boolean) {
         val targetInventory = if (removed) itemsRemovedFromInventory else itemsAddedToInventory
         val oppositeInventory = if (removed) itemsAddedToInventory else itemsRemovedFromInventory
 
@@ -232,24 +219,13 @@ object ItemPickupLog {
 
             if (!listToCheckAgainst.containsKey(key)) {
                 val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
+                updateItem(key, item, add)
             } else if (oldAmount > listToCheckAgainst[key]!!.second) {
                 val amount = (oldAmount - listToCheckAgainst[key]?.second!!)
                 val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
+                updateItem(key, item, add)
             }
         }
-    }
-
-    private fun isBannedItem(item: ItemStack): Boolean {
-        val internalName = item.getInternalNameOrNull() ?: return true
-        if (internalName.startsWith("MAP") == true) return true
-        if (internalName in bannedItemsConverted) return true
-
-        if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
-            return true
-        }
-        return false
     }
 
     private fun ItemStack.dynamicName(): String {
