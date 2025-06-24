@@ -175,5 +175,5 @@ class GuiConfig {
     val titlePosition: Position = Position(0, 160)
 
     @Expose
-    var titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
+    val titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
 }
