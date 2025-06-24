@@ -8,7 +8,7 @@ import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.javaField
 
 object ConfigUtils {
@@ -26,11 +26,11 @@ object ConfigUtils {
         return JsonPrimitive(if (element.asBoolean) trueValue.name else falseValue.name)
     }
 
-    fun KMutableProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
+    private fun KProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
         return editor.getOptionFromField(this.javaField ?: return null)
     }
 
-    fun KMutableProperty0<*>.jumpToEditor() {
+    fun KProperty0<*>.jumpToEditor() {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
 
         ErrorManager.crashInDevEnv("Can not open config $name")
@@ -43,7 +43,7 @@ object ConfigUtils {
         )
     }
 
-    private fun KMutableProperty0<*>.tryJumpToEditor(editor: MoulConfigEditor<*>): Boolean {
+    private fun KProperty0<*>.tryJumpToEditor(editor: MoulConfigEditor<*>): Boolean {
         val option = tryFindEditor(editor) ?: return false
         editor.search("")
         if (!editor.goToOption(option)) return false

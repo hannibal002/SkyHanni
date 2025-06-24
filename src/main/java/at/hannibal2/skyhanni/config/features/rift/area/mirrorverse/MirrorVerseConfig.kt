@@ -10,26 +10,26 @@ class MirrorVerseConfig {
     @ConfigOption(name = "Lava Maze", desc = "")
     @Accordion
     @Expose
-    var lavaMazeConfig: LavaMazeConfig = LavaMazeConfig()
+    val lavaMazeConfig: LavaMazeConfig = LavaMazeConfig()
 
     @ConfigOption(name = "Crafting Room", desc = "")
     @Accordion
     @Expose
-    var craftingRoom: CraftingRoomConfig = CraftingRoomConfig()
+    val craftingRoom: CraftingRoomConfig = CraftingRoomConfig()
 
     @ConfigOption(name = "Upside-Down Parkour", desc = "")
     @Accordion
     @Expose
-    var upsideDownParkour: UpsideDownParkourConfig = UpsideDownParkourConfig()
+    val upsideDownParkour: UpsideDownParkourConfig = UpsideDownParkourConfig()
 
     // Red-Green Puzzle
     @ConfigOption(name = "Dance Room Helper", desc = "")
     @Accordion
     @Expose
-    var danceRoomHelper: DanceRoomHelperConfig = DanceRoomHelperConfig()
+    val danceRoomHelper: DanceRoomHelperConfig = DanceRoomHelperConfig()
 
     @ConfigOption(name = "Tubulator", desc = "")
     @Accordion
     @Expose
-    var tubulatorConfig: TubulatorConfig = TubulatorConfig()
+    val tubulatorConfig: TubulatorConfig = TubulatorConfig()
 }

@@ -24,7 +24,7 @@ class PowderTrackerConfig {
     @Expose
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var textFormat: Property<MutableList<PowderDisplayEntry>> = Property.of(
+    val textFormat: Property<MutableList<PowderDisplayEntry>> = Property.of(
         mutableListOf(
             PowderDisplayEntry.TOTAL_CHESTS,
             PowderDisplayEntry.DOUBLE_POWDER,
@@ -87,5 +87,5 @@ class PowderTrackerConfig {
 
     @Expose
     @ConfigLink(owner = PowderTrackerConfig::class, field = "enabled")
-    var position: Position = Position(-274, 0)
+    val position: Position = Position(-274, 0)
 }

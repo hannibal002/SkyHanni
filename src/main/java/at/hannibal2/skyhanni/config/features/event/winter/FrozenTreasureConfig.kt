@@ -22,7 +22,7 @@ class FrozenTreasureConfig {
     @Expose
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var textFormat: MutableList<FrozenTreasureDisplayEntry> = mutableListOf(
+    val textFormat: MutableList<FrozenTreasureDisplayEntry> = mutableListOf(
         FrozenTreasureDisplayEntry.TITLE,
         FrozenTreasureDisplayEntry.TREASURES_MINED,
         FrozenTreasureDisplayEntry.TOTAL_ICE,
@@ -84,5 +84,5 @@ class FrozenTreasureConfig {
 
     @Expose
     @ConfigLink(owner = FrozenTreasureConfig::class, field = "enabled")
-    var position: Position = Position(10, 80)
+    val position: Position = Position(10, 80)
 }
