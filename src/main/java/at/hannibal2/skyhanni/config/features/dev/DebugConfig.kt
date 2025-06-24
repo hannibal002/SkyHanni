@@ -199,7 +199,7 @@ class DebugConfig {
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "dvdLogo")
-    var dvdLogoPosition: Position = Position(100, 100)
+    val dvdLogoPosition: Position = Position(100, 100)
 
     @Expose
     @ConfigOption(name = "Orbital", desc = "Enable the test Orbital System renderable.")
@@ -208,7 +208,7 @@ class DebugConfig {
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "orbital")
-    var orbitalPosition: Position = Position(200, 200)
+    val orbitalPosition: Position = Position(200, 200)
 
     @Expose
     @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
