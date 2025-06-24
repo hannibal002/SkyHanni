@@ -33,7 +33,7 @@ class PestsConfig {
     @Expose
     @ConfigOption(name = "Pest Trap", desc = "")
     @Accordion
-    var pestTrap: PestTrapConfig = PestTrapConfig()
+    val pestTrap: PestTrapConfig = PestTrapConfig()
 
     @Expose
     @ConfigOption(name = "Pest Profit Tracker", desc = "")
