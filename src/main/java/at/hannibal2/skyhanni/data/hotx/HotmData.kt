@@ -1,10 +1,11 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.hotx
 
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.HotmApi.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -19,8 +20,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -31,6 +30,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import java.util.regex.Matcher
 import kotlin.math.pow
 
 private fun calculateCoreOfTheMountainLoot(level: Int): Map<HotmReward, Double> = buildMap {
@@ -48,12 +48,13 @@ private fun calculateCoreOfTheMountainLoot(level: Int): Map<HotmReward, Double> 
     }
 }
 
+// Heart of the Mountain
 enum class HotmData(
-    val guiName: String,
-    val maxLevel: Int,
-    val costFun: (Int) -> (Double?),
-    val rewardFun: (Int) -> (Map<HotmReward, Double>),
-) {
+    override val guiName: String,
+    override val maxLevel: Int,
+    override val costFun: (Int) -> (Double?),
+    override val rewardFun: (Int) -> (Map<HotmReward, Double>),
+) : HotxData<HotmReward> {
 
     MINING_SPEED(
         "Mining Speed",
@@ -361,65 +362,35 @@ enum class HotmData(
     MINERS_BLESSING("Miner's Blessing", 1, { null }, { mapOf(HotmReward.MAGIC_FIND to 30.0) }),
     ;
 
-    private val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
+    override val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
 
-    val printName get() = name.allLettersFirstUppercase()
-
-    /** Level which are actually paid with powder (does exclude [blueEgg])*/
-    var rawLevel: Int
-        get() = storage?.perks?.get(this.name)?.level ?: 0
-        private set(value) {
-            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
-        }
-
-    /** Level for which the effect that is present (considers [enabled] and [blueEgg])*/
-    val activeLevel: Int
-        get() = if (enabled) effectiveLevel else 0
+    override val printName = name.allLettersFirstUppercase()
 
     /** Level that considering [blueEgg]*/
-    val effectiveLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
-
-    val isMaxLevel: Boolean
-        get() = effectiveLevel >= maxLevel // >= to account for +1 from Blue Cheese
+    override val effectiveLevel: Int get() = rawLevel.takeIf { it != Int.MIN_VALUE }?.plus(blueEgg()) ?: 0
 
     private fun blueEgg() = if (this != CORE_OF_THE_MOUNTAIN && maxLevel != 1 && HotmApi.isBlueEggActive) 1 else 0
 
-    var enabled: Boolean
-        get() = storage?.perks?.get(this.name)?.enabled ?: false
-        private set(value) {
-            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.enabled = value
-        }
+    override var slot: Slot? = null
 
-    var isUnlocked: Boolean
-        get() = storage?.perks?.get(this.name)?.isUnlocked ?: false
-        private set(value) {
-            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.isUnlocked = value
-        }
+    override var item: ItemStack? = null
 
-    var slot: Slot? = null
-        private set
+    override val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
-    var item: ItemStack? = null
-        private set
-
-    fun getLevelUpCost() = costFun(rawLevel)
-
-    fun getReward() = if (enabled) rewardFun(activeLevel) else emptyMap()
-
-    fun calculateTotalCost(desiredLevel: Int) = (2..desiredLevel).sumOf { level -> costFun(level)?.toInt() ?: 0 }
-
-    val totalCostMaxLevel = calculateTotalCost(maxLevel)
+    override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
     // TODO move all object functions into hotm api?
     @SkyHanniModule
-    companion object {
+    companion object : HotxHandler<HotmData, HotmReward>(entries) {
+
+        override val name: String = "HotM"
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
         val abilities =
             listOf(PICKOBULUS, MINING_SPEED_BOOST, MANIAC_MINER, GEMSTONE_INFUSION, ANOMALOUS_DESIRE, SHEER_FORCE)
 
-        private val inventoryPattern by patternGroup.pattern(
+        override val inventoryPattern by patternGroup.pattern(
             "inventory",
             "Heart of the Mountain",
         )
@@ -428,12 +399,12 @@ enum class HotmData(
          * REGEX-TEST: §5§o§7Level 1§8/50 §7(§b0 §l0%§7):skull:
          * REGEX-TEST: §7Level 1§8/50
          */
-        private val levelPattern by patternGroup.pattern(
+        override val levelPattern by patternGroup.pattern(
             "perk.level",
             "(?:§.)*§(?<color>.)Level (?<level>\\d+).*",
         )
 
-        private val notUnlockedPattern by patternGroup.pattern(
+        override val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked",
             "(?:§.)*Requires.*|.*Mountain!|(?:§.)*Click to unlock!|",
         )
@@ -442,7 +413,7 @@ enum class HotmData(
          * REGEX-TEST: §a§lSELECTED
          * REGEX-TEST: §a§lENABLED
          */
-        private val enabledPattern by patternGroup.pattern(
+        override val enabledPattern by patternGroup.pattern(
             "perk.enable",
             "§a§lENABLED|(?:§.)*SELECTED",
         )
@@ -471,11 +442,11 @@ enum class HotmData(
             "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset\\.",
         )
 
-        private val heartItemPattern by patternGroup.pattern(
+        override val heartItemPattern by patternGroup.pattern(
             "inventory.heart",
             "§5Heart of the Mountain",
         )
-        private val resetItemPattern by patternGroup.pattern(
+        override val resetItemPattern by patternGroup.pattern(
             "inventory.reset",
             "§cReset Heart of the Mountain",
         )
@@ -483,7 +454,7 @@ enum class HotmData(
         /**
          * REGEX-TEST: §7Token of the Mountain: §515
          */
-        private val heartTokensPattern by patternGroup.pattern(
+        override val heartTokensPattern by patternGroup.pattern(
             "inventory.heart.token",
             "§7Token of the Mountain: §5(?<token>\\d+)",
         )
@@ -491,7 +462,7 @@ enum class HotmData(
         /**
          * REGEX-TEST:   §8- §54 Token of the Mountain
          */
-        private val resetTokensPattern by patternGroup.pattern(
+        override val resetTokensPattern by patternGroup.pattern(
             "inventory.reset.token",
             "\\s+§8- §5(?<token>\\d+) Token of the Mountain",
         )
@@ -515,33 +486,28 @@ enum class HotmData(
             "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
         )
 
-        var inInventory = false
-
-        var tokens: Int
+        override var tokens: Int
             get() = ProfileStorageData.profileSpecific?.mining?.tokens ?: 0
-            private set(value) {
+            set(value) {
                 ProfileStorageData.profileSpecific?.mining?.tokens = value
             }
 
-        var availableTokens: Int
+        override var availableTokens: Int
             get() = ProfileStorageData.profileSpecific?.mining?.availableTokens ?: 0
-            private set(value) {
+            set(value) {
                 ProfileStorageData.profileSpecific?.mining?.availableTokens = value
             }
 
-        var heartItem: Slot? = null
-
         init {
-            entries.forEach { it.guiNamePattern }
             HotmApi.PowderType.entries.forEach {
                 it.heartPattern
                 it.resetPattern
             }
-            HotmApi.SkymallPerk.entries.forEach {
+            SkymallPerk.entries.forEach {
                 it.chatPattern
                 it.itemPattern
             }
-            HotmApi.MayhemPerk.entries.forEach {
+            MayhemPerk.entries.forEach {
                 it.chatPattern
             }
             for (level in 0..CORE_OF_THE_MOUNTAIN.maxLevel) {
@@ -561,102 +527,34 @@ enum class HotmData(
             }
         }
 
-        fun getPerkByNameOrNull(name: String): HotmData? = entries.find { it.guiName == name }
-
-        private fun resetTree() {
-            entries.forEach {
-                it.rawLevel = 0
-                it.enabled = false
-                it.isUnlocked = false
-                availableTokens = tokens
+        override fun currencyReset(full: Boolean) {
+            super.currencyReset(full)
+            if (full) {
+                HotmApi.PowderType.entries.forEach(HotmApi.PowderType::resetFull)
+            } else {
+                HotmApi.PowderType.entries.forEach(HotmApi.PowderType::resetTree)
             }
-            HotmApi.PowderType.entries.forEach(HotmApi.PowderType::resetTree)
         }
 
-        private fun Slot.parse() {
-            val item = this.stack ?: return
+        override val readingLevelTransform: Matcher.() -> Int = {
+            group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
+        }
 
-            if (this.handlePowder()) return
-
-            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.displayName) } ?: return
-            entry.slot = this
-            entry.item = item
-
-            val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
-
-            if (entry != CORE_OF_THE_MOUNTAIN && notUnlockedPattern.matches(lore.last())) {
-                entry.rawLevel = 0
-                entry.enabled = false
-                entry.isUnlocked = false
-                return
-            }
-
-            entry.isUnlocked = true
-
-            entry.rawLevel = levelPattern.matchMatcher(lore.first()) {
-                group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
-            } ?: entry.maxLevel
-
-            // raw level to ignore the blue egg buff
-            if (entry.rawLevel > entry.maxLevel) {
-                ErrorManager.skyHanniError(
-                    "Hotm Perk '${entry.name}' over max level",
-                    "name" to entry.name,
-                    "activeLevel" to entry.activeLevel,
-                    "maxLevel" to entry.maxLevel,
-                )
-            }
-
-            if (entry == CORE_OF_THE_MOUNTAIN) {
-                entry.enabled = entry.rawLevel != 0
-                return
-            }
-            entry.enabled = lore.any { enabledPattern.matches(it) }
-
+        override fun Slot.extraHandling(entry: HotmData, lore: List<String>) {
             if (entry == SKY_MALL) handleSkyMall(lore)
         }
 
-        private fun Slot.handlePowder(): Boolean {
-            val item = this.stack ?: return false
+        override val core = CORE_OF_THE_MOUNTAIN
 
-            val isHeartItem = when {
-                heartItemPattern.matches(item.displayName) -> true
-                resetItemPattern.matches(item.displayName) -> false
-                else -> return false
-            }
-
-            if (isHeartItem) { // Reset on the heart Item to remove duplication
-                tokens = 0
-                availableTokens = 0
-                HotmApi.PowderType.entries.forEach { it.resetFull() }
-                heartItem = this
-            }
-
-            val lore = item.getLore()
-
-            val tokenPattern = if (isHeartItem) heartTokensPattern else resetTokensPattern
-
-            lore@ for (line in lore) {
-
-                HotmApi.PowderType.entries.forEach {
-                    it.pattern(isHeartItem).matchMatcher(line) {
-                        val powder = group("powder").formatLong()
-                        if (isHeartItem) it.setAmount(powder)
-                        else it.total += powder
-                        continue@lore
-                    }
-                }
-
-                tokenPattern.matchMatcher(line) {
-                    val token = group("token").toInt()
-                    if (isHeartItem) {
-                        availableTokens = token
-                    }
-                    tokens += token
-                    continue@lore
+        override fun readFromHeartOrReset(line: String, isHeartItem: Boolean) {
+            HotmApi.PowderType.entries.forEach {
+                it.pattern(isHeartItem).matchMatcher(line) {
+                    val powder = group("powder").formatLong()
+                    if (isHeartItem) it.setAmount(powder)
+                    else it.total += powder
+                    return
                 }
             }
-            return true
         }
 
         private val skyMallCurrentEffect by patternGroup.pattern(
@@ -692,7 +590,6 @@ enum class HotmData(
 
         @HandleEvent(onlyOnSkyblock = true)
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-
             ScoreboardPattern.powderPattern.firstMatcher(event.added) {
                 val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
@@ -701,25 +598,14 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onInventoryClose(event: InventoryCloseEvent) {
-            if (!inInventory) return
-            inInventory = false
-            entries.forEach {
-                it.slot = null
-                it.item = null
-            }
-            heartItem = null
-        }
+        override fun onInventoryClose(event: InventoryCloseEvent) = super.onInventoryClose(event)
 
         @HandleEvent(onlyOnSkyblock = true)
-        fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-            inInventory = inventoryPattern.matches(event.inventoryName)
-            if (!inInventory) return
-            DelayedRun.runNextTick {
-                InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
-                abilities.filter { it.isUnlocked }.forEach {
-                    it.rawLevel = if (CORE_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
-                }
+        override fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) = super.onInventoryFullyOpened(event)
+
+        override fun extraInventoryHandling() {
+            abilities.filter { it.isUnlocked }.forEach {
+                it.rawLevel = if (CORE_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
             }
         }
 
@@ -792,12 +678,7 @@ enum class HotmData(
                 add("SkyMall: ${HotmApi.skymall}")
                 add("Mineshaft Mayhem: ${HotmApi.mineshaftMayhem}")
             }
-            event.title("HotM - Tree")
-            event.addIrrelevant(
-                entries.filter { it.isUnlocked }.map {
-                    "${if (it.enabled) "✔" else "✖"} ${it.printName}: ${it.activeLevel}"
-                },
-            )
+            debugTree(event)
         }
     }
 }
