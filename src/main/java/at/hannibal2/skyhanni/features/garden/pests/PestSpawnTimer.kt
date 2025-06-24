@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager.sendTitle
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -220,14 +220,14 @@ object PestSpawnTimer {
     }
 
     private fun cooldownExpired() {
-        sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
+        TitleManager.sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown has expired!")
         SoundUtils.playPlingSound()
         hasWarned = true
     }
 
     private fun cooldownReminder() {
-        sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
+        TitleManager.sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown expires in ${pestCooldownEndTime.timeUntil().format()}")
         SoundUtils.playPlingSound()
         hasWarned = true

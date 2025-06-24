@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
@@ -107,7 +107,7 @@ object BroodmotherFeatures {
     private fun onBroodmotherSpawn() {
         broodmotherSpawnTime = SimpleTimeMark.farPast()
         if (!isAliveMessageEnabled()) return
-        val feature: KMutableProperty0<*>
+        val feature: KProperty0<*>
         if (config.alertOnSpawn) {
             feature = config::alertOnSpawn
             val alertSound = SoundUtils.createSound(spawnAlertConfig.alertSound, spawnAlertConfig.pitch)

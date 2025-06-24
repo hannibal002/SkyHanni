@@ -36,7 +36,7 @@ class BackgroundConfig {
     @Expose
     @ConfigOption(name = "Background Outline", desc = "")
     @Accordion
-    var outline: BackgroundOutlineConfig = BackgroundOutlineConfig()
+    val outline: BackgroundOutlineConfig = BackgroundOutlineConfig()
 
     @Expose
     @ConfigOption(name = "Custom Background Image", desc = "See below on how to add your own custom background.")
@@ -54,5 +54,5 @@ class BackgroundConfig {
             "You can use this website to add your own image into as your Scoreboard Background."
     )
     @ConfigEditorButton(buttonText = "Create")
-    var runnable: Runnable = Runnable { openBrowser("https://j10a1n15.github.io/j10a1n15/pages/background.html") }
+    val runnable: Runnable = Runnable { openBrowser("https://j10a1n15.github.io/j10a1n15/pages/background.html") }
 }

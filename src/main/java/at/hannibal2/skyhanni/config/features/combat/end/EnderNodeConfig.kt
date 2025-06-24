@@ -33,7 +33,7 @@ class EnderNodeConfig {
     @Expose
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var textFormat: Property<MutableList<EnderNodeDisplayEntry>> = Property.of(
+    val textFormat: Property<MutableList<EnderNodeDisplayEntry>> = Property.of(
         mutableListOf(
             EnderNodeDisplayEntry.TITLE,
             EnderNodeDisplayEntry.NODES_MINED,
@@ -97,5 +97,5 @@ class EnderNodeConfig {
 
     @Expose
     @ConfigLink(owner = EnderNodeConfig::class, field = "enabled")
-    var position: Position = Position(10, 80)
+    val position: Position = Position(10, 80)
 }
