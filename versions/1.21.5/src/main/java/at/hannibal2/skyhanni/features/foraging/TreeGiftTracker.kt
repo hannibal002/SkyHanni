@@ -16,12 +16,16 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -31,6 +35,7 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.text.Text
+import kotlin.collections.emptySet
 
 @SkyHanniModule
 object TreeGiftTracker {
@@ -66,6 +71,10 @@ object TreeGiftTracker {
     class BucketData : BucketedItemTrackerData<TreeType>(TreeType::class) {
         override fun resetItems() {
             treesCut = enumMapOf()
+            wholeTreesCut = enumMapOf()
+            hotfExperience = enumMapOf()
+            foragingExperience = enumMapOf()
+            forestWhispers = enumMapOf()
         }
 
         override fun getDescription(bucket: TreeType?, timesGained: Long): List<String> {
@@ -90,8 +99,27 @@ object TreeGiftTracker {
         @Expose
         var treesCut: MutableMap<TreeType, Long> = enumMapOf()
 
+        fun getTreeCount(): Long = selectedBucket?.let { treesCut[it] } ?: treesCut.values.sum()
+
         @Expose
-        var totalTreesCut: MutableMap<TreeType, Double> = enumMapOf()
+        var wholeTreesCut: MutableMap<TreeType, Double> = enumMapOf()
+
+        fun getWholeTreeCount(): Double = selectedBucket?.let { wholeTreesCut[it] } ?: wholeTreesCut.values.sum()
+
+        @Expose
+        var hotfExperience: MutableMap<TreeType, Long> = enumMapOf()
+
+        fun getHotfExperience(): Long = selectedBucket?.let { hotfExperience[it] } ?: hotfExperience.values.sum()
+
+        @Expose
+        var foragingExperience : MutableMap<TreeType, Long> = enumMapOf()
+
+        fun getForagingExperience(): Long = selectedBucket?.let { foragingExperience[it] } ?: foragingExperience.values.sum()
+
+        @Expose
+        var forestWhispers: MutableMap<TreeType, Long> = enumMapOf()
+
+        fun getForestWhispers(): Long = selectedBucket?.let { forestWhispers[it] } ?: forestWhispers.values.sum()
     }
 
     // <editor-fold desc="Patterns">
@@ -167,16 +195,62 @@ object TreeGiftTracker {
     )
 
     /**
-     * REGEX-TEST:
+     * REGEX-TEST:                           §r§7§r§aStretching Sticks §r§8(§r§a20%§r§8)
+     * REGEX-TEST:           §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)
+     * REGEX-TEST:           §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)
+     * REGEX-TEST:                            §r§7§r§fSweep Booster §r§8(§r§a1%§r§8)
+     * REGEX-TEST:                     §r§7§r§fForaging Wisdom Booster §r§8(§r§a0.5%§r§8)
+     * REGEX-TEST:                   §r§7§r§aEnchanted Book (§r§d§lMissile I§r§a) §r§8(§r§a0.2%§r§8)
+     * REGEX-TEST:                           §r§7§r§cTree the Fish §r§8(§r§a0.05%§r§8)
+     * REGEX-TEST:                             §r§6Chameleon §r§8(§r§a0.08%§r§8)
+     * REGEX-FAIL:                      §r§7A §r§dPhanflare §r§7fell from the Tree!
      */
     private val bonusGiftRewardPattern by patternGroup.pattern(
         "bonus-gift.reward",
-        ""
+        " *(?:§.)*§r(?<item>.*) §r§8\\((?:§.)+(?<percentage>[\\d.]+)%(?:§.)+\\)"
+    )
+
+    /**
+     * REGEX-TEST: §aEnchanted Book (§r§d§lMissile I§r§a)
+     * REGEX-TEST: §aEnchanted Book (§r§d§lFirst Impression I§r§a)
+     */
+    private val enchantedBookPattern by patternGroup.pattern(
+        "bonus-gift.enchanted-book",
+        "(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
     )
     // </editor-fold>
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
+        addSearchString("§a§lTree Gift Tracker")
+        tracker.addBucketSelector(this, bucketData, "Tree Type")
 
+        val treesContributedTo = bucketData.getTreeCount()
+        if (treesContributedTo == 0L) return@buildList
+
+        val profit = tracker.drawItems(bucketData, { true }, this)
+
+        val foragingXp = bucketData.getForagingExperience()
+        if (foragingXp > 0) addSearchString("§eForaging Experience: §3${foragingXp.addSeparators()}")
+
+        val hotfXp = bucketData.getHotfExperience()
+        if (hotfXp > 0) addSearchString("§eHOTF Experience: §a${hotfXp.addSeparators()}")
+
+        val forestWhispers = bucketData.getForestWhispers()
+        if (forestWhispers > 0) addSearchString("§eForest Whispers: §b${forestWhispers.addSeparators()}")
+
+        val treeFormat = "Tree".pluralize(treesContributedTo.toInt())
+        val bucketFormat = bucketData.selectedBucket?.let { "$it " }.orEmpty()
+        val baseFormat = "${bucketFormat}$treeFormat Felled:"
+
+        val wholeTreesFelled = bucketData.getWholeTreeCount()
+        if (config.showWholeTrees && wholeTreesFelled > 0.0) {
+            val preambleFormat = "Whole $baseFormat"
+            addSearchString("§e$preambleFormat ${wholeTreesFelled.addSeparators()}")
+        }
+
+        addSearchString("§e$baseFormat ${treesContributedTo.addSeparators()}")
+        add(tracker.addTotalProfit(profit, treesContributedTo, "gift"))
+        tracker.addPriceFromButton(this)
     }
 
     private fun isEnabled() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && heldItemEnabled() && !PlatformUtils.IS_LEGACY
@@ -194,6 +268,7 @@ object TreeGiftTracker {
     // Chat FSM
     private var openLootLoop = false
     private var openBonusGiftLoop = false
+    private var treeType: TreeType? = null
     private val loot = mutableMapOf<NeuInternalName, Int>()
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
@@ -205,26 +280,75 @@ object TreeGiftTracker {
     private fun SkyHanniChatEvent.tryReadLoot() {
         openCloseRewardPattern.matchMatcher(message) {
             openLootLoop = !openLootLoop
+            if (openLootLoop) openBonusGiftLoop = false
+            if (config.hideChats) blockedReason = "TREE_GIFT"
         }
         if (!openLootLoop) return
+
+        bonusGiftSeparatorPattern.matchMatcher(message) {
+            openBonusGiftLoop = true
+            return
+        }
+
+        percentageContributedPattern.matchMatcher(message) {
+            val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
+            val type = group("type")
+            treeType = TreeType.byNameOrNull(type)
+            val treeType = treeType ?: return@matchMatcher
+            tracker.modify {
+                it.treesCut.addOrPut(treeType, 1)
+                it.wholeTreesCut.addOrPut(treeType, percentage / 100.0)
+            }
+        }
+
+        rewardsGainedPattern.matchMatcher(message) {
+            chatComponent.getHoverLootPairs().forEach { (item, amount) ->
+                loot.addOrPut(item, amount)
+            }
+        }
+
+        if (!openBonusGiftLoop) return
+        bonusGiftRewardPattern.matchMatcher(message) {
+            val item = group("item")
+            val itemInternalName = enchantedBookPattern.matchMatcher(item) {
+                val book = group("book")
+                val tier = group("tier").romanToDecimal()
+                NeuInternalName.fromItemNameOrNull("$book $tier")
+            } ?: NeuInternalName.fromItemNameOrNull(item) ?: return@matchMatcher
+            loot.addOrPut(itemInternalName, 1)
+        }
     }
 
     private fun SkyHanniChatEvent.tryBlock() {
         if (!config.hideChats || !openLootLoop) return
-
-    }
-
-    private fun SkyHanniChatEvent.getLootPairs(): Set<Pair<NeuInternalName, Int>> {
-        return if (rewardsGainedPattern.matches(message)) {
-            chatComponent.getHoverLootPairs()
-        } else setOf()
+        blockedReason = "TREE_GIFT"
     }
 
     private fun Text.getHoverLootPairs(): Set<Pair<NeuInternalName, Int>> = buildSet {
-        val joinedLines = hover.formattedTextCompat() + hover?.siblings?.joinToString {
-            it.formattedTextCompat()
+        val treeType = treeType ?: return emptySet()
+        val joinedLines = hover.formattedTextCompat() + hover?.siblings?.joinToString { it.formattedTextCompat() }
+        joinedLines.split("\n").forEach { line ->
+            val (item, amountString) = hoverRewardPattern.matchMatcher(line) {
+                group("item") to group("amount")
+            } ?: return@forEach
+            if (amountString.contains("-")) return@forEach // Skip ranges like "0-2" (for now)
+            val amount = amountString.formatIntOrNull() ?: return@forEach
+            when (item) {
+                "HOTF Experience" -> return@forEach tracker.modify {
+                    it.hotfExperience.addOrPut(treeType, amount.toLong())
+                }
+                "Foraging Experience" -> return@forEach tracker.modify {
+                    it.foragingExperience.addOrPut(treeType, amount.toLong())
+                }
+                "Forest Whispers" -> return@forEach tracker.modify {
+                    it.forestWhispers.addOrPut(treeType, amount.toLong())
+                }
+                else -> {
+                    val itemInternalName = NeuInternalName.fromItemNameOrNull(item) ?: return@forEach
+                    add(itemInternalName to amount)
+                }
+            }
         }
-        val splitLines = joinedLines.split("\n").takeIfNotEmpty() ?: return emptySet()
     }
 
     @HandleEvent

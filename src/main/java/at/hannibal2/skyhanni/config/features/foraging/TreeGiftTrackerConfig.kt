@@ -16,6 +16,7 @@ class TreeGiftTrackerConfig {
     var enabled: Boolean = true
 
     @Expose
+    @OnlyModern
     @ConfigLink(owner = TreeGiftTrackerConfig::class, field = "enabled")
     val position: Position = Position(-300, 300)
 
@@ -26,9 +27,9 @@ class TreeGiftTrackerConfig {
     var onlyHoldingAxe: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show Total Trees", desc = "Estimate how many total trees you have chopped down.")
+    @ConfigOption(name = "Show Entire Trees", desc = "Estimate how many entire trees you have chopped down, using percentage summing.")
     @ConfigEditorBoolean
     @OnlyModern
-    var showTotalTrees: Boolean = true
+    var showWholeTrees: Boolean = true
 
 }
