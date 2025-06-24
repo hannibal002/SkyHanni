@@ -12,12 +12,12 @@ class WinterConfig {
     @Expose
     @ConfigOption(name = "Frozen Treasure Tracker", desc = "")
     @Accordion
-    var frozenTreasureTracker: FrozenTreasureConfig = FrozenTreasureConfig()
+    val frozenTreasureTracker: FrozenTreasureConfig = FrozenTreasureConfig()
 
     @Accordion
     @Expose
     @ConfigOption(name = "Refined Bottle of Jyrre Timer", desc = "")
-    var jyrreTimer: JyrreTimerConfig = JyrreTimerConfig()
+    val jyrreTimer: JyrreTimerConfig = JyrreTimerConfig()
 
     @Expose
     @ConfigOption(
@@ -30,7 +30,7 @@ class WinterConfig {
 
     @Expose
     @ConfigLink(owner = WinterConfig::class, field = "islandCloseTime")
-    var islandCloseTimePosition: Position = Position(10, 10)
+    val islandCloseTimePosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

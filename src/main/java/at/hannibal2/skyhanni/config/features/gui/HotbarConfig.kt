@@ -29,7 +29,7 @@ class HotbarConfig {
 
     @Expose
     @ConfigLink(owner = HotbarConfig::class, field = "editable")
-    var hotbar: Position = Position(20, 20)
+    val hotbar: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Enable the hotbar to be edited even outside of SkyBlock.")

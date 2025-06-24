@@ -31,7 +31,7 @@ class CFConfig {
         desc = "Drag text to change what displays in the chocolate factory stats list and what order the text appears in.",
     )
     @ConfigEditorDraggableList
-    var statsDisplayList: MutableList<CFStat> = mutableListOf(
+    val statsDisplayList: MutableList<CFStat> = mutableListOf(
         CFStat.HEADER,
         CFStat.CURRENT,
         CFStat.THIS_PRESTIGE,
@@ -54,32 +54,32 @@ class CFConfig {
     @Expose
     @ConfigOption(name = "Stray Rabbit Warning", desc = "")
     @Accordion
-    var rabbitWarning: CFStrayRabbitWarningConfig = CFStrayRabbitWarningConfig()
+    val rabbitWarning: CFStrayRabbitWarningConfig = CFStrayRabbitWarningConfig()
 
     @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
     @Accordion
-    var chocolateUpgradeWarnings: CFUpgradeWarningsConfig = CFUpgradeWarningsConfig()
+    val chocolateUpgradeWarnings: CFUpgradeWarningsConfig = CFUpgradeWarningsConfig()
 
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
     @Accordion
-    var chocolateShopPrice: CFShopPriceConfig = CFShopPriceConfig()
+    val chocolateShopPrice: CFShopPriceConfig = CFShopPriceConfig()
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Keybinds", desc = "")
     @Accordion
-    var keybinds: CFKeybindsConfig = CFKeybindsConfig()
+    val keybinds: CFKeybindsConfig = CFKeybindsConfig()
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Custom Reminder", desc = "")
     @Accordion
-    var customReminder: CFCustomReminderConfig = CFCustomReminderConfig()
+    val customReminder: CFCustomReminderConfig = CFCustomReminderConfig()
 
     @Expose
     @ConfigOption(name = "Hoppity Collection Stats", desc = "")
     @Accordion
-    var hoppityCollectionStats: HoppityCollectionStatsConfig = HoppityCollectionStatsConfig()
+    val hoppityCollectionStats: HoppityCollectionStatsConfig = HoppityCollectionStatsConfig()
 
     @Expose
     @ConfigOption(
@@ -169,7 +169,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "statsDisplay")
-    var position: Position = Position(163, 160)
+    val position: Position = Position(163, 160)
 
     @Expose
     @ConfigOption(name = "Compact On Click", desc = "Compact the item tooltip when clicking on the chocolate.")
@@ -196,7 +196,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "tooltipMove")
-    var tooltipMovePosition: Position = Position(-380, 150)
+    val tooltipMovePosition: Position = Position(-380, 150)
 
     @Expose
     @ConfigOption(
@@ -243,7 +243,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "strayRabbitTracker")
-    var strayRabbitTrackerPosition: Position = Position(300, 300)
+    val strayRabbitTrackerPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")
@@ -253,7 +253,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "hitmanCosts")
-    var hitmanCostsPosition: Position = Position(300, 300)
+    val hitmanCostsPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(
@@ -261,5 +261,5 @@ class CFConfig {
         desc = "Don't turn this on.\n§cRequires SkyHanni Chroma to be enabled to fully function.",
     )
     @ConfigEditorBoolean
-    var partyMode: Property<Boolean> = Property.of(false)
+    val partyMode: Property<Boolean> = Property.of(false)
 }
