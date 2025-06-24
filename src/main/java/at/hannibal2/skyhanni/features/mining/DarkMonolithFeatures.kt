@@ -33,7 +33,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object DarkMonolithFeatures {
 
@@ -126,13 +125,11 @@ object DarkMonolithFeatures {
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onSecondPassed() {
         if (!isEnabled()) return
-        //#if TODO
         knownEggs = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
             distance = 40,
             filter = Blocks.dragon_egg,
         ).keys
-        //#endif
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
