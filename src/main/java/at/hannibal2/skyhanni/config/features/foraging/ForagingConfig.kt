@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -21,6 +22,10 @@ class ForagingConfig {
     @OnlyLegacy
     @ConfigEditorInfoText
     var notice: String = ""
+
+    @Expose
+    @Category(name = "HotF", desc = "Settings for Heart of the Forest.")
+    var hotf: HotfConfig = HotfConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
