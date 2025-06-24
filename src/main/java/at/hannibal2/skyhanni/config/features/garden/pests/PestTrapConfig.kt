@@ -14,19 +14,17 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestTrapConfig {
 
-    //#if TODO
     @ConfigOption(
         name = "Display",
         desc = "Display the status of pest traps in a GUI element.\nWill take you to Tab Widget Display to enable.",
     )
     @ConfigEditorButton(buttonText = "Go")
-    var displayRunnable = Runnable { SkyHanniMod.feature.gui.tabWidget::display.jumpToEditor() }
-    //#endif
+    val displayRunnable = Runnable { SkyHanniMod.feature.gui.tabWidget::display.jumpToEditor() }
 
     @Expose
     @ConfigOption(name = "Warnings", desc = "")
     @Accordion
-    var warningConfig = WarningConfig()
+    val warningConfig = WarningConfig()
 
     class WarningConfig {
 
@@ -42,7 +40,7 @@ class PestTrapConfig {
         @Expose
         @ConfigOption(name = "Enabled Warnings", desc = "Which warning types to enable.")
         @ConfigEditorDraggableList
-        var enabledWarnings: Property<MutableList<WarningReason>> = Property.of(mutableListOf())
+        val enabledWarnings: Property<MutableList<WarningReason>> = Property.of(mutableListOf())
 
         enum class WarningDisplayType(val displayName: String) {
             CHAT("Chat"),
@@ -56,17 +54,17 @@ class PestTrapConfig {
         @Expose
         @ConfigOption(name = "Warning Message", desc = "How the warning message should display")
         @ConfigEditorDropdown
-        var warningDisplayType: Property<WarningDisplayType> = Property.of(WarningDisplayType.TITLE)
+        val warningDisplayType: Property<WarningDisplayType> = Property.of(WarningDisplayType.TITLE)
 
         @Expose
         @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a warning.\nClear to disable sound.")
         @ConfigEditorText
-        var warningSound: Property<String> = Property.of("note.pling")
+        val warningSound: Property<String> = Property.of("note.pling")
 
 
         @Expose
         @ConfigOption(name = "Warning Interval", desc = "Reminder interval for messages in seconds.")
         @ConfigEditorSlider(minValue = 10f, minStep = 5f, maxValue = 300f)
-        var warningIntervalSeconds: Property<Int> = Property.of(30)
+        val warningIntervalSeconds: Property<Int> = Property.of(30)
     }
 }
