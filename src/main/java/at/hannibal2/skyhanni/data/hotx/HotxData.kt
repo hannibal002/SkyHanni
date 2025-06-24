@@ -5,6 +5,7 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
 
+// Abstraction for Heart of the Mountain/Forest
 interface HotxData<Reward> {
     val maxLevel: Int
     val costFun: (Int) -> (Double?)

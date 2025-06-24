@@ -9,7 +9,7 @@ class HotfConfig {
     @Expose
     @ConfigOption(
         name = "Enable Highlight",
-        desc = "Highlight enabled perks in the HOTF tree §agreen§7, and disabled §cred§7. Locked perks are highlighted gray."
+        desc = "Highlight enabled perks in the HOTF tree §agreen§7, and disabled §cred§7. Locked perks are highlighted gray.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

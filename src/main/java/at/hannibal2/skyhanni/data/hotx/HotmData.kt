@@ -48,6 +48,7 @@ private fun calculateCoreOfTheMountainLoot(level: Int): Map<HotmReward, Double> 
     }
 }
 
+// Heart of the Mountain
 enum class HotmData(
     override val guiName: String,
     override val maxLevel: Int,
