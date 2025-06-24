@@ -21,7 +21,7 @@ class LaneSwitchSoundSettings {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    var testSound: Runnable = Runnable(FarmingLaneFeatures::playUserSound)
+    val testSound: Runnable = Runnable(FarmingLaneFeatures::playUserSound)
 
     @Expose
     @ConfigOption(
@@ -33,5 +33,5 @@ class LaneSwitchSoundSettings {
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
-    var listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 }

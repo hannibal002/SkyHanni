@@ -131,11 +131,11 @@ class GraphConfig {
 
     @Expose
     @ConfigLink(owner = GraphConfig::class, field = "enabled")
-    var infoDisplay: Position = Position(20, 20)
+    val infoDisplay: Position = Position(20, 20)
 
     @Expose
     @ConfigLink(owner = GraphConfig::class, field = "enabled")
-    var namedNodesList: Position = Position(20, 20)
+    val namedNodesList: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Max Node Distance", desc = "Only render nodes below this distance to the player.")

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
@@ -132,12 +133,22 @@ object PetUtils {
             .sumOf { it.toDouble() }
     }
 
-    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int {
+    fun xpToLevel(petInfo: SkyBlockItemModifierUtils.PetInfo): Int = PetData(petInfo).level
+
+    /**
+     * DO NOT USE THIS METHOD UNLESS YOU ARE SURE YOU HAVE A FAUX INTERNAL NAME!
+     * Converts total XP to a pet level.
+     * @param totalXp The total XP of the pet.
+     * @param petInternalName The internal name of the pet, reflecting tier boost properly.
+     * @param coerceToMax Whether to floor the calculated level to the maximum level of the pet. (Default: true)
+     */
+    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName, coerceToMax: Boolean = true): Int {
         var xp = totalXp.takeIf { it > 0 } ?: return 1
         val rarityOffset = getRarityOffset(petInternalName) ?: return 1
         val xpList = getFullLevelingTree(petInternalName)
 
         var level = 1
+        val maxLevel = getMaxLevel(petInternalName)
         for (i in 0 + rarityOffset until xpList.size) {
             val xpReq = xpList[i]
             if (xp >= xpReq) {
@@ -146,7 +157,7 @@ object PetUtils {
             } else break
         }
 
-        return level
+        return if (coerceToMax) level.coerceAtMost(maxLevel) else level
     }
 
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {

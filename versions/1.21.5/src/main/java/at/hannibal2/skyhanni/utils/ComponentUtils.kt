@@ -9,9 +9,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.SkullOwnerInfo
 import at.hannibal2.skyhanni.data.jsonobjects.other.TextureInfo
 import at.hannibal2.skyhanni.data.jsonobjects.other.toGameProfile
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.google.gson.JsonObject
 import com.mojang.serialization.JsonOps
@@ -21,6 +24,7 @@ import net.minecraft.component.type.NbtComponent
 import net.minecraft.component.type.ProfileComponent
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtOps
+import net.minecraft.util.Identifier
 import net.minecraft.util.Unit
 import kotlin.jvm.optionals.getOrNull
 
@@ -40,6 +44,7 @@ object ComponentUtils {
         if (nbtInfo.unbreakable?.boolean == true) {
             stack.set(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE)
         }
+        nbtInfo.itemModel?.let { stack.set(DataComponentTypes.ITEM_MODEL, Identifier.of(it)) }
         if (nbtInfo.display != null) {
             val display = nbtInfo.display
             if (display.color != null) {
@@ -73,12 +78,13 @@ object ComponentUtils {
             uuid = uuid.toString(),
             properties = propertiesInfo,
             hypixelPopulated = NbtBoolean(true),
-            name = profile?.name?.getOrNull()
+            name = profile?.name?.getOrNull(),
         )
         val lore = stack.getLore()
         val color = stack.get(DataComponentTypes.DYED_COLOR)?.rgb
         val displayInfo = DisplayInfo(name = stack.name.formattedTextCompat(), lore = lore, color = color)
         val customData = stack.get(DataComponentTypes.CUSTOM_DATA)
+        val itemModel = stack.getItemModel()?.getIdentifierString()
         val extraAttributes: JsonObject? = if (customData != null) {
             NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, customData.copyNbt()).asJsonObject
         } else {
@@ -96,6 +102,7 @@ object ComponentUtils {
             customPotionEffects = null,
             enchantments = enchants,
             overrideMeta = NbtBoolean(true),
+            itemModel = itemModel,
             generation = null,
             resolved = null,
         )
@@ -107,7 +114,7 @@ object ComponentUtils {
         if (convertMinecraftIdToModern2 == id && damage > 0) {
             println("Unconverted minecraft id with damage above 0. id: $id damage: $damage")
         }
-        return "minecraft:" + convertMinecraftIdToModern2
+        return "minecraft:$convertMinecraftIdToModern2"
     }
 
     private fun convertMinecraftIdToModern2(id: String, damage: Int): String {

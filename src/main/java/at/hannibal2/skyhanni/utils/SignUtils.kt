@@ -19,14 +19,21 @@ object SignUtils {
     fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        gui.text[line] = text.asComponent()
+        //#if MC < 1.21
+        gui.signText[line] = text.asComponent()
+        //#else
+        //$$ val oldRow = gui.currentRow
+        //$$ gui.currentRow = line
+        //$$ gui.setCurrentRowMessage(text)
+        //$$ gui.currentRow = oldRow
+        //#endif
     }
 
     private fun addTextIntoSign(addedText: String) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        val lines = gui.text
-        val index = gui.editLine
+        val lines = gui.signText
+        val index = gui.currentRow
         val text = lines[index].unformattedText + addedText
         lines[index] = text.capAtMinecraftLength(91).asComponent()
     }
@@ -37,12 +44,12 @@ object SignUtils {
             SkyHanniMod.coroutineScope.launch {
                 val newLine = if (KeyboardManager.isDeleteLineDown()) ""
                 else if (KeyboardManager.isDeleteWordDown()) {
-                    val currentLine = gui.text[gui.editLine].unformattedText
+                    val currentLine = gui.signText[gui.currentRow].unformattedText
 
                     val lastSpaceIndex = currentLine.trimEnd().lastIndexOf(' ')
                     if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 2) else ""
                 } else return@launch
-                setTextIntoSign(newLine, gui.editLine)
+                setTextIntoSign(newLine, gui.currentRow)
             }
         }
         deleteLastClicked = deleteClicked
@@ -52,7 +59,7 @@ object SignUtils {
         val copyClicked = KeyboardManager.isCopyingKeysDown()
         if (!copyLastClicked && copyClicked && gui is AccessorGuiEditSign) {
             SkyHanniMod.coroutineScope.launch {
-                ClipboardUtils.copyToClipboard(gui.text[gui.editLine].unformattedText)
+                ClipboardUtils.copyToClipboard(gui.signText[gui.currentRow].unformattedText)
             }
         }
         copyLastClicked = copyClicked
@@ -72,7 +79,7 @@ object SignUtils {
 
     private fun GuiEditSign.getSignLines(): List<String>? {
         if (this !is AccessorGuiEditSign) return null
-        return (this as AccessorGuiEditSign).text.map { it.unformattedText.removeColor() }
+        return (this as AccessorGuiEditSign).signText.map { it.unformattedText.removeColor() }
     }
 
     fun GuiEditSign.isRancherSign(): Boolean {
@@ -101,10 +108,10 @@ object SignUtils {
         return isRancherSign() || isMousematSign()
     }
 
-    val AccessorGuiEditSign.text: Array<IChatComponent>
+    private val AccessorGuiEditSign.signText: Array<IChatComponent>
         //#if MC < 1.21
         get() = this.tileSign.signText
     //#else
-    //$$ get() = this.tileSign.frontText.getMessages(false)
+    //$$ get() = this.text.getMessages(false)
     //#endif
 }
