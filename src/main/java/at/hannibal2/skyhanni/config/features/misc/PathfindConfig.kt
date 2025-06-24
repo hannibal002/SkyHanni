@@ -17,7 +17,7 @@ class PathfindConfig {
     @SearchTag("navigation, pathfind")
     var chatUpdateInterval: UpdateInterval = UpdateInterval.PERFECT
 
-    enum class UpdateInterval(private val displayName: String, val duration: Duration) : HasLegacyId {
+    enum class UpdateInterval(private val displayName: String, val duration: Duration) {
         IMMEDIATELY("1/20 second", 0.seconds),
         PERFECT("1/10 second", 100.milliseconds),
         SHORT("1/4 second", 250.milliseconds),
