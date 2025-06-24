@@ -5,9 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
@@ -21,7 +25,7 @@ import com.google.gson.annotations.Expose
 @SkyHanniModule
 object TreeGiftTracker {
 
-    private val config get() = SkyHanniMod.feature.foraging
+    private val config get() = SkyHanniMod.feature.foraging.treeGiftTracker
     private val patternGroup = RepoPattern.group("foraging.treegift")
 
     private val tracker = SkyHanniBucketedItemTracker(
@@ -110,6 +114,10 @@ object TreeGiftTracker {
 
     }
 
+    private fun isEnabled() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && heldItemEnabled()
+    private fun heldItemEnabled() = !config.onlyHoldingAxe || isHoldingAxe()
+    private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE
+
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onChat(event: SkyHanniChatEvent) {
 
@@ -117,7 +125,7 @@ object TreeGiftTracker {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.GALATEA) return
+        if (!isEnabled()) return
         tracker.firstUpdate()
     }
 
