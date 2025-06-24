@@ -153,6 +153,7 @@ object UpdateKeybinds {
         if (shouldFlip) {
             keybindMap = keybindMap.entries.associateBy({ it.value }) { it.key }
         }
+        var shouldNotify = false
         for (keybind in keybinds) {
             val shimmy = Shimmy.makeShimmy(SkyHanniMod.feature, keybind.split("."))
             if (shimmy == null) {
@@ -164,7 +165,6 @@ object UpdateKeybinds {
             }
 
             val currentValue = shimmy.getJson().asInt
-            var shouldNotify = false
 
             if (keybindMap.containsKey(currentValue)) {
                 val newValue = keybindMap[currentValue]
@@ -180,14 +180,14 @@ object UpdateKeybinds {
                     ChatUtils.chat("Could not convert keybind for $keybind, please set it manually in /sh")
                 }
             }
-            if (shouldNotify) {
-                val text = listOf(
-                    "§c§lMissing Keybind Mapping Data",
-                    "§cData used to convert your skyhanni keybinds between versions is outdated",
-                    "§cPlease join the SkyHanni Discord and message in §l#support§r§c to get support.",
-                )
-                NotificationManager.queueNotification(SkyHanniNotification(text, Duration.INFINITE, false))
-            }
+        }
+        if (shouldNotify) {
+            val text = listOf(
+                "§c§lMissing Keybind Mapping Data",
+                "§cData used to convert your skyhanni keybinds between versions is outdated",
+                "§cPlease join the SkyHanni Discord and message in §l#support§r§c to get support.",
+            )
+            NotificationManager.queueNotification(SkyHanniNotification(text, Duration.INFINITE, false))
         }
     }
 
