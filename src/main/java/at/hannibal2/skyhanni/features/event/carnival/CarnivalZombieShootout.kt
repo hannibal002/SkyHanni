@@ -41,14 +41,14 @@ object CarnivalZombieShootout {
 
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
-    private data class Lamp(var pos: LorenzVec, var time: SimpleTimeMark)
-    private data class Zombie(val entity: EntityZombie, val type: ZombieType)
+    private data class ShootoutLamp(var pos: LorenzVec, var time: SimpleTimeMark)
+    private data class ShootoutZombie(val entity: EntityZombie, val type: ZombieType)
 
     private var content = HorizontalContainerRenderable(listOf())
-    private var drawZombies = listOf<Zombie>()
-    private val zombieTimes = mutableMapOf<Zombie, SimpleTimeMark>()
+    private var drawZombies = listOf<ShootoutZombie>()
+    private val zombieTimes = mutableMapOf<ShootoutZombie, SimpleTimeMark>()
     private var maxType = ZombieType.LEATHER
-    private var lamp: Lamp? = null
+    private var lamp: ShootoutLamp? = null
     private var started = false
 
     private val patternGroup = RepoPattern.group("event.carnival")
@@ -81,7 +81,7 @@ object CarnivalZombieShootout {
         if (!isEnabled() || (!config.coloredHitboxes && !config.coloredLines && !config.zombieTimer)) return
 
         if (config.zombieTimer) {
-            val zombiesToRemove = mutableListOf<Zombie>()
+            val zombiesToRemove = mutableListOf<ShootoutZombie>()
 
             for ((zombie, time) in zombieTimes) {
                 val lifetime = zombie.type.lifetime
@@ -154,7 +154,7 @@ object CarnivalZombieShootout {
         val new = event.new
 
         lamp = when {
-            old == "redstone_lamp" && new == "lit_redstone_lamp" -> Lamp(event.location, SimpleTimeMark.now())
+            old == "redstone_lamp" && new == "lit_redstone_lamp" -> ShootoutLamp(event.location, SimpleTimeMark.now())
             old == "lit_redstone_lamp" && new == "redstone_lamp" -> null
             else -> lamp
         }
@@ -226,7 +226,7 @@ object CarnivalZombieShootout {
             if (zombie.health <= 0) return@mapNotNull null
             val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
             val type = toType(helmet) ?: return@mapNotNull null
-            Zombie(zombie, type)
+            ShootoutZombie(zombie, type)
         }.toList()
 
     private fun determinePrefix(timer: Duration, good: Duration, mid: Duration, bad: Duration) =
