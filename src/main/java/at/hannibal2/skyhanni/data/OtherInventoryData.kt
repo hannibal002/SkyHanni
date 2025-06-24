@@ -60,6 +60,7 @@ object OtherInventoryData {
     //$$    ScreenHandlerType.BREWING_STAND to 5,
     //$$    ScreenHandlerType.SHULKER_BOX to 27,
     //$$    ScreenHandlerType.BEACON to 1,
+    //$$    ScreenHandlerType.HOPPER to 5,
     //$$ )
     //#endif
 
