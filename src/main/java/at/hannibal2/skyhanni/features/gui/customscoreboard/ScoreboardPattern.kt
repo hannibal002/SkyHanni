@@ -767,7 +767,7 @@ object ScoreboardPattern {
      */
     val riftDimensionPattern by riftSB.pattern(
         "dimension",
-        "\\s*§fRift Dimension",
+        "\\s*(?:§f)?Rift Dimension",
     )
     val riftHotdogTitlePattern by riftSB.pattern(
         "hotdogtitle",

@@ -19,6 +19,13 @@ class InventoryDetector(
     val openInventory: (String) -> Unit = {},
     val checkInventoryName: (String) -> Boolean,
 ) {
+    constructor(
+        pattern: Pattern,
+        openInventory: (String) -> Unit = {},
+    ) : this(
+        openInventory,
+        checkInventoryName = { name -> pattern.matches(name) }
+    )
 
     constructor(
         pattern: Pattern,

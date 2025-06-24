@@ -204,7 +204,7 @@ object ItemUtils {
     //#else
     //$$ fun getDisplayName(compound: ComponentMap?): String? {
     //$$     compound ?: return null
-    //$$     val name = compound.get(DataComponentTypes.CUSTOM_NAME)?.formattedTextCompat()
+    //$$     val name = compound.get(DataComponentTypes.CUSTOM_NAME)?.formattedTextCompatWithStartingWhiteColorCode()
     //$$     if (name.isNullOrEmpty()) return null
     //$$     return name
     //$$ }
@@ -932,6 +932,15 @@ object ItemUtils {
         skull.extraAttributes = skull.extraAttributes.apply { setString("id", "SKYBLOCK_COIN") }
 
         return skull
+    }
+
+    fun ItemStack.isSkull(): Boolean {
+        //#if MC < 1.21
+        return item === Items.skull
+        //#else
+        //$$ val hasItemModel = this.getItemModel() != null
+        //$$ return item == Items.PLAYER_HEAD && !hasItemModel
+        //#endif
     }
 
     //#if MC > 1.21
