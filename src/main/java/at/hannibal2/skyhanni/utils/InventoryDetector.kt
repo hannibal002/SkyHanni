@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import java.util.regex.Pattern
 
 /**
  * The InventoryDetector tracks whether an inventory is open and provides
@@ -17,6 +19,13 @@ class InventoryDetector(
     val openInventory: (String) -> Unit = {},
     val checkInventoryName: (String) -> Boolean,
 ) {
+    constructor(
+        pattern: Pattern,
+        openInventory: (String) -> Unit = {},
+    ) : this(
+        openInventory,
+        checkInventoryName = { name -> pattern.matches(name) }
+    )
 
     init {
         detectors.add(this)

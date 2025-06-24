@@ -19,5 +19,5 @@ class ModifyWordsConfig {
 
     @ConfigOption(name = "Open Config", desc = "Open the menu to setup the visual words.\n§eCommand: /shwords")
     @ConfigEditorButton(buttonText = "Open")
-    var open: Runnable = Runnable(VisualWordGui::onCommand)
+    val open: Runnable = Runnable(VisualWordGui::onCommand)
 }

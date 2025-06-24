@@ -12,7 +12,8 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleContext
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -51,7 +52,7 @@ object GardenCropMilestoneDisplay {
     private val overflowConfig get() = config.overflow
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone
 
-    private var countdownTitleContext: TitleManager.TitleContext? = null
+    private var countdownTitleContext: TitleContext? = null
     private var lastTitleWarnedLevel = -1
     private var needsInventory = false
 

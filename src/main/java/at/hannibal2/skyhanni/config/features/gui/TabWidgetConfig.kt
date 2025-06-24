@@ -35,9 +35,9 @@ class TabWidgetConfig {
     @Expose
     @ConfigOption(name = "Widgets", desc = "")
     @ConfigEditorDraggableList
-    var display: Property<MutableList<TabWidgetDisplay>> = Property.of(mutableListOf())
+    val display: Property<MutableList<TabWidgetDisplay>> = Property.of(mutableListOf())
 
     @Expose
     @ConfigLink(owner = TabWidgetConfig::class, field = "enabled")
-    var displayPositions: PositionList = PositionList(TabWidgetDisplay.entries.size)
+    val displayPositions: PositionList = PositionList(TabWidgetDisplay.entries.size)
 }

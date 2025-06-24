@@ -16,7 +16,7 @@ class SkillETADisplayConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Farming", desc = "After how many seconds should the Farming session timer pause.")

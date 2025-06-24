@@ -10,17 +10,17 @@ class CommandsConfig {
     @ConfigOption(name = "Tab Complete", desc = "")
     @Accordion
     @Expose
-    var tabComplete: TabCompleteConfig = TabCompleteConfig()
+    val tabComplete: TabCompleteConfig = TabCompleteConfig()
 
     @ConfigOption(name = "Better §e/wiki", desc = "")
     @Accordion
     @Expose
-    var betterWiki: BetterWikiCommandConfig = BetterWikiCommandConfig()
+    val betterWiki: BetterWikiCommandConfig = BetterWikiCommandConfig()
 
     @ConfigOption(name = "Reverse Party Transfer", desc = "")
     @Accordion
     @Expose
-    var reversePT: ReversePartyTransferConfig = ReversePartyTransferConfig()
+    val reversePT: ReversePartyTransferConfig = ReversePartyTransferConfig()
 
     @ConfigOption(
         name = "Party Commands",

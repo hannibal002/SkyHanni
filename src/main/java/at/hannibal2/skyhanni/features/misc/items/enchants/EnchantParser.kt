@@ -75,7 +75,7 @@ object EnchantParser {
     // enchants stacked in a single column
     private var shouldBeSingleColumn = false
 
-    private var stackingEnchant: Enchant.Stacking? = null
+    private val stackingEnchants: MutableList<Enchant.Stacking> = mutableListOf()
 
     // Used to determine how many enchants are used on each line
     // for this particular item, since consistency is not Hypixel's strong point
@@ -178,7 +178,7 @@ object EnchantParser {
             return
         }
 
-        stackingEnchant = null
+        stackingEnchants.clear()
         shouldBeSingleColumn = false
         loreLines = mutableListOf()
         orderedEnchants = TreeSet()
@@ -251,7 +251,8 @@ object EnchantParser {
 
         if (config.stackingEnchantProgress) {
             // TODO check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
-            stackingEnchant?.let { stacking ->
+
+            stackingEnchants.forEach { stacking ->
                 currentItem?.let { item ->
                     loreList.add(loreList.size - 1, stacking.progressString(item))
                 }
@@ -304,7 +305,7 @@ object EnchantParser {
                 } else "empty"
 
                 if (enchant is Enchant.Stacking) {
-                    stackingEnchant = enchant
+                    stackingEnchants.add(enchant)
                 }
 
                 // Last found enchant

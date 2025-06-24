@@ -26,7 +26,7 @@ class StashConfig {
     @Expose
     @ConfigOption(name = "Hide Dupe Warnings", desc = "")
     @Accordion
-    var hideDuplicateWarning: HideDuplicateWarningConfig = HideDuplicateWarningConfig()
+    val hideDuplicateWarning: HideDuplicateWarningConfig = HideDuplicateWarningConfig()
 
     class HideDuplicateWarningConfig {
         @Expose
