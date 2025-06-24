@@ -174,6 +174,8 @@ object StringUtils {
         }
     }
 
+    fun String.isPlayerName() = UtilsPatterns.playerNamePattern.matches(this)
+
     fun String.substringBeforeLastOrNull(needle: String): String? {
         val index = this.lastIndexOf(needle)
         if (index < 0) return null
