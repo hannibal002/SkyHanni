@@ -15,11 +15,17 @@ class ForagingConfig {
 
     @ConfigOption(
         name = "§cNotice",
-        desc = "To see all foraging features please launch the game on a modern version of Minecraft with SkyHanni installed."
+        desc = "To see all foraging features please launch the game on a modern version of Minecraft with SkyHanni installed.",
     )
     @OnlyLegacy
     @ConfigEditorInfoText
     var notice: String = ""
+
+    @Expose
+    @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
+    @Accordion
+    @OnlyModern
+    val tutorialQuest: ForagingTutorialQuestConfig = ForagingTutorialQuestConfig()
 
     @Expose
     @ConfigOption(name = "Moonglade Beacon", desc = "Settings for the moonglade beacon.")
