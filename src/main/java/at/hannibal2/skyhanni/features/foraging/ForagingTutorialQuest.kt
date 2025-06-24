@@ -58,7 +58,9 @@ object ForagingTutorialQuest {
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
-        if (event.message == "§cYou don't have the requirements to use this warp!") {
+        if (event.message == "§cYou don't have the requirements to use this warp!" ||
+            event.message == "§cYou haven't unlocked this fast travel destination!"
+        ) {
             if (lastParkWarpAttempt.passedSince() < 1.seconds) {
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
                     start(Quest.FIRST)
@@ -132,7 +134,7 @@ object ForagingTutorialQuest {
             },
         )
         ChatUtils.clickableChat(
-            "Never see this suggestion again? Click heere!",
+            "Never see this suggestion again? Click here!",
             onClick = {
                 ChatUtils.chat("Disabled Foraging Tutorial Quest Suggestions.")
                 config.suggestToEnable = false

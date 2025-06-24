@@ -81,7 +81,6 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "rounded_rect",
         uniforms = getCommonRoundedUniforms(),
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     ROUNDED_TEXTURED_RECT(
         snippet = RenderPipelines.MATRICES_SNIPPET,
@@ -91,7 +90,6 @@ enum class SkyHanniRenderPipeline(
         sampler = "textureSampler",
         uniforms = getCommonRoundedUniforms(),
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     ROUNDED_RECT_OUTLINE(
         snippet = RenderPipelines.MATRICES_SNIPPET,
@@ -103,7 +101,6 @@ enum class SkyHanniRenderPipeline(
             "borderBlur" to UniformType.FLOAT,
         ),
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_SNIPPET,
