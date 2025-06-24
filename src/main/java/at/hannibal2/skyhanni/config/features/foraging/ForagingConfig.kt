@@ -39,4 +39,10 @@ class ForagingConfig {
     @Accordion
     var birriesHighlight = BirriesHighlightConfig()
 
+    @Expose
+    @ConfigOption(name = "Tree Gift Tracker", desc = "")
+    @OnlyModern
+    @Accordion
+    val treeGiftTracker = TreeGiftTrackerConfig()
+
 }
