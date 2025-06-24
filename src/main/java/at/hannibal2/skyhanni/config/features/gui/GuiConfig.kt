@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
+import at.hannibal2.skyhanni.data.title.TitleManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -172,4 +173,7 @@ class GuiConfig {
 
     @Expose
     var titlePosition: Position = Position(0, 160)
+
+    @Expose
+    var titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
 }
