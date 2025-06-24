@@ -20,60 +20,50 @@ object OrderedTextUtils {
         orderedText ?: return ""
 
         return textToLegacyCache.getOrPut(orderedText) {
-
-            val sb = StringBuilder()
+            val builder = StringBuilder()
             var lastStyle = Style.EMPTY
-
-            orderedText.accept { index, style, codePoint ->
-
+            orderedText.accept { _, style, codePoint ->
                 if (lastStyle != style) {
-                    sb.append(requiredStyleChangeString(lastStyle, style, true))
+                    builder.append(requiredStyleChangeString(lastStyle, style, true))
                     lastStyle = style
                 }
-
-                sb.append(codePoint.toChar())
+                builder.append(codePoint.toChar())
                 true
             }
 
-            return sb.toString().removeSuffix("§r").removePrefix("§r")
+            return builder.toString().removeSuffix("§r").removePrefix("§r")
         }
     }
 
     @JvmStatic
     fun stringVisitableToLegacyString(stringVisitable: StringVisitable): String {
-
-        val sb = StringBuilder()
+        val builder = StringBuilder()
         var lastStyle = Style.EMPTY
-
-        stringVisitable.visit({ style, string ->
-
-            if (lastStyle != style) {
-                sb.append(requiredStyleChangeString(lastStyle, style))
-                lastStyle = style
-            }
-
-            sb.append(string)
-
-            Optional.empty<Any>()
-        }, Style.EMPTY)
-
-        return sb.toString()
+        stringVisitable.visit(
+            { style, string ->
+                if (lastStyle != style) {
+                    builder.append(requiredStyleChangeString(lastStyle, style))
+                    lastStyle = style
+                }
+                builder.append(string)
+                Optional.empty<Any>()
+            },
+            Style.EMPTY,
+        )
+        return builder.toString()
     }
 
     @JvmStatic
     fun legacyStringToStringVisitable(legacyString: String): StringVisitable {
-
         val segments = mutableListOf<StringVisitable>()
         var lastStyle = Style.EMPTY
         var wasLastStyle = false
         val sb = StringBuilder()
 
         for (char in legacyString) {
-
             if (char == '§') {
                 wasLastStyle = true
             } else if (wasLastStyle) {
-
                 if (sb.isNotEmpty()) {
                     segments.add(StringVisitable.styled(sb.toString(), lastStyle))
                     sb.clear()
@@ -91,12 +81,10 @@ object OrderedTextUtils {
                 sb.append(char)
             }
         }
-
         if (sb.isNotEmpty()) {
             segments.add(StringVisitable.styled(sb.toString(), lastStyle))
             sb.clear()
         }
-
         return StringVisitable.concat(segments)
     }
 
@@ -148,7 +136,7 @@ object OrderedTextUtils {
             if (to.color?.name == "chroma") {
                 sb.append("§z")
             } else {
-                to.color?.toChatFormatting() ?.let {
+                to.color?.toChatFormatting()?.let {
                     sb.append(it.toString())
                 }
             }
