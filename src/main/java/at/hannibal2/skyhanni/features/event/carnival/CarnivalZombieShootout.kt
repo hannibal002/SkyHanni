@@ -178,7 +178,6 @@ object CarnivalZombieShootout {
         //#else
         //$$ val blockOld = event.old
         //$$ val blockNew = event.new
-        //$$ println("$block $block2")
         //$$ if(blockOld == "redstone_lamp" && blockNew == "redstone_lamp") {
         //$$     val old = event.oldState.get(Properties.LIT)
         //$$     val new = event.newState.get(Properties.LIT)
