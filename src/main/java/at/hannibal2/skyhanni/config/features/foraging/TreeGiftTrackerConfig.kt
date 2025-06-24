@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.foraging
 
 import at.hannibal2.skyhanni.config.OnlyModern
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class TreeGiftTrackerConfig {
@@ -12,6 +14,16 @@ class TreeGiftTrackerConfig {
     @ConfigEditorBoolean
     @OnlyModern
     var enabled: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = TreeGiftTrackerConfig::class, field = "enabled")
+    val position: Position = Position(-300, 300)
+
+    @Expose
+    @ConfigOption(name = "Only Holding Axe", desc = "Only show the tracker while holding an axe.")
+    @ConfigEditorBoolean
+    @OnlyModern
+    var onlyHoldingAxe: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show Total Trees", desc = "Estimate how many total trees you have chopped down.")
