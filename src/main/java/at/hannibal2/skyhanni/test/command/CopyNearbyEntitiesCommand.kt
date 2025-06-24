@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -118,6 +119,7 @@ object CopyNearbyEntitiesCommand {
                     //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
                     //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
                     //$$ is net.minecraft.entity.passive.PandaEntity -> addPanda(entity)
+                    //$$ is net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity -> addBlockDisplayEntity(entity)
                     //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
@@ -148,8 +150,9 @@ object CopyNearbyEntitiesCommand {
 
         add("-  inventory:")
         for ((id, stack) in entity.getInventoryItems().withIndex()) {
-            add("-  id $id ($stack)")
-            printItemStackData(stack)
+            val adjustedStack = stack.orNull()
+            add("-  id $id ($adjustedStack)")
+            printItemStackData(adjustedStack)
         }
     }
 
@@ -261,6 +264,15 @@ object CopyNearbyEntitiesCommand {
     //$$     add("-  mainGene: $mainGene")
     //$$     add("-  hiddenGene: $hiddenGene")
     //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addBlockDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity) {
+    //$$     add("EntityBlockDisplay:")
+    //$$     val block = entity.blockState.block
+    //$$     val rotation = entity.rotationVector
+    //$$
+    //$$     add("-  block: ${block.name.formattedTextCompat()}")
+    //$$     add("-  rotation: $rotation")
+    //$$ }
     //#endif
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
@@ -338,7 +350,7 @@ object CopyNearbyEntitiesCommand {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcopyentities") {
-            description = "Copies the entites in the specified radius around the player into the clipboard"
+            description = "Copies the entities in the specified radius around the player into the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
             legacyCallbackArgs { command(it) }
         }

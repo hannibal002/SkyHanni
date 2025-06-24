@@ -29,14 +29,6 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Heat: §c1♨
-     */
-    val heatPattern by mainSB.pattern(
-        "heat",
-        "Heat: (?<heat>.*)",
-    )
-
-    /**
      * REGEX-TEST: Copper: §c3,416
      */
     val copperPattern by mainSB.pattern(
@@ -775,7 +767,7 @@ object ScoreboardPattern {
      */
     val riftDimensionPattern by riftSB.pattern(
         "dimension",
-        "\\s*§fRift Dimension",
+        "\\s*(?:§f)?Rift Dimension",
     )
     val riftHotdogTitlePattern by riftSB.pattern(
         "hotdogtitle",

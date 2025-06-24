@@ -14,12 +14,23 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
+
+/** Crashes if [value] is false and in developer environment */
+fun requireDevEnv(value: Boolean) = requireDevEnv(value, null)
+
+/** Crashes if [value] is false and in developer environment */
+fun requireDevEnv(value: Boolean, lazyMessage: (() -> Any)?) {
+    if (!value) {
+        val msg = lazyMessage?.invoke()?.toString()
+        val message = "Failed requirement in Dev Environment" + msg?.let { ": $it" }.orEmpty()
+        ErrorManager.crashInDevEnv(message)
+    }
+}
 
 @SkyHanniModule
 object ErrorManager {
@@ -210,14 +221,15 @@ object ErrorManager {
         val extraDataString = getExtraDataOrCached(extraData)
         val rawMessage = message.removeColor()
         val shVersion = SkyHanniMod.VERSION
-        val mcVersion = VersionConstants.MC_VERSION
-        errorMessages[randomId] = "```\nSkyHanni $shVersion $mcVersion: $rawMessage\n \n$stackTrace\n$extraDataString```"
+        val mcVersion = PlatformUtils.MC_VERSION
+        val label = "SkyHanni $shVersion $mcVersion"
+        errorMessages[randomId] = "```\n$label: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
-            "```\nSkyHanni $shVersion $mcVersion: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
+            "```\n$label: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
         val finalMessage = buildFinalMessage(message) ?: return false
         ChatUtils.clickableChat(
-            "§c[SkyHanni-$shVersion]: $finalMessage Click here to copy the error into the clipboard.",
+            "§c[$label]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
             prefix = false,

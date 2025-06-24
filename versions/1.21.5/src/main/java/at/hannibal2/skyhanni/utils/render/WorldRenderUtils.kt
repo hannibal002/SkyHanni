@@ -208,39 +208,14 @@ object WorldRenderUtils {
             aabb
         }
 
-        if (drawVerticalBarriers) {
-            matrices.push()
-
-            val inverseView = getViewerPos()
-            matrices.translate(inverseView.x, inverseView.y, inverseView.z)
-
-            // TODO these look weird on modern and i dont see them on legacy so they are disabled for now
-//             LineDrawer.draw3D(this, 1, !seeThroughBlocks) {
-//                 drawPath(
-//                     listOf(
-//                         LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ),
-//                         LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ),
-//                         LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ),
-//                         LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ),
-//                         LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ),
-//                     ),
-//                     c.addAlpha((c.alpha * alphaMultiplier).toInt()),
-//                     -1.0,
-//                 )
-//                 drawPath(
-//                     listOf(
-//                         LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ),
-//                         LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ),
-//                         LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ),
-//                         LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ),
-//                         LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ),
-//                     ),
-//                     c.addAlpha((c.alpha * alphaMultiplier).toInt()),
-//                     -1.0,
-//                 )
-//             }
-
-            matrices.pop()
+        if (this.isCurrentlyDeferring) {
+            DeferredDrawer.deferBox(
+                effectiveAABB,
+                c,
+                alphaMultiplier,
+                depth = !seeThroughBlocks,
+            )
+            return
         }
 
         val layer = SkyHanniRenderLayers.getFilled(seeThroughBlocks)
@@ -280,6 +255,20 @@ object WorldRenderUtils {
         yOffset: Float = 0f,
         backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
+        if (this.isCurrentlyDeferring) {
+            DeferredDrawer.deferString(
+                location,
+                text,
+                color,
+                scale,
+                shadow,
+                yOffset,
+                backGroundColor,
+                !seeThroughBlocks,
+            )
+            return
+        }
+
         val matrix = Matrix4f()
         val cameraPos = camera.pos
         val fr = MinecraftClient.getInstance().textRenderer
@@ -463,6 +452,11 @@ object WorldRenderUtils {
         color: Color,
         depth: Boolean = true,
     ) {
+        if (this.isCurrentlyDeferring) {
+            DeferredDrawer.deferPyramid(topPoint, baseCenterPoint, baseEdgePoint, color, depth)
+            return
+        }
+
         val layer = SkyHanniRenderLayers.getTriangles(!depth)
         val buf = vertexConsumers.getBuffer(layer)
         matrices.push()

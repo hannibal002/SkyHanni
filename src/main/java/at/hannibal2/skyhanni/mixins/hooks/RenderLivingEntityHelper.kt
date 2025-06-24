@@ -26,8 +26,8 @@ object RenderLivingEntityHelper {
         entityNoHurtTimeCondition.clear()
     }
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
         entityColorMap.removeIfKey { it.isDead }
         entityColorCondition.removeIfKey { it.isDead }
         entityNoHurtTimeCondition.removeIfKey { it.isDead }

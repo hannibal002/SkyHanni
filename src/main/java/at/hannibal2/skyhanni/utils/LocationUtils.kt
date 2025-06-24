@@ -13,7 +13,6 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.time.Duration
 
-// todo 1.21 impl needed
 @Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object LocationUtils {
 

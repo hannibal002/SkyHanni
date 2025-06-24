@@ -67,6 +67,7 @@ loom {
     if (target == ProjectTarget.MODERN) {
         accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
     }
+    @Suppress("UnstableApiUsage")
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -114,7 +115,7 @@ val devenvMod: Configuration by configurations.creating {
     isVisible = false
 }
 
-val headlessLwjgl by configurations.creating {
+val headlessLwjgl: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
@@ -213,8 +214,8 @@ dependencies {
         isTransitive = false
     }
     // December 29, 2024, 07:30 PM EST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.6.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.6.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -225,7 +226,7 @@ dependencies {
         shadowModImpl(libs.moulconfigModern)
         include(libs.moulconfigModern)
     }
-
+    @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
@@ -301,7 +302,7 @@ tasks.processResources {
 }
 
 if (target == ProjectTarget.MAIN) {
-    tasks.create("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).apply {
+    tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
         jvmArgs(
@@ -420,24 +421,15 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     }
 }
 
-val skipTodos by lazy {
-    val prop = Properties()
-    val file = rootProject.file(".gradle/private.properties")
-    if (file.exists()) {
-        file.inputStream().use(prop::load)
-    }
-    (prop["skyhanni.skipPreprocessTodos"] as? String)?.toBoolean() ?: false
-}
-
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
-    vars.put("TODO", if (skipTodos) 1 else 0)
+    vars.put("TODO", 0)
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
+val sourcesJar by tasks.registering(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
     from(sourceSets.main.get().allSource)

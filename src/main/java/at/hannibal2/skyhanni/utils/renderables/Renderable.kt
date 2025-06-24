@@ -18,13 +18,13 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
@@ -34,13 +34,14 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGui
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 //#if TODO
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 //#endif
@@ -107,7 +108,7 @@ interface Renderable {
             null -> placeholder(12)
             is Renderable -> any
             is String -> RenderableString(any)
-            is ItemStack -> itemStack(any, itemScale)
+            is ItemStack -> ItemStackRenderable(any, itemScale)
             else -> null
         }
 
@@ -436,28 +437,10 @@ interface Renderable {
             }
         }
 
-        fun itemStackWithTip(
-            item: ItemStack,
-            scale: Double = NeuItems.ITEM_FONT_SIZE,
-            xSpacing: Int = 2,
-            ySpacing: Int = 0,
-            rescaleSkulls: Boolean = true,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = hoverTips(
-            itemStack(
-                item,
-                scale,
-                xSpacing,
-                ySpacing,
-                rescaleSkulls,
-                horizontalAlign = horizontalAlign,
-                verticalAlign = verticalAlign,
-            ),
-            item.getTooltipCompat(false),
-            stack = item,
+        @Deprecated(
+            "Use ItemStackRenderable instead",
+            ReplaceWith("ItemStackRenderable(item, scale, xSpacing, ySpacing, rescaleSkulls, horizontalAlign, verticalAlign)"),
         )
-
         fun itemStack(
             item: ItemStack,
             scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -872,6 +855,52 @@ interface Renderable {
                 this@renderBounds.render(posX, posY)
             }
 
+        }
+
+        fun rectButton(
+            content: Renderable,
+            activeColor: Color,
+            inActiveColor: Color = activeColor.darker(0.4),
+            hoveredColor: (Color) -> Color = { it.darker(0.5) },
+            onClick: (Boolean) -> Unit,
+            onHover: (Boolean) -> Unit = {},
+            button: Int = KeyboardManager.LEFT_MOUSE,
+            bypassChecks: Boolean = false,
+            condition: (Boolean) -> Boolean = { true },
+            startState: Boolean = false,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            var state = startState
+
+            val color get() = if (state) activeColor else inActiveColor
+
+            override val width = content.width + padding * 2
+            override val height = content.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                val realColor: Color
+                if (isHovered(posX, posY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
+                    if (button.isKeyClicked()) {
+                        state = !state
+                        onClick(state)
+                    }
+                    onHover(state)
+                    realColor = hoveredColor(color)
+                } else {
+                    realColor = color
+                }
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                content.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
         }
 
         fun fixedSizeLine(
@@ -1443,7 +1472,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
@@ -1471,7 +1500,7 @@ interface Renderable {
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
 
-                RenderUtils.drawRoundRectOutline(
+                ShaderRenderUtils.drawRoundRectOutline(
                     0,
                     0,
                     width,
@@ -1493,6 +1522,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
             radius: Int = 0,
+            smoothness: Float = 0f,
         ) = object : Renderable {
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
@@ -1500,13 +1530,14 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                RenderUtils.drawRoundTexturedRect(
+                ShaderRenderUtils.drawRoundTexturedRect(
                     0,
                     0,
                     width,
                     height,
                     GL11.GL_NEAREST,
                     radius,
+                    smoothness,
                     texture = texture,
                     alpha = alpha / 255f,
                 )
@@ -1564,8 +1595,8 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-                RenderUtils.drawRoundRectOutline(
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                ShaderRenderUtils.drawRoundRectOutline(
                     0,
                     0,
                     width,
@@ -1629,8 +1660,8 @@ interface Renderable {
                 //$$     playerY + height,
                 //$$     entityScale,
                 //$$     0.0625f,
-                //$$     -mouseXRelativeToPlayer,
-                //$$     -mouseYRelativeToPlayer,
+                //$$     -mouseXRelativeToPlayer + if (followMouse) 70f else 0f,
+                //$$     -mouseYRelativeToPlayer + if (followMouse) 195f else 0f,
                 //$$     player
                 //$$ )
                 //$$ DrawContextUtils.translate(35f, 125f, 0f)

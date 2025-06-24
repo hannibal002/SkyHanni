@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
@@ -50,7 +52,6 @@ object SkyHanniMod {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
-        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
 
         PreInitFinishedEvent.post()
     }
@@ -58,6 +59,7 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
         MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
@@ -81,9 +83,9 @@ object SkyHanniMod {
                     //#else
                     //$$ MinecraftCompat.localPlayer.closeHandledScreen()
                     //#endif
+                    OtherInventoryData.close(title)
                 }
                 shouldCloseScreen = true
-                OtherInventoryData.close(title)
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null
@@ -106,6 +108,7 @@ object SkyHanniMod {
     lateinit var knownFeaturesData: KnownFeaturesJson
     lateinit var jacobContestsData: JacobContestsJson
     lateinit var visualWordsData: VisualWordsJson
+    lateinit var petData: PetDataStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -165,7 +168,10 @@ object SkyHanniMod {
         event.registerBrigadier("shconfigsave") {
             description = "Manually saving the config"
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
+            simpleCallback {
+                ChatUtils.chat("Manually saved the config!")
+                configManager.saveConfig(ConfigFileType.FEATURES, "manual-command")
+            }
         }
     }
 }

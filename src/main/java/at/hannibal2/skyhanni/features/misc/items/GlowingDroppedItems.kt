@@ -60,7 +60,8 @@ object GlowingDroppedItems {
     }
 
     private val isShowcaseArea by RecalculatingValue(1.seconds) {
-        IslandTypeTags.HAS_SHOWCASES.inAny() || SkyBlockUtils.graphArea in showcaseItemLocations
+        // TODO use graph area when fixing the end area
+        IslandTypeTags.HAS_SHOWCASES.inAny() || SkyBlockUtils.scoreboardArea in showcaseItemLocations
     }
 
     private fun shouldHideShowcaseItem(entity: EntityItem): Boolean {

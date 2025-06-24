@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -152,15 +152,6 @@ object ExperimentationTableApi {
         "book",
         "§9(?<enchant>.*)",
     )
-
-    /**
-     * REGEX-TEST: §dGuardian
-     * REGEX-TEST: §9Guardian§e
-     */
-    private val petNamePattern by patternGroup.pattern(
-        "guardianpet",
-        "§[956d]Guardian.*",
-    )
     // </editor-fold>
 
     fun inDistanceToTable(max: Double): Boolean {
@@ -185,5 +176,5 @@ object ExperimentationTableApi {
         }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
     }
 
-    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetApi.currentPet)
+    fun hasGuardianPet(): Boolean = CurrentPetApi.isCurrentPet("Guardian")
 }

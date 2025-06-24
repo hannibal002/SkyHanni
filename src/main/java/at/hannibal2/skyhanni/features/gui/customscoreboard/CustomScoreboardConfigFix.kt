@@ -101,10 +101,10 @@ object CustomScoreboardConfigFix {
     }
 
     private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {
-        transform(version, EVENT_ENTRIES_KEY) {
-            it.asJsonArray.apply {
-                keys.forEach {
-                    add(JsonPrimitive(it.name))
+        transform(version, EVENT_ENTRIES_KEY) { element ->
+            element.asJsonArray.apply {
+                keys.forEach { key ->
+                    add(JsonPrimitive(key.name))
                 }
             }
         }

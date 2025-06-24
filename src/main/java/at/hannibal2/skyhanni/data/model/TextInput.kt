@@ -7,15 +7,13 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
+import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-//#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
-//#endif
 
 open class TextInput {
 
@@ -46,6 +44,7 @@ open class TextInput {
     //#else
     //$$ handleTextInput(null)
     //#endif
+
     fun clear() {
         textBox = ""
         carriage = null
@@ -76,7 +75,7 @@ open class TextInput {
 
         fun activate(instance: TextInput) {
             activeInstance = instance
-            //#if TODO
+            //#if MC < 1.21
             timeSinceKeyEvent = Keyboard.getEventNanoseconds()
             //#endif
         }
@@ -93,12 +92,22 @@ open class TextInput {
             }
         }
 
-        fun onGuiInput(ci: CallbackInfo) {
+        fun onGuiInput(
+            //#if MC < 1.21
+            ci: CallbackInfo
+            //#else
+            //$$ ci: CallbackInfoReturnable<Boolean>
+            //#endif
+        ) {
             if (activeInstance != null) {
                 if (Keyboard.KEY_ESCAPE.isKeyHeld()) {
                     disable()
                 } else {
+                    //#if MC < 1.21
                     ci.cancel()
+                    //#else
+                    //$$ ci.setReturnValue(false)
+                    //#endif
                 }
                 return
             }
@@ -164,15 +173,7 @@ open class TextInput {
             }
             //#if MC > 1.21
             //$$ if (GLFW.GLFW_KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && GLFW.GLFW_KEY_DELETE.isKeyClicked())) {
-            //$$     if (carriage != null) {
-            //$$         textBox = textBox.removeRange(carriage, carriage + 1)
-            //$$     } else {
-            //$$         if (KeyboardManager.isModifierKeyDown()) {
-            //$$             textBox = textBox.removeWordsAtEnd(1)
-            //$$         } else {
-            //$$             textBox = textBox.dropLast(1)
-            //$$         }
-            //$$     }
+            //$$     textBox = onRemove()
             //$$     updated()
             //$$     return
             //$$ }
@@ -191,9 +192,8 @@ open class TextInput {
                 } else {
                     textBox
                 }
-                null -> {
-                    textBox
-                }
+
+                null -> textBox
 
                 else -> if (carriage != null) {
                     this.carriage = carriage + 1
@@ -212,7 +212,11 @@ open class TextInput {
                 this.carriage = it.minus(1)
                 textBox.removeRange(it - 1, it)
             }
-        } ?: textBox.dropLast(1)
+        } ?: if (KeyboardManager.isModifierKeyDown()) {
+            textBox.removeWordsAtEnd(1)
+        } else {
+            textBox.dropLast(1)
+        }
 
         private fun moveCarriageRight(carriage: Int) = carriage + 1
 

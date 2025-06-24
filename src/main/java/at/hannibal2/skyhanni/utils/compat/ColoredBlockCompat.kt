@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import net.minecraft.block.Block
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
@@ -10,6 +9,8 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 //#if MC < 1.21
 import net.minecraft.block.BlockCarpet
+//#else
+//$$ import net.minecraft.block.Block
 //#endif
 
 /**
@@ -229,7 +230,11 @@ enum class ColoredBlockCompat(
         val newState = state ?: Blocks.stained_glass.defaultState
         return newState.withProperty(BlockCarpet.COLOR, getDyeColor())
         //#else
-        //$$ return this.glassBlock.defaultState
+        //$$ if (state == null) return this.glassBlock.defaultState
+        //$$ if (state.isStainedGlassPane()) {
+        //$$     return this.glassPaneBlock.getStateWithProperties(state)
+        //$$ }
+        //$$ return this.glassBlock.getStateWithProperties(state)
         //#endif
     }
 
@@ -306,60 +311,60 @@ enum class ColoredBlockCompat(
             //#endif
         }
 
-        fun Block.isStainedGlass(color: ColoredBlockCompat): Boolean = isStainedGlass(color.metaColor)
-        fun Block.isStainedGlassPane(color: ColoredBlockCompat): Boolean = isStainedGlassPane(color.metaColor)
-        fun Block.isWool(color: ColoredBlockCompat): Boolean = isWool(color.metaColor)
-        fun Block.isStainedClay(color: ColoredBlockCompat): Boolean = isStainedClay(color.metaColor)
+        fun IBlockState.isStainedGlass(color: ColoredBlockCompat): Boolean = isStainedGlass(color.metaColor)
+        fun IBlockState.isStainedGlassPane(color: ColoredBlockCompat): Boolean = isStainedGlassPane(color.metaColor)
+        fun IBlockState.isWool(color: ColoredBlockCompat): Boolean = isWool(color.metaColor)
+        fun IBlockState.isStainedClay(color: ColoredBlockCompat): Boolean = isStainedClay(color.metaColor)
 
         /**
          * No metadata means any stained-glass
          */
-        fun Block.isStainedGlass(meta: Int? = null): Boolean {
+        fun IBlockState.isStainedGlass(meta: Int? = null): Boolean {
             //#if MC < 1.16
-            if (this != Blocks.stained_glass) return false
+            if (this.block != Blocks.stained_glass) return false
             meta ?: return true
-            return defaultState.getValue(BlockStainedGlass.COLOR).metadata == meta
+            return getValue(BlockStainedGlass.COLOR).metadata == meta
             //#else
-            //$$ return entries.any { (meta == null || it.metaColor == meta) && this == it.glassBlock }
+            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this.block == it.glassBlock }
             //#endif
         }
 
         /**
          * No metadata means any stained-glass pane
          */
-        fun Block.isStainedGlassPane(meta: Int? = null): Boolean {
+        fun IBlockState.isStainedGlassPane(meta: Int? = null): Boolean {
             //#if MC < 1.16
-            if (this != Blocks.stained_glass_pane) return false
+            if (this.block != Blocks.stained_glass_pane) return false
             meta ?: return true
-            return defaultState.getValue(BlockStainedGlass.COLOR).metadata == meta
+            return getValue(BlockStainedGlass.COLOR).metadata == meta
             //#else
-            //$$ return entries.any { (meta == null || it.metaColor == meta) && this == it.glassPaneBlock }
+            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this.block == it.glassPaneBlock }
             //#endif
         }
 
         /**
          * No metadata means any wool
          */
-        fun Block.isWool(meta: Int? = null): Boolean {
+        fun IBlockState.isWool(meta: Int? = null): Boolean {
             //#if MC < 1.16
-            if (this != Blocks.wool) return false
+            if (this.block != Blocks.wool) return false
             meta ?: return true
-            return defaultState.getValue(BlockStainedGlass.COLOR).metadata == meta
+            return getValue(BlockStainedGlass.COLOR).metadata == meta
             //#else
-            //$$ return entries.any { (meta == null || it.metaColor == meta) && this == it.woolBlock }
+            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this.block == it.woolBlock }
             //#endif
         }
 
         /**
          * No metadata means any stained clay
          */
-        fun Block.isStainedClay(meta: Int? = null): Boolean {
+        fun IBlockState.isStainedClay(meta: Int? = null): Boolean {
             //#if MC < 1.16
-            if (this != Blocks.stained_hardened_clay) return false
+            if (this.block != Blocks.stained_hardened_clay) return false
             meta ?: return true
-            return defaultState.getValue(BlockStainedGlass.COLOR).metadata == meta
+            return getValue(BlockStainedGlass.COLOR).metadata == meta
             //#else
-            //$$ return entries.any { (meta == null || it.metaColor == meta) && this == it.clayBlock }
+            //$$ return ColoredBlockCompat.entries.any { (meta == null || it.metaColor == meta) && this.block == it.clayBlock }
             //#endif
         }
 

@@ -27,8 +27,11 @@ import kotlin.jvm.optionals.getOrNull
 object ComponentUtils {
     fun convertToComponents(stack: ItemStack, nbtInfo: NeuNbtInfoJson?) {
         nbtInfo ?: return
-        if (nbtInfo.extraAttributes != null) {
-            val extraAttributes = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, nbtInfo.extraAttributes).asCompound().get()
+        nbtInfo.extraAttributes?.let { extraJson ->
+            val extraAttributes = JsonOps.INSTANCE
+                .convertTo(NbtOps.INSTANCE, extraJson)
+                .asCompound()
+                .get()
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(extraAttributes))
         }
         if (nbtInfo.enchantments?.isNotEmpty() == true) {
@@ -100,7 +103,11 @@ object ComponentUtils {
     }
 
     fun convertMinecraftIdToModern(id: String, damage: Int): String {
-        return "minecraft:" + convertMinecraftIdToModern2(id, damage)
+        val convertMinecraftIdToModern2 = convertMinecraftIdToModern2(id, damage)
+        if (convertMinecraftIdToModern2 == id && damage > 0) {
+            println("Unconverted minecraft id with damage above 0. id: $id damage: $damage")
+        }
+        return "minecraft:" + convertMinecraftIdToModern2
     }
 
     private fun convertMinecraftIdToModern2(id: String, damage: Int): String {
@@ -237,6 +244,7 @@ object ComponentUtils {
                 else -> strippedId
             }
 
+            strippedId == "snow" -> "snow_block"
             strippedId == "snow_layer" -> "snow"
             strippedId == "wooden_slab" -> getWood(damage) + "_slab"
             strippedId == "stone_slab2" -> "red_sandstone_slab"
@@ -253,6 +261,8 @@ object ComponentUtils {
                 0 -> "infested_stone"
                 else -> strippedId
             }
+
+            strippedId == "sand" && damage == 1 -> "red_sand"
 
             else -> strippedId
         }

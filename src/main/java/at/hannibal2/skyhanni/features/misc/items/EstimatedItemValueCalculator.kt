@@ -681,9 +681,7 @@ object EstimatedItemValueCalculator {
 
     private fun addBoosters(stack: ItemStack, list: MutableList<String>): Double {
         val boosters = stack.readBoosters()
-        if (boosters.isEmpty()) {
-            return 0.0
-        }
+        if (boosters.isEmpty()) return 0.0
 
         val (totalPrice, names) = getTotalAndNames(boosters)
 
@@ -944,7 +942,7 @@ object EstimatedItemValueCalculator {
             // Do not error out on items if their data was changed.
             if (getLore().any { it.contains("This item has unused Gemstones!") }) return null
             ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for $displayName",
+                "Could not find gemstone slot price for ${this.displayName}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,

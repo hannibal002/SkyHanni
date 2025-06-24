@@ -9,8 +9,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 
 // scoreboard
 // scoreboard update event
-object
-ScoreboardEventGalatea : ScoreboardEvent() {
+object ScoreboardEventGalatea : ScoreboardEvent() {
 
     override fun getDisplay() = buildList {
         ScoreboardPattern.whispersPattern.firstMatches(getSBLines())?.let { add(it) }

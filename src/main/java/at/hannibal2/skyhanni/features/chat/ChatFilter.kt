@@ -49,7 +49,7 @@ object ChatFilter {
         "§b✦ §r§7You earned §r§b\\d+ §r§7Mystery Dust!".toPattern(),
 
         // pet consumables
-        "§b✦ §r§7You earned §r§a\\d+ §r§7Pet Consumables?!".toPattern(),
+        "§b§b✦ §r§7You earned §a\\d+ §7Pet Consumables items!".toPattern(),
     )
 
     private val lobbyMessages = listOf(
@@ -222,6 +222,7 @@ object ChatFilter {
         "§cYou currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!".toPattern(),
     )
 
+    // TODO update patterns for 1.21
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
         "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
