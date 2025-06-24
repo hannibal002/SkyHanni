@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
+import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -17,7 +18,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.Vec3
@@ -319,7 +319,7 @@ object GuiRenderUtils {
         rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
-        val isSkull = rescaleSkulls && item.item === Items.skull
+        val isSkull = rescaleSkulls && item.isSkull()
 
         val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()

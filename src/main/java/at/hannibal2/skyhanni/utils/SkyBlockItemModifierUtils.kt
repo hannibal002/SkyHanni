@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -74,7 +75,7 @@ object SkyBlockItemModifierUtils {
     @KSerializable
     data class PetInfo(
         @Expose val type: String,
-        @Expose val active: Boolean,
+        @Expose val active: Boolean? = null,
         @Expose val exp: Double,
         @Expose val tier: LorenzRarity,
         @Expose val hideInfo: Boolean = false,
@@ -136,8 +137,24 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    fun ItemStack.getPetInfo(): PetInfo? =
-        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), PetInfo::class.java)
+    fun ItemStack.getPetInfo(): PetInfo? {
+        val petInfoJson = getExtraAttributes()?.takeIf {
+            it.hasKey("petInfo")
+        }?.getString("petInfo")?.takeIf {
+            it.isNotEmpty()
+        } ?: return null
+
+        try {
+            return ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
+        } catch (e: Exception) {
+            ErrorManager.skyHanniError(
+                "Failed to parse pet info for item: ${displayName.removeColor()}",
+                "exception" to e.message,
+                "extraAttributes" to extraAttributes.toString(),
+                "petInfoJson" to petInfoJson,
+            )
+        }
+    }
 
     fun ItemStack.getPetLevel(): Int = getPetInfo()?.let(PetUtils::xpToLevel) ?: 1
 

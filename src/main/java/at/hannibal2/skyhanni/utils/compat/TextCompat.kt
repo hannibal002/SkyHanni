@@ -28,6 +28,7 @@ import net.minecraft.util.ChatComponentText
 //#if MC > 1.16
 //$$ private val unformattedTextCache = java.util.WeakHashMap<Component, String>()
 //$$ private val formattedTextCache = java.util.WeakHashMap<Component, String>()
+//$$ private val formattedTextCacheLessResets = java.util.WeakHashMap<Component, String>()
 //#endif
 
 fun IChatComponent.unformattedTextForChatCompat(): String {
@@ -68,8 +69,13 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, removeSt
 //#else
 //$$ run {
 //$$     this ?: return@run ""
+//$$     if (noExtraResets) {
+//$$         return@run formattedTextCacheLessResets.getOrPut(this) {
+//$$             computeFormattedTextCompat(true, removeStartingWhiteColorCode)
+//$$         }
+//$$     }
 //$$     formattedTextCache.getOrPut(this) {
-//$$         computeFormattedTextCompat(noExtraResets, removeStartingWhiteColorCode)
+//$$         computeFormattedTextCompat(false, removeStartingWhiteColorCode)
 //$$     }
 //$$ }
 //$$
