@@ -33,7 +33,7 @@ object ModifyVisualWords {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords
-        (Minecraft.getMinecraft().ingameGUI.chatGUI as Any as AccessorMixinGuiNewChat).refreshChat()
+        (Minecraft.getMinecraft().ingameGUI.chatGUI as Any as AccessorMixinGuiNewChat).refreshChat_skyhanni()
     }
 
     @HandleEvent

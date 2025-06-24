@@ -27,5 +27,5 @@ public interface AccessorMixinGuiNewChat {
     int getScrollPos_skyhanni();
 
     @Invoker("refreshChat")
-    void refreshChat();
+    void refreshChat_skyhanni();
 }
