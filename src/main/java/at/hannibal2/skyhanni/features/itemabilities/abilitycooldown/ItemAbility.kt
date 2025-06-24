@@ -136,7 +136,7 @@ enum class ItemAbility(
         }
 
         fun getAllAbilityScrolls(itemStack: ItemStack?): Set<ItemAbility> =
-            itemStack?.getAbilityScrolls()?.takeIfNotEmpty()?.getAllAbilityScrolls() ?: emptySet()
+            itemStack?.getAbilityScrolls()?.takeIfNotEmpty()?.getAllAbilityScrolls().orEmpty()
 
         private fun List<NeuInternalName>.getAllAbilityScrolls(): Set<ItemAbility> = WITHER_SCROLLS
             .filter { ability -> ability.internalNames.any { it in this } }
