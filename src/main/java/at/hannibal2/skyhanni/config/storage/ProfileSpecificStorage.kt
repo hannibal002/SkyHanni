@@ -881,4 +881,7 @@ class ProfileSpecificStorage(
         @Expose var cakesEaten: Int? = -1,
         @Expose var soulsFound: Int = 0,
     )
+
+    @Expose
+    var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
 }
