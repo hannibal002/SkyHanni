@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
 
@@ -33,7 +34,10 @@ object ModifyVisualWords {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords
-        (Minecraft.getMinecraft().ingameGUI.chatGUI as Any as AccessorMixinGuiNewChat).refreshChat()
+
+        // We do not refresh chat on 1.8
+        if (PlatformUtils.IS_LEGACY) return
+        (Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorMixinGuiNewChat).refreshChat()
     }
 
     @HandleEvent
