@@ -26,23 +26,23 @@ class GuiConfig {
     @Expose
     @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
     @Accordion
-    var compactTabList: CompactTabListConfig = CompactTabListConfig()
+    val compactTabList: CompactTabListConfig = CompactTabListConfig()
 
     @Expose
     @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
-    var customScoreboard: CustomScoreboardConfig = CustomScoreboardConfig()
+    val customScoreboard: CustomScoreboardConfig = CustomScoreboardConfig()
 
     @Expose
     @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
     @Accordion
-    var chroma: ChromaConfig = ChromaConfig()
+    val chroma: ChromaConfig = ChromaConfig()
 
     @ConfigOption(
         name = "Edit GUI Locations",
         desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays."
     )
     @ConfigEditorButton(buttonText = "Edit")
-    var positions: Runnable = Runnable { openGuiPositionEditor(true) }
+    val positions: Runnable = Runnable { openGuiPositionEditor(true) }
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
@@ -63,17 +63,17 @@ class GuiConfig {
     @Expose
     @ConfigOption(name = "Discord Rich Presence", desc = "")
     @Accordion
-    var discordRPC: DiscordRPCConfig = DiscordRPCConfig()
+    val discordRPC: DiscordRPCConfig = DiscordRPCConfig()
 
     @Expose
     @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar.")
     @Accordion
-    var hotbar: HotbarConfig = HotbarConfig()
+    val hotbar: HotbarConfig = HotbarConfig()
 
     @Expose
     @ConfigOption(name = "XP Bar", desc = "Settings for adjusting the XP bar.")
     @Accordion
-    var xpBar: XPBarConfig = XPBarConfig()
+    val xpBar: XPBarConfig = XPBarConfig()
 
     @Expose
     @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.")
@@ -83,27 +83,27 @@ class GuiConfig {
     @Expose
     @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
     @Accordion
-    var markedPlayers: MarkedPlayerConfig = MarkedPlayerConfig()
+    val markedPlayers: MarkedPlayerConfig = MarkedPlayerConfig()
 
     @Expose
     @ConfigOption(name = "Modify Visual Words", desc = "")
     @Accordion
-    var modifyWords: ModifyWordsConfig = ModifyWordsConfig()
+    val modifyWords: ModifyWordsConfig = ModifyWordsConfig()
 
     @Expose
     @ConfigOption(name = "Custom Text Box", desc = "")
     @Accordion
-    var customTextBox: TextBoxConfig = TextBoxConfig()
+    val customTextBox: TextBoxConfig = TextBoxConfig()
 
     @Expose
     @ConfigOption(name = "Tab Widget", desc = "")
     @Accordion
-    var tabWidget: TabWidgetConfig = TabWidgetConfig()
+    val tabWidget: TabWidgetConfig = TabWidgetConfig()
 
     @Expose
     @ConfigOption(name = "In-Game Date", desc = "")
     @Accordion
-    var inGameDate: InGameDateConfig = InGameDateConfig()
+    val inGameDate: InGameDateConfig = InGameDateConfig()
 
     @Expose
     @ConfigOption(name = "Beacon Power", desc = "Display the current beacon power duration and what stat is boosted.")
@@ -118,7 +118,7 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "beaconPower")
-    var beaconPowerPosition: Position = Position(10, 10)
+    val beaconPowerPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(
@@ -144,11 +144,11 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "realTime")
-    var realTimePosition: Position = Position(10, 10)
+    val realTimePosition: Position = Position(10, 10)
 
     @Expose
     @Category(name = "Cosmetic", desc = "Cosmetics Settings")
-    var cosmetic: CosmeticConfig = CosmeticConfig()
+    val cosmetic: CosmeticConfig = CosmeticConfig()
 
     @Expose
     @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")
@@ -158,7 +158,7 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "tpsDisplay")
-    var tpsDisplayPosition: Position = Position(10, 10)
+    val tpsDisplayPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
@@ -172,8 +172,8 @@ class GuiConfig {
     val widenConfig: Property<Boolean> = Property.of(false)
 
     @Expose
-    var titlePosition: Position = Position(0, 160)
+    val titlePosition: Position = Position(0, 160)
 
     @Expose
-    var titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
+    val titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
 }

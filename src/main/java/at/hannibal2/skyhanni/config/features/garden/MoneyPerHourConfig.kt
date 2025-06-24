@@ -63,7 +63,7 @@ class MoneyPerHourConfig {
     @Expose
     @ConfigOption(name = "Custom Format", desc = "Set what prices to show")
     @ConfigEditorDraggableList(requireNonEmpty = true)
-    var customFormat: MutableList<CustomFormatEntry> = mutableListOf(
+    val customFormat: MutableList<CustomFormatEntry> = mutableListOf(
         CustomFormatEntry.SELL_OFFER,
         CustomFormatEntry.INSTANT_SELL,
         CustomFormatEntry.NPC_PRICE
@@ -115,7 +115,8 @@ class MoneyPerHourConfig {
     @ConfigEditorBoolean
     var hideTitle: Boolean = false
 
+    // Todo rename to position
     @Expose
     @ConfigLink(owner = MoneyPerHourConfig::class, field = "display")
-    var pos: Position = Position(-330, 170)
+    val pos: Position = Position(-330, 170)
 }

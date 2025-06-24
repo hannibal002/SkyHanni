@@ -65,7 +65,7 @@ class PestFinderConfig {
 
     @Expose
     @ConfigLink(owner = PestFinderConfig::class, field = "showDisplay")
-    var position: Position = Position(-350, 200, 1.3f)
+    val position: Position = Position(-350, 200, 1.3f)
 
     @Expose
     @ConfigOption(

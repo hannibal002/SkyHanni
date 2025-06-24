@@ -53,5 +53,5 @@ class CrownOfAvariceConfig {
 
     @Expose
     @ConfigLink(owner = CrownOfAvariceConfig::class, field = "enable")
-    var position: Position = Position(20, 20)
+    val position: Position = Position(20, 20)
 }
