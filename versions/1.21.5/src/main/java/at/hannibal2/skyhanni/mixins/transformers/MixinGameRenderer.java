@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent;
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
@@ -28,5 +30,10 @@ public class MixinGameRenderer {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V"))
     private void onRenderTail(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext context) {
         GuiEditManager.renderLast(context);
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderWithTooltip(Lnet/minecraft/client/gui/DrawContext;IIF)V"))
+    private void onRenderTooltip(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext context) {
+         new ScreenDrawnEvent(context, MinecraftClient.getInstance().currentScreen).post();
     }
 }
