@@ -9,6 +9,8 @@ net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawCont
 
 net.minecraft.client.gui.hud.ChatHudLine getContent() getChatComponent()
 
+net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
+
 net.minecraft.client.gui.screen.ingame.SignEditScreen blockEntity sign
 
 net.minecraft.client.gui.widget.Widget net.minecraft.client.gui.Drawable

@@ -47,6 +47,7 @@ enum class TabWidgetDisplay(
         TabWidget.FAIRY_SOULS,
     ),
     EYES("Eyes placed", TabWidget.EYES_PLACED),
+    MOONGLADE_BEACON("Moonglade Beacon", TabWidget.MOONGLADE_BEACON),
     ;
 
     val position get() = config.displayPositions[ordinal]
