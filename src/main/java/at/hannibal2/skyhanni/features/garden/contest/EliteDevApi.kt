@@ -75,7 +75,7 @@ object EliteDevApi {
         val body = ConfigManager.gson.toJson(
             contests.associate { contest ->
                 contest.startTime.toMillis() / 1000 to contest.crops.map { crop -> crop.cropName }
-            }
+            },
         )
         val success = ApiUtils.postJSONIsSuccessful(CONTEST_API_URL, body, apiName = API_NAME)
 

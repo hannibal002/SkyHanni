@@ -141,13 +141,12 @@ object GardenNextJacobContest {
             add("Display: '$display'")
             add("")
 
-            val nextContest = nextContest
-            if (nextContest != null) {
+            nextContest?.let { contest ->
                 add("Next Contest:")
-                add("  End Time: ${nextContest.endTime}")
-                add("  Crops: ${nextContest.crops.joinToString(", ") { it.cropName }}")
-                add("  Boosted Crop: ${nextContest.boostedCrop?.cropName ?: "None"}")
-            } else {
+                add("  End Time: ${contest.endTime}")
+                add("  Crops: ${contest.crops.joinToString(", ") { it.cropName }}")
+                add("  Boosted Crop: ${contest.boostedCrop?.cropName ?: "None"}")
+            } ?: run {
                 add("No upcoming contest found.")
             }
             add("")
@@ -214,7 +213,7 @@ object GardenNextJacobContest {
         if (!isEnabled() || !calendarDetector.isInside()) return
         val (monthGroup, yearGroup) = monthPattern.matchGroups(
             event.inventoryName,
-            "month", "year"
+            "month", "year",
         ) ?: return
         val month = monthGroup?.let(SkyBlockTime::getSBMonthByName) ?: return
         val year = yearGroup?.toIntOrNull() ?: return
@@ -371,10 +370,12 @@ object GardenNextJacobContest {
             untilEnd > (SkyBlockTime.SKYBLOCK_DAY_MILLIS * 4).milliseconds -> {
                 return addString(CLOSE_TO_NEW_YEAR_TEXT)
             }
+
             activeContest -> {
                 addString("§aActive: ")
                 untilEnd
             }
+
             else -> {
                 addString("§eNext: ")
                 warn(contest.startTime.timeUntil(), contest.crops, contest.boostedCrop)
@@ -415,7 +416,7 @@ object GardenNextJacobContest {
             SkyHanniMod.coroutineScope.launch {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
-                    message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>"
+                    message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
                 )
             }
         }
