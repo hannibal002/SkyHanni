@@ -51,6 +51,10 @@ public class MiscConfig {
     @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
     public AreaNavigationConfig areaNavigation = new AreaNavigationConfig();
 
+    @Expose
+    @Category(name = "Pathfinding", desc = "General settings for Pathfinding in different features.")
+    public PathfindConfig pathfinding = new PathfindConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
