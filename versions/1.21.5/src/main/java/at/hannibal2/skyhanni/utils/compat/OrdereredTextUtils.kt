@@ -94,17 +94,17 @@ object OrderedTextUtils {
         return OrderedText { visitor ->
             var lastStyle = Style.EMPTY
             val str = legacyString ?: ""
-            var i = 0
-            while (i < str.length) {
-                val c = str[i]
-                if (c == '§' && i + 1 < str.length) {
-                    val code = str[i + 1]
-                    if (code == '#' && i + 7 < str.length) {
-                        val hexPart = str.substring(i + 2, i + 8)
+            var index = 0
+            while (index < str.length) {
+                val char = str[index]
+                if (char == '§' && index + 1 < str.length) {
+                    val code = str[index + 1]
+                    if (code == '#' && index + 7 < str.length) {
+                        val hexPart = str.substring(index + 2, index + 8)
                         val rgb = hexPart.toIntOrNull(16)
                         if (rgb != null) {
-                            lastStyle = lastStyle.withColor(TextColor.fromRgb(rgb))
-                            i += 8  // §#RRGGBB
+                            lastStyle = lastStyle.withColor(rgb)
+                            index += 8  // §#RRGGBB
                             continue
                         }
                     }
@@ -114,10 +114,10 @@ object OrderedTextUtils {
                     } else if (code == 'z') {
                         lastStyle = lastStyle.withColor(CHROMA_COLOR)
                     }
-                    i += 2
+                    index += 2
                 } else {
-                    visitor.accept(0, lastStyle, c.code)
-                    i += 1
+                    visitor.accept(0, lastStyle, char.code)
+                    index += 1
                 }
             }
             true
