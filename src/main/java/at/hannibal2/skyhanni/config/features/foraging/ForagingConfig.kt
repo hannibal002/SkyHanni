@@ -49,7 +49,7 @@ class ForagingConfig {
     var birriesHighlight = BirriesHighlightConfig()
 
     @Expose
-    @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen")
+    @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
     @ConfigEditorBoolean
     var lassoDisplay = true
 
