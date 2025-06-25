@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -124,6 +125,15 @@ object GardenNextJacobContest {
         " ?(?:§.)*(?:○|(?<boosted>☘)) (?:§.)*(?<crop>.*)",
     )
 
+    /**
+     * REGEX-TEST: §e§lJacob's Contest: §r§a19m left
+     * REGEX-TEST: §e§lJacob's Contest: §r§a8m left
+     */
+    private val timeLeftPattern by patternGroup.pattern(
+        "time-left",
+        "(?:§.)+Jacob's Contest: (?:§.)+(?<timeleft>\\d+[smh]+) left"
+    )
+
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
@@ -189,9 +199,11 @@ object GardenNextJacobContest {
 
     private fun WidgetUpdateEvent.tryUpdateBoostedCrop() {
         nextContest ?: return
+        val firstLine = lines.firstOrNull() ?: return
+        if (timeLeftPattern.matches(firstLine)) return
         cropPattern.matchAll(lines) {
             if (groupOrNull("boosted") == null) return@matchAll
-            val cropType = CropType.getByName(groupOrNull("crop") ?: return@matchAll)
+            val cropType = CropType.getByNameOrNull(groupOrNull("crop") ?: return@matchAll)
             nextContest?.boostedCrop = cropType
         }
     }
