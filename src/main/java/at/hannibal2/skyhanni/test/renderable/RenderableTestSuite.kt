@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,8 +23,8 @@ object RenderableTestSuite {
 
     private val active = mutableSetOf<TestRenderable>()
 
-    @HandleEvent
-    fun onGuiRender(event: GuiRenderEvent.GuiOnTopRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
+    fun onGuiRender() {
         for (test in active) {
             test.position.renderRenderable(test.finalRenderable, posLabel = "Renderable Test: $test")
         }
@@ -31,30 +32,26 @@ object RenderableTestSuite {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shrenderable") {
+        event.registerBrigadier("shrenderable") {
             category = CommandCategory.DEVELOPER_DEBUG
-            callback {
-                val input = it.joinToString(" ")
+            description = "Used for testing specific gui element primitives."
+            argCallback("test", BrigadierArguments.greedyString(), register.keys) {input ->
                 if (input.isBlank()) {
                     ChatUtils.userError("No Argument provided")
                 }
                 val test = register[input]
                 if (test == null) {
                     ChatUtils.userError("Unknown Test '$input'")
-                    return@callback
+                    return@argCallback
                 }
                 if (active.contains(test)) {
                     ChatUtils.chat("Renderable Test '$input' is now §cdisabled§e.")
                     active.remove(test)
-                    return@callback
+                    return@argCallback
                 }
                 ChatUtils.chat("Renderable Test '$input' is now §aactive§e.")
                 active.add(test)
-                return@callback
-            }
-            autoComplete { args ->
-                val input = args.joinToString(" ")
-                register.keys.filter { it.startsWith(input) }
+                return@argCallback
             }
         }
     }
