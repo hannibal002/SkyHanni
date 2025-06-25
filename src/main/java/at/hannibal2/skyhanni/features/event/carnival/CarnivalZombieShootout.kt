@@ -40,7 +40,7 @@ import kotlin.time.DurationUnit
 //#if MC > 1.21
 //$$ import net.minecraft.state.property.Properties
 //#endif
-  
+
 @SkyHanniModule
 object CarnivalZombieShootout {
 
