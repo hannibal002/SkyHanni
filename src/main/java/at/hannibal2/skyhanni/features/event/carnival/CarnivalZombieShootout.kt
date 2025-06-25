@@ -35,6 +35,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 //#if MC > 1.21
@@ -90,15 +91,14 @@ object CarnivalZombieShootout {
 
             for ((zombie, time) in zombieTimes) {
                 val lifetime = zombie.type.lifetime
-                val exceeded = time.passedSince() >= lifetime
+                val timer = lifetime - time.passedSince()
 
                 if (config.highestOnly && zombie.type != maxType) continue
 
-                if (!exceeded) {
+                if (timer > 0.seconds) {
                     val entity = EntityUtils.getEntityByID(zombie.entity.entityId) ?: continue
                     val isSmall = (entity as? EntityZombie)?.isChild ?: false
 
-                    val timer = lifetime - time.passedSince()
                     val skips = lifetime / 3
                     val prefix = determinePrefix(timer, lifetime, lifetime - skips, lifetime - skips * 2)
                     val height = if (isSmall) entity.height / 2 else entity.height
@@ -109,7 +109,9 @@ object CarnivalZombieShootout {
                         1.25,
                     )
                 } else {
-                    zombiesToRemove.add(zombie)
+                    if (timer < 500.milliseconds) {
+                        zombiesToRemove.add(zombie)
+                    }
                 }
             }
 
