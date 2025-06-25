@@ -23,7 +23,7 @@ object BlockCompat {
         //#endif
     }
 
-    fun getAllLeaves(): List<Block>  = buildList { addLeaves() }
+    fun getAllLeaves(): List<Block> = buildList { addLeaves() }
 }
 
 fun MutableList<Block>.addLeaves() {

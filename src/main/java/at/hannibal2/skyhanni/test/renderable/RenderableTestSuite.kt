@@ -35,7 +35,7 @@ object RenderableTestSuite {
         event.registerBrigadier("shrenderable") {
             category = CommandCategory.DEVELOPER_DEBUG
             description = "Used for testing specific gui element primitives."
-            argCallback("test", BrigadierArguments.greedyString(), register.keys) {input ->
+            argCallback("test", BrigadierArguments.greedyString(), register.keys) { input ->
                 if (input.isBlank()) {
                     ChatUtils.userError("No Argument provided")
                 }
