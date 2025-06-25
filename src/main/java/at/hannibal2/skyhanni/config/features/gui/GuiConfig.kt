@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
@@ -170,6 +171,13 @@ class GuiConfig {
     @ConfigOption(name = "Widen Config", desc = "Make SkyHanni's config window wider. (~1.5x)")
     @ConfigEditorBoolean
     val widenConfig: Property<Boolean> = Property.of(false)
+
+    @Expose
+    @ConfigOption(name = "Hide Status Effects", desc = "Hide the status effect displays at top right of the screen and in inventory.")
+    @OnlyModern
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideStatusEffects: Boolean = true
 
     @Expose
     val titlePosition: Position = Position(0, 160)
