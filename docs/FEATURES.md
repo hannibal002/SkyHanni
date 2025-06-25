@@ -1009,17 +1009,25 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Despawn timer below every chest, and as GUI display.
     + Chests color-coded to show despawn timer.
 + Added option to mute High Heat Sound in Magma Fields. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2573)
++ Added Current Powder line on HOTM perk hover. - munkuk (https://github.com/hannibal002/SkyHanni/pull/3956)
 
 </details>
 <details open><summary>
 
 ## Foraging
 
+</summary>
+
 + Added Foraging Quest Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4130)
     + Shows paths to useful locations for unlocking the 1.21 Foraging island.
 + Added Moonglade Beacon Ready Alert. - nopo (https://github.com/hannibal002/SkyHanni/pull/4135)
 + Added Moonglade Beacon Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4135)
 + Highlight the small Birries in Galatea. - nopo (https://github.com/hannibal002/SkyHanni/pull/4137)
++ Added Heart Of The Forest features. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4040)
+    + Show Perk Levels and Enabled Perks in the menu.
+
+</details>
+<details open><summary>
 
 ## Events
 
@@ -1621,6 +1629,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Clickable chat option shows on new update or first join with new version.
     + Works with `/shchangelog <old version> <new version>`.
 + Added support for Fabric 1.21.5. - nopo and CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4038)
++ Added Ex Co-op Member Hider. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3795)
+    + Hides Ex Co-op Members from Collections.
 
 </details>
 <details open><summary>
