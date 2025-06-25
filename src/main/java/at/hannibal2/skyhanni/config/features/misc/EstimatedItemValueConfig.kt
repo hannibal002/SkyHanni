@@ -89,16 +89,6 @@ class EstimatedItemValueConfig {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Use Attribute Price",
-        desc = "Show composite price for attributes instead of lowest bin. " +
-            "This will drastically decrease the estimated value but might be correct when " +
-            "buying multiple low tier items and combining them."
-    )
-    @ConfigEditorBoolean
-    val useAttributeComposite: Property<Boolean> = Property.of(false)
-
-    @Expose
     @ConfigLink(owner = EstimatedItemValueConfig::class, field = "enabled")
     val position: Position = Position(140, 90)
 }

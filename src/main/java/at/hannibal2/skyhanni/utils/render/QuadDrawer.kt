@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.pos
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -41,8 +40,7 @@ class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator
             GlStateManager.disableCull()
 
             GlStateManager.pushMatrix()
-            WorldRenderUtils.translate(RenderUtils.getViewerPos(event.partialTicks).negated())
-            RenderUtils.getViewerPos(event.partialTicks)
+            WorldRenderUtils.translate(WorldRenderUtils.getViewerPos(event.partialTicks).negated())
 
             quads.invoke(QuadDrawer(Tessellator.getInstance()))
 
