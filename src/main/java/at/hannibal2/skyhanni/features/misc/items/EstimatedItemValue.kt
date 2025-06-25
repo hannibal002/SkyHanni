@@ -189,7 +189,6 @@ object EstimatedItemValue {
                 ignoreArmorDyes,
                 ignoreRunes,
                 priceSource,
-                useAttributeComposite,
             ) {
                 cache.clear()
             }

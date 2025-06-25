@@ -43,8 +43,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
@@ -365,7 +365,7 @@ object HoppityLiveDisplay {
                 val isEmpty = renderableList.isEmpty() || renderableList.all { it.isEmpty() }
 
                 if (isEmpty) buildEmptyFallback(isCurrentEvent).map {
-                    RenderableString(it.string)
+                    StringRenderable(it.string)
                 } else renderableList
             },
     )
@@ -375,7 +375,7 @@ object HoppityLiveDisplay {
         statYear: Int,
     ): MutableList<Renderable> = map { (stat, statStrings) ->
         val baseRenderable = VerticalContainerRenderable(
-            statStrings.map { RenderableString(it.string) },
+            statStrings.map { StringRenderable(it.string) },
         )
         renderableOverridesOperationList[stat]?.invoke(
             RenderableOverrideOperation(
@@ -387,7 +387,7 @@ object HoppityLiveDisplay {
         ) ?: baseRenderable
     }.toMutableList()
 
-    private fun Renderable.isEmpty(): Boolean = this is RenderableString && text.trim().isEmpty() ||
+    private fun Renderable.isEmpty(): Boolean = this is StringRenderable && text.trim().isEmpty() ||
         this is ContainerRenderable && renderables.all { it.isEmpty() }
 
     private fun MutableList<Renderable>.tryAddYearSwitchers(statYear: Int) {

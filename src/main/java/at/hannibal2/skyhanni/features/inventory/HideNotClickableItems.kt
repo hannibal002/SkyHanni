@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -119,7 +120,9 @@ object HideNotClickableItems {
             if (hide(chestName, stack)) {
                 slot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
             } else if (showGreenLine && config.itemsGreenLine) {
-                slot.drawBorder(LorenzColor.GREEN.addOpacity(200))
+                if (stack.isNotEmpty()) {
+                    slot.drawBorder(LorenzColor.GREEN.addOpacity(200))
+                }
             }
         }
     }
@@ -565,6 +568,7 @@ object HideNotClickableItems {
                 chestName == "Create BIN Auction" || chestName == "Create Auction"
         if (!bazaarInventory && !auctionHouseInventory) return false
         showGreenLine = true
+
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             if (bazaarInventory) hideReason = "The SkyBlock Menu is not a Bazaar Product!"
