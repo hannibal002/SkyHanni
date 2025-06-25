@@ -95,9 +95,9 @@ object ForagingTracker {
             StringRenderable("§e$baseFormat ${treesContributedTo.addSeparators()}"),
             tips = bucketData.treesCut.mapNotNull { (treeType, count) ->
                 if (count <= 0) return@mapNotNull null
-                "$treeType Trees contributed to: §a${count.addSeparators()}"
+                "$treeType Tree contributions: §a${count.addSeparators()}"
             }
-        ).toSearchable("total trees felled")
+        ).toSearchable("trees felled")
         add(totalRenderable)
 
 
