@@ -16,14 +16,15 @@ import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
+import net.minecraft.entity.Entity
 
 @SkyHanniModule
 object HideArmor {
 
-    private val config get() = SkyHanniMod.feature.misc.hideArmor2
+    val config get() = SkyHanniMod.feature.misc.hideArmor2
     private var armor = mapOf<Int, ItemStack>()
 
-    private fun shouldHideArmor(entity: EntityPlayer): Boolean {
+    fun shouldHideArmor(entity: EntityPlayer): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
         if (entity is FakePlayer) return false
         if (entity.hasPotionEffect(EffectsCompat.INVISIBILITY)) return false
@@ -73,5 +74,19 @@ object HideArmor {
         event.transform(15, "misc.hideArmor2.mode") { element ->
             ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)
         }
+    }
+
+    private val CURRENT_RENDERED_ENTITY: ThreadLocal<Entity> = ThreadLocal<Entity>()
+
+    fun set(entity: Entity) {
+        CURRENT_RENDERED_ENTITY.set(entity)
+    }
+
+    fun get(): Entity {
+        return CURRENT_RENDERED_ENTITY.get()
+    }
+
+    fun clear() {
+        CURRENT_RENDERED_ENTITY.remove()
     }
 }
