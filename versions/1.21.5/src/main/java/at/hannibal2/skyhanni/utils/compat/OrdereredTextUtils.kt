@@ -93,24 +93,31 @@ object OrderedTextUtils {
 
         return OrderedText { visitor ->
             var lastStyle = Style.EMPTY
-            var wasLastStyle = false
-
-            for (char in legacyString ?: "") {
-
-                if (char == '§') {
-                    wasLastStyle = true
-                } else if (wasLastStyle) {
-
-                    val formatting = Formatting.byCode(char)
+            val str = legacyString ?: ""
+            var i = 0
+            while (i < str.length) {
+                val c = str[i]
+                if (c == '§' && i + 1 < str.length) {
+                    val code = str[i + 1]
+                    if (code == '#' && i + 7 < str.length) {
+                        val hexPart = str.substring(i + 2, i + 8)
+                        val rgb = hexPart.toIntOrNull(16)
+                        if (rgb != null) {
+                            lastStyle = lastStyle.withColor(TextColor.fromRgb(rgb))
+                            i += 8  // §#RRGGBB
+                            continue
+                        }
+                    }
+                    val formatting = Formatting.byCode(code)
                     if (formatting != null) {
                         lastStyle = lastStyle.withExclusiveFormatting(formatting)
-                    } else if (char == 'z') {
+                    } else if (code == 'z') {
                         lastStyle = lastStyle.withColor(CHROMA_COLOR)
                     }
-
-                    wasLastStyle = false
+                    i += 2
                 } else {
-                    visitor.accept(0, lastStyle, char.code)
+                    visitor.accept(0, lastStyle, c.code)
+                    i += 1
                 }
             }
             true
@@ -138,6 +145,9 @@ object OrderedTextUtils {
             } else {
                 to.color?.toChatFormatting()?.let {
                     sb.append(it.toString())
+                } ?: run {
+                    sb.append("§")
+                    sb.append(to.color?.hexCode)
                 }
             }
         } else if (reset) {
