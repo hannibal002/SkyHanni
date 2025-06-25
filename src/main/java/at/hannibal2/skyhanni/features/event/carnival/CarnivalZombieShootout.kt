@@ -110,7 +110,7 @@ object CarnivalZombieShootout {
                         scaleMultiplier = 1.25,
                     )
                 } else {
-                    if (timer < 500.milliseconds) {
+                    if (timer > (-500).milliseconds) {
                         zombiesToRemove.add(zombie)
                     }
                 }
