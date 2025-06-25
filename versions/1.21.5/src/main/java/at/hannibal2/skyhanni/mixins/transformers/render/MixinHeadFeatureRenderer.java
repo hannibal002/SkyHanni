@@ -16,18 +16,18 @@ import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 @Mixin(HeadFeatureRenderer.class)
 public class MixinHeadFeatureRenderer {
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
-     private void onRenderArmor(
-         MatrixStack matrixStack,
-         VertexConsumerProvider vertexConsumerProvider,
-         int light,
-         LivingEntityRenderState renderState,
-         float f,
-         float g,
-         CallbackInfo ci
-     ) {
-         Entity current = HideArmor.INSTANCE.get();
-         if (current instanceof PlayerEntity && HideArmor.INSTANCE.shouldHideArmor(((PlayerEntity) current))) {
-             ci.cancel();
-         }
-     }
- }
+    private void onRenderArmor(
+        MatrixStack matrixStack,
+        VertexConsumerProvider vertexConsumerProvider,
+        int light,
+        LivingEntityRenderState renderState,
+        float f,
+        float g,
+        CallbackInfo ci
+    ) {
+        Entity current = HideArmor.INSTANCE.get();
+        if (current instanceof PlayerEntity && HideArmor.INSTANCE.shouldHideArmor(((PlayerEntity) current))) {
+            ci.cancel();
+        }
+    }
+}
