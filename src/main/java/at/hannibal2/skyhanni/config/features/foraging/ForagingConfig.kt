@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.config.features.foraging
 
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 /**
@@ -44,5 +47,14 @@ class ForagingConfig {
     @OnlyModern
     @Accordion
     var birriesHighlight = BirriesHighlightConfig()
+
+    @Expose
+    @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen")
+    @ConfigEditorBoolean
+    var lassoDisplay = true
+
+    @Expose
+    @ConfigLink(owner = ForagingConfig::class, field = "lassoDisplay")
+    val lassoDisplayPosition: Position = Position(380, 210)
 
 }
