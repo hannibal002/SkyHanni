@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.foraging
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -51,6 +52,7 @@ class ForagingConfig {
     @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var lassoDisplay = true
 
     @Expose
