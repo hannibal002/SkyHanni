@@ -261,6 +261,7 @@ object ForagingTracker {
                     it.forestWhispers.addOrPut(treeType, amount.toLong())
                 }
                 else -> NeuInternalName.fromItemNameOrNull(item)?.let {
+                    ChatUtils.debug("Adding hover loot: $it x$amount")
                     add(it to amount)
                 }
             }
@@ -293,8 +294,8 @@ object ForagingTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresettreegifttracker") {
-            description = "Resets the Tree Gift Tracker"
+        event.registerBrigadier("shresetforagingtracker") {
+            description = "Resets the Foraging Tracker."
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
         }

@@ -191,7 +191,7 @@ object ForagingTrackerLegacy {
      */
     val logInternalNamePattern by patternGroup.pattern(
         "log-internal-name",
-        "(?:ENCHANTED_)?(?<treeType>.*)_LOG"
+        "(?<enchanted>ENCHANTED_)?(?<treeType>.*)_LOG"
     )
     // </editor-fold>
 }
