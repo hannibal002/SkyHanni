@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -224,7 +223,7 @@ object ForagingTracker {
                 }
                 loot.clear()
             }
-            if (config.hideChats) blockedReason = "TREE_GIFT"
+            if (config.compactGiftChats) blockedReason = "TREE_GIFT"
         }
         if (!openLootLoop) return
 
@@ -274,7 +273,7 @@ object ForagingTracker {
     }
 
     private fun SkyHanniChatEvent.tryBlock() {
-        if (!config.hideChats || !openLootLoop) return
+        if (!config.compactGiftChats || !openLootLoop) return
         blockedReason = "TREE_GIFT"
     }
 

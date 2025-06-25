@@ -22,10 +22,10 @@ class ForagingTrackerConfig {
     val position: Position = Position(-300, 300)
 
     @Expose
-    @ConfigOption(name = "Hide Chats", desc = "Hide the chat messages when you receive a tree gift.")
+    @ConfigOption(name = "Compact Gifts", desc = "Compact the chat messages when you receive a tree gift.")
     @ConfigEditorBoolean
     @OnlyModern
-    var hideChats: Boolean = true
+    var compactGiftChats: Boolean = true
 
     @Expose
     @ConfigOption(name = "Only Holding Axe", desc = "Only show the tracker while holding an axe.")
