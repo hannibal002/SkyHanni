@@ -35,7 +35,6 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -158,7 +157,7 @@ object CarnivalZombieShootout {
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
-    @HandleEvent
+    @HandleEvent(ServerBlockChangeEvent::class)
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !started) return
 
