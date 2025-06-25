@@ -87,64 +87,67 @@ object CarnivalZombieShootout {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || (!config.coloredHitboxes && !config.coloredLines && !config.zombieTimer)) return
 
-        if (config.zombieTimer) {
-            val zombiesToRemove = mutableListOf<ShootoutZombie>()
+        if (config.zombieTimer) event.renderZombieTimer()
+        if (config.coloredHitboxes) event.renderHitBoxes()
+    }
 
-            for ((zombie, time) in zombieTimes) {
-                val lifetime = zombie.type.lifetime
-                val timer = lifetime - time.passedSince()
+    private fun SkyHanniRenderWorldEvent.renderZombieTimer() {
+        val zombiesToRemove = mutableListOf<ShootoutZombie>()
 
-                if (config.highestOnly && zombie.type != maxType) continue
+        for ((zombie, time) in zombieTimes) {
+            val lifetime = zombie.type.lifetime
+            val timer = lifetime - time.passedSince()
 
-                if (timer > 0.seconds) {
-                    val entity = EntityUtils.getEntityByID(zombie.entity.entityId) ?: continue
-                    val isSmall = (entity as? EntityZombie)?.isChild ?: false
+            if (config.highestOnly && zombie.type != maxType) continue
 
-                    val skips = lifetime / 3
-                    val prefix = determinePrefix(timer, lifetime, lifetime - skips, lifetime - skips * 2)
-                    val height = if (isSmall) entity.height / 2 else entity.height
-
-                    event.drawDynamicText(
-                        entity.getLorenzVec().add(-0.5, height + 0.5, -0.5),
-                        "$prefix${timer.toString(DurationUnit.SECONDS, 1)}",
-                        scaleMultiplier = 1.25,
-                    )
-                } else {
-                    if (timer > (-500).milliseconds) {
-                        zombiesToRemove.add(zombie)
-                    }
-                }
-            }
-
-            zombiesToRemove.forEach { zombieTimes.remove(it) }
-        }
-
-        if (config.coloredHitboxes) {
-            lamp?.let {
-                if (config.coloredLines) event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
-                    it.pos.add(0.0, 0.5, 0.0),
-                    Color.RED,
-                    3,
-                    false,
-                )
-                event.drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1.0f)
-            }
-
-            for ((zombie, type) in drawZombies) {
-                val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
+            if (timer > 0.seconds) {
+                val entity = EntityUtils.getEntityByID(zombie.entity.entityId) ?: continue
                 val isSmall = (entity as? EntityZombie)?.isChild ?: false
 
-                val boundingBox = if (isSmall) entity.entityBoundingBox.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
-                else entity.entityBoundingBox
+                val skips = lifetime / 3
+                val prefix = determinePrefix(timer, lifetime, lifetime - skips, lifetime - skips * 2)
+                val height = if (isSmall) entity.height / 2 else entity.height
 
-                event.drawHitbox(
-                    boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
-                    type.color,
-                    lineWidth = 3,
-                    depth = false,
+                drawDynamicText(
+                    entity.getLorenzVec().add(-0.5, height + 0.5, -0.5),
+                    "$prefix${timer.toString(DurationUnit.SECONDS, 1)}",
+                    scaleMultiplier = 1.25,
                 )
+            } else {
+                if (timer > (-500).milliseconds) {
+                    zombiesToRemove.add(zombie)
+                }
             }
+        }
+
+        zombiesToRemove.forEach { zombieTimes.remove(it) }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderHitBoxes() {
+        lamp?.let {
+            if (config.coloredLines) draw3DLine(
+                exactPlayerEyeLocation(),
+                it.pos.add(0.0, 0.5, 0.0),
+                Color.RED,
+                3,
+                false,
+            )
+            drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1.0f)
+        }
+
+        for ((zombie, type) in drawZombies) {
+            val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
+            val isSmall = (entity as? EntityZombie)?.isChild ?: false
+
+            val boundingBox = if (isSmall) entity.entityBoundingBox.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
+            else entity.entityBoundingBox
+
+            drawHitbox(
+                boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
+                type.color,
+                lineWidth = 3,
+                depth = false,
+            )
         }
     }
 
