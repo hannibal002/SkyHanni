@@ -36,6 +36,7 @@ import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object CarnivalZombieShootout {
@@ -101,7 +102,7 @@ object CarnivalZombieShootout {
 
                     event.drawDynamicText(
                         entity.getLorenzVec().add(-0.5, height.plus(0.5), -0.5),
-                        "$prefix$timer",
+                        "$prefix${timer.toString(DurationUnit.SECONDS, 1)}",
                         1.25,
                     )
                 } else {
