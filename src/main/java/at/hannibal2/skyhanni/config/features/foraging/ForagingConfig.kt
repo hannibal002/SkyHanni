@@ -43,6 +43,6 @@ class ForagingConfig {
     @ConfigOption(name = "Tree Gift Tracker", desc = "")
     @OnlyModern
     @Accordion
-    val treeGiftTracker = TreeGiftTrackerConfig()
+    val tracker = ForagingTrackerConfig()
 
 }

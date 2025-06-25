@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.foraging.TreeGiftTrackerLegacy
+import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
@@ -717,9 +717,9 @@ class ProfileSpecificStorage(
     val foraging: ForagingConfig = ForagingConfig()
 
     class ForagingConfig {
-        // todo when we're fully 1.21, remove this and use TreeGiftTracker
+        // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
         @Expose
-        val treeGiftTracker: TreeGiftTrackerLegacy.BucketData = TreeGiftTrackerLegacy.BucketData()
+        var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
     }
 
     @Expose
