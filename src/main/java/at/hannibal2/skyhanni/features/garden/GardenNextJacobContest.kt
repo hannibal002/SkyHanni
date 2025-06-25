@@ -456,7 +456,8 @@ object GardenNextJacobContest {
         isFetchingContests = true
         SkyHanniMod.launchIOCoroutine {
             knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
-            if (knownContests.isNotEmpty()) {
+            if (haveAllContests) {
+                ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
                 fetchedFromElite = true
                 nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
                 loadedContestsYear = SkyBlockTime.now().year
