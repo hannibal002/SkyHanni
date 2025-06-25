@@ -69,7 +69,7 @@ class ItemResolutionQuery {
 
         @HandleEvent
         fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-            val typeToken = object  : TypeToken<List<BazaarOverride>>() {}.type
+            val typeToken = object : TypeToken<List<BazaarOverride>>() {}.type
             val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", typeToken)
             bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
         }
