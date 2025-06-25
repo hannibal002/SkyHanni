@@ -52,6 +52,12 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
+//#if MC > 1.21
+//$$ import net.minecraft.client.MinecraftClient
+//$$ import net.minecraft.client.gui.DrawContext
+//$$ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+//#endif
+
 @SkyHanniModule
 object HideNotClickableItems {
 
@@ -107,6 +113,56 @@ object HideNotClickableItems {
         }
     }
 
+    //#if MC > 1.21
+//$$     @JvmStatic
+//$$     fun <T> test(slots: DefaultedList<Slot>, context: DrawContext, x: Int, y: Int) {
+//$$         val (background, border) = onRun(slots) ?: return
+//$$
+//$$         for ((slot, color) in border) {
+//$$             val sx: Int = x + slot.x
+//$$             val sy: Int = y + slot.y
+//$$ //             context.fill(sx, sy, sx + 16, sy + 16, -0x78000000)
+//$$             context.fill(sx, sy, sx + 16, sy + 16, color.rgb)
+//$$         }
+//$$
+//$$         // semi-transparent gray: 0x88000000
+//$$         for (slot in slots) {
+//$$             val sx: Int = x + slot.x
+//$$             val sy: Int = y + slot.y
+//$$             context.fill(sx, sy, sx + 16, sy + 16, -0x78000000)
+//$$         }
+//$$     }
+//
+//$$     @JvmStatic
+//$$     fun onRun(slots: DefaultedList<Slot>): Pair<MutableMap<Slot, Color>, MutableMap<Slot, Color>>? {
+//$$         if (!isEnabled()) return null
+//$$         if (bypassActive()) return null
+//$$ //         if (event.gui !is GenericContainerScreen) return
+//$$ //         val chest = event.container as GenericContainerScreenHandler
+//$$         val chestName = InventoryUtils.openInventoryName()
+//$$
+//$$
+//$$         val background = mutableMapOf<Slot, Color>()
+//$$         val border = mutableMapOf<Slot, Color>()
+//$$
+//$$         for (slot in slots) {
+//$$             val stack = slot.stack ?: continue
+//$$ //         }
+//$$ //         for ((slot, stack) in chest.getLowerItems()) {
+//$$             if (hide(chestName, stack)) {
+//$$                 background[slot] = LorenzColor.DARK_GRAY.addOpacity(config.opacity)
+//$$ //                 slot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
+//$$             } else if (showGreenLine && config.itemsGreenLine) {
+//$$                 border[slot] = LorenzColor.GREEN.addOpacity(200)
+//$$ //                 slot.drawBorder(LorenzColor.GREEN.addOpacity(200))
+//$$             }
+//$$         }
+//$$
+//$$         return background to border
+//$$     }
+//#else
+
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
@@ -123,6 +179,8 @@ object HideNotClickableItems {
             }
         }
     }
+
+//#endif
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTooltip(event: ToolTipEvent) {
