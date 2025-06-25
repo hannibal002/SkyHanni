@@ -16,12 +16,12 @@ class SkillProgressBarConfig {
     @ConfigOption(name = "Enabled", desc = "Enable or disable the progress bar.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Textured Bar", desc = "Use a textured progress bar.\n§eCan be changed with a resource pack.")
     @ConfigEditorBoolean
-    var useTexturedBar: Property<Boolean> = Property.of(false)
+    val useTexturedBar: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -29,7 +29,7 @@ class SkillProgressBarConfig {
         desc = "Use the SBA like chroma effect on the bar.\n§eIf enabled, ignore the Bar Color setting."
     )
     @ConfigEditorBoolean
-    var useChroma: Property<Boolean> = Property.of(false)
+    val useChroma: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.\n§eIgnored if Chroma is enabled.")
@@ -39,13 +39,13 @@ class SkillProgressBarConfig {
     @Expose
     @ConfigOption(name = "Textured Bar", desc = "")
     @Accordion
-    var texturedBar: TexturedBar = TexturedBar()
+    val texturedBar: TexturedBar = TexturedBar()
 
     class TexturedBar {
         @Expose
         @ConfigOption(name = "Used Texture", desc = "Choose what texture to use.")
         @ConfigEditorDropdown
-        var usedTexture: Property<UsedTexture> = Property.of(UsedTexture.MATCH_PACK)
+        val usedTexture: Property<UsedTexture> = Property.of(UsedTexture.MATCH_PACK)
 
         enum class UsedTexture(private val displayName: String, val path: String) {
             MATCH_PACK("Match Resource Pack", "minecraft:textures/gui/icons.png"),
@@ -83,7 +83,7 @@ class SkillProgressBarConfig {
     @Expose
     @ConfigOption(name = "Regular Bar", desc = "")
     @Accordion
-    var regularBar: RegularBar = RegularBar()
+    val regularBar: RegularBar = RegularBar()
 
     class RegularBar {
         @Expose

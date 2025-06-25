@@ -13,35 +13,35 @@ class RiftConfig {
     @ConfigOption(name = "Rift Timer", desc = "")
     @Accordion
     @Expose
-    var timer: RiftTimerConfig = RiftTimerConfig()
+    val timer: RiftTimerConfig = RiftTimerConfig()
 
     @ConfigOption(name = "Crux Talisman Progress", desc = "")
     @Accordion
     @Expose
-    var cruxTalisman: CruxTalismanDisplayConfig = CruxTalismanDisplayConfig()
+    val cruxTalisman: CruxTalismanDisplayConfig = CruxTalismanDisplayConfig()
 
     @ConfigOption(name = "Enigma Soul Waypoints", desc = "")
     @Accordion
     @Expose
-    var enigmaSoulWaypoints: EnigmaSoulConfig = EnigmaSoulConfig()
+    val enigmaSoulWaypoints: EnigmaSoulConfig = EnigmaSoulConfig()
 
     @Category(name = "Rift Areas", desc = "Rift Area Settings")
     @Expose
-    var area: RiftAreasConfig = RiftAreasConfig()
+    val area: RiftAreasConfig = RiftAreasConfig()
 
     @Expose
     @Category(name = "Motes", desc = "")
-    var motes: MotesConfig = MotesConfig()
+    val motes: MotesConfig = MotesConfig()
 
     @Expose
     @ConfigOption(name = "Motes Orbs", desc = "")
     @Accordion
-    var motesOrbs: MotesOrbsConfig = MotesOrbsConfig() // TODO move into MotesConfig
+    val motesOrbs: MotesOrbsConfig = MotesOrbsConfig() // TODO move into MotesConfig
 
     @Expose
     @ConfigOption(name = "Punchcard Artifact", desc = "")
     @Accordion
-    var punchcard: PunchcardConfig = PunchcardConfig()
+    val punchcard: PunchcardConfig = PunchcardConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")

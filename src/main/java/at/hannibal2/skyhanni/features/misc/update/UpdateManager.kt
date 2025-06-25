@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.JsonElement
-import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
@@ -86,7 +85,7 @@ object UpdateManager {
         logger.log("Starting update check")
         val currentStream = config.updateStream.get()
         if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || SkyHanniMod.isBetaVersion)) {
-            config.updateStream = Property.of(UpdateStream.BETA)
+            config.updateStream.set(UpdateStream.BETA)
             updateStream = UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream).thenAcceptAsync(

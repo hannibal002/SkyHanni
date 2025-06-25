@@ -22,5 +22,5 @@ class ArmorDropTrackerConfig {
 
     @Expose
     @ConfigLink(owner = ArmorDropTrackerConfig::class, field = "enabled")
-    var position: Position = Position(16, -232)
+    val position: Position = Position(16, -232)
 }

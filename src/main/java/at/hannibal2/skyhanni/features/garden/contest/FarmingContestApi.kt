@@ -118,7 +118,8 @@ object FarmingContestApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Your Contests") return
         val bulkClaimStack = event.inventoryItems[50] ?: return
-        if (!bulkClaimFarmingPattern.matches(bulkClaimStack.getLore().first())) return
+        val firstLine = bulkClaimStack.getLore().firstOrNull() ?: return
+        if (!bulkClaimFarmingPattern.matches(firstLine)) return
         inInventory = true
     }
 

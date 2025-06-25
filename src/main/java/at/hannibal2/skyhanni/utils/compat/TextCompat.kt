@@ -12,9 +12,11 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.ChatComponentText
 //#endif
 //#if MC > 1.16
+//$$ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.MutableComponent
 //$$ import net.minecraft.network.chat.TextColor
+//$$ import kotlin.time.Duration.Companion.minutes
 //#endif
 //#if MC > 1.21
 //$$ import net.minecraft.text.PlainTextContent
@@ -26,9 +28,28 @@ import net.minecraft.util.ChatComponentText
 //$$ import net.minecraft.text.TranslatableTextContent
 //#endif
 //#if MC > 1.16
-//$$ private val unformattedTextCache = java.util.WeakHashMap<Component, String>()
-//$$ private val formattedTextCache = java.util.WeakHashMap<Component, String>()
-//$$ private val formattedTextCacheLessResets = java.util.WeakHashMap<Component, String>()
+//$$ private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
+//$$ private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
+//$$
+//$$ private enum class FormattedTextSettings(noExtraResets: Boolean, leadingWhite: Boolean) {
+//$$     DEFAULT(false, false),
+//$$     LESS_RESETS(true, false),
+//$$     LEADING_WHITE(false, true),
+//$$     LEADING_WHITE_LESS_RESETS(true, true),
+//$$     ;
+//$$     companion object {
+//$$         fun getByArgs(noExtraResets: Boolean, leadingWhite: Boolean): FormattedTextSettings {
+//$$             return when {
+//$$                 noExtraResets && leadingWhite -> LEADING_WHITE_LESS_RESETS
+//$$                 noExtraResets -> LESS_RESETS
+//$$                 leadingWhite -> LEADING_WHITE
+//$$                 else -> DEFAULT
+//$$             }
+//$$         }
+//$$     }
+//$$ }
+//$$
+//$$ private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
 //#endif
 
 fun IChatComponent.unformattedTextForChatCompat(): String {
@@ -59,32 +80,30 @@ fun IChatComponent.unformattedTextCompat(): String =
 
 // has to be a separate function for pattern mappings
 fun IChatComponent?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
-fun IChatComponent?.formattedTextCompatWithStartingWhiteColorCode(): String = this.formattedTextCompat(removeStartingWhiteColorCode = false)
+fun IChatComponent?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
+fun IChatComponent?.formattedTextCompatLeadingWhiteLessResets(): String =
+    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
 
 @JvmOverloads
 @Suppress("unused")
-fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, removeStartingWhiteColorCode: Boolean = true): String =
+fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
 //#if MC < 1.16
-    this?.formattedText.orEmpty()
+    return this?.formattedText.orEmpty()
+}
 //#else
-//$$ run {
-//$$     this ?: return@run ""
-//$$     if (noExtraResets) {
-//$$         return@run formattedTextCacheLessResets.getOrPut(this) {
-//$$             computeFormattedTextCompat(true, removeStartingWhiteColorCode)
-//$$         }
-//$$     }
-//$$     formattedTextCache.getOrPut(this) {
-//$$         computeFormattedTextCompat(false, removeStartingWhiteColorCode)
+//$$     this ?: return ""
+//$$     val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
+//$$     return formattedTextCache.getOrPut(cacheKey) {
+//$$         computeFormattedTextCompat(noExtraResets, leadingWhite)
 //$$     }
 //$$ }
 //$$
-//$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, removeStartingWhiteColorCode: Boolean): String {
+//$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
 //$$     this ?: return ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
 //$$         val chatStyle = component.style.chatStyle()
-//$$         if (!removeStartingWhiteColorCode || (sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
+//$$         if (leadingWhite || (sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
 //$$             sb.append(chatStyle)
 //$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())

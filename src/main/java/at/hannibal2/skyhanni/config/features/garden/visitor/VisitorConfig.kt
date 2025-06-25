@@ -14,22 +14,27 @@ class VisitorConfig {
     @Expose
     @ConfigOption(name = "Visitor Timer", desc = "")
     @Accordion
-    var timer: TimerConfig = TimerConfig()
+    val timer: TimerConfig = TimerConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Shopping List", desc = "")
     @Accordion
-    var shoppingList: ShoppingListConfig = ShoppingListConfig()
+    val shoppingList: ShoppingListConfig = ShoppingListConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Inventory", desc = "")
     @Accordion
-    var inventory: VisitorInventoryConfig = VisitorInventoryConfig()
+    val inventory: VisitorInventoryConfig = VisitorInventoryConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Reward Warning", desc = "")
     @Accordion
-    var rewardWarning: RewardWarningConfig = RewardWarningConfig()
+    val rewardWarning: RewardWarningConfig = RewardWarningConfig()
+
+    @Expose
+    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
+    @Accordion
+    val dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
 
     @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
@@ -88,11 +93,6 @@ class VisitorConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideChat: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
-    @Accordion
-    var dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
 
     @Expose
     @ConfigOption(

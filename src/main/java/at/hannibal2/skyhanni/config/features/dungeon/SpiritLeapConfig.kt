@@ -78,7 +78,7 @@ class SpiritLeapConfig {
 
     @ConfigOption(name = "Reset Colors", desc = "Restores the class highlighter colors to their default settings.")
     @ConfigEditorButton(buttonText = "Reset")
-    var resetColors: Runnable = Runnable {
+    val resetColors: Runnable = Runnable {
         deadTeammateColor = DEAD_COLOR
         archerClassColor = DEFAULT_COLOR
         mageClassColor = DEFAULT_COLOR

@@ -14,14 +14,14 @@ class ObjectHighlighterConfig {
     @Expose
     @ConfigOption(name = "Starred Mobs", desc = "")
     @Accordion
-    var starred: StarredConfig = StarredConfig()
+    val starred: StarredConfig = StarredConfig()
 
     class StarredConfig {
         @Expose
         @ConfigOption(name = "Highlight Starred", desc = "Highlights starred mobs in a color.")
         @ConfigEditorBoolean
         @FeatureToggle
-        var highlight: Property<Boolean> = Property.of(false)
+        val highlight: Property<Boolean> = Property.of(false)
 
         /*
         TODO for someone who has time
@@ -36,20 +36,20 @@ class ObjectHighlighterConfig {
         @Expose
         @ConfigOption(name = "Color", desc = "The color used to highlight starred mobs.")
         @ConfigEditorColour
-        var colour: Property<String> = Property.of("0:60:255:255:0")
+        val colour: Property<String> = Property.of("0:60:255:255:0")
     }
 
     @Expose
     @ConfigOption(name = "Fels Skull", desc = "")
     @Accordion
-    var fel: FelConfig = FelConfig()
+    val fel: FelConfig = FelConfig()
 
     class FelConfig {
         @Expose
         @ConfigOption(name = "Highlight Fels Skull", desc = "Highlights fels that are not active.")
         @ConfigEditorBoolean
         @FeatureToggle
-        var highlight: Property<Boolean> = Property.of(true)
+        val highlight: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(name = "Draw Line", desc = "Draws a line to fels skulls. Requires highlight to be enabled.")
@@ -59,6 +59,6 @@ class ObjectHighlighterConfig {
         @Expose
         @ConfigOption(name = "Color", desc = "The color used to highlight fel skulls and draw the line.")
         @ConfigEditorColour
-        var colour: Property<String> = Property.of("0:200:255:0:255")
+        val colour: Property<String> = Property.of("0:200:255:0:255")
     }
 }
