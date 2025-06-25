@@ -20,6 +20,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import java.util.Locale
 import java.util.UUID
+import kotlin.time.Duration.Companion.minutes
 
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
@@ -75,8 +76,8 @@ object SkyBlockItemModifierUtils {
     @KSerializable
     data class PetInfo(
         @Expose val type: String,
-        @Expose val active: Boolean? = null,
-        @Expose val exp: Double,
+        @Expose val active: Boolean = false,
+        @Expose val exp: Double = 0.0,
         @Expose val tier: LorenzRarity,
         @Expose val hideInfo: Boolean = false,
         @Expose val heldItem: NeuInternalName? = null,
@@ -137,18 +138,27 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
+    val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
+    var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
+
     fun ItemStack.getPetInfo(): PetInfo? {
+        val colorlessName = displayName.removeColor()
+        // Repo pets will always return null for PetInfo, don't even attempt to parse it
+        if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) return null
         val petInfoJson = getExtraAttributes()?.takeIf {
             it.hasKey("petInfo")
         }?.getString("petInfo")?.takeIf {
             it.isNotEmpty()
         } ?: return null
 
-        try {
-            return ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
+        return try {
+            ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
         } catch (e: Exception) {
+            val added = warnedAboutPetParseFailure.add(colorlessName)
+            if (!added || lastWarnedParseFailure.passedSince() <= 1.minutes) return null
+            lastWarnedParseFailure = SimpleTimeMark.now()
             ErrorManager.skyHanniError(
-                "Failed to parse pet info for item: ${displayName.removeColor()}",
+                "Failed to parse pet info for item: $colorlessName",
                 "exception" to e.message,
                 "extraAttributes" to extraAttributes.toString(),
                 "petInfoJson" to petInfoJson,
