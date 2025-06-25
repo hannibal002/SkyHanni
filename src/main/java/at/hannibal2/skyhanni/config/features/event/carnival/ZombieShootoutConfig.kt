@@ -20,7 +20,12 @@ class ZombieShootoutConfig {
     var coloredHitboxes: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Highest Only", desc = "Only draw colored hitboxes for the highest scoring zombies.")
+    @ConfigOption(name = "Zombie Timer", desc = "Displays a timer above the heads of the zombies.")
+    @ConfigEditorBoolean
+    var zombieTimer: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Highest Only", desc = "Only draw colored hitboxes/timers for the highest scoring zombies.")
     @ConfigEditorBoolean
     var highestOnly: Boolean = false
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
+
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -14,8 +15,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
+
 
 @SkyHanniModule
 object HideArmor {
@@ -23,7 +26,7 @@ object HideArmor {
     private val config get() = SkyHanniMod.feature.misc.hideArmor
     private var armor = mapOf<Int, ItemStack>()
 
-    private fun shouldHideArmor(entity: EntityPlayer): Boolean {
+    fun shouldHideArmor(entity: EntityPlayer): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
         if (entity is FakePlayer) return false
         if (entity.hasPotionEffect(EffectsCompat.INVISIBILITY)) return false
@@ -74,5 +77,19 @@ object HideArmor {
             ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)
         }
         event.move(90, "misc.hideArmor2", "misc.hideArmor")
+    }
+
+    private val CURRENT_RENDERED_ENTITY: ThreadLocal<Entity> = ThreadLocal<Entity>()
+
+    fun set(entity: Entity) {
+        CURRENT_RENDERED_ENTITY.set(entity)
+    }
+
+    fun get(): Entity {
+        return CURRENT_RENDERED_ENTITY.get()
+    }
+
+    fun clear() {
+        CURRENT_RENDERED_ENTITY.remove()
     }
 }
