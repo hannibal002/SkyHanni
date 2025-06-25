@@ -38,6 +38,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+
 //#if MC > 1.21
 //$$ import net.minecraft.state.property.Properties
 //#endif
@@ -104,9 +105,9 @@ object CarnivalZombieShootout {
                     val height = if (isSmall) entity.height / 2 else entity.height
 
                     event.drawDynamicText(
-                        entity.getLorenzVec().add(-0.5, height.plus(0.5), -0.5),
+                        entity.getLorenzVec().add(-0.5, height + 0.5, -0.5),
                         "$prefix${timer.toString(DurationUnit.SECONDS, 1)}",
-                        1.25,
+                        scaleMultiplier = 1.25,
                     )
                 } else {
                     if (timer < 500.milliseconds) {
