@@ -17,7 +17,7 @@ class HoppityStrayTimerConfig {
 
     @Expose
     @ConfigLink(owner = HoppityStrayTimerConfig::class, field = "enabled")
-    var strayTimerPosition: Position = Position(200, 200)
+    val strayTimerPosition: Position = Position(200, 200)
 
     @Expose
     @ConfigOption(

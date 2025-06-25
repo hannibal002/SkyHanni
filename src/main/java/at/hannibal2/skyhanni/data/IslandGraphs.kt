@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -41,6 +42,7 @@ import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.util.ChatComponentText
 import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -103,6 +105,9 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object IslandGraphs {
+
+    private val config get() = SkyHanniMod.feature.misc.pathfinding
+
     var currentIslandGraph: Graph? = null
     private var lastLoadedIslandType = "nothing"
     private var lastLoadedTime = SimpleTimeMark.farPast()
@@ -146,6 +151,8 @@ object IslandGraphs {
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
     private var inGlaciteTunnels: Boolean? = null
+    private var nextChatMessage: ChatComponentText? = null
+    private var lastMessageSent = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
@@ -295,6 +302,14 @@ object IslandGraphs {
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
             update()
+        }
+        updateChat()
+        nextChatMessage?.let {
+            if (lastMessageSent.passedSince() > config.chatUpdateInterval.duration) {
+                it.send(pathFindMessageId)
+                nextChatMessage = null
+                lastMessageSent = SimpleTimeMark.now()
+            }
         }
     }
 
@@ -553,7 +568,7 @@ object IslandGraphs {
             },
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
-        componentText.send(pathFindMessageId)
+        nextChatMessage = componentText
     }
 
     fun overrideChatMessage(message: String) {

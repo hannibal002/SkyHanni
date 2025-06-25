@@ -9,7 +9,7 @@ class RepoPatternConfig {
     @Expose
     @ConfigOption(name = "Force Local Loading", desc = "Force loading local patterns.")
     @ConfigEditorBoolean
-    var forceLocal: Property<Boolean> = Property.of(false)
+    val forceLocal: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(

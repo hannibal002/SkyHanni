@@ -63,7 +63,7 @@ class MiningEventConfig {
 
     @Expose
     @ConfigLink(owner = MiningEventConfig::class, field = "enabled")
-    var position: Position = Position(200, 60)
+    val position: Position = Position(200, 60)
 
     @Expose
     @ConfigOption(

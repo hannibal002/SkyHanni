@@ -206,7 +206,7 @@ object KeyboardManager {
 
         else -> Keyboard.isKeyDown(this)
         //#else
-        //$$ this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid", "keycode" to this)
+        //$$ this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid: $this")
         //$$ this == -1 -> false
         //$$ this in 0..5 -> MouseCompat.isButtonDown(this)
         //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window.handle, this)

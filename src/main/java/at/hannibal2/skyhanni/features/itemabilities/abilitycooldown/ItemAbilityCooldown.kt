@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -71,16 +70,29 @@ object ItemAbilityCooldown {
     private val SOS_FLARE = "SOS_FLARE".toInternalName()
     private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".toInternalName()
 
-
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         when {
-            // Hyperion
+            // Wither Shield Sound Solo and Wither Impact
             event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f -> {
-                val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
-                if (abilityScrolls.size != 3) return
+                val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
+                if (scrolls.singleOrNull() == ItemAbility.WITHER_IMPACT) {
+                    ItemAbility.WITHER_IMPACT.sound()
+                } else {
+                    for (ability in scrolls) {
+                        if (ability == ItemAbility.WITHER_SHIELD_SCROLL) {
+                            ability.activate(null, 5_000)
+                        }
+                        ability.sound()
+                    }
+                }
+            }
 
-                ItemAbility.HYPERION.sound()
+            event.soundName == "random.fizz" && event.pitch == 0.4920635f && event.volume == 1f -> {
+                val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
+                if (scrolls.contains(ItemAbility.SHADOW_WARP_SCROLL)) {
+                    ItemAbility.SHADOW_WARP_SCROLL.sound()
+                }
             }
             // Fire Fury Staff
             event.soundName == "liquid.lavapop" && event.pitch == 1f && event.volume == 1f -> {
@@ -97,16 +109,14 @@ object ItemAbilityCooldown {
                     ItemAbility.GYROKINETIC_WAND_LEFT.sound()
                 }
                 // Shadow Fury
-                if (event.pitch == 1f && event.volume == 1f) {
-                    val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
-                    if (!internalName.equalsOneOf(
-                            "SHADOW_FURY".toInternalName(),
-                            "STARRED_SHADOW_FURY".toInternalName(),
-                        )
-                    ) return
+                val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                if (!internalName.equalsOneOf(
+                        "SHADOW_FURY".toInternalName(),
+                        "STARRED_SHADOW_FURY".toInternalName(),
+                    )
+                ) return
 
-                    ItemAbility.SHADOW_FURY.sound()
-                }
+                ItemAbility.SHADOW_FURY.sound()
             }
             // Giant's Sword
             event.soundName == "random.anvil_land" && event.pitch == 0.4920635f && event.volume == 1f -> {
@@ -138,9 +148,20 @@ object ItemAbilityCooldown {
                     ItemAbility.VOODOO_DOLL_WILTED.sound()
                 }
             }
-            // Golem Sword
-            event.soundName == "random.explode" && event.pitch == 4.047619f && event.volume == 0.2f -> {
-                ItemAbility.GOLEM_SWORD.sound()
+            // Golem Sword & Implosion Solo Scroll & Staff of the Volcano
+            event.soundName == "random.explode" -> {
+                if (event.pitch == 1f && event.volume == 1f) {
+                    val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
+                    if (scrolls.contains(ItemAbility.IMPLOSION_SCROLL)) {
+                        ItemAbility.IMPLOSION_SCROLL.sound()
+                    }
+                }
+                if (event.pitch == 4.047619f && event.volume == 0.2f) {
+                    ItemAbility.GOLEM_SWORD.sound()
+                }
+                if (event.pitch == 0.4920635f && event.volume == 0.5f) {
+                    ItemAbility.STAFF_OF_THE_VOLCANO.sound()
+                }
             }
             // Weird Tuba & Weirder Tuba
             event.soundName == "mob.wolf.howl" && event.volume == 0.5f -> {
@@ -170,10 +191,6 @@ object ItemAbilityCooldown {
             // Fire Freeze Staff
             event.soundName == "mob.guardian.elder.idle" && event.pitch == 2f && event.volume == 0.2f -> {
                 ItemAbility.FIRE_FREEZE_STAFF.sound()
-            }
-            // Staff of the Volcano
-            event.soundName == "random.explode" && event.pitch == 0.4920635f && event.volume == 0.5f -> {
-                ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Staff of the Volcano
             event.soundName == "random.eat" && event.pitch == 1f && event.volume == 1f -> {
@@ -232,6 +249,9 @@ object ItemAbilityCooldown {
         if (!SkyBlockUtils.inSkyBlock) return
         itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
+        }
+        for (scrollAbility in ItemAbility.getAllAbilityScrolls(itemInHand)) {
+            scrollAbility.setItemClick()
         }
     }
 
@@ -331,11 +351,20 @@ object ItemAbilityCooldown {
     }
 
     private fun tryHandleNextPhase(ability: ItemAbility, specialColor: LorenzColor) {
-        if (ability == ItemAbility.GYROKINETIC_WAND_RIGHT && specialColor == LorenzColor.BLUE) {
-            ability.activate(null, 4_000)
-        }
-        if (ability == ItemAbility.RAGNAROCK_AXE && specialColor == LorenzColor.DARK_PURPLE) {
-            ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
+        when (ability) {
+            ItemAbility.GYROKINETIC_WAND_RIGHT -> if (specialColor == LorenzColor.BLUE) {
+                ability.activate(null, 4_000)
+            }
+
+            ItemAbility.RAGNAROCK_AXE -> if (specialColor == LorenzColor.DARK_PURPLE) {
+                ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
+            }
+
+            ItemAbility.WITHER_SHIELD_SCROLL -> if (specialColor == LorenzColor.DARK_PURPLE) {
+                ability.activate(null, (max(10_000 * ability.getMultiplier() - 5_000, 0.0)).toInt())
+            }
+
+            else -> return
         }
     }
 
@@ -427,8 +456,10 @@ object ItemAbilityCooldown {
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
         val internalName = stack.getInternalName()
+        val scrolls = ItemAbility.getAllAbilityScrolls(stack)
 
         val list = mutableListOf<ItemAbility>()
+        list.addAll(scrolls)
         for (ability in ItemAbility.entries) {
             if (ability.newVariant) {
                 if (ability.internalNames.contains(internalName)) {

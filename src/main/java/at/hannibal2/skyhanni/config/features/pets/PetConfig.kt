@@ -43,12 +43,12 @@ class PetConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Highlight your current pet in the §e/pets §7menu.")
         @ConfigEditorBoolean
-        val enabled: Boolean = true
+        var enabled: Boolean = true
 
         @Expose
         @ConfigOption(name = "Highlight Color", desc = "What color the slot should be highlighted.")
         @ConfigEditorColour
-        val color: ChromaColour = LorenzColor.GREEN.toChromaColor(alpha = 128)
+        var color: ChromaColour = LorenzColor.GREEN.toChromaColor(alpha = 128)
     }
 
     @Expose
@@ -66,7 +66,7 @@ class PetConfig {
         desc = "Specify the pet items for which icons should be displayed next to pets."
     )
     @ConfigEditorDraggableList
-    var petItemDisplay: MutableList<PetItemsDisplay> = mutableListOf(
+    val petItemDisplay: MutableList<PetItemsDisplay> = mutableListOf(
         PetItemsDisplay.XP_SHARE,
         PetItemsDisplay.TIER_BOOST
     )

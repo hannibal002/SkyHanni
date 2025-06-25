@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -202,8 +202,8 @@ object CFStrayTracker {
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
             if (rarity == LorenzRarity.LEGENDARY) tip += extractGoldenTypesCaught(data)
-            Renderable.hoverTips(RenderableString(lineFormat), tips = tip.partyModeReplace().split("\n"))
-        } ?: RenderableString(lineFormat)
+            Renderable.hoverTips(StringRenderable(lineFormat), tips = tip.partyModeReplace().split("\n"))
+        } ?: StringRenderable(lineFormat)
         return renderable.toSearchable(rarity.toString())
     }
 
@@ -259,19 +259,19 @@ object CFStrayTracker {
         // Golden Strays, "Golden Click"
         goldenStrayClick.matchMatcher(loreLine) {
             incrementGoldenType("goldenclick")
-            incrementRarity(LorenzRarity.LEGENDARY, 0)
+            incrementRarity(LEGENDARY, 0)
         }
 
         // Golden Strays, hoard/stampede
         strayHoardPattern.matchMatcher(loreLine.removeResets()) {
             incrementGoldenType("stampede")
-            incrementRarity(LorenzRarity.LEGENDARY, 0)
+            incrementRarity(LEGENDARY, 0)
         }
 
         // El Dorado - all catches
         strayDoradoPattern.matchMatcher(loreLine) {
             groupOrNull("amount")?.let { amount ->
-                incrementRarity(LorenzRarity.LEGENDARY, amount.formatLong())
+                incrementRarity(LEGENDARY, amount.formatLong())
             }
             incrementGoldenType("dorado")
         }

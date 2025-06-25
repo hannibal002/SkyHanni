@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import com.google.gson.JsonPrimitive
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -153,6 +152,7 @@ object UpdateKeybinds {
         if (shouldFlip) {
             keybindMap = keybindMap.entries.associateBy({ it.value }) { it.key }
         }
+        var shouldNotify = false
         for (keybind in keybinds) {
             val shimmy = Shimmy.makeShimmy(SkyHanniMod.feature, keybind.split("."))
             if (shimmy == null) {
@@ -164,11 +164,10 @@ object UpdateKeybinds {
             }
 
             val currentValue = shimmy.getJson().asInt
-            var shouldNotify = false
 
             if (keybindMap.containsKey(currentValue)) {
                 val newValue = keybindMap[currentValue]
-                shimmy.setJson(JsonPrimitive(newValue))
+                shimmy.set(newValue)
 
                 logger.log("$keybind old $currentValue")
                 logger.log("$keybind new $newValue")
@@ -180,14 +179,14 @@ object UpdateKeybinds {
                     ChatUtils.chat("Could not convert keybind for $keybind, please set it manually in /sh")
                 }
             }
-            if (shouldNotify) {
-                val text = listOf(
-                    "§c§lMissing Keybind Mapping Data",
-                    "§cData used to convert your skyhanni keybinds between versions is outdated",
-                    "§cPlease join the SkyHanni Discord and message in §l#support§r§c to get support.",
-                )
-                NotificationManager.queueNotification(SkyHanniNotification(text, Duration.INFINITE, false))
-            }
+        }
+        if (shouldNotify) {
+            val text = listOf(
+                "§c§lMissing Keybind Mapping Data",
+                "§cData used to convert your skyhanni keybinds between versions is outdated",
+                "§cPlease join the SkyHanni Discord and message in §l#support§r§c to get support.",
+            )
+            NotificationManager.queueNotification(SkyHanniNotification(text, Duration.INFINITE, false))
         }
     }
 
