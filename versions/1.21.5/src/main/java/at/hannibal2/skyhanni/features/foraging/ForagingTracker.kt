@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import net.minecraft.text.Text
@@ -82,7 +82,7 @@ object ForagingTracker {
         if (config.showWholeTrees && wholeTreesFelled > 0.0) {
             val preambleFormat = "Whole $baseFormat"
             val wholeRenderable = Renderable.hoverTips(
-                RenderableString("§e$preambleFormat ${wholeTreesFelled.addSeparators()}"),
+                StringRenderable("§e$preambleFormat ${wholeTreesFelled.addSeparators()}"),
                 tips = bucketData.wholeTreesCut.mapNotNull { (treeType, count) ->
                     if (count <= 0.0) return@mapNotNull null
                     "§7Whole $treeType Trees cut: §a${count.addSeparators()}"
@@ -92,7 +92,7 @@ object ForagingTracker {
         }
 
         val totalRenderable = Renderable.hoverTips(
-            RenderableString("§e$baseFormat ${treesContributedTo.addSeparators()}"),
+            StringRenderable("§e$baseFormat ${treesContributedTo.addSeparators()}"),
             tips = bucketData.treesCut.mapNotNull { (treeType, count) ->
                 if (count <= 0) return@mapNotNull null
                 "$treeType Trees contributed to: §a${count.addSeparators()}"
