@@ -32,6 +32,6 @@ class MoongladeBeaconConfig {
 
     @Expose
     @ConfigLink(owner = MoongladeBeaconConfig::class, field = "enabled")
-    var displayPosition: Position = Position(-300, 140)
+    val displayPosition: Position = Position(-300, 140)
 
 }

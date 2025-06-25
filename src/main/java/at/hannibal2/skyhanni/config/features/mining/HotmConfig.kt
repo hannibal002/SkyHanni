@@ -48,4 +48,13 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var powderFor10Levels: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Current Powder",
+        desc = "Displays the current amount of powder available for the specific perk when viewing its tooltip."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var currentPowder: Boolean = true
 }

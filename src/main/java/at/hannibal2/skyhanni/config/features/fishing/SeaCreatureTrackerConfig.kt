@@ -17,12 +17,12 @@ class SeaCreatureTrackerConfig {
 
     @Expose
     @ConfigLink(owner = SeaCreatureTrackerConfig::class, field = "enabled")
-    var position: Position = Position(20, 20)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Percentage", desc = "Show percentage how often what sea creature got caught.")
     @ConfigEditorBoolean
-    var showPercentage: Property<Boolean> = Property.of(false)
+    val showPercentage: Property<Boolean> = Property.of(false)
 
     // TODO move into sea creature category as this is now independent of the tracker
     @Expose

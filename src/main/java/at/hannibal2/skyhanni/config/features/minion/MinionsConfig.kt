@@ -32,12 +32,12 @@ class MinionsConfig {
     @Expose
     @ConfigOption(name = "Last Clicked", desc = "")
     @Accordion
-    var lastClickedMinion: LastClickedMinionConfig = LastClickedMinionConfig()
+    val lastClickedMinion: LastClickedMinionConfig = LastClickedMinionConfig()
 
     @Expose
     @ConfigOption(name = "Emptied Time", desc = "")
     @Accordion
-    var emptiedTime: EmptiedTimeConfig = EmptiedTimeConfig()
+    val emptiedTime: EmptiedTimeConfig = EmptiedTimeConfig()
 
     @Expose
     @ConfigOption(
@@ -56,7 +56,7 @@ class MinionsConfig {
 
     @Expose
     @ConfigLink(owner = MinionsConfig::class, field = "hopperProfitDisplay")
-    var hopperProfitPos: Position = Position(360, 90)
+    val hopperProfitPos: Position = Position(360, 90)
 
     @Expose
     @ConfigOption(name = "Hide Mob Nametag", desc = "Hide the nametags of mobs close to minions.")
