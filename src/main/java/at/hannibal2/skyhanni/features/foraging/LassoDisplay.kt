@@ -24,14 +24,14 @@ object LassoDisplay {
     private val config get() = SkyHanniMod.feature.foraging
     private var display: Renderable? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.lassoDisplay) return
         if (display == null) return
         config.lassoDisplayPosition.renderRenderable(display, posLabel = "Lasso Display")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
         if (!config.lassoDisplay) return
         var isReel = false
