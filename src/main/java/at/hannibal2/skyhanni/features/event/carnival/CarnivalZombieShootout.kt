@@ -172,7 +172,7 @@ object CarnivalZombieShootout {
         //$$     val old = event.oldState.get(Properties.LIT)
         //$$     val new = event.newState.get(Properties.LIT)
         //$$     lamp = when {
-        //$$         !old && new -> Lamp(event.location, SimpleTimeMark.now())
+        //$$         !old && new -> ShootoutLamp(event.location, SimpleTimeMark.now())
         //$$         old && !new -> null
         //$$         else -> lamp
         //$$     }
