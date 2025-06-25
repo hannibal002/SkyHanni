@@ -40,7 +40,7 @@ class DamageIndicatorConfig {
     @Expose
     @ConfigOption(name = "Select Boss", desc = "Change what bosses the damage indicator should be enabled for.")
     @ConfigEditorDraggableList
-    var bossesToShow: MutableList<BossCategory> = mutableListOf(
+    val bossesToShow: MutableList<BossCategory> = mutableListOf(
         BossCategory.NETHER_MINI_BOSSES,
         BossCategory.VANQUISHER,
         BossCategory.REVENANT_HORROR,
@@ -141,10 +141,10 @@ class DamageIndicatorConfig {
     @Expose
     @ConfigOption(name = "Ender Slayer", desc = "")
     @Accordion
-    var enderSlayer: EnderSlayerConfig = EnderSlayerConfig()
+    val enderSlayer: EnderSlayerConfig = EnderSlayerConfig()
 
     @Expose
     @ConfigOption(name = "Vampire Slayer", desc = "")
     @Accordion
-    var vampireSlayer: VampireSlayerConfig = VampireSlayerConfig()
+    val vampireSlayer: VampireSlayerConfig = VampireSlayerConfig()
 }

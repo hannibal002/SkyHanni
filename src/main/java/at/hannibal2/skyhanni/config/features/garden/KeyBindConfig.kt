@@ -25,49 +25,49 @@ class KeyBindConfig {
 
     @ConfigOption(name = "Disable All", desc = "Disable all keys.")
     @ConfigEditorButton(buttonText = "Disable")
-    var presetDisable: Runnable = Runnable(GardenCustomKeybinds::disableAll)
+    val presetDisable: Runnable = Runnable(GardenCustomKeybinds::disableAll)
 
     @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
     @ConfigEditorButton(buttonText = "Default")
-    var presetDefault: Runnable = Runnable(GardenCustomKeybinds::defaultAll)
+    val presetDefault: Runnable = Runnable(GardenCustomKeybinds::defaultAll)
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")
     @ConfigEditorKeybind(defaultKey = KeyboardManager.LEFT_MOUSE)
-    var attack: Property<Int> = Property.of(KeyboardManager.LEFT_MOUSE)
+    val attack: Property<Int> = Property.of(KeyboardManager.LEFT_MOUSE)
 
     @Expose
     @ConfigOption(name = "Use Item", desc = "")
     @ConfigEditorKeybind(defaultKey = KeyboardManager.RIGHT_MOUSE)
-    var useItem: Property<Int> = Property.of(KeyboardManager.RIGHT_MOUSE)
+    val useItem: Property<Int> = Property.of(KeyboardManager.RIGHT_MOUSE)
 
     @Expose
     @ConfigOption(name = "Move Left", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_A)
-    var left: Property<Int> = Property.of(Keyboard.KEY_A)
+    val left: Property<Int> = Property.of(Keyboard.KEY_A)
 
     @Expose
     @ConfigOption(name = "Move Right", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_D)
-    var right: Property<Int> = Property.of(Keyboard.KEY_D)
+    val right: Property<Int> = Property.of(Keyboard.KEY_D)
 
     @Expose
     @ConfigOption(name = "Move Forward", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_W)
-    var forward: Property<Int> = Property.of(Keyboard.KEY_W)
+    val forward: Property<Int> = Property.of(Keyboard.KEY_W)
 
     @Expose
     @ConfigOption(name = "Move Back", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_S)
-    var back: Property<Int> = Property.of(Keyboard.KEY_S)
+    val back: Property<Int> = Property.of(Keyboard.KEY_S)
 
     @Expose
     @ConfigOption(name = "Jump", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_SPACE)
-    var jump: Property<Int> = Property.of(Keyboard.KEY_SPACE)
+    val jump: Property<Int> = Property.of(Keyboard.KEY_SPACE)
 
     @Expose
     @ConfigOption(name = "Sneak", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    var sneak: Property<Int> = Property.of(Keyboard.KEY_LSHIFT)
+    val sneak: Property<Int> = Property.of(Keyboard.KEY_LSHIFT)
 }
