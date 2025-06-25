@@ -86,6 +86,11 @@ object CopyNearbyEntitiesCommand {
                 if (entity.isInvisible) {
                     add("Invisible: true")
                 }
+                //#if MC > 1.21
+                //$$ if (entity.isGlowing) {
+                //$$     add("Glowing: true")
+                //$$ }
+                //#endif
 
                 if (entity is EntityLivingBase) {
                     add("EntityLivingBase:")
