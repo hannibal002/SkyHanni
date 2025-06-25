@@ -34,7 +34,10 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import net.minecraft.text.Text
 import kotlin.time.Duration.Companion.seconds
@@ -73,17 +76,32 @@ object ForagingTracker {
         val forestWhispers = bucketData.getForestWhispers()
         if (forestWhispers > 0) addSearchString("§eForest Whispers: §b${forestWhispers.addSeparators()}")
 
-        val treeFormat = "Tree".pluralize(treesContributedTo.toInt())
         val bucketFormat = bucketData.selectedBucket?.let { "$it " }.orEmpty()
-        val baseFormat = "${bucketFormat}$treeFormat Felled:"
+        val baseFormat = "${bucketFormat}Trees Felled:"
 
         val wholeTreesFelled = bucketData.getWholeTreeCount()
         if (config.showWholeTrees && wholeTreesFelled > 0.0) {
             val preambleFormat = "Whole $baseFormat"
-            addSearchString("§e$preambleFormat ${wholeTreesFelled.addSeparators()}")
+            val wholeRenderable = Renderable.hoverTips(
+                RenderableString("§e$preambleFormat ${wholeTreesFelled.addSeparators()}"),
+                tips = bucketData.wholeTreesCut.mapNotNull { (treeType, count) ->
+                    if (count <= 0.0) return@mapNotNull null
+                    "§7Whole $treeType Trees cut: §a${count.addSeparators()}"
+                }
+            ).toSearchable("whole trees felled")
+            add(wholeRenderable)
         }
 
-        addSearchString("§e$baseFormat ${treesContributedTo.addSeparators()}")
+        val totalRenderable = Renderable.hoverTips(
+            RenderableString("§e$baseFormat ${treesContributedTo.addSeparators()}"),
+            tips = bucketData.treesCut.mapNotNull { (treeType, count) ->
+                if (count <= 0) return@mapNotNull null
+                "§7Total $treeType Trees contributed to: §a${count.addSeparators()}"
+            }
+        ).toSearchable("total trees felled")
+        add(totalRenderable)
+
+
         add(tracker.addTotalProfit(profit, treesContributedTo, "gift"))
         tracker.addPriceFromButton(this)
     }
