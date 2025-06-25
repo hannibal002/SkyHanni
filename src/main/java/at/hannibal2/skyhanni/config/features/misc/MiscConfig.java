@@ -454,5 +454,6 @@ public class MiscConfig {
     @OnlyModern
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("beacon potion")
     public boolean hideStatusEffects = true;
 }
