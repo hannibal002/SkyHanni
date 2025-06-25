@@ -22,6 +22,7 @@
     <ID>CyclomaticComplexMethod:Renderable.kt$Renderable.Companion$internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean</ID>
     <ID>CyclomaticComplexMethod:SoopyGuessBurrow.kt$SoopyGuessBurrow$@HandleEvent(onlyOnSkyblock = true) fun onReceiveParticle(event: ReceiveParticleEvent)</ID>
     <ID>CyclomaticComplexMethod:ToolTooltipTweaks.kt$ToolTooltipTweaks$@HandleEvent(onlyOnSkyblock = true) fun onToolTip(event: ToolTipEvent)</ID>
+    <ID>CyclomaticComplexMethod:TrevorSolver.kt$TrevorSolver$fun findMob()</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
@@ -56,7 +57,6 @@
     <ID>MemberNameEqualsClassName:PestSpawn.kt$PestSpawn$private fun pestSpawn(amount: Int, plotNames: List&lt;String&gt;, unknownAmount: Boolean)</ID>
     <ID>MemberNameEqualsClassName:Shimmy.kt$Shimmy.Companion$private fun shimmy(source: Any?, fieldName: String): Any?</ID>
     <ID>MemberNameEqualsClassName:TestBingo.kt$TestBingo$var testBingo = false</ID>
-    <ID>NoEmptyClassBody:ModernPatterns.kt$ModernPatterns${ }</ID>
     <ID>NoNameShadowing:ContributorManager.kt$ContributorManager${ it.isAllowed() }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
