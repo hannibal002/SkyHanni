@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -22,7 +20,18 @@ import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
-// todo 1.21 impl needed
+/** Crashes if [value] is false and in developer environment */
+fun requireDevEnv(value: Boolean) = requireDevEnv(value, null)
+
+/** Crashes if [value] is false and in developer environment */
+fun requireDevEnv(value: Boolean, lazyMessage: (() -> Any)?) {
+    if (!value) {
+        val msg = lazyMessage?.invoke()?.toString()
+        val message = "Failed requirement in Dev Environment" + msg?.let { ": $it" }.orEmpty()
+        ErrorManager.crashInDevEnv(message)
+    }
+}
+
 @SkyHanniModule
 object ErrorManager {
 
@@ -46,6 +55,8 @@ object ErrorManager {
         "io.moulberry.notenoughupdates." to "NEU.",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
+        "knot//" to "",
+        "java.base/" to "",
     )
 
     private val replaceEntirely = mapOf(
@@ -84,19 +95,24 @@ object ErrorManager {
 //         ),
 //     )
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestreseterrorcache") {
+        event.registerBrigadier("shtestreseterrorcache") {
             description = "Resets the cache of errors."
             category = CommandCategory.DEVELOPER_TEST
-            callback {
+            simpleCallback {
                 cache.clear()
                 ChatUtils.chat("Error cache reset.")
             }
         }
+        event.registerBrigadier("shthrowerror") {
+            description = "Throws an error to test error manager."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                logErrorWithData(NullPointerException(), "Manually triggered error!")
+            }
+        }
     }
-    //#endif
 
 
     // Extra data from last thrown error
@@ -204,13 +220,16 @@ object ErrorManager {
 
         val extraDataString = getExtraDataOrCached(extraData)
         val rawMessage = message.removeColor()
-        errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n \n$stackTrace\n$extraDataString```"
+        val shVersion = SkyHanniMod.VERSION
+        val mcVersion = PlatformUtils.MC_VERSION
+        val label = "SkyHanni $shVersion $mcVersion"
+        errorMessages[randomId] = "```\n$label: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
-            "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
+            "```\n$label: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
         val finalMessage = buildFinalMessage(message) ?: return false
         ChatUtils.clickableChat(
-            "§c[SkyHanni-${SkyHanniMod.VERSION}]: $finalMessage Click here to copy the error into the clipboard.",
+            "§c[$label]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
             prefix = false,

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
 import net.minecraft.init.Items
 
 class NeuInternalName private constructor(private val internalName: String) {
@@ -95,8 +94,8 @@ class NeuInternalName private constructor(private val internalName: String) {
             else -> internalName
         }
 
-    private val isPet: Boolean
-        get() = getItemStackOrNull()?.getPetExp() != null
+    val isPet: Boolean
+        get() = this in PetUtils.petInternalNames
 
     private val isEnchantedBook: Boolean
         get() = getItemStackOrNull()?.item == Items.enchanted_book

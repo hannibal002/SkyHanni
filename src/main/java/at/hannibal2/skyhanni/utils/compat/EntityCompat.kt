@@ -31,6 +31,8 @@ fun EntityLiving.getEntityHelmet(): ItemStack? =
 fun EntityLivingBase.getAllEquipment() =
 //#if MC < 1.16
     this.inventory
+//#elseif MC < 1.21
+//$$ this.armorSlots
 //#else
 //$$ this.equipment.map.values.toTypedArray()
 //#endif
@@ -47,6 +49,20 @@ fun EntityArmorStand.getHandItem(): ItemStack? =
     this.getEquipmentInSlot(0)
 //#else
 //$$ this.getItemBySlot(EquipmentSlot.MAINHAND)
+//#endif
+
+fun EntityArmorStand.getInventoryItems(): Array<ItemStack> =
+    //#if MC < 1.16
+    inventory
+//#else
+//$$ arrayOf(
+//$$ getEquippedStack(EquipmentSlot.MAINHAND),
+//$$ getEquippedStack(EquipmentSlot.FEET),
+//$$ getEquippedStack(EquipmentSlot.LEGS),
+//$$ getEquippedStack(EquipmentSlot.CHEST),
+//$$ getEquippedStack(EquipmentSlot.HEAD),
+//$$ getEquippedStack(EquipmentSlot.OFFHAND),
+//$$ )
 //#endif
 
 fun Entity.getEntityLevel(): World =

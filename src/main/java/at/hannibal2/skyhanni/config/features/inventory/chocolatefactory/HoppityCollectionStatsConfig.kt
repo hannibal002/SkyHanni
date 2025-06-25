@@ -2,16 +2,13 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.HighlightRabbitTypes
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class HoppityCollectionStatsConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show info about your Hoppity rabbit collection.")
@@ -21,7 +18,7 @@ class HoppityCollectionStatsConfig {
 
     @Expose
     @ConfigLink(owner = HoppityCollectionStatsConfig::class, field = "enabled")
-    var position: Position = Position(163, 160)
+    val position: Position = Position(163, 160)
 
     @Expose
     @ConfigOption(name = "Highlight Found Rabbits", desc = "Highlight rabbits that have already been found.")
@@ -29,11 +26,10 @@ class HoppityCollectionStatsConfig {
     @FeatureToggle
     var highlightFoundRabbits: Boolean = false
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Highlight Rabbits", desc = "Highlight specific rabbit types in Hoppity's Collection.")
     @ConfigEditorDraggableList
-    var highlightRabbits: MutableList<HighlightRabbitTypes> = mutableListOf(
+    val highlightRabbits: MutableList<HighlightRabbitTypes> = mutableListOf(
         HighlightRabbitTypes.ABI,
         HighlightRabbitTypes.FACTORY,
         HighlightRabbitTypes.MET,
@@ -41,7 +37,6 @@ class HoppityCollectionStatsConfig {
         HighlightRabbitTypes.SHOP,
         HighlightRabbitTypes.STRAYS
     )
-    //#endif
 
     @Expose
     @ConfigOption(

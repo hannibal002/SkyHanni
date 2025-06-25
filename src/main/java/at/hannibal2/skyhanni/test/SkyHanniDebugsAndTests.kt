@@ -57,13 +57,16 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
 import net.minecraft.nbt.NBTTagCompound
+//#if FORGE
 import net.minecraftforge.common.MinecraftForge
+//#endif
 import java.io.File
 import java.time.LocalDate
 import java.time.Month
@@ -75,6 +78,7 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
+
     @Suppress("MemberVisibilityCanBePrivate")
     var displayList = emptyList<Renderable>()
 
@@ -110,7 +114,8 @@ object SkyHanniDebugsAndTests {
             return result
         }
 
-    val enabled get() = SkyBlockUtils.onHypixel && SkyHanniMod.feature.dev.debug.enabled
+    @Deprecated(message = "use SkyBlockUtils", ReplaceWith("SkyBlockUtils.debug"))
+    val enabled get() = SkyBlockUtils.debug
 
     private var testLocation: LorenzVec? = null
 
@@ -122,7 +127,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun waypoint(args: Array<String>) {
+    private fun waypoint(args: Array<String>) {
         SoundUtils.playBeepSound()
 
         if (args.isEmpty()) {
@@ -143,8 +148,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("set test waypoint")
     }
 
-    fun testCommand(args: Array<String>) {
-
+    private fun testCommand(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
             asyncTest(args)
         }
@@ -155,15 +159,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("§fTest successful!")
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun findNullConfig(args: Array<String>) {
-        println("start null finder")
-        findNull(SkyHanniMod.feature, "config")
-        println("stop null finder")
-    }
-
     private fun findNull(obj: Any, path: String) {
-
         val blockedNames = listOf(
             "TRUE",
             "FALSE",
@@ -198,20 +194,11 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    private fun resetConfigCommand() {
-        ChatUtils.clickableChat(
-            "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
-            onClick = { resetConfig() },
-            "§eClick to confirm.",
-            prefix = false,
-            oneTimeClick = true,
-        )
-    }
-
     private fun resetConfig() {
         // saving old config state
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
         SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "reload config manager")
         Thread {
             Thread.sleep(500)
             SkyHanniMod.configManager.disableSaving()
@@ -228,7 +215,7 @@ object SkyHanniDebugsAndTests {
         }.start()
     }
 
-    fun testGardenVisitors() {
+    private fun testGardenVisitors() {
         if (displayList.isNotEmpty()) {
             displayList = mutableListOf()
             return
@@ -268,7 +255,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun reloadListeners() {
+    private fun reloadListeners() {
         // TODO: use repo for this and implement it correctly
         val blockedFeatures = try {
             File("config/skyhanni/blocked-features.txt").readLines().toList()
@@ -280,14 +267,18 @@ object SkyHanniDebugsAndTests {
         for (original in modules.toMutableList()) {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
+            //#if FORGE
             MinecraftForge.EVENT_BUS.unregister(original)
+            //#endif
             SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
                 modules.add(original)
+                //#if FORGE
                 MinecraftForge.EVENT_BUS.register(original)
+                //#endif
                 SkyHanniEvents.register(original)
                 println("Registered listener $simpleName")
             } else {
@@ -297,7 +288,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("Reloaded ${modules.size} listener classes.")
     }
 
-    fun stopListeners() {
+    private fun stopListeners() {
         ChatUtils.clickableChat(
             "§cAre you sure you want to stop all listeners? Doing this will make most features not work.",
             onClick = {
@@ -305,7 +296,9 @@ object SkyHanniDebugsAndTests {
                 for (original in modules.toMutableList()) {
                     val javaClass = original.javaClass
                     val simpleName = javaClass.simpleName
+                    //#if FORGE
                     MinecraftForge.EVENT_BUS.unregister(original)
+                    //#endif
                     SkyHanniEvents.unregister(original)
                     println("Unregistered listener $simpleName")
                 }
@@ -318,34 +311,19 @@ object SkyHanniDebugsAndTests {
         )
     }
 
-    fun whereAmI() {
-        if (SkyBlockUtils.inSkyBlock) {
-            ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
-            return
-        }
-        ChatUtils.chat("§eYou are not in Skyblock.")
-    }
-
     private var lastManualContestDataUpdate = SimpleTimeMark.farPast()
 
-    fun resetContestData() {
+    private fun resetContestData() {
         if (lastManualContestDataUpdate.passedSince() < 30.seconds) {
             ChatUtils.userError("§cYou already reset Jacob's Contest data recently!")
             return
         }
         lastManualContestDataUpdate = SimpleTimeMark.now()
 
-        GardenNextJacobContest.contests.clear()
-        GardenNextJacobContest.fetchedFromElite = false
-        GardenNextJacobContest.isFetchingContests = true
-        SkyHanniMod.coroutineScope.launch {
-            GardenNextJacobContest.fetchUpcomingContests()
-            GardenNextJacobContest.lastFetchAttempted = SimpleTimeMark.now()
-            GardenNextJacobContest.isFetchingContests = false
-        }
+        GardenNextJacobContest.resetContestData()
     }
 
-    fun copyLocation(args: Array<String>) {
+    private fun copyLocation(args: Array<String>) {
         val location = LocationUtils.playerLocation()
         val x = (location.x + 0.001).roundTo(1)
         val y = (location.y + 0.001).roundTo(1)
@@ -359,33 +337,6 @@ object SkyHanniDebugsAndTests {
         "json" -> "$x:$y:$z" to "json"
         "pathfind" -> "`/shtestwaypoint $x $y $z pathfind`" to "pathfind"
         else -> "LorenzVec($x, $y, $z)" to "LorenzVec"
-    }
-
-    fun debugVersion() {
-        val name = "SkyHanni ${SkyHanniMod.VERSION}"
-        ChatUtils.chat("§eYou are using $name")
-        OSUtils.copyToClipboard(name)
-    }
-
-    fun copyItemInternalName() {
-        val hand = InventoryUtils.getItemInHand()
-        if (hand == null) {
-            ChatUtils.userError("No item in hand!")
-            return
-        }
-
-        val internalName = hand.getInternalName().asString()
-        OSUtils.copyToClipboard(internalName)
-        ChatUtils.chat("§eCopied internal name §7$internalName §eto the clipboard!")
-    }
-
-    fun toggleRender() {
-        globalRender = !globalRender
-        if (globalRender) {
-            ChatUtils.chat("§aEnabled global renderer!")
-        } else {
-            ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
-        }
     }
 
     @HandleEvent(GuiKeyPressEvent::class)
@@ -491,7 +442,7 @@ object SkyHanniDebugsAndTests {
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
-        if (Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+        if (MinecraftCompat.showDebugHud) {
             if (debugConfig.currentAreaDebug) {
                 config.debugLocationPos.renderString(
                     "Current Area: ${HypixelData.skyBlockArea}",
@@ -563,6 +514,7 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
     }
 
+    @Suppress("LongMethod")
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shresetconfig") {
@@ -570,7 +522,105 @@ object SkyHanniDebugsAndTests {
                 "This §cWILL RESET §7your config, but also update the config files " +
                 "(names, description, orderings and stuff)."
             category = CommandCategory.DEVELOPER_TEST
-            callback { resetConfigCommand() }
+            callback {
+                ChatUtils.clickableChat(
+                    "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
+                    onClick = { resetConfig() },
+                    "§eClick to confirm.",
+                    prefix = false,
+                    oneTimeClick = true,
+                )
+            }
+        }
+        event.registerBrigadier("shversion") {
+            description = "Prints the SkyHanni version in the chat"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                val name1 = "SkyHanni ${SkyHanniMod.VERSION} on Minecraft ${PlatformUtils.MC_VERSION}"
+                ChatUtils.chat("§eYou are using $name1")
+                OSUtils.copyToClipboard(name1)
+            }
+        }
+        event.registerBrigadier("shtestgardenvisitors") {
+            description = "Test the garden visitor drop statistics"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { testGardenVisitors() }
+        }
+        event.registerBrigadier("shcopyinternalname") {
+            description = "Copies the internal name of the item in hand to the clipboard."
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                val hand = InventoryUtils.getItemInHand()
+                if (hand == null) {
+                    ChatUtils.userError("No item in hand!")
+                } else {
+                    val internalName = hand.getInternalName().asString()
+                    OSUtils.copyToClipboard(internalName)
+                    ChatUtils.chat("§eCopied internal name §7$internalName §eto the clipboard!")
+                }
+            }
+        }
+        event.registerBrigadier("shcopylocation") {
+            description = "Copies the player location as LorenzVec format to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { copyLocation(it) }
+        }
+        event.registerBrigadier("shtest") {
+            description = "Unused test command."
+            category = CommandCategory.DEVELOPER_TEST
+            legacyCallbackArgs { testCommand(it) }
+        }
+        event.registerBrigadier("shfindnullconfig") {
+            description = "Find config elements that are null and prints them into the console"
+            category = CommandCategory.DEVELOPER_TEST
+            legacyCallbackArgs {
+                println("start null finder")
+                findNull(SkyHanniMod.feature, "config")
+                println("stop null finder")
+            }
+        }
+        event.registerBrigadier("shtestwaypoint") {
+            description = "Set a waypoint on that location"
+            category = CommandCategory.DEVELOPER_TEST
+            legacyCallbackArgs { waypoint(it) }
+        }
+        event.registerBrigadier("shstoplisteners") {
+            description = "Unregistering all loaded event listeners"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { stopListeners() }
+        }
+        event.registerBrigadier("shreloadlisteners") {
+            description = "Reloads all event listeners again"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { reloadListeners() }
+        }
+        event.registerBrigadier("shresetcontestdata") {
+            description = "Resets Jacob's Contest Data"
+            category = CommandCategory.USERS_RESET
+            callback { resetContestData() }
+        }
+        event.registerBrigadier("shwhereami") {
+            description = "Print current island in chat"
+            category = CommandCategory.USERS_BUG_FIX
+            callback {
+                if (SkyBlockUtils.inSkyBlock) {
+                    ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
+                } else {
+                    ChatUtils.chat("§eYou are not in Skyblock.")
+                }
+            }
+        }
+        event.registerBrigadier("shrendertoggle") {
+            description = "Disables/enables the rendering of all skyhanni guis."
+            category = CommandCategory.USERS_BUG_FIX
+            callback {
+                globalRender = !globalRender
+                if (globalRender) {
+                    ChatUtils.chat("§aEnabled global renderer!")
+                } else {
+                    ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
+                }
+            }
         }
     }
 }
