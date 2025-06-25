@@ -103,15 +103,16 @@ object TreeGiftTrackerLegacy {
      */
     val percentageContributedPattern by patternGroup.pattern(
         "contribution-percentage",
-        " *(?:§.)+You helped cut (?:§.)+(?<percentage>[\\d.]+)% (?:§.)+of the (?:§.)+(?<type>.*) Tree(?:§.)+\\."
+        " *(?:§.)+You helped cut (?<percentColor>§.)+(?<percentage>[\\d.]+)% (?:§.)+of the (?:§.)+(?<type>.*) Tree(?:§.)+\\."
     )
 
     /**
      * REGEX-TEST: §f                       §e+5 rewards gained! §8(hover)
+     * REGEX-TEST:                             §r§e+0 rewards gained!
      */
     val rewardsGainedPattern by patternGroup.pattern(
         "rewards-gained",
-        "(?:§.)+ *(?:§.)+\\+(?<count>[\\d,]+) rewards gained! (?:§.)+\\(hover\\)"
+        "(?:§.)* *(?:§.)+\\+(?<count>[\\d,]+) rewards gained!(?: (?:§.)+\\(hover\\))?"
     )
 
     /**

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -23,13 +24,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import net.minecraft.text.Text
 import kotlin.time.Duration.Companion.seconds
@@ -38,7 +38,6 @@ import kotlin.time.Duration.Companion.seconds
 object TreeGiftTracker {
 
     private val config get() = SkyHanniMod.feature.foraging.treeGiftTracker
-    private val patternGroup = RepoPattern.group("foraging.treegift")
 
     private val tracker = SkyHanniBucketedItemTracker(
         "Tree Gift Tracker",
@@ -84,7 +83,7 @@ object TreeGiftTracker {
         tracker.addPriceFromButton(this)
     }
 
-    private fun isEnabled() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && heldItemEnabled() && !PlatformUtils.IS_LEGACY
+    private fun isEnabled() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && heldItemEnabled()
     private fun heldItemEnabled() = !config.onlyHoldingAxe || isHoldingAxe()
     private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE
 
@@ -133,6 +132,8 @@ object TreeGiftTracker {
             if (openLootLoop) {
                 openBonusGiftLoop = false
                 lastTreeGiftAt = SimpleTimeMark.now()
+            } else {
+                sendTreeGiftStats()
             }
             if (config.hideChats) blockedReason = "TREE_GIFT"
         }
@@ -145,6 +146,8 @@ object TreeGiftTracker {
 
         TreeGiftTrackerLegacy.percentageContributedPattern.matchMatcher(message) {
             val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
+            val percentColor = group("percentColor")
+            lastPercentString = "$percentColor$percentage%"
             val type = group("type")
             treeType = TreeGiftTrackerLegacy.TreeType.byNameOrNull(type)
             val treeType = treeType ?: return@matchMatcher
@@ -155,6 +158,7 @@ object TreeGiftTracker {
         }
 
         TreeGiftTrackerLegacy.rewardsGainedPattern.matchMatcher(message) {
+            group("count").formatIntOrNull()?.let { lastRewardCount = it }
             val dataSibling = chatComponent.siblings.firstOrNull() ?: return@matchMatcher
             dataSibling.getHoverLootPairs().forEach { (item, amount) ->
                 loot.addOrPut(item, amount)
@@ -170,6 +174,9 @@ object TreeGiftTracker {
                 NeuInternalName.fromItemNameOrNull("$book $tier")
             } ?: NeuInternalName.fromItemNameOrNull(item) ?: return@matchMatcher
             loot.addOrPut(itemInternalName, 1)
+
+            val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
+            if (percentage <= 1.0) rareDrops.add(item)
         }
     }
 
@@ -180,6 +187,7 @@ object TreeGiftTracker {
 
     private fun Text.getHoverLootPairs(): Set<Pair<NeuInternalName, Int>> = buildSet {
         val treeType = treeType ?: return this
+        lastHover = hover
         val joinedLines = hover?.formattedTextCompat() + hover?.siblings?.joinToString("") { it.formattedTextCompat() }
         joinedLines.split("\n").forEach { line ->
             val (item, amountString) = TreeGiftTrackerLegacy.hoverRewardPattern.matchMatcher(line) {
@@ -208,6 +216,24 @@ object TreeGiftTracker {
                 }
             }
         }
+    }
+
+    private var lastPercentString = ""
+    private var lastRewardCount = 0
+    private val rareDrops = mutableListOf<String>()
+    private var lastHover: Text? = null
+
+    private fun sendTreeGiftStats() {
+        val lastTreeType = treeType ?: return
+        val message = "§9$lastTreeType Tree Gift. §7You helped cut $lastPercentString §7and gained §e$lastRewardCount rewards§a!"
+        val component = message.asComponent()
+        component.hover = lastHover
+        ChatUtils.chat(component)
+        rareDrops.forEach { drop ->
+            ChatUtils.chat("§f - $drop", prefix = false)
+        }
+        rareDrops.clear()
+        lastHover = null
     }
 
     @HandleEvent
