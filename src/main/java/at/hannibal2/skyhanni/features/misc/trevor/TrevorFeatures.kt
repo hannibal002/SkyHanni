@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -112,12 +113,12 @@ object TrevorFeatures {
     var questActive = false
     var inBetweenQuests = false
     var inTrapperDen = false
+    var lastTitle: TitleContext? = null
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    @HandleEvent(SecondPassedEvent::class)
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onSecondPassed() {
-        if (!onFarmingIsland()) return
         updateTrapper()
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
@@ -126,16 +127,15 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!onFarmingIsland()) return
-
         val formattedMessage = event.message.removeColor()
 
         mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
-                TitleManager.sendTitle("§2Mob Died ")
+                lastTitle?.stop()
+                lastTitle = TitleManager.sendTitle("§2Mob Died")
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
@@ -188,10 +188,9 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderOverlay() {
         if (!config.trapperCooldownGui) return
-        if (!onFarmingIsland()) return
 
         val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
         else if (timeUntilNextReady == 1) "1 second left"
@@ -213,7 +212,8 @@ object TrevorFeatures {
         if (timeUntilNextReady <= 0 && trapperReady) {
             if (timeUntilNextReady == 0) {
                 if (config.readyTitle) {
-                    TitleManager.sendTitle("§2Trapper Ready")
+                    lastTitle?.stop()
+                    lastTitle = TitleManager.sendTitle("§2Trapper Ready")
                     SoundUtils.playBeepSound()
                 }
             }
@@ -256,9 +256,8 @@ object TrevorFeatures {
         questActive = active
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!onFarmingIsland()) return
         var entityTrapper = EntityUtils.getEntityByID(TRAPPER_ID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
@@ -293,9 +292,8 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onKeyPress(event: KeyPressEvent) {
-        if (!onFarmingIsland()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
 

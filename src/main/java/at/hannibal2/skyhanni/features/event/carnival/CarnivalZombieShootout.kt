@@ -29,6 +29,9 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.21
+//$$ import net.minecraft.state.property.Properties
+//#endif
 
 @SkyHanniModule
 object CarnivalZombieShootout {
@@ -163,6 +166,7 @@ object CarnivalZombieShootout {
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !started) return
 
+        //#if MC < 1.21
         val old = event.old
         val new = event.new
 
@@ -171,6 +175,19 @@ object CarnivalZombieShootout {
             old == "lit_redstone_lamp" && new == "redstone_lamp" -> null
             else -> lamp
         }
+        //#else
+        //$$ val blockOld = event.old
+        //$$ val blockNew = event.new
+        //$$ if(blockOld == "redstone_lamp" && blockNew == "redstone_lamp") {
+        //$$     val old = event.oldState.get(Properties.LIT)
+        //$$     val new = event.newState.get(Properties.LIT)
+        //$$     lamp = when {
+        //$$         !old && new -> Lamp(event.location, SimpleTimeMark.now())
+        //$$         old && !new -> null
+        //$$         else -> lamp
+        //$$     }
+        //$$ }
+        //#endif
     }
 
     @HandleEvent
