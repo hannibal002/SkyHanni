@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
+import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 import net.minecraft.client.gui.hud.InGameHud;
     import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,6 +13,6 @@ public class MixinInGameHud {
 
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
     public void disableEffects(CallbackInfo ci) {
-        if (SkyHanniMod.feature.misc.hideStatusEffects) ci.cancel();
+        if (SkyBlockUtils.INSTANCE.getInSkyBlock() && SkyHanniMod.feature.misc.hideStatusEffects) ci.cancel();
     }
 }
