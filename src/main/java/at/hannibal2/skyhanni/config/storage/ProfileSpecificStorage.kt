@@ -662,7 +662,7 @@ class ProfileSpecificStorage(
 
     // - foraging
     @Expose
-    var foraging: ForagingStorage = ForagingStorage()
+    val foraging: ForagingStorage = ForagingStorage()
 
     class ForagingStorage {
         @Expose
@@ -676,6 +676,10 @@ class ProfileSpecificStorage(
 
         @Expose
         var whispers: PowderStorage = PowderStorage()
+
+        // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
+        @Expose
+        var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
     }
 
     // - mining
@@ -728,16 +732,6 @@ class ProfileSpecificStorage(
 
         @Expose
         var crystalNucleusTracker: CrystalNucleusTracker.Data = CrystalNucleusTracker.Data()
-    }
-
-    // - foraging
-    @Expose
-    val foraging: ForagingConfig = ForagingConfig()
-
-    class ForagingConfig {
-        // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
-        @Expose
-        var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
     }
 
     @Expose
