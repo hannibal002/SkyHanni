@@ -188,9 +188,8 @@ object OrderedTextUtils {
                 } ?: {
 
                     to.color?.let {
-                        val hexString = it.rgb.toString(16).padStart(6, '0')
 
-                        sb.append("§#${hexString}")
+                        sb.append("§${it.hexCode}")
                     }
                 }
             }
