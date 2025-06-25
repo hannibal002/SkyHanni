@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import com.google.gson.JsonPrimitive
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
