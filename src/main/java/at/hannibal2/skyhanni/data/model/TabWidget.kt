@@ -344,8 +344,8 @@ enum class TabWidget(
         "(?:§.)*Shard Traps"
     ),
     STARBORN_TEMPLE(
-    // language=RegExp
-    "§9§lStarborn Temple:"
+        // language=RegExp
+        "§9§lStarborn Temple:",
     ),
     ;
 
