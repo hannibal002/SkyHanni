@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.trevor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -84,9 +85,8 @@ object TrevorTracker {
     // TODO change functionality to use enum rather than ordinals
     private fun formatDisplay(map: List<Renderable>) = config.textFormat.map { map[it.ordinal] }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!TrevorFeatures.onFarmingIsland()) return
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
 
         selfKillMobPattern.matchMatcher(event.message) {
@@ -134,7 +134,7 @@ object TrevorTracker {
         addString("§b${(storage.animalRarities[TrapperMobRarity.ELUSIVE] ?: 0).addSeparators()} §6Elusive Animals")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
         config.position.renderRenderables(display, posLabel = "Trevor Tracker")
@@ -142,7 +142,6 @@ object TrevorTracker {
 
     private fun shouldDisplay(): Boolean {
         if (!config.dataTracker) return false
-        if (!TrevorFeatures.onFarmingIsland()) return false
         if (TrevorFeatures.inTrapperDen) return true
         return when (config.displayType) {
             true -> (TrevorFeatures.inBetweenQuests || TrevorFeatures.questActive)

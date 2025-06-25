@@ -264,4 +264,6 @@ class Mob(
         LineToMobHandler.register(this, color, lineWidth, depth, condition)
 
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
+
+    val isAlive: Boolean get() = baseEntity.isEntityAlive
 }
