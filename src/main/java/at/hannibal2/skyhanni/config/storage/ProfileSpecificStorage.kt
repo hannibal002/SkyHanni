@@ -66,9 +66,6 @@ import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
-//#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.features.foraging.TreeGiftTracker
-//#endif
 
 // put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage(
