@@ -168,7 +168,7 @@ object UpdateKeybinds {
 
             if (keybindMap.containsKey(currentValue)) {
                 val newValue = keybindMap[currentValue]
-                shimmy.setJson(JsonPrimitive(newValue))
+                shimmy.set(newValue)
 
                 logger.log("$keybind old $currentValue")
                 logger.log("$keybind new $newValue")
