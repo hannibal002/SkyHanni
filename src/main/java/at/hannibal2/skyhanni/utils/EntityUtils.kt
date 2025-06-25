@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
@@ -25,12 +24,18 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+//#if MC > 1.21
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.player.PlayerInventory
+//$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+//#else
+import net.minecraft.entity.SharedMonsterAttributes
+//#endif
 
 @SkyHanniModule
 object EntityUtils {
@@ -158,8 +163,19 @@ object EntityUtils {
 
     fun EntityPlayer.isNpc() = !isRealPlayer()
 
+    //#if MC < 1.21
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
+    //#else
+    //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    //$$     if (this !is PlayerEntity) return null
+    //$$     val list = mutableListOf<ItemStack?>()
+    //$$     for (equipmentSlot in PlayerInventory.EQUIPMENT_SLOTS.values) {
+    //$$         list.add(inventory.equipment.get(equipmentSlot).orNull())
+    //$$     }
+    //$$     return list.normalizeAsArray()
+    //$$ }
+    //#endif
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
@@ -179,9 +195,20 @@ object EntityUtils {
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
+    //#if MC < 1.21
     fun getAllTileEntities(): Sequence<TileEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
+    //#else
+    //$$ fun getAllTileEntities(): Sequence<BlockEntity> {
+    //$$     if (!MinecraftCompat.localWorldExists) return emptySequence()
+    //$$     val blockEntityTickers = MinecraftCompat.localWorld.blockEntityTickers.let {
+    //$$         if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
+    //$$     }.asSequence().filterNotNull()
+    //$$
+    //$$     return blockEntityTickers.map { MinecraftCompat.localWorld.getBlockEntity(it.pos) }.filterNotNull()
+    //$$ }
+    //#endif
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
         if (isDead) return false

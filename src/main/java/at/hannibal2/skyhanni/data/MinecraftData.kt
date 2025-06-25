@@ -13,7 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
+//#if MC < 1.21
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
+//#else
+//$$ import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
+//#endif
 
 @SkyHanniModule
 object MinecraftData {
@@ -22,34 +26,58 @@ object MinecraftData {
     fun onPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
             is S29PacketSoundEffect -> {
-                if (PlaySoundEvent(packet.soundName, LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume).post()) {
-                    event.cancel()
-                }
-            }
-
-            is S2APacketParticles -> {
-                if (ReceiveParticleEvent(
-                        packet.particleType,
-                        LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate),
-                        packet.particleCount,
-                        packet.particleSpeed,
-                        LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
-                        packet.isLongDistance,
-                        packet.particleArgs,
+                if (PlaySoundEvent(
+                        //#if MC < 1.21
+                        packet.soundName,
+                        //#else
+                        //$$ packet.sound.value().id.toString().removePrefix("minecraft:"),
+                        //#endif
+                        LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume,
                     ).post()
                 ) {
                     event.cancel()
                 }
             }
 
+            is S2APacketParticles -> {
+                if (ReceiveParticleEvent(
+                        //#if MC < 1.21
+                        packet.particleType,
+                        //#else
+                        //$$ packet.parameters.type,
+                        //#endif
+                        LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate),
+                        packet.particleCount,
+                        packet.particleSpeed,
+                        LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
+                        packet.isLongDistance,
+                        //#if MC < 1.21
+                        packet.particleArgs,
+                        //#endif
+                    ).post()
+                ) {
+                    event.cancel()
+                }
+            }
+
+            //#if MC < 1.21
             is S32PacketConfirmTransaction -> {
                 if (packet.actionNumber > 0) return
+                //#else
+                //$$ is CommonPingS2CPacket -> {
+                //$$ if (lastPingParameter == packet.parameter) return
+                //$$ lastPingParameter = packet.parameter
+                //#endif
 
                 totalServerTicks++
                 ServerTickEvent.post()
             }
         }
     }
+
+    //#if MC > 1.21
+    //$$ private var lastPingParameter = 0
+    //#endif
 
     var totalServerTicks: Long = 0L
         private set

@@ -26,7 +26,7 @@ fun Collection<Score>.getPlayerNames(scoreboard: Scoreboard): List<Score> {
 }
 //#else
 //$$ fun Collection<ScoreboardEntry>.getPlayerNames(scoreboard: Scoreboard): List<Text> {
-//$$     return this.sortedBy { -it.value }
+//$$     return this.sortedBy { it.value }
 //$$         .map {
 //$$             val team = scoreboard.getScoreHolderTeam(it.owner)
 //$$             Text.empty().also { main ->

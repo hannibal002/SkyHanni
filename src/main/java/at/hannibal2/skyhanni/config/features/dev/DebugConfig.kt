@@ -1,18 +1,16 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.data.ElectionCandidate
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
-// todo 1.21 impl needed
 class DebugConfig {
     @Expose
     @ConfigOption(name = "Enable Debug", desc = "Enable Test logic")
@@ -169,12 +167,10 @@ class DebugConfig {
     @ConfigEditorBoolean
     val powderMessages: Boolean = false
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     var assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
-    //#endif
 
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
@@ -200,6 +196,24 @@ class DebugConfig {
     @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
     @ConfigEditorBoolean
     var dvdLogo: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
+    @ConfigEditorBoolean
+    var itemStack: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "itemStack")
+    var itemStackPosition: Position = Position(-200, 300)
+
+    @Expose
+    @ConfigOption(name = "Animated Item Stack", desc = "Enable the test Animated Item Stack Renderable")
+    @ConfigEditorBoolean
+    var animatedItemStack: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
+    var animatedItemStackPosition: Position = Position(-300, 300)
 
     // Does not have a config element!
     @Expose
