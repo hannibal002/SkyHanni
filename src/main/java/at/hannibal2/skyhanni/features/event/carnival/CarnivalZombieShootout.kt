@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -239,7 +239,7 @@ object CarnivalZombieShootout {
         return HorizontalContainerRenderable(
             listOf(
                 ItemStackRenderable(lamp),
-                RenderableString("§6Disappears in $prefix$timer"),
+                StringRenderable("§6Disappears in $prefix$timer"),
             ),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,

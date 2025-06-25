@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
@@ -31,8 +31,8 @@ object LassoDisplay {
         config.lassoDisplayPosition.renderRenderable(display, posLabel = "Lasso Display")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(SkyHanniTickEvent::class, onlyOnSkyblock = true)
+    fun onTick() {
         if (!config.lassoDisplay) return
         var isReel = false
         var progressBar = ""
@@ -61,13 +61,11 @@ object LassoDisplay {
                 }
             }
         }
-        if (isReel) {
-            display = RenderableString("§e§l          REEL          ")
+        display = if (isReel) {
+            StringRenderable("§e§l          REEL          ")
         } else if (progressBar.isNotEmpty()) {
-            display = RenderableString(progressBar)
-        } else {
-            display = null
-        }
+            StringRenderable(progressBar)
+        } else null
     }
 
 }
