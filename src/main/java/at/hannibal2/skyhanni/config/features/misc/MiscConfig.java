@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.OnlyLegacy;
+import at.hannibal2.skyhanni.config.OnlyModern;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
@@ -297,6 +298,7 @@ public class MiscConfig {
     @ConfigOption(name = "NEU Heavy Pearls", desc = "Fix NEU's Heavy Pearl detection.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @OnlyLegacy
     public boolean fixNeuHeavyPearls = true;
 
     @Expose
@@ -446,4 +448,11 @@ public class MiscConfig {
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int abiphoneAcceptKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Hide Status Effects", desc = "Hides status effects in the top right of the screen")
+    @OnlyModern
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideStatusEffects = true;
 }
