@@ -9,14 +9,17 @@ import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -27,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -98,7 +102,7 @@ object ForagingTracker {
 
     private val rangedItems: MutableSet<NeuInternalName> = mutableSetOf()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onSackChange(event: SackChangeEvent) {
         event.readTreeGifts()
         event.addLogs()
@@ -170,6 +174,24 @@ object ForagingTracker {
         event.tryBlock()
     }
 
+    private val STRETCHING_STICKS = "STRETCHING_STICKS".toInternalName()
+    private var currentStretchingSticks = 0
+
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+        if (!isEnabled()) return
+        val treeType = treeType ?: return
+
+        val stretchingSticksNow = InventoryUtils.getItemsInOwnInventory().filter {
+            it.getInternalNameOrNull() == STRETCHING_STICKS
+        }.sumOf { it.count }
+
+        val change = stretchingSticksNow - currentStretchingSticks
+        currentStretchingSticks = stretchingSticksNow
+        if (change <= 0) return
+        tracker.addItem(treeType, STRETCHING_STICKS, change, command = false)
+    }
+
     private fun SkyHanniChatEvent.tryReadLoot() {
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
             openLootLoop = !openLootLoop
@@ -222,6 +244,10 @@ object ForagingTracker {
                 val tier = group("tier").romanToDecimal()
                 NeuInternalName.fromItemNameOrNull("$book $tier")
             } ?: NeuInternalName.fromItemNameOrNull(item) ?: return@matchMatcher
+
+            // Stretching Sticks handled separately due to stack size not being given in message
+            if (itemInternalName == STRETCHING_STICKS) return@matchMatcher
+
             loot.addOrPut(itemInternalName, 1)
 
             val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
@@ -237,11 +263,13 @@ object ForagingTracker {
     private fun Text.getHoverLootPairs(): Set<Pair<NeuInternalName, Int>> = buildSet {
         val treeType = treeType ?: return this
         lastHover = hover
-        val joinedLines = hover?.formattedTextCompat() + hover?.siblings?.joinToString("") { it.formattedTextCompat() }
-        joinedLines.split("\n").forEach { line ->
+        val lootLines = hover?.formattedTextCompat()?.split("\n")?.takeIfNotEmpty() ?: return this
+        ChatUtils.debug("found loot lines:\n${lootLines.joinToString("\n").replace("§", "&")}")
+        lootLines.forEach { line ->
             val (item, amountString) = ForagingTrackerLegacy.hoverRewardPattern.matchMatcher(line) {
                 group("item") to group("amount")
             } ?: return@forEach
+            ChatUtils.debug("found hover loot: $item x$amountString")
             if (amountString.contains("-")) {
                 NeuInternalName.fromItemNameOrNull(item)?.let {
                     // Skip ranges like "0-2" (for now), handle from sack changes
