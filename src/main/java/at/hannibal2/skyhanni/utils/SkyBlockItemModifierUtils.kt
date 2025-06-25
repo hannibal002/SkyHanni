@@ -144,7 +144,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getPetInfo(): PetInfo? {
         val colorlessName = displayName.removeColor()
         // Repo pets will always return null for PetInfo, don't even attempt to parse it
-        if (colorlessName.contains("→")) return null
+        if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) return null
         val petInfoJson = getExtraAttributes()?.takeIf {
             it.hasKey("petInfo")
         }?.getString("petInfo")?.takeIf {
