@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi

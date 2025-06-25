@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import java.util.*
 import kotlin.time.Duration
@@ -110,7 +110,7 @@ object CFStrayTimer {
         listOf(
             "§eStray Timer",
             "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"
-        ).map { RenderableString(it) }
+        ).map { StringRenderable(it) }
     )
 
     private fun preventCloseTitle() {
