@@ -107,13 +107,13 @@ interface Renderable {
         fun fromAny(any: Any?, itemScale: Double = NeuItems.ITEM_FONT_SIZE): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
-            is String -> RenderableString(any)
+            is String -> StringRenderable(any)
             is ItemStack -> ItemStackRenderable(any, itemScale)
             else -> null
         }
 
         fun link(text: String, bypassChecks: Boolean = false, onLeftClick: () -> Unit): Renderable =
-            link(RenderableString(text), onLeftClick, bypassChecks = bypassChecks)
+            link(StringRenderable(text), onLeftClick, bypassChecks = bypassChecks)
 
         fun optionalLink(
             text: String,
@@ -122,7 +122,7 @@ interface Renderable {
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
         ): Renderable = link(
-            RenderableString(text),
+            StringRenderable(text),
             onLeftClick,
             bypassChecks,
             highlightsOnHoverSlots = highlightsOnHoverSlots,
@@ -154,7 +154,7 @@ interface Renderable {
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(RenderableString(text), onLeftClick, bypassChecks, condition, tips, onHover)
+        ) = clickable(StringRenderable(text), onLeftClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
             render: Renderable,
@@ -177,7 +177,7 @@ interface Renderable {
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(RenderableString(text), onAnyClick, bypassChecks, condition, tips, onHover)
+        ) = clickable(StringRenderable(text), onAnyClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
             render: Renderable,
@@ -278,7 +278,7 @@ interface Renderable {
             onHover: () -> Unit = {},
         ): Renderable {
 
-            val render = fromAny(content) ?: RenderableString("Error")
+            val render = fromAny(content) ?: StringRenderable("Error")
             return object : Renderable {
                 override val width = render.width
                 override val height = render.height
@@ -483,8 +483,8 @@ interface Renderable {
         }
 
         @Deprecated(
-            "Use RenderableString instead",
-            ReplaceWith("RenderableString(text, scale, color, horizontalAlign, verticalAlign)"),
+            "Use StringRenderable instead",
+            ReplaceWith("StringRenderable(text, scale, color, horizontalAlign, verticalAlign)"),
         )
         fun string(
             text: String,
@@ -492,7 +492,7 @@ interface Renderable {
             color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-        ) = RenderableString(
+        ) = StringRenderable(
             text,
             scale,
             color,
@@ -501,8 +501,8 @@ interface Renderable {
         )
 
         @Deprecated(
-            "use WrappedRenderableString instead",
-            ReplaceWith("WrappedRenderableString(text, width, scale, color, horizontalAlign, verticalAlign)"),
+            "use WrappedStringRenderable instead",
+            ReplaceWith("WrappedStringRenderable(text, width, scale, color, horizontalAlign, verticalAlign)"),
         )
         fun wrappedString(
             text: String,
@@ -512,7 +512,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
             internalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-        ) = WrappedRenderableString(
+        ) = WrappedStringRenderable(
             text,
             width,
             scale,
@@ -1016,8 +1016,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
             showScrollableTipsInList: Boolean = false,
         ) = object : Renderable {
-            private val scrollUpTip = RenderableString("§7§oMore items above (scroll)")
-            private val scrollDownTip = RenderableString("§7§oMore items below (scroll)")
+            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
+            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
 
             override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width)
             override val height = height
@@ -1068,8 +1068,8 @@ interface Renderable {
         ) = object : Renderable {
             private var list: Set<Renderable> = filterList(content, textInput.textBox)
 
-            private val scrollUpTip = RenderableString("§7§oMore items above (scroll)")
-            private val scrollDownTip = RenderableString("§7§oMore items below (scroll)")
+            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
+            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
 
             override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollUpTip.width, scrollDownTip.width)
             override val height = height
@@ -1177,10 +1177,10 @@ interface Renderable {
         }
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =
-            filterListBase(content, textBox, RenderableString("§cNo search results!"))
+            filterListBase(content, textBox, StringRenderable("§cNo search results!"))
 
         private fun filterListMap(content: Map<List<Renderable>, String?>, textBox: String) =
-            filterListBase(content, textBox, listOf(RenderableString("§cNo search results!")))
+            filterListBase(content, textBox, listOf(StringRenderable("§cNo search results!")))
 
         private fun <T> filterListBase(content: Map<T, String?>, textBox: String, empty: T): Set<T> {
             val map = content.filter { it.value?.contains(textBox, ignoreCase = true) != false }
@@ -1248,8 +1248,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            private val scrollUpTip = RenderableString("§7§oMore items above (scroll)")
-            private val scrollDownTip = RenderableString("§7§oMore items below (scroll)")
+            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
+            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
 
             private var list = filterListMap(content, textInput.textBox).toList()
 
