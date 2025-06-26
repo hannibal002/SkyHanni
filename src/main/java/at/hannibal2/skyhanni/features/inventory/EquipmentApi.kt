@@ -107,7 +107,7 @@ object EquipmentApi {
     }
 
     private fun handleInventoryItem(slot: EquipmentSlot, itemStack: ItemStack?) {
-        val item = if (itemStack.isNotEmpty() && !itemStack.isStainedGlassPane()) itemStack else null
+        val item = if (itemStack != null && !itemStack.isStainedGlassPane()) itemStack else null
         setEquipment(slot, item)
     }
 

@@ -103,6 +103,7 @@ object CroesusChestTracker {
                 return
             }
 
+            // TODO current impl of inventoryItemsWithNull hides all null fields already - this might cause bugs
             // With null, since if an item is missing the chest will be set null
             checkChests(event.inventoryItemsWithNull)
 

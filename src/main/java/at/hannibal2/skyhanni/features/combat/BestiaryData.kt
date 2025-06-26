@@ -421,8 +421,7 @@ object BestiaryData {
         return true
     }
 
-    private fun isBestiaryGui(stack: ItemStack?, name: String): Boolean {
-        if (!stack.isNotEmpty()) return false
+    private fun isBestiaryGui(stack: ItemStack, name: String): Boolean {
         val bestiaryGuiTitleMatcher = titlePattern.matcher(name)
         if (bestiaryGuiTitleMatcher.matches()) {
             if ("Bestiary" != bestiaryGuiTitleMatcher.group("title")) {
