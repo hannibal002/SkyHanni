@@ -19,9 +19,8 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
         items.entries.removeIf { !it.value.isNotEmpty() }
         return items
     }
-    // TODO might remove: the value is never null
     val inventoryItemsWithNull: Map<Int, ItemStack?> by lazy {
-        (0 until inventorySize).associateWith { inventoryItems[it].orNull() }
+        (0 until inventorySize).associateWith { inventoryItems[it] }
     }
     val inventoryItemsPrimitive: Map<Int, PrimitiveItemStack> by lazy {
         val map = mutableMapOf<Int, PrimitiveItemStack>()
