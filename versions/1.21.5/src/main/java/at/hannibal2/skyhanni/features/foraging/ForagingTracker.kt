@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -37,6 +38,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.text.Text
 import kotlin.time.Duration.Companion.seconds
 
@@ -56,8 +58,12 @@ object ForagingTracker {
         tracker.initRenderer({ config.position }) { isInIsland() && heldItemEnabled() && config.enabled }
     }
 
-    private fun heldItemEnabled() = !config.onlyHoldingAxe || isHoldingAxe()
-    private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE
+    private fun heldItemEnabled() = !config.onlyHoldingAxe ||
+        (isHoldingAxe() || lastAxeHeldTime.passedSince() < config.disappearingDelay.seconds)
+    private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE || hasHeldAxe
+
+    private var lastAxeHeldTime: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var hasHeldAxe: Boolean = false
 
     private fun drawDisplay(bucketData: ForagingTrackerLegacy.BucketData): List<Searchable> = buildList {
         addSearchString("§a§lForaging Tracker")
@@ -349,6 +355,27 @@ object ForagingTracker {
             description = "Resets the Foraging Tracker."
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
+        }
+    }
+
+    @HandleEvent
+    fun onPacketSent(event: PacketSentEvent) {
+        val packet = event.packet
+        if (packet !is UpdateSelectedSlotC2SPacket) return
+        handleSlotChange(packet.selectedSlot)
+    }
+
+    private fun handleSlotChange(newSlot: Int) {
+        val isAxe = InventoryUtils.getItemsInOwnInventoryWithNull()?.get(newSlot)?.getItemCategoryOrNull() == ItemCategory.AXE
+        if (isAxe) {
+            if (!hasHeldAxe) {
+                hasHeldAxe = true
+            }
+        } else {
+            if (hasHeldAxe) {
+                hasHeldAxe = false
+                lastAxeHeldTime = SimpleTimeMark.now()
+            }
         }
     }
 
