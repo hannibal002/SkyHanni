@@ -284,7 +284,8 @@ object ForagingTracker {
         ChatUtils.debug("found loot lines:\n${lootLines.joinToString("\n").replace("§", "&")}")
         lootLines.forEach { line ->
             val (item, amountString) = ForagingTrackerLegacy.hoverRewardPattern.matchMatcher(line) {
-                group("item") to group("amount")
+                val amountString = if (groupOrNull("percentage") != null) "1" else group("amount")
+                group("item") to amountString
             } ?: return@forEach
             ChatUtils.debug("found hover loot: $item x$amountString")
             if (amountString.contains("-")) {
