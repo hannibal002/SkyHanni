@@ -28,7 +28,7 @@ public class MixinArmorFeatureRenderer {
     ) {
         Entity current = HideArmor.INSTANCE.get();
         if (current instanceof PlayerEntity && HideArmor.INSTANCE.shouldHideArmor(((PlayerEntity) current))) {
-            if (!HideArmor.INSTANCE.getConfig().onlyHelmet || slot == EquipmentSlot.HEAD) {
+            if (!HideArmor.INSTANCE.getConfig().getOnlyHelmet() || slot == EquipmentSlot.HEAD) {
                 ci.cancel();
             }
         }
