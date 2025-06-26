@@ -62,7 +62,7 @@ class ForagingConfig {
     var lassoDisplay = true
 
     @Expose
-    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the galatea.")
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Galatea.")
     @ConfigEditorBoolean
     @FeatureToggle
     @OnlyModern
