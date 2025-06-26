@@ -41,22 +41,22 @@ class ExperimentsSuperpairsConfig {
             @Expose
             @ConfigOption(name = "Highlight Type", desc = "How the slot will be highlighted.")
             @ConfigEditorDropdown
-            val type: HighlightType = HighlightType.FULL
+            var type: HighlightType = HighlightType.FULL
 
             @Expose
             @ConfigOption(name = "Matched Pairs", desc = "Color for pairs you have already matched, and will receive in rewards.")
             @ConfigEditorColour
-            val matchedPairColor: ChromaColour = Color.GREEN.toChromaColor(alpha = 150)
+            var matchedPairColor: ChromaColour = Color.GREEN.toChromaColor(alpha = 150)
 
             @Expose
             @ConfigOption(name = "Uncovered Pairs", desc = "Color for pairs you have uncovered, but have not yet matched.")
             @ConfigEditorColour
-            val uncoveredPairColor: ChromaColour = Color.YELLOW.toChromaColor(alpha = 150)
+            var uncoveredPairColor: ChromaColour = Color.YELLOW.toChromaColor(alpha = 150)
 
             @Expose
             @ConfigOption(name = "Second Click Pair", desc = "Color for an item that would complete a pair on your second click.")
             @ConfigEditorColour
-            val secondClickPairColor: ChromaColour = Color.MAGENTA.toChromaColor(alpha = 150)
+            var secondClickPairColor: ChromaColour = Color.MAGENTA.toChromaColor(alpha = 150)
         }
     }
 
