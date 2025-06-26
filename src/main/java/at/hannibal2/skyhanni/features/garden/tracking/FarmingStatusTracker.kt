@@ -154,7 +154,7 @@ object FarmingStatusTracker {
         }
 
         InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { crop ->
-            "${crop.cropName} ${cropEmojis[crop]}".takeUnless { status in listOf("Idle", "Offline")}
+            "${crop.cropName} ${cropEmojis[crop]}".takeUnless { status in listOf("Idle", "Offline") }
         }
 
         InformationType.ANITA_BUFF -> FarmingContestApi.anitaBuffCrop?.cropName?.let { getCropEnum(it) }
