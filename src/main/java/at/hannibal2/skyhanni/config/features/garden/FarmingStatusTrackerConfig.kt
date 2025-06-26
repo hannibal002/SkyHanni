@@ -44,7 +44,7 @@ class FarmingStatusTrackerConfig {
     @ConfigOption(name = "Enabled", desc = "Send an embed with the options you selected below to your specified webhook.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Webhook Settings", desc = "")
