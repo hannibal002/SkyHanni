@@ -3,7 +3,7 @@
     "version": "${version}",
     "id": "skyhanni",
     "name": "SkyHanni",
-    "description": "SkyHanni is a Minecraft Mod for Hypixel SkyBlock.",
+    "description": "SkyHanni is a Mod for Hypixel SkyBlock.",
     "icon": "assets/skyhanni/logo.png",
     "authors": [],
     "environment": "client",
@@ -33,7 +33,14 @@
     },
     "custom": {
         "modmenu": {
-            "update_checker": true
+            "update_checker": true,
+            "links": {
+                "Discord": "https://discord.gg/skyhanni-997079228510117908",
+                "Modrinth Page": "https://modrinth.com/mod/skyhanni",
+                "List of all Features": "https://github.com/hannibal002/SkyHanni/blob/beta/docs/FEATURES.md",
+                "Source Code": "https://github.com/hannibal002/SkyHanni",
+                "Contributing Guide": "https://github.com/hannibal002/SkyHanni/blob/beta/CONTRIBUTING.md"
+            }
         }
     }
 }
