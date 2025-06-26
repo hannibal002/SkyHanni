@@ -78,7 +78,7 @@ object OrderedTextUtils {
                         if (index + 8 < legacyString.length) {
                             val hexColor = legacyString.substring(index + 2, index + 8)
 
-                            hexColor.toIntOrNull(16) ?: { color: Int ->
+                            hexColor.toIntOrNull(16) ?.let { color: Int ->
                                 lastStyle = Style.EMPTY.withColor(color)
                                 index += 7
                             }
