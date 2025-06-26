@@ -24,8 +24,10 @@ import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S04PacketEntityEquipment
 import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
+//#if MC < 1.21
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.network.play.server.S0FPacketSpawnMob
+//#endif
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraft.network.play.server.S14PacketEntity
