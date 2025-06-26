@@ -13,7 +13,7 @@ object WebhookUtils {
 
     private const val SKYHANNI_URL =
         "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true"
-    private const val ERROR_PREFIX = "Farming Tracker error!"
+    private const val ERROR_PREFIX = "Farming Status Tracker error!"
 
     private var lastMessageID: Long? = null
 

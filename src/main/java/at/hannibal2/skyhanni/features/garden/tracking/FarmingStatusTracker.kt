@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.garden.tracking
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Crop
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.EmbedConfig.InformationType
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Pet
+import at.hannibal2.skyhanni.config.features.garden.FarmingStatusTrackerConfig.Crop
+import at.hannibal2.skyhanni.config.features.garden.FarmingStatusTrackerConfig.EmbedConfig.InformationType
+import at.hannibal2.skyhanni.config.features.garden.FarmingStatusTrackerConfig.MessageType
+import at.hannibal2.skyhanni.config.features.garden.FarmingStatusTrackerConfig.Pet
 import at.hannibal2.skyhanni.data.BitsApi.cookieBuffTime
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Field
@@ -77,7 +77,7 @@ object FarmingStatusTracker {
 
         val success = prepareAndSendEmbed(status)
 
-        if (success) lastNotification = SimpleTimeMark.now() else ChatUtils.chat("§cCouldn't send embed (Farming Tracker).")
+        if (success) lastNotification = SimpleTimeMark.now() else ChatUtils.chat("§cCouldn't send embed (Farming Status Tracker).")
     }
 
     // Sends an embed when disconnecting from a server
@@ -106,7 +106,7 @@ object FarmingStatusTracker {
 
         val embed = buildEmbed(status, color, fields)
         val threadID = config.webhook.threadId.ifBlank { null }
-        val username = "[FARMING TRACKER] ${PlayerUtils.getName()}"
+        val username = "[FARMING STATUS TRACKER] ${PlayerUtils.getName()}"
 
         return sendOrEditMessage(embed, threadID, username)
     }

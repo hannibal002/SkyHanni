@@ -52,9 +52,9 @@ class GardenConfig {
     val farmingLane: FarmingLaneConfig = FarmingLaneConfig()
 
     @Expose
-    @ConfigOption(name = "Farming Tracker", desc = "")
+    @ConfigOption(name = "Farming Status Tracker", desc = "")
     @Accordion
-    val tracking: TrackingConfig = TrackingConfig()
+    val tracking: FarmingStatusTrackerConfig = FarmingStatusTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")

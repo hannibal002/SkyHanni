@@ -17,7 +17,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import java.util.Locale
 
 
-class TrackingConfig {
+class FarmingStatusTrackerConfig {
 
     @ConfigOption(
         name = "§cNotice",
