@@ -50,6 +50,12 @@ class ForagingConfig {
     var birriesHighlight = BirriesHighlightConfig()
 
     @Expose
+    @ConfigOption(name = "Foraging Tracker", desc = "")
+    @OnlyModern
+    @Accordion
+    val tracker = ForagingTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
     @ConfigEditorBoolean
     @FeatureToggle
