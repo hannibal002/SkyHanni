@@ -51,6 +51,10 @@ public class MiscConfig {
     @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
     public AreaNavigationConfig areaNavigation = new AreaNavigationConfig();
 
+    @Expose
+    @Category(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
+    public PathfindConfig pathfinding = new PathfindConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
@@ -256,6 +260,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Better Sign Editing", desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
     @ConfigEditorBoolean
+    @OnlyLegacy
     @FeatureToggle
     public boolean betterSignEditing = true;
 

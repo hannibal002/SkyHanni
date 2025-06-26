@@ -19,7 +19,7 @@ class CrystalNucleusTrackerConfig {
 
     @Expose
     @ConfigLink(owner = CrystalNucleusTrackerConfig::class, field = "enabled")
-    var position: Position = Position(20, 20)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Outside of Nucleus", desc = "Show the tracker anywhere in the Crystal Hollows.")
@@ -42,7 +42,7 @@ class CrystalNucleusTrackerConfig {
     @Expose
     @ConfigOption(name = "Professor Usage", desc = "Determine how cost for Sapphire Crystal is calculated.")
     @ConfigEditorDropdown
-    var professorUsage: Property<ProfessorUsageType> = Property.of(ProfessorUsageType.ROBOT_PARTS)
+    val professorUsage: Property<ProfessorUsageType> = Property.of(ProfessorUsageType.ROBOT_PARTS)
 
     enum class ProfessorUsageType(private val displayName: String) {
         ROBOT_PARTS("§9Robot Parts"),

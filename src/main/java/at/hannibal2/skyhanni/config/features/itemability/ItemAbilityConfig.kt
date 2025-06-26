@@ -31,17 +31,17 @@ class ItemAbilityConfig {
     @Expose
     @ConfigOption(name = "Fire Veil", desc = "")
     @Accordion
-    var fireVeilWands: FireVeilWandConfig = FireVeilWandConfig()
+    val fireVeilWands: FireVeilWandConfig = FireVeilWandConfig()
 
     @ConfigOption(name = "Chicken Head", desc = "")
     @Accordion
     @Expose
-    var chickenHead: ChickenHeadConfig = ChickenHeadConfig()
+    val chickenHead: ChickenHeadConfig = ChickenHeadConfig()
 
     @ConfigOption(name = "Crown of Avarice", desc = "")
     @Accordion
     @Expose
-    var crownOfAvarice: CrownOfAvariceConfig = CrownOfAvariceConfig()
+    val crownOfAvarice: CrownOfAvariceConfig = CrownOfAvariceConfig()
 
     @Expose
     @ConfigOption(

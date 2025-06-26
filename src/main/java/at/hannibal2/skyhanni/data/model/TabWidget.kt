@@ -339,6 +339,14 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Forest Whispers: (?:§.)*(?<amount>.*)",
     ),
+    SHARD_TRAPS(
+        // language=RegExp
+        "(?:§.)*Shard Traps"
+    ),
+    STARBORN_TEMPLE(
+        // language=RegExp
+        "§9§lStarborn Temple:",
+    ),
     ;
 
     /** The pattern for the first line of the widget*/

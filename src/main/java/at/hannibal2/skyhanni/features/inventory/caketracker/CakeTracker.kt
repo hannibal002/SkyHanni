@@ -33,9 +33,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -345,7 +345,7 @@ object CakeTracker {
             val displayString =
                 if (isSingular) "§fYear $colorCode$start"
                 else "§fYears $colorCode$start§f-$colorCode$end"
-            var renderable: Renderable = RenderableString(displayString)
+            var renderable: Renderable = StringRenderable(displayString)
             if (displayType == DisplayType.MISSING_CAKES && config.priceOnHover) {
                 renderable = Renderable.clickable(
                     renderable,
@@ -469,7 +469,7 @@ object CakeTracker {
         if (cakeList.isEmpty()) {
             val colorCode = if (displayType == DisplayType.OWNED_CAKES) "§c" else "§a"
             val verbiage = if (displayType == DisplayType.OWNED_CAKES) "missing" else "owned"
-            add(RenderableString("$colorCode§lAll cakes $verbiage!"))
+            add(StringRenderable("$colorCode§lAll cakes $verbiage!"))
         } else add(
             Renderable.scrollList(
                 getCakeRanges(cakeList, displayType, displayOrderType),

@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import java.awt.Color
 
-open class RenderableString(
+open class StringRenderable(
     val text: String,
     val scale: Double = 1.0,
     val color: Color = Color.WHITE,
@@ -26,7 +26,7 @@ open class RenderableString(
     }
 }
 
-class WrappedRenderableString(
+class WrappedStringRenderable(
     text: String,
     width: Int,
     scale: Double = 1.0,
@@ -34,7 +34,7 @@ class WrappedRenderableString(
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     private val internalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-) : Renderable, RenderableString(
+) : Renderable, StringRenderable(
     text,
     scale,
     color,

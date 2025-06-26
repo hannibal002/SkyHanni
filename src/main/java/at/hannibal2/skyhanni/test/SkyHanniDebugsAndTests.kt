@@ -66,10 +66,11 @@ import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -331,14 +332,7 @@ object SkyHanniDebugsAndTests {
         }
         lastManualContestDataUpdate = SimpleTimeMark.now()
 
-        GardenNextJacobContest.contests.clear()
-        GardenNextJacobContest.fetchedFromElite = false
-        GardenNextJacobContest.isFetchingContests = true
-        SkyHanniMod.coroutineScope.launch {
-            GardenNextJacobContest.fetchUpcomingContests()
-            GardenNextJacobContest.lastFetchAttempted = SimpleTimeMark.now()
-            GardenNextJacobContest.isFetchingContests = false
-        }
+        GardenNextJacobContest.resetContestData()
     }
 
     private fun copyLocation(args: Array<String>) {
@@ -508,12 +502,12 @@ object SkyHanniDebugsAndTests {
 
         config.debugItemPos.renderRenderables(
             listOf(
-                DragNDrop.draggable(RenderableString("A Bone"), { bone }),
+                DragNDrop.draggable(StringRenderable("A Bone"), { bone }),
                 Renderable.placeholder(0, 30),
-                DragNDrop.draggable(RenderableString("A Leaf"), { leaf }),
+                DragNDrop.draggable(StringRenderable("A Leaf"), { leaf }),
                 Renderable.placeholder(0, 30),
                 DragNDrop.droppable(
-                    RenderableString("Feed Dog"),
+                    StringRenderable("Feed Dog"),
                     object : Droppable {
                         override fun handle(drop: Any?) {
                             val unit = drop as ItemStack
@@ -545,7 +539,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { RenderableString(it.roundTo(1).toString()) }.toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { StringRenderable(it.roundTo(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(
@@ -553,7 +547,7 @@ object SkyHanniDebugsAndTests {
                 Renderable.table(renderables),
                 HorizontalContainerRenderable(
                     listOf(
-                        RenderableString("Test:").renderBounds(),
+                        StringRenderable("Test:").renderBounds(),
                         Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
                     ),
                     1,
@@ -629,7 +623,7 @@ object SkyHanniDebugsAndTests {
             description = "Prints the SkyHanni version in the chat"
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
-                val name1 = "SkyHanni ${SkyHanniMod.VERSION}"
+                val name1 = "SkyHanni ${SkyHanniMod.VERSION} on Minecraft ${PlatformUtils.MC_VERSION}"
                 ChatUtils.chat("§eYou are using $name1")
                 OSUtils.copyToClipboard(name1)
             }
