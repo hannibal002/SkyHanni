@@ -7,7 +7,6 @@ import net.minecraft.text.Style
 import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
 import java.util.Optional
-import kotlin.text.iterator
 import kotlin.time.Duration.Companion.minutes
 
 object OrderedTextUtils {
@@ -57,29 +56,52 @@ object OrderedTextUtils {
     fun legacyStringToStringVisitable(legacyString: String): StringVisitable {
         val segments = mutableListOf<StringVisitable>()
         var lastStyle = Style.EMPTY
-        var wasLastStyle = false
+
         val sb = StringBuilder()
 
-        for (char in legacyString) {
+        var index = 0
+        while (index < legacyString.length) {
+            val char = legacyString[index]
+
             if (char == '§') {
-                wasLastStyle = true
-            } else if (wasLastStyle) {
-                if (sb.isNotEmpty()) {
+
+                if (index + 1 < legacyString.length) {
+
                     segments.add(StringVisitable.styled(sb.toString(), lastStyle))
+
                     sb.clear()
+
+                    val nextChar = legacyString[index + 1]
+
+                    if (legacyString[index + 1] == '#') {
+
+                        if (index + 8 < legacyString.length) {
+                            val hexColor = legacyString.substring(index + 2, index + 8)
+
+                            hexColor.toIntOrNull(16) ?: { color: Int ->
+                                lastStyle = Style.EMPTY.withColor(color)
+                                index += 7
+                            }
+                        }
+
+                    } else {
+
+                        val formatting = Formatting.byCode(nextChar)
+
+                        if (formatting != null) {
+                            lastStyle = lastStyle.withExclusiveFormatting(formatting)
+                        } else if (nextChar == 'z') {
+                            lastStyle = lastStyle.withColor(CHROMA_COLOR)
+                        }
+
+                        index ++
+                    }
                 }
 
-                val formatting = Formatting.byCode(char)
-                if (formatting != null) {
-                    lastStyle = lastStyle.withExclusiveFormatting(formatting)
-                } else if (char == 'z') {
-                    lastStyle = lastStyle.withColor(CHROMA_COLOR)
-                }
-
-                wasLastStyle = false
             } else {
                 sb.append(char)
             }
+            index ++
         }
         if (sb.isNotEmpty()) {
             segments.add(StringVisitable.styled(sb.toString(), lastStyle))
@@ -92,26 +114,51 @@ object OrderedTextUtils {
     fun legacyTextToOrderedText(legacyString: String?): OrderedText {
 
         return OrderedText { visitor ->
-            var lastStyle = Style.EMPTY
-            var wasLastStyle = false
 
-            for (char in legacyString ?: "") {
+            legacyString ?: return@OrderedText true
+
+            var lastStyle = Style.EMPTY
+
+            var index = 0
+
+            while (index < legacyString.length) {
+                val char = legacyString[index]
 
                 if (char == '§') {
-                    wasLastStyle = true
-                } else if (wasLastStyle) {
 
-                    val formatting = Formatting.byCode(char)
-                    if (formatting != null) {
-                        lastStyle = lastStyle.withExclusiveFormatting(formatting)
-                    } else if (char == 'z') {
-                        lastStyle = lastStyle.withColor(CHROMA_COLOR)
+                    if (index + 1 < legacyString.length) {
+
+                        val nextChar = legacyString[index + 1]
+
+                        if (legacyString[index + 1] == '#') {
+
+                            if (index + 8 < legacyString.length) {
+                                val hexColor = legacyString.substring(index + 2, index + 8)
+
+                                hexColor.toIntOrNull(16) ?.let { color: Int ->
+                                    lastStyle = Style.EMPTY.withColor(color)
+                                    index += 7
+                                }
+                            }
+
+                        } else {
+
+                            val formatting = Formatting.byCode(nextChar)
+
+                            if (formatting != null) {
+                                lastStyle = lastStyle.withExclusiveFormatting(formatting)
+                            } else if (nextChar == 'z') {
+                                lastStyle = lastStyle.withColor(CHROMA_COLOR)
+                            }
+
+                            index ++
+                        }
                     }
 
-                    wasLastStyle = false
                 } else {
                     visitor.accept(0, lastStyle, char.code)
                 }
+                index ++
             }
             true
         }
@@ -136,8 +183,13 @@ object OrderedTextUtils {
             if (to.color?.name == "chroma") {
                 sb.append("§z")
             } else {
-                to.color?.toChatFormatting()?.let {
-                    sb.append(it.toString())
+
+                val colorFormatting = to.color?.toChatFormatting()
+
+                if (colorFormatting != null) {
+                    sb.append(colorFormatting.toString())
+                } else {
+                    sb.append("§${to.color?.hexCode}")
                 }
             }
         } else if (reset) {

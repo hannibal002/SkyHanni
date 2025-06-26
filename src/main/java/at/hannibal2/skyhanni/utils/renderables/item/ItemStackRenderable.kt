@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.TimeDependentRenderable
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration
 
 open class ItemStackRenderable(
     item: ItemStack,
@@ -18,7 +20,7 @@ open class ItemStackRenderable(
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     open val highlight: Boolean = false,
-) : Renderable {
+) : TimeDependentRenderable() {
     val stack: ItemStack = item.copy().apply {
         if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
     }
@@ -26,7 +28,7 @@ open class ItemStackRenderable(
     override val width = (15.5 * scale + 0.5).toInt() + xSpacing
     override val height = (15.5 * scale + 0.5).toInt() + ySpacing
 
-    override fun render(posX: Int, posY: Int) {
+    override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
         stack.renderOnScreen(
             xSpacing / 2.0f,
             0F,
