@@ -50,6 +50,12 @@ class ForagingConfig {
     var birriesHighlight = BirriesHighlightConfig()
 
     @Expose
+    @ConfigOption(name = "Hideonleaf Highlight", desc = "")
+    @OnlyModern
+    @Accordion
+    var hideonleafHighlight = HideonleafHighlightConfig()
+
+    @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
     @OnlyModern
     @Accordion
