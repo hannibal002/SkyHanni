@@ -105,7 +105,7 @@ object ForagingTracker {
         tracker.addPriceFromButton(this)
     }
 
-    private fun isEnabled() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && heldItemEnabled()
+    private fun isEnabled() = config.enabled && IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && heldItemEnabled()
     private fun heldItemEnabled() = !config.onlyHoldingAxe || isHoldingAxe()
     private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE
 
