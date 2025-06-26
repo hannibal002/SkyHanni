@@ -129,6 +129,7 @@ object FarmingTracker {
     }
 
     // Returns the value for a given information type
+    @Suppress("CyclomaticComplexity")
     private fun InformationType.resolveValue(status: String): Any? = when (this) {
         InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue?.roundToInt()
         InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue?.roundToInt()

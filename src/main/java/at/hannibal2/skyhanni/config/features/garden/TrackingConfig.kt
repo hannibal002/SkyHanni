@@ -33,7 +33,7 @@ class TrackingConfig {
             "§l§cWarning: Clicking this will open a webpage in your browser.",
     )
     @ConfigEditorButton(buttonText = "OPEN")
-    var sourceCodeUrl: Runnable = Runnable {
+    val sourceCodeUrl: Runnable = Runnable {
         OSUtils.openBrowser(
             "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/" +
                 "hannibal2/skyhanni/features/garden/tracking/FarmingTracker.kt",
@@ -43,7 +43,7 @@ class TrackingConfig {
     @Expose
     @ConfigOption(name = "Webhook Settings", desc = "")
     @Accordion
-    var webhook: WebhookConfig = WebhookConfig()
+    val webhook: WebhookConfig = WebhookConfig()
 
     class WebhookConfig {
         @Expose
@@ -74,7 +74,7 @@ class TrackingConfig {
         @Expose
         @ConfigOption(name = "Information Displayed", desc = "Change which stats are enabled, and the order they will be displayed in.")
         @ConfigEditorDraggableList
-        var information: MutableList<InformationType> = ArrayList()
+        val information: MutableList<InformationType> = ArrayList()
 
         enum class InformationType(val display: String, val fieldName: String) {
             FARMING_FORTUNE("§6Farming Fortune ☘", "FF <:farming_fortune:1263201171317854369>"),
