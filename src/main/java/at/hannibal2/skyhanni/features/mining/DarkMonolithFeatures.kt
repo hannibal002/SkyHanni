@@ -19,11 +19,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -139,7 +138,9 @@ object DarkMonolithFeatures {
         checkTitle()
         lastFoundEggVec = foundEggVec
         val knownEggVec = foundEggVec ?: return
-        renderBox = knownEggVec.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
+        with(WorldRenderUtils) {
+            renderBox = knownEggVec.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
+        }
     }
 
     private fun checkTitle() {
@@ -153,7 +154,7 @@ object DarkMonolithFeatures {
         addSearchString("§5§lDark Monolith Tracker")
         val profit = tracker.drawItems(data, { true }, this)
         add(
-            RenderableString(
+            StringRenderable(
                 "§7Monoliths looted: §d${data.monolithsLooted}",
             ).toSearchable(),
         )
@@ -167,7 +168,9 @@ object DarkMonolithFeatures {
         val knownEggVec = foundEggVec ?: return
         if (knownEggVec.distanceToPlayer() >= 100) return
         val axis = renderBox ?: return
-        event.drawFilledBoundingBox(axis, config.highlightColor.toColor())
+        with(WorldRenderUtils) {
+            event.drawFilledBoundingBox(axis, config.highlightColor.toColor())
+        }
     }
 
     private fun isEnabled() = config.highlight || config.title.isNotEmpty()
