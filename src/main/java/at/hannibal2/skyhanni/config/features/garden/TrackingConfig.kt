@@ -30,7 +30,7 @@ class TrackingConfig {
     @ConfigOption(
         name = "Source",
         desc = "Click to open the source code for this feature.\n" +
-            "§l§cWarning: Clicking this will open a webpage in your browser.",
+            "§eClicking this will open a webpage in your browser.",
     )
     @ConfigEditorButton(buttonText = "OPEN")
     val sourceCodeUrl: Runnable = Runnable {

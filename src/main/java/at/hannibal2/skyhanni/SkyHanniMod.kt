@@ -66,7 +66,11 @@ object SkyHanniMod {
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
         Runtime.getRuntime().addShutdownHook(
-            if (feature.garden.tracking.tracking) Thread { FarmingTracker.prepareAndSendEmbed("Offline") } else null,
+            Thread {
+                if (feature.garden.tracking.tracking) {
+                    FarmingTracker.prepareAndSendEmbed("Offline")
+                }
+            },
         )
         try {
             RepoManager.initRepo()
