@@ -166,7 +166,7 @@ object HideNotClickableItems {
         val slot = event.slot ?: return
 
         if (slot.slotNumber == slot.slotIndex) return
-        val stack = slot.stack?.orNull() ?: return
+        val stack = slot.stack.orNull() ?: return
 
         if (hide(chestName, stack)) {
             event.cancel()

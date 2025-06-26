@@ -152,7 +152,7 @@ object InventoryUtils {
     fun ContainerChest.getAllItems(): Map<Slot, ItemStack> = buildMap {
         for (slot in inventorySlots) {
             if (slot == null) continue
-            val stack = slot.stack?.orNull() ?: continue
+            val stack = slot.stack.orNull() ?: continue
             this[slot] = stack
         }
     }
