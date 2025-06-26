@@ -53,6 +53,11 @@ object GuiEditManager {
         guiScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
             if (it is GuiEditSign && !it.isGardenSign()) return
+            //#if MC > 1.21
+            //$$ val focusedWidget = it.focused?.javaClass?.name ?: "unknown"
+            //$$ ChatUtils.debug("Focused widget: $focusedWidget")
+            //$$ if (it.focused is net.minecraft.client.gui.widget.TextFieldWidget) return
+            //#endif
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
