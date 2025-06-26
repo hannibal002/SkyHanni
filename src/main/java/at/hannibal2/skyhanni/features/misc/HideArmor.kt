@@ -23,7 +23,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object HideArmor {
 
-    private val config get() = SkyHanniMod.feature.misc.hideArmor
+    val config get() = SkyHanniMod.feature.misc.hideArmor
     private var armor = mapOf<Int, ItemStack>()
 
     fun shouldHideArmor(entity: EntityPlayer): Boolean {
