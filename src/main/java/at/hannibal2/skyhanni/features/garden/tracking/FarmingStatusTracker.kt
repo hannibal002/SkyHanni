@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.EmbedConfig.I
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Pet
 import at.hannibal2.skyhanni.data.BitsApi.cookieBuffTime
-import at.hannibal2.skyhanni.data.ElectionApi
-import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Field
 import at.hannibal2.skyhanni.data.Footer
@@ -17,13 +15,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.Thumbnail
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.contest.ContestBracket
-import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.BRONZE
-import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.DIAMOND
-import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.GOLD
-import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.PLATINUM
-import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.SILVER
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,7 +39,7 @@ import kotlin.time.Duration.Companion.minutes
 // No tokens, session data, passwords, or account information is ever accessed or sent.
 
 @SkyHanniModule
-object FarmingTracker {
+object FarmingStatusTracker {
 
     private val config get() = SkyHanniMod.feature.garden.tracking
     private val godPotionTimer get() = ProfileStorageData.profileSpecific?.godPotExpiry
@@ -54,7 +47,19 @@ object FarmingTracker {
     var status = "Offline"
     private var lastNotification = SimpleTimeMark.farPast()
     private var playerFaceURL = ""
-    private val currentCrop: Crop? = null
+
+    private val cropEmojis: Map<CropType, String> = mapOf(
+        CropType.WHEAT to "<:wheat:1263207588296790048>",
+        CropType.POTATO to "<:potato:1263207583502569522>",
+        CropType.CARROT to "<:carrot:1263207574472359956>",
+        CropType.PUMPKIN to "<:pumpkin:1263207585004257321>",
+        CropType.MELON to "<:melon:1263207577920213083>",
+        CropType.SUGAR_CANE to "<:sugar:1263207586463748289>",
+        CropType.MUSHROOM to "<:mushroom:1263207580268888096>", // TODO NEW EMOJI
+        CropType.CACTUS to "<:cactus:1263207572962414724>",
+        CropType.COCOA_BEANS to "<:cocoa_beans:1263207576330567795>",
+        CropType.NETHER_WART to "<:nether_wart:1263207581770579970>"
+    )
 
     // Sends embed periodically
     @HandleEvent(SecondPassedEvent::class)
@@ -149,8 +154,7 @@ object FarmingTracker {
         }
 
         InformationType.ACTIVE_CROP -> GardenApi.getCurrentlyFarmedCrop()?.let { crop ->
-            getCropEnum(crop.cropName)?.let { "${it.display} ${it.emoji}" }
-                .takeUnless { status == "Idle" || status == "Offline" }
+            "${crop.cropName} ${cropEmojis[crop]}".takeUnless { status in listOf("Idle", "Offline")}
         }
 
         InformationType.ANITA_BUFF -> FarmingContestApi.anitaBuffCrop?.cropName?.let { getCropEnum(it) }
@@ -166,7 +170,7 @@ object FarmingTracker {
         return if (this != InformationType.JACOBS_CONTEST) {
             fieldName
         } else {
-            currentCrop?.let { "${it.name} Contest ${it.emoji}" } ?: fieldName
+            FarmingContestApi.contestCrop?.let { "${it.cropName} Contest ${cropEmojis[it]}" } ?: fieldName
         }
     }
 
@@ -215,25 +219,7 @@ object FarmingTracker {
         return (red shl 16) or (green shl 8) or blue
     }
 
-    private fun convertPlacement(placement: Double): ContestBracket? {
-        val isFinnegan = ElectionApi.currentMayor == ElectionCandidate.FINNEGAN
-        val (requiredBronze, requiredSilver, requiredGold, requiredPlatinum, requiredDiamond) = ContestBracket.entries
-            .map {
-                if (isFinnegan) it.requiredNormal else it.requiredFinnegan
-            }
-
-        return when {
-            placement >= requiredBronze -> null
-            placement in requiredSilver..requiredBronze -> BRONZE
-            placement in requiredGold..requiredSilver -> SILVER
-            placement in requiredPlatinum..requiredGold -> GOLD
-            placement in requiredDiamond..requiredPlatinum -> PLATINUM
-            placement >= requiredDiamond -> DIAMOND
-            else -> null
-        }
-    }
-
     fun InformationType.isSelected() = config.embed.information.contains(this)
 
-    fun isEnabled() = config.tracking
+    fun isEnabled() = config.enabled
 }

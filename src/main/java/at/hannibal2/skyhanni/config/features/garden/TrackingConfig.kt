@@ -36,9 +36,15 @@ class TrackingConfig {
     val sourceCodeUrl: Runnable = Runnable {
         OSUtils.openBrowser(
             "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/" +
-                "hannibal2/skyhanni/features/garden/tracking/FarmingTracker.kt",
+                "hannibal2/skyhanni/features/garden/tracking/FarmingStatusTracker.kt",
         )
     }
+
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Send an embed with the options you selected above to your specified webhook.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Webhook Settings", desc = "")
@@ -68,7 +74,7 @@ class TrackingConfig {
     @Expose
     @ConfigOption(name = "Embed Settings", desc = "")
     @Accordion
-    var embed: EmbedConfig = EmbedConfig()
+    val embed: EmbedConfig = EmbedConfig()
 
     class EmbedConfig {
         @Expose
@@ -127,12 +133,6 @@ class TrackingConfig {
             return str
         }
     }
-
-    @Expose
-    @ConfigOption(name = "Tracking", desc = "Send an embed with the options you selected above to your specified webhook.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var tracking: Boolean = true
 
     enum class Pet(val petName: String) {
         BEE("Bee <:bee:1263201131064983673>"),
