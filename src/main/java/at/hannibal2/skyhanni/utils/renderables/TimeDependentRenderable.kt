@@ -11,6 +11,7 @@ abstract class TimeDependentRenderable : Renderable {
 
     abstract fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration)
 
+    @Deprecated("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
     override fun render(posX: Int, posY: Int) {
         val now = SimpleTimeMark.now()
         val deltaTime = now - lastRenderTime

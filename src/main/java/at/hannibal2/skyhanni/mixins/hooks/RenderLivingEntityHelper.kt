@@ -31,7 +31,9 @@ object RenderLivingEntityHelper {
         entityColorMap.removeIfKey { it.isDead }
         entityColorCondition.removeIfKey { it.isDead }
         entityNoHurtTimeCondition.removeIfKey { it.isDead }
+    }
 
+    fun check() {
         areMobsHighlighted = false
         for (entry in entityColorCondition) {
             if (entry.value.invoke()) {

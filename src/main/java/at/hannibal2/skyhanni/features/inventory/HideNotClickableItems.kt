@@ -45,7 +45,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -120,9 +120,7 @@ object HideNotClickableItems {
             if (hide(chestName, stack)) {
                 slot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
             } else if (showGreenLine && config.itemsGreenLine) {
-                if (stack.isNotEmpty()) {
-                    slot.drawBorder(LorenzColor.GREEN.addOpacity(200))
-                }
+                slot.drawBorder(LorenzColor.GREEN.addOpacity(200))
             }
         }
     }
@@ -168,9 +166,7 @@ object HideNotClickableItems {
         val slot = event.slot ?: return
 
         if (slot.slotNumber == slot.slotIndex) return
-        if (slot.stack == null) return
-
-        val stack = slot.stack
+        val stack = slot.stack.orNull() ?: return
 
         if (hide(chestName, stack)) {
             event.cancel()

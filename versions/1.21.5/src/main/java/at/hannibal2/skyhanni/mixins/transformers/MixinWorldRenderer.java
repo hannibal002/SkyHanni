@@ -36,6 +36,7 @@ public class MixinWorldRenderer {
     @Inject(method = "getEntitiesToRender", at = @At(value = "HEAD"))
     public void resetRealGlowing(CallbackInfoReturnable<Boolean> cir) {
         RenderLivingEntityHelper.INSTANCE.setRenderingRealGlow(false);
+        RenderLivingEntityHelper.INSTANCE.check();
     }
 
     @Inject(method = "getEntitiesToRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))

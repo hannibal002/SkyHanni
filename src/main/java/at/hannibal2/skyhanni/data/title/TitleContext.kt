@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -82,14 +82,14 @@ open class TitleContext(
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         DrawContextUtils.pushPop {
-            val mainTextRenderable = RenderableString(
+            val mainTextRenderable = StringRenderable(
                 getTitleText(),
                 scale = mainScalar,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
 
             val subtitleRenderable: Renderable? = getSubtitleText()?.let {
-                RenderableString(
+                StringRenderable(
                     it,
                     scale = subScalar,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -135,13 +135,13 @@ open class TitleContext(
 
         val stringRenderable = VerticalContainerRenderable(
             listOfNotNull(
-                RenderableString(
+                StringRenderable(
                     getTitleText(),
                     1.5,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                 ),
                 getSubtitleText()?.let {
-                    RenderableString(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+                    StringRenderable(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
                 }
             ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

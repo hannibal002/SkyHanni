@@ -24,7 +24,11 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+<<<<<<< zombie-shootout
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
+=======
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+>>>>>>> beta
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -88,7 +92,10 @@ object CarnivalZombieShootout {
 
         if (config.zombieTimer) event.renderZombieTimer()
         if (config.coloredHitboxes) event.renderHitBoxes()
+<<<<<<< zombie-shootout
         if (config.coloredLines) event.renderLines()
+=======
+>>>>>>> beta
     }
 
     private fun SkyHanniRenderWorldEvent.renderZombieTimer() {
@@ -119,12 +126,28 @@ object CarnivalZombieShootout {
                 }
             }
         }
+<<<<<<< zombie-shootout
 
         zombiesToRemove.forEach { zombieTimes.remove(it) }
     }
 
     private fun SkyHanniRenderWorldEvent.renderHitBoxes() {
         lamp?.let {
+=======
+
+        zombiesToRemove.forEach { zombieTimes.remove(it) }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderHitBoxes() {
+        lamp?.let {
+            if (config.coloredLines) draw3DLine(
+                exactPlayerEyeLocation(),
+                it.pos.add(0.0, 0.5, 0.0),
+                Color.RED,
+                3,
+                false,
+            )
+>>>>>>> beta
             drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1.0f)
         }
 
@@ -243,7 +266,11 @@ object CarnivalZombieShootout {
         return HorizontalContainerRenderable(
             listOf(
                 ItemStackRenderable(lamp),
+<<<<<<< zombie-shootout
                 RenderableString("§6Disappears in $prefix$timer"),
+=======
+                StringRenderable("§6Disappears in $prefix$timer"),
+>>>>>>> beta
             ),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
