@@ -131,17 +131,19 @@ object FarmingTracker {
     // Returns the value for a given information type
     @Suppress("CyclomaticComplexity")
     private fun InformationType.resolveValue(status: String): Any? = when (this) {
-        InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownValue?.roundToInt()
-        InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownValue?.roundToInt()
-        InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue?.roundToInt()
-        InformationType.SPEED -> SkyblockStat.SPEED.lastKnownValue?.roundToInt()
-        InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownValue?.roundToInt()
+        InformationType.FARMING_FORTUNE -> SkyblockStat.FARMING_FORTUNE.lastKnownInt()
+        InformationType.FARMING_WISDOM -> SkyblockStat.FARMING_WISDOM.lastKnownInt()
+        InformationType.BONUS_PEST_CHANCE -> SkyblockStat.BONUS_PEST_CHANCE.lastKnownInt()
+        InformationType.SPEED -> SkyblockStat.SPEED.lastKnownInt()
+        InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownInt()
+
         InformationType.PET -> CurrentPetApi.currentPet?.let { pet ->
             Pet.entries.find { it.toString() == pet.cleanName }?.petName.orEmpty()
         }
 
-        InformationType.COOKIE_BUFF -> cookieBuffTime?.takeIf { it.isInFuture() }?.timeUntil()?.toString() ?: "<:no:1263210393723998278>"
-        InformationType.GOD_POTION -> godPotionTimer?.takeIf { it.isInFuture() }?.timeUntil()?.toString() ?: "<:no:1263210393723998278>"
+        InformationType.COOKIE_BUFF -> cookieBuffTime.formatTime()
+        InformationType.GOD_POTION -> godPotionTimer.formatTime()
+
         InformationType.JACOBS_CONTEST -> if (!FarmingContestApi.inContest) "" else with(FarmingContestApi.contestData) {
             "$placement% ($collected)${bracket?.emoji?.let { " $it" }.orEmpty()}"
         }
@@ -155,6 +157,10 @@ object FarmingTracker {
         InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.roundTo(2).takeUnless { it == 0.0 }
         InformationType.FARMING_SINCE -> if (GardenApi.farmingSince.isInFuture()) "" else GardenApi.farmingSince.passedSince()
     }
+
+    private fun SkyblockStat.lastKnownInt() = lastKnownValue?.roundToInt()
+
+    private fun SimpleTimeMark?.formatTime() = this?.takeIf { it.isInFuture() }?.timeUntil()?.toString() ?: "<:no:1263210393723998278>"
 
     private fun InformationType.getFieldDisplayName(): String {
         return if (this != InformationType.JACOBS_CONTEST) {
