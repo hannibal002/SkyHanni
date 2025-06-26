@@ -62,6 +62,13 @@ class ForagingConfig {
     var lassoDisplay = true
 
     @Expose
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the galatea.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var mutePhantoms = true
+
+    @Expose
     @ConfigLink(owner = ForagingConfig::class, field = "lassoDisplay")
     val lassoDisplayPosition: Position = Position(380, 210)
 
