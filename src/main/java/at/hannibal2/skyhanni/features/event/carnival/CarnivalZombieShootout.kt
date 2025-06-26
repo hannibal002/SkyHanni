@@ -88,6 +88,7 @@ object CarnivalZombieShootout {
 
         if (config.zombieTimer) event.renderZombieTimer()
         if (config.coloredHitboxes) event.renderHitBoxes()
+        if (config.coloredLines) event.renderLines()
     }
 
     private fun SkyHanniRenderWorldEvent.renderZombieTimer() {
@@ -124,13 +125,6 @@ object CarnivalZombieShootout {
 
     private fun SkyHanniRenderWorldEvent.renderHitBoxes() {
         lamp?.let {
-            if (config.coloredLines) draw3DLine(
-                exactPlayerEyeLocation(),
-                it.pos.add(0.0, 0.5, 0.0),
-                Color.RED,
-                3,
-                false,
-            )
             drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1.0f)
         }
 
@@ -148,6 +142,16 @@ object CarnivalZombieShootout {
                 depth = false,
             )
         }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderLines() = lamp?.let {
+        draw3DLine(
+            exactPlayerEyeLocation(),
+            it.pos.add(0.5, 0.5, 0.5),
+            Color.RED,
+            3,
+            false,
+        )
     }
 
     @HandleEvent
