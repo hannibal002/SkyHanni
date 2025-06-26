@@ -42,10 +42,10 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.WrappedRenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.init.Blocks
@@ -195,7 +195,7 @@ object BlockStrengthGuide {
                     listOf(
                         Renderable.itemStack(icon),
                         progressBar,
-                        RenderableString("$ticks"),
+                        StringRenderable("$ticks"),
                     ),
                     spacing = 0,
                     RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
@@ -237,7 +237,7 @@ object BlockStrengthGuide {
                     add(Renderable.placeholder(0, 5))
                     addString("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}")
                     addString("§3Blocks in that group:")
-                    add(WrappedRenderableString(hoverText, width = 200))
+                    add(WrappedStringRenderable(hoverText, width = 200))
 
                     if (!showExtraInfos) {
                         add(Renderable.placeholder(0, 5))
@@ -340,11 +340,11 @@ object BlockStrengthGuide {
             base.toInt().addSeparators(),
             gemstone.toInt().addSeparators(),
             metal.toInt().addSeparators(),
-        ).map { RenderableString("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
+        ).map { StringRenderable("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
     }
 
     private val headerHeaderLine = listOf("Base", "Gemstone", "Metal").map {
-        RenderableString(
+        StringRenderable(
             text = it,
             scale = 0.75,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -383,7 +383,7 @@ object BlockStrengthGuide {
     }.distribute(3)
 
     private fun createHeader(): List<Renderable> = listOf(
-        RenderableString(
+        StringRenderable(
             SkyblockStat.MINING_SPEED.iconWithName,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
@@ -397,7 +397,7 @@ object BlockStrengthGuide {
                     xPadding = 5,
                 ),
                 Renderable.clickable(
-                    RenderableString(
+                    StringRenderable(
                         "§${if (inMineshaft) 'b' else '7'}Mineshaft",
                         scale = 0.5,
                         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -451,7 +451,7 @@ object BlockStrengthGuide {
         if (!sbMenuOpened) {
             if (lastRunCommand.passedSince() < 2.seconds) {
                 sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
-                RenderableString(
+                StringRenderable(
                     "Loading...",
                     scale = 2.0,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

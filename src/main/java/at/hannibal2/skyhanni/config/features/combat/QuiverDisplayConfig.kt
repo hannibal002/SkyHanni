@@ -18,17 +18,17 @@ class QuiverDisplayConfig {
 
     @Expose
     @ConfigLink(owner = QuiverDisplayConfig::class, field = "enabled")
-    var quiverDisplayPos: Position = Position(260, -15)
+    val quiverDisplayPos: Position = Position(260, -15)
 
     @Expose
     @ConfigOption(name = "Show arrow icon", desc = "Display an icon next to the Quiver Display.")
     @ConfigEditorBoolean
-    var showIcon: Property<Boolean> = Property.of(true)
+    val showIcon: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "When to show", desc = "Decide in what conditions to show the display.")
     @ConfigEditorDropdown
-    var whenToShow: Property<ShowWhen> = Property.of(ShowWhen.ONLY_BOW_HAND)
+    val whenToShow: Property<ShowWhen> = Property.of(ShowWhen.ONLY_BOW_HAND)
 
     enum class ShowWhen(private val displayName: String) {
         ALWAYS("Always"),

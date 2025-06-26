@@ -13,7 +13,7 @@ class LividFinderConfig {
     @ConfigOption(name = "Enabled", desc = "Help find the correct livid in F5 and in M5.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Wrong Livids", desc = "Hide wrong livids entirely.")

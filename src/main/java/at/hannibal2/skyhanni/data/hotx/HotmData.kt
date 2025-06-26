@@ -54,6 +54,7 @@ enum class HotmData(
     override val maxLevel: Int,
     override val costFun: (Int) -> (Double?),
     override val rewardFun: (Int) -> (Map<HotmReward, Double>),
+    val powderType: HotmApi.PowderType?,
 ) : HotxData<HotmReward> {
 
     MINING_SPEED(
@@ -61,84 +62,98 @@ enum class HotmData(
         50,
         { level -> (level + 1.0).pow(3.0) },
         { level -> mapOf(HotmReward.MINING_SPEED to level * 20.0) },
+        HotmApi.PowderType.MITHRIL,
     ),
     MINING_FORTUNE(
         "Mining Fortune",
         50,
         { level -> (level + 1.0).pow(3.05) },
         { level -> mapOf(HotmReward.MINING_FORTUNE to level * 2.0) },
+        HotmApi.PowderType.MITHRIL,
     ),
     TITANIUM_INSANIUM(
         "Titanium Insanium",
         50,
         { level -> (level + 1.0).pow(3.1) },
         { level -> mapOf(HotmReward.TITANIUM_CHANCE to 2.0 + (level * 0.1)) },
+        HotmApi.PowderType.MITHRIL,
     ),
     LUCK_OF_THE_CAVE(
         "Luck of the Cave",
         45,
         { level -> (level + 1.0).pow(3.07) },
         { level -> mapOf(HotmReward.EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES to 5.0 + level) },
+        HotmApi.PowderType.MITHRIL,
     ),
     EFFICIENT_MINER(
         "Efficient Miner",
         100,
         { level -> (level + 1.0).pow(2.6) },
         { level -> mapOf(HotmReward.MINING_SPREAD to 3.0 * level) },
+        HotmApi.PowderType.MITHRIL,
     ),
     QUICK_FORGE(
         "Quick Forge",
         20,
         { level -> (level + 1.0).pow(3.2) },
         { level -> mapOf(HotmReward.FORGE_TIME_DECREASE to if (level >= 20) 30.0 else 10.0 + (level * 0.5)) },
+        HotmApi.PowderType.MITHRIL,
     ),
     OLD_SCHOOL(
         "Old-School",
         20,
         { level -> (level + 1.0).pow(4.0) },
         { level -> mapOf(HotmReward.ORE_FORTUNE to level * 5.0) },
+        HotmApi.PowderType.GEMSTONE,
     ),
     PROFESSIONAL(
         "Professional",
         140,
         { level -> (level + 1.0).pow(2.3) },
         { level -> mapOf(HotmReward.MINING_SPEED to 50.0 + (level * 5.0)) },
+        HotmApi.PowderType.GEMSTONE
     ),
     MOLE(
         "Mole",
         200,
         { level -> (level + 1.0).pow(2.17883) },
         { level -> mapOf(HotmReward.MINING_SPREAD to 50.0 + ((level - 1) * (350 / 199))) },
+        HotmApi.PowderType.GEMSTONE,
     ),
     GEM_LOVER(
         "Gem Lover",
         20,
         { level -> (level + 1.0).pow(4.0) },
         { level -> mapOf(HotmReward.GEMSTONE_FORTUNE to 20.0 + (level * 4.0)) },
+        HotmApi.PowderType.GEMSTONE,
     ),
     SEASONED_MINEMAN(
         "Seasoned Mineman",
         100,
         { level -> (level + 1.0).pow(2.3) },
         { level -> mapOf(HotmReward.MINING_WISDOM to 5.0 + (level * 0.1)) },
+        HotmApi.PowderType.GEMSTONE,
     ),
     FORTUNATE_MINEMAN(
         "Fortunate Mineman",
         50,
         { level -> (level + 1.0).pow(3.2) },
         { level -> mapOf(HotmReward.MINING_FORTUNE to level * 3.0) },
+        HotmApi.PowderType.GEMSTONE,
     ),
     BLOCKHEAD(
         "Blockhead",
         20,
         { level -> (level + 1.0).pow(4.0) },
         { level -> mapOf(HotmReward.BLOCK_FORTUNE to level * 5.0) },
+        HotmApi.PowderType.GEMSTONE,
     ),
     KEEP_IT_COOL(
         "Keep It Cool",
         50,
         { level -> (level + 1.0).pow(3.07) },
         { level -> mapOf(HotmReward.HEAT_RESISTANCE to level * 0.4) },
+        HotmApi.PowderType.GEMSTONE,
     ),
 
     LONESOME_MINER(
@@ -146,6 +161,7 @@ enum class HotmData(
         45,
         { level -> (level + 1.0).pow(3.07) },
         { level -> mapOf(HotmReward.COMBAT_STAT_BOOST to 5.0 + ((level - 1.0) * 0.5)) },
+        HotmApi.PowderType.GEMSTONE,
     ),
     GREAT_EXPLORER(
         "Great Explorer",
@@ -157,6 +173,7 @@ enum class HotmData(
                 HotmReward.LOCKS_OF_TREASURE_CHEST to 1 + level * 0.2,
             )
         },
+        HotmApi.PowderType.GEMSTONE,
     ),
 
     POWDER_BUFF(
@@ -169,12 +186,14 @@ enum class HotmData(
                 HotmReward.MORE_GEMSTONE_POWER to level.toDouble(),
             )
         },
+        HotmApi.PowderType.GEMSTONE,
     ),
     SPEEDY_MINEMAN(
         "Speedy Mineman",
         50,
         { level -> (level + 1.0).pow(3.2) },
         { level -> mapOf(HotmReward.MINING_SPEED to level * 40.0) },
+        HotmApi.PowderType.GEMSTONE,
     ),
 
     SUBTERRANEAN_FISHER(
@@ -187,12 +206,13 @@ enum class HotmData(
                 HotmReward.SEA_CREATURE_CHANCE to 1 + (level * 0.1),
             )
         },
+        HotmApi.PowderType.GEMSTONE,
     ),
 
     // Static
 
-    SKY_MALL("Sky Mall", 1, { null }, { emptyMap() }),
-    PRECISION_MINING("Precision Mining", 1, { null }, { mapOf(HotmReward.MINING_SPEED_BOOST to 30.0) }),
+    SKY_MALL("Sky Mall", 1, { null }, { emptyMap() }, null),
+    PRECISION_MINING("Precision Mining", 1, { null }, { mapOf(HotmReward.MINING_SPEED_BOOST to 30.0) }, null),
     FRONT_LOADED(
         "Front Loaded",
         1,
@@ -204,9 +224,10 @@ enum class HotmData(
                 HotmReward.MORE_GEMSTONE_POWER to 200.0,
             )
         },
+        null,
     ),
-    DAILY_GRIND("Daily Grind", 1, { null }, { emptyMap() }),
-    DAILY_POWDER("Daily Powder", 1, { null }, { emptyMap() }),
+    DAILY_GRIND("Daily Grind", 1, { null }, { emptyMap() }, null),
+    DAILY_POWDER("Daily Powder", 1, { null }, { emptyMap() }, null),
     // Abilities
 
     PICKOBULUS(
@@ -219,6 +240,7 @@ enum class HotmData(
                 HotmReward.ABILITY_COOLDOWN to 60.0 - 10.0 * (level - 1),
             )
         },
+        null,
     ),
     MINING_SPEED_BOOST(
         "Mining Speed Boost",
@@ -231,6 +253,7 @@ enum class HotmData(
                 HotmReward.ABILITY_COOLDOWN to 120.0,
             )
         },
+        null,
     ),
     MANIAC_MINER(
         "Maniac Miner",
@@ -243,6 +266,7 @@ enum class HotmData(
                 HotmReward.BREAKING_POWER to 1.0,
             )
         },
+        null,
     ),
 
     SHEER_FORCE(
@@ -255,6 +279,7 @@ enum class HotmData(
                 HotmReward.MINING_SPREAD to 200.0,
             )
         },
+        null,
     ),
 
     ANOMALOUS_DESIRE(
@@ -268,11 +293,13 @@ enum class HotmData(
                 HotmReward.ABILITY_DURATION to 30.0,
             )
         },
+        null,
     ),
 
     CORE_OF_THE_MOUNTAIN(
         "Core of the Mountain", 10, { null },
         { level -> calculateCoreOfTheMountainLoot(level) },
+        null,
     ),
 
     // Mining V3
@@ -282,6 +309,7 @@ enum class HotmData(
         50,
         { level -> (level + 1.0).pow(3.05) },
         { level -> mapOf(HotmReward.UNKNOWN to 0.5 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
 
     STRONG_ARM(
@@ -289,77 +317,89 @@ enum class HotmData(
         100,
         { level -> (level + 1.0).pow(2.3) },
         { level -> mapOf(HotmReward.MINING_SPEED to 5.0 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     STEADY_HAND(
         "Steady Hand",
         100,
         { level -> (level + 1.0).pow(2.6) },
         { level -> mapOf(HotmReward.GEMSTONE_SPREAD to 0.1 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     WARM_HEART(
         "Warm Heart",
         50,
         { level -> (level + 1.0).pow(3.1) },
         { level -> mapOf(HotmReward.COLD_RESISTANCE to 0.4 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     SURVEYOR(
         "Surveyor",
         20,
         { level -> (level + 1.0).pow(4.0) },
         { level -> mapOf(HotmReward.MINESHAFT_CHANCE to 0.75 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     METAL_HEAD(
         "Metal Head",
         20,
         { level -> (level + 1.0).pow(4.0) },
         { level -> mapOf(HotmReward.DWARVEN_METAL_FORTUNE to 5.0 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     RAGS_TO_RICHES(
         "Rags to Riches",
         50,
         { level -> (level + 1.0).pow(3.05) },
         { level -> mapOf(HotmReward.MINING_FORTUNE to 4.0 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     EAGER_ADVENTURER(
         "Eager Adventurer",
         100,
         { level -> (level + 1.0).pow(2.3) },
         { level -> mapOf(HotmReward.MINING_SPEED to 4.0 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     CRYSTALLINE(
         "Crystalline",
         50,
         { level -> (level + 1.0).pow(3.3) },
         { level -> mapOf(HotmReward.UNKNOWN to 0.5 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     GIFTS_FROM_THE_DEPARTED(
         "Gifts from the Departed",
         100,
         { level -> (level + 1.0).pow(2.45) },
         { level -> mapOf(HotmReward.UNKNOWN to 0.2 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     MINING_MASTER(
         "Mining Master",
         10,
         { level -> (level + 7.0).pow(5.0) },
         { level -> mapOf(HotmReward.PRISTINE to 0.1 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     DEAD_MANS_CHEST(
         "Dead Man's Chest",
         50,
         { level -> (level + 1.0).pow(3.2) },
         { level -> mapOf(HotmReward.UNKNOWN to 1.0 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
     VANGUARD_SEEKER(
         "Vanguard Seeker",
         50,
         { level -> (level + 1.0).pow(3.1) },
         { level -> mapOf(HotmReward.UNKNOWN to 1.0 * level) },
+        HotmApi.PowderType.GLACITE,
     ),
 
-    MINESHAFT_MAYHEM("Mineshaft Mayhem", 1, { null }, { emptyMap() }),
-    GEMSTONE_INFUSION("Gemstone Infusion", 1, { null }, { emptyMap() }),
-    MINERS_BLESSING("Miner's Blessing", 1, { null }, { mapOf(HotmReward.MAGIC_FIND to 30.0) }),
+    MINESHAFT_MAYHEM("Mineshaft Mayhem", 1, { null }, { emptyMap() }, null),
+    GEMSTONE_INFUSION("Gemstone Infusion", 1, { null }, { emptyMap() }, null),
+    MINERS_BLESSING("Miner's Blessing", 1, { null }, { mapOf(HotmReward.MAGIC_FIND to 30.0) }, null),
     ;
 
     override val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")

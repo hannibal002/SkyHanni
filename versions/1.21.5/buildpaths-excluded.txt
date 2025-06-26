@@ -14,6 +14,7 @@ at.hannibal2.skyhanni.tweaker.SkyHanniTweaker.java
 at.hannibal2.skyhanni.tweaker.ModLoadingTweaker.java
 at.hannibal2.skyhanni.tweaker.TweakerUtils.java
 
+at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHook.kt
 at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
@@ -54,8 +55,6 @@ at.hannibal2.skyhanni.mixins.transformers.renderer.MixinContributorRendererEntit
 at.hannibal2.skyhanni.mixins.transformers.renderer.MixinRendererLivingEntity.java
 
 # these files do not work yet but should be made to work in the future
-at/hannibal2/skyhanni/mixins/hooks/BlockRendererDispatcherHook.kt
-at.hannibal2.skyhanni.test.PacketTest.kt
 at.hannibal2.skyhanni.utils.HolographicEntities.kt
 at.hannibal2.skyhanni.utils.json.NBTTypeAdapter.kt
 at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory.kt
