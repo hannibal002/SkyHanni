@@ -41,7 +41,7 @@ class TrackingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Send an embed with the options you selected above to your specified webhook.")
+    @ConfigOption(name = "Enabled", desc = "Send an embed with the options you selected below to your specified webhook.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
