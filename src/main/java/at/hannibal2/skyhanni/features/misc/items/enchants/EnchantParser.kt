@@ -303,7 +303,7 @@ object EnchantParser {
         val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
         val regex = "[\\d,.kKmMbB]+\$".toRegex()
         val aaron = OtherModsSettings.aaron()
-        val matcherType: Pattern = if (aaron.getBoolean("skyblock.enchantments.rainbowMaxEnchants")) {
+        val matcherType: Pattern = if (aaron.getBoolean("skyblock.enchantments.rainbowMaxEnchants") == true) {
             if (aaron.getConfigValue("skyblock.enchantments.rainbowMode").toString() == "Chroma") {
                 enchantmentPatternAaronChroma
             } else {

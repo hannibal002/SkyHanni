@@ -23,11 +23,20 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
                     clazz.getDeclaredField(name).apply { isAccessible = true }
                 }
             }
+
+        fun clearClassCache() { classCache.clear() }
+        fun clearFieldCache() { fieldCache.clear() }
+        fun clearCaches() {
+            clearClassCache()
+            clearFieldCache()
+        }
     }
+
+    fun isLoaded(): Boolean = loadClass(modConfigPath) != null
 
     private val chainCache = ConcurrentHashMap<Pair<String, String>, List<Field>>()
 
-    fun getBoolean(path: String): Boolean = getNestedValue<Boolean>(path) ?: false
+    fun getBoolean(path: String): Boolean? = getNestedValue<Boolean>(path)
     fun setBoolean(path: String, value: Any) = setNestedValue(path, value)
     fun getConfigValue(path: String): Any? = getNestedValue<Any>(path)
     fun setConfigValue(path: String, value: Any) = setNestedValue(path, value)
@@ -86,5 +95,14 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
             val f = getField(modConfigPath, instance.javaClass, rootName)
             instance to f
         }.getOrNull()
+    }
+
+    fun clearChainCache() { chainCache.clear() }
+    fun clearClassCache() = Companion.clearClassCache()
+    fun clearFieldCache() = Companion.clearFieldCache()
+    fun clearCaches() {
+        clearChainCache()
+        clearClassCache()
+        clearFieldCache()
     }
 }
