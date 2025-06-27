@@ -19,7 +19,7 @@ class TreeProgressConfig {
 
     @Expose
     @ConfigLink(owner = TreeProgressConfig::class, field = "enabled")
-    val treeProgressDisplayPosition: Position = Position(380, 210)
+    val treeProgressDisplayPosition: Position = Position(30, -130)
 
     @Expose
     @ConfigOption(name = "Only Holding Axe", desc = "Only show the tracker while holding an axe.")
