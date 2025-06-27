@@ -16,14 +16,14 @@ class InquisitorSoundConfig {
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the sound.")
-    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
-    var pitch: Float = 1.0f
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2f, minStep = 0.1f)
+    var pitch: Float = 1f
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    var testSound: Runnable = Runnable { InquisitorWaypointShare.playUserSound() }
+    val testSound: Runnable = Runnable { InquisitorWaypointShare.playUserSound() }
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
-    var listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 }

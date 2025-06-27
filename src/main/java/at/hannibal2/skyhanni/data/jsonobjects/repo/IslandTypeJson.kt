@@ -13,4 +13,12 @@ data class IslandJson(
     @Expose val name: String,
     @Expose @SerializedName("api_name") val apiName: String? = null,
     @Expose @SerializedName("max_players") val maxPlayers: Int? = null,
+    @Expose val bounds: IslandBounds? = null
+)
+
+data class IslandBounds(
+    @Expose @SerializedName("max_x") val maxX: Int,
+    @Expose @SerializedName("min_x") val minX: Int,
+    @Expose @SerializedName("max_z") val maxZ: Int,
+    @Expose @SerializedName("min_z") val minZ: Int
 )

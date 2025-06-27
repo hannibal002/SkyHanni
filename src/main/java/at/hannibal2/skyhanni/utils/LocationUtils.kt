@@ -13,14 +13,19 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.time.Duration
 
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object LocationUtils {
 
     fun canSee(a: LorenzVec, b: LorenzVec, offset: Double? = null): Boolean {
         return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
     }
 
-    private fun canSee0(a: LorenzVec, b: LorenzVec) =
-        MinecraftCompat.localWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
+    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean =
+        //#if MC < 1.21
+        BlockUtils.rayTrace(a, b) == null
+    //#else
+    //$$ BlockUtils.rayTrace(a, b)?.missed == true
+    //#endif
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
@@ -54,8 +59,7 @@ object LocationUtils {
         val b = this
         val noBlocks = canSee(a, b, offset)
         val notTooFar = a.distance(b) < viewDistance.toDouble()
-        val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
-        return noBlocks && notTooFar && inFov
+        return noBlocks && notTooFar
     }
 
     fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =

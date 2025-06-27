@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -23,11 +24,11 @@ object GardenPlotBorders {
         if (!isEnabled()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
-        if (event.keyCode == Keyboard.KEY_G && Keyboard.isKeyDown(Keyboard.KEY_F3)) {
+        if (event.keyCode == Keyboard.KEY_G && Keyboard.KEY_F3.isKeyHeld()) {
             timeLastSaved = SimpleTimeMark.now()
             showBorders = !showBorders
         }
-        if (event.keyCode == Keyboard.KEY_F3 && Keyboard.isKeyDown(Keyboard.KEY_G)) {
+        if (event.keyCode == Keyboard.KEY_F3 && Keyboard.KEY_G.isKeyHeld()) {
             timeLastSaved = SimpleTimeMark.now()
             showBorders = !showBorders
         }

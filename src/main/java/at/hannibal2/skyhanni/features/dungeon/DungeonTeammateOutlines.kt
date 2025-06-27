@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.scoreboard.ScorePlayerTeam
@@ -34,7 +34,7 @@ object DungeonTeammateOutlines {
 
         val colorFormat = StringUtils.getFormatFromString(team.colorPrefix)
         return if (colorFormat.length >= 2)
-            Minecraft.getMinecraft().fontRendererObj.getColorCode(colorFormat[1])
+            ColorUtils.getColorCode(colorFormat[1])
         else null
     }
 }
