@@ -54,12 +54,13 @@ jobs:
             -   name: Commit Changes
                 if: env.REPLACEMENT_MADE == 'true'
                 run: |
-                    git config user.name "GitHub Actions"
-                    git config user.email "actions@github.com"
+                    git config user.name "github-actions[bot]"
+                    git config user.email "github-action@users.noreply.github.com"
                     git add .
                     git commit -m "Bumped configVersion to $CONFIG_VERSION"
 
             -   name: Push Changes
                 if: env.REPLACEMENT_MADE == 'true'
                 run: |
+                    git remote set-url origin https://x-access-token:${{ secrets.PRIVILEGED_PAT }}@github.com/${{ github.repository }}.git
                     git push origin HEAD
