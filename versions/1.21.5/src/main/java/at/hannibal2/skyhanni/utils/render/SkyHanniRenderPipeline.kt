@@ -102,6 +102,16 @@ enum class SkyHanniRenderPipeline(
         ),
         depthWrite = false,
     ),
+    CIRCLE(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "circle",
+        uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+            "angle1" to UniformType.FLOAT,
+            "angle2" to UniformType.FLOAT,
+        ),
+    ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_SNIPPET,
         vFormat = VertexFormats.POSITION_COLOR,
