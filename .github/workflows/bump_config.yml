@@ -12,8 +12,18 @@ jobs:
         env:
             VERSION_FILE : Config_Version
         steps:
+            -   name: Gemerate Github App token
+                id: app-token
+                uses: actions/create-github-app-token@v2
+                with:
+                    app-id: ${{ secrets.CONFIG_BUMP_ID }}
+                    private-key: ${{secrets.CONFIG_BUMP_KEY}}
+
             -   name: Checkout Repository
                 uses: actions/checkout@v4
+                with:
+                    token: ${{ steps.app-token.outputs.token }}
+                    persist-credentials: false
 
             -   name: Get Version
                 run: |
@@ -54,13 +64,11 @@ jobs:
             -   name: Commit Changes
                 if: env.REPLACEMENT_MADE == 'true'
                 run: |
-                    git config user.name "github-actions[bot]"
-                    git config user.email "github-action@users.noreply.github.com"
+                    git config user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
+                    git config user.email "${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
                     git add .
                     git commit -m "Bumped configVersion to $CONFIG_VERSION"
-
             -   name: Push Changes
                 if: env.REPLACEMENT_MADE == 'true'
                 run: |
-                    git remote set-url origin https://x-access-token:${{ secrets.PRIVILEGED_PAT }}@github.com/${{ github.repository }}.git
                     git push origin HEAD
