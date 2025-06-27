@@ -44,16 +44,9 @@ class ForagingConfig {
     var moongladeBeacon = MoongladeBeaconConfig()
 
     @Expose
-    @ConfigOption(name = "Birries Highlight", desc = "")
     @OnlyModern
-    @Accordion
-    var birriesHighlight = BirriesHighlightConfig()
-
-    @Expose
-    @ConfigOption(name = "Hideonleaf Highlight", desc = "")
-    @OnlyModern
-    @Accordion
-    var hideonleafHighlight = HideonleafHighlightConfig()
+    @Category(name = "Foraging Mob Highlights", desc = "Settings for foraging mob highlights")
+    var foragingMobHighlight = ForagingMobHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
