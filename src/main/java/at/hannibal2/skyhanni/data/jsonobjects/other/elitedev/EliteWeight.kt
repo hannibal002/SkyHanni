@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.jsonobjects.other
+package at.hannibal2.skyhanni.data.jsonobjects.other.elitedev
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -6,6 +6,11 @@ import com.google.gson.annotations.SerializedName
 data class ElitePlayerWeightJson(
     @Expose val selectedProfileId: String,
     @Expose val profiles: List<WeightProfile>,
+)
+
+data class EliteWeightResponse(
+    @Expose val totalWeight: Double,
+    @Expose val profileId: String,
 )
 
 data class WeightProfile(
@@ -17,6 +22,14 @@ data class WeightProfile(
     @Expose val uncountedCrops: Map<String, Int>,
     @Expose val pests: Map<String, Int>,
 )
+
+enum class EliteLeaderboardType(private val displayName: String, val suffix: String = "") {
+    NORMAL("Normal"),
+    MONTHLY("Monthly", "-monthly"),
+    ;
+
+    override fun toString() = displayName
+}
 
 data class EliteLeaderboardJson(
     @Expose val data: EliteLeaderboard,
