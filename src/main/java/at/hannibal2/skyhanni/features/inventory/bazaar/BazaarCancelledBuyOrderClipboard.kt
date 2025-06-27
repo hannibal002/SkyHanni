@@ -9,14 +9,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -82,7 +82,7 @@ object BazaarCancelledBuyOrderClipboard {
             ?: ErrorManager.skyHanniError("Cancel buy order clipboard could not detect the last bazaar product.")
 
         val message = "Bazaar buy order cancelled. Click to re-order.\n" +
-            "§e(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e for ${coins.formatChatCoins()} coins§e)"
+            "§e(§8${latestAmount.addSeparators()}x §r${lastClicked.repoItemName}§e for ${coins.formatChatCoins()} coins§e)"
         ChatUtils.clickableChat(
             message,
             onClick = {
@@ -93,5 +93,5 @@ object BazaarCancelledBuyOrderClipboard {
         this.latestAmount = null
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.bazaar.cancelledBuyOrderClipboard
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.bazaar.cancelledBuyOrderClipboard
 }

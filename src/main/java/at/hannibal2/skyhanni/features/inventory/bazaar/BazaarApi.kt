@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
@@ -21,16 +22,16 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -95,7 +96,7 @@ object BazaarApi {
 
     fun NeuInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
         ErrorManager.skyHanniError(
-            "Can not find bazaar data for $itemName",
+            "Can not find bazaar data for $repoItemName",
             "internal name" to this,
         )
     }
@@ -109,10 +110,10 @@ object BazaarApi {
     }
 
     fun searchForBazaarItem(displayName: String, amount: Int? = null) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
         if (NeuItems.neuHasFocus()) return
-        if (LorenzUtils.noTradeMode) return
-        if (DungeonApi.inDungeon() || LorenzUtils.inKuudraFight) return
+        if (SkyBlockUtils.noTradeMode) return
+        if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
         HypixelCommands.bazaar(displayName.removeColor())
         amount?.let { OSUtils.copyToClipboard(it.toString()) }
         currentSearchedItem = displayName.removeColor()
@@ -185,8 +186,7 @@ object BazaarApi {
         if (currentSearchedItem == "") return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (chest.inventorySlots.indexOf(slot) !in 9..44) {
@@ -194,7 +194,7 @@ object BazaarApi {
             }
 
             if (stack.displayName.removeColor() == currentSearchedItem) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }

@@ -9,8 +9,9 @@ import at.hannibal2.skyhanni.config.features.dev.DevConfig
 import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig
 import at.hannibal2.skyhanni.config.features.event.EventConfig
 import at.hannibal2.skyhanni.config.features.fishing.FishingConfig
+import at.hannibal2.skyhanni.config.features.foraging.ForagingConfig
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
-import at.hannibal2.skyhanni.config.features.gui.GUIConfig
+import at.hannibal2.skyhanni.config.features.gui.GuiConfig
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig
@@ -18,7 +19,7 @@ import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
 import at.hannibal2.skyhanni.config.storage.Storage
-import at.hannibal2.skyhanni.utils.LorenzUtils.isAprilFoolsDay
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
@@ -38,7 +39,7 @@ class Features : Config() {
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
-        if (isAprilFoolsDay) return HorizontalAlign.RIGHT
+        if (SkyHanniDebugsAndTests.isAprilFoolsDay) return HorizontalAlign.RIGHT
         return super.alignCategory(category, isSelected)
     }
 
@@ -55,7 +56,7 @@ class Features : Config() {
     }
 
     override fun getTitle(): String {
-        val modName = if (isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
+        val modName = if (SkyHanniDebugsAndTests.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
         return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
 
@@ -72,7 +73,7 @@ class Features : Config() {
     @JvmField
     @Expose
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
-    var gui: GUIConfig = GUIConfig()
+    var gui: GuiConfig = GuiConfig()
 
     // Islands
     @Expose
@@ -95,6 +96,10 @@ class Features : Config() {
     @Expose
     @Category(name = "Mining", desc = "Features that help you break blocks.")
     var mining: MiningConfig = MiningConfig()
+
+    @Expose
+    @Category(name = "Foraging", desc = "Features that help you cut down trees.")
+    var foraging: ForagingConfig = ForagingConfig()
 
     // Combat like
     @Expose
@@ -142,4 +147,7 @@ class Features : Config() {
     @Expose
     @Suppress("unused")
     var lastVersion: Int = ConfigUpdaterMigrator.CONFIG_VERSION
+
+    @Expose
+    var lastMinecraftVersion: String? = null
 }

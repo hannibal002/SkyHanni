@@ -10,12 +10,12 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -60,7 +60,7 @@ object DungeonCleanEnd {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         bossDone = false
         chestsSpawned = false
         lastBossId = -1
@@ -95,13 +95,13 @@ object DungeonCleanEnd {
 
         val entity = event.entity
 
-        if (entity == Minecraft.getMinecraft().thePlayer) return
+        if (entity.isLocalPlayer) return
 
         if (config.f3IgnoreGuardians &&
             DungeonApi.isOneOf("F3", "M3") &&
             entity is EntityGuardian &&
             entity.entityId != lastBossId &&
-            Minecraft.getMinecraft().thePlayer.isSneaking
+            MinecraftCompat.localPlayer.isSneaking
         ) {
             return
         }

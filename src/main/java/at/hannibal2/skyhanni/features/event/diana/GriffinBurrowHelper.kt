@@ -5,9 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -17,20 +19,16 @@ import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -38,9 +36,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.addDoublePlant
+import at.hannibal2.skyhanni.utils.compat.addLeaves
+import at.hannibal2.skyhanni.utils.compat.addLeaves2
+import at.hannibal2.skyhanni.utils.compat.addRedFlower
+import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import org.lwjgl.input.Keyboard
@@ -51,16 +54,16 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround = listOf(
-        Blocks.air,
-        Blocks.leaves,
-        Blocks.leaves2,
-        Blocks.tallgrass,
-        Blocks.double_plant,
-        Blocks.red_flower,
-        Blocks.yellow_flower,
-        Blocks.spruce_fence,
-    )
+    private val allowedBlocksAboveGround = buildList {
+        add(Blocks.air)
+        add(Blocks.yellow_flower)
+        add(Blocks.spruce_fence)
+        addLeaves()
+        addLeaves2()
+        addTallGrass()
+        addDoublePlant()
+        addRedFlower()
+    }
 
     var targetLocation: LorenzVec? = null
 
@@ -115,12 +118,6 @@ object GriffinBurrowHelper {
         loadTestGriffinSpots()
     }
 
-    fun testGriffinSpots() {
-        testGriffinSpots = !testGriffinSpots
-        val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
-        ChatUtils.chat("Test Griffin Spots $state§e.")
-    }
-
     private fun loadTestGriffinSpots() {
         if (!testGriffinSpots) return
         val center = LocationUtils.playerLocation().toBlockPos().toLorenzVec()
@@ -144,7 +141,7 @@ object GriffinBurrowHelper {
         val newLocation = calculateNewTarget()
         if (targetLocation != newLocation) {
             targetLocation = newLocation
-            // add island graphs here some day when the hub is fully added in the graph
+            // TODO: add island graphs here some day when the hub is fully added in the graph
 //             newLocation?.let {
 //                 IslandGraphs.find(it)
 //             }
@@ -177,39 +174,28 @@ object GriffinBurrowHelper {
         return newLocation
     }
 
-    private var correctCounter = 0
-
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
-        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val newLocation = event.guessLocation
-        val playerLocation = Minecraft.getMinecraft().thePlayer.getLorenzVec()
+        val playerLocation = LocationUtils.playerLocation()
 
         if (newLocation.distance(playerLocation) < 6) return
 
         latestGuess?.let {
-            if (it.precise && config.multiGuesses) {
-                if (it.getLocation() == newLocation) {
-                    correctCounter++
-                } else {
-                    if (correctCounter > 5) {
-                        config.guess
-                        if (it.getLocation() !in particleBurrows) {
-                            additionalGuesses.add(it)
-                        }
-                    }
-                    correctCounter = 0
-                }
+            if (it.precise && config.multiGuesses && event.new && it.getLocation() !in particleBurrows) {
+                additionalGuesses.add(it)
             }
         }
 
-        latestGuess = Guess(newLocation, event.precise)
+        latestGuess = if (IslandType.HUB.isInBounds(newLocation)) Guess(newLocation, event.precise) else null
+
         update()
     }
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
-        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val burrowLocation = event.burrowLocation
         particleBurrows = particleBurrows.editCopy { this[burrowLocation] = event.type }
 
@@ -219,11 +205,8 @@ object GriffinBurrowHelper {
 
     private fun removePreciseGuess(location: LorenzVec) {
         latestGuess?.let {
-            if (it.precise) {
-                if (location == it.getLocation()) {
-                    latestGuess = null
-                    correctCounter = 0
-                }
+            if (it.precise && location == it.getLocation()) {
+                latestGuess = null
             }
         }
         additionalGuesses.removeIf { it.getLocation() == location }
@@ -235,7 +218,6 @@ object GriffinBurrowHelper {
         val location = guess.getLocation()
         if (particleBurrows.any { location.distance(it.key) < distance }) {
             latestGuess = null
-            correctCounter = 0
         }
     }
 
@@ -270,7 +252,6 @@ object GriffinBurrowHelper {
 
     private fun resetAllData() {
         latestGuess = null
-        correctCounter = 0
         additionalGuesses.clear()
         targetLocation = null
         particleBurrows = emptyMap()
@@ -283,7 +264,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         resetAllData()
     }
 
@@ -438,11 +419,9 @@ object GriffinBurrowHelper {
 
         if (particleBurrows.containsKey(location)) {
             DelayedRun.runDelayed(1.seconds) {
-                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
-                    if (particleBurrows.containsKey(location)) {
-                        // workaround
-                        particleBurrows = particleBurrows.editCopy { keys.remove(location) }
-                    }
+                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds && particleBurrows.containsKey(location)) {
+                    // workaround
+                    particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                 }
             }
         }
@@ -459,14 +438,14 @@ object GriffinBurrowHelper {
         } else ""
         if (lastTitleSentTime.passedSince() > 2.seconds) {
             lastTitleSentTime = SimpleTimeMark.now()
-            LorenzUtils.sendTitle(text + keybindSuffix, 2.seconds, fontSize = 3f)
+            TitleManager.sendTitle(text + keybindSuffix, duration = 2.seconds)
         }
     }
 
     private fun isEnabled() = DianaApi.isDoingDiana()
 
-    private fun setTestBurrow(strings: Array<String>) {
-        if (!IslandType.HUB.isInIsland()) {
+    private fun setTestBurrow(arg: String) {
+        if (!IslandType.HUB.isCurrent()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }
@@ -484,12 +463,7 @@ object GriffinBurrowHelper {
             return
         }
 
-        if (strings.size != 1) {
-            ChatUtils.userError("/shtestburrow <type>")
-            return
-        }
-
-        val type: BurrowType = when (strings[0].lowercase()) {
+        val type: BurrowType = when (arg) {
             "reset" -> {
                 resetAllData()
                 ChatUtils.chat("Manually reset all burrow data.")
@@ -505,7 +479,7 @@ object GriffinBurrowHelper {
             }
         }
 
-        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val location = LocationUtils.playerLocation().roundLocation()
         particleBurrows = particleBurrows.editCopy { this[location] = type }
         update()
@@ -513,10 +487,21 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestburrow") {
+        event.registerBrigadier("shtestburrow") {
             description = "Sets a test burrow waypoint at your location"
             category = CommandCategory.DEVELOPER_TEST
-            callback { setTestBurrow(it) }
+            arg("type", BrigadierArguments.string()) { type ->
+                callback { setTestBurrow(getArg(type)) }
+            }
+        }
+        event.registerBrigadier("shtestgriffinspots") {
+            description = "Show potential griffin spots around you."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                testGriffinSpots = !testGriffinSpots
+                val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
+                ChatUtils.chat("Test Griffin Spots $state§e.")
+            }
         }
     }
 }

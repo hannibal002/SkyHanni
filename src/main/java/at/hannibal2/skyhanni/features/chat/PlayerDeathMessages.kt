@@ -6,18 +6,21 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PlayerDeathMessages {
 
-    private val lastTimePlayerSeen = mutableMapOf<String, Long>()
+    private val lastTimePlayerSeen = mutableMapOf<String, SimpleTimeMark>()
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -33,7 +36,7 @@ object PlayerDeathMessages {
 
         if (MarkedPlayerManager.config.highlightInChat &&
             !DungeonApi.inDungeon() &&
-            !LorenzUtils.inKuudraFight &&
+            !KuudraApi.inKuudra &&
             MarkedPlayerManager.isMarkedPlayer(name)
         ) {
             val reason = event.reason
@@ -43,7 +46,9 @@ object PlayerDeathMessages {
             return
         }
 
-        val time = System.currentTimeMillis() > lastTimePlayerSeen.getOrDefault(name, 0) + 30_000
+        val lastTime = lastTimePlayerSeen[name] ?: SimpleTimeMark.farPast()
+        val time = lastTime.passedSince() > 30.seconds
+
         if (isHideFarDeathsEnabled() && time) {
             event.chatEvent.blockedReason = "far_away_player_death"
         }
@@ -53,10 +58,10 @@ object PlayerDeathMessages {
         val entities = EntityUtils.getEntities<EntityOtherPlayerMP>()
             .filter { it.getLorenzVec().distance(LocationUtils.playerLocation()) < 25 }
         for (otherPlayer in entities) {
-            lastTimePlayerSeen[otherPlayer.name] = System.currentTimeMillis()
+            lastTimePlayerSeen[otherPlayer.name] = SimpleTimeMark.now()
         }
     }
 
     private fun isHideFarDeathsEnabled(): Boolean =
-        LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
+        SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !DungeonApi.inDungeon() && !KuudraApi.inKuudra
 }

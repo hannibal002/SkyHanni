@@ -4,6 +4,7 @@ import net.minecraft.client.gui.ChatLine;
 import net.minecraft.client.gui.GuiNewChat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.List;
 
@@ -21,4 +22,10 @@ public interface AccessorMixinGuiNewChat {
 
     @Accessor("drawnChatLines")
     void setDrawnChatLines_skyhanni(List<ChatLine> drawnChatLines);
+
+    @Accessor("scrollPos")
+    int getScrollPos_skyhanni();
+
+    @Invoker("refreshChat")
+    void refreshChat_skyhanni();
 }

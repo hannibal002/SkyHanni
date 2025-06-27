@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -17,6 +17,7 @@ object BingoBoopParty {
 
     private val config get() = SkyHanniMod.feature.event.bingo.boopParty
     private val patternGroup = RepoPattern.group("bingo")
+
     /**
      * REGEX-TEST: §dFrom §b[MVP§3+§b] Tryp0MC§7: §d§lBoop!
      * REGEX-TEST: §dFrom §b[MVP§5+§b] martimavocado§7: §d§lBoop!
@@ -27,7 +28,7 @@ object BingoBoopParty {
     )
 
     @HandleEvent
-    fun onChat(event: PrivateMessageChatEvent) {
+    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         val message = event.messageComponent.textComponent.formattedText.removeResets()
         if (!boopPattern.matches(message)) return
@@ -41,5 +42,5 @@ object BingoBoopParty {
         )
     }
 
-    private fun isEnabled() = LorenzUtils.isBingoProfile && config
+    private fun isEnabled() = SkyBlockUtils.isBingoProfile && config
 }

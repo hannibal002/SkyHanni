@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.CONFIG_VERSION
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
+import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement

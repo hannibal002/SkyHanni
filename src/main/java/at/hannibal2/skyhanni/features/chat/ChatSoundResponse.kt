@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -33,7 +33,7 @@ object ChatSoundResponse {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
 
 private const val START_PATTERN = "(?:^|^.* )(?: |§.)*(?i)"

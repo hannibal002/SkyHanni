@@ -5,9 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -67,7 +66,7 @@ object ArachneChatMessageHider {
             return true
         }
 
-        if (LorenzUtils.skyBlockArea == "Arachne's Sanctuary") return false
+        if (SkyBlockUtils.graphArea == "Arachne's Sanctuary") return false
 
         arachneCallingPattern.matchMatcher(message) {
             return true
@@ -89,5 +88,5 @@ object ArachneChatMessageHider {
         return hideArachneDeadMessage
     }
 
-    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && config.hideArachneMessages
+    fun isEnabled() = IslandType.SPIDER_DEN.isCurrent() && config.hideArachneMessages
 }

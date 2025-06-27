@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
@@ -9,23 +10,28 @@ import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.toLorenzVec
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SlayerApi {
 
+    val config get() = SkyHanniMod.feature.slayer
+    private val trackerConfig get() = config.itemProfitTracker
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
@@ -35,12 +41,16 @@ object SlayerApi {
     var latestWrongAreaWarning = SimpleTimeMark.farPast()
     var latestSlayerProgress = ""
 
+    val currentAreaType by RecalculatingValue(500.milliseconds) {
+        checkSlayerTypeForCurrentArea()
+    }
+
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
 
     fun getItemNameAndPrice(internalName: NeuInternalName, amount: Int): Pair<String, Double> =
         nameCache.getOrPut(internalName to amount) {
             val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-            val displayName = internalName.itemName
+            val displayName = internalName.repoItemName
 
             val price = internalName.getPrice()
             val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
@@ -69,6 +79,13 @@ object SlayerApi {
         event.addData {
             add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
+            if (!isInCorrectArea) {
+                add("currentAreaType: $currentAreaType")
+                add(" graph area: ${SkyBlockUtils.graphArea}")
+                with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+                    add(" /shtestwaypoint $x $y $z pathfind")
+                }
+            }
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")
         }
@@ -118,22 +135,19 @@ object SlayerApi {
         }
 
         if (event.isMod(5)) {
-            isInCorrectArea = if (LorenzUtils.isStrandedProfile) {
+            if (SkyBlockUtils.isStrandedProfile) {
                 isInAnyArea = true
-                true
+                isInCorrectArea = true
             } else {
-                val slayerTypeForCurrentArea = getSlayerTypeForCurrentArea()
-                isInAnyArea = slayerTypeForCurrentArea != null
-                slayerTypeForCurrentArea == activeSlayer && slayerTypeForCurrentArea != null
+                isInAnyArea = currentAreaType != null
+                isInCorrectArea = currentAreaType == activeSlayer && currentAreaType != null
             }
         }
     }
-
     // TODO USE SH-REPO
-    fun getSlayerTypeForCurrentArea() = when (LorenzUtils.skyBlockArea) {
-        "Graveyard",
-        "Coal Mine",
-        -> SlayerType.REVENANT
+    private fun checkSlayerTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
+        "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isCurrent()) SlayerType.REVENANT else null
+        "Revenant Cave" -> SlayerType.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
@@ -145,11 +159,12 @@ object SlayerApi {
         "Howling Cave",
         -> SlayerType.SVEN
 
-        "The End",
-        "Dragon's Nest",
         "Void Sepulture",
         "Zealot Bruiser Hideout",
         -> SlayerType.VOID
+
+        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isCurrent()) SlayerType.VOID else null
+        "no_area" -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isCurrent()) SlayerType.VOID else null
 
         "Stronghold",
         "The Wasteland",

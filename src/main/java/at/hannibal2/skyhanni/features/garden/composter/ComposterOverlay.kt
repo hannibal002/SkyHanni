@@ -1,21 +1,23 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.GetFromSackApi
+import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterApi.getLevel
@@ -24,15 +26,17 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoinWithBrackets
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -43,13 +47,21 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import java.util.Collections
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -63,23 +75,23 @@ object ComposterOverlay {
     private var organicMatter: Map<NeuInternalName, Double> = emptyMap()
 
     private val config get() = GardenApi.config.composters
-    private var organicMatterDisplay = emptyList<List<Any>>()
-    private var fuelExtraDisplay = emptyList<List<Any>>()
+    private var organicMatterDisplay: Renderable? = null
+    private var fuelExtraDisplay: Renderable? = null
 
     private var currentTimeType = TimeType.HOUR
-    private var inComposter = false
-    private var inComposterUpgrades = false
+    private val composterInventory = InventoryDetector { name -> name == "Composter" }
+    private val composterUpgradesInventory = InventoryDetector { name -> name == "Composter Upgrades" }
     private var extraComposterUpgrade: ComposterUpgrade? = null
         set(value) {
             field = value
-            lastHovered = System.currentTimeMillis()
+            lastHovered = SimpleTimeMark.now()
         }
 
     private var maxLevel = false
-    private var lastHovered = 0L
+    private var lastHovered = SimpleTimeMark.farPast()
     private var lastAttemptTime = SimpleTimeMark.farPast()
 
-    var inInventory = false
+    val inInventory get() = composterInventory.isInside() || composterUpgradesInventory.isInside()
 
     private var testOffset = 0
 
@@ -95,55 +107,36 @@ object ComposterOverlay {
             GardenApi.storage?.composterCurrentFuelItem = value
         }
 
-    fun onCommand(args: Array<String>) {
-        if (args.size != 1) {
-            ChatUtils.userError("Usage: /shtestcomposter <offset>")
-            return
-        }
-        testOffset = args[0].toInt()
-        ChatUtils.chat("Composter test offset set to $testOffset.")
-    }
-
     private val COMPOST = "COMPOST".toInternalName()
     private val BIOFUEL = "BIOFUEL".toInternalName()
     private val VOLTA = "VOLTA".toInternalName()
     private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inInventory = false
-    }
-
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!inInventory) return
-
-        update()
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
-        if (inComposterUpgrades && extraComposterUpgrade != null && System.currentTimeMillis() > lastHovered + 200) {
-            extraComposterUpgrade = null
+    @HandleEvent(TabListUpdateEvent::class, priority = HandleEvent.LOW)
+    fun onTabListUpdate() {
+        if (inInventory) {
             update()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!config.overlay) return
-        inComposter = event.inventoryName == "Composter"
-        inComposterUpgrades = event.inventoryName == "Composter Upgrades"
-        if (!inComposter && !inComposterUpgrades) return
-
-        inInventory = true
-        update()
+    fun onTick() {
+        if (composterUpgradesInventory.isInside() && extraComposterUpgrade != null && lastHovered.passedSince() > 200.milliseconds) {
+            extraComposterUpgrade = null
+            update()
+        }
     }
 
-    @HandleEvent
+    @HandleEvent(InventoryFullyOpenedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onInventoryFullyOpened() {
+        if (inInventory) {
+            update()
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
-        if (!inComposterUpgrades) return
-        update()
+        if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
             val name = event.itemStack.displayName
             if (name.contains(upgrade.displayName)) {
@@ -158,32 +151,34 @@ object ComposterOverlay {
         if (extraComposterUpgrade != null) {
             extraComposterUpgrade = null
             maxLevel = false
-            update()
         }
+        update()
     }
 
     private fun update() {
+        if (!config.overlay) return
         val composterUpgrades = ComposterApi.composterUpgrades ?: return
         if (composterUpgrades.isEmpty()) {
-            val list = Collections.singletonList(listOf("§cOpen Composter Upgrades!"))
-            organicMatterDisplay = list
-            fuelExtraDisplay = list
+            StringRenderable("§cOpen Composter Upgrades!").let {
+                organicMatterDisplay = it
+                fuelExtraDisplay = it
+            }
             return
         }
         if (organicMatterFactors.isEmpty()) {
-            organicMatterDisplay = listOf(
-                Collections.singletonList("§cSkyHanni composter error:"),
-                Collections.singletonList("§cRepo data not loaded!"),
-                Collections.singletonList("§7(organicMatterFactors is empty)"),
-            )
+            organicMatterDisplay = Renderable.vertical {
+                addString("§cSkyHanni composter error:")
+                addString("§cRepo data not loaded!")
+                addString("§7(organicMatterFactors is empty)")
+            }
             return
         }
         if (fuelFactors.isEmpty()) {
-            organicMatterDisplay = listOf(
-                Collections.singletonList("§cSkyHanni composter error:"),
-                Collections.singletonList("§cRepo data not loaded!"),
-                Collections.singletonList("§7(fuelFactors is empty)"),
-            )
+            organicMatterDisplay = Renderable.vertical {
+                addString("§cSkyHanni composter error:")
+                addString("§cRepo data not loaded!")
+                addString("§7(fuelFactors is empty)")
+            }
             return
         }
         if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != NONE }) {
@@ -191,33 +186,27 @@ object ComposterOverlay {
         }
         if (currentFuelItem.let { it !in fuelFactors.keys && it != NONE }) currentFuelItem = NONE
 
-        if (inComposter) {
+        if (composterInventory.isInside()) {
             organicMatterDisplay = drawOrganicMatterDisplay()
             fuelExtraDisplay = drawFuelExtraDisplay()
-        } else if (inComposterUpgrades) {
+        } else if (this.composterUpgradesInventory.isInside()) {
             organicMatterDisplay = drawUpgradeStats()
-            fuelExtraDisplay = emptyList()
+            fuelExtraDisplay = null
         }
     }
 
-    private fun drawUpgradeStats(): List<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
-
-        var upgrade = extraComposterUpgrade
+    private fun preview(upgrade: ComposterUpgrade?): Renderable =
         if (upgrade == null) {
-            newList.addAsSingletonList("§7Preview: Nothing")
+            StringRenderable("§7Preview: Nothing")
         } else {
             val level = upgrade.getLevel(null)
             val nextLevel = if (maxLevel) "§6§lMAX" else "§c➜ §a" + (level + 1)
             val displayName = upgrade.displayName
-            newList.addAsSingletonList("§7Preview §a$displayName§7: §a$level $nextLevel")
-        }
-        newList.addAsSingletonList("")
-        if (maxLevel) {
-            upgrade = null
+            StringRenderable("§7Preview §a$displayName§7: §a$level $nextLevel")
         }
 
-        addExtraData(newList)
+    private fun drawUpgradeStats(): Renderable {
+        val upgrade = if (!maxLevel) extraComposterUpgrade else null
 
         val maxOrganicMatter = ComposterApi.maxOrganicMatter(null)
         val maxOrganicMatterPreview = ComposterApi.maxOrganicMatter(upgrade)
@@ -225,15 +214,7 @@ object ComposterOverlay {
         val matterPer = ComposterApi.organicMatterRequiredPer(null)
         val matterPerPreview = ComposterApi.organicMatterRequiredPer(upgrade)
 
-        val matterMaxDuration = ComposterApi.timePerCompost(null) * floor(maxOrganicMatter / matterPer)
-        val matterMaxDurationPreview =
-            ComposterApi.timePerCompost(upgrade) * floor(maxOrganicMatterPreview / matterPerPreview)
-
-        var format = formatTime(matterMaxDuration)
-        var formatPreview =
-            if (matterMaxDuration != matterMaxDurationPreview) " §c➜ §b" + formatTime(matterMaxDurationPreview) else ""
-
-        newList.addAsSingletonList("§7Full §eOrganic Matter §7empty time: §b$format$formatPreview")
+        val organicMatterFormat = format(maxOrganicMatter, matterPer, upgrade, maxOrganicMatterPreview, matterPerPreview)
 
         val maxFuel = ComposterApi.maxFuel(null)
         val maxFuelPreview = ComposterApi.maxFuel(upgrade)
@@ -241,81 +222,83 @@ object ComposterOverlay {
         val fuelRequiredPer = ComposterApi.fuelRequiredPer(null)
         val fuelRequiredPerPreview = ComposterApi.fuelRequiredPer(upgrade)
 
-        val fuelMaxDuration = ComposterApi.timePerCompost(null) * floor(maxFuel / fuelRequiredPer)
-        val fuelMaxDurationPreview =
-            ComposterApi.timePerCompost(upgrade) * floor(maxFuelPreview / fuelRequiredPerPreview)
+        val fuelFormat = format(maxFuel, fuelRequiredPer, upgrade, maxFuelPreview, fuelRequiredPerPreview)
 
-        format = formatTime(fuelMaxDuration)
-        formatPreview =
-            if (fuelMaxDuration != fuelMaxDurationPreview) " §c➜ §b" + formatTime(fuelMaxDurationPreview) else ""
-        newList.addAsSingletonList("§7Full §2Fuel §7empty time: §b$format$formatPreview")
-
-        return newList
+        return Renderable.vertical {
+            add(preview(extraComposterUpgrade))
+            addVerticalSpacer()
+            addNotNull(profitDisplay())
+            addString(
+                "§eOrganic Matter §7empty in §b$organicMatterFormat",
+                tips = listOf(
+                    "§7The full §eOrganic Matter §7storage would",
+                    "§7become empty with your Composter Speed",
+                    "§7in $organicMatterFormat",
+                ),
+            )
+            addString(
+                "§2Fuel §7empty in $fuelFormat",
+                tips = listOf(
+                    "§7The full §2Fuel §7storage would",
+                    "§7become empty with your Composter Speed",
+                    "§7in $fuelFormat",
+                ),
+            )
+        }
     }
 
-    private fun formatTime(duration: Duration) = duration.format(maxUnits = 2)
+    private fun format(max: Int, per: Double, upgrade: ComposterUpgrade?, maxPreview: Int, perPreview: Double): String {
+        val matterMaxDuration = ComposterApi.timePerCompost(null) * floor(max / per)
+        val matterMaxDurationPreview =
+            ComposterApi.timePerCompost(upgrade) * floor(maxPreview / perPreview)
 
-    private fun drawOrganicMatterDisplay(): MutableList<List<Any>> {
+        val format = formatTime(matterMaxDuration)
+        val formatPreview = if (matterMaxDuration != matterMaxDurationPreview) " §c➜ " + formatTime(matterMaxDurationPreview) else ""
+
+        return "$format$formatPreview"
+    }
+
+    private fun formatTime(duration: Duration) = "§b" + duration.format(maxUnits = 2)
+
+    private fun drawOrganicMatterDisplay(): Renderable {
         val maxOrganicMatter = ComposterApi.maxOrganicMatter(if (maxLevel) null else extraComposterUpgrade)
         val currentOrganicMatter = ComposterApi.getOrganicMatter()
         val missingOrganicMatter = (maxOrganicMatter - currentOrganicMatter).toDouble()
 
-        val newList = mutableListOf<List<Any>>()
-        newList.addAsSingletonList("§7Items needed to fill §eOrganic Matter")
-        val fillList = fillList(newList, organicMatterFactors, missingOrganicMatter, testOffset) {
-            currentOrganicMatterItem = it
-            update()
-        }
-        if (currentOrganicMatterItem == NONE) {
-            currentOrganicMatterItem = fillList
-            update()
-        }
-        return newList
-    }
-
-    private fun drawFuelExtraDisplay(): List<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
-
-        addExtraData(newList)
-
-        if (inComposter) {
-            newList.addAsSingletonList("§7Items needed to fill §2Fuel")
-            val maxFuel = ComposterApi.maxFuel(null)
-            val currentFuel = ComposterApi.getFuel()
-            val missingFuel = (maxFuel - currentFuel).toDouble()
-            val fillList = fillList(newList, fuelFactors, missingFuel) {
-                currentFuelItem = it
+        return Renderable.vertical {
+            addString("§7Items needed to fill §eOrganic Matter")
+            val fillList = fillList(organicMatterFactors, missingOrganicMatter, testOffset) {
+                currentOrganicMatterItem = it
                 update()
             }
-            if (currentFuelItem == NONE) {
-                currentFuelItem = fillList
+            if (currentOrganicMatterItem == NONE) {
+                currentOrganicMatterItem = fillList
                 update()
             }
         }
-        return newList
     }
 
-    private fun addExtraData(newList: MutableList<List<Any>>) {
-        val organicMatterItem = currentOrganicMatterItem ?: return
-        val fuelItem = currentFuelItem ?: return
-        if (organicMatterItem == NONE || fuelItem == NONE) return
+    private fun drawFuelExtraDisplay() = Renderable.vertical {
+        addNotNull(profitDisplay())
+        if (!composterInventory.isInside()) return@vertical
+        addString("§7Items needed to fill §2Fuel")
+        val maxFuel = ComposterApi.maxFuel(null)
+        val currentFuel = ComposterApi.getFuel()
+        val missingFuel = (maxFuel - currentFuel).toDouble()
+        val fillList = fillList(fuelFactors, missingFuel) {
+            currentFuelItem = it
+            update()
+        }
+        if (currentFuelItem == NONE) {
+            currentFuelItem = fillList
+            update()
+        }
+    }
 
-        newList.addSelector<TimeType>(
-            "§7Per ",
-            getName = { type -> type.display },
-            isCurrent = { it == currentTimeType },
-            onChange = {
-                currentTimeType = it
-                update()
-            },
-        )
-
-        val list = mutableListOf<Any>()
-        list.add("§7Using: ")
-        list.add(organicMatterItem.getItemStack())
-        list.add("§7and ")
-        list.add(fuelItem.getItemStack())
-        newList.add(list)
+    private fun profitDisplay(): Renderable? {
+        val organicMatterItem = currentOrganicMatterItem ?: return null
+        val fuelItem = currentFuelItem ?: return null
+        if (organicMatterItem == NONE || fuelItem == NONE) return null
 
         val timePerCompost = ComposterApi.timePerCompost(null)
         val upgrade = if (maxLevel) null else extraComposterUpgrade
@@ -323,7 +306,6 @@ object ComposterOverlay {
         val format = timePerCompost.format()
         val formatPreview =
             if (timePerCompostPreview != timePerCompost) " §c➜ §b" + timePerCompostPreview.format() else ""
-        newList.addAsSingletonList(" §7Time per Compost: §b$format$formatPreview")
 
         val timeText = currentTimeType.display.lowercase()
         val timeMultiplier = if (currentTimeType != TimeType.COMPOST) {
@@ -340,8 +322,7 @@ object ComposterOverlay {
         val compostPerTitlePreview =
             if (multiplier != multiplierPreview) " §c➜ §e" + multiplierPreview.roundTo(2) else ""
         val compostPerTitle =
-            if (currentTimeType == TimeType.COMPOST) "Compost multiplier" else "Composts per $timeText"
-        newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
+            if (currentTimeType == TimeType.COMPOST) "Compost factor" else "Composts per $timeText"
 
         val organicMatterPrice = getPrice(organicMatterItem)
         val organicMatterFactor = organicMatterFactors[organicMatterItem] ?: 1.0
@@ -366,9 +347,6 @@ object ComposterOverlay {
 
         val materialCostFormatPreview =
             if (totalCost != totalCostPreview) " §c➜ §6" + totalCostPreview.shortFormat() else ""
-        val materialCostFormat =
-            " §7Material costs per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview"
-        newList.addAsSingletonList(materialCostFormat)
 
         val priceCompost = COMPOST.getPrice()
         val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
@@ -376,14 +354,62 @@ object ComposterOverlay {
             ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
 
         val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + profitPreview.shortFormat() else ""
-        val profitFormat = " §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview"
-        newList.addAsSingletonList(profitFormat)
 
-        newList.addAsSingletonList("")
+        return Renderable.vertical {
+            addRenderableButton<TimeType>(
+                "Display",
+                current = currentTimeType,
+                onChange = {
+                    currentTimeType = it
+                    update()
+                },
+            )
+
+            addLine(
+                tips = listOf(
+                    "§7The variables below are calcualted with",
+                    "${organicMatterItem.repoItemName} §7and ${fuelItem.repoItemName}.",
+                ),
+            ) {
+                addString("§7Using ")
+                addItemStack(organicMatterItem)
+                addString(" §7and ")
+                addItemStack(fuelItem)
+            }
+
+            addString(
+                text = " §7Time per Compost: §b$format$formatPreview",
+                tips = listOf(
+                    "§7It takes §b$format §7for",
+                    "§7your composter to create one §aCompost.",
+                ),
+            )
+            addString(
+                " §7$compostPerTitle: §e${multiplier.roundTo(2).addSeparators()}$compostPerTitlePreview",
+                tips = listOf(
+                    "§7The §aCompost Factor §7is calcualted by adding",
+                    "§aMulti Drop §7and §aComposter Speed §7together.",
+                ),
+            )
+            addString(
+                " §7Cost per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview",
+                tips = listOf(
+                    "§7Shows how much you §cpay as cost §7in",
+                    "§eOrganic Matter §7and §2Fuel§7.",
+                ),
+            )
+            addString(
+                " §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview",
+                tips = listOf(
+                    "§7Shows how much you make as §6profit §7from",
+                    "§7selling §aCompsot §7after subtracting the §ccosts§6.",
+                ),
+            )
+            addVerticalSpacer()
+        }
     }
 
-    private fun fillList(
-        bigList: MutableList<List<Any>>,
+    private fun MutableList<Renderable>.fillList(
         factors: Map<NeuInternalName, Double>,
         missing: Double,
         testOffsetRec: Int = 0,
@@ -400,9 +426,9 @@ object ComposterOverlay {
             0
         } else testOffsetRec
 
-        val first: NeuInternalName? = calculateFirst(map, testOffset, factors, missing, onClick, bigList)
+        val first: NeuInternalName? = calculateFirst(map, testOffset, factors, missing, onClick)
         if (testOffset != 0) {
-            bigList.addAsSingletonList(
+            add(
                 Renderable.link("testOffset = $testOffset") {
                     ComposterOverlay.testOffset = 0
                     update()
@@ -413,13 +439,12 @@ object ComposterOverlay {
         return first ?: error("First is empty!")
     }
 
-    private fun calculateFirst(
+    private fun MutableList<Renderable>.calculateFirst(
         map: MutableMap<NeuInternalName, Double>,
         testOffset: Int,
         factors: Map<NeuInternalName, Double>,
         missing: Double,
         onClick: (NeuInternalName) -> Unit,
-        bigList: MutableList<List<Any>>,
     ): NeuInternalName? {
         var i = 0
         var first: NeuInternalName? = null
@@ -430,7 +455,6 @@ object ComposterOverlay {
             val factor = factors[internalName] ?: 1.0
 
             val item = internalName.getItemStack()
-            val price = getPrice(internalName)
             val itemsNeeded = if (config.roundDown) {
                 val amount = missing / factor
                 if (amount > .75 && amount < 1.0) {
@@ -440,48 +464,72 @@ object ComposterOverlay {
                 }
             } else {
                 ceil(missing / factor)
-            }
-            val totalPrice = itemsNeeded * price
+            }.toInt()
 
-            val list = mutableListOf<Any>()
-            if (testOffset != 0) {
-                list.add("#$i ")
+            addLine {
+                if (testOffset != 0) addString("#$i ")
+                addItemStack(item)
+                add(formatPrice(internalName, itemsNeeded, onClick, factor))
             }
-            list.add(item)
-            formatPrice(totalPrice, internalName, item.displayName, list, itemsNeeded, onClick)
-            bigList.add(list)
+
             if (i == 10 + testOffset) break
         }
         return first
     }
 
     private fun formatPrice(
-        totalPrice: Double,
         internalName: NeuInternalName,
-        itemName: String,
-        list: MutableList<Any>,
-        itemsNeeded: Double,
+        itemsNeeded: Int,
         onClick: (NeuInternalName) -> Unit,
-    ) {
-        val format = totalPrice.shortFormat()
-        val selected = if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
-        val rawItemName = itemName.removeColor()
-        val name = itemName.substring(0, 2) + selected + rawItemName
-        list.add(
-            Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
+        factor: Double,
+    ): Renderable {
+        val pricePer = getPrice(internalName)
+        val selected = internalName == currentOrganicMatterItem || internalName == currentFuelItem
+
+        val displayType = when (internalName) {
+            in organicMatterFactors -> "§eOrganic Matter"
+            in fuelFactors -> "§2Fuel"
+            else -> error("no type found: $internalName")
+        }
+        val totalPrice = itemsNeeded * pricePer
+
+        val tips = buildList {
+            add(internalName.repoItemName)
+            add(" ")
+            add("§7Price per: ${pricePer.formatCoin()}")
+            add("$displayType §7per: §e${factor.addSeparators()}")
+            add("§7Need §8$itemsNeeded §7items for max $displayType")
+            add("§7Total price: ${totalPrice.formatCoin()}")
+
+            add("")
+            if (selected) {
+                add(internalName.createBuyTipLine("Control + "))
+            } else {
+                add("§eClick to select for profit calculations!")
+            }
+        }
+
+        val itemName = internalName.repoItemNameCompact
+        val selectedFormat = if (selected) "§n" else ""
+        val displayName = itemName.substring(0, 2) + selectedFormat + itemName.removeColor()
+
+        return Renderable.clickable(
+            text = "$displayName §8x${itemsNeeded.addSeparators()} ${totalPrice.formatCoinWithBrackets()}",
+            onLeftClick = {
                 onClick(internalName)
                 if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
                     retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
                 }
             },
+            tips = tips,
         )
     }
 
     private fun retrieveMaterials(internalName: NeuInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
-        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR &&
-            !LorenzUtils.noTradeMode && internalName != BIOFUEL
+        if (config.retrieveFrom == RetrieveFromEntry.BAZAAR &&
+            !SkyBlockUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
@@ -493,7 +541,7 @@ object ComposterOverlay {
         }
 
         val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
-            HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
+            GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
             val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
@@ -508,7 +556,7 @@ object ComposterOverlay {
         }
         if (havingInSacks == 0) {
             SoundUtils.playErrorSound()
-            if (LorenzUtils.noTradeMode) {
+            if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("No $itemName §efound in sacks.")
             } else {
                 ChatUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
@@ -517,10 +565,10 @@ object ComposterOverlay {
             return
         }
 
-        HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
+        GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
         val havingInTotal = havingInInventory + havingInSacks
         if (itemsNeeded >= havingInTotal) {
-            if (LorenzUtils.noTradeMode) {
+            if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 ChatUtils.clickableChat(
@@ -540,8 +588,8 @@ object ComposterOverlay {
         return price
     }
 
-    @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    @HandleEvent(NeuRepositoryReloadEvent::class)
+    fun onNeuRepoReload() {
         updateOrganicMatterFactors()
     }
 
@@ -551,6 +599,15 @@ object ComposterOverlay {
         organicMatter = data.organicMatter
         fuelFactors = data.fuel
         updateOrganicMatterFactors()
+    }
+
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        with(config) {
+            ConditionalUtils.onToggle(minimumOrganicMatter) {
+                updateOrganicMatterFactors()
+            }
+        }
     }
 
     private fun updateOrganicMatterFactors() {
@@ -584,38 +641,41 @@ object ComposterOverlay {
             if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
 
             var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName.toInternalName())
-            if (amount <= 9) continue
             if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
                 amount = 5184
             }
             baseValues[newId]?.let {
-                map[internalName.toInternalName()] = it * amount
+                val totalOrganicMatter = it * amount
+                if (totalOrganicMatter <= config.minimumOrganicMatter.get()) continue
+                map[internalName.toInternalName()] = totalOrganicMatter
             }
         }
         return map
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onBackgroundDraw() {
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
-        if (inInventory) {
-            config.overlayOrganicMatterPos.renderStringsAndItems(
-                organicMatterDisplay,
-                posLabel = "Composter Overlay Organic Matter",
-            )
-            config.overlayFuelExtrasPos.renderStringsAndItems(
-                fuelExtraDisplay,
-                posLabel = "Composter Overlay Fuel Extras",
-            )
-        }
+        if (!inInventory || !config.overlay) return
+        config.overlayOrganicMatterPos.renderRenderable(
+            organicMatterDisplay,
+            posLabel = "Composter Overlay Organic Matter",
+        )
+        config.overlayFuelExtrasPos.renderRenderable(
+            fuelExtraDisplay,
+            posLabel = "Composter Overlay Fuel Extras",
+        )
     }
 
     enum class TimeType(val display: String, val multiplier: Int) {
         COMPOST("Compost", 1),
         HOUR("Hour", 60 * 60),
         DAY("Day", 60 * 60 * 24),
+        ;
+
+        override fun toString(): String = display
     }
 
     @HandleEvent
@@ -653,6 +713,22 @@ object ComposterOverlay {
             val tabListData = ComposterApi.tabListData
             for ((a, b) in tabListData) {
                 add("tabListData $a: $b")
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestcomposter") {
+            description = "Test the composter overlay"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs {
+                if (it.size != 1) {
+                    ChatUtils.userError("Usage: /shtestcomposter <offset>")
+                } else {
+                    testOffset = it[0].toInt()
+                    ChatUtils.chat("Composter test offset set to $testOffset.")
+                }
             }
         }
     }

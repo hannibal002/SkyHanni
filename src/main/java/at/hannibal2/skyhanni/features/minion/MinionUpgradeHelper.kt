@@ -9,13 +9,12 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -23,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Blocks
@@ -78,7 +78,7 @@ object MinionUpgradeHelper {
 
     // TODO make this event not necessary here.
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         resetItems()
     }
 
@@ -99,7 +99,7 @@ object MinionUpgradeHelper {
 
     private fun createDisplayItem(internalName: NeuInternalName): ItemStack {
         val lore = createLore(internalName)
-        return ItemStack(Blocks.diamond_block).setLore(lore).setStackDisplayName("§bGet Required Items")
+        return ItemStack(Blocks.diamond_block).setLore(lore).setCustomItemName("§bGet Required Items")
     }
 
     private fun createLore(internalName: NeuInternalName): List<String> {
@@ -108,7 +108,7 @@ object MinionUpgradeHelper {
             val itemsRemaining = itemsNeeded - itemsInSacks
             val totalCost = itemsNeeded * itemPrice
             val remainingCost = itemsRemaining * itemPrice
-            val itemName = internalName.itemName
+            val itemName = internalName.repoItemName
 
             add("§8(From SkyHanni)")
             add("")

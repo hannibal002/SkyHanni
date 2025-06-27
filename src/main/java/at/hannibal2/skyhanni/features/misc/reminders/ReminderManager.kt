@@ -13,11 +13,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.command
-import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.chat.TextHelper.suggest
 import at.hannibal2.skyhanni.utils.chat.TextHelper.wrap
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.suggest
 import net.minecraft.util.IChatComponent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
