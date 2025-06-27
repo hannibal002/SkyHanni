@@ -577,7 +577,7 @@ net.minecraft.world.item.Items LEATHER_HELMET leather_helmet
 net.minecraft.world.item.Items LEATHER_LEGGINGS leather_leggings
 net.minecraft.world.item.Items MAGMA_CREAM magma_cream
 net.minecraft.world.item.Items MAP map
-net.minecraft.world.item.Items MELON melon
+net.minecraft.world.item.Items MELON_SLICE melon
 net.minecraft.world.item.Items MELON_SEEDS melon_seeds
 net.minecraft.world.item.Items MILK_BUCKET milk_bucket
 net.minecraft.world.item.Items MINECART minecart
