@@ -54,3 +54,4 @@ net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket getEntityId() getId()
 
 net.minecraft.text.Text net.minecraft.text.LiteralText
 
+net.minecraft.client.texture.TextureManager registerTexture() method_24303()

@@ -18,6 +18,7 @@ at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHook.kt
 at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
+at.hannibal2.skyhanni.mixins.transformers.AccessorGuiScreen.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRender.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket.java
@@ -41,6 +42,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinRenderGlobal.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRenderItem.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRenderPlayer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRendererLivingEntity.java
+at.hannibal2.skyhanni.mixins.transformers.MixinSimpleReloadableResourceManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinWorld.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiEditSign.java
