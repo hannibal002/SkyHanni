@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
@@ -126,6 +127,7 @@ object OrderedWaypoints {
             arg("name", BrigadierArguments.string()) { name ->
                 callback { load(getArg(name)) }
             }
+            callback { load("") }
             aliases = generateAliases(listOf("load", "import"))
         }
 
@@ -142,6 +144,7 @@ object OrderedWaypoints {
             arg("amount", BrigadierArguments.integer()) { amount ->
                 callback { skip(getArg(amount)) }
             }
+            simpleCallback { skip(1) }
             aliases = generateAliases(listOf("skip"))
         }
 
@@ -187,6 +190,7 @@ object OrderedWaypoints {
             arg("format", BrigadierArguments.string()) { format ->
                 callback { export(getArg(format)) }
             }
+            simpleCallback { export("coleweight") }
             aliases = generateAliases(listOf("export"))
         }
 
@@ -226,6 +230,7 @@ object OrderedWaypoints {
             }
 
             res?.let {
+                ChatUtils.chat(it.waypoints.toString())
                 orderedWaypointsList = it
                 currentOrderedWaypointIndex = 0
                 renderWaypoints.clear()
@@ -337,7 +342,7 @@ object OrderedWaypoints {
     }
 
     private fun save(name: String) {
-        ProfileStorageData.playerSpecific?.routes?.put(name, orderedWaypointsList)
+        ProfileStorageData.playerSpecific?.routes?.put(name, orderedWaypointsList.deepCopy())
         ChatUtils.chat("Route saved as $name. Do /shorderedload $name to import it.")
     }
 
@@ -410,6 +415,6 @@ object OrderedWaypoints {
     }
 
     private fun exportWaypoints(waypoints: Waypoints<SkyhanniWaypoint>, name: String): String? {
-        return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.save(waypoints)
+        return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.export(waypoints)
     }
 }

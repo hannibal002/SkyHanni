@@ -10,7 +10,7 @@ import java.awt.Color
 
 @AutoService(WaypointFormat::class)
 class ColeweightWaypointFormat : WaypointFormat {
-    class ColeweightWaypoint(
+    data class ColeweightWaypoint(
         @Expose
         val x: Int,
         @Expose
@@ -25,7 +25,9 @@ class ColeweightWaypointFormat : WaypointFormat {
         val b: Double,
         @Expose
         val options: MutableMap<String, String> = mutableMapOf(),
-    )
+    ) : Copyable<ColeweightWaypoint> {
+        override fun copy() = ColeweightWaypoint(x, y, z, r, g, b, options)
+    }
 
     override fun load(string: String): Waypoints<SkyhanniWaypoint>? {
         val type = object : TypeToken<Waypoints<ColeweightWaypoint>>() {}.type
@@ -54,7 +56,7 @@ class ColeweightWaypointFormat : WaypointFormat {
         return load(string) != null
     }
 
-    override fun save(waypoints: Waypoints<SkyhanniWaypoint>): String {
+    override fun export(waypoints: Waypoints<SkyhanniWaypoint>): String {
         return ConfigManager.gson.toJson(
             Waypoints(
                 waypoints.map {

@@ -20,7 +20,7 @@ class OrderedWaypointsConfig {
     @Expose
     @ConfigOption(name = "Previous Color", desc = "Color of the previous ordered waypoint.")
     @ConfigEditorColour
-    val previousWaypointColor: String = "0:153:85:85:255"
+    var previousWaypointColor: String = "0:153:85:85:255"
 
     @Expose
     @ConfigOption(name = "Next Color", desc = "Color of the next ordered waypoint.")

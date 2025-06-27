@@ -13,4 +13,6 @@ class SkyhanniWaypoint(
     var number: Int,
     @Expose
     val options: MutableMap<String, String> = mutableMapOf(),
-)
+) : Copyable<SkyhanniWaypoint> {
+    override fun copy() = SkyhanniWaypoint(location, color, number, options)
+}
