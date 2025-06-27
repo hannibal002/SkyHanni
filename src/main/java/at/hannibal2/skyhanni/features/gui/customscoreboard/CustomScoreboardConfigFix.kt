@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
+import scala.xml.parsing.`MarkupParser$class`.element
 
 @SkyHanniModule
 object CustomScoreboardConfigFix {
@@ -98,6 +99,10 @@ object CustomScoreboardConfigFix {
         }
 
         event.addEvent(89, ScoreboardConfigEventElement.GALATEA)
+
+        event.transform(90, EVENT_ENTRIES_KEY) { element ->
+            JsonArray().apply { element.asJsonArray.toSet().forEach(::add) }
+        }
     }
 
     private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {
