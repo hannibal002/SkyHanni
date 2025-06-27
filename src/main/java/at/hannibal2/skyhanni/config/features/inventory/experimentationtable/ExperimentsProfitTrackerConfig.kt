@@ -23,7 +23,7 @@ class ExperimentsProfitTrackerConfig {
         desc = "Change the messages to be hidden after completing Add-on/Main experiments."
     )
     @ConfigEditorDraggableList
-    var hideMessages: MutableList<ExperimentMessages> = mutableListOf()
+    val hideMessages: MutableList<ExperimentMessages> = mutableListOf()
 
     @Expose
     @ConfigOption(name = "Time displayed", desc = "Time displayed after completing an experiment.")
