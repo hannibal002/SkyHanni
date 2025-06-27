@@ -31,7 +31,7 @@ object TreeProgressDisplay {
         config.treeProgressDisplayPosition.renderRenderable(display, posLabel = "Tree Progress")
     }
 
-    @HandleEvent(SkyHanniTickEvent::class, onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onTick() {
         if (!config.enabled) return
         if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
