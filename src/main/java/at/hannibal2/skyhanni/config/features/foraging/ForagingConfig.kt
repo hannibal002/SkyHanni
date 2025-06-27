@@ -50,10 +50,29 @@ class ForagingConfig {
     var birriesHighlight = BirriesHighlightConfig()
 
     @Expose
+    @ConfigOption(name = "Hideonleaf Highlight", desc = "")
+    @OnlyModern
+    @Accordion
+    var hideonleafHighlight = HideonleafHighlightConfig()
+
+    @Expose
+    @ConfigOption(name = "Foraging Tracker", desc = "")
+    @OnlyModern
+    @Accordion
+    val tracker = ForagingTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
     @ConfigEditorBoolean
     @FeatureToggle
     var lassoDisplay = true
+
+    @Expose
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Galatea.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var mutePhantoms = true
 
     @Expose
     @ConfigLink(owner = ForagingConfig::class, field = "lassoDisplay")
