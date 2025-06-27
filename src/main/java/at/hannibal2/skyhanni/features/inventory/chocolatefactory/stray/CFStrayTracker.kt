@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,11 +21,11 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -201,8 +202,8 @@ object CFStrayTracker {
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
             if (rarity == LEGENDARY) tip += extractGoldenTypesCaught(data)
-            Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.partyModeReplace().split("\n"))
-        } ?: Renderable.string(lineFormat)
+            Renderable.hoverTips(StringRenderable(lineFormat), tips = tip.partyModeReplace().split("\n"))
+        } ?: StringRenderable(lineFormat)
         return renderable.toSearchable(rarity.toString())
     }
 
@@ -278,8 +279,8 @@ object CFStrayTracker {
         return true
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)
@@ -310,16 +311,16 @@ object CFStrayTracker {
         ) { config.strayRabbitTracker && isEnabled() }
     }
 
-    @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(InventoryFullyOpenedEvent::class)
+    fun onInventoryFullyOpened() {
         if (!isEnabled()) return
         // Force a refresh for party mode
         if (CFApi.inChocolateFactory && config.partyMode.get()) tracker.update()
         tracker.firstUpdate()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         if (!isEnabled()) return
         tracker.update() // Make sure we don't stay in party mode
     }
@@ -350,8 +351,8 @@ object CFStrayTracker {
         }
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         config.partyMode.onToggle(tracker::update)
     }
 
@@ -364,5 +365,5 @@ object CFStrayTracker {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && CFApi.inChocolateFactory
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && CFApi.inChocolateFactory
 }

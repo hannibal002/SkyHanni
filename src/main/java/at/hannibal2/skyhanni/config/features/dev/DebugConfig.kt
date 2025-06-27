@@ -1,18 +1,16 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.data.ElectionCandidate
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
-// todo 1.21 impl needed
 class DebugConfig {
     @Expose
     @ConfigOption(name = "Enable Debug", desc = "Enable Test logic")
@@ -167,14 +165,12 @@ class DebugConfig {
     @Expose
     @ConfigOption(name = "Powder Messages", desc = "Shows debug messages every time Hotm Powder changes.")
     @ConfigEditorBoolean
-    val powderMessages: Boolean = false
+    var powderMessages: Boolean = false
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
-    var assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
-    //#endif
+    val assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
 
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
@@ -194,18 +190,49 @@ class DebugConfig {
     @Expose
     @ConfigOption(name = "Always Great Spook", desc = "Assumes the Great Spook is always active.")
     @ConfigEditorBoolean
-    var forceGreatSpook: Property<Boolean> = Property.of(false)
+    val forceGreatSpook: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
     @ConfigEditorBoolean
     var dvdLogo: Boolean = false
 
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "dvdLogo")
+    val dvdLogoPosition: Position = Position(100, 100)
+
+    @Expose
+    @ConfigOption(name = "Orbital", desc = "Enable the test Orbital System renderable.")
+    @ConfigEditorBoolean
+    var orbital: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "orbital")
+    val orbitalPosition: Position = Position(200, 200)
+
+    @Expose
+    @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
+    @ConfigEditorBoolean
+    var itemStack: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "itemStack")
+    val itemStackPosition: Position = Position(-200, 300)
+
+    @Expose
+    @ConfigOption(name = "Animated Item Stack", desc = "Enable the test Animated Item Stack Renderable")
+    @ConfigEditorBoolean
+    var animatedItemStack: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
+    val animatedItemStackPosition: Position = Position(-300, 300)
+
     // Does not have a config element!
     @Expose
-    var trackSoundPosition: Position = Position(0, 0)
+    val trackSoundPosition: Position = Position(0, 0)
 
     // Also does not have a config element!
     @Expose
-    var trackParticlePosition: Position = Position(0, 0)
+    val trackParticlePosition: Position = Position(0, 0)
 }

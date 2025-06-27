@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.misc.EmojiReplacer
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 object MixinPatcherFontRendererHookHook {
@@ -23,8 +23,13 @@ object MixinPatcherFontRendererHookHook {
                 }
             }
         }
+        
+        if (!SkyBlockUtils.onHypixel) return
 
-        if (!LorenzUtils.onHypixel) return
+        if (ChromaManager.config.allChroma) {
+            cir.returnValue = false
+            return
+        }
 
         if (
             ChromaManager.config.allChroma ||
