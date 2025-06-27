@@ -13,9 +13,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-//#if TODO
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-//#endif
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
@@ -108,7 +106,6 @@ object SkyHanniTypeAdapters {
         }
     }
 
-    //#if TODO
     val COLOR = object : TypeAdapter<Color>() {
         override fun write(out: JsonWriter, value: Color) {
             out.value("0:${value.alpha}:${value.red}:${value.green}:${value.blue}")
@@ -118,7 +115,6 @@ object SkyHanniTypeAdapters {
             return reader.nextString().toSpecialColor()
         }
     }
-    //#endif
 
     inline fun <reified T> GsonBuilder.registerTypeAdapter(
         crossinline write: (JsonWriter, T) -> Unit,

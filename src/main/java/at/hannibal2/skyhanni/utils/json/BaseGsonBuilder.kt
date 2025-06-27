@@ -43,9 +43,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
-        //#if TODO
         .registerTypeAdapter(Color::class.java, SkyHanniTypeAdapters.COLOR)
-        //#endif
         .enableComplexMapKeySerialization()
 
     fun lenientGson(): GsonBuilder = gson()
