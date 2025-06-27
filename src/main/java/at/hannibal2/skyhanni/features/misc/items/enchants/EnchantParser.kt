@@ -57,22 +57,54 @@ object EnchantParser {
         "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
 
-    // Above regex tests apply to this pattern also
+    /**
+     * REGEX-TEST: §9Champion VI §81.2M
+     * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §5§o§9Compact X
+     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
+     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
+     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
+     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     */
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
         "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
+    /**
+     * REGEX-TEST: §eChampion VI §81.2M
+     * REGEX-TEST: §rCultivating VII §83,271,717
+     * REGEX-TEST: §5§o§9Compact X
+     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §6Champion X§9, §9Cleave VI
+     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §fFeather Falling X
+     * REGEX-TEST: §9Compact X§9, §rEfficiency V§9, §9Experience IV
+     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     */
     @Suppress("MaxLineLength")
     val enchantmentPatternAaronChroma by patternGroup.pattern(
         "enchants.newaaronchroma",
         "(?:§7§l|§d§l|§[0-9a-f]|§r)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
+    /**
+     * REGEX-TEST: §9Champion VI §81.2M
+     * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §5§o§9Compact X
+     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
+     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
+     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
+     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     */
     @Suppress("MaxLineLength")
-    val enchantmentPatternAaronStill by patternGroup.pattern( // TODO: doesnt actually work yet :P (ill implement later)
+    val enchantmentPatternAaronStill by patternGroup.pattern( // TODO: doesnt actually work yet :P (ill implement later), and make sure to change the REGEX-TEST!!!
         "enchants.newaaronstill",
         "(?:§7§l|§d§l|§7|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
+    /**
+     * REGEX-TEST: Respiration
+     * REGEX-TEST: Efficiency V
+     * REGEX-TEST: Depth Strider II
+     * REGEX-TEST: Aqua Affinity
+     */
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
     )
@@ -297,13 +329,9 @@ object EnchantParser {
         this.endEnchant = endEnchant
     }
 
-    private fun orderEnchants(loreList: MutableList<String>) {
-        var lastEnchant: FormattedEnchant? = null
-
-        val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
-        val regex = "[\\d,.kKmMbB]+\$".toRegex()
+    fun getEnchantPattern(): Pattern {
         val aaron = OtherModsSettings.aaron()
-        val matcherType: Pattern = if (aaron.getBoolean("skyblock.enchantments.rainbowMaxEnchants") == true) {
+        return if (aaron.getBoolean("skyblock.enchantments.rainbowMaxEnchants") == true) {
             if (aaron.getConfigValue("skyblock.enchantments.rainbowMode").toString() == "Chroma") {
                 enchantmentPatternAaronChroma
             } else {
@@ -312,8 +340,16 @@ object EnchantParser {
         } else {
             enchantmentPattern
         }
+    }
+
+    private fun orderEnchants(loreList: MutableList<String>) {
+        var lastEnchant: FormattedEnchant? = null
+
+        val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
+        val regex = "[\\d,.kKmMbB]+\$".toRegex()
+        val enchantMatcherPattern = getEnchantPattern()
         for (i in startEnchant..endEnchant) {
-            val matcher = matcherType.matcher(loreList[i])
+            val matcher = enchantMatcherPattern.matcher(loreList[i])
             var containsEnchant = false
             var enchantsOnThisLine = 0
 

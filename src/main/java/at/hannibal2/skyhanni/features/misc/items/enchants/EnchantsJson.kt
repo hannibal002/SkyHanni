@@ -29,7 +29,7 @@ class EnchantsJson {
         val exclusiveMatch = EnchantParser.enchantmentExclusivePattern.matcher(line)
         if (!exclusiveMatch.find()) return false // This is the case that the line is not exclusively enchants
 
-        val matcher = EnchantParser.enchantmentPattern.matcher(line)
+        val matcher = EnchantParser.getEnchantPattern().matcher(line)
         while (matcher.find()) {
             val enchant = this.getFromLore(matcher.group("enchant"))
             if (enchants.isNotEmpty()) {
