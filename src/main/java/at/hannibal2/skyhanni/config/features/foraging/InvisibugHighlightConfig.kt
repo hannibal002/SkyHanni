@@ -8,19 +8,21 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import java.awt.Color
 
+/**
+ * Code stolen from @NopoTheGamer (im lazy)
+ */
 class InvisibugHighlightConfig {
     @Expose
-    @ConfigOption(name = "Highlight Invisibug", desc = "Highlights nearby Invisibug.")
+    @ConfigOption(name = "Highlight Invisibugs", desc = "Highlights nearby Invisibugs.")
     @FeatureToggle
     @ConfigEditorBoolean
     @OnlyModern
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color for the Hideonleaf highlight")
+    @ConfigOption(name = "Color", desc = "Color for the Invisibug highlight")
     @ConfigEditorColour
     @OnlyModern
     var color: ChromaColour = Color.CYAN.toChromaColor()
