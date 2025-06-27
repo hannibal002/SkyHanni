@@ -74,5 +74,5 @@ object PowerStoneGuideFeatures {
         event.toolTip.add(5, "9x from Bazaar: §6${totalPrice.shortFormat()}")
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.powerStoneGuide
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.skyblockGuide.powerStone
 }
