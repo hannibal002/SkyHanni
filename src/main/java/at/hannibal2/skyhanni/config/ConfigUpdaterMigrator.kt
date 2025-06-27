@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.CONFIG_VERSION
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.VersionConstants.CONFIG_VERSION
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -18,7 +18,6 @@ val CONFIG_MOVE_VERSION: Int = CONFIG_VERSION + 1
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    val CONFIG_VERSION = "@CONFIG_VERSION@".toInt()
 
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this

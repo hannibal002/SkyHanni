@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
 import at.hannibal2.skyhanni.config.storage.Storage
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.VersionConstants.CONFIG_VERSION
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
@@ -146,7 +147,7 @@ class Features : Config() {
 
     @Expose
     @Suppress("unused")
-    var lastVersion: Int = ConfigUpdaterMigrator.CONFIG_VERSION
+    var lastVersion: Int = CONFIG_VERSION
 
     @Expose
     var lastMinecraftVersion: String? = null

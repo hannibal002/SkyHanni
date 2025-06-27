@@ -21,6 +21,7 @@ class ModuleProcessor(
     private val logger: KSPLogger,
     private val modVersion: String,
     private val mcVersion: String,
+    private val configVersion: String?,
     private val buildPaths: String?,
 ) : SymbolProcessor {
 
@@ -186,6 +187,7 @@ class ModuleProcessor(
             it.write("    // And might not be correct at run time\n")
             it.write("    // We use it for the auto updater only\n")
             it.write("    const val MC_VERSION = \"$mcVersion\"\n")
+            it.write("    const val CONFIG_VERSION = ${configVersion?.let { File(it) }?.readText()?.filter{it.isDigit()}?.toInt() ?: 0}\n")
             it.write("}\n")
         }
         logger.warn("Generated VersionConstants file with mod version $modVersion and mc version $mcVersion")
