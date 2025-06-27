@@ -37,6 +37,7 @@ class ColeweightWaypointFormat : WaypointFormat {
                         SkyhanniWaypoint(
                             LorenzVec(it.x, it.y, it.z),
                             Color(it.r.toFloat(), it.g.toFloat(), it.b.toFloat(), 0.4f),
+                            @Suppress("UnsafeCallOnNullableType")
                             it.options["name"]!!.toInt(),
                             it.options,
                         )
@@ -73,5 +74,5 @@ class ColeweightWaypointFormat : WaypointFormat {
     }
 
     override val name: String
-        get() = "Coleweight"
+        get() = "coleweight"
 }
