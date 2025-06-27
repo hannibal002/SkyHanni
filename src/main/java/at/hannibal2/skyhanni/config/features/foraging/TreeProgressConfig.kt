@@ -31,6 +31,6 @@ class TreeProgressConfig {
     @ConfigOption(name = "Compact Display", desc = "Shows a compact version of the display.")
     @ConfigEditorBoolean
     @OnlyModern
-    var compact: Boolean = true
+    var compact: Boolean = false
 
 }
