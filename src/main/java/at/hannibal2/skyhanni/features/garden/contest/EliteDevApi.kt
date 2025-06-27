@@ -18,7 +18,6 @@ object EliteDevApi {
     private const val API_NAME = "Elitebot Farming Contests"
     private const val ELITEBOT_API_URL = "https://api.elitebot.dev"
     private const val CONTEST_API_URL = "$ELITEBOT_API_URL/contests/at/now"
-    private val contestDuration = 20.minutes
 
     @KSerializable
     data class ContestsResponse(
@@ -45,7 +44,9 @@ object EliteDevApi {
         @Expose val crops: List<CropType>,
         @Expose var boostedCrop: CropType? = null,
     ) {
-        val endTime = startTime + contestDuration
+        // If hypixel changes the length of a SkyBlock day, we'll have
+        // bigger problems than this being hardcoded.
+        val endTime = startTime + 20.minutes
     }
 
     fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
