@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.OtherModsSettings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -30,6 +31,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.IChatComponent
 import java.util.TreeSet
+import java.util.regex.Pattern
 
 /**
  * Modified Enchant Parser from [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/enchants/EnchantManager.java)
@@ -60,6 +62,16 @@ object EnchantParser {
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
         "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+    )
+    @Suppress("MaxLineLength")
+    val enchantmentPatternAaronChroma by patternGroup.pattern(
+        "enchants.newaaronchroma",
+        "(?:§7§l|§d§l|§[0-9a-f]|§r)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+    )
+    @Suppress("MaxLineLength")
+    val enchantmentPatternAaronStill by patternGroup.pattern( // TODO: doesnt actually work yet :P (ill implement later)
+        "enchants.newaaronstill",
+        "(?:§7§l|§d§l|§7|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
@@ -290,8 +302,18 @@ object EnchantParser {
 
         val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
         val regex = "[\\d,.kKmMbB]+\$".toRegex()
+        val aaron = OtherModsSettings.aaron()
+        val matcherType: Pattern = if (aaron.getBoolean("skyblock.enchantments.rainbowMaxEnchants")) {
+            if (aaron.getConfigValue("skyblock.enchantments.rainbowMode").toString() == "Chroma") {
+                enchantmentPatternAaronChroma
+            } else {
+                enchantmentPatternAaronStill
+            }
+        } else {
+            enchantmentPattern
+        }
         for (i in startEnchant..endEnchant) {
-            val matcher = enchantmentPattern.matcher(loreList[i])
+            val matcher = matcherType.matcher(loreList[i])
             var containsEnchant = false
             var enchantsOnThisLine = 0
 

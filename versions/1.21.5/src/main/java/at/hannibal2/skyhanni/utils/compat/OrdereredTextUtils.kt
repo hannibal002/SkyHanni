@@ -65,14 +65,14 @@ object OrderedTextUtils {
             if (char == '§') {
 
                 if (index + 1 < legacyString.length) {
+                    if (sb.isNotEmpty()) {
+                        segments.add(StringVisitable.styled(sb.toString(), lastStyle))
 
-                    segments.add(StringVisitable.styled(sb.toString(), lastStyle))
-
-                    sb.clear()
-
+                        sb.clear()
+                    }
                     val nextChar = legacyString[index + 1]
 
-                    if (legacyString[index + 1] == '#') {
+                    if (nextChar == '#') {
 
                         if (index + 8 < legacyString.length) {
                             val hexColor = legacyString.substring(index + 2, index + 8)
@@ -128,7 +128,7 @@ object OrderedTextUtils {
 
                         val nextChar = legacyString[index + 1]
 
-                        if (legacyString[index + 1] == '#') {
+                        if (nextChar == '#') {
 
                             if (index + 8 < legacyString.length) {
                                 val hexColor = legacyString.substring(index + 2, index + 8)
