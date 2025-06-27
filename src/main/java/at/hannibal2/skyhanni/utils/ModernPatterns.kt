@@ -40,8 +40,8 @@ object ModernPatterns {
     )
 
     /**
-     * REGEX-TEST: §a§lFIG TREE §b§l88%
-     * REGEX-TEST: §2§lMANGROVE TREE §b§l5%
+     * REGEX-TEST: §a§lFIG TREE §r§b§l88%
+     * REGEX-TEST: §2§lMANGROVE TREE §r§b§l5%
      */
     val currentTreeProgressPattern by RepoPattern.pattern(
         "foraging.tree.progress",
