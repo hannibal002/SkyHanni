@@ -13,10 +13,12 @@ import java.util.regex.Pattern
  * an inventory open consumer and a isInside function to handle inventory check logic.
  *
  * @property openInventory A callback triggered when the given inventory is detected to be open. Contains the name of the inventory. Optional.
+ * @property onInventoryClose A callback triggered when the inventory is closed. Optional.
  * @property checkInventoryName Define what inventory name or names we are looking for.
  */
 class InventoryDetector(
     val openInventory: (String) -> Unit = {},
+    val onInventoryClose: () -> Unit = {},
     val checkInventoryName: (String) -> Boolean,
 ) {
     constructor(
@@ -45,6 +47,7 @@ class InventoryDetector(
         @HandleEvent(priority = HandleEvent.HIGHEST)
         fun onInventoryClose(event: InventoryCloseEvent) {
             detectors.forEach { it.inInventory = false }
+            detectors.forEach { it.onInventoryClose() }
         }
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
