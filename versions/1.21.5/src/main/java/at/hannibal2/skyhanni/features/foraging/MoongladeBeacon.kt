@@ -395,10 +395,8 @@ object MoongladeBeacon {
         )
 
         fun updateMatchSlot(slot: Int) {
-            if (slot == currentMatchSlot) return
-            currentMatchSlot = slot
-            val tickDifference = currentServerTicks - lastServerTickCount
-            if (tickDifference == 0) return
+            currentMatchSlot = slot.takeIf { it != currentMatchSlot } ?: return
+            val tickDifference = (currentServerTicks - lastServerTickCount).takeIf { it > 0 } ?: return
             recentTicks.add(tickDifference)
             lastServerTickCount = currentServerTicks
             if (upgradingStrength && recentTicks.size < 3) return
