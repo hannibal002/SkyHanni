@@ -236,6 +236,13 @@ public class InventoryConfig {
     public boolean highlightWidgets = true;
 
     @Expose
+    @ConfigOption(name = "Highlight Disabled Attributes", desc = "Highlight disabled attributes in /attributemenu.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightDisabledAttributes = true;
+
+
+    @Expose
     @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")
     @ConfigEditorBoolean
     public boolean vacuumBagCap = true;
