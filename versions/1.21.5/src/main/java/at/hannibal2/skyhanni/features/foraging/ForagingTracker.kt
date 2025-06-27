@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -359,15 +361,8 @@ object ForagingTracker {
     }
 
     @HandleEvent
-    fun onPacketSent(event: PacketSentEvent) {
-        val packet = event.packet
-        if (packet !is UpdateSelectedSlotC2SPacket) return
-        handleSlotChange(packet.selectedSlot)
-    }
-
-    private fun handleSlotChange(newSlot: Int) {
-        val isAxe = InventoryUtils.getItemsInOwnInventoryWithNull()?.get(newSlot)?.getItemCategoryOrNull() == ItemCategory.AXE
-        if (isAxe) {
+    fun onItemChange(event: ItemInHandChangeEvent) {
+        if (event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE) {
             if (!hasHeldAxe) {
                 hasHeldAxe = true
             }
@@ -378,5 +373,4 @@ object ForagingTracker {
             }
         }
     }
-
 }
