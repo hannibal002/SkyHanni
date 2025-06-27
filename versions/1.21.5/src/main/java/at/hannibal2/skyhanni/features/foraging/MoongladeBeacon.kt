@@ -106,7 +106,14 @@ object MoongladeBeacon {
         }
     ) { name ->
         upgradingStrength = (name == "Upgrade Signal Strength")
-        name == "Tune Frequency" || upgradingStrength
+        val inInv = (name == "Tune Frequency" || upgradingStrength)
+        if (inInv) {
+            normalTuning = TuneData()
+            enchantedTuning = TuneData(isEnchanted = true)
+            ChatUtils.debug("Normal tuning readable slots: ${normalTuning.readableSlots}")
+            ChatUtils.debug("Enchanted tuning readable slots: ${enchantedTuning.readableSlots}")
+        }
+        inInv
     }
 
     private var upgradingStrength = false
@@ -266,6 +273,7 @@ object MoongladeBeacon {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             when (slot.index) {
                 in MATCH_SLOTS -> slot.handleMatchSlot()
+                in CHANGE_SLOTS -> slot.handleChangeSlot()
                 in normalTuning.readableSlots -> slot.readToTuningSet(normalTuning)
                 in enchantedTuning.readableSlots -> slot.readToTuningSet(enchantedTuning)
             }
@@ -274,12 +282,18 @@ object MoongladeBeacon {
     }
 
     private fun Slot.handleMatchSlot() {
-        val colorIndex = stack.getColorIndex()
-        if (colorIndex == -1) return
+        val colorIndex = stack.getColorIndexOrNull() ?: return
         val isItemEnchanted = stack.isEnchanted()
         val tuningData = if (isItemEnchanted) enchantedTuning else normalTuning
         tuningData.targetColor = colorIndex
         tuningData.updateMatchSlot(index)
+    }
+
+    private fun Slot.handleChangeSlot() {
+        val colorIndex = stack.getColorIndexOrNull() ?: return
+        val isItemEnchanted = stack.isEnchanted()
+        val tuningData = if (isItemEnchanted) enchantedTuning else normalTuning
+        tuningData.currentColor = colorIndex
     }
 
     private fun Slot.readToTuningSet(tuningSet: TuneData) {
@@ -333,8 +347,8 @@ object MoongladeBeacon {
         return pitchLevels.getOrNull(pitch) ?: "§eUnknown"
     }
 
-    private fun ItemStack.getColorIndex(): Int {
-        return colorOrder.indexOf(this.item)
+    private fun ItemStack.getColorIndexOrNull(): Int? = colorOrder.indexOf(this.item).takeIf {
+        it != -1
     }
 
     private fun ItemStack.getColorFromItem(): Int? {
@@ -417,7 +431,7 @@ object MoongladeBeacon {
                 it != lastOffsetColorMessage
             }?.let {
                 lastOffsetColorMessage = it
-                ChatUtils.chat("${if (isEnchanted) "§aEnchanted " else ""}Tuning§r: $it")
+                ChatUtils.debug("${if (isEnchanted) "§aEnchanted " else ""}Tuning§r: $it")
             }
 
             return diff
@@ -431,7 +445,7 @@ object MoongladeBeacon {
                 it != lastOffsetSpeedMessage
             }?.let {
                 lastOffsetSpeedMessage = it
-                ChatUtils.chat("${if (isEnchanted) "§aEnchanted " else ""}Tuning§r: $it")
+                ChatUtils.debug("${if (isEnchanted) "§aEnchanted " else ""}Tuning§r: $it")
             }
 
             if (target < current) {
@@ -448,7 +462,7 @@ object MoongladeBeacon {
                 it != lastOffsetPitchMessage
             }?.let {
                 lastOffsetPitchMessage = it
-                ChatUtils.chat("${if (isEnchanted) "§aEnchanted " else ""}Tuning§r: $it")
+                ChatUtils.debug("${if (isEnchanted) "§aEnchanted " else ""}Tuning§r: $it")
             }
 
             if (target < current) {
@@ -492,6 +506,7 @@ object MoongladeBeacon {
             currentColor = null
             currentSpeed = null
             currentPitch = null
+            nextExpectedPitch = null
             currentMatchSlot = MATCH_SLOTS.first
             recentTicks.clear()
             lastServerTickCount = 0
