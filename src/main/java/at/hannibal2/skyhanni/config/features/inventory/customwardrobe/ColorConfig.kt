@@ -20,7 +20,7 @@ class ColorConfig {
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    var resetColor: Runnable = Runnable(ColorConfig::resetColor)
+    val resetColor: Runnable = Runnable(ColorConfig::resetColor)
 
     @Expose
     @ConfigOption(name = "Background", desc = "Color of the GUI background.")
