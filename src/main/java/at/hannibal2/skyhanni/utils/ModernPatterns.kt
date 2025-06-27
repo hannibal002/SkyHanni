@@ -39,4 +39,9 @@ object ModernPatterns {
         " §r§fCooldown: §r§7§r§aAVAILABLE",
     )
 
+    val currentTreeProgressPattern by RepoPattern.pattern(
+        "foraging.tree.progress",
+        "(?<treeType>§.§l\\w+) TREE §r§b§l(?<percent>\\d+)%"
+    )
+
 }
