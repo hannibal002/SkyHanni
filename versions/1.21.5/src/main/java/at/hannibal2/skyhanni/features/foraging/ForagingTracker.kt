@@ -324,12 +324,14 @@ object ForagingTracker {
 
     private fun sendTreeGiftStats() {
         val lastTreeType = treeType ?: return
-        val message = "§9$lastTreeType Tree Gift. §7You helped cut $lastPercentString §7and gained §e$lastRewardCount rewards§a!"
-        val component = message.asComponent()
-        component.hover = lastHover
-        ChatUtils.chat(component)
-        rareDrops.forEach { drop ->
-            ChatUtils.chat("§f - $drop", prefix = false)
+        if (config.compactGiftChats) {
+            val message = "§9$lastTreeType Tree Gift. §7You helped cut $lastPercentString §7and gained §e$lastRewardCount rewards§a!"
+            val component = message.asComponent()
+            component.hover = lastHover
+            ChatUtils.chat(component)
+            rareDrops.forEach { drop ->
+                ChatUtils.chat("§f - $drop", prefix = false)
+            }
         }
         rareDrops.clear()
         lastHover = null
