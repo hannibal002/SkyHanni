@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -202,8 +202,8 @@ object CFStrayTracker {
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
             if (rarity == LEGENDARY) tip += extractGoldenTypesCaught(data)
-            Renderable.hoverTips(RenderableString(lineFormat), tips = tip.partyModeReplace().split("\n"))
-        } ?: RenderableString(lineFormat)
+            Renderable.hoverTips(StringRenderable(lineFormat), tips = tip.partyModeReplace().split("\n"))
+        } ?: StringRenderable(lineFormat)
         return renderable.toSearchable(rarity.toString())
     }
 

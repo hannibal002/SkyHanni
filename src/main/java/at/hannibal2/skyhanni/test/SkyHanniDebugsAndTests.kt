@@ -66,7 +66,7 @@ import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
@@ -502,12 +502,12 @@ object SkyHanniDebugsAndTests {
 
         config.debugItemPos.renderRenderables(
             listOf(
-                DragNDrop.draggable(RenderableString("A Bone"), { bone }),
+                DragNDrop.draggable(StringRenderable("A Bone"), { bone }),
                 Renderable.placeholder(0, 30),
-                DragNDrop.draggable(RenderableString("A Leaf"), { leaf }),
+                DragNDrop.draggable(StringRenderable("A Leaf"), { leaf }),
                 Renderable.placeholder(0, 30),
                 DragNDrop.droppable(
-                    RenderableString("Feed Dog"),
+                    StringRenderable("Feed Dog"),
                     object : Droppable {
                         override fun handle(drop: Any?) {
                             val unit = drop as ItemStack
@@ -539,7 +539,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { RenderableString(it.roundTo(1).toString()) }.toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { StringRenderable(it.roundTo(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(
@@ -547,7 +547,7 @@ object SkyHanniDebugsAndTests {
                 Renderable.table(renderables),
                 HorizontalContainerRenderable(
                     listOf(
-                        RenderableString("Test:").renderBounds(),
+                        StringRenderable("Test:").renderBounds(),
                         Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
                     ),
                     1,

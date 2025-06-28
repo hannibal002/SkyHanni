@@ -86,6 +86,11 @@ object CopyNearbyEntitiesCommand {
                 if (entity.isInvisible) {
                     add("Invisible: true")
                 }
+                //#if MC > 1.21
+                //$$ if (entity.isGlowing) {
+                //$$     add("Glowing: true")
+                //$$ }
+                //#endif
 
                 if (entity is EntityLivingBase) {
                     add("EntityLivingBase:")
@@ -120,6 +125,7 @@ object CopyNearbyEntitiesCommand {
                     //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
                     //$$ is net.minecraft.entity.passive.PandaEntity -> addPanda(entity)
                     //$$ is net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity -> addBlockDisplayEntity(entity)
+                    //$$ is net.minecraft.entity.passive.FrogEntity -> addFrogEntity(entity)
                     //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
@@ -272,6 +278,13 @@ object CopyNearbyEntitiesCommand {
     //$$
     //$$     add("-  block: ${block.name.formattedTextCompat()}")
     //$$     add("-  rotation: $rotation")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addFrogEntity(entity: net.minecraft.entity.passive.FrogEntity) {
+    //$$     add("EntityFrog:")
+    //$$     val variant = entity.variant
+    //$$
+    //$$     add("-  Variant: $variant")
     //$$ }
     //#endif
 

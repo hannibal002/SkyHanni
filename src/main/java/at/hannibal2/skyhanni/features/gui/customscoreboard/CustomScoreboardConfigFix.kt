@@ -97,7 +97,7 @@ object CustomScoreboardConfigFix {
             )
         }
 
-        event.addEvent(88, ScoreboardConfigEventElement.GALATEA)
+        event.addEvent(89, ScoreboardConfigEventElement.GALATEA)
     }
 
     private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {
