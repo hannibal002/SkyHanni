@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
+import at.hannibal2.skyhanni.utils.MobUtils.isCompletelyDefault
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeNotContainedFromList
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -35,7 +35,7 @@ object InvisibugHighlighter {
         val nearestArmorStand = EntityUtils.getEntitiesNearby<ArmorStandEntity>(event.location, 5.0)
             .minByOrNull { it.distanceTo(event.location) }
 
-        if (nearestArmorStand == null || !nearestArmorStand.isDefaultValue()) return
+        if (nearestArmorStand == null || !nearestArmorStand.isCompletelyDefault()) return
 
         invisibugEntities.add(nearestArmorStand)
     }
@@ -45,7 +45,7 @@ object InvisibugHighlighter {
         if (!config.enabled) return
 
         for (entity in invisibugEntities) {
-            if (!entity.canBeSeen(20)) continue
+            if (!entity.canBeSeen(32)) continue
 
             event.drawWaypointFilled(
                 entity.getLorenzVec(),
