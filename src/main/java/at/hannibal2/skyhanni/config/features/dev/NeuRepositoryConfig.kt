@@ -22,17 +22,17 @@ class NeuRepositoryConfig {
 
     @ConfigOption(name = "Update NEU Repo Now", desc = "Update your NEU repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    var updateRepo: Runnable = Runnable(EnoughUpdatesRepo::downloadRepo)
+    val updateRepo: Runnable = Runnable(EnoughUpdatesRepo::downloadRepo)
 
     @Expose
     @ConfigOption(name = "NEU Repository Location", desc = "")
     @Accordion
-    var location: RepositoryLocation = RepositoryLocation()
+    val location: RepositoryLocation = RepositoryLocation()
 
     class RepositoryLocation {
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your NEU repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
-        var resetRepoLocation: Runnable = Runnable { EnoughUpdatesRepo.resetRepoLocation() }
+        val resetRepoLocation: Runnable = Runnable { EnoughUpdatesRepo.resetRepoLocation() }
 
         @Expose
         @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: NotEnoughUpdates")

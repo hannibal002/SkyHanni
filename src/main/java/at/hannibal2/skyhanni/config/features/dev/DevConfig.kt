@@ -24,7 +24,7 @@ class DevConfig {
     @Expose
     @ConfigOption(name = "Neu Repository", desc = "")
     @Accordion
-    var neuRepo: NeuRepositoryConfig = NeuRepositoryConfig()
+    val neuRepo: NeuRepositoryConfig = NeuRepositoryConfig()
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")
