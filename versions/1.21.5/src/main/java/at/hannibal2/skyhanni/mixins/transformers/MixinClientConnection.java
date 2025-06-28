@@ -14,13 +14,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
 
-    @Inject(method = "handlePacket", at = @At(value = "HEAD"))
+    @Inject(method = "handlePacket", at = @At(value = "HEAD"), cancellable = true)
     private static void handlePacket$Inject$HEAD(Packet<?> packet, PacketListener listener, CallbackInfo ci) {
-        new PacketReceivedEvent(packet).post();
+        if (new PacketReceivedEvent(packet).post()) {
+            ci.cancel();
+        }
     }
 
-    @Inject(method = "sendInternal", at = @At(value = "HEAD"), cancellable = true)
-    private void sendPacket(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo ci) {
+    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;Z)V", at = @At(value = "HEAD"), cancellable = true)
+    private void sendPacketNew(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo ci) {
         if (new PacketSentEvent(packet).post()) {
             ci.cancel();
         }

@@ -5,13 +5,13 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+// todo 1.21 impl needed
 enum class HoppityEggType(
     val mealName: String,
     val mealColor: String,
@@ -75,7 +75,7 @@ enum class HoppityEggType(
             hour = resetsAt,
             minute = 0,
             second = 0,
-        ).asTimeMark().also {
+        ).toTimeMark().also {
             nextSpawnCache[this] = it
         }
     }

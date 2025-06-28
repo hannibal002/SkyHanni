@@ -20,11 +20,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -32,6 +33,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
@@ -101,19 +103,39 @@ object FastFairySoulsPathfinder {
         fun foundNearby() {
             if (disabled) return
             foundButNotClickedSoul = null
-            val nearest = missingSouls.map { it.position }.minBy { it.distanceSqToPlayer() }
-            if (nearest.distanceToPlayer() > 10) {
-                ErrorManager.logErrorStateWithData(
-                    "unknown fairy soul",
-                    "user clicked a fairy soul while far away from known fairy souls",
-                    "nearest loc" to nearest,
-                    "player loc" to LocationUtils.playerLocation(),
-                    "distance" to nearest.distanceToPlayer().roundTo(1),
-                )
-                return
+            val nearest = getNearestSoul() ?: return
+            found(nearest)
+            pathToNext()
+        }
+
+        private fun getNearestSoul(): LorenzVec? {
+            val playerLocation = LocationUtils.playerLocation()
+            val nearest = allSouls.minBy { it.distanceSq(playerLocation) }
+            if (nearest.distanceToPlayer() < 10) return nearest
+
+            val inAir = PlayerUtils.inAir()
+            if (inAir) {
+                val abovePlayer = LocationUtils.playerLocation().up(10)
+                val aboveNearest = allSouls.minBy { it.distanceSq(abovePlayer) }
+                if (aboveNearest.distanceToPlayer() < 10) return aboveNearest
+            }
+
+            ErrorManager.logErrorStateWithData(
+                "unknown fairy soul",
+                "user clicked a fairy soul while far away from known fairy souls",
+                "nearest loc" to nearest,
+                "player loc" to LocationUtils.playerLocation(),
+                "distance" to nearest.distanceToPlayer().roundTo(1),
+                "inAir" to inAir,
+            )
+            return null
+        }
+
+        private fun found(nearest: LorenzVec) {
+            if (route.remove(nearest)) {
+                found++
             }
             fairySoulsData.add(nearest)
-            pathToNext()
         }
 
         fun pathToNext() {
@@ -289,7 +311,7 @@ object FastFairySoulsPathfinder {
         }
         event.register("shsoulsreloadpath") {
             description = "Reload the Fairy Souls pathfinder."
-            category = CommandCategory.USERS_RESET
+            category = CommandCategory.DEVELOPER_TEST
             callback { onReloadPathCommand() }
         }
     }

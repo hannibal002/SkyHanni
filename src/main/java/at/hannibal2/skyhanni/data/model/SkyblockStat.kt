@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-//#if TODO
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-//#endif
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -24,7 +22,6 @@ import kotlin.math.roundToInt
 @Language("RegExp")
 private const val VALUE_PATTERN = "(?<value>[\\d,.]+)(?: .*)?"
 
-// todo 1.21 impl needed
 @Suppress("MaxLineLength")
 enum class SkyblockStat(
     val icon: String,
@@ -103,6 +100,8 @@ enum class SkyblockStat(
     RUNECRAFTING_WISDOM("§3☯", " *Runecrafting Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Runecrafting Wisdom §f$VALUE_PATTERN"),
     SOCIAL_WISDOM("§3☯", " *Social Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Social Wisdom §f$VALUE_PATTERN"),
     TAMING_WISDOM("§3☯", " *Taming Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Taming Wisdom §f$VALUE_PATTERN"),
+    HUNTING_WISDOM("§3☯", " *Hunting Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Hunting Wisdom §f$VALUE_PATTERN"),
+
     MINING_SPEED("§6⸕", " *Mining Speed: §r§6⸕$VALUE_PATTERN", " *§6⸕ Mining Speed §f$VALUE_PATTERN"),
     BREAKING_POWER("§2Ⓟ", "", " *§2Ⓟ Breaking Power §f$VALUE_PATTERN"),
     PRISTINE("§5✧", " *Pristine: §r§5✧$VALUE_PATTERN", " *§5✧ Pristine §f$VALUE_PATTERN"),
@@ -146,16 +145,22 @@ enum class SkyblockStat(
     GEMSTONE_FORTUNE("§6☘", " *Gemstone Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Gemstone Fortune §f$VALUE_PATTERN"),
     HEAT_RESISTANCE("§c♨", " *Heat Resistance: §r§c♨$VALUE_PATTERN", " *§c♨ Heat Resistance §f$VALUE_PATTERN"),
 
+    SWEEP("§2∮", " *Sweep: §r§2∮$VALUE_PATTERN", " *§2∮ Sweep §f$VALUE_PATTERN"),
+    RESPIRATION("§3⚶", " *Respiration: §r§3⚶$VALUE_PATTERN", " *§3⚶ Respiration §f$VALUE_PATTERN"),
+    PRESSURE_RESISTANCE("§9❍", " *Pressure Resistance: §r§9❍$VALUE_PATTERN", " *§9❍ Pressure Resistance §f$VALUE_PATTERN"),
+    PULL("§bᛷ", " *Pull: §r§bᛷ$VALUE_PATTERN", " *§bᛷ Pull §f$VALUE_PATTERN"),
+    HUNTER_FORTUNE("§d☘", " *Hunter Fortune: §r§d☘$VALUE_PATTERN", " *§d☘ Hunter Fortune §f$VALUE_PATTERN"),
+    FIG_FORTUNE("§6☘", " *Fig Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Fig Fortune §f$VALUE_PATTERN"),
+    MANGROVE_FORTUNE("§6☘", " *Mangrove Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mangrove Fortune §f$VALUE_PATTERN"),
+
     UNKNOWN("§c?", "", "")
     ;
 
-    //#if TODO
     var lastKnownValue: Double?
         get() = ProfileStorageData.profileSpecific?.stats?.get(this)
         set(value) {
             ProfileStorageData.profileSpecific?.stats?.set(this, value)
         }
-    //#endif
 
     var lastSource: StatSourceType = StatSourceType.UNKNOWN
 
@@ -167,9 +172,7 @@ enum class SkyblockStat(
 
     private val keyName = name.lowercase().replace('_', '.')
 
-    //#if TODO
     val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
-    //#endif
 
     val tablistPattern by RepoPattern.pattern("stats.tablist.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)
@@ -194,7 +197,6 @@ enum class SkyblockStat(
             }
         }
 
-        //#if TODO
         @HandleEvent(onlyOnSkyblock = true)
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             onSkyblockMenu(event)
@@ -221,7 +223,6 @@ enum class SkyblockStat(
                 assignEntry(list, StatSourceType.STATS_MENU) { it.menuPattern }
             }
         }
-        //#endif
 
         @HandleEvent
         fun onTabList(event: WidgetUpdateEvent) {
@@ -235,9 +236,7 @@ enum class SkyblockStat(
                 val matchResult = pattern(entry).matchMatcher(line) {
                     groupOrNull("value")?.replace("[,%]".toRegex(), "")?.toDouble()
                 } ?: continue
-                //#if TODO
                 entry.lastKnownValue = matchResult
-                //#endif
                 entry.lastSource = type
                 entry.lastAssignment = SimpleTimeMark.now()
                 break // Exit the inner loop once a match is found

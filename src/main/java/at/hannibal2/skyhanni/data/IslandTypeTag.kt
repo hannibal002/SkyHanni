@@ -105,6 +105,12 @@ object IslandTypeTags {
         IslandType.SPIDER_DEN,
     )
 
+    // Foraging
+    val FORAGING_CUSTOM_TREES = IslandTypeTag(
+        "foraging_custom_trees",
+        IslandType.GALATEA,
+    )
+
     // Misc
     val HOPPITY_DISALLOWED = IslandTypeTag(
         "hoppity_disallowed",
