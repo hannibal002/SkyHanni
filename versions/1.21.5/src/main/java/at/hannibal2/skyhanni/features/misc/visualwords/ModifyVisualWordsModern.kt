@@ -29,6 +29,7 @@ object ModifyVisualWordsModern {
     fun update() {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
+        stringVisitableCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords.map { visualWordText -> visualWordText.toVisualWord() }.toMutableList()
         MinecraftClient.getInstance().inGameHud.chatHud.refresh()
     }

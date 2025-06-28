@@ -50,7 +50,6 @@ public class MixinTextRenderer {
         at = @At("HEAD"),
         argsOnly = true
     )
-
     private OrderedText modifyWidth(OrderedText value) {
 
         OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
