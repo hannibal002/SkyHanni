@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -33,7 +32,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
@@ -76,7 +74,7 @@ object FastFairySoulsPathfinder {
         var debugState: String? = null
         var foundButNotClickedSoul: LorenzVec? = null
 
-        var route: List<LorenzVec>? = null
+        var route: MutableList<LorenzVec>? = null
 
         init {
             calculate()
@@ -132,9 +130,7 @@ object FastFairySoulsPathfinder {
         }
 
         private fun found(nearest: LorenzVec) {
-            if (route.remove(nearest)) {
-                found++
-            }
+            route.remove(nearest)
             fairySoulsData.add(nearest)
         }
 
