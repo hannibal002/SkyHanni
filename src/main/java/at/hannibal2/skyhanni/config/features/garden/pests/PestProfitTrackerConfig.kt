@@ -27,5 +27,5 @@ class PestProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = PestProfitTrackerConfig::class, field = "enabled")
-    var position: Position = Position(20, 20)
+    val position: Position = Position(20, 20)
 }

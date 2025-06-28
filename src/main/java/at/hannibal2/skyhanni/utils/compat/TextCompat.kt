@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.LorenzColor
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -8,11 +9,14 @@ import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
 //#if MC < 1.16
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import net.minecraft.util.ChatComponentText
 //#endif
 //#if MC > 1.16
+//$$ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.MutableComponent
 //$$ import net.minecraft.network.chat.TextColor
+//$$ import kotlin.time.Duration.Companion.minutes
 //#endif
 //#if MC > 1.21
 //$$ import net.minecraft.text.PlainTextContent
@@ -23,6 +27,30 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 //$$ import kotlin.math.abs
 //$$ import net.minecraft.text.TranslatableTextContent
 //#endif
+//#if MC > 1.16
+//$$ private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
+//$$ private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
+//$$
+//$$ private enum class FormattedTextSettings(noExtraResets: Boolean, leadingWhite: Boolean) {
+//$$     DEFAULT(false, false),
+//$$     LESS_RESETS(true, false),
+//$$     LEADING_WHITE(false, true),
+//$$     LEADING_WHITE_LESS_RESETS(true, true),
+//$$     ;
+//$$     companion object {
+//$$         fun getByArgs(noExtraResets: Boolean, leadingWhite: Boolean): FormattedTextSettings {
+//$$             return when {
+//$$                 noExtraResets && leadingWhite -> LEADING_WHITE_LESS_RESETS
+//$$                 noExtraResets -> LESS_RESETS
+//$$                 leadingWhite -> LEADING_WHITE
+//$$                 else -> DEFAULT
+//$$             }
+//$$         }
+//$$     }
+//$$ }
+//$$
+//$$ private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
+//#endif
 
 fun IChatComponent.unformattedTextForChatCompat(): String {
 //#if MC < 1.16
@@ -30,10 +58,16 @@ fun IChatComponent.unformattedTextForChatCompat(): String {
 //#elseif MC < 1.21
 //$$ return this.contents
 //#else
-//$$ if (this.content is TranslatableTextContent) {
-//$$     return (this.content as TranslatableTextContent).key.orEmpty()
+//$$     return unformattedTextCache.getOrPut(this) {
+//$$         computeUnformattedTextCompat()
+//$$     }
 //$$ }
-//$$ return (this.content as? PlainTextContent)?.string().orEmpty()
+//$$
+//$$ private fun Text.computeUnformattedTextCompat(): String {
+//$$     if (this.content is TranslatableTextContent) {
+//$$         return this.string
+//$$     }
+//$$     return (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif
 }
 
@@ -44,23 +78,56 @@ fun IChatComponent.unformattedTextCompat(): String =
 //$$ iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
 //#endif
 
-fun IChatComponent?.formattedTextCompat(): String =
+// has to be a separate function for pattern mappings
+fun IChatComponent?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
+fun IChatComponent?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
+fun IChatComponent?.formattedTextCompatLeadingWhiteLessResets(): String =
+    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
+
+@JvmOverloads
+@Suppress("unused")
+fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
 //#if MC < 1.16
-    this?.formattedText.orEmpty()
+    return this?.formattedText.orEmpty()
+}
 //#else
-//$$ run {
-//$$     this ?: return@run ""
+//$$     this ?: return ""
+//$$     val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
+//$$     return formattedTextCache.getOrPut(cacheKey) {
+//$$         computeFormattedTextCompat(noExtraResets, leadingWhite)
+//$$     }
+//$$ }
+//$$
+//$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
+//$$     this ?: return ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
-//$$         sb.append(component.style.color?.toChatFormatting()?.toString() ?: "")
+//$$         val chatStyle = component.style.chatStyle()
+//$$         if (leadingWhite || (sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
+//$$             sb.append(chatStyle)
+//$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())
+//$$         if (!noExtraResets) {
+//$$             sb.append("§r")
+//$$         } else {
+//$$             if (component == Component.empty()) sb.append("§r")
+//$$         }
 //$$     }
-//$$     sb.toString()
+//$$     return sb.toString().removeSuffix("§r").removePrefix("§r")
 //$$ }
 //$$
 //$$ private val textColorLUT = ChatFormatting.entries
 //$$     .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
 //$$     .toMap()
+//$$
+//$$ fun Style.chatStyle() = buildString {
+//$$     color?.let { append(it.toChatFormatting()?.toString() ?: "§r") }
+//$$     if (isBold) append("§l")
+//$$     if (isItalic) append("§o")
+//$$     if (isUnderlined) append("§n")
+//$$     if (isStrikethrough) append("§m")
+//$$     if (isObfuscated) append("§k")
+//$$ }
 //$$
 //$$ fun TextColor.toChatFormatting(): ChatFormatting? {
 //$$     return textColorLUT[this.value]
@@ -201,7 +268,10 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     //#if MC < 1.16
     Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
-    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
+    //$$ MinecraftClient.getInstance().execute {
+    //$$    MinecraftClient.getInstance().inGameHud.chatHud.removeMessage(idToMessageSignature(id))
+    //$$    MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
+    //$$ }
     //#endif
 }
 
@@ -260,3 +330,26 @@ fun HoverEvent.value(): IChatComponent {
     //$$ }
     //#endif
 }
+
+//#if MC < 1.21
+fun createHoverEvent(action: HoverEvent.Action?, component: ChatComponentText): HoverEvent? {
+    if (action == null) return null
+    return HoverEvent(action, component)
+}
+//#else
+//$$ fun createHoverEvent(action: HoverEvent.Action?, component: MutableText): HoverEvent? {
+//$$     if (action == null) return null
+//$$     when (action) {
+//$$         HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
+//$$         // i really don't think anyone is using the other 2 lol
+//$$         else -> return null
+//$$     }
+//$$ }
+//#endif
+
+fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
+    //#if MC < 1.21
+    this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
+//#else
+//$$ this.copy().formatted(color.toChatFormatting())
+//#endif

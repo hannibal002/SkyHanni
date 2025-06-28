@@ -12,12 +12,12 @@ class BingoConfig {
     @Expose
     @ConfigOption(name = "Bingo Card", desc = "")
     @Accordion
-    var bingoCard: BingoCardConfig = BingoCardConfig()
+    val bingoCard: BingoCardConfig = BingoCardConfig()
 
     @Expose
     @ConfigOption(name = "Compact Chat Messages", desc = "")
     @Accordion
-    var compactChat: CompactChatConfig = CompactChatConfig()
+    val compactChat: CompactChatConfig = CompactChatConfig()
 
     // TODO move into own category
     @Expose
@@ -40,7 +40,7 @@ class BingoConfig {
 
     @Expose
     @ConfigLink(owner = BingoConfig::class, field = "minionCraftHelperEnabled")
-    var minionCraftHelperPos: Position = Position(10, 10)
+    val minionCraftHelperPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

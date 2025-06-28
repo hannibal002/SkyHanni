@@ -6,21 +6,16 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ItemSource
 //#if TODO
 import at.hannibal2.skyhanni.data.OwnInventoryData
-//#endif
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
-//#if TODO
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
-//#endif
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
@@ -38,9 +33,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-//#endif
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -50,7 +43,6 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object BazaarApi {
 
@@ -124,15 +116,12 @@ object BazaarApi {
         if (!SkyBlockUtils.inSkyBlock) return
         if (NeuItems.neuHasFocus()) return
         if (SkyBlockUtils.noTradeMode) return
-        //#if TODO
         if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
-        //#endif
         HypixelCommands.bazaar(displayName.removeColor())
         amount?.let { OSUtils.copyToClipboard(it.toString()) }
         currentSearchedItem = displayName.removeColor()
     }
 
-    //#if TODO
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
@@ -187,7 +176,6 @@ object BazaarApi {
             }
         }
     }
-    //#endif
 
     private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
@@ -208,7 +196,6 @@ object BazaarApi {
         }
     }
 
-    //#if TODO
     // TODO cache
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -229,7 +216,6 @@ object BazaarApi {
             }
         }
     }
-    //#endif
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
@@ -243,7 +229,6 @@ object BazaarApi {
         }
     }
 
-    //#if TODO
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
         if (items.any { it.displayName.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
@@ -260,20 +245,17 @@ object BazaarApi {
         if (isBazaarOrderInventory(event.inventoryName)) return true
         return inventoryNamePattern.matches(event.inventoryName)
     }
-    //#endif
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(25, "bazaar", "inventory.bazaar")
     }
 
-    //#if TODO
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inBazaarInventory = false
         currentlyOpenedProduct = null
     }
-    //#endif
 
     fun isBazaarOrderInventory(inventoryName: String): Boolean = inventoryBazaarOrdersPattern.matches(inventoryName)
 }

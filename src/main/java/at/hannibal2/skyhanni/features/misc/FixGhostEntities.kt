@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
+//#if MC < 1.21
 import net.minecraft.network.play.server.S0FPacketSpawnMob
+//#endif
 import net.minecraft.network.play.server.S13PacketDestroyEntities
 
 /**

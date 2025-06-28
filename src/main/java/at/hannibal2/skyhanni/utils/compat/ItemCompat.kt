@@ -72,7 +72,7 @@ enum class DyeCompat(
     WHITE(
         15,
         //#if MC > 1.16
-        //$$ Items.WHITE_DYE
+        //$$ Items.BONE_MEAL
         //#endif
     ),
     ORANGE(
@@ -138,13 +138,13 @@ enum class DyeCompat(
     BLUE(
         4,
         //#if MC > 1.16
-        //$$ Items.BLUE_DYE
+        //$$ Items.LAPIS_LAZULI
         //#endif
     ),
     BROWN(
         3,
         //#if MC > 1.16
-        //$$ Items.BROWN_DYE
+        //$$ Items.COCOA_BEANS
         //#endif
     ),
     GREEN(
@@ -187,7 +187,7 @@ enum class DyeCompat(
                 //#if MC < 1.16
                 return this.item == Items.dye
                 //#else
-                //$$ return this.item is DyeItem
+                //$$ return entries.firstOrNull { this.item == item } != null
                 //#endif
             }
 
@@ -199,6 +199,14 @@ enum class DyeCompat(
         }
 
         private fun fromDyeColor(dyeColor: Int): DyeCompat = entries.firstOrNull { it.dyeColor == dyeColor } ?: GRAY
+
+        fun toDamage(stack: ItemStack): Int {
+            //#if MC < 1.21
+            return entries.firstOrNull { it.dyeColor == stack.metadata }?.dyeColor ?: 0
+            //#else
+            //$$ return entries.firstOrNull { it.stackType == stack.item }?.dyeColor ?: 0
+            //#endif
+        }
 
         fun createDyeStack(dyeColor: Int, size: Int = 1): ItemStack =
             fromDyeColor(dyeColor).createStack(size)

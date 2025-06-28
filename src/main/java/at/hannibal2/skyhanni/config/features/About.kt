@@ -31,12 +31,12 @@ class About {
     @ConfigOption(name = "Update Stream", desc = "How frequently you want updates for SkyHanni")
     @Expose
     @ConfigEditorDropdown
-    var updateStream: Property<UpdateStream> = Property.of(UpdateStream.RELEASES)
+    val updateStream: Property<UpdateStream> = Property.of(UpdateStream.RELEASES)
 
     @ConfigOption(name = "Used Software", desc = "Information about used software and licenses")
     @Accordion
     @Expose
-    var licenses: Licenses = Licenses()
+    val licenses: Licenses = Licenses()
 
     enum class UpdateStream(private val label: String, val stream: String) {
         NONE("None", "none"),
@@ -49,30 +49,26 @@ class About {
     class Licenses {
         @ConfigOption(name = "MoulConfig", desc = "MoulConfig is available under the LGPL 3.0 License or later version")
         @ConfigEditorButton(buttonText = "Source")
-        var moulConfig: Runnable = Runnable { openBrowser("https://github.com/NotEnoughUpdates/MoulConfig") }
+        val moulConfig: Runnable = Runnable { openBrowser("https://github.com/NotEnoughUpdates/MoulConfig") }
 
-        @ConfigOption(
-            name = "NotEnoughUpdates",
-            desc = "NotEnoughUpdates is available under the LGPL 3.0 License or later version"
-        )
+        @ConfigOption(name = "NotEnoughUpdates", desc = "NotEnoughUpdates is available under the LGPL 3.0 License or later version")
         @ConfigEditorButton(buttonText = "Source")
-        var notEnoughUpdates: Runnable =
-            Runnable { openBrowser("https://github.com/NotEnoughUpdates/NotEnoughUpdates") }
+        val notEnoughUpdates: Runnable = Runnable { openBrowser("https://github.com/NotEnoughUpdates/NotEnoughUpdates") }
 
         @ConfigOption(name = "Forge", desc = "Forge is available under the LGPL 3.0 license")
         @ConfigEditorButton(buttonText = "Source")
-        var forge: Runnable = Runnable { openBrowser("https://github.com/MinecraftForge/MinecraftForge") }
+        val forge: Runnable = Runnable { openBrowser("https://github.com/MinecraftForge/MinecraftForge") }
 
         @ConfigOption(name = "LibAutoUpdate", desc = "LibAutoUpdate is available under the BSD 2 Clause License")
         @ConfigEditorButton(buttonText = "Source")
-        var libAutoUpdate: Runnable = Runnable { openBrowser("https://github.com/nea89o/libautoupdate") }
+        val libAutoUpdate: Runnable = Runnable { openBrowser("https://github.com/nea89o/libautoupdate") }
 
         @ConfigOption(name = "Mixin", desc = "Mixin is available under the MIT License")
         @ConfigEditorButton(buttonText = "Source")
-        var mixin: Runnable = Runnable { openBrowser("https://github.com/SpongePowered/Mixin/") }
+        val mixin: Runnable = Runnable { openBrowser("https://github.com/SpongePowered/Mixin/") }
 
         @ConfigOption(name = "DiscordIPC", desc = "DiscordIPC is available under the Apache License 2.0")
         @ConfigEditorButton(buttonText = "GitHub")
-        var discordRPC: Runnable = Runnable { openBrowser("https://github.com/jagrosh/DiscordIPC") }
+        val discordRPC: Runnable = Runnable { openBrowser("https://github.com/jagrosh/DiscordIPC") }
     }
 }

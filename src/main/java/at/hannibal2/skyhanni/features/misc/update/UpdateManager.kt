@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,7 +15,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.JsonElement
-import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
@@ -83,7 +85,7 @@ object UpdateManager {
         logger.log("Starting update check")
         val currentStream = config.updateStream.get()
         if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || SkyHanniMod.isBetaVersion)) {
-            config.updateStream = Property.of(UpdateStream.BETA)
+            config.updateStream.set(UpdateStream.BETA)
             updateStream = UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream).thenAcceptAsync(
@@ -104,6 +106,12 @@ object UpdateManager {
                             "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
                             config::autoUpdates,
+                        )
+                        ChatUtils.clickableChat(
+                            "§e§lCLICK HERE §r§eto view changes.",
+                            onClick = {
+                                ChangelogViewer.showChangelog(SkyHanniMod.VERSION, it.update.versionName)
+                            },
                         )
                     }
                 } else if (forceDownload) {
@@ -169,9 +177,8 @@ object UpdateManager {
 
     private var potentialUpdate: PotentialUpdate? = null
 
-    fun updateCommand(args: Array<String>) {
+    private fun updateCommand(arg: String) {
         val currentStream = SkyHanniMod.feature.about.updateStream.get()
-        val arg = args.firstOrNull() ?: "current"
         val updateStream = when {
             arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
             arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
@@ -192,6 +199,22 @@ object UpdateManager {
             )
         } else {
             checkUpdate(true, updateStream)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdate") {
+            description = "Updates the mod to the specified update stream."
+            category = CommandCategory.USERS_BUG_FIX
+            arg("updateStream", BrigadierArguments.string()) { stream ->
+                callback {
+                    updateCommand(getArg(stream))
+                }
+            }
+            callback {
+                updateCommand("current")
+            }
         }
     }
 }

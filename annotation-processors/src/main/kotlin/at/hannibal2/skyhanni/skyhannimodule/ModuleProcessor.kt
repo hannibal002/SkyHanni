@@ -74,7 +74,7 @@ class ModuleProcessor(
         return symbols.filter {
             val path = it.containingFile?.filePath ?: return@filter false
             val properPath = path.substringAfter("/main/java/")
-            properPath in validPaths
+            properPath !in validPaths
         }
     }
 
@@ -182,6 +182,9 @@ class ModuleProcessor(
             it.write("package at.hannibal2.skyhanni.utils\n\n")
             it.write("object VersionConstants {\n")
             it.write("    const val MOD_VERSION = \"$modVersion\"\n")
+            it.write("    // Do not use this mc version as its reflective of the compile time version\n")
+            it.write("    // And might not be correct at run time\n")
+            it.write("    // We use it for the auto updater only\n")
             it.write("    const val MC_VERSION = \"$mcVersion\"\n")
             it.write("}\n")
         }

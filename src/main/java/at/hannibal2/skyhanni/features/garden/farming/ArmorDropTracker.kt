@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ArmorDropTracker {
 
-    private val config get() = GardenApi.config.farmingArmorDrop
+    private val config get() = GardenApi.config.armorDropTracker
 
     /**
      * REGEX-TEST: FERMENTO_CHESTPLATE
@@ -174,6 +174,7 @@ object ArmorDropTracker {
             new
         }
         event.move(87, "garden.farmingArmorDrop.pos", "garden.armorDropTracker.position")
+        event.move(88, "garden.farmingArmorDrop", "garden.armorDropTracker")
     }
 
     @HandleEvent

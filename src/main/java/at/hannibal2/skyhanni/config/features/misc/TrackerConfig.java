@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.utils.ItemPriceSource;
-//#if TODO
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
-//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -12,13 +10,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// todo 1.21 impl needed
 public class TrackerConfig {
 
     @Expose
@@ -31,12 +29,10 @@ public class TrackerConfig {
     @ConfigEditorDropdown
     public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_BUY;
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
     @ConfigEditorDropdown
     public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.REMEMBER_LAST);
-    //#endif
 
     @Expose
     @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently gained items.")
@@ -50,6 +46,7 @@ public class TrackerConfig {
 
     @Expose
     @ConfigOption(name = "Item Warnings", desc = "Item Warnings")
+    @SearchTag("Tracker Title, Drop Title")
     @Accordion
     public TrackerItemWarningsConfig warnings = new TrackerItemWarningsConfig();
 

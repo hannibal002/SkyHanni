@@ -48,5 +48,5 @@ class GoldenFishTimerConfig {
 
     @Expose
     @ConfigLink(owner = GoldenFishTimerConfig::class, field = "enabled")
-    var position: Position = Position(50, 80)
+    val position: Position = Position(50, 80)
 }

@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
@@ -20,7 +20,7 @@ object RenderableCollectionUtils {
         horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
         verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
     ) {
-        add(RenderableString(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
+        add(StringRenderable(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
 
     fun MutableList<Renderable>.addString(
@@ -29,7 +29,7 @@ object RenderableCollectionUtils {
         horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
         verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
     ) {
-        add(Renderable.hoverTips(RenderableString(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign), tips = tips))
+        add(Renderable.hoverTips(StringRenderable(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign), tips = tips))
     }
 
     fun MutableList<Searchable>.addSearchString(

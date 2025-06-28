@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,7 +23,7 @@ object SkyBlockKickDuration {
 
     private var kickMessage = false
     private var showTime = false
-    private var lastKickTime = SimpleTimeMark.farPast()
+    private var lastKickTime = SimpleTimeMark.farFuture()
     private var hasWarned = false
 
     private val patternGroup = RepoPattern.group("misc.kickduration")
@@ -47,35 +47,32 @@ object SkyBlockKickDuration {
         "§cThere was a problem joining SkyBlock, try again in a moment!",
     )
 
+    private fun kicked() {
+        kickMessage = false
+        showTime = true
+        lastKickTime = SimpleTimeMark.now()
+    }
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled() || !showTime) return
+        if (!isEnabled() || !(lastKickTime.isFarFuture())) return
 
         if (kickPattern.matches(event.message)) {
             if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
-                kickMessage = false
-                showTime = true
-                lastKickTime = SimpleTimeMark.now()
+                kicked()
             } else {
                 kickMessage = true
             }
         }
 
         if (problemJoiningPattern.matches(event.message)) {
-            kickMessage = false
-            showTime = true
-            lastKickTime = SimpleTimeMark.now()
+            kicked()
         }
     }
 
-    @HandleEvent
-    fun onWorldChange() {
-        if (!isEnabled()) return
-        if (kickMessage) {
-            kickMessage = false
-            showTime = true
-            lastKickTime = SimpleTimeMark.now()
-        }
+    private fun notKicked() {
+        showTime = false
+        lastKickTime = SimpleTimeMark.farFuture()
         hasWarned = false
     }
 
@@ -84,13 +81,12 @@ object SkyBlockKickDuration {
         if (!isEnabled()) return
         if (!SkyBlockUtils.onHypixel) return
         if (!showTime) return
-
         if (SkyBlockUtils.inSkyBlock) {
-            showTime = false
+            notKicked()
         }
 
         if (lastKickTime.passedSince() > 5.minutes) {
-            showTime = false
+            notKicked()
         }
 
         if (lastKickTime.passedSince() > config.warnTime.get().seconds) {
