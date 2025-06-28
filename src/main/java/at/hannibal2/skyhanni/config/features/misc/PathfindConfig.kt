@@ -24,6 +24,7 @@ class PathfindConfig {
         MID("Every second", 1.seconds),
         A_BIT_LONGER("Every 2 second", 2.seconds),
         LONG("5 seconds", 5.seconds),
+        NEVER("§c§lNever", Duration.INFINITE),
         ;
 
         override fun toString() = displayName

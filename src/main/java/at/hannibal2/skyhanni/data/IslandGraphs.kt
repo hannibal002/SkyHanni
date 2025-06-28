@@ -45,6 +45,7 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.ChatComponentText
 import java.awt.Color
 import java.io.File
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -303,9 +304,11 @@ object IslandGraphs {
         if (event.isMod(2)) {
             update()
         }
+        val updateInterval = config.chatUpdateInterval.duration
+        if (updateInterval == Duration.INFINITE) return
         updateChat()
         nextChatMessage?.let {
-            if (lastMessageSent.passedSince() > config.chatUpdateInterval.duration) {
+            if (lastMessageSent.passedSince() > updateInterval) {
                 it.send(pathFindMessageId)
                 nextChatMessage = null
                 lastMessageSent = SimpleTimeMark.now()
