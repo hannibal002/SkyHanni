@@ -177,6 +177,12 @@ object AttributeShardOverlay {
             else -> "§6${priceUntilNextTier.shortFormat()}"
         }
 
+        val bazaarAmount = when {
+            currentTier == 10 -> 1
+            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> amountUntilMaxed
+            else -> amountToNextTier
+        }
+
         val tooltip = buildList {
             add(shardItemName)
             add("§7Current Tier: §e$currentTier")
@@ -201,7 +207,7 @@ object AttributeShardOverlay {
             " §7- $shardItemName §e$currentTier $priceString",
             tips = tooltip,
             onLeftClick = {
-                BazaarApi.searchForBazaarItem(shardItemName, amountToNextTier.coerceAtLeast(1))
+                BazaarApi.searchForBazaarItem(shardItemName, bazaarAmount)
             },
         )
         val searchable = HorizontalContainerRenderable(
