@@ -152,6 +152,11 @@ public class InventoryConfig {
     public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
 
     @Expose
+    @ConfigOption(name = "Fann Cost Per XP/Bits", desc = "")
+    @Accordion
+    public FannCostConfig fannCost = new FannCostConfig();
+
+    @Expose
     @ConfigOption(name = "Attribute Overlay", desc = "")
     @Accordion
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();

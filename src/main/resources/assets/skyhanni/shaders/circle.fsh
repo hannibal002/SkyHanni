@@ -1,6 +1,6 @@
 #version 120
 
-const float pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062f;
+const float pi = 3.14159265f;
 
 uniform float scaleFactor;
 uniform float radius;

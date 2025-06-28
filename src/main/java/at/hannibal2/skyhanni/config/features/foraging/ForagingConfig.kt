@@ -50,6 +50,12 @@ class ForagingConfig {
     var birriesHighlight = BirriesHighlightConfig()
 
     @Expose
+    @ConfigOption(name = "Hideonleaf Highlight", desc = "")
+    @OnlyModern
+    @Accordion
+    var hideonleafHighlight = HideonleafHighlightConfig()
+
+    @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
     @OnlyModern
     @Accordion
@@ -60,6 +66,13 @@ class ForagingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var lassoDisplay = true
+
+    @Expose
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Galatea.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var mutePhantoms = true
 
     @Expose
     @ConfigLink(owner = ForagingConfig::class, field = "lassoDisplay")

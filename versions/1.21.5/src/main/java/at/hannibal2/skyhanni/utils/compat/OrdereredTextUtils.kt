@@ -15,7 +15,6 @@ object OrderedTextUtils {
 
     @JvmStatic
     fun orderedTextToLegacyString(orderedText: OrderedText?): String {
-
         orderedText ?: return ""
 
         return textToLegacyCache.getOrPut(orderedText) {
@@ -26,7 +25,7 @@ object OrderedTextUtils {
                     builder.append(requiredStyleChangeString(lastStyle, style, true))
                     lastStyle = style
                 }
-                builder.append(codePoint.toChar())
+                builder.appendCodePoint(codePoint)
                 true
             }
 
@@ -91,7 +90,7 @@ object OrderedTextUtils {
                         if (formatting != null) {
                             lastStyle = lastStyle.withExclusiveFormatting(formatting)
                         } else if (nextChar == 'z') {
-                            lastStyle = lastStyle.withColor(CHROMA_COLOR)
+                            lastStyle = Style.EMPTY.withColor(CHROMA_COLOR)
                         }
 
                         index ++
@@ -112,7 +111,6 @@ object OrderedTextUtils {
 
     @JvmStatic
     fun legacyTextToOrderedText(legacyString: String?): OrderedText {
-
         return OrderedText { visitor ->
 
             legacyString ?: return@OrderedText true
@@ -155,6 +153,16 @@ object OrderedTextUtils {
                         }
                     }
 
+                } else if (char.isHighSurrogate() && index + 1 < legacyString.length) {
+                    val nextChar = legacyString[index + 1]
+
+                    if (nextChar.isLowSurrogate()) {
+                        visitor.accept(0, lastStyle, Character.toCodePoint(char, nextChar))
+
+                        index ++
+                    } else {
+                        visitor.accept(0, lastStyle, char.code)
+                    }
                 } else {
                     visitor.accept(0, lastStyle, char.code)
                 }

@@ -23,11 +23,14 @@ abstract class RoundedShader<Self : RoundedShader<Self>>(vertex: String, fragmen
     //$$ var modelViewMatrix: Matrix4f = Matrix4f()
     //#endif
 
-    fun applyBaseUniforms(hasSmoothness: Boolean = true) {
+    fun applyBaseUniforms(
+        hasSmoothness: Boolean = true,
+        hasHalfSize: Boolean = true
+    ) {
         registerUniform(Uniform.UniformType.FLOAT, "scaleFactor") { scaleFactor }
         registerUniform(Uniform.UniformType.FLOAT, "radius") { radius }
         if (hasSmoothness) registerUniform(Uniform.UniformType.FLOAT, "smoothness") { smoothness }
-        registerUniform(Uniform.UniformType.VEC2, "halfSize") { halfSize }
+        if (hasHalfSize) registerUniform(Uniform.UniformType.VEC2, "halfSize") { halfSize }
         registerUniform(Uniform.UniformType.VEC2, "centerPos") { centerPos }
     }
 
@@ -44,8 +47,18 @@ object RoundedRectangleOutlineShader : RoundedShader<RoundedRectangleOutlineShad
     var borderBlur: Float = 0.3f
 
     override fun registerUniforms() {
-        super.applyBaseUniforms(hasSmoothness = false)
+        super.applyBaseUniforms(hasSmoothness = false, hasHalfSize = true)
         registerUniform(Uniform.UniformType.FLOAT, "borderThickness") { borderThickness }
         registerUniform(Uniform.UniformType.FLOAT, "borderBlur") { borderBlur }
+    }
+}
+object CircleShader : RoundedShader<CircleShader>("circle", "circle") {
+    var angle1: Float = 0f
+    var angle2: Float = 0f
+
+    override fun registerUniforms() {
+        super.applyBaseUniforms(hasSmoothness = true, hasHalfSize = false)
+        registerUniform(Uniform.UniformType.FLOAT, "angle1") { angle1 }
+        registerUniform(Uniform.UniformType.FLOAT, "angle2") { angle2 }
     }
 }
