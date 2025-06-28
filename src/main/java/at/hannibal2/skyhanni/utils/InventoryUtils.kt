@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.convertEmptyToNull
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.filterNotNullOrEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
@@ -151,7 +152,7 @@ object InventoryUtils {
     fun ContainerChest.getAllItems(): Map<Slot, ItemStack> = buildMap {
         for (slot in inventorySlots) {
             if (slot == null) continue
-            val stack = slot.stack ?: continue
+            val stack = slot.stack.orNull() ?: continue
             this[slot] = stack
         }
     }

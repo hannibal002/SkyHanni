@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
-import at.hannibal2.skyhanni.shader.CircleShader
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -35,7 +33,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -597,54 +594,6 @@ object RenderUtils {
 
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
-    }
-
-    /**
-     * Method to draw a circle.
-     *
-     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
-     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
-     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
-     *
-     * @param x The x-coordinate of the circle's center.
-     * @param y The y-coordinate of the circle's center.
-     * @param radius The circle's radius.
-     * @param color The fill color.
-     * @param angle1 defines the start of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
-     * @param angle2 defines the end of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
-     * @param smoothness smooths out the edge. (In amount of blurred pixels)
-     */
-    fun drawFilledCircle(x: Int, y: Int, radius: Int, color: Color, smoothness: Float = 2.5f, angle1: Float = 7.0f, angle2: Float = 7.0f) {
-        val scaleFactor = GuiScreenUtils.scaleFactor
-
-        DrawContextUtils.popMatrix()
-        val radiusIn = radius * scaleFactor
-        val xIn = x * scaleFactor
-        val yIn = y * scaleFactor
-
-        //#if TODO
-        // Not really a TODO, there's an open PR to fix this for 1.21+
-        //  but it does need to be merged in correctly (looking at you, future Daveed)
-        CircleShader.scaleFactor = scaleFactor.toFloat()
-        CircleShader.radius = radiusIn.toFloat()
-        CircleShader.smoothness = smoothness
-        CircleShader.centerPos = floatArrayOf((xIn + radiusIn).toFloat(), (yIn + radiusIn).toFloat())
-        CircleShader.angle1 = angle1 - Math.PI.toFloat()
-        CircleShader.angle2 = angle2 - Math.PI.toFloat()
-        //#endif
-
-        // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
-        val circleColor = color.addAlpha(255).rgb
-
-        //#if TODO
-        // Not really a TODO, there's an open PR to fix this for 1.21+
-        //  but it does need to be merged in correctly (looking at you, future Daveed)
-        DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
-            GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, circleColor)
-            ShaderManager.disableShader()
-        }
-        //#endif
     }
 
     //#if MC < 1.21
