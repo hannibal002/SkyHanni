@@ -505,7 +505,7 @@ object CollectionUtils {
             checkList[i] = true
         }
         checkList.withIndex().filter { !it.value }
-            .sortedByDescending { it.index }
+            .reversed()
             .forEach {
                 list.removeAt(it.index)
             }
