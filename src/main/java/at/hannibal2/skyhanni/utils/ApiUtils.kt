@@ -57,6 +57,11 @@ object ApiUtils {
 
     data class ApiResponse(val success: Boolean, val message: String?, val data: JsonObject)
 
+    val defaultHeaders = mutableListOf(
+        BasicHeader("Pragma", "no-cache"),
+        BasicHeader("Cache-Control", "no-cache"),
+    )
+
     private val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
             .setDefaultHeaders(
@@ -70,6 +75,10 @@ object ApiUtils {
                     .build(),
             )
             .useSystemProperties()
+
+    private val explicitGzipBuilder = builder.setDefaultHeaders(
+        defaultHeaders + BasicHeader("Accept-Encoding", "gzip, deflate, br"),
+    )
 
     /**
      * TODO
@@ -85,7 +94,7 @@ object ApiUtils {
         apiName: String,
         gunzip: Boolean = false,
     ): JsonElement {
-        val client = builder.build()
+        val client = if (gunzip) explicitGzipBuilder.build() else builder.build()
         try {
             client.execute(HttpGet(url)).use { response ->
                 val entity = response.entity

@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteContestsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteFarmingContest
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteLeaderboard
@@ -9,8 +12,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteLeaderboardTyp
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.WeightProfile
+import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteAuctionItem
+import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteAuctionsResponse
+import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteItem
+import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteItemResponse
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -18,8 +26,21 @@ import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonObject
+import kotlin.reflect.KClass
 
+@SkyHanniModule
 object EliteDevApi {
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shgeteliteresource") {
+
+        }
+    }
+
+    enum class EliteResourceType {
+        ITEM, AUCTION, BAZAAR,
+    }
 
     private const val ELITEBOT_API_URL = "https://api.elitebot.dev"
 
@@ -33,18 +54,21 @@ object EliteDevApi {
     private const val WEIGHT_LEADERBOARD_API_NAME = "Elitebot Farming Weight Leaderboard"
     private const val WEIGHT_LEADERBOARD_URL = "$ELITEBOT_API_URL/leaderboard/farmingweight"
 
+    private const val RESOURCE_API_NAME = "Elitebot Resources"
+    private const val RESOURCE_API_URL = "$ELITEBOT_API_URL/resources"
+
     // Todo when ConfigManager gson has type adapters specifically registered, see
     //  if we can replace this custom gson with ConfigManager.gson
-    private val eliteGson by lazy {
+    /*private val eliteGson by lazy {
         BaseGsonBuilder.gson()
             .registerTypeAdapter(CropType::class.java, SkyHanniTypeAdapters.CROP_TYPE.nullSafe())
             .registerTypeAdapter(PestType::class.java, SkyHanniTypeAdapters.PEST_TYPE.nullSafe())
             .create()
-    }
+    }*/
 
     // <editor-fold desc="Upcoming Contests">
     fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
-        val jsonContestsResponse = ApiUtils.getJSONResponse(CONTEST_API_URL, apiName = CONTEST_API_NAME).asJsonObject
+        val jsonContestsResponse = ApiUtils.getJSONResponse(CONTEST_API_URL, apiName = CONTEST_API_NAME)
         val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(jsonContestsResponse)
         contestResponse.responseContests
     } catch (e: Exception) {
@@ -80,9 +104,9 @@ object EliteDevApi {
         val uuid = PlayerUtils.getUuid()
         weightUrl = "$FARMING_WEIGHT_URL/$uuid"
 
-        weightApiResponse = ApiUtils.getJSONResponse(weightUrl, apiName = FARMING_WEIGHT_API_NAME).asJsonObject
+        weightApiResponse = ApiUtils.getJSONResponse(weightUrl, apiName = FARMING_WEIGHT_API_NAME)
         val weightApiResponse = weightApiResponse ?: throw IllegalStateException("Response was null")
-        val weightData = eliteGson.fromJson<ElitePlayerWeightJson>(weightApiResponse)
+        val weightData = ConfigManager.gson.fromJson<ElitePlayerWeightJson>(weightApiResponse)
 
         val selectedProfileId = weightData.selectedProfileId
         val selectedProfileEntry = weightData.profiles.firstOrNull {
@@ -111,9 +135,9 @@ object EliteDevApi {
 
     private var apiWeightsResponse: JsonObject? = null
     fun fetchApiWeights(): EliteWeightsJson? = try {
-        apiWeightsResponse = ApiUtils.getJSONResponse(API_WEIGHTS_URL, apiName = FARMING_WEIGHT_API_NAME).asJsonObject
+        apiWeightsResponse = ApiUtils.getJSONResponse(API_WEIGHTS_URL, apiName = FARMING_WEIGHT_API_NAME)
         val apiWeightsResponse = apiWeightsResponse ?: throw IllegalStateException("Response was null")
-        eliteGson.fromJson<EliteWeightsJson>(apiWeightsResponse)
+        ConfigManager.gson.fromJson<EliteWeightsJson>(apiWeightsResponse)
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
             e, "Error getting crop weights from elitebot.dev",
@@ -144,9 +168,9 @@ object EliteDevApi {
         val lbSuffix = lbType.suffix
         lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
 
-        lbApiResponse = ApiUtils.getJSONResponse(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME).asJsonObject
+        lbApiResponse = ApiUtils.getJSONResponse(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME)
         val lbApiResponse = lbApiResponse ?: throw IllegalStateException("Response was null")
-        val lbData = eliteGson.fromJson<EliteLeaderboardJson>(lbApiResponse)
+        val lbData = ConfigManager.gson.fromJson<EliteLeaderboardJson>(lbApiResponse)
         lbData.data
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
@@ -156,5 +180,29 @@ object EliteDevApi {
         )
         null
     }
+    // </editor-fold>
+
+    // <editor-fold desc="Resources">
+    private var resourceUrl = ""
+    private var resourceApiResponse: JsonObject? = null
+    private inline fun <reified T> fetchResources(
+        subUrl: String,
+    ): T? = try {
+        resourceUrl = "$RESOURCE_API_URL/$subUrl"
+        resourceApiResponse = ApiUtils.getJSONResponse(resourceUrl, apiName = RESOURCE_API_NAME, gunzip = true)
+        val resourceApiResponse = resourceApiResponse ?: throw IllegalStateException("Response was null")
+        ConfigManager.gson.fromJson(resourceApiResponse, T::class.java)
+    } catch (e: Exception) {
+        ErrorManager.logErrorWithData(
+            e, "Error getting resources from elitebot.dev",
+            "resourceUrl" to resourceUrl,
+            "resourceApiResponse" to resourceApiResponse,
+        )
+        null
+    }
+
+    private fun fetchItemResources() = fetchResources<EliteItemResponse>("items")
+    private fun fetchAuctionResources() = fetchResources<EliteAuctionsResponse>("auctions")
+    private fun fetchBazaarResources() = fetchResources<EliteItemResponse>("bazaar")
     // </editor-fold>
 }

@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 @SkyHanniModule
 object DailyKuudraBossHelper {
 
-    val kuudraTiers = mutableListOf<KuudraTier>()
+    val kuudraTiers get() = KuudraTier.entries
 
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
@@ -90,7 +90,6 @@ object DailyKuudraBossHelper {
     }
 
     fun onRepoReload(data: Map<String, ReputationQuest>) {
-        kuudraTiers.clear()
         var tier = 1
         for ((displayName, kuudraTier) in data) {
             val displayItem = kuudraTier.item
@@ -98,8 +97,7 @@ object DailyKuudraBossHelper {
             if (location != null) {
                 kuudraLocation = location
             }
-            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
-
+            KuudraTier.addRepoData(displayName, displayItem, location, tier)
             tier++
         }
     }
