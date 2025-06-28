@@ -38,12 +38,16 @@ object AttributeShardOverlay {
     private var totalShardLevels = 0
 
     private var lastShardsData: Map<String, ProfileSpecificStorage.AttributeShardData> = emptyMap()
+    private var lastTotalSyphoned = 0
 
     fun updateDisplay() {
         if (!config.enabled) return
         val newData = storage?.toMap().orEmpty()
-        if (lastShardsData == newData) return
+        val newTotalSyphoned = newData.values.sumOf { it.amountSyphoned }
+
+        if (lastShardsData == newData && newTotalSyphoned == lastTotalSyphoned) return
         lastShardsData = newData
+        lastTotalSyphoned = newTotalSyphoned
 
         reconstructDisplay()
     }
@@ -51,11 +55,9 @@ object AttributeShardOverlay {
     enum class AttributeShardSorting(val displayName: String) {
         PRICE_TO_NEXT_TIER("Price to Next Tier"),
         PRICE_TO_MAXED("Price to Maxed"),
-        TIER("Tier"),
-        ALPHABETICAL("Alphabetical"),
         ;
 
-        override fun toString(): String = "§a$displayName"
+        override fun toString(): String = displayName
     }
 
     private data class AttributeShardDisplayLine(
@@ -98,8 +100,6 @@ object AttributeShardOverlay {
         val sorted = when (config.displaySortingMethod) {
             AttributeShardSorting.PRICE_TO_NEXT_TIER -> lines.sortedBy { it.priceToNextTier }
             AttributeShardSorting.PRICE_TO_MAXED -> lines.sortedBy { it.priceUntilMaxed }
-            AttributeShardSorting.TIER -> lines.sortedBy { it.currentTier }
-            AttributeShardSorting.ALPHABETICAL -> lines.sortedBy { it.displayName }
         }
         val filtered = sorted.filter { line ->
             if (config.hideMaxed && line.currentTier == 10) return@filter false
@@ -122,7 +122,7 @@ object AttributeShardOverlay {
                 add(StringRenderable("§cNo Shards Found"))
                 add(StringRenderable("§cTry changing your settings below."))
             } else {
-                add(filtered.map { it.renderLine }.buildSearchableScrollable(height = 300, textInput, velocity = 55.0))
+                add(filtered.map { it.renderLine }.buildSearchableScrollable(height = 225, textInput, velocity = 25.0))
             }
             addButtons()
         }
@@ -132,6 +132,7 @@ object AttributeShardOverlay {
         addRenderableButton<AttributeShardSorting>(
             label = "Sorting Method",
             current = config.displaySortingMethod,
+            getName = { "{§a$it.displayName}" },
             onChange = {
                 config.displaySortingMethod = it
                 reconstructDisplay()

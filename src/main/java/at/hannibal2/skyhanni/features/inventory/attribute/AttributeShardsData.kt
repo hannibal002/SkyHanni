@@ -153,9 +153,7 @@ object AttributeShardsData {
             return
         }
         val totalAmount = findTotalAmount(currentTier, toNextTier, rarity)
-        storage?.getOrPut(attributeName) {
-            ProfileSpecificStorage.AttributeShardData(totalAmount)
-        }
+        storage?.getOrPut(attributeName) { ProfileSpecificStorage.AttributeShardData(0) }?.amountSyphoned = totalAmount
     }
 
     private fun findTotalAmount(currentTier: Int, toNextTier: Int, rarity: LorenzRarity): Int {

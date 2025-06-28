@@ -908,8 +908,8 @@ class ProfileSpecificStorage(
     @Expose
     var attributeShards: MutableMap<String, AttributeShardData> = mutableMapOf()
 
-    class AttributeShardData(
-        @Expose val amountSyphoned: Int = 0,
+    data class AttributeShardData(
+        @Expose var amountSyphoned: Int = 0,
     )
 
     @Expose
