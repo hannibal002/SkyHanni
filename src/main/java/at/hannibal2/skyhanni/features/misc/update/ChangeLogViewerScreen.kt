@@ -10,11 +10,11 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import at.hannibal2.skyhanni.utils.renderables.WrappedRenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import java.util.NavigableMap
@@ -31,7 +31,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
     private val buttonPanel = HorizontalContainerRenderable(
         listOf(
             Renderable.rectButton(
-                RenderableString("Include Betas"),
+                StringRenderable("Include Betas"),
                 activeColor = ChangelogViewer.primaryColor,
                 startState = ChangelogViewer.shouldShowBeta,
                 onClick = {
@@ -40,7 +40,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                 },
             ),
             Renderable.rectButton(
-                RenderableString("Show Technical Details"),
+                StringRenderable("Show Technical Details"),
                 activeColor = ChangelogViewer.primaryColor,
                 startState = ChangelogViewer.showTechnicalDetails,
                 onClick = {
@@ -79,7 +79,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
         Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
             if (!ChangelogViewer.cache.containsKeys(ChangelogViewer.startVersion, ChangelogViewer.endVersion)) {
                 ChangelogViewer.shouldMakeNewList = true
-                RenderableString(
+                StringRenderable(
                     if (ChangelogViewer.openTime.passedSince() >= 5.0.seconds)
                         "§aStill Loading. §cThe Version you are looking for may not exist"
                     else "§aStill Loading",
@@ -111,7 +111,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
             DrawContextUtils.translate(0f, topOfGui.toFloat(), 0f)
             buttonPanel.renderXAligned(0, topOfGui, width)
             Renderable.drawInsideRoundedRect(
-                RenderableString("§9${ChangelogViewer.startVersion} §e➜ §9${ChangelogViewer.endVersion}"),
+                StringRenderable("§9${ChangelogViewer.startVersion} §e➜ §9${ChangelogViewer.endVersion}"),
                 ChangelogViewer.primaryColor,
                 horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
             ).renderXAligned(0, topOfGui, width)
@@ -127,7 +127,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
     ): Renderable = Renderable.scrollList(
         changelogList.filter { ChangelogViewer.shouldShowBeta || !it.key.isBeta }.map { (version, body) ->
             listOf(
-                RenderableString("§l§9Version $version", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
+                StringRenderable("§l§9Version $version", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
             ) + makeChangeLogToRenderable(body, width) + listOf(
                 Renderable.placeholder(
                     0, 15,
@@ -138,9 +138,9 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
             {
                 listOf(
                     if (changelogList.isEmpty()) {
-                        RenderableString("§aNo changes found", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+                        StringRenderable("§aNo changes found", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
                     } else if (!ChangelogViewer.shouldShowBeta) {
-                        RenderableString(
+                        StringRenderable(
                             "§aOnly Betas where added, turn on \"Include Betas\"",
                             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                         )
@@ -170,7 +170,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
             return@mapNotNull null
         }
         value.map {
-            WrappedRenderableString(it, width)
+            WrappedStringRenderable(it, width)
         }
     }.flatten()
 }

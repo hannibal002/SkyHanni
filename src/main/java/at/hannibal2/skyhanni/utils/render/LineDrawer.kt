@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
@@ -128,7 +127,7 @@ class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator
             GlStateManager.disableAlpha()
 
             GlStateManager.pushMatrix()
-            val inverseView = RenderUtils.getViewerPos(event.partialTicks)
+            val inverseView = WorldRenderUtils.getViewerPos(event.partialTicks)
             WorldRenderUtils.translate(inverseView.negated())
 
             draws.invoke(LineDrawer(Tessellator.getInstance(), lineWidth, depth))

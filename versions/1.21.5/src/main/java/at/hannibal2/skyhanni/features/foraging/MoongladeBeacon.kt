@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import kotlin.math.abs
@@ -299,17 +299,17 @@ object MoongladeBeacon {
     private fun updateDisplay() {
         val newList = mutableListOf<Renderable>()
 
-        newList.add(RenderableString("§d§lMoonglade Beacon Solver"))
-        newList.add(RenderableString("§7Target Color: ${formatTargetColor(normalTuning.targetColor)}"))
-        newList.add(RenderableString("§7Target Speed: §a${formatTargetSpeed(normalTuning.targetSpeed)}"))
-        newList.add(RenderableString("§7Target Pitch: §a${formatTargetPitch(normalTuning.targetPitch)}"))
+        newList.add(StringRenderable("§d§lMoonglade Beacon Solver"))
+        newList.add(StringRenderable("§7Target Color: ${formatTargetColor(normalTuning.targetColor)}"))
+        newList.add(StringRenderable("§7Target Speed: §a${formatTargetSpeed(normalTuning.targetSpeed)}"))
+        newList.add(StringRenderable("§7Target Pitch: §a${formatTargetPitch(normalTuning.targetPitch)}"))
 
         if (upgradingStrength) {
-            newList.add(RenderableString(""))
-            newList.add(RenderableString("§aEnchanted Tuning"))
-            newList.add(RenderableString("§7Target Color: ${formatTargetColor(enchantedTuning.targetColor)}"))
-            newList.add(RenderableString("§7Target Speed: §a${formatTargetSpeed(enchantedTuning.targetSpeed)}"))
-            newList.add(RenderableString("§7Target Pitch: §a${formatTargetPitch(enchantedTuning.targetPitch)}"))
+            newList.add(StringRenderable(""))
+            newList.add(StringRenderable("§aEnchanted Tuning"))
+            newList.add(StringRenderable("§7Target Color: ${formatTargetColor(enchantedTuning.targetColor)}"))
+            newList.add(StringRenderable("§7Target Speed: §a${formatTargetSpeed(enchantedTuning.targetSpeed)}"))
+            newList.add(StringRenderable("§7Target Pitch: §a${formatTargetPitch(enchantedTuning.targetPitch)}"))
         }
 
         display = newList
