@@ -26,13 +26,18 @@ class EnchantsJson {
         return enchant
     }
 
-    fun containsEnchantment(enchants: Map<String, Int>, line: String, enchantmentPattern: Pattern): Boolean {
+    @Suppress("MaxLineLength")
+    fun containsEnchantment(enchants: Map<String, Int>, line: String, enchantmentPattern: Pattern, removeFormattingCodes: Boolean): Boolean {
         val exclusiveMatch = EnchantParser.enchantmentExclusivePattern.matcher(line)
         if (!exclusiveMatch.find()) return false // This is the case that the line is not exclusively enchants
 
         val matcher = enchantmentPattern.matcher(line)
+        val formattingCodesRegex = "§[0-9a-fr]".toRegex()
         while (matcher.find()) {
-            val enchant = this.getFromLore(matcher.group("enchant"))
+            val enchant = this.getFromLore(
+                matcher.group("enchant")
+                    .let { if (removeFormattingCodes) it.replace(formattingCodesRegex, "") else it }
+            )
             if (enchants.isNotEmpty()) {
                 if (enchants.containsKey(enchant.nbtName)) return true
             } else {

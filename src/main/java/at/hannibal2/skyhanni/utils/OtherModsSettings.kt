@@ -68,7 +68,7 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
         for (f in chain.drop(1).dropLast(1)) {
             current = current?.let { runCatching { f.get(it) }.getOrNull() } ?: return
         }
-        runCatching { chain.last().set(current!!, value) }
+        runCatching { chain.last().set(current, value) }
     }
 
     private fun buildFieldChain(path: String): List<Field> {

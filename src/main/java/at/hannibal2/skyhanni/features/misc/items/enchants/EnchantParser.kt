@@ -81,9 +81,25 @@ object EnchantParser {
      * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
      */
     @Suppress("MaxLineLength")
-    val enchantmentPatternAaron by patternGroup.pattern(
-        "enchants.aaron",
+    val enchantmentPatternAaronChroma by patternGroup.pattern(
+        "enchants.aaronchroma",
         "(?:§7§l|§d§l|§[0-9a-fr])(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+    )
+    /**
+     * REGEX-TEST: §9Champion VI §81.2M
+     * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §5§o§9Compact X
+     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
+     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
+     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
+     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §9Giant Killer V§9, §rI§rm§rp§ra§rl§ri§rn§rg§r §rI§rI§rI§r§9, §rK§rn§ro§rc§rk§rb§ra§rc§rk§r §rI§rI
+     * REGEX-TEST: §rH§ra§rr§rv§re§rs§rt§ri§rn§rg§r §rV§rI
+     */
+    @Suppress("MaxLineLength")
+    val enchantmentPatternAaronStill by patternGroup.pattern(
+        "enchants.newaaronstill",
+        "(?:§7§l|§d§l|§[0-9a-f]|§r)(?<enchant>[A-Za-z][A-Za-z '§-]+) (?:§[0-9a-fr])?(?<levelNumeral>(?:(?:[IVXLCDM]|[0-9])(?:§[0-9a-fr])?)+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
     /**
      * REGEX-TEST: Respiration
@@ -181,6 +197,7 @@ object EnchantParser {
         parseEnchants(lore, mapOf(), event.component)
     }
 
+    @Suppress("LongMethod", "ReturnCount")
     private fun parseEnchants(
         loreList: MutableList<String>,
         enchants: Map<String, Int>,
@@ -201,14 +218,12 @@ object EnchantParser {
         loreCache.updateBefore(loreList)
 
         var enchantPattern = enchantmentPattern
-
-        // TODO: even with color parsing off, it still runs enchantStartAndEnd & orderEnchants which both fail with aaron
-        // TODO: Also my AOTV fails idk why
+        var removeFormattingCodes = false
 
         if (config.colorParsing.get()) {
             when (getAaronChromaMode()) {
                 false -> {
-                    enchantPattern = enchantmentPatternAaron
+                    enchantPattern = enchantmentPatternAaronChroma
 
                     val leadingCodes = Regex("^(?:§[0-9a-fk-or])+")
                     val allFormatting = Regex("§[0-9a-fk-or]")
@@ -218,8 +233,8 @@ object EnchantParser {
                         line
                             .split(", ")
                             .joinToString(", ") { segment ->
-                                val prefix = leadingCodes.find(segment)?.value ?: ""
-                                val suffix = trailingCode.find(segment)?.value ?: ""
+                                val prefix = leadingCodes.find(segment)?.value.orEmpty()
+                                val suffix = trailingCode.find(segment)?.value.orEmpty()
                                 val coreText = segment
                                     .removePrefix(prefix)
                                     .removeSuffix(suffix)
@@ -230,13 +245,22 @@ object EnchantParser {
                             }
                     }
                 }
-                true -> enchantPattern = enchantmentPatternAaron
+                true -> enchantPattern = enchantmentPatternAaronChroma
+                null -> {}
+            }
+        } else {
+            when (getAaronChromaMode()) {
+                false -> {
+                    enchantPattern = enchantmentPatternAaronStill
+                    removeFormattingCodes = true
+                }
+                true -> enchantPattern = enchantmentPatternAaronChroma
                 null -> {}
             }
         }
 
         // Find where the enchants start and end
-        enchantStartAndEnd(loreList, enchants, enchantPattern)
+        enchantStartAndEnd(loreList, enchants, enchantPattern, removeFormattingCodes)
 
         if (endEnchant == -1) {
             loreCache.updateAfter(loreList)
@@ -250,7 +274,7 @@ object EnchantParser {
         maxEnchantsPerLine = 0
 
         // Order all enchants
-        orderEnchants(loreList, enchantPattern)
+        orderEnchants(loreList, enchantPattern, removeFormattingCodes)
 
         if (orderedEnchants.isEmpty()) {
             loreCache.updateAfter(loreList)
@@ -315,7 +339,7 @@ object EnchantParser {
         loreList.addAll(startEnchant, insertEnchants)
 
         if (config.stackingEnchantProgress) {
-            // TODO check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
+            // TODO: check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
 
             stackingEnchants.forEach { stacking ->
                 currentItem?.let { item ->
@@ -333,7 +357,8 @@ object EnchantParser {
         }
     }
 
-    private fun enchantStartAndEnd(loreList: MutableList<String>, enchants: Map<String, Int>, enchantPattern: Pattern) {
+    @Suppress("MaxLineLength")
+    private fun enchantStartAndEnd(loreList: MutableList<String>, enchants: Map<String, Int>, enchantPattern: Pattern, removeFormattingCodes: Boolean) {
         var startEnchant = -1
         var endEnchant = -1
 
@@ -342,7 +367,7 @@ object EnchantParser {
             val strippedLine = loreList[i].removeColor()
 
             if (startEnchant == -1) {
-                if (this.enchants.containsEnchantment(enchants, loreList[i], enchantPattern)) startEnchant = i
+                if (this.enchants.containsEnchantment(enchants, loreList[i], enchantPattern, removeFormattingCodes)) startEnchant = i
             } else if (strippedLine.trim().isEmpty() && endEnchant == -1) endEnchant = i - 1
         }
 
@@ -351,8 +376,8 @@ object EnchantParser {
     }
 
     /**
-    * null: off, false: still, true: chroma
-    */
+     * null: off, false: still, true: chroma
+     */
     fun getAaronChromaMode(aaronModSettings: OtherModsSettings = OtherModsSettings.aaron()): Boolean? {
         return if (aaronModSettings.getBoolean("skyblock.enchantments.rainbowMaxEnchants") == true) {
             aaronModSettings.getConfigValue("skyblock.enchantments.rainbowMode").toString() == "Chroma"
@@ -361,11 +386,12 @@ object EnchantParser {
         }
     }
 
-    private fun orderEnchants(loreList: MutableList<String>, enchantPattern: Pattern) {
+    private fun orderEnchants(loreList: MutableList<String>, enchantPattern: Pattern, removeFormattingCodes: Boolean) {
         var lastEnchant: FormattedEnchant? = null
 
         val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
         val regex = "[\\d,.kKmMbB]+\$".toRegex()
+        val formattingCodesRegex = "§[0-9a-fr]".toRegex()
         for (i in startEnchant..endEnchant) {
             val matcher = enchantPattern.matcher(loreList[i])
             var containsEnchant = false
@@ -373,8 +399,13 @@ object EnchantParser {
 
             while (matcher.find()) {
                 // Pull enchant, enchant level and stacking amount if applicable
-                val enchant = this.enchants.getFromLore(matcher.group("enchant"))
-                val level = matcher.group("levelNumeral").romanToDecimalIfNecessary()
+                val enchant = this.enchants.getFromLore(
+                    matcher.group("enchant")
+                        .let { if (removeFormattingCodes) it.replace(formattingCodesRegex, "") else it }
+                )
+                val level = matcher.group("levelNumeral")
+                    .let { if (removeFormattingCodes) it.replace(formattingCodesRegex, "") else it }
+                    .romanToDecimalIfNecessary()
                 val stacking = if (matcher.group("stacking").trimStart().removeColor().matches(regex)) {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
