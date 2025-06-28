@@ -7,6 +7,7 @@ import java.util.EnumMap
 import java.util.PriorityQueue
 import java.util.Queue
 import java.util.WeakHashMap
+import java.util.regex.Pattern
 import kotlin.math.ceil
 
 @Suppress("TooManyFunctions")
@@ -479,5 +480,21 @@ object CollectionUtils {
             candidates = next
         }
         return null
+    }
+
+    /**
+     * Insert content after a line that matches the given pattern.
+     *
+     * @param pattern the pattern to match
+     * @param content the content to insert
+     */
+    fun MutableList<String>.insertLineAfter(pattern: Pattern, content: String) {
+        val iter = this.listIterator()
+        while (iter.hasNext()) {
+            val line = iter.next()
+            if (pattern.matcher(line).find()) {
+                iter.add(content)
+            }
+        }
     }
 }
