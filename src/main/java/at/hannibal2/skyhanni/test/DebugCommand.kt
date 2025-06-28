@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -186,6 +187,15 @@ object DebugCommand {
                 for (constant in RepoManager.unsuccessfulConstants) {
                     add("  - $constant")
                 }
+            }
+
+            val neuRepoConfig = SkyHanniMod.feature.dev.neuRepo
+            add(" neuRepoAutoUpdate: ${neuRepoConfig.repoAutoUpdate}")
+
+            if (!EnoughUpdatesRepo.hasDefaultRepositoryLocation()) {
+                add(" neu repo location: '${EnoughUpdatesRepo.getRepoLocation()}'")
+            } else {
+                add(" neu repo location: default")
             }
 
             add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
