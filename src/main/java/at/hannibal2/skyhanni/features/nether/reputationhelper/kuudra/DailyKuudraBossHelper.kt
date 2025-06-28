@@ -48,7 +48,7 @@ object DailyKuudraBossHelper {
     fun onKuudraDone(event: KuudraCompleteEvent) {
         val tier = event.kuudraTier
         val kuudraTier = getByTier(tier) ?: return
-        ChatUtils.debug("Detected kuudra tier done: ${kuudraTier.getDisplayName()}")
+        ChatUtils.debug("Detected kuudra tier done: ${kuudraTier.getTieredDisplayName()}")
         DailyQuestHelper.finishKuudra(kuudraTier)
         kuudraTier.doneToday = true
         updateAllKuudraDone()
@@ -63,7 +63,7 @@ object DailyKuudraBossHelper {
             for (tier in kuudraTiers) {
                 if (config.hideComplete.get() && tier.doneToday) continue
                 val result = if (tier.doneToday) "§aDone" else "§bTodo"
-                val displayName = tier.getDisplayName()
+                val displayName = tier.getTieredDisplayName()
                 val displayItem = tier.displayItem
 
                 addLine {

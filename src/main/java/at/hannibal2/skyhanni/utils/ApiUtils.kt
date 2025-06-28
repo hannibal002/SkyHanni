@@ -19,6 +19,7 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
+import java.io.InputStream
 import java.security.KeyStore
 import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
@@ -76,9 +77,11 @@ object ApiUtils {
             )
             .useSystemProperties()
 
-    private val explicitGzipBuilder = builder.setDefaultHeaders(
-        defaultHeaders + BasicHeader("Accept-Encoding", "gzip, deflate, br"),
-    )
+    private val explicitGzipBuilder = HttpClients.custom()
+        .setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
+        .setDefaultHeaders(defaultHeaders + BasicHeader("Accept-Encoding", "gzip, deflate"))
+        .setDefaultRequestConfig(RequestConfig.custom().build())
+        .useSystemProperties()
 
     /**
      * TODO
@@ -97,40 +100,40 @@ object ApiUtils {
         val client = if (gunzip) explicitGzipBuilder.build() else builder.build()
         try {
             client.execute(HttpGet(url)).use { response ->
-                val entity = response.entity
-                if (entity != null) {
-                    val inputStream = if (gunzip) {
-                        GZIPInputStream(entity.content)
+                val entity = response.entity ?: throw IllegalStateException("No response entity")
+                val encoding = response.getFirstHeader("Content-Encoding")?.value
+                val rawStream = entity.content
+                val input: InputStream = when {
+                    gunzip && encoding.equals("gzip", ignoreCase = true) -> GZIPInputStream(rawStream)
+                    else -> rawStream
+                }
+                val returnedData = input.bufferedReader().use { it.readText() }
+
+                try {
+                    return parser.parse(returnedData)
+                } catch (e: Exception) {
+                    val name = e.javaClass.name
+                    val message = "$name: ${e.message}"
+                    if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
+                        println("MalformedJsonException: Use JsonReader.setLenient(true)")
+                        println(" - getJSONResponse: '$url'")
+                        ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                    } else if (returnedData.contains("<center><h1>502 Bad Gateway</h1></center>")) {
+                        ErrorManager.skyHanniError(
+                            "Error fetching data from $apiName API!",
+                            "error message" to "$message(502 Bad Gateway)",
+                            "api name" to apiName,
+                            "url" to url,
+                            "returned data" to returnedData,
+                        )
                     } else {
-                        entity.content
-                    }
-                    val returnedData = inputStream.bufferedReader().use { it.readText() }
-                    try {
-                        return parser.parse(returnedData)
-                    } catch (e: Exception) {
-                        val name = e.javaClass.name
-                        val message = "$name: ${e.message}"
-                        if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
-                            println("MalformedJsonException: Use JsonReader.setLenient(true)")
-                            println(" - getJSONResponse: '$url'")
-                            ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
-                        } else if (returnedData.contains("<center><h1>502 Bad Gateway</h1></center>")) {
-                            ErrorManager.skyHanniError(
-                                "Error fetching data from $apiName API!",
-                                "error message" to "$message(502 Bad Gateway)",
-                                "api name" to apiName,
-                                "url" to url,
-                                "returned data" to returnedData,
-                            )
-                        } else {
-                            ErrorManager.skyHanniError(
-                                "Error fetching data from $apiName API!",
-                                "error message" to message,
-                                "api name" to apiName,
-                                "url" to url,
-                                "returned data" to returnedData,
-                            )
-                        }
+                        ErrorManager.skyHanniError(
+                            "Error fetching data from $apiName API!",
+                            "error message" to message,
+                            "api name" to apiName,
+                            "url" to url,
+                            "returned data" to returnedData,
+                        )
                     }
                 }
             }

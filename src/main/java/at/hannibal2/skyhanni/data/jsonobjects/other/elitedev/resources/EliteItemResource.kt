@@ -19,6 +19,7 @@ import com.google.gson.annotations.SerializedName
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import kotlin.time.Duration
 
+@KSerializable
 data class EliteItemResponse(
     @Expose val items: Map<NeuInternalName, EliteItem>,
 )
@@ -121,6 +122,7 @@ data class EliteItemRequirement(
     }
 }
 
+@KSerializable
 data class EliteItemCatacombRequirement(
     @Expose val type: String,
     @Expose @SerializedName("dungeon_type") val dungeonType: String? = null,
@@ -154,14 +156,16 @@ enum class EliteMuseumGameStage {
 }
 
 @KSerializable
+@Suppress("PrivatePropertyName")
 data class EliteMuseumData(
-    @Expose @SerializedName("donation_xp") val donationXp: Int,
+    @Expose private val donation_xp: Int,
     @Expose private val parent: Map<String, String>? = null,
     @Expose val type: EliteMuseumType,
     @Expose @SerializedName("armor_set_donation_xp") val armorSetDonationXp: Map<String, Int>? = null,
     @Expose @SerializedName("game_stage") val gameStage: EliteMuseumGameStage,
     @Expose @SerializedName("mapped_item_ids") val mappedItemIds: List<NeuInternalName> = emptyList(),
 ) {
+    val donationXp: Int = donation_xp
     val selfIdentifier: String? = parent?.entries?.first()?.key
     val parentIdentifier: String? = parent?.entries?.first()?.value
 }
@@ -171,14 +175,14 @@ enum class EliteItemOrigin { RIFT, BINGO }
 
 @KSerializable
 data class EliteItem(
-    @Expose @SerializedName("id") val internalName: NeuInternalName,
+    @Expose private val id: NeuInternalName,
     @Expose val material: String,
     @Expose val durability: Int? = null,
     @Expose val skin: EliteSkin? = null,
     @Expose val name: String,
     @Expose @SerializedName("description") val dirtyDescription: String? = null,
     @Expose @SerializedName("category") private val itemCategory: String? = null,
-    @Expose @SerializedName("tier") val rarity: LorenzRarity,
+    @Expose @SerializedName("tier") val rarity: LorenzRarity? = null,
     @Expose @SerializedName("has_uuid") val hasUuid: Boolean? = null,
     @Expose @SerializedName("item_model") val itemModel: String? = null,
     @Expose @SerializedName("soulbound") val soulboundType: SoulboundType? = null,
@@ -227,6 +231,7 @@ data class EliteItem(
     @Expose @SerializedName("motes_sell_price") val motesSellPrice: Double? = null,
     @Expose @SerializedName("lose_motes_value_on_transfer") val loseMotesValueOnTransfer: Boolean? = null,
 ) {
+    val internalName: NeuInternalName = id
     // Example of why we need this:
     // "description": "%%gray%%%%italic%%A perfectly fine tooth, besides its radiant brightness..."
     val description: String? = dirtyDescription?.let {

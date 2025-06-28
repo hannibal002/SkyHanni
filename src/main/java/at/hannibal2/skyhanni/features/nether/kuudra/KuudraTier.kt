@@ -26,7 +26,7 @@ enum class KuudraTier(val displayName: String) {
     private fun setLocation(location: LorenzVec?) { this.intLocation = location }
     private fun setDisplayItem(displayItem: NeuInternalName) { this.intDisplayItem = displayItem }
 
-    fun getDisplayName() = "Tier $intTierNumber ($displayName)"
+    fun getTieredDisplayName() = "Tier $intTierNumber ($displayName)"
 
     companion object {
         init {

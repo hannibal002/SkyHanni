@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteContestsResponse
@@ -20,44 +21,47 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonObject
 
 @SkyHanniModule
 object EliteDevApi {
 
+    enum class EliteResourceType { ITEM, AUCTION, BAZAAR }
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfetcheliteresource") {
+            description = "Fetches the specified Elite resource from elitebot.dev"
+            category = CommandCategory.DEVELOPER_DEBUG
             arg("resource", EnumArgumentType.create(
                 EliteResourceType::class.java,
                 toString = { it.name.lowercase() },
             )) { resource ->
                 callback {
                     val resourceType = getArg(resource)
+                    val timeNow = SimpleTimeMark.now()
                     when (resourceType) {
                         EliteResourceType.ITEM -> {
-                            val itemResources = fetchItemResources()
-                            ChatUtils.chat("Item resources fetched: ${itemResources?.items?.size ?: 0}")
+                            val itemResources = fetchItemResources() ?: return@callback
+                            ChatUtils.chat("§aItem resources fetched: ${itemResources.items.size}")
                         }
                         EliteResourceType.AUCTION -> {
-                            val auctionResources = fetchAuctionResources()
-                            ChatUtils.chat("Auction resources fetched: ${auctionResources?.items?.size ?: 0}")
+                            val auctionResources = fetchAuctionResources() ?: return@callback
+                            ChatUtils.chat("§aAuction resources fetched: ${auctionResources.items.size}")
                         }
                         EliteResourceType.BAZAAR -> {
-                            val bazaarResources = fetchBazaarResources()
-                            ChatUtils.chat("Bazaar resources fetched: ${bazaarResources?.products?.size ?: 0}")
+                            val bazaarResources = fetchBazaarResources() ?: return@callback
+                            ChatUtils.chat("§aBazaar resources fetched: ${bazaarResources.products.size}")
                         }
                     }
+                    val elapsedTime = timeNow.passedSince()
+                    val elapsedFormat = elapsedTime.format()
+                    ChatUtils.chat("Fetched ${resourceType.name} resources in $elapsedFormat")
                 }
             }
         }
-    }
-
-    enum class EliteResourceType {
-        ITEM, AUCTION, BAZAAR,
-        ;
-        override fun toString() = name.lowercase()
     }
 
     private const val ELITEBOT_API_URL = "https://api.elitebot.dev"
