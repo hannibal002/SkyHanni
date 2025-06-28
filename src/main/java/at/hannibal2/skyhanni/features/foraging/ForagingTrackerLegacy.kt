@@ -144,10 +144,11 @@ object ForagingTrackerLegacy {
      * REGEX-TEST: §aTender Wood §8x0-5
      * REGEX-TEST: §aTender Wood §8x0-9
      * REGEX-TEST: §aVinesap §8x0-3
+     * REGEX-TEST: §6Signal Enhancer §8(§a0.4%§8)
      */
     val hoverRewardPattern by patternGroup.pattern(
         "hover-reward",
-        "(?:§.)*(?<item>.*) (?:§.)*§8x(?<amount>[\\d,-]+)"
+        "(?:§.)*(?<item>.*) (?:§.)*§8x?(?:(?<amount>[\\d,-]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
     )
 
     /**

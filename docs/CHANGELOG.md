@@ -38,6 +38,8 @@
 #### Inventory
 
 + Added option to highlight Current Pet in menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
++ Added Fann Leveling Cost. - minhperry + Daveed (https://github.com/hannibal002/SkyHanni/pull/4061)
+    + Coins per XP and XP per Bit.
 
 #### Foraging
 
@@ -52,6 +54,9 @@
     + Tracks logs and enchanted logs sent to Sacks, and Tree Gifts.
     + Option to hide or compact Tree Gift messages in chat.
 + Added Movable Lasso Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4161)
++ Added Hideonleaf Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4172)
++ Added Phantoms Muter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4174)
+    + Mutes Phantoms in Galatea.
 
 #### Misc
 
@@ -130,6 +135,7 @@
 #### Event
 
 + Added Zombie Timer to Zombie Shootout QOL. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2508)
++ Prevented Wrong Diana Guesses from becoming unremovable. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4182)
 
 #### Misc
 
@@ -155,6 +161,7 @@
 + Added support for multiple Stacking Enchants Progress lines per item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
 + Added Visual Words (/shwords) support for 1.21. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4131)
 + Added Bazaar price support for new Attribute Shards. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4160)
++ Added Mod Menu button support, linking to SkyHanni Discord and Modrinth. - nopo (https://github.com/hannibal002/SkyHanni/pull/4173)
 
 ### Fixes
 
@@ -215,6 +222,7 @@
 + Fixed placement of inventory titles to not overlap the inventory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4065)
 + Fixed vanilla inventory errors in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
 + Fixed Hide Non Clickable Items and inventory highlighting not rendering properly in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4160)
++ Fixed empty inventory slots graying and unclickable in Sacks menu when Hide Non-Clickable Items enabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4176)
 
 #### Mining
 
@@ -228,6 +236,7 @@
 
 + Fixed other particles interfering with hotspot guesses. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3913)
 + Fixed Fishing Profit Tracker's times-fished count. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3980)
++ Fixed Sea Creature Highlight. - nopo (https://github.com/hannibal002/SkyHanni/pull/4185)
 
 #### Hoppity
 
@@ -239,12 +248,14 @@
 
 + Fixed Carnival Zombie Shootout detection breaking with certain texture packs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4002)
 + Fixed incorrect next-egg-spawn message at end of Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3999)
++ Fixed Zombie Shootout Colored Lines requiring hitboxes enabled. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/4179)
 
 #### GUI
 
 + Fixed TabWidget Eyes Placed so it will show dragon spawned and egg respawning. - G0dwhitelight (https://github.com/hannibal002/SkyHanni/pull/3991)
 + Fixed changelog viewer crash on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4132)
 + Fixed Visual Words stripping non-Minecraft colors. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4159)
++ Fixed Visual Words removing emojis. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4178)
 
 #### Slayer
 
@@ -257,6 +268,13 @@
 #### Foraging
 
 + Fixed Tadgang highlighting in Birrie's Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4158)
++ Fixed Custom Scoreboard Galatea lines not being auto-enabled. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4187)
++ Fixed Foraging Tracker not hiding when disabled in config. - nopo (https://github.com/hannibal002/SkyHanni/pull/4177)
++ Fixed Foraging Tracker sometimes not counting items that go in sacks. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4177)
++ Fixed Foraging Tracker sometimes not showing up on first entering Galatea. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4177)
++ Fixed sending compact tree gift message when disabled. - The_Deerman + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4181)
++ Fixed Signal Enhancer not tracking in Foraging Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4170)
+    + Blame Hypixel for including a percentage in Lore.
 
 #### Misc
 
@@ -302,6 +320,10 @@
     + Escape key can no longer be bound.
     + Category scrolling now works as intended.
 + Fixed Trapper Solver alert for already-dying mobs. - Luna (https://github.com/hannibal002/SkyHanni/pull/4086)
++ Fixed Explosion Hider. - nopo (https://github.com/hannibal002/SkyHanni/pull/4175)
++ Fixed Hide Coop Members removing wrong lines. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/4180)
++ Fixed Party Highlight. - nopo (https://github.com/hannibal002/SkyHanni/pull/4185)
++ Fixed SkillApi not working with >1000% overflow. - nopo (https://github.com/hannibal002/SkyHanni/pull/4184)
 
 ### Technical Details
 
