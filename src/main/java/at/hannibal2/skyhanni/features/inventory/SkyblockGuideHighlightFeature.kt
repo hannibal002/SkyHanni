@@ -266,7 +266,7 @@ class SkyblockGuideHighlightFeature private constructor(
                 "§c§lINCOMPLETE",
             )
             SkyblockGuideHighlightFeature(
-                { SkyHanniMod.feature.inventory.highlightDisabledAttributes },
+                { SkyHanniMod.feature.inventory.attributeShards.highlightDisabledAttributes },
                 "attribute.disable",
                 "Attribute Menu",
                 "§7Enabled: §cNo",
