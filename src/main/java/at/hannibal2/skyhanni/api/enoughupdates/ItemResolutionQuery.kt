@@ -1,26 +1,18 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
-import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
@@ -49,35 +41,7 @@ class ItemResolutionQuery {
     private var knownInternalName: String? = null
     private var guiContext: GuiScreen? = null
 
-    @SkyHanniModule
     companion object {
-
-        val patternGroup = RepoPattern.group("itemresoultionquery")
-
-        /**
-         * REGEX-TEST: §6Nature Elemental
-         * REGEX-TEST: §6Berry Eater IX
-         * REGEX-TEST: §6Essence of Ice I
-         * REGEX-TEST: §6Advanced Mode
-         */
-        private val attributeShardNamePattern by patternGroup.pattern(
-            "item.name.attribute.shard",
-            "§6(?<name>.+?) ?(?<tier>[IVXL]+)?$",
-        )
-
-        private var bazaarOverrides = mapOf<String, String>()
-
-        @HandleEvent
-        fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-            val typeToken = object : TypeToken<List<BazaarOverride>>() {}.type
-            val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", typeToken)
-            bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
-        }
-
-        private data class BazaarOverride(
-            @Expose @SerializedName("stock") val bazaarInternalName: String,
-            @Expose @SerializedName("id") val neuInternalName: String,
-        )
 
         private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
 
@@ -86,7 +50,7 @@ class ItemResolutionQuery {
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
 
         fun transformHypixelBazaarToNeuItemId(hypixelId: String): String {
-            bazaarOverrides[hypixelId]?.let {
+            ItemUtils.bazaarOverrides[hypixelId]?.let {
                 return it
             }
             val matcher = BAZAAR_ENCHANTMENT_PATTERN.matcher(hypixelId)
@@ -317,17 +281,28 @@ class ItemResolutionQuery {
         return null
     }
 
-    private fun resolveItemInAttributeMenu(displayName: String): String? {
-        attributeShardNamePattern.matchMatcher(displayName) {
-            val name = group("name").removeAllNonLettersAndNumbers()
-            val tier = groupOrNull("tier")?.romanToDecimal() ?: 0
-            if (name == "Advanced Mode") return null
-            if (tier == 0) {
-                return "ATTRIBUTE_SHARD_" + name.uppercase() + ";1"
+    private val shardNameOverrides = mapOf(
+        "STRIDERSURFER" to "STRIDER_SURFER",
+        "ABYSSAL_LANTERNFISH" to "ABYSSAL_LANTERN",
+        "CINDERBAT" to "CINDER_BAT",
+    )
+
+    private fun resolveItemInAttributeMenu(lore: List<String>): String? {
+        UtilsPatterns.attributeSourcePattern.firstMatcher(lore) {
+            val attributeSource = group("source").uppercase().replace(" ", "_")
+            val fixedShardName = shardNameOverrides[attributeSource] ?: attributeSource
+            val shardName = "SHARD_$fixedShardName"
+            ItemUtils.bazaarOverrides[shardName]?.let {
+                return it
             }
-            return "ATTRIBUTE_SHARD_" + name.uppercase() + ";$tier"
         }
         return null
+    }
+
+    private fun resolveItemInHuntingBoxMenu(displayName: String): String? {
+        val nane = displayName.removeColor().uppercase().replace(" ", "_")
+        val fixedName = shardNameOverrides[nane] ?: nane
+        return ItemUtils.bazaarOverrides["SHARD_$fixedName"]
     }
 
     private fun resolveContextualName(): String? {
@@ -341,7 +316,7 @@ class ItemResolutionQuery {
             return resolveEnchantmentByName(displayName)
         }
         if (itemType === Items.skull && displayName.contains("Essence")) {
-            return findInternalNameByDisplayName(displayName, false)
+            findInternalNameByDisplayName(displayName, false)?.let { return it }
         }
         if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
             for (loreLine in compound.getLore()) {
@@ -360,7 +335,10 @@ class ItemResolutionQuery {
             return resolveEnchantmentByName(displayName)
         }
         if (guiName == "Attribute Menu") {
-            return resolveItemInAttributeMenu(displayName)
+            return resolveItemInAttributeMenu(compound.getLore())
+        }
+        if (guiName == "Hunting Box" || guiName == "Fusion Box") {
+            return resolveItemInHuntingBoxMenu(displayName)
         }
         return null
     }

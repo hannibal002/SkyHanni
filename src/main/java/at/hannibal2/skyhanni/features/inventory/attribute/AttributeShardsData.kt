@@ -1,0 +1,206 @@
+package at.hannibal2.skyhanni.features.inventory.attribute
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.inventory.AttributeShardsConfig
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardJson
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+
+@SkyHanniModule
+object AttributeShardsData {
+
+    val config get(): AttributeShardsConfig = SkyHanniMod.feature.inventory.attributeShards
+    private val storage get() = ProfileStorageData.profileSpecific?.attributeShards
+
+    private var attributeLevelling = mapOf<LorenzRarity, List<Int>>()
+    private var unconsumableAttributes = listOf<String>()
+    private var attributeInfo = mapOf<String, NeuAttributeShardData>()
+    private var internalNameToShard = mapOf<NeuInternalName, String>()
+
+    var maxShards = 0
+        private set
+
+    val attributeMenuInventory = InventoryDetector(
+        openInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
+    ) { name -> name == "Attribute Menu" }
+    val huntingBoxInventory = InventoryDetector(
+        openInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
+    ) { name -> name == "Hunting Box" }
+    val bazaarShardsInventory = InventoryDetector(
+        pattern = "\\(\\d+/\\d+\\) Oddities ➜ Shards".toPattern(),
+        openInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
+    )
+
+    private val patternGroup = RepoPattern.group("inventory.attributeshards")
+
+    /**
+     * REGEX-TEST: §6Nature Elemental
+     * REGEX-TEST: §6Berry Eater IX
+     * REGEX-TEST: §6Essence of Ice I
+     * REGEX-TEST: §6Advanced Mode
+     */
+    val attributeShardNamePattern by patternGroup.pattern(
+        "name",
+        "§6(?<name>.+?) ?(?<tier>[IVXL]+)?$",
+    )
+
+    /**
+     * REGEX-TEST: §7Syphon §b3 §7more to level up!
+     * REGEX-TEST: §7Syphon §b1 §7shard to unlock!
+     * REGEX-TEST: §7Syphon §b1 §7more to level up!
+     */
+    private val syphonAmountPattern by patternGroup.pattern(
+        "syphon.amount",
+        "§7Syphon §b(?<amount>\\d+) §7(?:more to level up|shard to unlock)!",
+    )
+
+    /**
+     * REGEX-TEST: §6Veil §8(Combat)
+     * REGEX-TEST: §6Yummy X §8(Foraging)
+     */
+    private val attributeShardNameLorePattern by patternGroup.pattern(
+        "name.lore",
+        "§6(?<name>.+?) ?(?<tier>[IVXL]+)? §8\\(\\w+\\)$",
+    )
+
+    /**
+     * REGEX-TEST: §7Owned: §b1 Shard
+     * REGEX-TEST: §7Owned: §b3 Shards
+     * REGEX-TEST: §7Owned: §b71 Shards
+     * REGEX-TEST: §7Owned: §b1,729 Shards
+     */
+    @Suppress("unused")
+    private val amountOwnedPattern by patternGroup.pattern(
+        "owned",
+        "§7Owned: §b(?<amount>[\\d,]+) Shards?",
+    )
+
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+        val attributesJson = event.getConstant<NeuAttributeShardJson>("attribute_shards")
+        attributeLevelling = attributesJson.attributeLevelling
+        unconsumableAttributes = attributesJson.unconsumableAttributes
+        attributeInfo = attributesJson.attributes
+        maxShards = attributeInfo.size - unconsumableAttributes.size
+        internalNameToShard = attributeInfo.map { (name, info) ->
+            info.internalName to name
+        }.toMap()
+    }
+
+    private fun processAttributeMenuItems() {
+        val items = InventoryUtils.getItemsInOpenChest().map { it.stack }
+        for (item in items) {
+            val internalName = item.getInternalNameOrNull() ?: continue
+            if (!isAttributeShard(internalName)) continue
+            var tier = 0
+            var toNextTier = 0
+            attributeShardNamePattern.matchMatcher(item.displayName) {
+                tier = groupOrNull("tier")?.romanToDecimal() ?: 0
+            }
+            syphonAmountPattern.firstMatcher(item.getLore()) {
+                toNextTier = group("amount").toInt()
+            }
+            processShard(internalName, tier, toNextTier, item.getItemRarityOrCommon())
+        }
+        AttributeShardOverlay.updateDisplay()
+    }
+
+    private fun processHuntingBoxItems() {
+        val items = InventoryUtils.getItemsInOpenChest().map { it.stack }
+        for (item in items) {
+            val internalName = item.getInternalNameOrNull() ?: continue
+            if (!isAttributeShard(internalName)) continue
+            var tier = 0
+            var toNextTier = 0
+            for (line in item.getLore()) {
+                attributeShardNameLorePattern.matchMatcher(line) {
+                    tier = groupOrNull("tier")?.romanToDecimal() ?: 0
+                }
+                syphonAmountPattern.matchMatcher(line) {
+                    toNextTier = group("amount").toInt()
+                }
+            }
+            processShard(internalName, tier, toNextTier, item.getItemRarityOrCommon())
+        }
+    }
+
+    private fun processShard(
+        internalName: NeuInternalName,
+        currentTier: Int,
+        toNextTier: Int,
+        rarity: LorenzRarity,
+    ) {
+        val attributeName = shardInternalNameToShardName(internalName)
+        if (attributeName in unconsumableAttributes) {
+            return
+        }
+        val totalAmount = findTotalAmount(currentTier, toNextTier, rarity)
+        storage?.getOrPut(attributeName) {
+            ProfileSpecificStorage.AttributeShardData(totalAmount)
+        }
+    }
+
+    private fun findTotalAmount(currentTier: Int, toNextTier: Int, rarity: LorenzRarity): Int {
+        val tierLevelling = attributeLevelling[rarity] ?: ErrorManager.skyHanniError("Unknown attribute rarity: $rarity")
+        if (currentTier > tierLevelling.size) {
+            ErrorManager.skyHanniError("Current attribute tier $currentTier exceeds the maximum tier")
+        }
+        val cumulativeAmount = tierLevelling.take(currentTier + 1).sum()
+        return cumulativeAmount - toNextTier
+    }
+
+    fun findTierAndAmountUntilNext(shardName: String, totalAmount: Int): Triple<Int, Int, Int> {
+        val rarity = attributeInfo[shardName]?.rarity
+            ?: ErrorManager.skyHanniError("Unknown attribute shard rarity for $shardName")
+        val tierLevelling = attributeLevelling[rarity]
+            ?: ErrorManager.skyHanniError("Unknown attribute rarity: $rarity")
+
+        var tier = 0
+        var cumulativeCount = 0
+        var amountToNextTier = 0
+
+        for (amount in tierLevelling) {
+            cumulativeCount += amount
+            if (cumulativeCount > totalAmount && amountToNextTier == 0) {
+                amountToNextTier = cumulativeCount - totalAmount
+            }
+            if (cumulativeCount > totalAmount) continue
+            tier++
+        }
+        val amountToMax = (cumulativeCount - totalAmount).coerceAtLeast(0)
+        return Triple(tier, amountToNextTier, amountToMax)
+    }
+
+    private fun shardInternalNameToShardName(internalName: NeuInternalName): String {
+        return internalNameToShard[internalName]
+            ?: ErrorManager.skyHanniError("Unknown attribute shard internal name: $internalName")
+    }
+
+    fun shardNameToInternalName(shardName: String): NeuInternalName {
+        return attributeInfo[shardName]?.internalName
+            ?: ErrorManager.skyHanniError("Unknown attribute shard name: $shardName")
+    }
+
+    fun isAttributeShard(internalName: NeuInternalName): Boolean {
+        val asString = internalName.asString()
+        return asString.startsWith("ATTRIBUTE_SHARD_") && asString.endsWith(";1")
+    }
+}
