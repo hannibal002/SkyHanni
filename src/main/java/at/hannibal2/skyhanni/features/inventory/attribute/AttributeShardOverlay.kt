@@ -132,7 +132,7 @@ object AttributeShardOverlay {
         addRenderableButton<AttributeShardSorting>(
             label = "Sorting Method",
             current = config.displaySortingMethod,
-            getName = { "{§a$it.displayName}" },
+            getName = { "§a${it.displayName}" },
             onChange = {
                 config.displaySortingMethod = it
                 reconstructDisplay()
