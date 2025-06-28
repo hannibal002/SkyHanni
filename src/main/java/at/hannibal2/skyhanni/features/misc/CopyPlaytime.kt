@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
@@ -35,7 +35,7 @@ object CopyPlaytime {
         val text = event.item?.getLore()?.toMutableList() ?: return
 
         val profile = HypixelData.profileName.firstLetterUppercase()
-        text.add(0, "${LorenzUtils.getPlayerName()}'s - $profile Playtime Stats")
+        text.add(0, "${PlayerUtils.getName()}'s - $profile Playtime Stats")
 
         ClipboardUtils.copyToClipboard(text.joinToString("\n") { it.removeColor() })
         ChatUtils.chat("Copied playtime stats into clipboard.")

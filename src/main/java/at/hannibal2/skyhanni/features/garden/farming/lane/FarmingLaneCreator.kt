@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -120,6 +122,15 @@ object FarmingLaneCreator {
         potentialEnd?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor(), beacon = true)
             event.drawDynamicText(it, "potentialEnd", 1.5)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shlanedetection") {
+            description = "Detect a farming lane in the Garden"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { commandLaneDetection() }
         }
     }
 

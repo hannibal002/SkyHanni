@@ -8,18 +8,16 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
@@ -83,7 +81,7 @@ object SlayerApi {
             add("isInCorrectArea: $isInCorrectArea")
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
-                add(" graph area: ${IslandAreas.currentAreaName}")
+                add(" graph area: ${SkyBlockUtils.graphArea}")
                 with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
                     add(" /shtestwaypoint $x $y $z pathfind")
                 }
@@ -137,7 +135,7 @@ object SlayerApi {
         }
 
         if (event.isMod(5)) {
-            if (LorenzUtils.isStrandedProfile) {
+            if (SkyBlockUtils.isStrandedProfile) {
                 isInAnyArea = true
                 isInCorrectArea = true
             } else {
@@ -146,10 +144,9 @@ object SlayerApi {
             }
         }
     }
-
     // TODO USE SH-REPO
-    private fun checkSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
-        "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isInIsland()) SlayerType.REVENANT else null
+    private fun checkSlayerTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
+        "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isCurrent()) SlayerType.REVENANT else null
         "Revenant Cave" -> SlayerType.REVENANT
 
         "Spider Mound",
@@ -160,14 +157,16 @@ object SlayerApi {
 
         "Ruins",
         "Howling Cave",
+        "Soul Cave",
+        "Spirit Cave",
         -> SlayerType.SVEN
 
         "Void Sepulture",
         "Zealot Bruiser Hideout",
         -> SlayerType.VOID
 
-        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isInIsland()) SlayerType.VOID else null
-        "no_area" -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isInIsland()) SlayerType.VOID else null
+        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isCurrent()) SlayerType.VOID else null
+        "no_area" -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isCurrent()) SlayerType.VOID else null
 
         "Stronghold",
         "The Wasteland",

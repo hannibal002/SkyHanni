@@ -7,8 +7,10 @@ import java.util.EnumMap
 import java.util.PriorityQueue
 import java.util.Queue
 import java.util.WeakHashMap
+import java.util.regex.Pattern
 import kotlin.math.ceil
 
+@Suppress("TooManyFunctions")
 object CollectionUtils {
 
     inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
@@ -24,9 +26,16 @@ object CollectionUtils {
     // Let garbage collector handle the removal of entries in this list
     fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
 
-    fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
+    fun <T> MutableList<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
 
-    fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
+    fun <T> List<T>.indexOfFirst(vararg args: T): Int? {
+        if (args.isEmpty()) return null
+        val set = args.toSet()
+        forEachIndexed { index, item ->
+            if (item in set) return index
+        }
+        return null
+    }
 
     infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
         this[pairs.first] = pairs.second
@@ -41,16 +50,7 @@ object CollectionUtils {
         return false
     }
 
-    fun <E> List<E>.getOrNull(index: Int): E? {
-        return if (index in indices) {
-            get(index)
-        } else null
-    }
-
-    fun <T : Any> T?.toSingletonListOrEmpty(): List<T> {
-        if (this == null) return emptyList()
-        return listOf(this)
-    }
+    fun <T : Any> T?.toSingletonListOrEmpty(): List<T> = listOfNotNull(this)
 
     fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int =
         this.merge(key, number, Int::plus)!! // Never returns null since "plus" can't return null
@@ -165,13 +165,13 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
-    fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements)
+    fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements.asList())
 
     @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
-    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
+    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit): Map<K, V> = toMutableMap().apply(function)
 
     @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
-    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
+    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit): List<T> = toMutableList().apply(function)
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
         val entry = entries.find(matcher)
@@ -190,11 +190,11 @@ object CollectionUtils {
     }
 
     fun <K, V : Comparable<V>> Map<K, V>.sorted(): Map<K, V> {
-        return toList().sorted().toMap()
+        return asSequence().sortedBy { (_, value) -> value }.associate { it.toPair() }
     }
 
     fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
-        return toList().sorted().reversed().toMap()
+        return asSequence().sortedByDescending { (_, value) -> value }.associate { it.toPair() }
     }
 
     fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
@@ -230,6 +230,40 @@ object CollectionUtils {
         return collection
     }
 
+    inline fun <reified T> MutableIterator<T>.removeIf(predicate: (T) -> Boolean) {
+        while (hasNext()) {
+            if (predicate(next())) this.remove()
+        }
+    }
+
+    fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.iterator().removeIf(predicate)
+
+    /** Removes the first element that matches the given [predicate] in the list. */
+    fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
+        val mutableList = this.toMutableList()
+        val iterator = mutableList.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableList.toList()
+    }
+
+    /** Removes the first element that matches the given [predicate] in the map. */
+    fun <K, V> Map<K, V>.removeFirst(predicate: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
+        val mutableMap = this.toMutableMap()
+        val iterator = mutableMap.entries.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableMap.toMap()
+    }
+
     /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
     inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
         this.remove(newValue)
@@ -237,9 +271,18 @@ object CollectionUtils {
         true
     } else false
 
-    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = if (all { it != null }) filterNotNull() else null
+    fun <T> List<T?>.takeIfAllNotNull(): List<T>? {
+        val list = mutableListOf<T>()
+        for (item in this) {
+            if (item != null) list.add(item)
+            else return null
+        }
+        return list
+    }
 
     fun <T, C : Collection<T>> C.takeIfNotEmpty(): C? = takeIf { it.isNotEmpty() }
+
+    fun <K, V> Map<K, V>.takeIfNotEmpty(): Map<K, V>? = takeIf { it.isNotEmpty() }
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
@@ -317,6 +360,8 @@ object CollectionUtils {
         return filterKeys { it != null } as Map<K, V>
     }
 
+    fun <K, V> Map<K, V>.containsKeys(vararg keys: K) = keys.all { this.keys.contains(it) }
+
     /**
      * Inserts the element at the index or appends it to the end if out of bounds of the list.
      *
@@ -327,18 +372,8 @@ object CollectionUtils {
         if (index < size) add(index, element) else add(element)
     }
 
-    /**
-     * If there is only one element in the iterator, returns it. Otherwise, returns the [defaultValue].
-     */
-    private fun <T> getOnlyElement(it: Iterator<T>, defaultValue: T): T {
-        if (!it.hasNext()) return defaultValue
-        val ret = it.next()
-        if (it.hasNext()) return defaultValue
-        return ret
-    }
-
-    fun <T> getOnlyElement(it: Iterable<T>, defaultValue: T): T {
-        return getOnlyElement(it.iterator(), defaultValue)
+    fun <T> Iterable<T>.singleOrDefault(defaultValue: T): T {
+        return singleOrNull() ?: defaultValue
     }
 
     fun <K, V> MutableMap<K, V>.add(pair: Pair<K, V>) {
@@ -351,14 +386,8 @@ object CollectionUtils {
         }
     }
 
-    fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
-        val iterator = this.iterator()
-        while (iterator.hasNext()) {
-            if (predicate(iterator.next())) {
-                iterator.remove()
-            }
-        }
-    }
+    @Deprecated("Use the removeIf function provided by java")
+    fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) = removeIf(predicate)
 
     fun <K, V> MutableMap<K, V>.removeIfKey(predicate: (K) -> Boolean) {
         val iterator = this.entries.iterator()
@@ -390,12 +419,7 @@ object CollectionUtils {
     }
 
     fun <T> Collection<T>.indexOfFirstOrNull(predicate: (T) -> Boolean): Int? {
-        for ((index, element) in this.withIndex()) {
-            if (predicate(element)) {
-                return index
-            }
-        }
-        return null
+        return indexOfFirst(predicate).takeIf { it != -1 }
     }
 
     class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
@@ -440,9 +464,37 @@ object CollectionUtils {
     }
 
     fun <K> MutableMap<K, SimpleTimeMark>.evictOldestEntry(cap: Int) {
-        if (size > cap) {
-            val oldestKey = minByOrNull { it.value }?.key
-            oldestKey?.let { remove(it) }
+        if (size <= cap) return
+        val oldestKey = minByOrNull { it.value }?.key ?: return
+        remove(oldestKey)
+    }
+
+    fun <T> Collection<T>.firstUniqueByOrNull(
+        vararg predicates: (T) -> Boolean,
+    ): T? {
+        var candidates = this
+        for (pred in predicates) {
+            val next = candidates.filter(pred)
+            if (next.isEmpty()) return null
+            else if (next.size == 1) return next.single()
+            candidates = next
+        }
+        return null
+    }
+
+    /**
+     * Insert content after a line that matches the given pattern.
+     *
+     * @param pattern the pattern to match
+     * @param content the content to insert
+     */
+    fun MutableList<String>.insertLineAfter(pattern: Pattern, content: String) {
+        val iter = this.listIterator()
+        while (iter.hasNext()) {
+            val line = iter.next()
+            if (pattern.matcher(line).find()) {
+                iter.add(content)
+            }
         }
     }
 }
