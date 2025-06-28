@@ -266,10 +266,10 @@ class SkyblockGuideHighlightFeature private constructor(
                 "§c§lINCOMPLETE",
             )
             SkyblockGuideHighlightFeature(
-                {SkyHanniMod.feature.inventory.highlightDisabledAttributes},
+                { SkyHanniMod.feature.inventory.highlightDisabledAttributes },
                 "attribute.disable",
                 "Attribute Menu",
-                "§7Enabled: §cNo"
+                "§7Enabled: §cNo",
             )
         }
     }
