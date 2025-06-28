@@ -162,6 +162,11 @@ public class InventoryConfig {
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
+    @ConfigOption(name = "Attribute Shards", desc = "")
+    @Accordion
+    public AttributeShardsConfig attributeShards = new AttributeShardsConfig();
+
+    @Expose
     @ConfigOption(name = "Evolving Items", desc = "")
     @Accordion
     @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
@@ -234,13 +239,6 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightWidgets = true;
-
-    @Expose
-    @ConfigOption(name = "Highlight Disabled Attributes", desc = "Highlight disabled attributes in /attributemenu.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightDisabledAttributes = true;
-
 
     @Expose
     @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")
