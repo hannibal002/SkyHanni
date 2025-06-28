@@ -271,7 +271,7 @@ object ScoreboardPattern {
      */
     val pastingPattern by farmingSB.pattern(
         "pasting",
-        "\\s*(?:§.)*?(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
+        "\\s*(?:§.)*(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
     )
 
     /**
@@ -699,7 +699,7 @@ object ScoreboardPattern {
      */
     val newYearPattern by eventsSB.pattern(
         "newyear",
-        "§dNew Year Event!§f \\d*?:?\\d+",
+        "§dNew Year Event!§f \\d*:?\\d+",
     )
 
     /**
@@ -707,7 +707,7 @@ object ScoreboardPattern {
      */
     val spookyPattern by eventsSB.pattern(
         "spooky",
-        "§6Spooky Festival§f \\d*?:?\\d+",
+        "§6Spooky Festival§f \\d*:?\\d+",
     )
 
     /**
