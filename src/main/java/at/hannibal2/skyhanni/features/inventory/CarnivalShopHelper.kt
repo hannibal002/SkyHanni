@@ -224,22 +224,21 @@ object CarnivalShopHelper {
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled() || repoEventShops.isEmpty()) return
-        var shouldUpdate = processTokenShopFooter(event)
-        repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) }?.let { matchingShop ->
-            currentEventType = matchingShop.shopName
-            processEventShopUpgrades(event.inventoryItems)
-            shouldUpdate = true
-        }
 
-        if (!shouldUpdate) return
+        val matchedShop = repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) } ?: return
+        currentEventType = matchedShop.shopName
+
+        processEventShopUpgrades(event.inventoryItems)
+        if (!processTokenShopFooter(event)) return
+
         regenerateShopSpecificItemStack()
         regenerateOverviewItemStack()
         saveProgress()
     }
 
     private fun processTokenShopFooter(event: InventoryOpenEvent): Boolean {
-        val tokenFooterStack = event.inventoryItems[32]
-        if (tokenFooterStack === null || tokenFooterStack.displayName != "§eCarnival Tokens") return false
+        val tokenFooterStack = event.inventoryItems.getOrElse(32) { return false }
+        if (tokenFooterStack.displayName != "§eCarnival Tokens") return false
         currentTokenCountPattern.firstMatcher(tokenFooterStack.getLore()) {
             val new = groupOrNull("tokens")?.formatInt() ?: 0
             val changed = new != tokensOwned
