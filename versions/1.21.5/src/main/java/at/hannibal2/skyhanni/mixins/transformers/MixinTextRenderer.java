@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWordsModern;
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.OrderedText;
@@ -20,14 +20,12 @@ public class MixinTextRenderer {
     )
     private OrderedText modifyOrderedText(OrderedText value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.orderedTextToLegacyString(value)
+        OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
+            value
         );
 
         if (replaced == null) return value;
-        return OrderedTextUtils.legacyTextToOrderedText(
-            replaced
-        );
+        return replaced;
     }
 
     @ModifyVariable(
@@ -38,12 +36,12 @@ public class MixinTextRenderer {
     )
     private String modifyString(String value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            value
+        OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
+            OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
         if (replaced == null) return value;
-        return replaced;
+        return OrderedTextUtils.orderedTextToLegacyString(replaced);
     }
 
     @ModifyVariable(
@@ -55,14 +53,12 @@ public class MixinTextRenderer {
 
     private OrderedText modifyWidth(OrderedText value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.orderedTextToLegacyString(value)
+        OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
+            value
         );
 
         if (replaced == null) return value;
-        return OrderedTextUtils.legacyTextToOrderedText(
-            replaced
-        );
+        return replaced;
     }
 
     @ModifyVariable(
@@ -73,12 +69,12 @@ public class MixinTextRenderer {
     )
     private String modifyWidth(String value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            value
+        OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
+            OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
         if (replaced == null) return value;
-        return replaced;
+        return OrderedTextUtils.orderedTextToLegacyString(replaced);
     }
 
     @ModifyVariable(
@@ -89,13 +85,11 @@ public class MixinTextRenderer {
     )
     private StringVisitable modifyWidth(StringVisitable value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.stringVisitableToLegacyString(value)
+        StringVisitable replaced = ModifyVisualWordsModern.INSTANCE.transformStringVisitable(
+            value
         );
 
         if (replaced == null) return value;
-        return OrderedTextUtils.legacyStringToStringVisitable(
-            replaced
-        );
+        return replaced;
     }
 }

@@ -1,12 +1,9 @@
-package at.hannibal2.skyhanni.data.jsonobjects.local;
+package at.hannibal2.skyhanni.data.jsonobjects.local
 
-import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord
+import com.google.gson.annotations.Expose
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class VisualWordsJson {
+class VisualWordsJson {
     @Expose
-    public List<VisualWord> modifiedWords = new ArrayList<>();
+    var modifiedWords: MutableList<VisualWord> = ArrayList()
 }
