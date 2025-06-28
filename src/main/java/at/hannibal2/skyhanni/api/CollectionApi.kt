@@ -10,12 +10,16 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -26,11 +30,21 @@ object CollectionApi {
     private val patternGroup = RepoPattern.group("data.collection.api")
 
     /**
+     * REGEX-TEST: Farming Collections
+     * REGEX-TEST: Carrot Collection
+     */
+    private val collectionInventoryPattern by patternGroup.pattern(
+        "collections",
+        ".+ Collections?",
+    )
+
+    /**
      * REGEX-TEST: §2§l§m                      §f§l§m   §r §e43,649§6/§e50k
+     * REGEX-TEST: §7Total collected: §e277,252
      */
     private val counterPattern by patternGroup.pattern(
         "counter",
-        ".* §e(?<amount>.*)§6/.*",
+        ".* §e(?<amount>[\\d,]*)(?:§6/.*)?",
     )
 
     /**
@@ -44,6 +58,25 @@ object CollectionApi {
     )
 
     /**
+     * REGEX-TEST: §b[MVP§f+§b] oxsss§7: §e1.9M
+     * REGEX-TEST: §a[VIP] oxsss§7: §e0
+     * REGEX-TEST: §7oxsss§7: §e0
+     */
+    val playerCounterPattern by patternGroup.pattern(
+        "playercounter",
+        "(?:§.\\[[^]]+(?:§\\++§b)?] |§7)(?<name>[^§]{2,16})§7: §e(?<amount>.+)",
+    )
+
+    /**
+     * REGEX-TEST: §7Progress to Raw Chicken IX: §e25.7§6%
+     * REGEX-TEST: §7Total Collected: §e1,917,287
+     */
+    val collectionNotMaxedPattern by patternGroup.pattern(
+        "collections.notmaxed",
+        "§7(?:Progress to .+|Total Collected: .+)",
+    )
+
+    /**
      * REGEX-TEST: §7Progress to Nether Wart I: §e46§6%
      */
     private val collectionTier0Pattern by patternGroup.pattern(
@@ -51,6 +84,7 @@ object CollectionApi {
         "§7Progress to .* I: .*",
     )
 
+    val collectionInventory = InventoryDetector { name -> collectionInventoryPattern.matches(name) }
     val collectionValue = mutableMapOf<NeuInternalName, Long>()
 
     var specialCollectionItems: SpecialCollectionItems = SpecialCollectionItems()
@@ -63,36 +97,62 @@ object CollectionApi {
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
-        if (inventoryName.endsWith(" Collection")) {
+        if (!collectionInventory.isInside()) return
+
+        if (inventoryName.endsWith("n")) {
             val stack = event.inventoryItems[4] ?: return
-            singleCounterPattern.firstMatcher(stack.getLore()) {
+            val lore = stack.getLore()
+
+            singleCounterPattern.firstMatcher(lore) {
                 val counter = group("amount").formatLong()
                 val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                 val internalName = specialCollectionItems.global[name] ?: NeuInternalName.fromItemName(name)
                 collectionValue[internalName] = counter
             }
+
             CollectionUpdateEvent.post()
         }
 
         if (inventoryName.endsWith(" Collections")) {
             for ((_, stack) in event.inventoryItems) {
-                var name = stack.displayName.removeColor()
-                if (name.contains("Collections")) continue
+                val name = stack.displayName.removeColor()
+                if ("Collections" in name) continue
 
                 val lore = stack.getLore()
-                if (!lore.any { it.contains("Click to view!") }) continue
+                if (lore.none { it.contains("Click to view!") }) continue
 
-                if (!isCollectionTier0(lore)) {
-                    name = name.split(" ").dropLast(1).joinToString(" ")
-                }
+                val internalName = specialCollectionItems.global[name] ?: NeuInternalName.fromItemName(name)
 
                 if (name.contains("Kuudra")) continue
 
-                val internalName = specialCollectionItems.global[name] ?: NeuInternalName.fromItemName(name)
+                if (name.contains("Kuudra")) continue
+
                 // TODO: Co-op Contributions and specific collection inventory
                 counterPattern.firstMatcher(lore) {
                     val counter = group("amount").formatLong()
                     collectionValue[internalName] = counter
+                val isCoop = playerCounterPattern.anyMatches(lore)
+                val isNotMaxed = collectionNotMaxedPattern.anyMatches(lore)
+
+                if (!isCoop || isNotMaxed) {
+                    counterPattern.firstMatcher(lore) {
+                        val counter = group("amount").formatLong()
+                        collectionValue[internalName] = counter
+                    }
+                } else {
+                    val coopIndex = lore.indexOf("§7Co-op Contributions:")
+                    if (coopIndex == -1) continue
+
+                    var totalCollected = 0L
+                    lore.drop(coopIndex).forEach { line ->
+                        if (line.isBlank()) return@forEach
+
+                        playerCounterPattern.matchMatcher(line) {
+                            totalCollected += group("amount").formatLong()
+                        }
+                    }
+
+                    collectionValue[internalName] = totalCollected
                 }
             }
             CollectionUpdateEvent.post()

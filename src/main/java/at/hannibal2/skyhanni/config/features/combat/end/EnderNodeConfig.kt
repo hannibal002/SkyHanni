@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat.end
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNode
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -13,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class EnderNodeConfig {
     @Expose
     @ConfigOption(
@@ -36,7 +33,7 @@ class EnderNodeConfig {
     @Expose
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var textFormat: Property<MutableList<EnderNodeDisplayEntry>> = Property.of(
+    val textFormat: Property<MutableList<EnderNodeDisplayEntry>> = Property.of(
         mutableListOf(
             EnderNodeDisplayEntry.TITLE,
             EnderNodeDisplayEntry.NODES_MINED,
@@ -87,7 +84,6 @@ class EnderNodeConfig {
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
 
-        //#if TODO
         companion object {
             private val enderNodeCache: MutableMap<EnderNodeDisplayEntry, EnderNode?> = mutableMapOf()
         }
@@ -97,10 +93,9 @@ class EnderNodeConfig {
                 it.toEnderNodeDisplayEntryOrNull() == this
             }
         }
-        //#endif
     }
 
     @Expose
     @ConfigLink(owner = EnderNodeConfig::class, field = "enabled")
-    var position: Position = Position(10, 80)
+    val position: Position = Position(10, 80)
 }

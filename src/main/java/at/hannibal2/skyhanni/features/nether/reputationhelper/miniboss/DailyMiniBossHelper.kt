@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Q
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -123,5 +122,5 @@ object DailyMiniBossHelper {
     }
 
     private fun getByDisplayName(name: String) = miniBosses.firstOrNull { it.displayName == name }
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.enabled.get()
 }

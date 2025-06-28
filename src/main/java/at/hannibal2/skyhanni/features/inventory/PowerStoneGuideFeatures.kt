@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 
 @SkyHanniModule
@@ -74,5 +74,5 @@ object PowerStoneGuideFeatures {
         event.toolTip.add(5, "9x from Bazaar: §6${totalPrice.shortFormat()}")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.powerStoneGuide
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.powerStoneGuide
 }
