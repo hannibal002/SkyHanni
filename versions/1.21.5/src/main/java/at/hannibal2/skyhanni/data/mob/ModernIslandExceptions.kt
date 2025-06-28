@@ -20,12 +20,12 @@ object ModernIslandExceptions {
         nextEntity: LivingEntity?,
     ): MobData.MobResult? = when {
 
-        baseEntity is TadpoleEntity ->
+        baseEntity is TadpoleEntity && armorStand == null ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Birries"),
             )
 
-        baseEntity is FrogEntity ->
+        baseEntity is FrogEntity && armorStand == null ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Mossybit"),
             )

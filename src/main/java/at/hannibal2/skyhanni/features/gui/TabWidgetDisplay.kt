@@ -48,6 +48,10 @@ enum class TabWidgetDisplay(
     ),
     EYES("Eyes placed", TabWidget.EYES_PLACED),
     MOONGLADE_BEACON("Moonglade Beacon", TabWidget.MOONGLADE_BEACON),
+    STARBORN_TEMPLE("Starborn Temple", TabWidget.STARBORN_TEMPLE),
+    SHARD_TRAPS("Shard Traps", TabWidget.SHARD_TRAPS),
+    FOREST_WHISPERS("Forest Whispers", TabWidget.FOREST_WHISPERS),
+    AGATHA_CONTEST("Agatha's Contest", TabWidget.AGATHA_CONTEST),
     ;
 
     val position get() = config.displayPositions[ordinal]

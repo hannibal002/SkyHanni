@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import java.awt.Color
 
@@ -17,6 +19,11 @@ object RenderLivingEntityHelper {
     private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
     var areMobsHighlighted = false
     var renderingRealGlow = false
+    var currentGlowEvent: RenderEntityOutlineEvent? = null
+
+    fun isEntityInGlowEvent(entity: Entity): Int {
+        return currentGlowEvent?.entitiesToOutline?.get(entity) ?: 0
+    }
 
     @HandleEvent
     fun onWorldChange() {
@@ -31,7 +38,9 @@ object RenderLivingEntityHelper {
         entityColorMap.removeIfKey { it.isDead }
         entityColorCondition.removeIfKey { it.isDead }
         entityNoHurtTimeCondition.removeIfKey { it.isDead }
+    }
 
+    fun check() {
         areMobsHighlighted = false
         for (entry in entityColorCondition) {
             if (entry.value.invoke()) {
@@ -39,6 +48,7 @@ object RenderLivingEntityHelper {
                 return
             }
         }
+        if (currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true) areMobsHighlighted = true
     }
 
     fun <T : EntityLivingBase> removeEntityColor(entity: T) {

@@ -74,7 +74,7 @@ object HideExCoopMembers {
             }
         }
 
-        linesToRemove.sortedDescending().forEach { removeAt(it - 1) }
+        linesToRemove.sortedDescending().forEach { removeAt(it) }
 
         if (remainingPlayers >= 2) return this
 
