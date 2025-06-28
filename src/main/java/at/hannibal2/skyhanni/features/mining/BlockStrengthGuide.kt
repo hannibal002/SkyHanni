@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.HotmData
-import at.hannibal2.skyhanni.data.HotmReward
+import at.hannibal2.skyhanni.data.hotx.HotmData
+import at.hannibal2.skyhanni.data.hotx.HotmReward
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -39,15 +39,16 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.WrappedRenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.math.ceil
@@ -85,11 +86,11 @@ object BlockStrengthGuide {
             ),
         ),
         TITANIUM(
-            { ItemStack(Blocks.stone, 1, net.minecraft.block.BlockStone.EnumType.DIORITE_SMOOTH.metadata) },
+            { BlockCompat.createSmoothDiorite() },
             setOf(OreBlock.HIGH_TIER_MITHRIL),
         ),
         GRAY_MITHRIL(
-            { ItemStack(Blocks.wool, 1, EnumDyeColor.GRAY.metadata) },
+            { ColoredBlockCompat.GRAY.createWoolStack() },
             setOf(OreBlock.LOW_TIER_MITHRIL),
         ),
         GREEN_MITHRIL(
@@ -97,7 +98,7 @@ object BlockStrengthGuide {
             setOf(OreBlock.MID_TIER_MITHRIL),
         ),
         BLUE_MITHRIL(
-            { ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata) },
+            { ColoredBlockCompat.LIGHT_BLUE.createWoolStack() },
             setOf(OreBlock.HIGH_TIER_MITHRIL),
         ),
         TUNGSTEN_UMBER(
@@ -120,27 +121,27 @@ object BlockStrengthGuide {
             setOf(OreBlock.OBSIDIAN),
         ),
         RUBY(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.RED.metadata) },
+            { ColoredBlockCompat.RED.createGlassStack() },
             setOf(OreBlock.RUBY),
         ),
         NUCLEUS_GEMSTONES(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.LIGHT_BLUE.metadata) },
+            { ColoredBlockCompat.LIGHT_BLUE.createGlassStack() },
             setOf(OreBlock.AMBER, OreBlock.AMETHYST, OreBlock.JADE, OreBlock.SAPPHIRE),
         ),
         OPAL(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.WHITE.metadata) },
+            { ColoredBlockCompat.WHITE.createGlassStack() },
             setOf(OreBlock.OPAL),
         ),
         TOPAZ(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.YELLOW.metadata) },
+            { ColoredBlockCompat.YELLOW.createGlassStack() },
             setOf(OreBlock.TOPAZ),
         ),
         JASPER(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.MAGENTA.metadata) },
+            { ColoredBlockCompat.MAGENTA.createGlassStack() },
             setOf(OreBlock.JASPER),
         ),
         TUNNEL_GEMSTONES(
-            { ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLACK.metadata) },
+            { ColoredBlockCompat.BLACK.createGlassStack() },
             setOf(OreBlock.ONYX, OreBlock.PERIDOT, OreBlock.CITRINE, OreBlock.AQUAMARINE),
         ),
         HARD_STONE(
@@ -194,7 +195,7 @@ object BlockStrengthGuide {
                     listOf(
                         Renderable.itemStack(icon),
                         progressBar,
-                        RenderableString("$ticks"),
+                        StringRenderable("$ticks"),
                     ),
                     spacing = 0,
                     RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
@@ -236,7 +237,7 @@ object BlockStrengthGuide {
                     add(Renderable.placeholder(0, 5))
                     addString("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}")
                     addString("§3Blocks in that group:")
-                    add(WrappedRenderableString(hoverText, width = 200))
+                    add(WrappedStringRenderable(hoverText, width = 200))
 
                     if (!showExtraInfos) {
                         add(Renderable.placeholder(0, 5))
@@ -339,11 +340,11 @@ object BlockStrengthGuide {
             base.toInt().addSeparators(),
             gemstone.toInt().addSeparators(),
             metal.toInt().addSeparators(),
-        ).map { RenderableString("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
+        ).map { StringRenderable("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
     }
 
     private val headerHeaderLine = listOf("Base", "Gemstone", "Metal").map {
-        RenderableString(
+        StringRenderable(
             text = it,
             scale = 0.75,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -382,7 +383,7 @@ object BlockStrengthGuide {
     }.distribute(3)
 
     private fun createHeader(): List<Renderable> = listOf(
-        RenderableString(
+        StringRenderable(
             SkyblockStat.MINING_SPEED.iconWithName,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
@@ -396,7 +397,7 @@ object BlockStrengthGuide {
                     xPadding = 5,
                 ),
                 Renderable.clickable(
-                    RenderableString(
+                    StringRenderable(
                         "§${if (inMineshaft) 'b' else '7'}Mineshaft",
                         scale = 0.5,
                         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -450,7 +451,7 @@ object BlockStrengthGuide {
         if (!sbMenuOpened) {
             if (lastRunCommand.passedSince() < 2.seconds) {
                 sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
-                RenderableString(
+                StringRenderable(
                     "Loading...",
                     scale = 2.0,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -513,11 +514,11 @@ object BlockStrengthGuide {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shblockstrength") {
+        event.registerBrigadier("shblockstrength") {
             description = "Shows how many ticks you need to break any block with your mining speed."
             category = CommandCategory.MAIN
             aliases = listOf("shminingspeed")
-            callback { onCommand() }
+            simpleCallback { onCommand() }
         }
     }
 }

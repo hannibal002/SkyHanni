@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -61,8 +62,8 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import net.minecraft.component.type.NbtComponent
@@ -72,6 +73,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import com.mojang.authlib.properties.Property
 //$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
+//$$ import net.minecraft.registry.Registries
 //#endif
 
 @SkyHanniModule
@@ -148,7 +150,16 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> {
+    //$$     val data = cachedData
+    //$$     if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
+    //$$         return data.lastLore
+    //$$     }
+    //$$     val lore = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+    //$$     data.lastLore = lore
+    //$$     data.lastLoreFetchTime = SimpleTimeMark.now()
+    //$$     return lore
+    //$$ }
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -161,7 +172,7 @@ object ItemUtils {
     //#else
     //$$ fun ComponentMap?.getLore(): List<String> {
     //$$     this ?: return emptyList()
-    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() } ?: emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
     //$$ }
     //#endif
 
@@ -193,7 +204,7 @@ object ItemUtils {
     //#else
     //$$ fun getDisplayName(compound: ComponentMap?): String? {
     //$$     compound ?: return null
-    //$$     val name = compound.get(DataComponentTypes.CUSTOM_NAME)?.formattedTextCompat()
+    //$$     val name = compound.get(DataComponentTypes.CUSTOM_NAME)?.formattedTextCompatLeadingWhiteLessResets()
     //$$     if (name.isNullOrEmpty()) return null
     //$$     return name
     //$$ }
@@ -295,7 +306,12 @@ object ItemUtils {
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
     // Checks for the enchantment glint as part of the minecraft enchantments
-    fun ItemStack.isEnchanted() = isItemEnchanted
+    fun ItemStack.isEnchanted(): Boolean =
+        //#if MC < 1.21
+        isItemEnchanted
+    //#else
+    //$$ hasEnchantments() || this.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) == true
+    //#endif
 
     // Checks for hypixel enchantments in the attributes
     fun ItemStack.hasHypixelEnchantments() = getHypixelEnchantments()?.isNotEmpty() ?: false
@@ -430,12 +446,9 @@ object ItemUtils {
     )
 
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
+        if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
+
         val cleanName = this.cleanName()
-
-        if (PetApi.hasPetName(cleanName)) {
-            return getPetRarity(this) to ItemCategory.PET
-        }
-
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
@@ -446,7 +459,7 @@ object ItemUtils {
 
             if (itemCategory == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Could not read category for item $displayName",
+                    "Could not read category for item ${this.displayName}",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
                     "item name" to displayName,
@@ -479,7 +492,6 @@ object ItemUtils {
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-            PetApi.hasPetName(cleanName) -> ItemCategory.PET
             UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
@@ -656,6 +668,9 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
+        if (this.getItemStackOrNull()?.getPetInfo() != null) {
+            return PetUtils.getCleanPetName(this@grabItemName, colored = true) + " Pet"
+        }
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
         }
@@ -695,10 +710,6 @@ object ItemUtils {
             return ReplaceRomanNumerals.replaceLine(name)
         }
 
-        // hide pet level
-        PetApi.getCleanName(name)?.let {
-            return "$it Pet"
-        }
         return name
     }
 
@@ -738,25 +749,26 @@ object ItemUtils {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestitem") {
+        event.registerBrigadier("shtestitem") {
             description = "test item internal name resolving"
             category = CommandCategory.DEVELOPER_TEST
-            callback { testItemCommand(it) }
+            arg("item", BrigadierArguments.greedyString()) { item ->
+                callback {
+                    testItemCommand(getArg(item))
+                }
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+            }
         }
     }
 
-    private fun testItemCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
-            return
-        }
-
-        val input = args.joinToString(" ")
+    private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
         SkyHanniMod.coroutineScope.launch {
-            buildTestItemMessage(input).send(testItemMessageId)
+            buildTestItemMessage(args).send(testItemMessageId)
         }
     }
 
@@ -921,4 +933,21 @@ object ItemUtils {
 
         return skull
     }
+
+    fun ItemStack.isSkull(): Boolean {
+        //#if MC < 1.21
+        return item === Items.skull
+        //#else
+        //$$ val hasItemModel = this.getItemModel() != null
+        //$$ return item == Items.PLAYER_HEAD && !hasItemModel
+        //#endif
+    }
+
+    //#if MC > 1.21
+    //$$ fun ItemStack.getItemModel(): Item? {
+    //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
+    //$$     val item = Registries.ITEM.get(identifier)
+    //$$     return if (item == Items.AIR) null else item
+    //$$ }
+    //#endif
 }

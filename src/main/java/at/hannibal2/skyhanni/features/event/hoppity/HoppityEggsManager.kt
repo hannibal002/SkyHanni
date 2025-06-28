@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,14 +20,15 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,6 +40,8 @@ object HoppityEggsManager {
     private val unclaimedEggsConfig get() = config.unclaimedEggs
     private val waypointsConfig get() = config.waypoints
     private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
+    private val nextEggMessageId = ChatUtils.getUniqueMessageId()
+    private val nextHuntMessageId = ChatUtils.getUniqueMessageId()
 
     // <editor-fold desc="Patterns">
     /**
@@ -136,8 +140,8 @@ object HoppityEggsManager {
     private var latestWaypointOnclick: () -> Unit = {}
     private var syncedFromConfig: Boolean = false
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         if (!HoppityApi.isHoppityEvent()) return
         resettingEntries.forEach {
             val lastFound = profileStorage?.mealLastFound?.get(it) ?: SimpleTimeMark.farFuture()
@@ -182,20 +186,20 @@ object HoppityEggsManager {
     private fun SkyHanniChatEvent.sendNextEggAvailable() {
         val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
         val currentYear = SkyBlockTime.now().year
-        val spawnedEggs = HoppityEventSummary.getSpawnedEggCount(currentYear)
+        val spawnedEggs = HoppityEventSummary.getSpawnedEggCounts(currentYear).sumAllValues().toInt()
         when (spawnedEggs) {
             279 -> sendNextHuntIn("No more eggs will spawn this event")
-            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
+            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.", messageId = nextEggMessageId)
         }
         blockedReason = "hoppity_egg"
     }
 
     private fun SkyHanniChatEvent.sendNextHuntIn(
-        reason: String = "Hoppity's Hunt is not active"
+        reason: String = "Hoppity's Hunt is not active",
     ) {
         val currentYear = SkyBlockTime.now().year
         val timeUntil = SkyBlockTime(currentYear + 1).toTimeMark().timeUntil()
-        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
+        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.", messageId = nextHuntMessageId)
         blockedReason = "hoppity_egg"
     }
 
@@ -254,8 +258,8 @@ object HoppityEggsManager {
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         checkSpawned()
         if (!isActive()) return
         checkWarn()
@@ -276,7 +280,7 @@ object HoppityEggsManager {
 
     private val warpClickAction: Pair<() -> Unit, String>
         get() =
-            if (LorenzUtils.inSkyBlock) {
+            if (SkyBlockUtils.inSkyBlock) {
                 { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) } to
                     "warp to ${unclaimedEggsConfig.warpClickDestination}".trim()
             } else {
@@ -357,6 +361,6 @@ object HoppityEggsManager {
         }
     }
 
-    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && unclaimedEggsConfig.showOutsideSkyblock)) &&
+    fun isActive() = (SkyBlockUtils.inSkyBlock || (SkyBlockUtils.onHypixel && unclaimedEggsConfig.showOutsideSkyblock)) &&
         HoppityApi.isHoppityEvent()
 }

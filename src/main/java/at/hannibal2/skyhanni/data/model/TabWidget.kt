@@ -323,10 +323,34 @@ enum class TabWidget(
         // language=RegExp
         "§e§lEvent Trackers:",
     ),
+    AGATHA_CONTEST(
+        // language=RegExp
+        "(?:§.)*Agatha's Contest:.*",
+    ),
+    MOONGLADE_BEACON(
+        // language=RegExp
+        "(?:§.)*Moonglade Beacon: §r§b(?<stacks>\\d+) Stacks?",
+    ),
+    SALTS(
+        // language=RegExp
+        "(?:§.)*Salts:",
+    ),
+    FOREST_WHISPERS(
+        // language=RegExp
+        "(?:§.)*Forest Whispers: (?:§.)*(?<amount>.*)",
+    ),
+    SHARD_TRAPS(
+        // language=RegExp
+        "(?:§.)*Shard Traps"
+    ),
+    STARBORN_TEMPLE(
+        // language=RegExp
+        "§9§lStarborn Temple:",
+    ),
     ;
 
     /** The pattern for the first line of the widget*/
-    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*$pattern0")
+    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*(?:$pattern0)")
 
     /** The current active information from tab list.
      *

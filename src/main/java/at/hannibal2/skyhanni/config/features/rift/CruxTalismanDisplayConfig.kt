@@ -24,9 +24,9 @@ class CruxTalismanDisplayConfig {
     @ConfigOption(name = "Show Bonuses", desc = "Show bonuses you get from the talisman.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var showBonuses: Property<Boolean> = Property.of(true)
+    val showBonuses: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigLink(owner = CruxTalismanDisplayConfig::class, field = "enabled")
-    var position: Position = Position(144, 139)
+    val position: Position = Position(144, 139)
 }

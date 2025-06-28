@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.entity.EndermanTeleportEvent
 import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
+import at.hannibal2.skyhanni.events.render.OverlayType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.client.event.RenderBlockOverlayEvent
 
 /**
  *  I need these features in my dev env
@@ -60,7 +60,7 @@ object MiscFeatures {
     fun onRenderBlockOverlay(event: BlockOverlayRenderEvent) {
         if (!SkyHanniMod.feature.misc.hideFireOverlay) return
 
-        if (event.overlayType == RenderBlockOverlayEvent.OverlayType.FIRE) {
+        if (event.overlayType == OverlayType.FIRE) {
             event.cancel()
         }
     }
