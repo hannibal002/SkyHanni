@@ -198,6 +198,19 @@ class DebugConfig {
     var dvdLogo: Boolean = false
 
     @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "dvdLogo")
+    val dvdLogoPosition: Position = Position(100, 100)
+
+    @Expose
+    @ConfigOption(name = "Orbital", desc = "Enable the test Orbital System renderable.")
+    @ConfigEditorBoolean
+    var orbital: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "orbital")
+    val orbitalPosition: Position = Position(200, 200)
+
+    @Expose
     @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
     @ConfigEditorBoolean
     var itemStack: Boolean = false

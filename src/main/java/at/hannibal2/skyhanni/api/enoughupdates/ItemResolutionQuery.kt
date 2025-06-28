@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -16,6 +18,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
@@ -60,6 +65,20 @@ class ItemResolutionQuery {
             "§6(?<name>.+?) ?(?<tier>[IVXL]+)?$",
         )
 
+        private var bazaarOverrides = mapOf<String, String>()
+
+        @HandleEvent
+        fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+            val typeToken = object : TypeToken<List<BazaarOverride>>() {}.type
+            val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", typeToken)
+            bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
+        }
+
+        private data class BazaarOverride(
+            @Expose @SerializedName("stock") val bazaarInternalName: String,
+            @Expose @SerializedName("id") val neuInternalName: String,
+        )
+
         private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
 
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
@@ -67,6 +86,9 @@ class ItemResolutionQuery {
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
 
         fun transformHypixelBazaarToNeuItemId(hypixelId: String): String {
+            bazaarOverrides[hypixelId]?.let {
+                return it
+            }
             val matcher = BAZAAR_ENCHANTMENT_PATTERN.matcher(hypixelId)
             if (matcher.matches()) {
                 return matcher.group(1) + ";" + matcher.group(2)
