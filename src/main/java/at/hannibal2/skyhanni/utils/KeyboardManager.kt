@@ -8,7 +8,6 @@ import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 //#if MC < 1.21
-import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 //#else
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
