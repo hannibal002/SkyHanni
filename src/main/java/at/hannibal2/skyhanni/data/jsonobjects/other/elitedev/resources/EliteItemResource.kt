@@ -192,7 +192,7 @@ data class EliteItem(
     // Minecraft fields that hypixel uses
     @Expose val unstackable: Boolean? = null,
     @Expose val glowing: Boolean? = null,
-    @Expose @SerializedName("can_interact") val canInteract: Boolean?,
+    @Expose @SerializedName("can_interact") val canInteract: Boolean? = null,
     @Expose @SerializedName("can_interact_right_click") val canInteractRightClick: Boolean? = null,
 
     @Expose val furniture: NeuInternalName? = null, // Furniture item, if applicable
