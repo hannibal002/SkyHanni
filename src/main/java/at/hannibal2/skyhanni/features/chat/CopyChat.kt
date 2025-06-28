@@ -37,16 +37,17 @@ object CopyChat {
         val formatted = chatLine.fullComponent.formattedText
 
         val (clipboard, infoMessage) = when {
-            KeyboardManager.isMenuKeyDown() -> formatted
-                .stripHypixelMessage() to "formatted message"
+            KeyboardManager.isMenuKeyDown() ->
+                formatted.stripHypixelMessage() to "formatted message"
 
             KeyboardManager.isShiftKeyDown() -> (
                 //#if MC < 1.21
                 ModifyVisualWords.modifyText(formatted)?.removeColor()
-                //#else
-                //$$ OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.asOrderedText()))
-                //#endif
-                    ?: formatted) to "modified message"
+                    //#else
+                    //$$ OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.asOrderedText()))
+                    //#endif
+                    ?: formatted
+                ) to "modified message"
 
             KeyboardManager.isControlKeyDown() -> chatLine.chatMessage.removeColor() to "line"
 

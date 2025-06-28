@@ -38,6 +38,7 @@ object ModifyVisualWords {
 
     fun transformText(orderedText: OrderedText?): OrderedText? {
         if (orderedText == null) return null
+
         if (!config.enabled) return orderedText
         if (!changeWords) return orderedText
 
@@ -50,6 +51,7 @@ object ModifyVisualWords {
 
             OrderedText { visitor ->
                 if (!hasCachedCharacters) {
+
                     var lastIndex = 0
                     orderedText.accept { index, style, codePoint ->
                         if (codePoint == -1) {
@@ -78,8 +80,10 @@ object ModifyVisualWords {
             }
         }
     }
+
     fun transformStringVisitable(stringVisitable: StringVisitable?) : StringVisitable? {
         if (stringVisitable == null) return null
+
         if (!config.enabled) return stringVisitable
         if (!changeWords) return stringVisitable
 
