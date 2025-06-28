@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.shader.CircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.util.ResourceLocation
+import java.awt.Color
 import kotlin.math.max
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
@@ -199,6 +202,57 @@ object ShaderRenderUtils {
         }
         //#else
         //$$ RoundedShapeDrawer.drawRoundedRect(left, top, right, bottom, topColor, bottomColor)
+        //#endif
+    }
+
+    /**
+     * Method to draw a circle.
+     *
+     * **NOTE:** If you are using [DrawContextUtils.translate] or [DrawContextUtils.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
+     * is called **BEFORE** [DrawContextUtils.scale], otherwise the rectangle will not be rendered correctly
+     *
+     * @param x The x-coordinate of the circle's center.
+     * @param y The y-coordinate of the circle's center.
+     * @param radius The circle's radius.
+     * @param color The fill color.
+     * @param angle1 defines the start of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
+     * @param angle2 defines the end of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
+     * @param smoothness smooths out the edge. (In amount of blurred pixels)
+     */
+    fun drawFilledCircle(
+        x: Int,
+        y: Int,
+        color: Color,
+        radius: Int = 10,
+        smoothness: Float = 1f,
+        angle1: Float = 7.0f,
+        angle2: Float = 7.0f
+    ) {
+        val radiusIn = radius * GuiScreenUtils.scaleFactor
+        val diameter = radius * 2
+
+        CircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
+            this.angle1 = angle1 - Math.PI.toFloat()
+            this.angle2 = angle2 - Math.PI.toFloat()
+        }
+
+        // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
+        val circleColor = color.addAlpha(255).rgb
+
+        val left = x - 5
+        val top = y - 5
+        val right = x + (radius * 2) + 5
+        val bottom = y + (radius * 2) + 5
+
+        //#if MC < 1.21
+        DrawContextUtils.pushPop {
+            ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
+            GuiRenderUtils.drawRect(left, top, right, bottom, circleColor)
+            ShaderManager.disableShader()
+        }
+        //#else
+        //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, circleColor)
         //#endif
     }
 }
