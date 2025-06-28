@@ -271,7 +271,7 @@ object ScoreboardPattern {
      */
     val pastingPattern by farmingSB.pattern(
         "pasting",
-        "\\s*§f(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
+        "\\s*(?:§.)*?(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
     )
 
     /**
@@ -557,7 +557,7 @@ object ScoreboardPattern {
      */
     val flightDurationPattern by miscSB.pattern(
         "flightduration",
-        "^\\s*Flight Duration: §a(?::?\\d{1,3})*$",
+        "\\s*Flight Duration: §a(?::?\\d{1,3})*",
     )
 
     /**
@@ -938,7 +938,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * Somtimes when the scoreboard updates, it only updates half way,
+     * Sometimes when the scoreboard updates, it only updates half way,
      * causing some lines to become mixed with other lines -> broken.
      * This should already get handled fine but sometimes these errors still occur with some lines way too often.
      * This pattern is to catch those lines.
