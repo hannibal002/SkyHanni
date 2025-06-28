@@ -158,6 +158,6 @@ object MythologicalCreatureTracker {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(85, "event.diana.mythologicalMobtracker", "event.diana.mythologicalMobTracker")
+        event.move(90, "event.diana.mythologicalMobtracker", "event.diana.mythologicalMobTracker")
     }
 }
