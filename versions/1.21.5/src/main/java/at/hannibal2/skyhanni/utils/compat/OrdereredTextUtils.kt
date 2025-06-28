@@ -75,8 +75,6 @@ object OrderedTextUtils {
 
                 if (colorFormatting != null) {
                     sb.append(colorFormatting.toString())
-                } else {
-                    sb.append("§${to.color?.hexCode}")
                 }
             }
         } else if (reset) {
