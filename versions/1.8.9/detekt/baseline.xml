@@ -215,7 +215,6 @@
     <ID>ReturnCount:CollectionTracker.kt$CollectionTracker$private fun command(args: Array&lt;String&gt;)</ID>
     <ID>ReturnCount:CompactBingoChat.kt$CompactBingoChat$private fun onSkyBlockLevelUp(message: String): Boolean</ID>
     <ID>ReturnCount:CrimsonMinibossRespawnTimer.kt$CrimsonMinibossRespawnTimer$private fun updateArea()</ID>
-    <ID>ReturnCount:EnchantParser.kt$EnchantParser$private fun parseEnchants( loreList: MutableList&lt;String&gt;, enchants: Map&lt;String, Int&gt;, chatComponent: IChatComponent?, )</ID>
     <ID>ReturnCount:EnoughUpdatesManager.kt$EnoughUpdatesManager$private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map&lt;String, String&gt;</ID>
     <ID>ReturnCount:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun showGui(): Boolean</ID>
     <ID>ReturnCount:GraphEditor.kt$GraphEditor$private fun input()</ID>
