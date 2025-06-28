@@ -50,7 +50,7 @@ object EnchantParser {
      * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
      * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
-     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
@@ -64,7 +64,7 @@ object EnchantParser {
      * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
      * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
-     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
      */
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
@@ -78,7 +78,7 @@ object EnchantParser {
      * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §6Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §fFeather Falling X
      * REGEX-TEST: §9Compact X§9, §rEfficiency V§9, §9Experience IV
-     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
      */
     @Suppress("MaxLineLength")
     val enchantmentPatternAaronChroma by patternGroup.pattern(
@@ -92,12 +92,14 @@ object EnchantParser {
      * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
      * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
-     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §9Giant Killer V§9, §rI§rm§rp§ra§rl§ri§rn§rg§r §rI§rI§rI§r§9, §rK§rn§ro§rc§rk§rb§ra§rc§rk§r §rI§rI
+     * REGEX-TEST: §rH§ra§rr§rv§re§rs§rt§ri§rn§rg§r §rV§rI
      */
     @Suppress("MaxLineLength")
-    val enchantmentPatternAaronStill by patternGroup.pattern( // TODO: doesnt actually work yet :P (ill implement later), and make sure to change the REGEX-TEST!!!
+    val enchantmentPatternAaronStill by patternGroup.pattern(
         "enchants.newaaronstill",
-        "(?:§7§l|§d§l|§7|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+        "(?:§7§l|§d§l|§[0-9a-f]|§r)(?<enchant>[A-Za-z][A-Za-z '§-]+) (?:§[0-9a-fr])?(?<levelNumeral>(?:(?:[IVXLCDM]|[0-9])(?:§[0-9a-fr])?)+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
     /**
      * REGEX-TEST: Respiration
@@ -347,7 +349,9 @@ object EnchantParser {
 
         val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
         val regex = "[\\d,.kKmMbB]+\$".toRegex()
+        val formattingCodesRegex = "§[0-9a-fr]".toRegex()
         val enchantMatcherPattern = getEnchantPattern()
+        val removeFormattingCodes = enchantMatcherPattern.toRegex() == enchantmentPatternAaronStill.toRegex()
         for (i in startEnchant..endEnchant) {
             val matcher = enchantMatcherPattern.matcher(loreList[i])
             var containsEnchant = false
@@ -355,8 +359,13 @@ object EnchantParser {
 
             while (matcher.find()) {
                 // Pull enchant, enchant level and stacking amount if applicable
-                val enchant = this.enchants.getFromLore(matcher.group("enchant"))
-                val level = matcher.group("levelNumeral").romanToDecimalIfNecessary()
+                val enchant = this.enchants.getFromLore(
+                    matcher.group("enchant")
+                        .let { if (removeFormattingCodes) it.replace(formattingCodesRegex, "") else it }
+                )
+                val level = matcher.group("levelNumeral")
+                    .let { if (removeFormattingCodes) it.replace(formattingCodesRegex, "") else it }
+                    .romanToDecimalIfNecessary()
                 val stacking = if (matcher.group("stacking").trimStart().removeColor().matches(regex)) {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")

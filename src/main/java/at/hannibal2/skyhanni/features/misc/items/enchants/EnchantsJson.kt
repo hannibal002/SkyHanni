@@ -29,9 +29,15 @@ class EnchantsJson {
         val exclusiveMatch = EnchantParser.enchantmentExclusivePattern.matcher(line)
         if (!exclusiveMatch.find()) return false // This is the case that the line is not exclusively enchants
 
-        val matcher = EnchantParser.getEnchantPattern().matcher(line)
+        val enchantMatcherPattern = EnchantParser.getEnchantPattern()
+        val matcher = enchantMatcherPattern.matcher(line)
+        val removeFormattingCodes = enchantMatcherPattern.toRegex() == EnchantParser.enchantmentPatternAaronStill.toRegex()
+        val formattingCodesRegex = "§[0-9a-fr]".toRegex()
         while (matcher.find()) {
-            val enchant = this.getFromLore(matcher.group("enchant"))
+            val enchant = this.getFromLore(
+                matcher.group("enchant")
+                    .let { if (removeFormattingCodes) it.replace(formattingCodesRegex, "") else it }
+            )
             if (enchants.isNotEmpty()) {
                 if (enchants.containsKey(enchant.nbtName)) return true
             } else {
