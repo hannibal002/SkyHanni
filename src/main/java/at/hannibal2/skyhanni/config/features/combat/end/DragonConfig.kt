@@ -12,7 +12,7 @@ class DragonConfig {
     @Expose
     @ConfigOption(name = "Dragon Profit Tracker", desc = "")
     @Accordion
-    var dragonProfitTracker: DragonProfitTrackerConfig = DragonProfitTrackerConfig()
+    val dragonProfitTracker: DragonProfitTrackerConfig = DragonProfitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Superior Notification", desc = "Show a title when a Superior Dragon spawns.")
@@ -32,7 +32,7 @@ class DragonConfig {
 
     @Expose
     @ConfigLink(owner = DragonConfig::class, field = "display")
-    var displayPosition: Position = Position(120, 40)
+    val displayPosition: Position = Position(120, 40)
 
     @Expose
     @ConfigOption(name = "Weight Message", desc = "Shows your dragon weight in chat after the dragon died.")

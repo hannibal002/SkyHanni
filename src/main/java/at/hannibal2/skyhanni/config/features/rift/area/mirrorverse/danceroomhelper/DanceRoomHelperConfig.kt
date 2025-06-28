@@ -47,9 +47,9 @@ class DanceRoomHelperConfig {
     @Expose
     @ConfigOption(name = "Formatting", desc = "")
     @Accordion
-    var danceRoomFormatting: DanceRoomFormattingConfig = DanceRoomFormattingConfig()
+    val danceRoomFormatting: DanceRoomFormattingConfig = DanceRoomFormattingConfig()
 
     @Expose
     @ConfigLink(owner = DanceRoomHelperConfig::class, field = "enabled")
-    var position: Position = Position(442, 239)
+    val position: Position = Position(442, 239)
 }

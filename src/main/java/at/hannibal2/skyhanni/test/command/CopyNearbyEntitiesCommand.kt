@@ -1,13 +1,19 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
+import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
@@ -16,9 +22,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
+import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -32,9 +39,10 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
+@SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         var searchRadius = 10
         if (args.size == 1) {
             searchRadius = args[0].toInt()
@@ -78,6 +86,11 @@ object CopyNearbyEntitiesCommand {
                 if (entity.isInvisible) {
                     add("Invisible: true")
                 }
+                //#if MC > 1.21
+                //$$ if (entity.isGlowing) {
+                //$$     add("Glowing: true")
+                //$$ }
+                //#endif
 
                 if (entity is EntityLivingBase) {
                     add("EntityLivingBase:")
@@ -88,10 +101,10 @@ object CopyNearbyEntitiesCommand {
                 }
 
                 if (entity is EntityPlayer) {
-                    val inventory = entity.inventory
-                    if (inventory != null) {
+                    val armor = entity.getArmorInventory()
+                    if (armor != null) {
                         add("armor:")
-                        for ((i, itemStack) in inventory.armorInventory.withIndex()) {
+                        for ((i, itemStack) in armor.withIndex()) {
                             val name = itemStack?.displayName ?: "null"
                             add("-  at: $i: $name")
                         }
@@ -106,6 +119,14 @@ object CopyNearbyEntitiesCommand {
                     is EntityOtherPlayerMP -> addOtherPlayer(entity)
                     is EntityCreeper -> addCreeper(entity)
                     is EntityWither -> addWither(entity)
+                    //#if MC > 1.21
+                    //$$ is net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity -> addItemDisplayEntity(entity)
+                    //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
+                    //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
+                    //$$ is net.minecraft.entity.passive.PandaEntity -> addPanda(entity)
+                    //$$ is net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity -> addBlockDisplayEntity(entity)
+                    //$$ is net.minecraft.entity.passive.FrogEntity -> addFrogEntity(entity)
+                    //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
                     add("MobInfo: ")
@@ -134,9 +155,10 @@ object CopyNearbyEntitiesCommand {
         add("-  bodyRotation: $bodyRotation")
 
         add("-  inventory:")
-        for ((id, stack) in entity.inventory.withIndex()) {
-            add("-  id $id ($stack)")
-            printItemStackData(stack)
+        for ((id, stack) in entity.getInventoryItems().withIndex()) {
+            val adjustedStack = stack.orNull()
+            add("-  id $id ($adjustedStack)")
+            printItemStackData(adjustedStack)
         }
     }
 
@@ -192,10 +214,14 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.addCreeper(entity: EntityCreeper) {
         add("EntityCreeper:")
+        //#if MC < 1.16
         val creeperState = entity.creeperState
+        //#endif
         val ignite = entity.hasIgnited()
         val powered = entity.powered
+        //#if MC < 1.16
         add("-  creeperState: '$creeperState'")
+        //#endif
         add("-  ignite: '$ignite'")
         add("-  powered: '$powered'")
     }
@@ -207,6 +233,60 @@ object CopyNearbyEntitiesCommand {
         add("-  invulTime: '$invulTime'")
         add("-  armored: '$isArmored'")
     }
+
+    //#if MC > 1.21
+    //$$ private fun MutableList<String>.addItemDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity) {
+    //$$     add("EntityItemDisplay:")
+    //$$     val stack = entity.itemStack
+    //$$     val rotation = entity.rotationVector
+    //$$
+    //$$     add("-  itemStack:")
+    //$$     printItemStackData(stack)
+    //$$     add("-  rotation: $rotation")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addTropicalFish(entity: net.minecraft.entity.passive.TropicalFishEntity) {
+    //$$     add("EntityTropicalFish:")
+    //$$     val variety = entity.variety
+    //$$     val patternColor = entity.patternColor
+    //$$     val baseColor = entity.baseColor
+    //$$     add("-  variety: $variety")
+    //$$     add("-  patternColor: $patternColor")
+    //$$     add("-  baseColor: $baseColor")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addShulker(entity: net.minecraft.entity.mob.ShulkerEntity) {
+    //$$     add("EntityShulker:")
+    //$$     val color = entity.color
+    //$$     val attachedFace = entity.attachedFace
+    //$$     add("-  color: $color")
+    //$$     add("-  attachedFace: $attachedFace")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addPanda(entity: net.minecraft.entity.passive.PandaEntity) {
+    //$$     add("EntityPanda:")
+    //$$     val mainGene = entity.mainGene
+    //$$     val hiddenGene = entity.hiddenGene
+    //$$     add("-  mainGene: $mainGene")
+    //$$     add("-  hiddenGene: $hiddenGene")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addBlockDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity) {
+    //$$     add("EntityBlockDisplay:")
+    //$$     val block = entity.blockState.block
+    //$$     val rotation = entity.rotationVector
+    //$$
+    //$$     add("-  block: ${block.name.formattedTextCompat()}")
+    //$$     add("-  rotation: $rotation")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addFrogEntity(entity: net.minecraft.entity.passive.FrogEntity) {
+    //$$     add("EntityFrog:")
+    //$$     val variant = entity.variant
+    //$$
+    //$$     add("-  Variant: $variant")
+    //$$ }
+    //#endif
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {
@@ -277,6 +357,15 @@ object CopyNearbyEntitiesCommand {
         }
         if (mob.boundingBox != mob.baseEntity.entityBoundingBox) {
             add("Bounding Box: ${mob.boundingBox}")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcopyentities") {
+            description = "Copies the entities in the specified radius around the player into the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { command(it) }
         }
     }
 

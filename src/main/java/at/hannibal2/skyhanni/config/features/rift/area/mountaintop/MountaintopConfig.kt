@@ -10,17 +10,17 @@ class MountaintopConfig {
     @Expose
     @ConfigOption(name = "Sun Gecko", desc = "")
     @Accordion
-    var sunGecko: SunGeckoConfig = SunGeckoConfig()
+    val sunGecko: SunGeckoConfig = SunGeckoConfig()
 
     @Expose
     @ConfigOption(name = "Timite", desc = "")
     @Accordion
-    var timite: TimiteConfig = TimiteConfig()
+    val timite: TimiteConfig = TimiteConfig()
 
     @Expose
     @ConfigOption(
-        name = "Enigma Rose'End Flowerpot",
-        desc = "Show the dropdown location to the hard Flowerpot point while in the Enigma Rose'End quest.",
+        name = "Enigma Rose' End Flowerpot",
+        desc = "Show the dropdown location to the hard Flowerpot point while in the Enigma Rose' End quest.",
     )
     @ConfigEditorBoolean
     var enigmaRoseFlowerpot: Boolean = true

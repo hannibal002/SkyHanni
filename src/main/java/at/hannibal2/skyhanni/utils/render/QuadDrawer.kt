@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.pos
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.pos
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -10,7 +10,9 @@ import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
+
     val worldRenderer = tessellator.worldRenderer
+
     inline fun draw(
         middlePoint: LorenzVec,
         sidePoint1: LorenzVec,
@@ -28,7 +30,7 @@ class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator
 
     companion object {
         inline fun draw3D(
-            partialTicks: Float = 0F,
+            event: SkyHanniRenderWorldEvent,
             crossinline quads: QuadDrawer.() -> Unit,
         ) {
             GlStateManager.enableBlend()
@@ -38,8 +40,7 @@ class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator
             GlStateManager.disableCull()
 
             GlStateManager.pushMatrix()
-            RenderUtils.translate(RenderUtils.getViewerPos(partialTicks).negated())
-            RenderUtils.getViewerPos(partialTicks)
+            WorldRenderUtils.translate(WorldRenderUtils.getViewerPos(event.partialTicks).negated())
 
             quads.invoke(QuadDrawer(Tessellator.getInstance()))
 

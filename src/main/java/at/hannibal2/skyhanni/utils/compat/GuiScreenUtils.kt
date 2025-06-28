@@ -52,16 +52,23 @@ object GuiScreenUtils {
     private val globalMouseX get() = MouseCompat.getX()
     private val globalMouseY get() = MouseCompat.getY()
 
-    val mouseX get() = globalMouseX * scaledWindowWidth / displayWidth
+    val mouseX: Int get() {
+        var x = globalMouseX * scaledWindowWidth / displayWidth
+        //#if MC > 1.21
+        //$$ if (mc.window.framebufferWidth > mc.window.width) x *= 2
+        //#endif
+        return x
+    }
 
     val mouseY: Int
         get() {
             val height = this.scaledWindowHeight
             // TODO: in later versions the height - factor is removed, i think
-            val y = globalMouseY * height / displayHeight
-//#if MC < 1.16
+            var y = globalMouseY * height / displayHeight
+//#if MC < 1.21
             return height - y - 1
 //#else
+//$$            if (mc.window.framebufferHeight > mc.window.height) y *= 2
 //$$            return y
 //#endif
         }

@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.inventory.FixIronman
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,8 +24,10 @@ import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ScoreboardData {
 
@@ -33,8 +35,9 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() =
-        MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
+    val objectiveTitle: String
+        get() =
+            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -82,11 +85,13 @@ object ScoreboardData {
                     dirty = true
                 }
             }
+
             is S3EPacketTeams -> {
                 if (packet.name.startsWith("team_")) {
                     dirty = true
                 }
             }
+
             is S3BPacketScoreboardObjective -> {
                 val type = packet.func_179817_d()
                 if (type != IScoreObjectiveCriteria.EnumRenderType.INTEGER) return
@@ -139,13 +144,6 @@ object ScoreboardData {
         }
     }
 
-    fun toggleMonitor() {
-        monitor = !monitor
-        val action = if (monitor) "Enabled" else "Disabled"
-        ChatUtils.chat("$action scoreboard monitoring in the console.")
-
-    }
-
     private fun cleanSB(scoreboard: String) = scoreboard.toCharArray().filter {
         // 10735 = Rift Blood Effigies symbol
         it.code in 21..126 || it.code == 167 || it.code == 10735
@@ -166,7 +164,7 @@ object ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
         //#else
-        //$$ return list.map { it.formattedTextCompat() }
+        //$$ return list.map { it.formattedTextCompatLessResets() }
         //#endif
     }
 
@@ -189,16 +187,16 @@ object ScoreboardData {
     }
 
     private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+        //#if MC < 1.21
         if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
             return null
         }
+        //#endif
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-            //#if TODO
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")
                 return "Purse: $coins"
             }
-            //#endif
         }
 
         if (SkyHanniMod.feature.misc.colorMonthNames) {
@@ -208,11 +206,9 @@ object ScoreboardData {
                 }
             }
         }
-        //#if TODO
         FixIronman.fixScoreboard(text)?.let {
             return it
         }
-        //#endif
 
         return text
     }
@@ -250,4 +246,19 @@ object ScoreboardData {
         "\uD83C\uDF82",
         "\uD83D\uDD2B",
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shdebugscoreboard") {
+            description =
+                "Monitors the scoreboard changes: " +
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                monitor = !monitor
+                val action = if (monitor) "Enabled" else "Disabled"
+                ChatUtils.chat("$action scoreboard monitoring in the console.")
+            }
+        }
+    }
 }
