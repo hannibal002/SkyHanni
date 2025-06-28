@@ -179,6 +179,6 @@ object StashCompact {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val base = "chat.filterType.stashMessages"
 
-        event.move(90, "$base.hideDuplicateCounts", "$base.hideDuplicateWarning.enabled")
+        event.move(87, "$base.hideDuplicateCounts", "$base.hideDuplicateWarning.enabled")
     }
 }
