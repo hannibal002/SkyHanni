@@ -33,6 +33,7 @@ data class EliteSkin(
 
 enum class SlotCostType { COINS, ITEM }
 
+@KSerializable
 data class EliteGemstoneSlotCost(
     @Expose private val type: String,
     @Expose val coins: Int? = null,
@@ -42,6 +43,7 @@ data class EliteGemstoneSlotCost(
     val costType: SlotCostType = SlotCostType.valueOf(type.uppercase())
 }
 
+@KSerializable
 data class EliteGemstoneSlot(
     @Expose @SerializedName("slot_type") private val slotTypeStr: String,
     @Expose @SerializedName("costs") private val eliteCosts: List<EliteGemstoneSlotCost> = emptyList(),
@@ -127,6 +129,7 @@ data class EliteItemCatacombRequirement(
 
 enum class UpgradeCostType { ESSENCE, ITEM }
 
+@KSerializable
 data class EliteItemUpgradeCost(
     @Expose val type: UpgradeCostType,
     @Expose @SerializedName("essence_type") val eliteEssenceType: String? = null,
@@ -150,6 +153,7 @@ enum class EliteMuseumGameStage {
     MASTER,
 }
 
+@KSerializable
 data class EliteMuseumData(
     @Expose @SerializedName("donation_xp") val donationXp: Int,
     @Expose private val parent: Map<String, String>? = null,
@@ -165,6 +169,7 @@ data class EliteMuseumData(
 enum class EliteItemOrigin { RIFT, BINGO }
 // </editor-fold>
 
+@KSerializable
 data class EliteItem(
     @Expose @SerializedName("id") val internalName: NeuInternalName,
     @Expose val material: String,

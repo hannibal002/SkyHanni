@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteContestsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteFarmingContest
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteLeaderboard
@@ -12,34 +12,52 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteLeaderboardTyp
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.WeightProfile
-import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteAuctionItem
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteAuctionsResponse
-import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteItem
+import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteBazaarResponse
 import at.hannibal2.skyhanni.data.jsonobjects.other.elitedev.resources.EliteItemResponse
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonObject
-import kotlin.reflect.KClass
 
 @SkyHanniModule
 object EliteDevApi {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shgeteliteresource") {
-
+        event.registerBrigadier("shfetcheliteresource") {
+            arg("resource", EnumArgumentType.create(
+                EliteResourceType::class.java,
+                toString = { it.name.lowercase() },
+            )) { resource ->
+                callback {
+                    val resourceType = getArg(resource)
+                    when (resourceType) {
+                        EliteResourceType.ITEM -> {
+                            val itemResources = fetchItemResources()
+                            ChatUtils.chat("Item resources fetched: ${itemResources?.items?.size ?: 0}")
+                        }
+                        EliteResourceType.AUCTION -> {
+                            val auctionResources = fetchAuctionResources()
+                            ChatUtils.chat("Auction resources fetched: ${auctionResources?.items?.size ?: 0}")
+                        }
+                        EliteResourceType.BAZAAR -> {
+                            val bazaarResources = fetchBazaarResources()
+                            ChatUtils.chat("Bazaar resources fetched: ${bazaarResources?.products?.size ?: 0}")
+                        }
+                    }
+                }
+            }
         }
     }
 
     enum class EliteResourceType {
         ITEM, AUCTION, BAZAAR,
+        ;
+        override fun toString() = name.lowercase()
     }
 
     private const val ELITEBOT_API_URL = "https://api.elitebot.dev"
@@ -203,6 +221,6 @@ object EliteDevApi {
 
     private fun fetchItemResources() = fetchResources<EliteItemResponse>("items")
     private fun fetchAuctionResources() = fetchResources<EliteAuctionsResponse>("auctions")
-    private fun fetchBazaarResources() = fetchResources<EliteItemResponse>("bazaar")
+    private fun fetchBazaarResources() = fetchResources<EliteBazaarResponse>("bazaar")
     // </editor-fold>
 }
