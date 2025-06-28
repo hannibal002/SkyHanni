@@ -25,7 +25,7 @@ data class EliteItemResponse(
 )
 
 // <editor-fold desc="Helpers to parse to SH formats">
-enum class SoulboundType { NONE, SOLO, COOP}
+enum class SoulboundType { NONE, SOLO, COOP }
 
 data class EliteSkin(
     @Expose val value: String,
@@ -132,6 +132,7 @@ data class EliteItemCatacombRequirement(
 enum class UpgradeCostType { ESSENCE, ITEM }
 
 @KSerializable
+@Suppress("unused")
 data class EliteItemUpgradeCost(
     @Expose val type: UpgradeCostType,
     @Expose @SerializedName("essence_type") val eliteEssenceType: String? = null,
@@ -272,7 +273,7 @@ data class EliteItem(
         private val replacementCache: MutableMap<String, Map<String, String>> = mutableMapOf()
         private fun getReplacementMap(matchedGroup: String): Map<String, String> {
             if (replacementCache.containsKey(matchedGroup)) {
-                return replacementCache[matchedGroup] ?: emptyMap()
+                return replacementCache[matchedGroup].orEmpty()
             }
             val formatter = matchedGroup.removePrefix("%%").removeSuffix("%%").lowercase()
             val replacement = when (formatter) {

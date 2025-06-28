@@ -35,10 +35,7 @@ object EliteDevApi {
         event.registerBrigadier("shfetcheliteresource") {
             description = "Fetches the specified Elite resource from elitebot.dev"
             category = CommandCategory.DEVELOPER_DEBUG
-            arg("resource", EnumArgumentType.create(
-                EliteResourceType::class.java,
-                toString = { it.name.lowercase() },
-            )) { resource ->
+            arg("resource", EnumArgumentType.name<EliteResourceType>()) { resource ->
                 callback {
                     val resourceType = getArg(resource)
                     val timeNow = SimpleTimeMark.now()
@@ -78,15 +75,6 @@ object EliteDevApi {
 
     private const val RESOURCE_API_NAME = "Elitebot Resources"
     private const val RESOURCE_API_URL = "$ELITEBOT_API_URL/resources"
-
-    // Todo when ConfigManager gson has type adapters specifically registered, see
-    //  if we can replace this custom gson with ConfigManager.gson
-    /*private val eliteGson by lazy {
-        BaseGsonBuilder.gson()
-            .registerTypeAdapter(CropType::class.java, SkyHanniTypeAdapters.CROP_TYPE.nullSafe())
-            .registerTypeAdapter(PestType::class.java, SkyHanniTypeAdapters.PEST_TYPE.nullSafe())
-            .create()
-    }*/
 
     // <editor-fold desc="Upcoming Contests">
     fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
@@ -211,7 +199,7 @@ object EliteDevApi {
         subUrl: String,
     ): T? = try {
         resourceUrl = "$RESOURCE_API_URL/$subUrl"
-        resourceApiResponse = ApiUtils.getJSONResponse(resourceUrl, apiName = RESOURCE_API_NAME, gunzip = true)
+        resourceApiResponse = ApiUtils.getGZippedJSONResponse(resourceUrl, apiName = RESOURCE_API_NAME)
         val resourceApiResponse = resourceApiResponse ?: throw IllegalStateException("Response was null")
         ConfigManager.gson.fromJson(resourceApiResponse, T::class.java)
     } catch (e: Exception) {

@@ -91,20 +91,28 @@ object ApiUtils {
     fun getJSONResponse(urlString: String, silentError: Boolean = false, apiName: String, gunzip: Boolean = false) =
         getJSONResponseAsElement(urlString, silentError, apiName, gunzip) as JsonObject
 
-    fun getJSONResponseAsElement(
+    fun getGZippedJSONResponse(urlString: String, silentError: Boolean = false, apiName: String) =
+        getGZippedJSONResponseAsElement(urlString, silentError, apiName) as JsonObject
+
+    /**
+     * TODO; Remove this or combine with the other method.
+     * The below implementation works for fetching gzipped JSON from Elite, but not for NEU for some reason,
+     * I'm too deep in the weeds to figure out why.
+     * Both, for now.
+     */
+    fun getGZippedJSONResponseAsElement(
         url: String,
         silentError: Boolean = false,
         apiName: String,
-        gunzip: Boolean = false,
     ): JsonElement {
-        val client = if (gunzip) explicitGzipBuilder.build() else builder.build()
+        val client = explicitGzipBuilder.build()
         try {
             client.execute(HttpGet(url)).use { response ->
                 val entity = response.entity ?: throw IllegalStateException("No response entity")
                 val encoding = response.getFirstHeader("Content-Encoding")?.value
                 val rawStream = entity.content
                 val input: InputStream = when {
-                    gunzip && encoding.equals("gzip", ignoreCase = true) -> GZIPInputStream(rawStream)
+                    encoding.equals("gzip", ignoreCase = true) -> GZIPInputStream(rawStream)
                     else -> rawStream
                 }
                 val returnedData = input.bufferedReader().use { it.readText() }
@@ -134,6 +142,70 @@ object ApiUtils {
                             "url" to url,
                             "returned data" to returnedData,
                         )
+                    }
+                }
+            }
+        } catch (e: Throwable) {
+            if (silentError) {
+                throw e
+            }
+            val name = e.javaClass.name
+            val errorMessage = "$name: ${e.message}"
+            ErrorManager.skyHanniError(
+                "Error fetching data from $apiName API!",
+                "api name" to apiName,
+                "error message" to errorMessage,
+                "url" to url,
+            )
+        } finally {
+            client.close()
+        }
+        return JsonObject()
+    }
+
+    fun getJSONResponseAsElement(
+        url: String,
+        silentError: Boolean = false,
+        apiName: String,
+        gunzip: Boolean = false,
+    ): JsonElement {
+        val client = builder.build()
+        try {
+            client.execute(HttpGet(url)).use { response ->
+                val entity = response.entity
+                if (entity != null) {
+                    val inputStream = if (gunzip) {
+                        GZIPInputStream(entity.content)
+                    } else {
+                        entity.content
+                    }
+                    val returnedData = inputStream.bufferedReader().use { it.readText() }
+                    try {
+                        return parser.parse(returnedData)
+                    } catch (e: Exception) {
+                        val name = e.javaClass.name
+                        val message = "$name: ${e.message}"
+                        if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
+                            println("MalformedJsonException: Use JsonReader.setLenient(true)")
+                            println(" - getJSONResponse: '$url'")
+                            ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                        } else if (returnedData.contains("<center><h1>502 Bad Gateway</h1></center>")) {
+                            ErrorManager.skyHanniError(
+                                "Error fetching data from $apiName API!",
+                                "error message" to "$message(502 Bad Gateway)",
+                                "api name" to apiName,
+                                "url" to url,
+                                "returned data" to returnedData,
+                            )
+                        } else {
+                            ErrorManager.skyHanniError(
+                                "Error fetching data from $apiName API!",
+                                "error message" to message,
+                                "api name" to apiName,
+                                "url" to url,
+                                "returned data" to returnedData,
+                            )
+                        }
                     }
                 }
             }

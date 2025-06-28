@@ -16,7 +16,7 @@ enum class KuudraTier(val displayName: String) {
 
     private var intLocation: LorenzVec? = null
     private var intTierNumber: Int = 0
-    private var intDisplayItem: NeuInternalName = "KUUDRA_${name}_TIER_KEY".toInternalName();
+    private var intDisplayItem: NeuInternalName = "KUUDRA_${name}_TIER_KEY".toInternalName()
 
     val location: LorenzVec? get() = intLocation
     val tierNumber: Int get() = intTierNumber
@@ -42,6 +42,7 @@ enum class KuudraTier(val displayName: String) {
             val target = entries.firstOrNull { it.displayName == displayName } ?: return
             target.setLocation(location)
             target.setDisplayItem(displayItem)
+            target.setTierNumber(tier)
         }
     }
 }
