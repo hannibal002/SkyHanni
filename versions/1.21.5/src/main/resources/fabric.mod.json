@@ -3,7 +3,7 @@
     "version": "${version}",
     "id": "skyhanni",
     "name": "SkyHanni",
-    "description": "SkyHanni is a Minecraft Mod for Hypixel SkyBlock.",
+    "description": "SkyHanni is a Mod for Hypixel SkyBlock.",
     "icon": "assets/skyhanni/logo.png",
     "authors": [],
     "environment": "client",
@@ -25,6 +25,22 @@
     "depends": {
         "fabric-api": ">=0.126.0+1.21.5",
         "fabric-language-kotlin": ">=1.13.2+kotlin.2.1.20",
-        "minecraft": ">=1.21.5"
+        "minecraft": "1.21.5"
+    },
+    "contact": {
+        "homepage": "https://modrinth.com/mod/skyhanni",
+        "issues": "https://discord.gg/skyhanni-997079228510117908"
+    },
+    "custom": {
+        "modmenu": {
+            "update_checker": true,
+            "links": {
+                "Discord Link": "https://discord.gg/skyhanni-997079228510117908",
+                "Modrinth Page": "https://modrinth.com/mod/skyhanni",
+                "List of all Features": "https://github.com/hannibal002/SkyHanni/blob/beta/docs/FEATURES.md",
+                "Source Code on Github": "https://github.com/hannibal002/SkyHanni",
+                "Contributing Guide Docs": "https://github.com/hannibal002/SkyHanni/blob/beta/CONTRIBUTING.md"
+            }
+        }
     }
 }
