@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -34,6 +34,7 @@ object AttributeShardsData {
     private var unconsumableAttributes = listOf<String>()
     private var attributeInfo = mapOf<String, NeuAttributeShardData>()
     private var internalNameToShard = mapOf<NeuInternalName, String>()
+    private var attributeAbilityNameToShard = mapOf<String, String>()
 
     var maxShards = 0
         private set
@@ -93,16 +94,62 @@ object AttributeShardsData {
         "§7Owned: §b(?<amount>[\\d,]+) Shards?",
     )
 
+    /**
+     * REGEX-TEST: §a+1 Arthropod Ruler Attribute §r§7(Level 1) - 2 more to upgrade!
+     * REGEX-TEST: §a+1 Arthropod Ruler Attribute §r§7(Level 2) - 3 more to upgrade!
+     * REGEX-TEST: §a+2 Essence of Ice Attribute §r§7(Level 2) - 1 more to upgrade!
+     * REGEX-TEST: §a+6 Ender Ruler Attribute §r§7(Level 3) - 3 more to upgrade!
+     * REGEX-FAIL: §a+43 Essence of Ice Attribute §r§7(Level 10) §r§a§lMAXED
+     */
+    private val shardSyphonedPattern by patternGroup.pattern(
+        "chat.syphoned",
+        "§a\\+\\d+ (?<attributeName>.+) Attribute §r§7\\(Level (?<level>\\d+)\\) - (?<untilNext>\\d+) more to upgrade!",
+    )
+
+    /**
+     * REGEX-TEST: §a+43 Essence of Ice Attribute §r§7(Level 10) §r§a§lMAXED
+     * REGEX-FAIL: §a+2 Essence of Ice Attribute §r§7(Level 2) - 1 more to upgrade!
+     */
+    private val shardSyphonedMaxedPattern by patternGroup.pattern(
+        "chat.syphoned.maxed",
+        "§a\\+\\d+ (?<attributeName>.+) Attribute §r§7\\(Level (?<level>\\d+)\\) §r§a§lMAXED",
+    )
+
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val attributesJson = event.getConstant<NeuAttributeShardJson>("attribute_shards")
         attributeLevelling = attributesJson.attributeLevelling
         unconsumableAttributes = attributesJson.unconsumableAttributes
-        attributeInfo = attributesJson.attributes
+        attributeInfo = attributesJson.attributes.associateBy { it.bazaarName.asString() }
         maxShards = attributeInfo.size - unconsumableAttributes.size
         internalNameToShard = attributeInfo.map { (name, info) ->
             info.internalName to name
         }.toMap()
+        attributeAbilityNameToShard = attributeInfo.map { (name, info) ->
+            info.abilityName to name
+        }.toMap()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
+        shardSyphonedPattern.matchMatcher(event.message) {
+            val attributeName = group("attributeName")
+            val level = group("level").toInt()
+            val untilNext = group("untilNext").toInt()
+            val shardName = attributeAbilityNameToShard[attributeName]
+                ?: ErrorManager.skyHanniError("Unknown attribute shard name for ability: $attributeName")
+            val shardInternalName = shardNameToInternalName(shardName)
+            processShard(shardInternalName, level, untilNext)
+            return
+        }
+        shardSyphonedMaxedPattern.matchMatcher(event.message) {
+            val attributeName = group("attributeName")
+            val shardName = attributeAbilityNameToShard[attributeName]
+                ?: ErrorManager.skyHanniError("Unknown attribute shard name for ability: $attributeName")
+            val shardInternalName = shardNameToInternalName(shardName)
+            processShard(shardInternalName, 10, 0)
+            return
+        }
     }
 
     private fun processAttributeMenuItems() {
@@ -118,7 +165,7 @@ object AttributeShardsData {
             syphonAmountPattern.firstMatcher(item.getLore()) {
                 toNextTier = group("amount").toInt()
             }
-            processShard(internalName, tier, toNextTier, item.getItemRarityOrCommon())
+            processShard(internalName, tier, toNextTier)
         }
         AttributeShardOverlay.updateDisplay()
     }
@@ -138,7 +185,7 @@ object AttributeShardsData {
                     toNextTier = group("amount").toInt()
                 }
             }
-            processShard(internalName, tier, toNextTier, item.getItemRarityOrCommon())
+            processShard(internalName, tier, toNextTier)
         }
     }
 
@@ -146,12 +193,13 @@ object AttributeShardsData {
         internalName: NeuInternalName,
         currentTier: Int,
         toNextTier: Int,
-        rarity: LorenzRarity,
     ) {
         val attributeName = shardInternalNameToShardName(internalName)
         if (attributeName in unconsumableAttributes) {
             return
         }
+        val rarity = attributeInfo[attributeName]?.rarity
+            ?: ErrorManager.skyHanniError("Unknown attribute shard rarity for $attributeName")
         val totalAmount = findTotalAmount(currentTier, toNextTier, rarity)
         storage?.getOrPut(attributeName) { ProfileSpecificStorage.AttributeShardData(0) }?.amountSyphoned = totalAmount
     }

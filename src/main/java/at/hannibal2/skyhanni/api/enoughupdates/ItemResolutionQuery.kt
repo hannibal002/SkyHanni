@@ -148,6 +148,19 @@ class ItemResolutionQuery {
             "Dragon Tracer" -> "Aiming"
             else -> this
         }
+
+        fun attributeNameToInternalName(attributeName: String): String? {
+            var fixedAttributeName = attributeName.uppercase().replace(" ", "_")
+            fixedAttributeName = shardNameOverrides[fixedAttributeName] ?: fixedAttributeName
+            val shardName = "SHARD_$fixedAttributeName"
+            return ItemUtils.bazaarOverrides[shardName]
+        }
+
+        private val shardNameOverrides = mapOf(
+            "STRIDERSURFER" to "STRIDER_SURFER",
+            "ABYSSAL_LANTERNFISH" to "ABYSSAL_LANTERN",
+            "CINDERBAT" to "CINDER_BAT",
+        )
     }
 
     fun withItemStack(stack: ItemStack): ItemResolutionQuery {
@@ -281,28 +294,15 @@ class ItemResolutionQuery {
         return null
     }
 
-    private val shardNameOverrides = mapOf(
-        "STRIDERSURFER" to "STRIDER_SURFER",
-        "ABYSSAL_LANTERNFISH" to "ABYSSAL_LANTERN",
-        "CINDERBAT" to "CINDER_BAT",
-    )
-
     private fun resolveItemInAttributeMenu(lore: List<String>): String? {
         UtilsPatterns.attributeSourcePattern.firstMatcher(lore) {
-            val attributeSource = group("source").uppercase().replace(" ", "_")
-            val fixedShardName = shardNameOverrides[attributeSource] ?: attributeSource
-            val shardName = "SHARD_$fixedShardName"
-            ItemUtils.bazaarOverrides[shardName]?.let {
-                return it
-            }
+            return attributeNameToInternalName(group("source"))
         }
         return null
     }
 
     private fun resolveItemInHuntingBoxMenu(displayName: String): String? {
-        val nane = displayName.removeColor().uppercase().replace(" ", "_")
-        val fixedName = shardNameOverrides[nane] ?: nane
-        return ItemUtils.bazaarOverrides["SHARD_$fixedName"]
+        return attributeNameToInternalName(displayName.removeColor())
     }
 
     private fun resolveContextualName(): String? {
