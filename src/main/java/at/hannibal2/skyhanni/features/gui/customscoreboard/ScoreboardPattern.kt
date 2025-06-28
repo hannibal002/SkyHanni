@@ -29,14 +29,6 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Heat: §c1♨
-     */
-    val heatPattern by mainSB.pattern(
-        "heat",
-        "Heat: (?<heat>.*)",
-    )
-
-    /**
      * REGEX-TEST: Copper: §c3,416
      */
     val copperPattern by mainSB.pattern(
@@ -346,7 +338,7 @@ object ScoreboardPattern {
      */
     val miningEventPattern by miningSB.pattern(
         "miningevent",
-        "Event: §.§L.*",
+        "Event: §.§[lL].*",
     )
 
     /**
@@ -775,7 +767,7 @@ object ScoreboardPattern {
      */
     val riftDimensionPattern by riftSB.pattern(
         "dimension",
-        "\\s*§fRift Dimension",
+        "\\s*(?:§f)?Rift Dimension",
     )
     val riftHotdogTitlePattern by riftSB.pattern(
         "hotdogtitle",
@@ -914,6 +906,35 @@ object ScoreboardPattern {
     val carnivalKillsPattern by carnivalSB.pattern(
         "kills",
         "(?:§f)?Kills: §.\\d+",
+    )
+
+    // Galatea
+    private val galateaSB = scoreboardGroup.group("galatea")
+
+    /**
+     * REGEX-TEST: Whispers: §3141§b (+1)
+     * REGEX-TEST: Whispers: §317.5k§b (+50)
+     */
+    val whispersPattern by galateaSB.pattern(
+        "whispers",
+        "Whispers: §3[\\w,.]+.*"
+    )
+
+    /**
+     * REGEX-TEST:     §aHOTF§f: §a28k§3.7k§b (+35)
+     * REGEX-TEST:     §aHOTF§f: §a28k§9 (+29 Exp)
+     */
+    val hotfPattern by galateaSB.pattern(
+        "hotf",
+        "\\s*§aHOTF§f: §a[\\w,.]+.*",
+    )
+
+    /**
+     * REGEX-TEST: §eAgatha's Contest §a5m28s
+     */
+    val agathasContestPattern by galateaSB.pattern(
+        "agathas-contest",
+        "§eAgatha's Contest §a.*",
     )
 
     /**

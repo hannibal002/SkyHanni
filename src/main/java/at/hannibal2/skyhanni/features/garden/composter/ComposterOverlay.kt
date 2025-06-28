@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -34,7 +37,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -47,6 +49,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -56,8 +59,8 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -103,15 +106,6 @@ object ComposterOverlay {
         private set(value) {
             GardenApi.storage?.composterCurrentFuelItem = value
         }
-
-    fun onCommand(args: Array<String>) {
-        if (args.size != 1) {
-            ChatUtils.userError("Usage: /shtestcomposter <offset>")
-            return
-        }
-        testOffset = args[0].toInt()
-        ChatUtils.chat("Composter test offset set to $testOffset.")
-    }
 
     private val COMPOST = "COMPOST".toInternalName()
     private val BIOFUEL = "BIOFUEL".toInternalName()
@@ -165,7 +159,7 @@ object ComposterOverlay {
         if (!config.overlay) return
         val composterUpgrades = ComposterApi.composterUpgrades ?: return
         if (composterUpgrades.isEmpty()) {
-            RenderableString("§cOpen Composter Upgrades!").let {
+            StringRenderable("§cOpen Composter Upgrades!").let {
                 organicMatterDisplay = it
                 fuelExtraDisplay = it
             }
@@ -203,12 +197,12 @@ object ComposterOverlay {
 
     private fun preview(upgrade: ComposterUpgrade?): Renderable =
         if (upgrade == null) {
-            RenderableString("§7Preview: Nothing")
+            StringRenderable("§7Preview: Nothing")
         } else {
             val level = upgrade.getLevel(null)
             val nextLevel = if (maxLevel) "§6§lMAX" else "§c➜ §a" + (level + 1)
             val displayName = upgrade.displayName
-            RenderableString("§7Preview §a$displayName§7: §a$level $nextLevel")
+            StringRenderable("§7Preview §a$displayName§7: §a$level $nextLevel")
         }
 
     private fun drawUpgradeStats(): Renderable {
@@ -535,7 +529,7 @@ object ComposterOverlay {
     private fun retrieveMaterials(internalName: NeuInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
         if (config.retrieveFrom == RetrieveFromEntry.BAZAAR &&
-            !LorenzUtils.noTradeMode && internalName != BIOFUEL
+            !SkyBlockUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
@@ -547,7 +541,7 @@ object ComposterOverlay {
         }
 
         val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
-            HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
+            GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
             val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
@@ -562,7 +556,7 @@ object ComposterOverlay {
         }
         if (havingInSacks == 0) {
             SoundUtils.playErrorSound()
-            if (LorenzUtils.noTradeMode) {
+            if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("No $itemName §efound in sacks.")
             } else {
                 ChatUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
@@ -571,10 +565,10 @@ object ComposterOverlay {
             return
         }
 
-        HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
+        GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
         val havingInTotal = havingInInventory + havingInSacks
         if (itemsNeeded >= havingInTotal) {
-            if (LorenzUtils.noTradeMode) {
+            if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 ChatUtils.clickableChat(
@@ -719,6 +713,22 @@ object ComposterOverlay {
             val tabListData = ComposterApi.tabListData
             for ((a, b) in tabListData) {
                 add("tabListData $a: $b")
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestcomposter") {
+            description = "Test the composter overlay"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs {
+                if (it.size != 1) {
+                    ChatUtils.userError("Usage: /shtestcomposter <offset>")
+                } else {
+                    testOffset = it[0].toInt()
+                    ChatUtils.chat("Composter test offset set to $testOffset.")
+                }
             }
         }
     }

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 // TODO: replace id with ordinal
@@ -56,13 +55,6 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
         fun getByName(name: String): LorenzRarity? = entries.find { it.name.equals(name, ignoreCase = true) }
 
-        private fun getByColor(color: LorenzColor?): LorenzRarity? = entries.find { it.color == color }
-
-        private fun getByColorCode(colorCode: Char): LorenzRarity? = getByColor(colorCode.toLorenzColor())
-
-        fun colorCodeToRarity(colorCode: Char): String {
-            val rarity = getByColorCode(colorCode) ?: SPECIAL
-            return rarity.formattedName
-        }
+        fun getByColorCode(colorCode: Char): LorenzRarity? = entries.find { it.color.chatColorCode == colorCode }
     }
 }

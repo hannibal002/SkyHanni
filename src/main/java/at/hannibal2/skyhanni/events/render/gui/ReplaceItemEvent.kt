@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.events.render.gui
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import net.minecraft.inventory.IInventory
-import net.minecraft.inventory.InventoryBasic
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
@@ -23,7 +22,7 @@ class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, v
     companion object {
         @JvmStatic
         fun postEvent(
-            inventory: InventoryBasic,
+            inventory: IInventory,
             inventoryContents: Array<ItemStack?>,
             slot: Int,
             cir: CallbackInfoReturnable<ItemStack>,
@@ -32,7 +31,11 @@ class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, v
             val event = ReplaceItemEvent(inventory, originalItem, slot)
             event.post()
             if (event.shouldRemove) {
+                //#if MC < 1.21
                 cir.returnValue = null
+                //#else
+                //$$ cir.returnValue = ItemStack.EMPTY
+                //#endif
                 return
             }
             event.replacement?.let { cir.returnValue = it }

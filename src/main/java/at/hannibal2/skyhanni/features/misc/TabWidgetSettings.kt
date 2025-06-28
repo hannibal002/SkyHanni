@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -124,5 +124,5 @@ object TabWidgetSettings {
             }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.highlightWidgets
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.highlightWidgets
 }

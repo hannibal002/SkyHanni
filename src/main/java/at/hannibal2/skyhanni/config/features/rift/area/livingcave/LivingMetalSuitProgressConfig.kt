@@ -21,5 +21,5 @@ class LivingMetalSuitProgressConfig {
 
     @Expose
     @ConfigLink(owner = LivingMetalSuitProgressConfig::class, field = "enabled")
-    var position: Position = Position(100, 100)
+    val position: Position = Position(100, 100)
 }
