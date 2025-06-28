@@ -98,7 +98,7 @@ object EnchantParser {
      */
     @Suppress("MaxLineLength")
     val enchantmentPatternAaronStill by patternGroup.pattern(
-        "enchants.newaaronstill",
+        "enchants.aaronstill",
         "(?:§7§l|§d§l|§[0-9a-f]|§r)(?<enchant>[A-Za-z][A-Za-z '§-]+) (?:§[0-9a-fr])?(?<levelNumeral>(?:(?:[IVXLCDM]|[0-9])(?:§[0-9a-fr])?)+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
     /**
