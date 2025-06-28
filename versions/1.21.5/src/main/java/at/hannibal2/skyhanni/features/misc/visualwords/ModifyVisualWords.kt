@@ -13,7 +13,7 @@ import java.util.Optional
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
-object ModifyVisualWordsModern {
+object ModifyVisualWords {
     private val config get() = SkyHanniMod.feature.gui.modifyWords
 
     val textCache = TimeLimitedCache<OrderedText, OrderedText>(5.minutes)
@@ -188,8 +188,8 @@ data class VisualWordText(
 ) {
 
     fun toVisualWord() = VisualWord(
-        from.toLegacyString(),
-        to.toLegacyString(),
+        from.toLegacyString().replace("§", "&&"),
+        to.toLegacyString().replace("§", "&&"),
         enabled,
         caseSensitive
     )
@@ -197,8 +197,8 @@ data class VisualWordText(
     companion object {
 
         fun fromVisualWord(visualWord: VisualWord) = VisualWordText(
-            visualWord.phrase.toStyledCharacterList(),
-            visualWord.replacement.toStyledCharacterList(),
+            visualWord.phrase.replace("&&", "§").toStyledCharacterList(),
+            visualWord.replacement.replace("&&", "§").toStyledCharacterList(),
             visualWord.enabled,
             visualWord.isCaseSensitive()
         )

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWordsModern;
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.OrderedText;
@@ -20,7 +20,7 @@ public class MixinTextRenderer {
     )
     private OrderedText modifyOrderedText(OrderedText value) {
 
-        OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
             value
         );
 
@@ -36,7 +36,7 @@ public class MixinTextRenderer {
     )
     private String modifyString(String value) {
 
-        OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
             OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
@@ -52,7 +52,7 @@ public class MixinTextRenderer {
     )
     private OrderedText modifyWidth(OrderedText value) {
 
-        OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
             value
         );
 
@@ -68,7 +68,7 @@ public class MixinTextRenderer {
     )
     private String modifyWidth(String value) {
 
-        OrderedText replaced = ModifyVisualWordsModern.INSTANCE.transformText(
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
             OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
@@ -84,7 +84,7 @@ public class MixinTextRenderer {
     )
     private StringVisitable modifyWidth(StringVisitable value) {
 
-        StringVisitable replaced = ModifyVisualWordsModern.INSTANCE.transformStringVisitable(
+        StringVisitable replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(
             value
         );
 

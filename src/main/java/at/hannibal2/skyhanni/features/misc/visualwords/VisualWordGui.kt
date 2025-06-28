@@ -253,10 +253,8 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             }
 
             if (modifiedWords.isEmpty()) {
-                //#if MC < 1.21
                 modifiedWords = ModifyVisualWords.userModifiedWords
-                //#else
-                //$$ modifiedWords = ModifyVisualWordsModern.userModifiedWords
+                //#if MC > 1.21
                 //$$ .map { it.toVisualWord() }.toMutableList()
                 //#endif
             }
@@ -554,13 +552,12 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun saveChanges() {
-        //#if MC < 1.21
+
         ModifyVisualWords.userModifiedWords = modifiedWords
-        ModifyVisualWords.update()
-        //#else
-        //$$ ModifyVisualWordsModern.userModifiedWords = modifiedWords.map { VisualWordText.fromVisualWord(it) }.toMutableList()
-        //$$ ModifyVisualWordsModern.update()
+        //#if MC > 1.21
+        //$$ .map { VisualWordText.fromVisualWord(it) }.toMutableList()
         //#endif
+        ModifyVisualWords.update()
 
         SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }

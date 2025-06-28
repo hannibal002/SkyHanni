@@ -3,11 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
-//#if MC < 1.21
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
-//#else
-//$$ import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWordsModern
-//#endif
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -48,7 +44,7 @@ object CopyChat {
                 //#if MC < 1.21
                 ModifyVisualWords.modifyText(formatted)?.removeColor()
                 //#else
-                //$$ OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWordsModern.transformText(chatLine.fullComponent.asOrderedText()))
+                //$$ OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.asOrderedText()))
                 //#endif
                     ?: formatted) to "modified message"
 

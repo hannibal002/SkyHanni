@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWordsModern;
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import net.minecraft.client.font.TextHandler;
 import net.minecraft.text.StringVisitable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +20,7 @@ public class MixinTextHandler {
     )
     private StringVisitable modifyStringVisitable(StringVisitable visitable) {
 
-        return ModifyVisualWordsModern.INSTANCE.transformStringVisitable(
+        return ModifyVisualWords.INSTANCE.transformStringVisitable(
             visitable
         );
     }

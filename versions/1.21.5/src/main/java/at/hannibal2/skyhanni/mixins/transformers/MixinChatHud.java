@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWordsModern;
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -49,13 +49,13 @@ public abstract class MixinChatHud {
     @Inject(method = "render", at = @At("HEAD"))
     private void onRender(CallbackInfo info) {
         ChromaFontManagerKt.setRenderingChat(true);
-        ModifyVisualWordsModern.INSTANCE.setChangeWords(false);
+        ModifyVisualWords.INSTANCE.setChangeWords(false);
     }
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender2(CallbackInfo info) {
         ChromaFontManagerKt.setRenderingChat(false);
-        ModifyVisualWordsModern.INSTANCE.setChangeWords(true);
+        ModifyVisualWords.INSTANCE.setChangeWords(true);
     }
 
 }

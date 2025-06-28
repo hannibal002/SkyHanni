@@ -4,7 +4,6 @@ at.hannibal2.skyhanni.config.commands.brigadier.BrigadierCommand.kt
 at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer.kt
 at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines.kt
 at.hannibal2.skyhanni.features.misc.ButtonOnPause.kt
-at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords.kt
 at.hannibal2.skyhanni.mixins.hooks.FontRendererHook.kt
 at.hannibal2.skyhanni.mixins.hooks.RenderGlobalHook.kt
 at.hannibal2.skyhanni.mixins.hooks.MixinPatcherFontRendererHookHook.kt
