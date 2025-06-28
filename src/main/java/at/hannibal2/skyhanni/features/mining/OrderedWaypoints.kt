@@ -95,7 +95,7 @@ object OrderedWaypoints {
                 traceWP.location.add(0.5, 0.25, 0.5),
                 lineColor,
                 config.traceLineThickness.toInt(),
-                false
+                depth = true
             )
         }
 
@@ -106,7 +106,7 @@ object OrderedWaypoints {
                 traceWP.location.add(0.5, 0.5, 0.5),
                 lineColor,
                 config.setupModeLineThickness.toInt(),
-                depth = false
+                depth = true
             )
         }
 
@@ -229,8 +229,7 @@ object OrderedWaypoints {
             }
 
             res?.let {
-                ChatUtils.chat(it.waypoints.toString())
-                orderedWaypointsList = it
+                orderedWaypointsList = it.deepCopy()
                 currentOrderedWaypointIndex = 0
                 renderWaypoints.clear()
                 ChatUtils.chat("Loaded ordered waypoints!")
@@ -341,7 +340,9 @@ object OrderedWaypoints {
     }
 
     private fun save(name: String) {
-        ProfileStorageData.playerSpecific?.routes?.put(name, orderedWaypointsList.deepCopy())
+        ProfileStorageData.playerSpecific?.routes?.put(name, orderedWaypointsList.deepCopy()) ?: run {
+            return ChatUtils.chat("An error occurred while saving.")
+        }
         ChatUtils.chat("Route saved as $name. Do /shorderedload $name to import it.")
     }
 
@@ -370,7 +371,6 @@ object OrderedWaypoints {
         var distanceTo2 = Double.POSITIVE_INFINITY
         if (nextWaypoint != null) {
             distanceTo2 = nextWaypoint.location.distanceToPlayer()
-
             renderWaypoints.add(nextWaypoint.number - 1)
         }
 
