@@ -28,8 +28,6 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.WebhookUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.TimeZone
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.minutes
@@ -78,18 +76,6 @@ object FarmingStatusTracker {
         val success = prepareAndSendEmbed(status)
 
         if (success) lastNotification = SimpleTimeMark.now() else ChatUtils.chat("§cCouldn't send embed (Farming Status Tracker).")
-    }
-
-    // Sends an embed when disconnecting from a server
-    @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
-        status = "Offline"
-
-        if (!isEnabled()) return
-
-        val success = prepareAndSendEmbed(status)
-
-        if (success) lastNotification = SimpleTimeMark.now()
     }
 
     // Prepares and sends the embed to the configured webhook
