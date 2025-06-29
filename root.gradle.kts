@@ -25,11 +25,6 @@ allprojects {
     repositories {
         mavenCentral()
         mavenLocal()
-        maven("https://maven.minecraftforge.net") {
-            metadataSources {
-                artifact() // We love missing POMs
-            }
-        }
 
         // Fabric
         exclusiveContent {
@@ -59,13 +54,6 @@ allprojects {
             }
             filter {
                 includeGroup("me.djtheredstoner")
-            }
-        }
-
-        maven("https://jitpack.io") {
-            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
-            content {
-                includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
 
@@ -107,6 +95,19 @@ allprojects {
             }
             filter {
                 includeGroup("maven.modrinth")
+            }
+        }
+
+        maven("https://maven.minecraftforge.net") {
+            metadataSources {
+                artifact() // We love missing POMs
+            }
+        }
+
+        maven("https://jitpack.io") {
+            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
+            content {
+                includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
     }
