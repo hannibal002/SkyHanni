@@ -27,6 +27,7 @@ data class EliteContestsResponse(
     }
 }
 
+@KSerializable
 data class EliteFarmingContest(
     @Expose val startTime: SimpleTimeMark,
     @Expose val crops: List<CropType>,
