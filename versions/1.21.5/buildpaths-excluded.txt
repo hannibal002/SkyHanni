@@ -32,6 +32,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinEntityFireball.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityHorse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinFontRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiChat.java
+at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngameForge.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiPlayerTabOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetHandlerPlayClient.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
