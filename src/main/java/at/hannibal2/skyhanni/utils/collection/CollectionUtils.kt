@@ -499,15 +499,7 @@ object CollectionUtils {
     }
 
     fun <T> Sequence<T>.removeNotContainedFromList(list: MutableList<T>) {
-        val checkList = Array<Boolean>(list.size) { false }
-        for (element in this) {
-            val i = list.indexOfFirstOrNull { it == element } ?: continue
-            checkList[i] = true
-        }
-        checkList.withIndex().filter { !it.value }
-            .reversed()
-            .forEach {
-                list.removeAt(it.index)
-            }
+        list.retainAll(this.toSet())
     }
+
 }

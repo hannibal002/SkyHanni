@@ -46,7 +46,7 @@ class ForagingConfig {
     @Expose
     @OnlyModern
     @Category(name = "Foraging Mob Highlights", desc = "Settings for foraging mob highlights")
-    var foragingMobHighlight = ForagingMobHighlightConfig()
+    var mobHighlight = ForagingMobHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")

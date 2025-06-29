@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 @SkyHanniModule
 object HideonleafHighlighter {
 
-    private val config get() = SkyHanniMod.feature.foraging.foragingMobHighlight.hideonleafHighlight
+    private val config get() = SkyHanniMod.feature.foraging.mobHighlight.hideonleafHighlight
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onMob(event: MobEvent.Spawn.SkyblockMob) {
@@ -27,6 +27,6 @@ object HideonleafHighlighter {
 
     @HandleEvent
     fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(90, "foraging.hideonleafHighlight", "foraging.foragingMobHighlight.hideonleafHighlight")
+        event.move(90, "foraging.hideonleafHighlight", "foraging.mobHighlight.hideonleafHighlight")
     }
 }

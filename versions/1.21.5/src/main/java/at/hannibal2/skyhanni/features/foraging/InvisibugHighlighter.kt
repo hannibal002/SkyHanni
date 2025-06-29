@@ -4,15 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.MobUtils.isCompletelyDefault
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeNotContainedFromList
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.entity.LivingEntity
@@ -21,7 +20,7 @@ import net.minecraft.particle.ParticleTypes
 
 @SkyHanniModule
 object InvisibugHighlighter {
-    val config get() = SkyHanniMod.feature.foraging.foragingMobHighlight.invisibugHighlight
+    val config get() = SkyHanniMod.feature.foraging.mobHighlight.invisibugHighlight
 
     private val invisibugEntities = mutableListOf<LivingEntity>()
 
@@ -56,9 +55,9 @@ object InvisibugHighlighter {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.enabled) return
 
-        EntityUtils.getEntities<ArmorStandEntity>().removeNotContainedFromList(invisibugEntities)
+        EntityUtils.removeInvalidEntities(invisibugEntities)
     }
 }

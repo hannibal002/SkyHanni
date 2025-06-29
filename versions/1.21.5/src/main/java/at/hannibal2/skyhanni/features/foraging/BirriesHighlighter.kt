@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 @SkyHanniModule
 object BirriesHighlighter {
 
-    val config get() = SkyHanniMod.feature.foraging.foragingMobHighlight.birriesHighlight
+    val config get() = SkyHanniMod.feature.foraging.mobHighlight.birriesHighlight
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onMob(event: MobEvent.Spawn.SkyblockMob) {
@@ -27,6 +27,6 @@ object BirriesHighlighter {
 
     @HandleEvent
     fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(90, "foraging.birriesHighlight", "foraging.foragingMobHighlight.birriesHighlight")
+        event.move(90, "foraging.birriesHighlight", "foraging.mobHighlight.birriesHighlight")
     }
 }
