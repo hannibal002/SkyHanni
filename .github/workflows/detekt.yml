@@ -101,7 +101,7 @@ jobs:
                     script: |
                         const fs = require('fs');
                         const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
-                        const m = commentBody.match(/<!-- detekt-sarif-hash:(\d) -->/);
+                        const m = commentBody.match(/<!--\s*detekt-sarif-hash:(-?\d+)\s*-->/);
                         if (!m) return false;
                         const hash = m[1];
                         const { data: comments } = await github.rest.issues.listComments({
