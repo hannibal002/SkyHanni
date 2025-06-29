@@ -223,8 +223,8 @@ dependencies {
     if (target == ProjectTarget.MAIN) {
         shadowModImpl(libs.moulconfig)
     } else if (target == ProjectTarget.MODERN) {
-        shadowModImpl(libs.moulconfigModern)
-        include(libs.moulconfigModern)
+        shadowModImpl(libs.moulconfigmodern)
+        include(libs.moulconfigmodern)
     }
     @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
@@ -248,6 +248,12 @@ dependencies {
     } else if (target == ProjectTarget.MODERN) {
         modImplementation(libs.hypixelmodapi)
         include(libs.hypixelmodapi.fabric)
+    }
+
+    if (target == ProjectTarget.MODERN) {
+        modCompileOnly(libs.roughlyenoughitems) {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
     }
 
     // getting clock offset
