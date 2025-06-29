@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -22,7 +24,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AttributeShardsData {
@@ -49,6 +53,8 @@ object AttributeShardsData {
         pattern = "\\(\\d+/\\d+\\) Oddities ➜ Shards".toPattern(),
         openInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
     )
+
+    private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
 
@@ -115,6 +121,14 @@ object AttributeShardsData {
         "§a\\+\\d+ (?<attributeName>.+) Attribute §r§7\\(Level (?<level>\\d+)\\) §r§a§lMAXED",
     )
 
+    /**
+     * REGEX-TEST: §aand 7 more...
+     */
+    private val andMoreMessagePattern by patternGroup.pattern(
+        "chat.and.more",
+        "§aand (?<amount>\\d+) more\\.\\.\\.",
+    )
+
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val attributesJson = event.getConstant<NeuAttributeShardJson>("attribute_shards")
@@ -140,6 +154,7 @@ object AttributeShardsData {
                 ?: ErrorManager.skyHanniError("Unknown attribute shard name for ability: $attributeName")
             val shardInternalName = shardNameToInternalName(shardName)
             processShard(shardInternalName, level, untilNext)
+            lastSyphonedMessage = SimpleTimeMark.now()
             return
         }
         shardSyphonedMaxedPattern.matchMatcher(event.message) {
@@ -148,7 +163,19 @@ object AttributeShardsData {
                 ?: ErrorManager.skyHanniError("Unknown attribute shard name for ability: $attributeName")
             val shardInternalName = shardNameToInternalName(shardName)
             processShard(shardInternalName, 10, 0)
+            lastSyphonedMessage = SimpleTimeMark.now()
             return
+        }
+        andMoreMessagePattern.matchMatcher(event.message) {
+            if (lastSyphonedMessage.passedSince() > 1.seconds) return
+            if (!config.enabled) return
+            val amount = group("amount").toInt()
+            DelayedRun.runNextTick {
+                ChatUtils.clickableChat(
+                    "§aClick here and scroll through to refresh SkyHanni's attribute overlay data with $amount shards",
+                    { HypixelCommands.attributeMenu() },
+                )
+            }
         }
     }
 

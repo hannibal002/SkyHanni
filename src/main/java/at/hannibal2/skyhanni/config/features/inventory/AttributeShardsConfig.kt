@@ -33,6 +33,11 @@ class AttributeShardsConfig {
     var displaySortingMethod: AttributeShardOverlay.AttributeShardSorting = AttributeShardOverlay.AttributeShardSorting.PRICE_TO_NEXT_TIER
 
     @Expose
+    @ConfigOption(name = "Overlay Price Source", desc = "The price source used for the attribute shard overlay.")
+    @ConfigEditorDropdown
+    var overlayPriceSource: AttributeShardOverlay.AttributeShardPriceSource = AttributeShardOverlay.AttributeShardPriceSource.INSTANT_BUY
+
+    @Expose
     @ConfigOption(name = "Tier As Stack Size", desc = "Display the tier of the shard as stack size in the attribute menu.")
     @ConfigEditorBoolean
     @FeatureToggle

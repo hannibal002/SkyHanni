@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -55,6 +56,14 @@ object AttributeShardOverlay {
     enum class AttributeShardSorting(val displayName: String) {
         PRICE_TO_NEXT_TIER("Price to Next Tier"),
         PRICE_TO_MAXED("Price to Maxed"),
+        ;
+
+        override fun toString(): String = displayName
+    }
+
+    enum class AttributeShardPriceSource(val displayName: String, val priceSource: ItemPriceSource) {
+        INSTANT_BUY("Instant Buy", ItemPriceSource.BAZAAR_INSTANT_BUY),
+        SELL_ORDER("Sell Order", ItemPriceSource.BAZAAR_INSTANT_SELL),
         ;
 
         override fun toString(): String = displayName
@@ -139,6 +148,16 @@ object AttributeShardOverlay {
             },
         )
 
+        addRenderableButton<AttributeShardPriceSource>(
+            label = "Sorting Method",
+            current = config.overlayPriceSource,
+            getName = { "§a${it.displayName}" },
+            onChange = {
+                config.overlayPriceSource = it
+                reconstructDisplay()
+            },
+        )
+
         addRenderableButton(
             label = "Hide Maxed Shards",
             config = config::hideMaxed,
@@ -166,7 +185,7 @@ object AttributeShardOverlay {
         amountToNextTier: Int,
         amountUntilMaxed: Int,
     ): AttributeShardDisplayLine {
-        val individualPrice = internalName.getPrice()
+        val individualPrice = internalName.getPrice(config.overlayPriceSource.priceSource)
         val priceUntilNextTier = individualPrice * amountToNextTier
         val priceUntilMaxed = individualPrice * amountUntilMaxed
         val shardItemName = internalName.repoItemName
