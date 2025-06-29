@@ -11,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 /**
  * Attention developers:
@@ -31,6 +30,10 @@ class ForagingConfig {
     @Expose
     @Category(name = "HotF", desc = "Settings for Heart of the Forest.")
     val hotf: HotfConfig = HotfConfig()
+
+    @Expose
+    @Category(name = "Trees", desc = "Settings for big trees found on the foraging islands.")
+    val trees: TreesConfig = TreesConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
@@ -80,14 +83,6 @@ class ForagingConfig {
     @FeatureToggle
     @OnlyModern
     var mutePhantoms = true
-
-    @Expose
-    @ConfigOption(name = "Clean Tree View", desc = "Hides the floating blocks when mining trees in galatea.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @OnlyModern
-    @SearchTag("fig mangrove")
-    var cleanTreeView = true
 
     @Expose
     @ConfigLink(owner = ForagingConfig::class, field = "lassoDisplay")
