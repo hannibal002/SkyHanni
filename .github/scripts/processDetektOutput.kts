@@ -23,8 +23,6 @@ val lines = detektOutput.split('\n')
 val sarifRegex = Regex("^::warning file=(?<filePath>src\\/[^,]*\\/(?<file>[^,]+)),line=(?<line>\\d+),title=(?<wholeRule>(?<provider>[^.]+)\\.(?:(?:\\w+)\\.)+(?<rule>[^.]+)),col=(?<col>\\d+),endColumn=(?<endcol>\\d+)::(?<message>(?:.|)*\\n*)\$")
 val sarifPattern = sarifRegex.toPattern()
 
-val fileRegex = Regex("file=([^,]+)")
-val lineRegex = Regex("line=(\\d+)")
 val urlBase = "https://github.com/$githubRepo/blob/$prSha/"
 
 val rulesBroken: MutableMap<String, Int> = mutableMapOf()
@@ -43,18 +41,19 @@ val formatLines = lines.filter { it.isNotBlank() }.mapNotNull { raw ->
         val wholeRule = it.group("wholeRule")
         val message = it.group("message")
 
+        val cleanedFilePath = filePath.substringAfter("src/")
+
         rulesBroken[wholeRule] = rulesBroken.getOrDefault(wholeRule, 0) + 1
-        violatingFiles[filePath] = violatingFiles.getOrDefault(filePath, 0) + 1
-        pathToNameCache[filePath] = fileName
+        violatingFiles[cleanedFilePath] = violatingFiles.getOrDefault(cleanedFilePath, 0) + 1
+        pathToNameCache[cleanedFilePath] = fileName
         wholeRuleToNameCache[wholeRule] = rule
 
-        val cleanedFilePath = filePath.substringAfter("src/")
         val urlFormat = "$urlBase$cleanedFilePath#L$lineNum"
         val ruleFormat = "`[$rule]`"
 
-        flaggedFileUrls[filePath] = urlFormat
+        flaggedFileUrls[cleanedFilePath] = urlFormat
 
-        filePath to "- [${fileName}#L${lineNum}]($urlFormat) $ruleFormat: $message"
+        cleanedFilePath to "- [${fileName}#L${lineNum}]($urlFormat) $ruleFormat: $message"
     }
 }
 
@@ -95,9 +94,9 @@ val sb = StringBuilder().apply {
             violatingFiles.keys.size -> ""
             else -> " (+ ${violatingFiles.size - ceilingedFiles.size} more)"
         }
-        val fileViolationsFormat = ceilingedFiles.joinToString(", ") { (filePath, _) ->
-            val url = flaggedFileUrls[filePath]
-            val fileName = pathToNameCache[filePath] ?: filePath.substringAfter("src/")
+        val fileViolationsFormat = ceilingedFiles.joinToString(", ") { (cleanedFilePath, _) ->
+            val url = flaggedFileUrls[cleanedFilePath]
+            val fileName = pathToNameCache[cleanedFilePath] ?: cleanedFilePath.substringAfter("src/")
             when (url) {
                 null -> "`$fileName`"
                 else -> "[$fileName]($url)"
