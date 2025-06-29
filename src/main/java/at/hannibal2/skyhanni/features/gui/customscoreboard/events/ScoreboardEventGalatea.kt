@@ -30,6 +30,4 @@ object ScoreboardEventGalatea : ScoreboardEvent() {
         ScoreboardPattern.hotfPattern,
         ScoreboardPattern.agathasContestPattern,
     )
-
-    override fun showIsland() = IslandType.GALATEA.isValidIsland()
 }
