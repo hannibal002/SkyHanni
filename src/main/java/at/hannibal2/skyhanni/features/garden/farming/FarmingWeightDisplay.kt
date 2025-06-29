@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
@@ -458,7 +459,7 @@ object FarmingWeightDisplay {
 
     private fun lbName() = "${if (isMonthlyLB()) "Monthly " else ""}Farming Weight"
 
-    private fun loadLeaderboardPosition(): Int {
+    private suspend fun loadLeaderboardPosition(): Int {
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val upcomingPlayers = when {
             !isEnabled() -> 0
@@ -512,8 +513,8 @@ object FarmingWeightDisplay {
         return if (newData) apiData.rank else leaderboardPosition
     }
 
-    private fun loadWeight(localProfile: String) {
-        val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: return
+    private fun loadWeight(localProfile: String) = SkyHanniMod.coroutineScope.launch {
+        val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: return@launch
         profileId = apiData.profileId
         weight = apiData.totalWeight
         localCounter.clear()
@@ -574,12 +575,14 @@ object FarmingWeightDisplay {
     private fun getCropWeights() {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
-        val apiData = EliteDevApi.fetchApiWeights() ?: return
-        for (crop in apiData.crops) {
-            val cropType = CropType.getByNameOrNull(crop.key) ?: continue
-            cropWeight[cropType] = crop.value
+        SkyHanniMod.coroutineScope.launch {
+            val apiData = EliteDevApi.fetchApiWeights() ?: return@launch
+            for (crop in apiData.crops) {
+                val cropType = CropType.getByNameOrNull(crop.key) ?: continue
+                cropWeight[cropType] = crop.value
+            }
+            hasFetchedCropWeights = true
         }
-        hasFetchedCropWeights = true
     }
 
     // still needed when first joining garden and if they cant make https requests

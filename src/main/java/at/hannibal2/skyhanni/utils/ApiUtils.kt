@@ -6,306 +6,330 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledApiJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpUriRequest
+import org.apache.http.client.protocol.RequestAcceptEncoding
+import org.apache.http.client.protocol.ResponseContentEncoding
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
-import java.io.InputStream
+import java.nio.charset.StandardCharsets
 import java.security.KeyStore
-import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.coroutineContext
 
 @SkyHanniModule
 object ApiUtils {
+    data class ApiResponse(val success: Boolean, val message: String?, var data: JsonElement)
+    data class StaticApiPath(val url: String, val apiName: String)
 
-    private val parser = JsonParser()
-
-    private val ctx: SSLContext? = run {
-        try {
-            val myKeyStore = KeyStore.getInstance("JKS")
-            myKeyStore.load(ApiUtils.javaClass.getResourceAsStream("/skyhanni-keystore.jks"), "changeit".toCharArray())
-            val kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
-            val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-            kmf.init(myKeyStore, null)
-            tmf.init(myKeyStore)
-            SSLContext.getInstance("TLS").apply {
-                init(kmf.keyManagers, tmf.trustManagers, null)
-            }
-        } catch (e: Exception) {
-            println("Failed to load keystore. A lot of API requests won't work")
-            e.printStackTrace()
-            null
-        }
-    }
-
-    fun patchHttpsRequest(connection: HttpsURLConnection) {
-        ctx?.let {
-            connection.sslSocketFactory = it.socketFactory
-        }
-    }
-
-    data class ApiResponse(val success: Boolean, val message: String?, val data: JsonObject)
-
-    val defaultHeaders = mutableListOf(
-        BasicHeader("Pragma", "no-cache"),
-        BasicHeader("Cache-Control", "no-cache"),
-    )
-
-    private val builder: HttpClientBuilder =
-        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
-            .setDefaultHeaders(
-                mutableListOf(
-                    BasicHeader("Pragma", "no-cache"),
-                    BasicHeader("Cache-Control", "no-cache"),
-                ),
+    private val parser: JsonParser = JsonParser()
+    private val debugConfig get() = SkyHanniMod.feature.dev.debug
+    private val httpClient: CloseableHttpClient = HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
+        .setDefaultHeaders(
+            listOf(
+                BasicHeader("Pragma", "no-cache"),
+                BasicHeader("Cache-Control", "no-cache"),
             )
-            .setDefaultRequestConfig(
-                RequestConfig.custom()
-                    .build(),
-            )
-            .useSystemProperties()
-
-    private val explicitGzipBuilder = HttpClients.custom()
-        .setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
-        .setDefaultHeaders(defaultHeaders + BasicHeader("Accept-Encoding", "gzip, deflate"))
+        )
         .setDefaultRequestConfig(RequestConfig.custom().build())
         .useSystemProperties()
+        .addInterceptorLast(RequestAcceptEncoding())
+        .addInterceptorLast(ResponseContentEncoding())
+        .build()
+
+    private val ctx: SSLContext? = runCatching {
+        val ks = KeyStore.getInstance("JKS")
+        ks.load(
+            ApiUtils.javaClass.getResourceAsStream("/skyhanni-keystore.jks"),
+            "changeit".toCharArray()
+        )
+        val kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
+        kmf.init(ks, null)
+        val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        tmf.init(ks)
+        SSLContext.getInstance("TLS").apply {
+            init(kmf.keyManagers, tmf.trustManagers, null)
+        }
+    }.onFailure {
+        println("Failed to load keystore. A lot of Api requests won't work")
+        it.printStackTrace()
+    }.getOrNull()
+
+    fun patchHttpsRequest(connection: HttpsURLConnection) = ctx?.let {
+        connection.sslSocketFactory = it.socketFactory
+    }
 
     /**
-     * TODO
-     * make suspend
-     * use withContext(Dispatchers.IO) { APIUtils.getJSONResponse(url) }.asJsonObject
+     * This is probably superfluous and a bit programmatic, but this function
+     * ensures that a suspended block runs on the IO dispatcher if it is not already.
+     * This ensures any Api requests made within the block are executed on the IO dispatcher,
+     * and disconnects the reliance on using [SkyHanniMod.launchIOCoroutine]
      */
-    fun getJSONResponse(urlString: String, silentError: Boolean = false, apiName: String, gunzip: Boolean = false) =
-        getJSONResponseAsElement(urlString, silentError, apiName, gunzip) as JsonObject
-
-    fun getGZippedJSONResponse(urlString: String, silentError: Boolean = false, apiName: String) =
-        getGZippedJSONResponseAsElement(urlString, silentError, apiName) as JsonObject
+    @Suppress("InjectDispatcher")
+    private suspend fun <T> ioIfNeeded(block: suspend () -> T): T =
+        if (coroutineContext[ContinuationInterceptor] == Dispatchers.IO) block()
+        else withContext(Dispatchers.IO) {
+            block()
+        }
 
     /**
-     * TODO; Remove this or combine with the other method.
-     * The below implementation works for fetching gzipped JSON from Elite, but not for NEU for some reason,
-     * I'm too deep in the weeds to figure out why.
-     * Both, for now.
+     * Represents the intention to perform an Api request, and the data associated with it.
+     * This class is used to encapsulate the request and response data.
+     *
+     * @param url The URL of the Api request.
+     * @param apiName The name of the Api being requested.
+     * @param request The HTTP request to be executed.
+     * @param response The HTTP response received from the Api request, if any.
      */
-    fun getGZippedJSONResponseAsElement(
-        url: String,
-        silentError: Boolean = false,
-        apiName: String,
-    ): JsonElement {
-        val client = explicitGzipBuilder.build()
-        try {
-            client.execute(HttpGet(url)).use { response ->
-                val entity = response.entity ?: throw IllegalStateException("No response entity")
-                val encoding = response.getFirstHeader("Content-Encoding")?.value
-                val rawStream = entity.content
-                val input: InputStream = when {
-                    encoding.equals("gzip", ignoreCase = true) -> GZIPInputStream(rawStream)
-                    else -> rawStream
-                }
-                val returnedData = input.bufferedReader().use { it.readText() }
-
-                try {
-                    return parser.parse(returnedData)
-                } catch (e: Exception) {
-                    val name = e.javaClass.name
-                    val message = "$name: ${e.message}"
-                    if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
-                        println("MalformedJsonException: Use JsonReader.setLenient(true)")
-                        println(" - getJSONResponse: '$url'")
-                        ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
-                    } else if (returnedData.contains("<center><h1>502 Bad Gateway</h1></center>")) {
-                        ErrorManager.skyHanniError(
-                            "Error fetching data from $apiName API!",
-                            "error message" to "$message(502 Bad Gateway)",
-                            "api name" to apiName,
-                            "url" to url,
-                            "returned data" to returnedData,
-                        )
-                    } else {
-                        ErrorManager.skyHanniError(
-                            "Error fetching data from $apiName API!",
-                            "error message" to message,
-                            "api name" to apiName,
-                            "url" to url,
-                            "returned data" to returnedData,
-                        )
-                    }
-                }
-            }
-        } catch (e: Throwable) {
-            if (silentError) {
-                throw e
-            }
-            val name = e.javaClass.name
-            val errorMessage = "$name: ${e.message}"
-            ErrorManager.skyHanniError(
-                "Error fetching data from $apiName API!",
-                "api name" to apiName,
-                "error message" to errorMessage,
-                "url" to url,
-            )
-        } finally {
-            client.close()
-        }
-        return JsonObject()
-    }
-
-    fun getJSONResponseAsElement(
-        url: String,
-        silentError: Boolean = false,
-        apiName: String,
-        gunzip: Boolean = false,
-    ): JsonElement {
-        val client = builder.build()
-        try {
-            client.execute(HttpGet(url)).use { response ->
-                val entity = response.entity
-                if (entity != null) {
-                    val inputStream = if (gunzip) {
-                        GZIPInputStream(entity.content)
-                    } else {
-                        entity.content
-                    }
-                    val returnedData = inputStream.bufferedReader().use { it.readText() }
-                    try {
-                        return parser.parse(returnedData)
-                    } catch (e: Exception) {
-                        val name = e.javaClass.name
-                        val message = "$name: ${e.message}"
-                        if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
-                            println("MalformedJsonException: Use JsonReader.setLenient(true)")
-                            println(" - getJSONResponse: '$url'")
-                            ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
-                        } else if (returnedData.contains("<center><h1>502 Bad Gateway</h1></center>")) {
-                            ErrorManager.skyHanniError(
-                                "Error fetching data from $apiName API!",
-                                "error message" to "$message(502 Bad Gateway)",
-                                "api name" to apiName,
-                                "url" to url,
-                                "returned data" to returnedData,
-                            )
-                        } else {
-                            ErrorManager.skyHanniError(
-                                "Error fetching data from $apiName API!",
-                                "error message" to message,
-                                "api name" to apiName,
-                                "url" to url,
-                                "returned data" to returnedData,
-                            )
-                        }
-                    }
-                }
-            }
-        } catch (e: Throwable) {
-            if (silentError) {
-                throw e
-            }
-            val name = e.javaClass.name
-            val errorMessage = "$name: ${e.message}"
-            ErrorManager.skyHanniError(
-                "Error fetching data from $apiName API!",
-                "api name" to apiName,
-                "error message" to errorMessage,
-                "url" to url,
-            )
-        } finally {
-            client.close()
-        }
-        return JsonObject()
-    }
-
-    fun postJSON(url: String, body: String, apiName: String): ApiResponse {
-        val client = builder.build()
-
-        try {
-            val method = HttpPost(url)
-            method.entity = StringEntity(body, ContentType.APPLICATION_JSON)
-
-            client.execute(method).use { response ->
-                val status = response.statusLine
-                val entity = response.entity
-
-                if (status.statusCode in 200..299) {
-                    val data = readResponse(entity)
-                    return ApiResponse(true, "Request successful", data)
-                }
-
-                val message = "POST request to '$url' returned status ${status.statusCode}"
-                ErrorManager.logErrorStateWithData(
-                    "Error sending data to $apiName API!",
-                    "statusCode is ${status.statusCode}",
-                    "error message" to "$message(502 Bad Gateway)",
-                    "api name" to apiName,
-                    "url" to url,
-                    "status code" to status.statusCode,
-                    "body" to body,
-                )
-                return ApiResponse(false, message, JsonObject())
-            }
-        } catch (throwable: Throwable) {
-            ErrorManager.logErrorWithData(
-                throwable,
-                "Error sending data to $apiName API!",
-                "api name" to apiName,
-                "url" to url,
-                "body" to body,
-            )
-            return ApiResponse(false, throwable.message, JsonObject())
-        } finally {
-            client.close()
-        }
-    }
-
-    private fun readResponse(entity: HttpEntity?): JsonObject {
-        if (entity == null || entity.contentLength == 0L) {
-            return JsonObject() // Handle responses without a body
-        }
-
-        val retSrc = EntityUtils.toString(entity) ?: return JsonObject()
-
-        try {
-            val parsed = parser.parse(retSrc)
-            if (parsed.isJsonNull) return JsonObject()
-
-            return parsed as JsonObject
-        } catch (_: Throwable) {
-            // This causes content types that aren't JSON to be ignored
-            return JsonObject()
-        }
-    }
-
-    fun postJSONIsSuccessful(url: String, body: String, apiName: String): Boolean {
-        val response = postJSON(url, body, apiName)
-
-        if (response.success) {
-            return true
-        }
-
-        ErrorManager.logErrorStateWithData(
-            "An error occurred during the $apiName API request!",
-            "unsuccessful API response",
-            "url" to url,
-            "apiName" to apiName,
-            "body" to body,
-            "message" to response.message,
-            "response" to response,
+    private data class ApiIntentionContext(
+        val url: String,
+        val apiName: String,
+        val request: HttpUriRequest,
+        var response: CloseableHttpResponse? = null
+    ) {
+        constructor(request: HttpUriRequest, apiName: String) : this(
+            url = request.uri.toURL().toString(),
+            apiName = apiName,
+            request = request,
         )
 
-        return false
+        fun toFailureApiResponse(e: Throwable? = null): ApiResponse {
+            val message = e?.message ?: "Request to $apiName failed"
+            return ApiResponse(false, message, JsonObject())
+        }
     }
+
+    // <editor-fold desc="Client Execution Wrappers">
+    /**
+     * The default exception handler for Api requests.
+     * This function logs the error and returns a failure ApiResponse.
+     * Override this function if you want to handle exceptions differently.
+     *
+     * @param e The exception that occurred during the Api request.
+     * @param intentionContext The context of the Api request, containing the request and possibly response data.
+     * @param silentError If true, the error will not be logged, unless debugConfig.apiUtilsNeverSilent is true.
+     * @return An [ApiResponse] indicating failure, with the error message and empty data.
+     */
+    private fun defaultExceptionHandler(
+        e: Throwable,
+        intentionContext: ApiIntentionContext,
+        silentError: Boolean
+    ): ApiResponse {
+        val shouldSilentError = if (debugConfig.apiUtilsNeverSilent) false else silentError
+        if (!shouldSilentError) ErrorManager.logErrorWithData(
+            e,
+            e.message ?: "Error fetching data from ${intentionContext.apiName} Api",
+            extraData = intentionContext.collectInterestingFields().toTypedArray(),
+        )
+        return intentionContext.toFailureApiResponse(e)
+    }
+
+    /**
+     * Collects "interesting" fields related to an Api request, for use in error logging.
+     * This includes the Api name, URL, request method, response headers, status, and any post body content.
+     * Feel free to add more fields as you need them.
+     *
+     * @param this The ApiIntentionContext containing the Api request and possibly response data.
+     * @return A [List] of pairs where each pair contains a field name and its corresponding value.
+     */
+    private fun ApiIntentionContext.collectInterestingFields(): List<Pair<String, Any?>> = buildList {
+        addAll(
+            "api name" to apiName,
+            "url" to url,
+            "request method" to request.method,
+        )
+        response?.let { resp ->
+            add("response headers" to resp.allHeaders.joinToString { "${it.name}: ${it.value}" })
+            add("response status" to resp.statusLine.toString())
+            add("response status code" to resp.statusLine.statusCode.toString())
+        }
+        if (request is HttpPost && request.entity != null) {
+            val parsedContent = EntityUtils.toString(request.entity, StandardCharsets.UTF_8)
+                ?: "No content in request entity"
+            val contentType = ContentType.get(request.entity).mimeType
+            addAll(
+                "post body" to parsedContent,
+                "content mime type" to contentType,
+            )
+        }
+    }
+
+    /**
+     * Executes the given Api intention and returns a pair of ApiResponse and HttpEntity.
+     * If the request fails, it will call the exceptionHandler with the error.
+     *
+     * @param apiIntention The Api intention to execute.
+     * @param silentError If true, the error will not be logged.
+     * @param exceptionHandler The function to handle exceptions, must return an ApiResponse.
+     * @param responseHandler The function to handle the response, must return an HttpEntity or null.
+     * @return A [Pair] of [ApiResponse] and [HttpEntity], where the latter can be null if the request failed.
+     */
+    private fun withHttpClient(
+        apiIntention: ApiIntentionContext,
+        silentError: Boolean = true,
+        exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> ApiResponse = ::defaultExceptionHandler,
+        responseHandler: (CloseableHttpResponse) -> HttpEntity? = { it.getEntityOrNull() },
+    ): Pair<ApiResponse, HttpEntity?> = runCatching {
+        val resp = httpClient.execute(apiIntention.request)
+            ?: throw IllegalStateException("No response from Api request to ${apiIntention.apiName}")
+        val apiResponse = ApiResponse(true, "OK", JsonObject())
+        apiResponse to resp.use(responseHandler)
+    }.getOrElse { e ->
+        exceptionHandler(e, apiIntention, silentError) to null
+    }
+
+    /**
+     * The default method to fetch content from an HTTP Response.
+     *
+     * @param failOnNoContentLength If true, the method will return null if the content length is 0.
+     * @return The [HttpEntity] if the response is successful and has content, or null otherwise.
+     */
+    private fun CloseableHttpResponse.getEntityOrNull(
+        failOnNoContentLength: Boolean = true,
+    ): HttpEntity? = if (this.statusLine.statusCode in 200..299) {
+        this.entity.takeIf { it.contentLength > 0 || !failOnNoContentLength }
+    } else null
+
+    /**
+     * Reads the content of the HttpEntity and parses it as a JsonElement.
+     * If the entity is null or has no content, it returns the default value.
+     *
+     * @param T the specific subtype of [JsonElement] you expect (e.g., [JsonObject] or [com.google.gson.JsonArray])
+     * @param default The default value to return if the entity is null or has no content.
+     * @return The parsed [JsonElement] from the entity, or the [default] value if the entity is null or empty.
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : JsonElement> HttpEntity?.readEntityResponse(
+        default: T = JsonObject() as T
+    ): T = when {
+        this == null || this.contentLength == 0L -> default
+        else -> runCatching {
+            val text = EntityUtils.toString(this, StandardCharsets.UTF_8)
+            val parsed = parser.parse(text)
+            if (parsed.isJsonNull) default else parsed as T
+        }.getOrDefault(default)
+    }
+    // </editor-fold>
+
+    // <editor-fold desc="GETs">
+    /**
+     * Fetches a JSON response from the given static Api path.
+     * This function is a wrapper around [getJSONResponse] that uses the URL and Api name from the [StaticApiPath].
+     *
+     * @param static The [StaticApiPath] containing the URL and Api name.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return A [JsonObject] containing the JSON response, or null if the request failed or returned no content.
+     */
+    suspend fun getJSONResponse(static: StaticApiPath, silentError: Boolean = true): JsonObject? =
+        ioIfNeeded { internalGetJSONResponse(static.url, static.apiName, silentError) }
+
+    /**
+     * Fetches a JSON response from the given URL and Api name.
+     *
+     * @param url The URL to fetch the JSON response from.
+     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return A [JsonObject] containing the JSON response, or null if the request failed or returned no content.
+     */
+    suspend fun getJSONResponse(url: String, apiName: String, silentError: Boolean = true): JsonObject? =
+        ioIfNeeded { internalGetJSONResponse(url, apiName, silentError) }
+
+    /**
+     * Fetches a typed JSON response from the given URL and Api name.
+     *
+     * @param T The specific subtype of [JsonElement] you expect (e.g., [JsonObject] or [com.google.gson.JsonArray]).
+     * @param url The URL to fetch the JSON response from.
+     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return A [T] containing the parsed JSON response, or null if the request failed or returned no content.
+     */
+    suspend fun <T : JsonElement> getTypedJSONResponse(
+        url: String,
+        apiName: String,
+        silentError: Boolean = true
+    ): T? = ioIfNeeded { internalGetJSONResponse(url, apiName, silentError) }
+
+    /**
+     * Driving logic for fetching a JSON response from the Api.
+     * This function executes the HTTP GET request and processes the response.
+     *
+     * @param T The specific subtype of [JsonElement] you expect (e.g., [JsonObject] or [com.google.gson.JsonArray]).
+     * @param url The URL to fetch the JSON response from.
+     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return A [T] containing the parsed JSON response, or null if the request failed or returned no content.
+     */
+    private fun <T : JsonElement> internalGetJSONResponse(url: String, apiName: String, silentError: Boolean = true): T? {
+        val apiIntention = ApiIntentionContext(HttpGet(url), apiName)
+        val (_, entity) = withHttpClient(apiIntention, silentError = silentError)
+        return entity.readEntityResponse()
+    }
+    // </editor-fold>
+
+    // <editor-fold desc="POSTs">
+    /**
+     * Posts a JSON body to the given static Api path.
+     * This function is a wrapper around [postJSON] that uses the URL and Api name from the [StaticApiPath].
+     *
+     * @param static The [StaticApiPath] containing the URL and Api name.
+     * @param jsonBody The JSON body to post.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     */
+    suspend fun postJSON(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse =
+        ioIfNeeded { internalPostJSON(static.url, jsonBody, static.apiName, silentError) }
+
+    /**
+     * Posts a JSON body to the given URL.
+     *
+     * @param url The URL to post the JSON body to.
+     * @param jsonBody The JSON body to post.
+     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     */
+    suspend fun postJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse =
+        ioIfNeeded { internalPostJSON(url, jsonBody, apiName, silentError) }
+
+    /**
+     * Driving logic for posting a JSON body to the Api.
+     * This function executes the HTTP POST request and processes the response.
+     *
+     * @param url The URL to post the JSON body to.
+     * @param jsonBody The JSON body to post.
+     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     */
+    private fun internalPostJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse {
+        val method = HttpPost(url).apply {
+            entity = StringEntity(jsonBody, ContentType.APPLICATION_JSON)
+        }
+        val apiIntention = ApiIntentionContext(method, apiName)
+        val (apiResponse, entity) = withHttpClient(apiIntention, silentError = silentError)
+        apiResponse.data = entity.readEntityResponse<JsonObject>()
+
+        return apiResponse
+    }
+    // </editor-fold>
 
     private var disabledApis: DisabledApiJson? = null
 
@@ -314,15 +338,10 @@ object ApiUtils {
         disabledApis = event.getConstant<DisabledApiJson>("misc/DisabledApi")
     }
 
-    fun isMoulberryLowestBinDisabled(): Boolean {
-        return disabledApis?.disabledMoulberryLowestBin == true
-    }
-
-    fun isHypixelItemsDisabled(): Boolean {
-        return disabledApis?.disableHypixelItems == true
-    }
-
-    fun isBazaarDisabled(): Boolean {
-        return disabledApis?.disabledBazaar == true
-    }
+    fun isMoulberryLowestBinDisabled() = disabledApis?.disabledMoulberryLowestBin == true
+    fun isHypixelItemsDisabled() = disabledApis?.disableHypixelItems == true
+    fun isBazaarDisabled() = disabledApis?.disabledBazaar == true
+    fun isEliteAhDisabled() = disabledApis?.disabledEliteAh == true
+    fun isEliteBzDisabled() = disabledApis?.disabledEliteBz == true
+    fun isEliteItemsDisabled() = disabledApis?.disabledEliteItems == true
 }

@@ -61,12 +61,13 @@ object HypixelBazaarFetcher {
         }
     }
 
-    private fun fetchAndProcessBazaarData() {
+    private suspend fun fetchAndProcessBazaarData() {
         nextFetchTime = SimpleTimeMark.now() + 2.minutes
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
         try {
-            val jsonResponse = ApiUtils.getJSONResponse(URL, apiName = "Hypixel Bazaar").asJsonObject
+            val jsonResponse = ApiUtils.getJSONResponse(URL, apiName = "Hypixel Bazaar")
+                ?: return onError(fetchType, Exception("Failed to fetch bazaar data from Hypixel API"))
             val response = ConfigManager.gson.fromJson<BazaarApiResponseJson>(jsonResponse)
             if (response.success) {
                 latestProductInformation = process(response.products)

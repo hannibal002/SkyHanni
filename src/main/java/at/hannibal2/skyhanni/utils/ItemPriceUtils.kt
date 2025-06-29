@@ -169,12 +169,11 @@ object ItemPriceUtils {
         }
     }
 
-    private fun refreshLowestBins() {
+    private suspend fun refreshLowestBins() {
         lowestBins = ApiUtils.getJSONResponse(
             "https://moulberry.codes/lowestbin.json.gz",
             apiName = "NEU Lowest Bin",
-            gunzip = true,
-        )
+        ) ?: lowestBins
     }
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {
@@ -205,6 +204,25 @@ object ItemPriceUtils {
             }
             simpleCallback {
                 debugItemPrice(null)
+            }
+        }
+        event.registerBrigadier("shfetchmoulblbins") {
+            description = "Test fetching Moulberry's lowest bin data."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                SkyHanniMod.launchIOCoroutine {
+                    val timeNow = SimpleTimeMark.now()
+                    val fetchedLowestBins = ApiUtils.getJSONResponse(
+                        "https://moulberry.codes/lowestbin.json.gz",
+                        apiName = "NEU Lowest Bin",
+                    )
+                    if (fetchedLowestBins != null) {
+                        lowestBins = fetchedLowestBins
+                        ChatUtils.chat("Fetched Moulberry's lowest bin data in ${timeNow.passedSince()}!")
+                    } else {
+                        ChatUtils.userError("Failed to fetch Moulberry's lowest bin data!")
+                    }
+                }
             }
         }
     }

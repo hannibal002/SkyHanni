@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.chat.translation
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -104,9 +103,7 @@ object Translator {
      * ]
      */
 
-    private fun getJSONResponse(urlString: String) = ApiUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
-
-    fun getTranslation(
+    suspend fun getTranslation(
         message: String,
         targetLanguage: String,
         sourceLanguage: String = "auto",
@@ -116,7 +113,9 @@ object Translator {
         val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=$encode"
 
         var messageToSend = ""
-        val fullResponse = getJSONResponse(url).asJsonArray
+        val jsonResponse = ApiUtils.getTypedJSONResponse<JsonArray>(url, "Google Translate API")
+            ?: return null
+        val fullResponse = jsonResponse.asJsonArray
         if (fullResponse.size() < 3) return null
 
         val language = fullResponse[2].toString() // the detected language the message is in
@@ -135,7 +134,7 @@ object Translator {
     private fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 
-        coroutineScope.launch {
+        SkyHanniMod.coroutineScope.launch {
             val translation = getTranslation(message, nativeLanguage())
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = translation?.get(1) ?: "Error!"
@@ -160,7 +159,7 @@ object Translator {
         val language = args[0]
         val message = args.drop(1).joinToString(" ")
 
-        coroutineScope.launch {
+        SkyHanniMod.coroutineScope.launch {
             val translation = getTranslation(message, language, nativeLanguage())?.get(0) ?: "Error!"
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
@@ -199,15 +198,17 @@ object Translator {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        val translation = getTranslation(message, targetLanguage, sourceLanguage)
-        val translatedMessage = translation?.get(0) ?: "Error!"
-        val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
+        SkyHanniMod.coroutineScope.launch {
+            val translation = getTranslation(message, targetLanguage, sourceLanguage)
+            val translatedMessage = translation?.get(0) ?: "Error!"
+            val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
 
-        ChatUtils.clickableChat(
-            "Found translation from sl: $sourceLanguage: §f$translatedMessage §7(tl: $targetLanguage)",
-            onClick = { OSUtils.copyToClipboard(translatedMessage) },
-            "§eClick to copy!\n§eOriginal message: §f$message §7(sl: $sourceLanguage$detectedLanguage)",
-        )
+            ChatUtils.clickableChat(
+                "Found translation from sl: $sourceLanguage: §f$translatedMessage §7(tl: $targetLanguage)",
+                onClick = { OSUtils.copyToClipboard(translatedMessage) },
+                "§eClick to copy!\n§eOriginal message: §f$message §7(sl: $sourceLanguage$detectedLanguage)",
+            )
+        }
     }
 
     fun nativeLanguage(): String = config.languageCode.get().ifEmpty { "en" }

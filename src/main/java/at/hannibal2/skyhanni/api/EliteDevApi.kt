@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -37,25 +38,27 @@ object EliteDevApi {
             category = CommandCategory.DEVELOPER_DEBUG
             arg("resource", EnumArgumentType.name<EliteResourceType>()) { resource ->
                 callback {
-                    val resourceType = getArg(resource)
-                    val timeNow = SimpleTimeMark.now()
-                    when (resourceType) {
-                        EliteResourceType.ITEM -> {
-                            val itemResources = fetchItemResources() ?: return@callback
-                            ChatUtils.chat("§aItem resources fetched: ${itemResources.items.size}")
+                    SkyHanniMod.launchIOCoroutine {
+                        val resourceType = getArg(resource)
+                        val timeNow = SimpleTimeMark.now()
+                        when (resourceType) {
+                            EliteResourceType.ITEM -> {
+                                val itemResources = fetchItemResources() ?: return@launchIOCoroutine
+                                ChatUtils.chat("§aItem resources fetched: ${itemResources.items.size}")
+                            }
+                            EliteResourceType.AUCTION -> {
+                                val auctionResources = fetchAuctionResources() ?: return@launchIOCoroutine
+                                ChatUtils.chat("§aAuction resources fetched: ${auctionResources.items.size}")
+                            }
+                            EliteResourceType.BAZAAR -> {
+                                val bazaarResources = fetchBazaarResources() ?: return@launchIOCoroutine
+                                ChatUtils.chat("§aBazaar resources fetched: ${bazaarResources.products.size}")
+                            }
                         }
-                        EliteResourceType.AUCTION -> {
-                            val auctionResources = fetchAuctionResources() ?: return@callback
-                            ChatUtils.chat("§aAuction resources fetched: ${auctionResources.items.size}")
-                        }
-                        EliteResourceType.BAZAAR -> {
-                            val bazaarResources = fetchBazaarResources() ?: return@callback
-                            ChatUtils.chat("§aBazaar resources fetched: ${bazaarResources.products.size}")
-                        }
+                        val elapsedTime = timeNow.passedSince()
+                        val elapsedFormat = elapsedTime.format()
+                        ChatUtils.chat("Fetched ${resourceType.name} resources in $elapsedFormat")
                     }
-                    val elapsedTime = timeNow.passedSince()
-                    val elapsedFormat = elapsedTime.format()
-                    ChatUtils.chat("Fetched ${resourceType.name} resources in $elapsedFormat")
                 }
             }
         }
@@ -65,6 +68,7 @@ object EliteDevApi {
 
     private const val CONTEST_API_NAME = "Elitebot Farming Contests"
     private const val CONTEST_API_URL = "$ELITEBOT_API_URL/contests/at/now"
+    private val contestStatic = ApiUtils.StaticApiPath(CONTEST_API_URL, CONTEST_API_NAME)
 
     private const val FARMING_WEIGHT_API_NAME = "Elitebot Farming Weight"
     private const val FARMING_WEIGHT_URL = "$ELITEBOT_API_URL/weight"
@@ -77,24 +81,29 @@ object EliteDevApi {
     private const val RESOURCE_API_URL = "$ELITEBOT_API_URL/resources"
 
     // <editor-fold desc="Upcoming Contests">
-    fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
-        val jsonContestsResponse = ApiUtils.getJSONResponse(CONTEST_API_URL, apiName = CONTEST_API_NAME)
-        val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(jsonContestsResponse)
+    var contestsApiResponse: JsonObject? = null
+    suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
+        contestsApiResponse = ApiUtils.getJSONResponse(CONTEST_API_URL, apiName = CONTEST_API_NAME)
+        val contestsApiResponse = contestsApiResponse ?: throw IllegalStateException("Response was null")
+        val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(contestsApiResponse)
         contestResponse.responseContests
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
-            e, "Failed to fetch upcoming contests. Please report this error if it continues to occur",
+            e,
+            "Failed to fetch upcoming contests. Please report this error if it continues to occur",
+            "contestApiResponse" to contestsApiResponse,
         )
         null
     }
 
-    fun submitContests(contests: List<EliteFarmingContest>): Boolean = try {
+    suspend fun submitContests(contests: List<EliteFarmingContest>): Boolean = try {
         val body = ConfigManager.Companion.gson.toJson(
             contests.associate { contest ->
                 contest.startTime.toMillis() / 1000 to contest.crops.map { crop -> crop.cropName }
             },
         )
-        ApiUtils.postJSONIsSuccessful(CONTEST_API_URL, body, apiName = CONTEST_API_NAME)
+        val response = ApiUtils.postJSON(contestStatic, body)
+        response.success
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
             e,
@@ -108,7 +117,7 @@ object EliteDevApi {
     // <editor-fold desc="Farming Weight">
     private var weightUrl = ""
     private var weightApiResponse: JsonObject? = null
-    fun fetchWeightProfile(localProfile: String): WeightProfile? = try {
+    suspend fun fetchWeightProfile(localProfile: String): WeightProfile? = try {
         require(localProfile.isNotBlank()) { "Local profile cannot be blank" }
 
         val uuid = PlayerUtils.getUuid()
@@ -144,7 +153,7 @@ object EliteDevApi {
     }
 
     private var apiWeightsResponse: JsonObject? = null
-    fun fetchApiWeights(): EliteWeightsJson? = try {
+    suspend fun fetchApiWeights(): EliteWeightsJson? = try {
         apiWeightsResponse = ApiUtils.getJSONResponse(API_WEIGHTS_URL, apiName = FARMING_WEIGHT_API_NAME)
         val apiWeightsResponse = apiWeightsResponse ?: throw IllegalStateException("Response was null")
         ConfigManager.gson.fromJson<EliteWeightsJson>(apiWeightsResponse)
@@ -160,7 +169,7 @@ object EliteDevApi {
     // <editor-fold desc="Weight Leaderboard">
     private var lbUrl = ""
     private var lbApiResponse: JsonObject? = null
-    fun fetchLeaderboardPositions(
+    suspend fun fetchLeaderboardPositions(
         profileId: String,
         lbType: EliteLeaderboardType,
         upcomingCount: Int? = null,
@@ -195,11 +204,11 @@ object EliteDevApi {
     // <editor-fold desc="Resources">
     private var resourceUrl = ""
     private var resourceApiResponse: JsonObject? = null
-    private inline fun <reified T> fetchResources(
+    private suspend inline fun <reified T> fetchResources(
         subUrl: String,
     ): T? = try {
         resourceUrl = "$RESOURCE_API_URL/$subUrl"
-        resourceApiResponse = ApiUtils.getGZippedJSONResponse(resourceUrl, apiName = RESOURCE_API_NAME)
+        resourceApiResponse = ApiUtils.getJSONResponse(resourceUrl, apiName = RESOURCE_API_NAME)
         val resourceApiResponse = resourceApiResponse ?: throw IllegalStateException("Response was null")
         ConfigManager.gson.fromJson(resourceApiResponse, T::class.java)
     } catch (e: Exception) {
@@ -211,8 +220,8 @@ object EliteDevApi {
         null
     }
 
-    private fun fetchItemResources() = fetchResources<EliteItemResponse>("items")
-    private fun fetchAuctionResources() = fetchResources<EliteAuctionsResponse>("auctions")
-    private fun fetchBazaarResources() = fetchResources<EliteBazaarResponse>("bazaar")
+    private suspend fun fetchItemResources() = fetchResources<EliteItemResponse>("items")
+    private suspend fun fetchAuctionResources() = fetchResources<EliteAuctionsResponse>("auctions")
+    private suspend fun fetchBazaarResources() = fetchResources<EliteBazaarResponse>("bazaar")
     // </editor-fold>
 }
