@@ -31,6 +31,9 @@ val rulesBroken: MutableMap<String, Int> = mutableMapOf()
 val violatingFiles: MutableMap<String, Int> = mutableMapOf()
 val flaggedFileUrls: MutableMap<String, String> = mutableMapOf()
 
+val pathToNameCache: MutableMap<String, String> = mutableMapOf()
+val wholeRuleToNameCache: MutableMap<String, String> = mutableMapOf()
+
 val formatLines = lines.filter { it.isNotBlank() }.mapNotNull { raw ->
     sarifPattern.matcher(raw).takeIf { it.matches() }?.let {
         val filePath = it.group("filePath")
@@ -42,6 +45,8 @@ val formatLines = lines.filter { it.isNotBlank() }.mapNotNull { raw ->
 
         rulesBroken[wholeRule] = rulesBroken.getOrDefault(wholeRule, 0) + 1
         violatingFiles[filePath] = violatingFiles.getOrDefault(filePath, 0) + 1
+        pathToNameCache[filePath] = fileName
+        wholeRuleToNameCache[wholeRule] = rule
 
         val cleanedFilePath = filePath.substringAfter("src/")
         val urlFormat = "$urlBase$cleanedFilePath#L$lineNum"
@@ -59,6 +64,7 @@ val shouldCollapseComment = totalRulesBroken > 5
 fun buildCollapsedComment(): String = buildString {
     appendLine("<details>")
     appendLine("<summary>Rule violations</summary>")
+    appendLine()
     formatLines.forEach { (_, line) ->
         appendLine(line)
     }
@@ -74,23 +80,27 @@ val sb = StringBuilder().apply {
         val ceilingedKeys = rulesBroken.keys.take(6)
         val xMoreFormat = when (ceilingedKeys) {
             rulesBroken.keys -> ""
-            else -> "(+ ${rulesBroken.size - ceilingedKeys.size} more)"
+            else -> " (+ ${rulesBroken.size - ceilingedKeys.size} more)"
         }
-        val ruleViolationsFormat = ceilingedKeys.joinToString(", ") { "`$it`" }
+        val ruleViolationsFormat = ceilingedKeys.joinToString(", ") {
+            val ruleName = wholeRuleToNameCache[it] ?: it
+            "`$ruleName`"
+        }
         append ("**<ins>Rules flagged</ins>** (${rulesBroken.size}): $ruleViolationsFormat$xMoreFormat\n")
     }
 
     if (violatingFiles.size > 1) {
         val ceilingedFiles = violatingFiles.entries.take(6)
-        val xMoreFormat = when (ceilingedFiles) {
-            violatingFiles.keys -> ""
-            else -> "(+ ${violatingFiles.size - ceilingedFiles.size} more)"
+        val xMoreFormat = when (ceilingedFiles.size) {
+            violatingFiles.keys.size -> ""
+            else -> " (+ ${violatingFiles.size - ceilingedFiles.size} more)"
         }
         val fileViolationsFormat = ceilingedFiles.joinToString(", ") { (filePath, _) ->
             val url = flaggedFileUrls[filePath]
+            val fileName = pathToNameCache[filePath] ?: filePath.substringAfter("src/")
             when (url) {
-                null -> "`$filePath`"
-                else -> "[$filePath]($url)"
+                null -> "`$fileName`"
+                else -> "[$fileName]($url)"
             }
         }
         append("**<ins>Files flagged</ins>** (${violatingFiles.size}): $fileViolationsFormat$xMoreFormat\n")
