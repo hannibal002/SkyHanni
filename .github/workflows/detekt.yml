@@ -88,16 +88,12 @@ jobs:
                 with:
                     name: detekt-output
                     path: .
-            -   name: Set up Node.js
-                uses: actions/setup-node@v4
-                with:
-                    node-version: '>=21'
             -   name: Process detekt output and create comment
                 env:
                     PR_SHA: ${{ github.event.pull_request.head.sha }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                 run: |
-                    node .github/scripts/process_detekt_output.js
+                    kotlinc -script .github/scripts/processDetektOutput.kts
 
             -   name: Add comment to PR
                 uses: actions/github-script@v6
