@@ -37,8 +37,9 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 
 @SkyHanniModule
+@Suppress("InjectDispatcher")
 object ApiUtils {
-    data class ApiResponse <T : JsonElement> (val success: Boolean, val message: String?, var data: T? = null)
+    data class ApiResponse<T : JsonElement> (val success: Boolean, val message: String?, var data: T? = null)
     data class StaticApiPath(val url: String, val apiName: String)
 
     private val parser: JsonParser = JsonParser()
@@ -252,7 +253,7 @@ object ApiUtils {
         silentError: Boolean = true,
         tryForceGzip: Boolean = false,
     ): JsonObject? = withContext(Dispatchers.IO) {
-        internalGetJSONResponse(static.url, static.apiName, silentError)
+        internalGetJSONResponse(static.url, static.apiName, silentError, tryForceGzip)
     }
 
     /**
@@ -270,7 +271,7 @@ object ApiUtils {
         silentError: Boolean = true,
         tryForceGzip: Boolean = false,
     ): JsonObject? = withContext(Dispatchers.IO) {
-        internalGetJSONResponse(url, apiName, silentError)
+        internalGetJSONResponse(url, apiName, silentError, tryForceGzip)
     }
 
     /**
@@ -289,7 +290,7 @@ object ApiUtils {
         silentError: Boolean = true,
         tryForceGzip: Boolean = false,
     ): T? = withContext(Dispatchers.IO) {
-        internalGetJSONResponse(url, apiName, silentError)
+        internalGetJSONResponse(url, apiName, silentError, tryForceGzip)
     }
 
     /**
@@ -318,6 +319,7 @@ object ApiUtils {
             silentError = silentError,
             entityHandler = { it.readEntityResponse(tryForceGzip) }
         )
+        // Todo discarding the rest of the response is pretty eh
         return apiResponse.data
     }
     // </editor-fold>
