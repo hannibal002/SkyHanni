@@ -42,7 +42,7 @@ object ModifyVisualWords {
         if (!config.enabled) return orderedText
         if (!changeWords) return orderedText
 
-        return textCache.computeIfAbsent(orderedText) {
+        return textCache.getOrPut(orderedText) {
 
             var characters = mutableListOf<StyledCharacter>()
             var hasCachedCharacters = false
@@ -87,7 +87,7 @@ object ModifyVisualWords {
         if (!config.enabled) return stringVisitable
         if (!changeWords) return stringVisitable
 
-        return stringVisitableCache.computeIfAbsent(stringVisitable) {
+        return stringVisitableCache.getOrPut(stringVisitable) {
             var characters = mutableListOf<StyledCharacter>()
             stringVisitable.visit(
                 { style, string ->

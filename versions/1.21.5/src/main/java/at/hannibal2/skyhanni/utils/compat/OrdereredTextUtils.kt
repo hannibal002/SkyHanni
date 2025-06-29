@@ -34,15 +34,15 @@ object OrderedTextUtils {
     private val legacyToTextCache = TimeLimitedCache<String, OrderedText>(5.minutes)
 
     @JvmStatic
-    fun legacyTextToOrderedText(legacyString: String?): OrderedText {
+    fun legacyTextToOrderedText(legacyString: String): OrderedText {
 
-        return legacyToTextCache.computeIfAbsent(legacyString ?: "") {
-            val isNoReplace = it.startsWith("§§")
+        return legacyToTextCache.getOrPut(legacyString) {
+            val isNoReplace = legacyString.startsWith("§§")
 
             OrderedText { visitor ->
                 if (isNoReplace) visitor.accept(0, Style.EMPTY, -1)
 
-                TextVisitFactory.visitFormatted(it, Style.EMPTY) { index: Int, style: Style, codePoint: Int ->
+                TextVisitFactory.visitFormatted(legacyString, Style.EMPTY) { index: Int, style: Style, codePoint: Int ->
                     visitor.accept(index, style, codePoint)
                     true
                 }
