@@ -12,11 +12,11 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
         fun aaron() = OtherModsSettings("net.azureaaron.mod.config.AaronModConfigManager")
 
         internal fun loadClass(path: String): Class<*>? =
-            runCatching { classCache.computeIfAbsent(path) { Class.forName(path) } }
+            runCatching { classCache.getOrPut(path) { Class.forName(path) } }
                 .getOrNull()
 
         internal fun getField(modPath: String, clazz: Class<*>, name: String): Field =
-            fieldCache.computeIfAbsent(Triple(modPath, clazz, name)) {
+            fieldCache.getOrPut(Triple(modPath, clazz, name)) {
                 runCatching {
                     clazz.getField(name).apply { isAccessible = true }
                 }.getOrElse {
@@ -50,8 +50,8 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
         val (rootInstance, firstField) = getOptionPair(chain[0].name) ?: return null
         var current: Any? = runCatching { firstField.get(rootInstance) }.getOrNull()
 
-        for (f in chain.drop(1)) {
-            current = current?.let { runCatching { f.get(it) }.getOrNull() } ?: return null
+        for (field in chain.drop(1)) {
+            current = current?.let { runCatching { field.get(it) }.getOrNull() } ?: return null
         }
         return current as? T
     }
@@ -65,8 +65,8 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
         val (rootInstance, firstField) = getOptionPair(chain[0].name) ?: return
         var current: Any? = runCatching { firstField.get(rootInstance) }.getOrNull()
 
-        for (f in chain.drop(1).dropLast(1)) {
-            current = current?.let { runCatching { f.get(it) }.getOrNull() } ?: return
+        for (field in chain.drop(1).dropLast(1)) {
+            current = current?.let { runCatching { field.get(it) }.getOrNull() } ?: return
         }
         runCatching { chain.last().set(current, value) }
     }
@@ -76,10 +76,10 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
         val rootPair = getOptionPair(segments.first()) ?: return emptyList()
         val fields = mutableListOf(rootPair.second)
         var currentClass = rootPair.second.type
-        for (seg in segments.drop(1)) {
-            val f = getField(modConfigPath, currentClass, seg)
-            fields += f
-            currentClass = f.type
+        for (segment in segments.drop(1)) {
+            val field = getField(modConfigPath, currentClass, segment)
+            fields += field
+            currentClass = field.type
         }
         return fields
     }
@@ -87,13 +87,13 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
     private fun getOptionPair(rootName: String): Pair<Any?, Field>? {
         val cfgClass = loadClass(modConfigPath) ?: return null
         runCatching {
-            val f = getField(modConfigPath, cfgClass, rootName)
-            return null to f
+            val field = getField(modConfigPath, cfgClass, rootName)
+            return null to field
         }
         return runCatching {
             val instance = cfgClass.getMethod("get").invoke(null)!!
-            val f = getField(modConfigPath, instance.javaClass, rootName)
-            instance to f
+            val field = getField(modConfigPath, instance.javaClass, rootName)
+            instance to field
         }.getOrNull()
     }
 
