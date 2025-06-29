@@ -156,7 +156,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(name = "Attribute Shards", desc = "")
     @Accordion
-    public AttributeShardsConfig attributeShards = new AttributeShardsConfig();
+    val attributeShards: AttributeShardsConfig = AttributeShardsConfig()
 
     @Expose
     @ConfigOption(name = "Evolving Items", desc = "")
