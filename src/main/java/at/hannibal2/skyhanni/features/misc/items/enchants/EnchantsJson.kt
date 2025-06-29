@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser.colorFormatCodes
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.util.regex.Pattern
-import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser.colorFormatCodes
 
 class EnchantsJson {
     @Expose
@@ -30,7 +30,7 @@ class EnchantsJson {
     fun containsEnchantment(
         enchants: Map<String, Int>,
         line: String,
-        enchantmentPattern: Pattern, 
+        enchantmentPattern: Pattern,
         removeFormattingCodes: Boolean
     ): Boolean {
         val exclusiveMatch = EnchantParser.enchantmentExclusivePattern.matcher(line)
