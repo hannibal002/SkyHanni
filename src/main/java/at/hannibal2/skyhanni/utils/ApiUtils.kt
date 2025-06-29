@@ -313,13 +313,12 @@ object ApiUtils {
         val request = HttpGet(url).apply {
             if (tryForceGzip) addHeader("Accept-Encoding", "gzip")
         }
-        val apiIntention = ApiIntentionContext(request, apiName)
         val apiResponse = withHttpClient<T>(
-            apiIntention,
+            ApiIntentionContext(request, apiName),
             silentError = silentError,
             entityHandler = { it.readEntityResponse(tryForceGzip) }
         )
-        // Todo discarding the rest of the response is pretty eh
+        // Todo discarding the rest of the constructed ApiIntentionContext, maybe return it?
         return apiResponse.data
     }
     // </editor-fold>
