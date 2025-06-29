@@ -115,9 +115,10 @@ object EnchantParser {
      * REGEX-TEST: §r
      * REGEX-TEST: §b
      */
-    val colorFormatCodes by patternGroup.pattern(
+    val colorFormatCodesPattern by patternGroup.pattern(
         "formatCodes.color", "§[0-9a-fr]"
     )
+    val colorFormatCodes = colorFormatCodesPattern.toRegex()
 
     private var currentItem: ItemStack? = null
 
