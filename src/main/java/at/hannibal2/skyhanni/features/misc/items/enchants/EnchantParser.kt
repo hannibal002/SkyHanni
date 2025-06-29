@@ -67,7 +67,7 @@ object EnchantParser {
      * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
      */
     @Suppress("MaxLineLength")
-    val enchantmentPattern by patternGroup.pattern(
+    private val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
         "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
@@ -81,8 +81,8 @@ object EnchantParser {
      * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
      */
     @Suppress("MaxLineLength")
-    val enchantmentPatternAaronChroma by patternGroup.pattern(
-        "enchants.aaronchroma",
+    private val enchantmentPatternAaronChroma by patternGroup.pattern(
+        "enchants.aaron.chroma",
         "(?:§7§l|§d§l|§[0-9a-fr])(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
     /**
@@ -97,8 +97,8 @@ object EnchantParser {
      * REGEX-TEST: §rH§ra§rr§rv§re§rs§rt§ri§rn§rg§r §rV§rI
      */
     @Suppress("MaxLineLength")
-    val enchantmentPatternAaronStill by patternGroup.pattern(
-        "enchants.aaronstill",
+    private val enchantmentPatternAaronStill by patternGroup.pattern(
+        "enchants.aaron.still",
         "(?:§7§l|§d§l|§[0-9a-f]|§r)(?<enchant>[A-Za-z][A-Za-z '§-]+) (?:§[0-9a-fr])?(?<levelNumeral>(?:(?:[IVXLCDM]|[0-9])(?:§[0-9a-fr])?)+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
     /**
@@ -108,7 +108,7 @@ object EnchantParser {
      * REGEX-TEST: Aqua Affinity
      */
     private val grayEnchantPattern by patternGroup.pattern(
-        "grayenchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
+        "gray.enchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
     )
 
     private var currentItem: ItemStack? = null
@@ -141,8 +141,8 @@ object EnchantParser {
         this.enchants = event.getConstant<EnchantsJson>("Enchants")
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         // Add observers to config options that would need us to mark cache dirty
         ConditionalUtils.onToggle(
             config.colorParsing,
@@ -378,9 +378,9 @@ object EnchantParser {
     /**
      * null: off, false: still, true: chroma
      */
-    fun getAaronChromaMode(aaronModSettings: OtherModsSettings = OtherModsSettings.aaron()): Boolean? {
-        return if (aaronModSettings.getBoolean("skyblock.enchantments.rainbowMaxEnchants") == true) {
-            aaronModSettings.getConfigValue("skyblock.enchantments.rainbowMode").toString() == "Chroma"
+    private fun getAaronChromaMode(settings: OtherModsSettings = OtherModsSettings.aaron()): Boolean? {
+        return if (settings.getBoolean("skyblock.enchantments.rainbowMaxEnchants") == true) {
+            settings.getConfigValue("skyblock.enchantments.rainbowMode").toString() == "Chroma"
         } else {
             null
         }
