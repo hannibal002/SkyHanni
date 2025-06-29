@@ -195,16 +195,9 @@ object UpgradeReminder {
             ChatUtils.clickToActionOrDisable(
                 "The §a$name §eupgrade has completed!",
                 config::accountUpgradeReminder,
-                actionName = "warp to Hub",
+                actionName = "warp to Elizabeth",
                 action = {
-                    HypixelCommands.warp("hub")
-                    EntityMovementData.onNextTeleport(IslandType.HUB) {
-                        IslandGraphs.pathFind(
-                            LorenzVec(-2.6, 73.0, -101.6),
-                            "§eCommunity Shop",
-                            condition = { config.accountUpgradeReminder },
-                        )
-                    }
+                    HypixelCommands.warp("elizabeth")
                 },
             )
         }
