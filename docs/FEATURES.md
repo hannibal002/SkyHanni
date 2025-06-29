@@ -271,6 +271,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Doesn't suppport coins.
 + Added Evolving Item time remaining in lore (Bottle of Jyrre, Dark Cacao Truffle, etc.). - Obsidian (https://github.com/hannibal002/SkyHanni/pull/3614)
 + Added option to highlight Current Pet in menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
++ Added Fann Leveling Cost. - minhperry + Daveed (https://github.com/hannibal002/SkyHanni/pull/4061)
+    + Coins per XP and XP per Bit.
 
 </details>
 <details open><summary>
@@ -1029,6 +1031,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Tracks logs and enchanted logs sent to Sacks, and Tree Gifts.
     + Option to hide or compact Tree Gift messages in chat.
 + Added Movable Lasso Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4161)
++ Added Hideonleaf Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4172)
++ Added Phantoms Muter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4174)
+    + Mutes Phantoms in Galatea.
 
 </details>
 <details open><summary>
