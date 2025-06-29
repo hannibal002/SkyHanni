@@ -223,8 +223,8 @@ dependencies {
     if (target == ProjectTarget.MAIN) {
         shadowModImpl(libs.moulconfig)
     } else if (target == ProjectTarget.MODERN) {
-        shadowModImpl(libs.moulconfigmodern)
-        include(libs.moulconfigmodern)
+        shadowModImpl(libs.moulconfigModern)
+        include(libs.moulconfigModern)
     }
     @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
