@@ -56,7 +56,7 @@ public class CustomWardrobeConfig {
     public int tooltipKeybind = Keyboard.KEY_LSHIFT;
 
     @Expose
-    @ConfigOption(name = "Show Rei Items", desc = "Enables showing the Rei item list from firmament while in the custom wardrobe.")
+    @ConfigOption(name = "Show REI Items", desc = "Enables showing the REI item list from Firmament while in the custom wardrobe.")
     @OnlyModern
     @ConfigEditorBoolean
     public boolean showReiItems = true;
