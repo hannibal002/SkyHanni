@@ -34,6 +34,7 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
 
     private val chainCache = ConcurrentHashMap<Pair<String, String>, List<Field>>()
 
+    fun isEnabled(path: String): Boolean = getBoolean(path) ?: false
     fun getBoolean(path: String): Boolean? = getNestedValue<Boolean>(path)
     fun setBoolean(path: String, value: Boolean) = setNestedValue(path, value)
     fun getConfigValue(path: String): Any? = getNestedValue<Any>(path)

@@ -392,7 +392,7 @@ object EnchantParser {
      * null: off, false: still, true: chroma
      */
     private fun getAaronChromaMode(settings: OtherModsSettings = OtherModsSettings.aaron()): Boolean? {
-        return if (settings.getBoolean("skyblock.enchantments.rainbowMaxEnchants") == true) {
+        return if (settings.isEnabled("skyblock.enchantments.rainbowMaxEnchants")) {
             settings.getConfigValue("skyblock.enchantments.rainbowMode").toString() == "Chroma"
         } else {
             null
