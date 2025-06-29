@@ -15,26 +15,28 @@ import net.minecraft.util.EnumParticleTypes
 @SkyHanniModule
 object ParticleHider {
 
+    private val config get() = SkyHanniMod.feature.misc.particleHiders
+
     private fun inM7Boss() = DungeonApi.inDungeon() && DungeonApi.dungeonFloor == "M7" && DungeonApi.inBossRoom
 
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!MinecraftCompat.localPlayerExists) return
         val distanceToPlayer = event.distanceToPlayer
-        if (SkyHanniMod.feature.misc.particleHiders.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
+        if (config.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
             event.cancel()
             return
         }
 
         val type = event.type
-        if (SkyHanniMod.feature.misc.particleHiders.hideCloseRedstoneParticles &&
+        if (config.hideCloseRedstoneParticles &&
             type == EnumParticleTypes.REDSTONE && distanceToPlayer < 2
         ) {
             event.cancel()
             return
         }
 
-        if (SkyHanniMod.feature.misc.particleHiders.hideFireballParticles &&
+        if (config.hideFireballParticles &&
             (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE)
         ) {
             for (entity in EntityUtils.getEntities<EntitySmallFireball>()) {
@@ -46,6 +48,12 @@ object ParticleHider {
             }
         }
     }
+
+    @JvmStatic
+    fun shouldHideFireParticles() = MinecraftCompat.localWorldExists && config.hideFireBlockParticles
+
+    @JvmStatic
+    fun shouldHideBlazeParticles() = MinecraftCompat.localWorldExists && config.hideBlazeParticles
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

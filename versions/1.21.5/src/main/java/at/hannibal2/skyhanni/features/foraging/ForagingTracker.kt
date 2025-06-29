@@ -8,9 +8,11 @@ import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -19,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -56,8 +59,12 @@ object ForagingTracker {
         tracker.initRenderer({ config.position }) { isInIsland() && heldItemEnabled() && config.enabled }
     }
 
-    private fun heldItemEnabled() = !config.onlyHoldingAxe || isHoldingAxe()
-    private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE
+    private fun heldItemEnabled() = !config.onlyHoldingAxe ||
+        (isHoldingAxe() || lastAxeHeldTime.passedSince() < config.disappearingDelay.seconds)
+    private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE || hasHeldAxe
+
+    private var lastAxeHeldTime: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var hasHeldAxe: Boolean = false
 
     private fun drawDisplay(bucketData: ForagingTrackerLegacy.BucketData): List<Searchable> = buildList {
         addSearchString("§a§lForaging Tracker")
@@ -354,4 +361,15 @@ object ForagingTracker {
         }
     }
 
+    @HandleEvent
+    fun onItemChange(event: ItemInHandChangeEvent) {
+        if (!isInIsland()) return
+        val isAxe = event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE
+        if (isAxe != hasHeldAxe) {
+            if (!isAxe) {
+                lastAxeHeldTime = SimpleTimeMark.now()
+            }
+            hasHeldAxe = isAxe
+        }
+    }
 }

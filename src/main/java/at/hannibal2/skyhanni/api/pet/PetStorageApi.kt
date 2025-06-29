@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstUniqueByOrNull
@@ -45,6 +46,7 @@ import java.util.regex.Matcher
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PetStorageApi {
@@ -56,6 +58,8 @@ object PetStorageApi {
     private const val SB_MENU_CURRENT_PET_SLOT = 30
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
     private val EXP_SHARE_SLOTS = listOf(30, 31, 32)
+    private var jsonNeedsSave: Boolean = false
+    private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
 
     // <editor-fold desc="Patterns">
     /**
@@ -164,7 +168,13 @@ object PetStorageApi {
 
     private fun Matcher.getRarityOrNull() = LorenzRarity.getByColorCode(group("rarity")[0])
 
-    private fun saveConfig() = SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+    @HandleEvent
+    fun onSecondPassed() {
+        if (!jsonNeedsSave || lastSaved.passedSince() < 30.seconds) return
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+        jsonNeedsSave = false
+        lastSaved = SimpleTimeMark.now()
+    }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -204,7 +214,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.TAB)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 
@@ -243,7 +253,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.AUTOPET)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 
@@ -271,7 +281,7 @@ object PetStorageApi {
 
             else -> return
         }
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
@@ -304,8 +314,7 @@ object PetStorageApi {
                 petStorage.pets[it] = data
             } ?: petStorage.pets.add(data)
         }
-
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
@@ -329,7 +338,7 @@ object PetStorageApi {
         } ?: petStorage.pets.add(data)
 
         CurrentPetApi.assertFoundCurrentData(data, CurrentPetApi.PetDataAssertionSource.MENU)
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
@@ -380,7 +389,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.MENU)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 
