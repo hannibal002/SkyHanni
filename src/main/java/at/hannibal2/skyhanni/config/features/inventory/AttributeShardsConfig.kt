@@ -44,6 +44,12 @@ class AttributeShardsConfig {
     var tierAsStackSize: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Highlight Disabled Attributes", desc = "Highlight disabled attributes in /attributemenu.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var highlightDisabledAttributes: Boolean = true
+
+    @Expose
     @ConfigLink(owner = AttributeShardsConfig::class, field = "enabled")
     val displayPosition: Position = Position(174, 139)
 
