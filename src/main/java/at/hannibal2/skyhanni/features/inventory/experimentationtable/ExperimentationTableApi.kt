@@ -7,10 +7,12 @@ import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ExperimentsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
@@ -58,106 +60,6 @@ object ExperimentationTableApi {
     private val currentExperimentData = ExperimentationDataSet()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
-    val experimentationTableInventory = InventoryDetector { name -> inventoriesPattern.matches(name) }
-    val inTable get() = experimentationTableInventory.isInside()
-    val isActive get() = currentExperimentData.tier != null
-    val currentExperimentTier get() = currentExperimentData.tier
-    val currentExperimentType get() = currentExperimentData.type
-
-    private var lastExpOverHash: Int = 0
-    private var currentExpOverHash: Int = 0
-    private var queuedCompleteEvent: TableTaskCompletedEvent? = null
-    private var handleBottlesOnInvClose: Boolean = false
-    private var lastBottlesInInventory: Map<NeuInternalName, Int> = getBottlesInOwnInventory()
-    private var currentBottlesInInventory: Map<NeuInternalName, Int> = mapOf()
-
-    enum class ExperimentationMessages(private val displayName: String) {
-        DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
-        EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),
-        ENCHANTMENTS("§8 +§9Smite VII §8(§7Enchantment Drops§8)"),
-        BOTTLES("§8 +§9Titanic Experience Bottle §8(§7Bottle Drops§8)"),
-        MISC("§8 +§5Metaphysical Serum §8(§7Misc Drops§8)");
-
-        override fun toString() = displayName
-    }
-
-    enum class ExperimentationTaskType(private val displayName: String) {
-        CHRONOMATRON("Chronomatron"),
-        ULTRASEQUENCER("Ultrasequencer"),
-        SUPERPAIRS("Superpairs"),
-        ;
-
-        override fun toString() = displayName
-
-        companion object {
-            fun fromStringOrNull(string: String) = entries.firstOrNull {
-                it.displayName.equals(string, ignoreCase = true) || it.name.equals(string, ignoreCase = true)
-            }
-        }
-    }
-
-    enum class ExperimentationTier(
-        private val displayName: String,
-        overInclusiveSlotRange: IntRange, // Filtered 'later' to remove side spaces
-        private val sideSpace: Int = 1,
-    ) {
-        NONE("", 0..0, sideSpace = 0),
-        BEGINNER("Beginner", 18..35),
-        HIGH("High", 10..43, sideSpace = 2),
-        GRAND("Grand", 10..43, sideSpace = 2),
-        SUPREME("Supreme", 9..44),
-        TRANSCENDENT("Transcendent", 9..44),
-        METAPHYSICAL("Metaphysical", 9..44),
-        ;
-
-        val slotRange = overInclusiveSlotRange.filter {
-            (it % 9) !in when (sideSpace) {
-                1 -> listOf(0, 8)
-                2 -> listOf(0, 1, 7, 8)
-                else -> emptyList()
-            }
-        }
-
-        val gridSize: Int = slotRange.size
-
-        override fun toString() = displayName
-
-        companion object {
-            fun byNameOrNull(name: String): ExperimentationTier? = entries.firstOrNull {
-                it.displayName.equals(name, ignoreCase = true)
-            }
-        }
-    }
-
-    data class ExperimentationDataSet(
-        @Transient var type: ExperimentationTaskType? = null,
-        @Transient var tier: ExperimentationTier? = null,
-        var enchantingXpGained: Long = 0L,
-        var rareFoundFired: Boolean = false,
-    ) : ResettableStorageSet() {
-        @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
-
-        override fun reset() {
-            super.reset()
-            otherRewards.clear()
-            type = null
-            tier = null
-        }
-
-        fun addReward(internalName: NeuInternalName, amount: Int = 1) {
-            otherRewards.addOrPut(internalName, amount)
-        }
-
-        fun toCompletedTaskEventOrNull(): TableTaskCompletedEvent? = when {
-            type == null || tier == null -> null
-            else -> TableTaskCompletedEvent(
-                type = type ?: error("impossible"),
-                tier = tier ?: error("impossible"),
-                enchantingXpGained = enchantingXpGained,
-                loot = otherRewards,
-            )
-        }
-    }
 
     // <editor-fold desc="Patterns">
     /**
@@ -182,7 +84,7 @@ object ExperimentationTableApi {
      */
     private val experimentsDropPattern by patternGroup.pattern(
         "drop",
-        "^(?: |§. ?)(?:§.)*\\+(?:§.|\\[Lvl 1] (?:§r)?)*(?<reward>.*)\$",
+        "^(?: |§. ?)(?:§.)*\\+(?:§.)+(?:\\[Lvl 1] (?:§r)?)?(?<reward>.*)\$",
     )
 
     /**
@@ -311,12 +213,125 @@ object ExperimentationTableApi {
     )
     // </editor-fold>
 
+    val experimentationTableInventory = InventoryDetector(inventoriesPattern)
+    val inTable get() = experimentationTableInventory.isInside()
+    val isActive get() = currentExperimentData.tier != null
+    val currentExperimentTier get() = currentExperimentData.tier
+    val currentExperimentType get() = currentExperimentData.type
+
+    fun inSuperpairs() = inTable && isActive && currentExperimentType == ExperimentationTaskType.SUPERPAIRS
+
+    private var lastExpOverHash: Int = 0
+    private var currentExpOverHash: Int = 0
+    private var queuedCompleteEvent: TableTaskCompletedEvent? = null
+    private var handleBottlesOnInvClose: Boolean = false
+    private var lastBottlesInInventory: Map<NeuInternalName, Int> = getBottlesInOwnInventory()
+    private var currentBottlesInInventory: Map<NeuInternalName, Int> = mapOf()
+    var miscRewards: List<NeuInternalName> = emptyList()
+        private set
+
+    enum class ExperimentationMessages(private val displayName: String) {
+        DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
+        EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),
+        ENCHANTMENTS("§8 +§9Smite VII §8(§7Enchantment Drops§8)"),
+        BOTTLES("§8 +§9Titanic Experience Bottle §8(§7Bottle Drops§8)"),
+        MISC("§8 +§5Metaphysical Serum §8(§7Misc Drops§8)"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    enum class ExperimentationTaskType(private val displayName: String) {
+        CHRONOMATRON("Chronomatron"),
+        ULTRASEQUENCER("Ultrasequencer"),
+        SUPERPAIRS("Superpairs"),
+        ;
+
+        override fun toString() = displayName
+
+        companion object {
+            fun fromStringOrNull(string: String) = entries.firstOrNull {
+                it.displayName.equals(string, ignoreCase = true) || it.name.equals(string, ignoreCase = true)
+            }
+        }
+    }
+
+    enum class ExperimentationTier(
+        private val displayName: String,
+        overInclusiveSlotRange: IntRange, // Filtered 'later' to remove side spaces
+        private val sideSpace: Int = 1,
+    ) {
+        NONE("", 0..0, sideSpace = 0),
+        BEGINNER("Beginner", 18..35),
+        HIGH("High", 10..43, sideSpace = 2),
+        GRAND("Grand", 10..43, sideSpace = 2),
+        SUPREME("Supreme", 9..44),
+        TRANSCENDENT("Transcendent", 9..44),
+        METAPHYSICAL("Metaphysical", 9..44),
+        ;
+
+        val slotRange = overInclusiveSlotRange.filter {
+            (it % 9) !in when (sideSpace) {
+                1 -> listOf(0, 8)
+                2 -> listOf(0, 1, 7, 8)
+                else -> emptyList()
+            }
+        }
+
+        val gridSize: Int = slotRange.size
+
+        override fun toString() = displayName
+
+        companion object {
+            fun byNameOrNull(name: String): ExperimentationTier? = entries.firstOrNull {
+                it.displayName.equals(name, ignoreCase = true)
+            }
+        }
+    }
+
+    data class ExperimentationDataSet(
+        @Transient var type: ExperimentationTaskType? = null,
+        @Transient var tier: ExperimentationTier? = null,
+        var enchantingXpGained: Long = 0L,
+        var rareFoundFired: Boolean = false,
+    ) : ResettableStorageSet() {
+        @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
+
+        override fun reset() {
+            super.reset()
+            // todo at some point make resettable storage set deal with this stuff
+            // ResettableStorageSet doesn't deal with nulls or clearing mutables
+            otherRewards.clear()
+            type = null
+            tier = null
+        }
+
+        fun addReward(internalName: NeuInternalName, amount: Int = 1) {
+            otherRewards.addOrPut(internalName, amount)
+        }
+
+        fun toCompletedTaskEventOrNull(): TableTaskCompletedEvent? = when {
+            type == null || tier == null -> null
+            else -> TableTaskCompletedEvent(
+                type = type ?: error("impossible"),
+                tier = tier ?: error("impossible"),
+                enchantingXpGained = enchantingXpGained,
+                loot = otherRewards,
+            )
+        }
+    }
+
     fun inDistanceToTable(max: Double): Boolean {
         val vec = LorenzVec.getBlockBelowPlayer()
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
     }
 
     private fun ExperimentationMessages.isSelected() = config.hideMessages.contains(this)
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        miscRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
@@ -338,7 +353,7 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onWorldChange() {
         lastBottlesInInventory = getBottlesInOwnInventory()
     }
@@ -355,14 +370,12 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun String.isMiscReward() =
-        this == "Metaphysical Serum" || this == "Experiment The Fish" || this.endsWith("Guardian")
-
     private fun SkyHanniChatEvent.tryBlockChat(reward: String) {
+        val rewardInternalName = NeuInternalName.fromItemNameOrNull(reward)
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentationMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
             experienceBottleChatPattern.matches(reward) && ExperimentationMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-            reward.isMiscReward() && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
+            rewardInternalName in miscRewards && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
             ExperimentationMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
             else -> ""
         }

@@ -3,10 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ExperimentsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
@@ -14,7 +12,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -103,15 +100,9 @@ object SuperpairDataDisplay {
 
     private val emptySuperpairItem = SuperpairItem(-1, "", -1)
 
-    private var miscRewards: List<NeuInternalName> = emptyList()
     private var display = emptyList<String>()
     private var uncoveredItems = mapOf<Int, SuperpairItem>()
     private val currentFoundData = mutableMapOf<FoundType, MutableList<FoundData>>()
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards
-    }
 
     @HandleEvent
     fun onInventoryClose() {
@@ -358,7 +349,7 @@ object SuperpairDataDisplay {
 
     private fun isReward(reward: String) = rewardPattern.matches(reward) || isPowerUp(reward)
 
-    private fun isMiscReward(item: ItemStack) = item.getInternalNameOrNull() in miscRewards
+    private fun isMiscReward(item: ItemStack) = item.getInternalNameOrNull() in ExperimentationTableApi.miscRewards
 
     private fun isWaiting(itemName: String) = waitingMessagesPattern.matches(itemName)
 

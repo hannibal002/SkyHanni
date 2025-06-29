@@ -60,5 +60,5 @@ object UltraRareBookAlert {
         event.move(59, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
     }
 
-    private fun isEnabled() = config.ultraRareBookAlert && ExperimentationTableApi.isActive
+    private fun isEnabled() = config.ultraRareBookAlert && ExperimentationTableApi.inSuperpairs()
 }
