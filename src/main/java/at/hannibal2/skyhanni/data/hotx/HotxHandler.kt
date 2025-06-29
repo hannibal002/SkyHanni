@@ -3,17 +3,22 @@ package at.hannibal2.skyhanni.data.hotx
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.reflect.KClass
 
-abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection<Data>) {
+abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: Collection<Data>)
+    where RotPerkE : Enum<*>,
+          RotPerkE : RepoPatternEnum {
 
     /**
      * Name of the Tree Eg: HotM, HotF
@@ -106,6 +111,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
         }
         entry.enabled = lore.any { enabledPattern.matches(it) }
 
+        handleRotatingPerk(entry, lore)
         extraHandling(entry, lore)
     }
 
@@ -176,5 +182,97 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
             InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
             extraInventoryHandling()
         }
+    }
+
+    abstract val rotatingPerkClazz: KClass<RotPerkE>
+    private val rotatingPerkClassName by lazy { rotatingPerkClazz.java.simpleName.removeSuffix("Perk") }
+    private val allRotatingPerks = rotatingPerkClazz.java.enumConstants
+
+    abstract val resetChatPattern: Pattern
+    open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
+
+    abstract fun inPerkArea(): Boolean
+    abstract fun extraChatHandling(event: SkyHanniChatEvent)
+    abstract fun setRotatingPerk(newRotatingPerk: RotPerkE?)
+
+    open fun onChat(event: SkyHanniChatEvent) {
+        if (resetChatPattern.matches(event.message)) {
+            resetTree()
+            return
+        }
+        tryReadRotatingPerkChat(event)
+        extraChatHandling(event)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private inline fun <reified PType : RepoPatternEnum> getPatternedPerks(): Map<RotPerkE, Pattern> =
+        allRotatingPerks.filterIsInstance<PType>().map {
+            it as RotPerkE to when (PType::class) {
+                ChatRepoPatternEnum::class -> (it as ChatRepoPatternEnum).chatPattern
+                ItemRepoPatternEnum::class -> (it as ItemRepoPatternEnum).itemPattern
+                else -> error("Unsupported pattern type: ${PType::class.java}")
+            }
+        }.associate { it }
+
+    private val chatPatternedCache: Map<RotPerkE, Pattern> by lazy {
+        getPatternedPerks<ChatRepoPatternEnum>()
+    }
+
+    private fun tryReadRotatingPerkChat(event: SkyHanniChatEvent) {
+        if (!inPerkArea()) return
+
+        rotatingPerkPattern.matchMatcher(event.message) {
+            val perk = group("perk")
+            val foundPerk = chatPatternedCache.firstNotNullOfOrNull { (enum, pattern) ->
+                if (!pattern.matches(perk)) return@firstNotNullOfOrNull null
+                enum
+            } ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Could not read the $rotatingPerkClassName effect from chat",
+                    "no chatPattern matched",
+                    "chat" to event.message,
+                    "perk" to perk,
+                )
+                return
+            }
+            setRotatingPerk(foundPerk)
+        }
+    }
+
+    abstract val rotatingPerkEntry: Data
+
+    private val itemPatternedCache: Map<RotPerkE, Pattern> by lazy {
+        getPatternedPerks<ItemRepoPatternEnum>()
+    }
+
+    fun Slot.handleRotatingPerk(entry: Data, lore: List<String>) {
+        if (entry != rotatingPerkEntry) return
+        val foundPerk = if (!entry.enabled || !entry.isUnlocked) null
+        else {
+            val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Could not read the $rotatingPerkClassName effect from the $name tree",
+                    "itemPreEffectPattern didn't match",
+                    "lore" to lore,
+                )
+                null
+            }
+            if (index == null) null
+            else {
+                val nextLine = lore[index + 1]
+                itemPatternedCache.firstNotNullOfOrNull { (enum, pattern) ->
+                    if (!pattern.matches(nextLine)) return@firstNotNullOfOrNull null
+                    enum
+                } ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the $rotatingPerkClassName effect from the $name tree",
+                        "no itemPattern matched",
+                        "nextLine" to nextLine,
+                    )
+                    null
+                }
+            }
+        }
+        setRotatingPerk(foundPerk)
     }
 }
