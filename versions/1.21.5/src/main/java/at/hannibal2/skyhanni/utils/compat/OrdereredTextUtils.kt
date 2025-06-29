@@ -18,6 +18,7 @@ object OrderedTextUtils {
             val builder = StringBuilder()
             var lastStyle = Style.EMPTY
             orderedText.accept { _, style, codePoint ->
+                if (codePoint == -1) return@accept true
                 if (lastStyle != style) {
                     builder.append(requiredStyleChangeString(lastStyle, style, true))
                     lastStyle = style

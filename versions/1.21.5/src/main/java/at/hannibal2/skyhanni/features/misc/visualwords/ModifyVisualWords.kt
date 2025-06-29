@@ -124,6 +124,12 @@ object ModifyVisualWords {
     }
 
     private fun doReplacements(characters: MutableList<StyledCharacter>): MutableList<StyledCharacter> {
+
+        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
+            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
+            update()
+        }
+
         var workingCharacters = characters
 
         for (word in finalWordsList) {
