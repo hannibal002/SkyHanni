@@ -53,9 +53,9 @@ class GuideTab(
                 item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER
             )
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 GuiRenderUtils.drawRect(0, 0, width, height, selectColor)
-                itemRender.renderXYAligned(posX, posY, width, height)
+                itemRender.renderXYAligned(mousePosX, mousePosY, width, height)
             }
         },
         tips = listOf(tip),
@@ -65,7 +65,7 @@ class GuideTab(
         }
     )
 
-    fun render(posX: Int, posY: Int) {
-        renderable.render(posX, posY)
+    fun render(mousePosX: Int, mousePosY: Int) {
+        renderable.render(mousePosX, mousePosY)
     }
 }

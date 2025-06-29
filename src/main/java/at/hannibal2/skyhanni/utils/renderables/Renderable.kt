@@ -84,10 +84,14 @@ interface Renderable {
     } ?: false
 
     /**
+     * Render the renderable. Enough said?
      * Pos x and pos y are relative to the mouse position.
      * (the GL matrix stack should already be pre transformed)
+     *
+     * @param mousePosX The X position of the mouse at this pass of rendering.
+     * @param mousePosY The Y position of the mouse at this pass of rendering.
      */
-    fun render(posX: Int, posY: Int)
+    fun render(mousePosX: Int, mousePosY: Int)
 
     companion object {
 
@@ -220,11 +224,11 @@ interface Renderable {
             override val horizontalAlign = render.horizontalAlign
             override val verticalAlign = render.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
+                if (isHovered(mousePosX, mousePosY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     handleClickChecks()
                 }
-                render.render(posX, posY)
+                render.render(mousePosX, mousePosY)
             }
 
             private fun handleClickChecks() {
@@ -287,10 +291,10 @@ interface Renderable {
 
                 val tipsRender = tips.mapNotNull { fromAny(it) }
 
-                override fun render(posX: Int, posY: Int) {
-                    render.render(posX, posY)
-                    val pair = Pair(posX, posY)
-                    if (isHovered(posX, posY)) {
+                override fun render(mousePosX: Int, mousePosY: Int) {
+                    render.render(mousePosX, mousePosY)
+                    val pair = Pair(mousePosX, mousePosY)
+                    if (isHovered(mousePosX, mousePosY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
@@ -378,10 +382,10 @@ interface Renderable {
             override val horizontalAlign = renderable.horizontalAlign
             override val verticalAlign = renderable.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 GuiRenderUtils.drawRect(0, height, width, 11, color.rgb)
                 GlStateManager.color(1F, 1F, 1F, 1F)
-                renderable.render(posX, posY)
+                renderable.render(mousePosX, mousePosY)
             }
         }
 
@@ -400,15 +404,15 @@ interface Renderable {
 
             var isHovered = false
 
-            override fun render(posX: Int, posY: Int) {
-                val pair = Pair(posX, posY)
-                isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
+                val pair = Pair(mousePosX, mousePosY)
+                isHovered = if (isHovered(mousePosX, mousePosY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover()
-                    hovered.render(posX, posY)
+                    hovered.render(mousePosX, mousePosY)
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                     true
                 } else {
-                    unHovered.render(posX, posY)
+                    unHovered.render(mousePosX, mousePosY)
                     HighlightOnHoverSlot.currentSlots.remove(pair)
                     false
                 }
@@ -426,12 +430,12 @@ interface Renderable {
             override val horizontalAlign = bottomLayer.horizontalAlign
             override val verticalAlign = bottomLayer.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
-                val (nPosX, nPosY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
+                val (x, y) = topLayer.renderXYAligned(mousePosX, mousePosY, width, height)
+                val (nPosX, nPosY) = if (topLayer.isHovered(mousePosX + x, mousePosY + y) && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
-                    posX to posY
+                    mousePosX to mousePosY
                 }
                 bottomLayer.render(nPosX, nPosY)
             }
@@ -456,7 +460,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 if (highlight) {
                     item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
                 }
@@ -470,12 +474,12 @@ interface Renderable {
             override val horizontalAlign = this@darken.horizontalAlign
             override val verticalAlign = this@darken.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 //#if TODO
                 DarkenShader.darknessLevel = amount
                 ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
                 //#endif
-                this@darken.render(posX, posY)
+                this@darken.render(mousePosX, mousePosY)
                 //#if TODO
                 ShaderManager.disableShader()
                 //#endif
@@ -528,7 +532,7 @@ interface Renderable {
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
 
-            override fun render(posX: Int, posY: Int) {}
+            override fun render(mousePosX: Int, mousePosY: Int) {}
         }
 
         fun searchableTable(
@@ -580,13 +584,13 @@ interface Renderable {
                 return renderY + yShift
             }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 var renderY = 0
                 if (header.isNotEmpty()) {
-                    renderY = renderRow(posX, posY, header, renderY)
+                    renderY = renderRow(mousePosX, mousePosY, header, renderY)
                 }
                 for (row in list) {
-                    renderY = renderRow(posX, posY, row, renderY)
+                    renderY = renderRow(mousePosX, mousePosY, row, renderY)
                 }
                 DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
@@ -614,14 +618,14 @@ interface Renderable {
             val emptySpaceX = if (useEmptySpace) 0 else xPadding
             val emptySpaceY = if (useEmptySpace) 0 else yPadding
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 for ((rowIndex, row) in content.withIndex()) {
                     for ((index, renderable) in row.withIndex()) {
                         DrawContextUtils.pushMatrix()
                         DrawContextUtils.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
                         renderable.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY + yOffsets[rowIndex],
+                            mousePosX + xOffsets[index],
+                            mousePosY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
                         )
@@ -708,33 +712,33 @@ interface Renderable {
                 }
             }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 if (shouldRenderTopElseBottom && !(hideIfNoText && isTextBoxEmpty)) {
                     RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     DrawContextUtils.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
                 }
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                if (isHovered(mousePosX, mousePosY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
                     textInput.makeActive()
                     textInput.handle()
                     val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
-                    if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && RIGHT_MOUSE.isKeyClicked()) {
+                    if (isBoxHovered(mousePosX, width, mousePosY + yOff, textBoxHeight) && RIGHT_MOUSE.isKeyClicked()) {
                         textInput.clear()
                     }
                 } else {
                     textInput.disable()
                 }
                 if (hideIfNoText && isTextBoxEmpty) {
-                    content.render(posX, posY)
+                    content.render(mousePosX, mousePosY)
                 } else if (!shouldRenderTopElseBottom) {
-                    content.render(posX, posY)
+                    content.render(mousePosX, mousePosY)
                     DrawContextUtils.translate(0f, (ySpacing).toFloat(), 0f)
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {
                         RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     }
                     DrawContextUtils.translate(0f, -(ySpacing).toFloat(), 0f)
                 } else {
-                    content.render(posX, posY + textBoxHeight + ySpacing)
+                    content.render(mousePosX, mousePosY + textBoxHeight + ySpacing)
                     DrawContextUtils.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
                 }
             }
@@ -769,7 +773,7 @@ interface Renderable {
                 startColor
             }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 if (texture == null) {
                     GuiRenderUtils.drawRect(0, 0, width, height, 0xFF43464B.toInt())
 
@@ -802,12 +806,12 @@ interface Renderable {
 
                     //#if MC < 1.21
                     GuiRenderUtils.drawTexturedRect(
-                        posX, posY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
+                        mousePosX, mousePosY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
                         alpha = 1f, filter = GL11.GL_NEAREST
                     )
                     //#else
                     //$$ DrawContextUtils.drawContext.drawGuiTexture(RenderLayer::getGuiTextured, createResourceLocation("hud/experience_bar_background"),
-                    //$$     posX.toInt(), posY.toInt(), width, height)
+                    //$$     mousePosX.toInt(), mousePosY.toInt(), width, height)
                     //#endif
 
                     if (useChroma) {
@@ -815,25 +819,25 @@ interface Renderable {
                         //#if MC < 1.21
                         ChromaShaderManager.begin(ChromaType.TEXTURED)
                         GuiRenderUtils.drawTexturedRect(
-                            posX, posY, progress, height, uMin, uMin + (progress * scale),
+                            mousePosX, mousePosY, progress, height, uMin, uMin + (progress * scale),
                             vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
                             alpha = 1f, filter = GL11.GL_NEAREST
                         )
                         //#else
                         //$$ DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers::getChromaTextured, createResourceLocation("hud/experience_bar_progress"),
-                        //$$     width, height, 0, 0, posX.toInt(), posY.toInt(), progress, height)
+                        //$$     width, height, 0, 0, mousePosX.toInt(), mousePosY.toInt(), progress, height)
                         //#endif
                     } else {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                         //#if MC < 1.21
                         GuiRenderUtils.drawTexturedRect(
-                            posX, posY, progress, height, uMin, uMin + (progress * scale),
+                            mousePosX, mousePosY, progress, height, uMin, uMin + (progress * scale),
                             vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
                             alpha = 1f, filter = GL11.GL_NEAREST
                         )
                         //#else
                         //$$ DrawContextUtils.drawContext.drawGuiTexture(RenderLayer::getGuiTextured, createResourceLocation("hud/experience_bar_progress"),
-                        //$$     width, height, 0, 0, posX.toInt(), posY.toInt(), progress, height)
+                        //$$     width, height, 0, 0, mousePosX.toInt(), mousePosY.toInt(), progress, height)
                         //#endif
                     }
 
@@ -850,9 +854,9 @@ interface Renderable {
             override val horizontalAlign = this@renderBounds.horizontalAlign
             override val verticalAlign = this@renderBounds.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 GuiRenderUtils.drawRect(0, 0, width, height, color.rgb)
-                this@renderBounds.render(posX, posY)
+                this@renderBounds.render(mousePosX, mousePosY)
             }
 
         }
@@ -884,9 +888,9 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 val realColor: Color
-                if (isHovered(posX, posY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
+                if (isHovered(mousePosX, mousePosY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
                     if (button.isKeyClicked()) {
                         state = !state
                         onClick(state)
@@ -898,7 +902,7 @@ interface Renderable {
                 }
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
-                content.render(posX + padding, posY + padding)
+                content.render(mousePosX + padding, mousePosY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
@@ -915,8 +919,8 @@ interface Renderable {
             override val height = render.height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-            override fun render(posX: Int, posY: Int) {
-                render.renderXAligned(posX, posY, width)
+            override fun render(mousePosX: Int, mousePosY: Int) {
+                render.renderXAligned(mousePosX, mousePosY, width)
             }
         }
 
@@ -936,15 +940,15 @@ interface Renderable {
             val emptySpace = width - render.sumOf { it.width }
             val spacing = emptySpace / render.size
 
-            override fun render(posX: Int, posY: Int) {
-                var xOffset = posX
+            override fun render(mousePosX: Int, mousePosY: Int) {
+                var xOffset = mousePosX
                 render.forEach {
                     val x = it.width + spacing
-                    it.renderXYAligned(xOffset, posY, x, height)
+                    it.renderXYAligned(xOffset, mousePosY, x, height)
                     xOffset += x
                     DrawContextUtils.translate(x.toFloat(), 0f, 0f)
                 }
-                DrawContextUtils.translate(-(xOffset - posX).toFloat(), 0f, 0f)
+                DrawContextUtils.translate(-(xOffset - mousePosX).toFloat(), 0f, 0f)
             }
         }
 
@@ -960,8 +964,8 @@ interface Renderable {
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-            override fun render(posX: Int, posY: Int) {
-                render.renderYAligned(posX, posY, height)
+            override fun render(mousePosX: Int, mousePosY: Int) {
+                render.renderYAligned(mousePosX, mousePosY, height)
             }
         }
 
@@ -1034,14 +1038,14 @@ interface Renderable {
                 button,
             )
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(mousePosX, mousePosY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 scrollListRender(
-                    posX,
-                    posY,
+                    mousePosX,
+                    mousePosY,
                     height,
                     width,
                     list,
@@ -1095,14 +1099,14 @@ interface Renderable {
                 button,
             )
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(mousePosX, mousePosY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 scrollListRender(
-                    posX,
-                    posY,
+                    mousePosX,
+                    mousePosY,
                     height,
                     width,
                     list,
@@ -1285,9 +1289,9 @@ interface Renderable {
                 }
             }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(mousePosX, mousePosY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 var renderY = 0
@@ -1295,8 +1299,8 @@ interface Renderable {
                     var offset = 0
                     for ((index, renderable) in header.withIndex()) {
                         renderable.renderXYAligned(
-                            posX + offset,
-                            posY,
+                            mousePosX + offset,
+                            mousePosY,
                             xOffsets[index],
                             yOffsets[header] ?: 0,
                         )
@@ -1338,7 +1342,7 @@ interface Renderable {
                 }
 
                 if (showScrollableTipsInList && !scroll.atMinimum()) {
-                    scrollUpTip.render(posX, posY)
+                    scrollUpTip.render(mousePosX, mousePosY)
                     val yShift = scrollUpTip.height
                     renderY += yShift
                     DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
@@ -1350,8 +1354,8 @@ interface Renderable {
                     val yShift = yOffsets[row] ?: 0
                     for ((index, renderable) in row.withIndex()) {
                         renderable.renderXYAligned(
-                            posX + offset,
-                            posY + renderY,
+                            mousePosX + offset,
+                            mousePosY + renderY,
                             xOffsets[index],
                             yShift,
                         )
@@ -1364,7 +1368,7 @@ interface Renderable {
                 }
 
                 if (showScrollableTipsInList && !scroll.atMaximum()) {
-                    scrollDownTip.render(posX, posY)
+                    scrollDownTip.render(mousePosX, mousePosY)
                 }
 
                 DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
@@ -1405,9 +1409,9 @@ interface Renderable {
                 button,
             )
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(mousePosX, mousePosY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 var renderY = 0
@@ -1415,8 +1419,8 @@ interface Renderable {
                     for ((index, renderable) in content[0].withIndex()) {
                         DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY,
+                            mousePosX + xOffsets[index],
+                            mousePosY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[1],
                         )
@@ -1442,8 +1446,8 @@ interface Renderable {
                     for ((index, renderable) in content[rowIndex].withIndex()) {
                         DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY + renderY,
+                            mousePosX + xOffsets[index],
+                            mousePosY + renderY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex],
                         )
@@ -1471,10 +1475,10 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
+                input.render(mousePosX + padding, mousePosY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
@@ -1495,9 +1499,9 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
+                input.render(mousePosX + padding, mousePosY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
 
                 ShaderRenderUtils.drawRoundRectOutline(
@@ -1529,7 +1533,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 ShaderRenderUtils.drawRoundTexturedRect(
                     0,
                     0,
@@ -1543,7 +1547,7 @@ interface Renderable {
                 )
 
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
+                input.render(mousePosX + padding, mousePosY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
@@ -1567,11 +1571,11 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax, texture, alpha / 255f)
 
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
+                input.render(mousePosX + padding, mousePosY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
@@ -1594,7 +1598,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
                 ShaderRenderUtils.drawRoundRectOutline(
                     0,
@@ -1609,7 +1613,7 @@ interface Renderable {
                 )
 
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
+                input.render(mousePosX + padding, mousePosY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
@@ -1634,12 +1638,12 @@ interface Renderable {
             val playerX = width / 2 + padding
             val playerY = height / 2 + playerHeight / 2 + padding
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mousePosX: Int, mousePosY: Int) {
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
                 val mouse = currentRenderPassMousePosition ?: return
-                val mouseXRelativeToPlayer = if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
-                val mouseYRelativeToPlayer = if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
+                val mouseXRelativeToPlayer = if (followMouse) (mousePosX + playerX - mouse.first).toFloat() else eyesX
+                val mouseYRelativeToPlayer = if (followMouse) (mousePosY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
                 DrawContextUtils.translate(0f, 0f, 100f)
                 //#if MC < 1.21
                 drawEntityOnScreen(

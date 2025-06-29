@@ -58,11 +58,11 @@ object DragNDrop {
         bypassChecks: Boolean = false,
         condition: () -> Boolean = { true },
     ): Renderable = object : RenderableWrapper(display) {
-        override fun render(posX: Int, posY: Int) {
-            if (isHovered(posX, posY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
+        override fun render(mousePosX: Int, mousePosY: Int) {
+            if (isHovered(mousePosX, mousePosY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
                 handelDroppable(drop)
             }
-            content.render(posX, posY)
+            content.render(mousePosX, mousePosY)
         }
     }
 
