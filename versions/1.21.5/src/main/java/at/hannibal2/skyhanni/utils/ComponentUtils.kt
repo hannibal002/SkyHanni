@@ -192,6 +192,7 @@ object ComponentUtils {
             strippedId == "wool" -> getColor(damage) + "_wool"
             strippedId == "trapdoor" -> "oak_trapdoor"
             strippedId == "speckled_melon" -> "glistering_melon_slice"
+            strippedId == "melon" -> "melon_slice"
             strippedId == "melon_block" -> "melon"
             strippedId == "fish" -> when (damage) {
                 0 -> "cod"
