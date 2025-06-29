@@ -162,6 +162,11 @@ public class InventoryConfig {
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
+    @ConfigOption(name = "Attribute Shards", desc = "")
+    @Accordion
+    public AttributeShardsConfig attributeShards = new AttributeShardsConfig();
+
+    @Expose
     @ConfigOption(name = "Evolving Items", desc = "")
     @Accordion
     @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")

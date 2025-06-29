@@ -308,8 +308,6 @@
     <ID>UnsafeCallOnNullableType:RenderEntityOutlineEvent.kt$RenderEntityOutlineEvent$entitiesToChooseFrom!!</ID>
     <ID>UnsafeCallOnNullableType:RenderEntityOutlineEvent.kt$RenderEntityOutlineEvent$entitiesToOutline!!</ID>
     <ID>UnsafeCallOnNullableType:RenderGlobalHook.kt$RenderGlobalHook$camera!!</ID>
-    <ID>UnsafeCallOnNullableType:RenderLivingEntityHelper.kt$RenderLivingEntityHelper$entityColorCondition[entity]!!</ID>
-    <ID>UnsafeCallOnNullableType:RenderLivingEntityHelper.kt$RenderLivingEntityHelper$entityColorMap[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:RepoUtils.kt$RepoUtils$file!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[2]!!</ID>
