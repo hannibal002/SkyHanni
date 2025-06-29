@@ -15,10 +15,12 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -353,9 +355,11 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onWorldChange() {
-        lastBottlesInInventory = getBottlesInOwnInventory()
+    @HandleEvent(eventTypes = [WorldChangeEvent::class, ItemAddInInventoryEvent::class])
+    fun refreshBottlesInInventory() {
+        if (handleBottlesOnInvClose) return
+        lastBottlesInInventory = currentBottlesInInventory
+        currentBottlesInInventory = getBottlesInOwnInventory()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
