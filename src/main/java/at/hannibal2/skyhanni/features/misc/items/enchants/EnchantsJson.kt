@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.util.regex.Pattern
-import at.hannibal2.skyhanni.features.EnchantParser.colorFormatCodes
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser.colorFormatCodes
 
 class EnchantsJson {
     @Expose
