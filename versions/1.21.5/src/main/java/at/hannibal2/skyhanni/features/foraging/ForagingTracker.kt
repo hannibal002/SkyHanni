@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.text.Text
 import kotlin.time.Duration.Companion.seconds
 
@@ -364,15 +363,13 @@ object ForagingTracker {
 
     @HandleEvent
     fun onItemChange(event: ItemInHandChangeEvent) {
-        if (event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE) {
-            if (!hasHeldAxe) {
-                hasHeldAxe = true
-            }
-        } else {
-            if (hasHeldAxe) {
-                hasHeldAxe = false
+        if (!isInIsland()) return
+        val isAxe = event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE
+        if (isAxe != hasHeldAxe) {
+            if (!isAxe) {
                 lastAxeHeldTime = SimpleTimeMark.now()
             }
+            hasHeldAxe = isAxe
         }
     }
 }
