@@ -28,7 +28,7 @@ object TreeProgressDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (display == null) return
-        config.treeProgressDisplayPosition.renderRenderable(display, posLabel = "Tree Progress")
+        config.position.renderRenderable(display, posLabel = "Tree Progress")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
