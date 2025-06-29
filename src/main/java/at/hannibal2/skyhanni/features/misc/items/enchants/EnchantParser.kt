@@ -110,6 +110,14 @@ object EnchantParser {
     private val grayEnchantPattern by patternGroup.pattern(
         "gray.enchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
     )
+    /**
+     * REGEX-TEST: §5
+     * REGEX-TEST: §r
+     * REGEX-TEST: §b
+     */
+    val colorFormatCodes by patternGroup.pattern(
+        "formatCodes.color", "§[0-9a-fr]"
+    )
 
     private var currentItem: ItemStack? = null
 
@@ -357,8 +365,12 @@ object EnchantParser {
         }
     }
 
-    @Suppress("MaxLineLength")
-    private fun enchantStartAndEnd(loreList: MutableList<String>, enchants: Map<String, Int>, enchantPattern: Pattern, removeFormattingCodes: Boolean) {
+    private fun enchantStartAndEnd(
+        loreList: MutableList<String>,
+        enchants: Map<String, Int>,
+        enchantPattern: Pattern,
+        removeFormattingCodes: Boolean
+    ) {
         var startEnchant = -1
         var endEnchant = -1
 
@@ -391,7 +403,6 @@ object EnchantParser {
 
         val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
         val regex = "[\\d,.kKmMbB]+\$".toRegex()
-        val formattingCodesRegex = "§[0-9a-fr]".toRegex()
         for (i in startEnchant..endEnchant) {
             val matcher = enchantPattern.matcher(loreList[i])
             var containsEnchant = false
@@ -401,10 +412,10 @@ object EnchantParser {
                 // Pull enchant, enchant level and stacking amount if applicable
                 val enchant = this.enchants.getFromLore(
                     matcher.group("enchant")
-                        .let { if (removeFormattingCodes) it.replace(formattingCodesRegex, "") else it }
+                        .let { if (removeFormattingCodes) it.replace(colorFormatCodes, "") else it }
                 )
                 val level = matcher.group("levelNumeral")
-                    .let { if (removeFormattingCodes) it.replace(formattingCodesRegex, "") else it }
+                    .let { if (removeFormattingCodes) it.replace(colorFormatCodes, "") else it }
                     .romanToDecimalIfNecessary()
                 val stacking = if (matcher.group("stacking").trimStart().removeColor().matches(regex)) {
                     shouldBeSingleColumn = true
