@@ -48,8 +48,9 @@ object EliteDevApi {
         val endTime = startTime + contestDuration
     }
 
-    fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
-        val jsonContestsResponse = ApiUtils.getJSONResponse(CONTEST_API_URL, apiName = API_NAME).asJsonObject
+    suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
+        val jsonContestsResponse = ApiUtils.getJSONResponse(CONTEST_API_URL, apiName = API_NAME)
+            ?: return null
         val contestResponse = ConfigManager.gson.fromJson<ContestsResponse>(jsonContestsResponse)
         if (contestResponse.complete) contestResponse.responseContests
         else {
@@ -71,15 +72,15 @@ object EliteDevApi {
         null
     }
 
-    fun submitContests(contests: List<EliteFarmingContest>) = try {
+    suspend fun submitContests(contests: List<EliteFarmingContest>) = try {
         val body = ConfigManager.gson.toJson(
             contests.associate { contest ->
                 contest.startTime.toMillis() / 1000 to contest.crops.map { crop -> crop.cropName }
             },
         )
-        val success = ApiUtils.postJSONIsSuccessful(CONTEST_API_URL, body, apiName = API_NAME)
+        val apiResponse = ApiUtils.postJSON(CONTEST_API_URL, body, apiName = API_NAME)
 
-        if (success) {
+        if (apiResponse.success) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
             ErrorManager.logErrorStateWithData(

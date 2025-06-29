@@ -17,18 +17,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
 
 @SkyHanniModule
 object ChangelogViewer {
-
-    private val dispatcher = Dispatchers.IO
-
     internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
     internal var openTime = SimpleTimeMark.farPast()
@@ -60,7 +54,7 @@ object ChangelogViewer {
         startVersion = currentVersion
         endVersion = targetVersion
         if (!cache.containsKeys(startVersion, endVersion)) {
-            SkyHanniMod.coroutineScope.launch { getChangelog() }
+            SkyHanniMod.launchIOCoroutine { getChangelog() }
         }
         openChangelog()
     }
@@ -75,11 +69,9 @@ object ChangelogViewer {
             val data = mutableListOf<ChangelogJson>()
             var pageNumber = 1
             while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
-                val jsonObject = withContext(dispatcher) {
-                    ApiUtils.getJSONResponseAsElement(
-                        url + pageNumber, apiName = "github",
-                    )
-                }
+                val pagedUrl = "$url$pageNumber"
+                val jsonObject = ApiUtils.getJSONResponse(pagedUrl, apiName = "github")
+                    ?: return
                 val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
                 data.addAll(page)
                 pageNumber++

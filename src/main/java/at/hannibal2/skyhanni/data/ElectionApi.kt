@@ -219,7 +219,7 @@ object ElectionApi {
             val jsonObject = ApiUtils.getJSONResponse(
                 "https://api.hypixel.net/v2/resources/skyblock/election",
                 apiName = "Hypixel Election",
-            )
+            ) ?: return@launchIOCoroutine
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launchIOCoroutine
             val mayor = data.mayor ?: error("mayor is null")

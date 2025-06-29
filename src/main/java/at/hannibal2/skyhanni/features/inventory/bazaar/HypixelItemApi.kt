@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.json.fromJson
-import kotlinx.coroutines.launch
 
 class HypixelItemApi {
 
@@ -21,12 +20,12 @@ class HypixelItemApi {
         fun getNpcPrice(internalName: NeuInternalName) = npcPrices[internalName]
     }
 
-    private fun loadNpcPrices(): MutableMap<NeuInternalName, Double> {
+    private suspend fun loadNpcPrices(): MutableMap<NeuInternalName, Double> {
         val list = mutableMapOf<NeuInternalName, Double>()
         val apiResponse = ApiUtils.getJSONResponse(
             "https://api.hypixel.net/v2/resources/skyblock/items",
             apiName = "Hypixel SkyBlock Items",
-        )
+        ) ?: return list
         try {
             val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
 
@@ -50,7 +49,7 @@ class HypixelItemApi {
     }
 
     fun start() {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             npcPrices = loadNpcPrices()
         }
 
