@@ -57,6 +57,9 @@ object ExperimentsProfitTracker {
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
+    // Warn once per session about tracking XP bottle usage
+    private var warnedAboutTracking = false
+
     class Data : ItemTrackerData() {
         override fun resetItems() {
             experimentsDone = 0L
@@ -140,8 +143,6 @@ object ExperimentsProfitTracker {
         }
     }
 
-    private var warnedAboutTracking = false
-
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTableXpBottleUsed(event: TableXPBottleUsedEvent) {
         if (!isEnabled() || !config.trackUsedBottles) return
@@ -159,7 +160,7 @@ object ExperimentsProfitTracker {
                 tracker.modify {
                     it.startCost += (bottlePrice * event.amount)
                     val bottleFormat = "bottle".pluralize(event.amount)
-                    ChatUtils.chat("Undid the tracking of ${event.amount} $bottleFormat.")
+                    ChatUtils.chat("Un-did the tracking of ${event.amount} $bottleFormat!")
                 }
             },
             oneTimeClick = true,
@@ -200,13 +201,12 @@ object ExperimentsProfitTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
-        val startCost = if (SkyHanniMod.feature.misc.tracker.priceSource != ItemPriceSource.NPC_SELL) {
-            data.startCost
-        } else 0
+        val startCost = when (SkyHanniMod.feature.misc.tracker.priceSource) {
+            ItemPriceSource.NPC_SELL -> 0
+            else -> data.startCost
+        }
         val profit = tracker.drawItems(data, { true }, this) + startCost
-
-        val experimentsDone = data.experimentsDone
-        addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
+        addSearchString("§eExperiments Done: §a${data.experimentsDone.addSeparators()}")
 
         if (config.trackTimeSpent) {
             val timeFormat = data.timeWasted.values.sumOf { it.inWholeSeconds }.seconds.format()
@@ -244,15 +244,14 @@ object ExperimentsProfitTracker {
     init {
         tracker.initRenderer(
             { config.position },
-            ExperimentationTableApi.experimentationTableInventory,
-        ) { config.enabled && isEnabled() && IslandType.PRIVATE_ISLAND.isCurrent() }
+            inventory = ExperimentationTableApi.experimentationTableInventory,
+            onlyOnIsland = IslandType.PRIVATE_ISLAND,
+        ) { isEnabled() }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.PRIVATE_ISLAND) {
-            tracker.firstUpdate()
-        }
+        tracker.firstUpdate()
     }
 
     @HandleEvent
@@ -264,7 +263,5 @@ object ExperimentsProfitTracker {
         }
     }
 
-    private fun isLocationEnabled(check: Boolean = true) = !check || ExperimentationTableApi.inDistanceToTable(5.0)
-    private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
-        config.enabled && isLocationEnabled(checkDistanceToExperimentationTable)
+    private fun isEnabled() = config.enabled && ExperimentationTableApi.inDistanceToTable(5.0)
 }

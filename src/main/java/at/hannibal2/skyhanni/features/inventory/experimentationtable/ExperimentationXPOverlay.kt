@@ -48,7 +48,7 @@ object ExperimentationXPOverlay {
         }
     }
 
-    private fun isEnabled() = ExperimentationTableApi.inTable && config.xpOverlay
+    private fun isEnabled() = ExperimentationTableApi.inSuperpairs() && config.xpOverlay
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
