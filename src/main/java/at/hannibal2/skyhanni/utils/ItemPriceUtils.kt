@@ -169,11 +169,13 @@ object ItemPriceUtils {
         }
     }
 
+    private const val LBIN_URL = "https://moulberry.codes/lowestbin.json.gz"
+    private const val LBIN_API_NAME = "NEU Lowest Bin"
+    private val lbinStatic = ApiUtils.StaticApiPath(LBIN_URL, LBIN_API_NAME, tryForceGzip = true)
+
     private suspend fun refreshLowestBins() {
-        lowestBins = ApiUtils.getJSONResponse(
-            "https://moulberry.codes/lowestbin.json.gz",
-            apiName = "NEU Lowest Bin",
-        ) ?: lowestBins
+        lowestBins = ApiUtils.getJSONResponse(lbinStatic)
+            ?: lowestBins
     }
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {
@@ -212,10 +214,7 @@ object ItemPriceUtils {
             simpleCallback {
                 SkyHanniMod.launchIOCoroutine {
                     val timeNow = SimpleTimeMark.now()
-                    val fetchedLowestBins = ApiUtils.getJSONResponse(
-                        "https://moulberry.codes/lowestbin.json.gz",
-                        apiName = "NEU Lowest Bin",
-                    )
+                    val fetchedLowestBins = ApiUtils.getJSONResponse(lbinStatic)
                     if (fetchedLowestBins != null) {
                         lowestBins = fetchedLowestBins
                         ChatUtils.chat("Fetched Moulberry's lowest bin data in ${timeNow.passedSince()}!")

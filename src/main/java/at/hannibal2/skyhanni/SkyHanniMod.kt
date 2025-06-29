@@ -118,6 +118,12 @@ object SkyHanniMod {
 
     val modules: MutableList<Any> = ArrayList()
     private val globalJob: Job = Job(null)
+
+    // todo when no more direct .launch calls are made outside of this class, make this private
+    @Deprecated(
+        "Use SkyHanniMod.launchCoroutine or SkyHanniMod.launchIOCoroutine instead",
+        ReplaceWith("SkyHanniMod.launchCoroutine { ... }"),
+    )
     val coroutineScope = CoroutineScope(
         CoroutineName("SkyHanni") + SupervisorJob(globalJob),
     )
@@ -137,6 +143,7 @@ object SkyHanniMod {
         logger.log(Level.INFO, message)
     }
 
+    @Suppress("DEPRECATION")
     fun launchCoroutine(function: suspend () -> Unit) {
         coroutineScope.launch {
             try {

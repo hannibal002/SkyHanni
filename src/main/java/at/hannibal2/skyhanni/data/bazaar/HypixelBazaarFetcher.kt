@@ -26,6 +26,9 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HypixelBazaarFetcher {
     private const val URL = "https://api.hypixel.net/v2/skyblock/bazaar"
+    private const val API_NAME = "Hypixel Bazaar"
+    private val bzStatic = ApiUtils.StaticApiPath(URL, API_NAME)
+
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 
     var latestProductInformation = mapOf<NeuInternalName, BazaarData>()
@@ -66,7 +69,7 @@ object HypixelBazaarFetcher {
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
         try {
-            val jsonResponse = ApiUtils.getJSONResponse(URL, apiName = "Hypixel Bazaar")
+            val jsonResponse = ApiUtils.getJSONResponse(bzStatic)
                 ?: return onError(fetchType, Exception("Failed to fetch bazaar data from Hypixel API"))
             val response = ConfigManager.gson.fromJson<BazaarApiResponseJson>(jsonResponse)
             if (response.success) {

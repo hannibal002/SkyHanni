@@ -34,6 +34,11 @@ object MiningEventTracker {
 
     private val config get() = SkyHanniMod.feature.mining.miningEvent
     private val patternGroup = RepoPattern.group("mining.eventtracker")
+    private const val MINING_API_NAME = "Soopy Mining Events"
+    private const val MINING_URL = "https://api.soopy.dev/skyblock/chevents/get"
+
+    private val miningFetchStatic = ApiUtils.StaticApiPath("$MINING_URL/get", MINING_API_NAME)
+    private val miningSendStatic = ApiUtils.StaticApiPath("$MINING_URL/set", MINING_API_NAME)
 
     // <editor-fold desc="Patterns">
     /**
@@ -68,12 +73,6 @@ object MiningEventTracker {
         "(?:§.)*\\s+(?:§.)+§l(?<event>.+) ENDED!",
     )
     // </editor-fold>
-
-    private const val MINING_API_NAME = "Soopy Mining Events"
-    private const val MINING_URL = "https://api.soopy.dev/skyblock/chevents/get"
-
-    private val miningFetchStatic by lazy { ApiUtils.StaticApiPath("$MINING_URL/get", MINING_API_NAME) }
-    private val miningSendStatic by lazy { ApiUtils.StaticApiPath("$MINING_URL/set", MINING_API_NAME) }
 
     private val defaultCooldown = 1.minutes
 

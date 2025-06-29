@@ -30,7 +30,15 @@ import com.google.gson.JsonObject
 @SkyHanniModule
 object EliteDevApi {
 
-    enum class EliteResourceType { ITEM, AUCTION, BAZAAR }
+    enum class EliteResourceType(private val displayName: String) {
+        ITEM("Item"),
+        AUCTION("Auction"),
+        BAZAAR("Bazaar"),
+        ;
+
+        override fun toString() = displayName
+    }
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfetcheliteresource") {
@@ -38,29 +46,27 @@ object EliteDevApi {
             category = CommandCategory.DEVELOPER_DEBUG
             arg("resource", EnumArgumentType.name<EliteResourceType>()) { resource ->
                 callback {
-                    SkyHanniMod.launchIOCoroutine {
-                        val resourceType = getArg(resource)
-                        val timeNow = SimpleTimeMark.now()
-                        when (resourceType) {
-                            EliteResourceType.ITEM -> {
-                                val itemResources = fetchItemResources() ?: return@launchIOCoroutine
-                                ChatUtils.chat("§aItem resources fetched: ${itemResources.items.size}")
-                            }
-                            EliteResourceType.AUCTION -> {
-                                val auctionResources = fetchAuctionResources() ?: return@launchIOCoroutine
-                                ChatUtils.chat("§aAuction resources fetched: ${auctionResources.items.size}")
-                            }
-                            EliteResourceType.BAZAAR -> {
-                                val bazaarResources = fetchBazaarResources() ?: return@launchIOCoroutine
-                                ChatUtils.chat("§aBazaar resources fetched: ${bazaarResources.products.size}")
-                            }
-                        }
-                        val elapsedTime = timeNow.passedSince()
-                        val elapsedFormat = elapsedTime.format()
-                        ChatUtils.chat("Fetched ${resourceType.name} resources in $elapsedFormat")
-                    }
+                    val resourceType = getArg(resource)
+                    fetchResourceCommand(resourceType)
                 }
             }
+        }
+    }
+
+    private fun fetchResourceCommand(resourceType: EliteResourceType) {
+        SkyHanniMod.launchIOCoroutine {
+            val startTime = SimpleTimeMark.now()
+            val resourcesFetched = when (resourceType) {
+                EliteResourceType.ITEM -> fetchItemResources()?.items?.size
+                EliteResourceType.AUCTION -> fetchAuctionResources()?.items?.size
+                EliteResourceType.BAZAAR -> fetchBazaarResources()?.products?.size
+            }
+            val elapsedFormat = startTime.passedSince().format()
+            if (resourcesFetched == null || resourcesFetched == 0) {
+                ChatUtils.chat("§cFailed to fetch §e$resourceType §cresources!")
+                return@launchIOCoroutine
+            }
+            ChatUtils.chat("Fetched $resourcesFetched $resourceType resources in $elapsedFormat.")
         }
     }
 

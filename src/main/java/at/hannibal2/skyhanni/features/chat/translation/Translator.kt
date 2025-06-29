@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.setClickRunCommand
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import com.google.gson.JsonArray
-import kotlinx.coroutines.launch
 import net.minecraft.event.ClickEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -134,14 +133,14 @@ object Translator {
     private fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             val translation = getTranslation(message, nativeLanguage())
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = translation?.get(1) ?: "Error!"
 
             if (message == translatedMessage) {
                 ChatUtils.userError("Translation is the same as the original message!")
-                return@launch
+                return@launchIOCoroutine
             }
             ChatUtils.clickableChat(
                 "Found translation: §f$translatedMessage",
@@ -159,7 +158,7 @@ object Translator {
         val language = args[0]
         val message = args.drop(1).joinToString(" ")
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             val translation = getTranslation(message, language, nativeLanguage())?.get(0) ?: "Error!"
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
@@ -198,7 +197,7 @@ object Translator {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             val translation = getTranslation(message, targetLanguage, sourceLanguage)
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""

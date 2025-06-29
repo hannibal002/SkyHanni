@@ -39,8 +39,29 @@ import javax.net.ssl.TrustManagerFactory
 @SkyHanniModule
 @Suppress("InjectDispatcher")
 object ApiUtils {
+
+    /**
+     * Represents the response from an Api request.
+     *
+     * @param T The type of data returned by the Api, which must be a subtype of [JsonElement].
+     * @param success Indicates whether the Api request was successful.
+     * @param message A message describing the result of the Api request, can be null if the request was successful.
+     * @param data The data [T] returned by the Api request, can be null if the request was unsuccessful or if no data was returned.
+     */
     data class ApiResponse<T : JsonElement> (val success: Boolean, val message: String?, var data: T? = null)
-    data class StaticApiPath(val url: String, val apiName: String)
+
+    /**
+     * Represents a static Api path with a URL and Api name.
+     *
+     * @param url The URL of the Api endpoint.
+     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param tryForceGzip If true, the request will attempt to use gzip compression. Only relevant for GET requests.
+     */
+    data class StaticApiPath(
+        val url: String,
+        val apiName: String,
+        val tryForceGzip: Boolean = false
+    )
 
     private val parser: JsonParser = JsonParser()
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
@@ -245,15 +266,13 @@ object ApiUtils {
      *
      * @param static The [StaticApiPath] containing the URL and Api name.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
-     * @param tryForceGzip If true, the request will attempt to use gzip compression.
      * @return A [JsonObject] containing the JSON response, or null if the request failed or returned no content.
      */
     suspend fun getJSONResponse(
         static: StaticApiPath,
         silentError: Boolean = true,
-        tryForceGzip: Boolean = false,
     ): JsonObject? = withContext(Dispatchers.IO) {
-        internalGetJSONResponse(static.url, static.apiName, silentError, tryForceGzip)
+        internalGetJSONResponse(static.url, static.apiName, silentError, static.tryForceGzip)
     }
 
     /**
@@ -385,5 +404,5 @@ object ApiUtils {
     fun isBazaarDisabled() = disabledApis?.disabledBazaar == true
     fun isEliteAhDisabled() = disabledApis?.disabledEliteAh == true
     fun isEliteBzDisabled() = disabledApis?.disabledEliteBz == true
-    fun isEliteItemsDisabled() = disabledApis?.disabledEliteItems == true
+    fun isEliteItemsDisabled() = disabledApis?.disabledEliteItems
 }
