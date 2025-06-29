@@ -15,10 +15,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
 class DevConfig {
+
     @Expose
     @ConfigOption(name = "Repository", desc = "")
     @Accordion
     val repo: RepositoryConfig = RepositoryConfig()
+
+    @Expose
+    @ConfigOption(name = "Neu Repository", desc = "")
+    @Accordion
+    val neuRepo: NeuRepositoryConfig = NeuRepositoryConfig()
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")
