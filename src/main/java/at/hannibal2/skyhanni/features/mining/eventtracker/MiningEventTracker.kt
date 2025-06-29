@@ -196,8 +196,9 @@ object MiningEventTracker {
             return
         }
         if (!response.success) return
+        val data = response.data ?: return
 
-        val formattedResponse = ConfigManager.gson.fromJson<MiningEventDataReceive>(response.data)
+        val formattedResponse = ConfigManager.gson.fromJson<MiningEventDataReceive>(data)
         if (!formattedResponse.success && config.enabled) {
             ErrorManager.logErrorWithData(
                 Exception("PostFailure"), "Sending mining event data was unsuccessful",

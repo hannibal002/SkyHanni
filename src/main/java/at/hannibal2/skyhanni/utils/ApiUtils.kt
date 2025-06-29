@@ -8,11 +8,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import com.google.gson.JsonElement
+import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.http.HttpEntity
+import org.apache.http.client.HttpResponseException
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
@@ -28,28 +30,34 @@ import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
 import java.nio.charset.StandardCharsets
 import java.security.KeyStore
+import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
-import kotlin.coroutines.ContinuationInterceptor
-import kotlin.coroutines.coroutineContext
 
 @SkyHanniModule
 object ApiUtils {
-    data class ApiResponse(val success: Boolean, val message: String?, var data: JsonElement)
+    data class ApiResponse <T : JsonElement> (val success: Boolean, val message: String?, var data: T? = null)
     data class StaticApiPath(val url: String, val apiName: String)
 
     private val parser: JsonParser = JsonParser()
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
-    private val httpClient: CloseableHttpClient = HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
-        .setDefaultHeaders(
-            listOf(
-                BasicHeader("Pragma", "no-cache"),
-                BasicHeader("Cache-Control", "no-cache"),
-            )
-        )
-        .setDefaultRequestConfig(RequestConfig.custom().build())
+    private val defaultHeaders = listOf(
+        BasicHeader("Pragma", "no-cache"),
+        BasicHeader("Cache-Control", "no-cache"),
+    )
+    private val gatedConnectionConfig = RequestConfig.custom()
+        .setConnectTimeout(10_000)
+        .setSocketTimeout(30_000)
+        .setConnectionRequestTimeout(5_000)
+        .build()
+
+    @PublishedApi
+    internal val httpClient: CloseableHttpClient = HttpClients.custom()
+        .setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
+        .setDefaultHeaders(defaultHeaders)
+        .setDefaultRequestConfig(gatedConnectionConfig)
         .useSystemProperties()
         .addInterceptorLast(RequestAcceptEncoding())
         .addInterceptorLast(ResponseContentEncoding())
@@ -78,19 +86,6 @@ object ApiUtils {
     }
 
     /**
-     * This is probably superfluous and a bit programmatic, but this function
-     * ensures that a suspended block runs on the IO dispatcher if it is not already.
-     * This ensures any Api requests made within the block are executed on the IO dispatcher,
-     * and disconnects the reliance on using [SkyHanniMod.launchIOCoroutine]
-     */
-    @Suppress("InjectDispatcher")
-    private suspend fun <T> ioIfNeeded(block: suspend () -> T): T =
-        if (coroutineContext[ContinuationInterceptor] == Dispatchers.IO) block()
-        else withContext(Dispatchers.IO) {
-            block()
-        }
-
-    /**
      * Represents the intention to perform an Api request, and the data associated with it.
      * This class is used to encapsulate the request and response data.
      *
@@ -99,7 +94,8 @@ object ApiUtils {
      * @param request The HTTP request to be executed.
      * @param response The HTTP response received from the Api request, if any.
      */
-    private data class ApiIntentionContext(
+    @PublishedApi
+    internal data class ApiIntentionContext(
         val url: String,
         val apiName: String,
         val request: HttpUriRequest,
@@ -111,9 +107,9 @@ object ApiUtils {
             request = request,
         )
 
-        fun toFailureApiResponse(e: Throwable? = null): ApiResponse {
+        fun <T : JsonElement> toFailureApiResponse(e: Throwable? = null): ApiResponse<T> {
             val message = e?.message ?: "Request to $apiName failed"
-            return ApiResponse(false, message, JsonObject())
+            return ApiResponse(false, message, null)
         }
     }
 
@@ -128,11 +124,12 @@ object ApiUtils {
      * @param silentError If true, the error will not be logged, unless debugConfig.apiUtilsNeverSilent is true.
      * @return An [ApiResponse] indicating failure, with the error message and empty data.
      */
-    private fun defaultExceptionHandler(
+    @PublishedApi
+    internal fun <T : JsonElement> defaultExceptionHandler(
         e: Throwable,
         intentionContext: ApiIntentionContext,
         silentError: Boolean
-    ): ApiResponse {
+    ): ApiResponse<T> {
         val shouldSilentError = if (debugConfig.apiUtilsNeverSilent) false else silentError
         if (!shouldSilentError) ErrorManager.logErrorWithData(
             e,
@@ -179,21 +176,28 @@ object ApiUtils {
      * @param apiIntention The Api intention to execute.
      * @param silentError If true, the error will not be logged.
      * @param exceptionHandler The function to handle exceptions, must return an ApiResponse.
+     * @param entityHandler The function to handle the HttpEntity, must return a parsed JsonElement or null.
      * @param responseHandler The function to handle the response, must return an HttpEntity or null.
-     * @return A [Pair] of [ApiResponse] and [HttpEntity], where the latter can be null if the request failed.
+     * @return An [ApiResponse] indicating success or failure, with populated data where applicable.
      */
-    private fun withHttpClient(
+    @PublishedApi
+    internal inline fun <reified T : JsonElement> withHttpClient(
         apiIntention: ApiIntentionContext,
         silentError: Boolean = true,
-        exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> ApiResponse = ::defaultExceptionHandler,
+        exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> ApiResponse<T> = ::defaultExceptionHandler,
+        entityHandler: (HttpEntity?) -> T? = { it.readEntityResponse() },
         responseHandler: (CloseableHttpResponse) -> HttpEntity? = { it.getEntityOrNull() },
-    ): Pair<ApiResponse, HttpEntity?> = runCatching {
-        val resp = httpClient.execute(apiIntention.request)
-            ?: throw IllegalStateException("No response from Api request to ${apiIntention.apiName}")
-        val apiResponse = ApiResponse(true, "OK", JsonObject())
-        apiResponse to resp.use(responseHandler)
+    ): ApiResponse<T> = runCatching {
+        httpClient.execute(apiIntention.request).use { resp ->
+            apiIntention.response = resp
+            if (resp.statusLine.statusCode !in 200..299)
+                throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)
+            val entity = responseHandler.invoke(resp)
+            val data = entityHandler.invoke(entity)
+            ApiResponse(true, "OK", data)
+        }
     }.getOrElse { e ->
-        exceptionHandler(e, apiIntention, silentError) to null
+        exceptionHandler(e, apiIntention, silentError)
     }
 
     /**
@@ -202,30 +206,34 @@ object ApiUtils {
      * @param failOnNoContentLength If true, the method will return null if the content length is 0.
      * @return The [HttpEntity] if the response is successful and has content, or null otherwise.
      */
-    private fun CloseableHttpResponse.getEntityOrNull(
+    @PublishedApi
+    internal fun CloseableHttpResponse.getEntityOrNull(
         failOnNoContentLength: Boolean = true,
     ): HttpEntity? = if (this.statusLine.statusCode in 200..299) {
-        this.entity.takeIf { it.contentLength > 0 || !failOnNoContentLength }
+        this.entity.takeIf { it.contentLength != 0L || !failOnNoContentLength }
     } else null
 
     /**
      * Reads the content of the HttpEntity and parses it as a JsonElement.
-     * If the entity is null or has no content, it returns the default value.
      *
      * @param T the specific subtype of [JsonElement] you expect (e.g., [JsonObject] or [com.google.gson.JsonArray])
-     * @param default The default value to return if the entity is null or has no content.
-     * @return The parsed [JsonElement] from the entity, or the [default] value if the entity is null or empty.
+     * @return The parsed [JsonElement] from the entity, or null if the entity is null or has no content.
      */
     @Suppress("UNCHECKED_CAST")
-    private fun <T : JsonElement> HttpEntity?.readEntityResponse(
-        default: T = JsonObject() as T
-    ): T = when {
-        this == null || this.contentLength == 0L -> default
+    @PublishedApi
+    internal fun <T : JsonElement> HttpEntity?.readEntityResponse(
+        tryForceGzip: Boolean = false,
+    ): T? = when {
+        this == null || this.contentLength == 0L -> null
         else -> runCatching {
-            val text = EntityUtils.toString(this, StandardCharsets.UTF_8)
-            val parsed = parser.parse(text)
-            if (parsed.isJsonNull) default else parsed as T
-        }.getOrDefault(default)
+            val raw = if (tryForceGzip) GZIPInputStream(this.content) else this.content
+            val text = raw.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
+            if (text.isBlank()) null
+            else when (val parsed = parser.parse(text)) {
+                is JsonNull -> null
+                else -> parsed as T
+            }
+        }.getOrNull()
     }
     // </editor-fold>
 
@@ -236,10 +244,16 @@ object ApiUtils {
      *
      * @param static The [StaticApiPath] containing the URL and Api name.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @param tryForceGzip If true, the request will attempt to use gzip compression.
      * @return A [JsonObject] containing the JSON response, or null if the request failed or returned no content.
      */
-    suspend fun getJSONResponse(static: StaticApiPath, silentError: Boolean = true): JsonObject? =
-        ioIfNeeded { internalGetJSONResponse(static.url, static.apiName, silentError) }
+    suspend fun getJSONResponse(
+        static: StaticApiPath,
+        silentError: Boolean = true,
+        tryForceGzip: Boolean = false,
+    ): JsonObject? = withContext(Dispatchers.IO) {
+        internalGetJSONResponse(static.url, static.apiName, silentError)
+    }
 
     /**
      * Fetches a JSON response from the given URL and Api name.
@@ -247,10 +261,17 @@ object ApiUtils {
      * @param url The URL to fetch the JSON response from.
      * @param apiName The name of the Api being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @param tryForceGzip If true, the request will attempt to use gzip compression.
      * @return A [JsonObject] containing the JSON response, or null if the request failed or returned no content.
      */
-    suspend fun getJSONResponse(url: String, apiName: String, silentError: Boolean = true): JsonObject? =
-        ioIfNeeded { internalGetJSONResponse(url, apiName, silentError) }
+    suspend fun getJSONResponse(
+        url: String,
+        apiName: String,
+        silentError: Boolean = true,
+        tryForceGzip: Boolean = false,
+    ): JsonObject? = withContext(Dispatchers.IO) {
+        internalGetJSONResponse(url, apiName, silentError)
+    }
 
     /**
      * Fetches a typed JSON response from the given URL and Api name.
@@ -259,13 +280,17 @@ object ApiUtils {
      * @param url The URL to fetch the JSON response from.
      * @param apiName The name of the Api being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @param tryForceGzip If true, the request will attempt to use gzip compression.
      * @return A [T] containing the parsed JSON response, or null if the request failed or returned no content.
      */
-    suspend fun <T : JsonElement> getTypedJSONResponse(
+    suspend inline fun <reified T : JsonElement> getTypedJSONResponse(
         url: String,
         apiName: String,
-        silentError: Boolean = true
-    ): T? = ioIfNeeded { internalGetJSONResponse(url, apiName, silentError) }
+        silentError: Boolean = true,
+        tryForceGzip: Boolean = false,
+    ): T? = withContext(Dispatchers.IO) {
+        internalGetJSONResponse(url, apiName, silentError)
+    }
 
     /**
      * Driving logic for fetching a JSON response from the Api.
@@ -277,10 +302,23 @@ object ApiUtils {
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @return A [T] containing the parsed JSON response, or null if the request failed or returned no content.
      */
-    private fun <T : JsonElement> internalGetJSONResponse(url: String, apiName: String, silentError: Boolean = true): T? {
-        val apiIntention = ApiIntentionContext(HttpGet(url), apiName)
-        val (_, entity) = withHttpClient(apiIntention, silentError = silentError)
-        return entity.readEntityResponse()
+    @PublishedApi
+    internal inline fun <reified T : JsonElement> internalGetJSONResponse(
+        url: String,
+        apiName: String,
+        silentError: Boolean = true,
+        tryForceGzip: Boolean = false,
+    ): T? {
+        val request = HttpGet(url).apply {
+            if (tryForceGzip) addHeader("Accept-Encoding", "gzip")
+        }
+        val apiIntention = ApiIntentionContext(request, apiName)
+        val apiResponse = withHttpClient<T>(
+            apiIntention,
+            silentError = silentError,
+            entityHandler = { it.readEntityResponse(tryForceGzip) }
+        )
+        return apiResponse.data
     }
     // </editor-fold>
 
@@ -294,8 +332,8 @@ object ApiUtils {
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @return An [ApiResponse] containing the success status, message, and data from the Api response.
      */
-    suspend fun postJSON(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse =
-        ioIfNeeded { internalPostJSON(static.url, jsonBody, static.apiName, silentError) }
+    suspend fun postJSON(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse<JsonObject> =
+        withContext(Dispatchers.IO) { internalPostJSON(static.url, jsonBody, static.apiName, silentError) }
 
     /**
      * Posts a JSON body to the given URL.
@@ -306,8 +344,8 @@ object ApiUtils {
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @return An [ApiResponse] containing the success status, message, and data from the Api response.
      */
-    suspend fun postJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse =
-        ioIfNeeded { internalPostJSON(url, jsonBody, apiName, silentError) }
+    suspend fun postJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse<JsonObject> =
+        withContext(Dispatchers.IO) { internalPostJSON(url, jsonBody, apiName, silentError) }
 
     /**
      * Driving logic for posting a JSON body to the Api.
@@ -319,15 +357,18 @@ object ApiUtils {
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @return An [ApiResponse] containing the success status, message, and data from the Api response.
      */
-    private fun internalPostJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse {
+    @PublishedApi
+    internal inline fun <reified T : JsonElement> internalPostJSON(
+        url: String,
+        jsonBody: String,
+        apiName: String,
+        silentError: Boolean = true
+    ): ApiResponse<T> {
         val method = HttpPost(url).apply {
             entity = StringEntity(jsonBody, ContentType.APPLICATION_JSON)
         }
         val apiIntention = ApiIntentionContext(method, apiName)
-        val (apiResponse, entity) = withHttpClient(apiIntention, silentError = silentError)
-        apiResponse.data = entity.readEntityResponse<JsonObject>()
-
-        return apiResponse
+        return withHttpClient<T>(apiIntention, silentError = silentError)
     }
     // </editor-fold>
 
