@@ -43,7 +43,7 @@ object InvisibugHighlighter {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
 
-        for (entity in invisibugEntities) {
+        for (entity in invisibugEntities.toList()) {
             if (!entity.canBeSeen(32)) continue
 
             event.drawWaypointFilled(
