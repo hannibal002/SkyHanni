@@ -22,18 +22,13 @@ at.hannibal2.skyhanni.mixins.transformers.AccessorRender.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket.java
 at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal.java
-at.hannibal2.skyhanni.mixins.transformers.ExtendedColorPatch.java
-at.hannibal2.skyhanni.mixins.transformers.MixinBlockFire.java
 at.hannibal2.skyhanni.mixins.transformers.MixinBlockLiquid.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDataWatcher.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityAgeable.java
-at.hannibal2.skyhanni.mixins.transformers.MixinEntityBlaze.java
-at.hannibal2.skyhanni.mixins.transformers.MixinEntityFireball.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityHorse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinFontRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiChat.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngameForge.java
-at.hannibal2.skyhanni.mixins.transformers.MixinGuiPlayerTabOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetHandlerPlayClient.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinOptifineConnectedTextures.java
@@ -53,7 +48,6 @@ at.hannibal2.skyhanni.mixins.transformers.neu.MixinNEUOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.neu.MixinStorageOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.renderer.MixinBlockRendererDispatcher.java
 at.hannibal2.skyhanni.mixins.transformers.renderer.MixinContributorRendererEntityLiving.java
-at.hannibal2.skyhanni.mixins.transformers.renderer.MixinRendererLivingEntity.java
 
 # these files do not work yet but should be made to work in the future
 at.hannibal2.skyhanni.utils.HolographicEntities.kt
@@ -66,3 +60,7 @@ at.hannibal2.skyhanni.test.ComponentSpanTest.kt
 at.hannibal2.skyhanni.test.RepoPatternTest.kt
 at.hannibal2.skyhanni.test.ItemModifierTest.kt
 at.hannibal2.skyhanni.test.garden.VisitorListenerTest.kt
+
+at.hannibal2.skyhanni.mixins.transformers.ExtendedColorPatch.java
+at.hannibal2.skyhanni.mixins.transformers.MixinEntityFireball.java
+at.hannibal2.skyhanni.mixins.transformers.MixinGuiPlayerTabOverlay.java
