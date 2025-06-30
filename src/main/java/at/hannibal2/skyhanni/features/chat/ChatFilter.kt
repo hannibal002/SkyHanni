@@ -306,7 +306,8 @@ object ChatFilter {
     )
 
     private val lotteryMessages = listOf(
-
+        "§r§bNew day! §r§eYour §r§2Lottery §r§ebuff changed!",
+        "§r§8§oYou can disable this messaging by toggling Lottery in your /hotf!"
     )
 
     /**
@@ -499,6 +500,7 @@ object ChatFilter {
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
         "skymall" to skymallMessages,
+        "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
     )

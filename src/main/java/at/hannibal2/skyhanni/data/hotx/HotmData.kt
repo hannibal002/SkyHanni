@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.data.hotx
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.HotmApi.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -636,6 +638,7 @@ enum class HotmData(
         override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
 
         override fun extraChatHandling(event: SkyHanniChatEvent) {
+            if (chatConfig.hideSkyMall && !IslandTypeTags.MINING.inAny()) event.blockedReason = "skymall"
             DelayedRun.runNextTick {
                 mayhemChatPattern.matchMatcher(event.message) {
                     val perk = group("perk")
@@ -679,6 +682,8 @@ enum class HotmData(
         }
     }
 }
+
+private val chatConfig get() = SkyHanniMod.feature.chat
 
 private val coreOfTheMountainPerks = mutableMapOf<Int, Map<HotmReward, Double>>()
 
