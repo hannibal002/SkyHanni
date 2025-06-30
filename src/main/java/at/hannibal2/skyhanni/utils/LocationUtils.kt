@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.FacePointSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
@@ -66,6 +67,8 @@ object LocationUtils {
      * Another note, if [pointFill] is provided, this function will continue to fill out points in the map, even after
      * it finds a point that can be seen - this is useful for debugging, but should not be used in user-facing code.
      *
+     * @param min The first corner of the box (minimum corner).
+     * @param max The second corner of the box (maximum corner).
      * @param viewDistance The maximum distance at which the player can see the box.
      * @param stepCount The number of "middle points" between faces to check. Default is 0, meaning only the center point is checked.
      * @param stepDensity The number of rays to cast from the center of each face towards the nearest corner.
@@ -74,15 +77,17 @@ object LocationUtils {
      * @param ignoreFaces Which faces, if any, to ignore when checking visibility. Default is none.
      * @return True if the player can see any face of the box, false otherwise.
      */
-    fun Pair<LorenzVec, LorenzVec>.anyFaceCanBeSeen(
+    @Suppress("CyclomaticComplexMethod")
+    fun anyFaceCanBeSeen(
+        min: LorenzVec,
+        max: LorenzVec,
         viewDistance: Number = 150.0,
         stepCount: Int = 0,
         stepDensity: Int = 4,
-        pointFill: MutableMap<EnumFacing, MutableList<Pair<LorenzVec, Boolean>>>? = null,
+        pointFill: FacePointSet? = null,
         offset: Double? = null,
         vararg ignoreFaces: EnumFacing,
     ): Boolean {
-        val (min, max) = this
         val aabb = AxisAlignedBB(min.x, min.y, min.z, max.x, max.y, max.z)
         val eye = playerEyeLocation()
         val center = aabb.getBoxCenter()
@@ -97,6 +102,7 @@ object LocationUtils {
             return canSeeResult
         }
 
+        @Suppress("LoopWithTooManyJumpStatements")
         for (face in EnumFacing.entries) {
             if (ignoreFaces.contains(face)) continue
 
@@ -175,7 +181,6 @@ object LocationUtils {
         val ext1: Double,
         val ext2: Double,
     )
-
 
     fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()

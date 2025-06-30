@@ -23,6 +23,7 @@ import net.minecraft.client.render.VertexRendering
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Box
+import net.minecraft.util.math.Direction
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.cos
@@ -851,6 +852,69 @@ object WorldRenderUtils {
             val last = path.last()
             drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
         }
+    }
+
+    fun SkyHanniRenderWorldEvent.fillFace(
+        box: Box,
+        face: Direction,
+        color: Color,
+        alpha: Float = 1f,
+        renderRelativeToCamera: Boolean = false,
+        seeThroughBlocks: Boolean = false
+    ) {
+        val faceBox = when (face) {
+            Direction.UP -> Box(box.minX, box.maxY, box.minZ, box.maxX, box.maxY, box.maxZ)
+            Direction.DOWN -> Box(box.minX, box.minY, box.minZ, box.maxX, box.minY, box.maxZ)
+            Direction.NORTH -> Box(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.minZ)
+            Direction.SOUTH -> Box(box.minX, box.minY, box.maxZ, box.maxX, box.maxY, box.maxZ)
+            Direction.WEST -> Box(box.minX, box.minY, box.minZ, box.minX, box.maxY, box.maxZ)
+            Direction.EAST -> Box(box.maxX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ)
+        }
+
+        val effective = if (!renderRelativeToCamera) {
+            val cam = camera.pos
+            Box(
+                faceBox.minX - cam.x, faceBox.minY - cam.y, faceBox.minZ - cam.z,
+                faceBox.maxX - cam.x, faceBox.maxY - cam.y, faceBox.maxZ - cam.z
+            )
+        } else faceBox
+
+        if (isCurrentlyDeferring) {
+            DeferredDrawer.deferBox(effective, color, alpha, depth = !seeThroughBlocks)
+            return
+        }
+
+        drawFilledBoundingBox(
+            effective,
+            color,
+            alpha,
+            renderRelativeToCamera = true,
+            seeThroughBlocks = seeThroughBlocks
+        )
+    }
+
+    fun SkyHanniRenderWorldEvent.drawFaceRayWorld(
+        origin: LorenzVec,
+        face: Direction,
+        color: Color,
+        length: Double = 0.5,
+        thickness: Double = 0.02
+    ) {
+        val dir = LorenzVec(face.offsetX.toDouble(), face.offsetY.toDouble(), face.offsetZ.toDouble())
+        val end = origin + dir * length
+        val minX = minOf(origin.x, end.x) - thickness
+        val minY = minOf(origin.y, end.y) - thickness
+        val minZ = minOf(origin.z, end.z) - thickness
+        val maxX = maxOf(origin.x, end.x) + thickness
+        val maxY = maxOf(origin.y, end.y) + thickness
+        val maxZ = maxOf(origin.z, end.z) + thickness
+
+        drawFilledBoundingBox(
+            Box(minX, minY, minZ, maxX, maxY, maxZ),
+            color,
+            alphaMultiplier = 1f,
+            renderRelativeToCamera = false,
+        )
     }
 
     fun getViewerPos(ignored: Float) = getViewerPos()

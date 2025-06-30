@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.MathHelper
 import org.lwjgl.opengl.GL11
 import java.awt.Color
@@ -1139,6 +1140,101 @@ object WorldRenderUtils {
             val last = path.last()
             drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
         }
+    }
+
+    fun AxisAlignedBB.getFaceCorners(face: EnumFacing): List<LorenzVec> = when (face) {
+        EnumFacing.UP -> getCornersAtHeight(maxY)
+        EnumFacing.DOWN -> getCornersAtHeight(minY).asReversed()
+        EnumFacing.NORTH -> listOf(
+            LorenzVec(minX, minY, minZ),
+            LorenzVec(maxX, minY, minZ),
+            LorenzVec(maxX, maxY, minZ),
+            LorenzVec(minX, maxY, minZ),
+        )
+
+        EnumFacing.SOUTH -> listOf(
+            LorenzVec(maxX, minY, maxZ),
+            LorenzVec(minX, minY, maxZ),
+            LorenzVec(minX, maxY, maxZ),
+            LorenzVec(maxX, maxY, maxZ),
+        )
+
+        EnumFacing.WEST -> listOf(
+            LorenzVec(minX, minY, maxZ),
+            LorenzVec(minX, minY, minZ),
+            LorenzVec(minX, maxY, minZ),
+            LorenzVec(minX, maxY, maxZ),
+        )
+
+        EnumFacing.EAST -> listOf(
+            LorenzVec(maxX, minY, minZ),
+            LorenzVec(maxX, minY, maxZ),
+            LorenzVec(maxX, maxY, maxZ),
+            LorenzVec(maxX, maxY, minZ),
+        )
+    }
+
+    fun SkyHanniRenderWorldEvent.fillFace(
+        aabb: AxisAlignedBB,
+        face: EnumFacing,
+        color: Color,
+        alpha: Float = 1f,
+        renderRelativeToCamera: Boolean = false,
+    ) {
+        GlStateManager.disableTexture2D()
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        GlStateManager.disableCull()
+
+        val effectiveAABB = if (!renderRelativeToCamera) {
+            val vp = getViewerPos(partialTicks)
+            AxisAlignedBB(
+                aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
+                aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
+            )
+        } else aabb
+
+        val corners = effectiveAABB.getFaceCorners(face)
+        val tessellator = Tessellator.getInstance()
+        val wr = tessellator.worldRenderer
+        wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR)
+        val r = color.red   / 255f
+        val g = color.green / 255f
+        val b = color.blue  / 255f
+        val a = (color.alpha / 255f) * alpha
+
+        for (v in corners) {
+            wr.pos(v.x, v.y, v.z).color(r, g, b, a).endVertex()
+        }
+        tessellator.draw()
+
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableCull()
+        GlStateManager.disableBlend()
+    }
+
+    fun SkyHanniRenderWorldEvent.drawFaceRayWorld(
+        origin: LorenzVec,
+        face: EnumFacing,
+        color: Color,
+        length: Double = 0.5,
+        thickness: Double = 0.02
+    ) {
+        val dir = LorenzVec(face.frontOffsetX.toDouble(), face.frontOffsetY.toDouble(), face.frontOffsetZ.toDouble())
+        val end = origin + dir * length
+        val minX = minOf(origin.x, end.x) - thickness
+        val minY = minOf(origin.y, end.y) - thickness
+        val minZ = minOf(origin.z, end.z) - thickness
+        val maxX = maxOf(origin.x, end.x) + thickness
+        val maxY = maxOf(origin.y, end.y) + thickness
+        val maxZ = maxOf(origin.z, end.z) + thickness
+
+        drawFilledBoundingBox(
+            AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ),
+            color,
+            alphaMultiplier = 1f,
+            renderRelativeToCamera = false,
+        )
     }
 
     fun getViewerPos(partialTicks: Float) =
