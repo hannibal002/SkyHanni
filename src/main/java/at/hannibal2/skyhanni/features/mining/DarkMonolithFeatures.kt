@@ -59,9 +59,8 @@ object DarkMonolithFeatures {
     private val tracker = SkyHanniItemTracker(
         "Dark Monolith Tracker",
         createNewSession = { Data() },
-        getStorage = { it.mining.darkMonolithTracker }) {
-        drawDisplay(it)
-    }
+        getStorage = { it.mining.darkMonolithTracker }
+    ) { drawDisplay(it) }
 
     // Todo: need chat pattern for rock the fish drop
     /**
@@ -148,7 +147,7 @@ object DarkMonolithFeatures {
 
     private fun updateKnownEggs() {
         if (nextBlockCheck.isInFuture()) return
-        foundEggVec = knownEggs.firstOrNull { it.canBeSeen() }.also{
+        foundEggVec = knownEggs.firstOrNull { it.canBeSeen() }.also {
             checkTitle()
             lastFoundEggVec = it
             nextBlockCheck = SimpleTimeMark.now().plus(500.milliseconds)
