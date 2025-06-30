@@ -8,13 +8,12 @@ hypixelmodapi = "1.0.1"
 hypixelmodapi_fabric = "1.0.1+build.1+mc1.21"
 hypixelmodapi_forge = "1.0.1.2"
 
-modmenu = "14.0.0-rc.2"
+fabricLanguageKotlin = "1.13.2+kotlin.2.1.20"
 
 roughlyenoughitems = "19.0.806"
 
 [libraries]
 moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
-moulconfigModern = { module = "org.notenoughupdates.moulconfig:modern-1.21.5", version.ref = "moulconfig" }
 libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate" }
 headlessLwjgl = { module = "com.github.3arthqu4ke.HeadlessMc:headlessmc-lwjgl", version.ref = "headlessLwjgl" }
 jbAnnotations = { module = "org.jetbrains:annotations", version.ref = "jbAnnotations" }
@@ -27,6 +26,6 @@ hypixelmodapitweaker = { module = "net.hypixel:mod-api-forge-tweaker", version.r
 hypixelmodapi = { module = "net.hypixel:mod-api", version.ref = "hypixelmodapi" }
 hypixelmodapi_fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixelmodapi_fabric" }
 
-modmenu = { module = "maven.modrinth:modmenu", version.ref = "modmenu" }
+fabricLanguageKotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabricLanguageKotlin" }
 
 roughlyenoughitems = { module = "me.shedaniel:RoughlyEnoughItems-api-fabric", version.ref = "roughlyenoughitems" }

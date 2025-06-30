@@ -5,7 +5,6 @@ import java.util.Properties
 
 enum class MultiVersionStage(val label: String) {
     OFF("off"),
-    PREPROCESS_ONLY("preprocess-only"),
     FULL("compile")
     ;
 
@@ -13,8 +12,7 @@ enum class MultiVersionStage(val label: String) {
         if (projectTarget == ProjectTarget.MAIN) return true
         return when (this) {
             OFF -> false
-            PREPROCESS_ONLY -> false
-            FULL -> projectTarget == ProjectTarget.MODERN
+            FULL -> projectTarget.isModern
         }
     }
 
@@ -22,7 +20,6 @@ enum class MultiVersionStage(val label: String) {
         if (projectTarget == ProjectTarget.MAIN) return true
         return when (this) {
             OFF -> false
-            PREPROCESS_ONLY -> true
             FULL -> true
         }
     }
