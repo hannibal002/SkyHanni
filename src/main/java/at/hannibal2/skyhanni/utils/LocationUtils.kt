@@ -54,30 +54,6 @@ object LocationUtils {
 
     fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
 
-    /**
-     * When passed a corner pair of vectors, checks if the player can see the center point of, or optionally
-     * a number of other points on the box, defined by the [step] parameter.
-     *
-     * A note about the [step] parameter - it is linear, but at a rate of increasing by [stepDensity], per face, per step.
-     * So, use both sparingly, as it can lead to a lot of rays being cast.
-     *
-     * @param viewDistance The maximum distance at which the player can see the box.
-     * @param offset An optional vertical offset to apply to the box corners.
-     * @param step The number of "middle points" between faces to check. Default is 0, meaning only the center point is checked.
-     * @param stepDensity The number of rays to cast from the center of each face towards the nearest corner.
-     * @return True if the player can see any face of the box, false otherwise.
-     */
-    fun Pair<LorenzVec, LorenzVec>.anyFaceCanBeSeen(
-        viewDistance: Number = 150.0,
-        step: Int = 0,
-        stepDensity: Int = 4,
-        offset: Double? = null
-    ): Boolean {
-        val player = MinecraftCompat.localPlayer
-        val eyeLocation = playerEyeLocation()
-        return canSee(eyeLocation, this, offset) && eyeLocation.distance(this) < viewDistance.toDouble()
-    }
-
     fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
