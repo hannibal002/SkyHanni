@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
+import at.hannibal2.skyhanni.utils.LocationUtils.minBox
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -32,6 +34,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.EnumFacing
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -147,7 +150,16 @@ object DarkMonolithFeatures {
 
     private fun updateKnownEggs() {
         if (nextBlockCheck.isInFuture()) return
-        foundEggVec = knownEggs.firstOrNull { it.canBeSeen() }.also {
+        foundEggVec = knownEggs.firstOrNull { blockVec ->
+            val base = blockVec.floor()
+            val aabb = base.boundingToOffset(1.0, 1.0, 1.0)
+            LocationUtils.canSeeAnyFace(
+                min = aabb.minBox(),
+                max = aabb.maxBox(),
+                stepCount = 4,
+                ignoreFaces = listOf(EnumFacing.DOWN).toTypedArray(),
+            )
+        }.also {
             checkTitle()
             lastFoundEggVec = it
             nextBlockCheck = SimpleTimeMark.now().plus(500.milliseconds)

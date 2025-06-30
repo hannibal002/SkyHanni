@@ -9,4 +9,9 @@ class DevToolConfig {
     @ConfigOption(name = "Graph Tools", desc = "")
     @Accordion
     val graph: GraphConfig = GraphConfig()
+
+    @Expose
+    @ConfigOption(name = "LOS Face Test", desc = "")
+    @Accordion
+    val canSeeFace: TestCanSeeFaceConfig = TestCanSeeFaceConfig()
 }
