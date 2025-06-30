@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
@@ -125,6 +126,13 @@ object TestCanSeeFace {
     private val enabled get() = config.enabled.get()
     private val debugEnabled get() = config.debugInfo.get()
     private val faceCheckContext = FaceCheckContext()
+
+    @HandleEvent
+    fun onConfigLoad() {
+        ConditionalUtils.onToggleAll(config) {
+            regenDebugRenderable()
+        }
+    }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
