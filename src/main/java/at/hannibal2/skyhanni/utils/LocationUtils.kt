@@ -115,25 +115,30 @@ object LocationUtils {
         val aabb = AxisAlignedBB(min.x, min.y, min.z, max.x, max.y, max.z)
         val eye = playerEyeLocation()
         val center = aabb.getBoxCenter()
-        val maxDist = viewDistance.toDouble()
+        val faceCenter = face.getCenterPos(center, aabb)
+
+        if (eye.distance(faceCenter) > viewDistance.toDouble()) return false
+        val wrappedSuccess = pointFill.wrapCanSee(face, eye, faceCenter, offset)
+
+        return if (wrappedSuccess && pointFill == null) true
+        else if (stepCount == 0) false
+        else face.performStepping(aabb, faceCenter, eye, viewDistance, stepCount, stepDensity, pointFill, offset)
+    }
+
+    private fun EnumFacing.performStepping(
+        aabb: AxisAlignedBB,
+        faceCenter: LorenzVec,
+        eye: LorenzVec,
+        viewDistance: Number,
+        stepCount: Int,
+        stepDensity: Int,
+        pointFill: FacePointSet?,
+        offset: Double? = null,
+    ): Boolean {
         val halfX = (aabb.maxX - aabb.minX) / 2
         val halfY = (aabb.maxY - aabb.minY) / 2
         val halfZ = (aabb.maxZ - aabb.minZ) / 2
-        val faceCenter = face.getCenterPos(center, aabb)
-
-        fun wrapCanSee(face: EnumFacing, a: LorenzVec, b: LorenzVec, offset: Double?): Boolean {
-            val canSeeResult = canSee(a, b, offset)
-            pointFill?.getOrPut(face) { mutableListOf() }?.add(b to canSeeResult)
-            return canSeeResult
-        }
-
-        if (eye.distance(faceCenter) > maxDist) return false
-        else if (wrapCanSee(face, eye, faceCenter, offset) && pointFill == null) return true
-
-        if (stepCount == 0) return false
-
-        val (axis1, axis2, ext1, ext2) = face.getFaceRayConfig(halfX, halfY, halfZ) ?: return false
-
+        val (axis1, axis2, ext1, ext2) = getFaceRayConfig(halfX, halfY, halfZ) ?: return false
         for (stepSeq in 0 until stepDensity) {
             val angle = 2 * PI * stepSeq / stepDensity
             val dx = cos(angle)
@@ -147,11 +152,18 @@ object LocationUtils {
             stepLoop@for (step in 1..stepCount) {
                 val frac = step.toDouble() / (stepCount + 1)
                 val testPoint = faceCenter + dirVec * (boundaryDist * frac)
-                if (eye.distance(testPoint) > maxDist) continue@stepLoop
-                if (wrapCanSee(face, eye, testPoint, offset) && pointFill == null) return true
+                if (eye.distance(testPoint) > viewDistance.toDouble()) continue@stepLoop
+                val wrappedSuccess = pointFill.wrapCanSee(this, eye, testPoint, offset)
+                if (wrappedSuccess && pointFill == null) return true
             }
         }
         return false
+    }
+
+    private fun FacePointSet?.wrapCanSee(face: EnumFacing, a: LorenzVec, b: LorenzVec, offset: Double?): Boolean {
+        val canSeeResult = canSee(a, b, offset)
+        this?.getOrPut(face) { mutableListOf() }?.add(b to canSeeResult)
+        return canSeeResult
     }
 
     private fun EnumFacing.getCenterPos(center: LorenzVec, aabb: AxisAlignedBB) = when (this) {
