@@ -441,7 +441,7 @@ enum class HotfData(
         }
 
         override fun tryBlock(event: SkyHanniChatEvent) {
-            if (!chatConfig.hideSkyMall) return
+            if (!chatConfig.hideLottery) return
             event.blockedReason = "lottery"
         }
 
