@@ -218,7 +218,7 @@ object TestCanSeeFace {
         val vec1 = faceCheckContext.vec1 ?: return
         val vec2 = faceCheckContext.vec2 ?: return
         if (!force && faceCheckContext.finished) return
-        faceCheckContext.generallySeen = LocationUtils.anyFaceCanBeSeen(
+        faceCheckContext.generallySeen = LocationUtils.canSeeAnyFace(
             min = vec1,
             max = vec2,
             stepCount = config.stepCount.get(),

@@ -60,13 +60,13 @@ object LocationUtils {
     fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
 
     /**
-     * Extension function on top of [faceCanBeSeen], allowing checking of more than one face with a singular call.
+     * Extension function on top of [canSeeFace], allowing checking of more than one face with a singular call.
      * See lower function for more extensive documentation.
      *
      * @param ignoreFaces Which faces, if any, to ignore when checking visibility. Default is none (meaning all faces are checked).
      * @return True if any face can be seen, false otherwise.
      */
-    fun anyFaceCanBeSeen(
+    fun canSeeAnyFace(
         min: LorenzVec,
         max: LorenzVec,
         viewDistance: Number = 150.0,
@@ -78,7 +78,7 @@ object LocationUtils {
     ): Boolean {
         for (face in EnumFacing.entries) {
             if (ignoreFaces.contains(face)) continue
-            val faceResult = faceCanBeSeen(face, min, max, viewDistance, stepCount, stepDensity, pointFill, offset)
+            val faceResult = canSeeFace(face, min, max, viewDistance, stepCount, stepDensity, pointFill, offset)
             if (faceResult && pointFill == null) return true
         }
         return pointFill?.values?.any { facedFill ->
@@ -105,7 +105,7 @@ object LocationUtils {
      * @param offset An optional vertical offset to apply to the face corners.
      * @return True if the player can see the specified face, false otherwise.
      */
-    fun faceCanBeSeen(
+    fun canSeeFace(
         face: EnumFacing,
         min: LorenzVec,
         max: LorenzVec,
