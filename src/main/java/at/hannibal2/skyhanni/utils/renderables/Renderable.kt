@@ -1659,8 +1659,11 @@ interface Renderable {
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
                 val mouse = currentRenderPassMousePosition ?: return
-                val mouseXRelativeToPlayer = if (followMouse) (mouseOffsetX + playerX - mouse.first).toFloat() else eyesX
-                val mouseYRelativeToPlayer = if (followMouse) (mouseOffsetY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
+                val (mouseXRelativeToPlayer, mouseYRelativeToPlayer) = if (followMouse) {
+                    val newOffsetX = (mouseOffsetX + playerX - mouse.first).toFloat()
+                    val newOffsetY = (mouseOffsetY + playerY - mouse.second - 1.62 * entityScale).toFloat()
+                    newOffsetX to newOffsetY
+                } else eyesX to eyesY
                 DrawContextUtils.translate(0f, 0f, 100f)
                 //#if MC < 1.21
                 drawEntityOnScreen(
