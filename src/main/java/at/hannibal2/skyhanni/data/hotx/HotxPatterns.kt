@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.data.hotx
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+@SkyHanniModule
 object HotxPatterns {
 
     private val patternGroup = RepoPattern.group("misc.hotx")
