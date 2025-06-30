@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
-import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.stylesEqual
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.OrderedText
 import net.minecraft.text.StringVisitable
@@ -106,7 +105,7 @@ object ModifyVisualWords {
             val stringBuilder = StringBuilder()
 
             for (character in characters) {
-                if (!stylesEqual(lastStyle, character.style)) {
+                if (lastStyle != character.style) {
 
                     outputParts.add(StringVisitable.styled(stringBuilder.toString(), lastStyle))
                     lastStyle = character.style
@@ -220,7 +219,7 @@ fun List<StyledCharacter>.toLegacyString(): String {
     val builder = StringBuilder()
     var lastStyle = Style.EMPTY
     for (character in this) {
-        if (!stylesEqual(lastStyle, character.style)) {
+        if (lastStyle != character.style) {
             builder.append(requiredStyleChangeString(lastStyle, character.style, true))
             lastStyle = character.style
         }

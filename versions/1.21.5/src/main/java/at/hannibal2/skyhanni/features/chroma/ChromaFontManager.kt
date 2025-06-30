@@ -48,3 +48,10 @@ fun forceChromaStyleIfNecessary(style: Style): Style {
     }
     return style
 }
+
+fun isNotActuallyEqualBecauseOfChroma(
+    textColor: TextColor,
+    testObject: Any
+): Boolean = testObject is TextColor &&
+    (textColor.name == "chroma" || testObject.name == "chroma") &&
+    textColor.name != testObject.name

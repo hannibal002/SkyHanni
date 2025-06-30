@@ -20,7 +20,7 @@ object OrderedTextUtils {
             orderedText.accept { _, style, codePoint ->
                 if (codePoint == -1) return@accept true
 
-                if (!stylesEqual(lastStyle, style)) {
+                if (lastStyle != style) {
                     builder.append(requiredStyleChangeString(lastStyle, style, true))
                     lastStyle = style
                 }
@@ -67,7 +67,7 @@ object OrderedTextUtils {
 
         val sb = StringBuilder()
 
-        if ((from.color != to.color && to.color != null) || (reset && to.color != null)) {
+        if (((from.color != to.color) && to.color != null) || (reset && to.color != null)) {
             if (!exclusive) sb.append(Formatting.RESET.toString())
 
             if (to.color?.name == "chroma") {
@@ -101,14 +101,5 @@ object OrderedTextUtils {
         }
 
         return sb.toString()
-    }
-
-    // Vanilla style comparison doesn't take into account color names :(
-    fun stylesEqual(style1: Style, style2: Style): Boolean {
-        if (style1 != style2) return false
-        if (style1.color?.name != null) {
-            if (style1.color?.name != style2.color?.name) return false
-        }
-        return true
     }
 }
