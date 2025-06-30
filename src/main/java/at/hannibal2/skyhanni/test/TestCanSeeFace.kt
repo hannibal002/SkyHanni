@@ -12,18 +12,19 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
 import at.hannibal2.skyhanni.utils.LocationUtils.minBox
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -36,7 +37,7 @@ import net.minecraft.util.EnumFacing
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-typealias PointSet = MutableList<Pair<LorenzVec, Boolean>>
+typealias PointSet = TimeLimitedSet<Pair<LorenzVec, Boolean>>
 typealias FacePointEntry = Map.Entry<EnumFacing, PointSet>
 typealias FacePointSet = MutableMap<EnumFacing, PointSet>
 
@@ -55,6 +56,7 @@ object TestCanSeeFace {
         fun resetFromBlockVec(blockVec: LorenzVec) {
             this.reset()
             val base = blockVec.floor()
+            // Todo account for variable block sizes?
             val aabb = base.boundingToOffset(1.0, 1.0, 1.0)
             vec1 = aabb.minBox()
             vec2 = aabb.maxBox()
@@ -135,6 +137,8 @@ object TestCanSeeFace {
     private var nextMoveRegen: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastRenderable: Renderable? = null
     private val config get() = SkyHanniMod.feature.dev.devTool.canSeeFace
+    private val rayConfig get() = config.rays
+    private val faceHighlightConfig get() = config.faceHighlight
     private val enabled get() = config.enabled.get()
     private val debugEnabled get() = config.debugInfo.get()
     private val faceCheckContext = FaceCheckContext()
@@ -249,18 +253,18 @@ object TestCanSeeFace {
 
     private fun SkyHanniRenderWorldEvent.drawRaysFromFacePoints(
         face: EnumFacing,
-        points: List<Pair<LorenzVec, Boolean>>,
+        points: Collection<Pair<LorenzVec, Boolean>>,
     ) {
-        if (!config.drawPoints.get() || faceStates[face] == FaceState.HIDDEN) return
+        if (!rayConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
         for ((point, isSeen) in points) {
             if (currentVisibilityState == RayVisibilityState.SEEN && !isSeen) continue
-            val pointColor = if (isSeen) LorenzColor.GREEN else LorenzColor.RED
+            val pointColor = if (isSeen) rayConfig.seenColor.get() else rayConfig.unSeenColor.get()
             drawFaceRayWorld(
                 origin = point,
                 face = face,
-                color = pointColor.addOpacity(200),
-                length = config.rayLength.get().toDouble(),
-                thickness = config.rayThickness.get().toDouble(),
+                color = pointColor.toColor(),
+                length = rayConfig.length.get().toDouble(),
+                thickness = rayConfig.thickness.get().toDouble(),
                 seeThroughBlock = true
             )
         }
@@ -270,18 +274,17 @@ object TestCanSeeFace {
         context: FaceCheckContext,
         face: EnumFacing,
     ) {
-        if (!config.highlightFaces.get() || faceStates[face] == FaceState.HIDDEN) return
+        if (!faceHighlightConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
         val vec1 = context.vec1 ?: return
         val vec2 = context.vec2 ?: return
         val points = context.pointSet[face] ?: return
         val faceSeen = points.any { it.second }
-        val color = if (faceSeen) LorenzColor.GREEN else LorenzColor.RED
-        val finalColor = color.addOpacity(120)
+        val color = if (faceSeen) faceHighlightConfig.seenColor.get() else rayConfig.unSeenColor.get()
         val aabb = AxisAlignedBB(
             vec1.x, vec1.y, vec1.z,
             vec2.x, vec2.y, vec2.z,
         )
-        fillFace(aabb, face, finalColor, alpha = 1f)
+        fillFace(aabb, face, color.toColor(), alpha = 1f)
     }
 
 }

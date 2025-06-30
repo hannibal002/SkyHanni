@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.FacePointSet
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
@@ -15,6 +16,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object LocationUtils {
@@ -163,7 +165,7 @@ object LocationUtils {
 
     private fun FacePointSet?.wrapCanSee(face: EnumFacing, a: LorenzVec, b: LorenzVec, offset: Double?): Boolean {
         val canSeeResult = canSee(a, b, offset)
-        this?.getOrPut(face) { mutableListOf() }?.add(b to canSeeResult)
+        this?.getOrPut(face) { TimeLimitedSet(5.seconds) }?.add(b to canSeeResult)
         return canSeeResult
     }
 

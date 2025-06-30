@@ -1,6 +1,12 @@
+package at.hannibal2.skyhanni.config.features.dev
+
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -24,34 +30,68 @@ class TestCanSeeFaceConfig {
     val note: String = ""
 
     @Expose
-    @ConfigOption(name = "Step Count", desc = "")
-    @ConfigEditorSlider(minValue = 0f, maxValue = 40f, minStep = 1f)
+    @ConfigOption(name = "Step Count", desc = "§c(§4§l!§r§c) Large values may cause issues.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
     val stepCount: Property<Int> = Property.of(0)
 
     @Expose
-    @ConfigOption(name = "Step Density", desc = "")
-    @ConfigEditorSlider(minValue = 4f, maxValue = 40f, minStep = 1f)
+    @ConfigOption(name = "Step Density", desc = "§c(§4§l!§r§c) Large values may cause issues.")
+    @ConfigEditorSlider(minValue = 4f, maxValue = 60f, minStep = 1f)
     val stepDensity: Property<Int> = Property.of(4)
 
     @Expose
-    @ConfigOption(name = "Draw Rays", desc = "Render color-coded rays from points that are being checked.")
-    @ConfigEditorBoolean
-    val drawPoints: Property<Boolean> = Property.of(true)
+    @ConfigOption(name = "Rays", desc = "")
+    @Accordion
+    val rays: RayConfig = RayConfig()
+
+    class RayConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Render color-coded rays from points that are being checked.")
+        @ConfigEditorBoolean
+        val enabled: Property<Boolean> = Property.of(true)
+
+        @Expose
+        @ConfigOption(name = "Ray Length", desc = "How long the rays should be drawn (in blocks).")
+        @ConfigEditorSlider(minValue = 0.1f, maxValue = 5f, minStep = 0.1f)
+        val length: Property<Float> = Property.of(0.5f)
+
+        @Expose
+        @ConfigOption(name = "Ray Thickness", desc = "How thick the rays should be drawn (in blocks).")
+        @ConfigEditorSlider(minValue = 0.01f, maxValue = 0.1f, minStep = 0.01f)
+        val thickness: Property<Float> = Property.of(0.02f)
+
+        @Expose
+        @ConfigOption(name = "Seen Color", desc = "Color of rays that are seen by the face.")
+        @ConfigEditorColour
+        val seenColor: Property<ChromaColour> = Property.of(LorenzColor.GREEN.toChromaColor(220))
+
+        @Expose
+        @ConfigOption(name = "Not Seen Color", desc = "Color of rays that are not seen by the face.")
+        @ConfigEditorColour
+        val unSeenColor: Property<ChromaColour> = Property.of(LorenzColor.RED.toChromaColor(220))
+    }
 
     @Expose
-    @ConfigOption(name = "Ray Length", desc = "How long the rays should be drawn (in blocks).")
-    @ConfigEditorSlider(minValue = 0.1f, maxValue = 5f, minStep = 0.1f)
-    val rayLength: Property<Float> = Property.of(0.5f)
+    @ConfigOption(name = "Face Highlight", desc = "")
+    @Accordion
+    val faceHighlight: FaceHighlightConfig = FaceHighlightConfig()
 
-    @Expose
-    @ConfigOption(name = "Ray Thickness", desc = "How thick the rays should be drawn (in blocks).")
-    @ConfigEditorSlider(minValue = 0.01f, maxValue = 0.1f, minStep = 0.01f)
-    val rayThickness: Property<Float> = Property.of(0.02f)
+    class FaceHighlightConfig {
+        @Expose
+        @ConfigOption(name = "Highlight Faces", desc = "Highlight entire faces that are being checked.")
+        @ConfigEditorBoolean
+        val enabled: Property<Boolean> = Property.of(true)
 
-    @Expose
-    @ConfigOption(name = "Highlight Faces", desc = "Highlight entire faces that are being checked.")
-    @ConfigEditorBoolean
-    val highlightFaces: Property<Boolean> = Property.of(true)
+        @Expose
+        @ConfigOption(name = "Seen Color", desc = "Color of block faces that are seen by the face.")
+        @ConfigEditorColour
+        val seenColor: Property<ChromaColour> = Property.of(LorenzColor.GREEN.toChromaColor(120))
+
+        @Expose
+        @ConfigOption(name = "Not Seen Color", desc = "Color of block faces that are not seen by the face.")
+        @ConfigEditorColour
+        val unSeenColor: Property<ChromaColour> = Property.of(LorenzColor.RED.toChromaColor(120))
+    }
 
     @Expose
     @ConfigOption(name = "Refresh Interval", desc = "How often to refresh the face check (in seconds).")
