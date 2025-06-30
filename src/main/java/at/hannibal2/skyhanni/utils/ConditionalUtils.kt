@@ -5,6 +5,8 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
+import kotlin.reflect.jvm.javaGetter
 
 object ConditionalUtils {
 
@@ -92,9 +94,8 @@ object ConditionalUtils {
         if (!visited.add(current)) return@buildList
 
         for (prop in current::class.memberProperties) {
-            // Intentionally ignore transients and static properties
-            if (prop.hasAnnotation<Transient>()) return@buildList
-            prop.isAccessible = true
+            if (prop.javaField == null && prop.javaGetter == null || prop.hasAnnotation<Transient>()) continue
+            if (runCatching { prop.isAccessible = true }.isFailure) continue
             val value = runCatching { prop.getter.call(current) }.getOrNull() ?: continue
             when (value) {
                 is Property<*> -> add(value)
