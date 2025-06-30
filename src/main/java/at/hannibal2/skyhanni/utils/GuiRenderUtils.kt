@@ -54,7 +54,7 @@ object GuiRenderUtils {
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
-        drawStringCentered(str, x.toFloat(), y.toFloat(), true, 0xffffff)
+        drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
@@ -67,19 +67,19 @@ object GuiRenderUtils {
         DrawContextUtils.popMatrix()
     }
 
-    fun drawString(str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
+    fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
         DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
-    fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+    fun drawString(str: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
-    fun drawStrings(strings: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+    fun drawStrings(strings: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         drawStrings(strings.split("\n"), x, y, color, shadow)
     }
 
-    fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+    fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
             DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
