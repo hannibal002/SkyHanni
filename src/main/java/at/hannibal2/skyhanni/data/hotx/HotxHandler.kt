@@ -186,7 +186,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
     abstract val rotatingPerkClazz: KClass<RotPerkE>
     private val rotatingPerkClassName by lazy { rotatingPerkClazz.java.simpleName.removeSuffix("Perk") }
-    private val allRotatingPerks = rotatingPerkClazz.java.enumConstants
+    private val allRotatingPerks by lazy { rotatingPerkClazz.java.enumConstants }
 
     abstract val resetChatPattern: Pattern
     open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
