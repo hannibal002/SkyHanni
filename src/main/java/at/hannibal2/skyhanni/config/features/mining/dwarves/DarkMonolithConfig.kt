@@ -62,6 +62,7 @@ class DarkMonolithConfig {
 
     companion object {
         @Suppress("StorageVarOrVal")
-        @Transient const val DEFAULT_TITLE: String = "§5§lDark Monolith"
+        @Transient
+        const val DEFAULT_TITLE: String = "§5§lDark Monolith"
     }
 }
