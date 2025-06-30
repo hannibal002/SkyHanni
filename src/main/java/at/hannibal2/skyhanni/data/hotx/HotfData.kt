@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.hotx
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotfApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -441,7 +442,7 @@ enum class HotfData(
         }
 
         override fun tryBlock(event: SkyHanniChatEvent) {
-            if (!chatConfig.hideLottery) return
+            if (!chatConfig.hideLottery || IslandTypeTags.FORAGING.inAny()) return
             event.blockedReason = "lottery"
         }
 
