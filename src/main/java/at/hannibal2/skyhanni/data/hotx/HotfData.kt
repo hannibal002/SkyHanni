@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.hotx
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotfApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -436,7 +437,7 @@ enum class HotfData(
         }
 
         override fun extraChatHandling(event: SkyHanniChatEvent) {
-            // Hi I'm not empty
+            if (chatConfig.hideSkyMall) event.blockedReason = "LOTTERY"
         }
 
         override fun readFromHeartOrReset(line: String, isHeartItem: Boolean) {
@@ -489,6 +490,8 @@ enum class HotfData(
 
     }
 }
+
+private val chatConfig get() = SkyHanniMod.feature.chat
 
 private val patternGroup = RepoPattern.group("foraging.hotf")
 
