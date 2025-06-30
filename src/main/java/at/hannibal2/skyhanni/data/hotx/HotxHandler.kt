@@ -191,7 +191,6 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     abstract val resetChatPattern: Pattern
     open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
 
-    abstract fun inPerkArea(): Boolean
     abstract fun extraChatHandling(event: SkyHanniChatEvent)
     abstract fun setRotatingPerk(newRotatingPerk: RotPerkE?)
 
@@ -200,7 +199,6 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
             resetTree()
             return
         }
-        tryReadRotatingPerkChat(event)
         extraChatHandling(event)
     }
 
@@ -218,9 +216,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         getPatternedPerks<ChatRepoPatternEnum>()
     }
 
-    private fun tryReadRotatingPerkChat(event: SkyHanniChatEvent) {
-        if (!inPerkArea()) return
-
+    fun tryReadRotatingPerkChat(event: SkyHanniChatEvent): Boolean? {
         rotatingPerkPattern.matchMatcher(event.message) {
             val perk = group("perk")
             val foundPerk = chatPatternedCache.firstNotNullOfOrNull { (enum, pattern) ->
@@ -233,10 +229,12 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
                     "chat" to event.message,
                     "perk" to perk,
                 )
-                return
+                return false
             }
             setRotatingPerk(foundPerk)
+            return true
         }
+        return null
     }
 
     abstract val rotatingPerkEntry: Data

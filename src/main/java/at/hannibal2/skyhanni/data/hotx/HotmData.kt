@@ -604,8 +604,6 @@ enum class HotmData(
             }
         }
 
-        override fun inPerkArea(): Boolean = IslandTypeTags.MINING.inAny()
-
         @HandleEvent
         override fun onInventoryClose(event: InventoryCloseEvent) = super.onInventoryClose(event)
 

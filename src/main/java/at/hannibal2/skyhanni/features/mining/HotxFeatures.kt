@@ -4,10 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotmData
+import at.hannibal2.skyhanni.data.hotx.HotxData
 import at.hannibal2.skyhanni.data.hotx.HotxHandler
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 
@@ -16,6 +19,26 @@ object HotxFeatures {
 
     private val configHotm get() = SkyHanniMod.feature.mining.hotm
     private val configHotf get() = SkyHanniMod.feature.foraging.hotf
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
+        val claimMap: Map<HotxHandler<*, *, *>, Boolean?> = listOf(
+            HotmData, HotfData,
+        ).associateWith { data ->
+            data.tryReadRotatingPerkChat(event)
+        }
+
+        val claimResults = claimMap.values
+        val wasClaimed = claimResults.any { it == true }
+        val noMatches = claimResults.all { it == null }
+        if (wasClaimed || noMatches) return
+
+        ErrorManager.logErrorStateWithData(
+            "Could not read the rotating effect from chat",
+            "no hotxhandler claimed the event",
+            "chat" to event.message,
+        )
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {

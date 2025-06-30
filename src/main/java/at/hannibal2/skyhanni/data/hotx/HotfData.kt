@@ -462,8 +462,6 @@ enum class HotfData(
             }
         }
 
-        override fun inPerkArea(): Boolean = IslandTypeTags.FORAGING.inAny()
-
         @HandleEvent
         override fun onInventoryClose(event: InventoryCloseEvent) = super.onInventoryClose(event)
 
