@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
@@ -28,8 +30,10 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumFacing
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 typealias PointSet = MutableList<Pair<LorenzVec, Boolean>>
@@ -69,9 +73,7 @@ object TestCanSeeFace {
             label = "Toggle",
             current = faceStates[face] ?: FaceState.VISIBLE,
             getName = { it.toString() },
-            onChange = {
-                toggleFaceVisibility(face)
-            },
+            onChange = { toggleFaceVisibility(face) },
         )
         if (faceStates[face] == FaceState.HIDDEN) {
             add(StringRenderable("§7§oFace is hidden - vectors collapsed."))
@@ -94,6 +96,14 @@ object TestCanSeeFace {
         )
     }
 
+    enum class RayVisibilityState(private val displayName: String) {
+        ALL("All Rays"),
+        SEEN("Seen Rays"),
+        ;
+
+        override fun toString(): String = displayName
+    }
+
     enum class FaceState(private val displayName: String) {
         VISIBLE("Visible"),
         HIDDEN("Hidden"),
@@ -102,11 +112,11 @@ object TestCanSeeFace {
         override fun toString(): String = displayName
     }
 
-    val faceStates: MutableMap<EnumFacing, FaceState> by lazy {
+    private val faceStates: MutableMap<EnumFacing, FaceState> by lazy {
         EnumFacing.entries.associateWith { FaceState.VISIBLE }.toMutableMap()
     }
 
-    fun toggleFaceVisibility(face: EnumFacing) {
+    private fun toggleFaceVisibility(face: EnumFacing) {
         faceStates[face] = when (faceStates[face]) {
             FaceState.VISIBLE -> FaceState.HIDDEN
             else -> FaceState.VISIBLE
@@ -121,6 +131,8 @@ object TestCanSeeFace {
         return "($xFormat, $yFormat, $zFormat)"
     }
 
+    private var currentVisibilityState: RayVisibilityState = RayVisibilityState.ALL
+    private var nextMoveRegen: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastRenderable: Renderable? = null
     private val config get() = SkyHanniMod.feature.dev.devTool.canSeeFace
     private val enabled get() = config.enabled.get()
@@ -134,13 +146,27 @@ object TestCanSeeFace {
         }
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (!enabled || !event.isLocalPlayer) return
+        if (!config.refreshOnMove.get() || nextMoveRegen.isInFuture()) return
+        recalcContext(true)
+        nextMoveRegen = SimpleTimeMark.now() + 500.milliseconds
+    }
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestcanseeface") {
             description = "Test if you can see certain faces of a block."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                if (!enabled) return@simpleCallback
+                if (!enabled) {
+                    ChatUtils.chat(
+                        "The /shtestcanseeface command is disabled. Enable it in the dev tool config.",
+                        replaceSameMessage = true
+                    )
+                    return@simpleCallback
+                }
                 faceCheckContext.reset()
                 faceCheckContext.waitingForPunch = true
                 ChatUtils.chat("The next block you punch will be used for the face check.", replaceSameMessage = true)
@@ -153,40 +179,17 @@ object TestCanSeeFace {
 
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!enabled) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (!enabled || event.clickType != ClickType.LEFT_CLICK) return
         if (!faceCheckContext.waitingForPunch) return
         faceCheckContext.resetFromBlockVec(event.position)
         ChatUtils.chat("Starting face check for block at ${event.position}.", replaceSameMessage = true)
-        faceCheckContext.waitingForPunch = false
+        recalcContext(force = true)
     }
 
     @HandleEvent
     fun onSecondPassed() {
         if (!enabled) return
-        val vec1 = faceCheckContext.vec1 ?: return
-        val vec2 = faceCheckContext.vec2 ?: return
-        if (faceCheckContext.finished) return
-        faceCheckContext.generallySeen = LocationUtils.anyFaceCanBeSeen(
-            min = vec1,
-            max = vec2,
-            stepCount = config.stepCount.get(),
-            stepDensity = config.stepDensity.get(),
-            pointFill = faceCheckContext.pointSet,
-        )
-        regenDebugRenderable()
-        faceCheckContext.finished = true
-        DelayedRun.runDelayed(config.refreshInterval.get().seconds) {
-            faceCheckContext.pointSet.clear()
-            faceCheckContext.finished = false
-            faceCheckContext.generallySeen = false
-            regenDebugRenderable()
-        }
-    }
-
-    private fun regenDebugRenderable() {
-        if (!enabled || !debugEnabled) return
-        faceCheckContext.debugRenderable = faceCheckContext.buildSummaryRenderable().wrapWithOtherToggles()
+        recalcContext()
     }
 
     @HandleEvent
@@ -199,30 +202,6 @@ object TestCanSeeFace {
         }
     }
 
-    enum class VisibilityType(private val displayName: String) {
-        ALL("All Faces"),
-        SEEN("Seen Faces"),
-        ;
-
-        override fun toString(): String = displayName
-    }
-
-    var currentVisibilityType: VisibilityType = VisibilityType.ALL
-
-    private fun Renderable.wrapWithOtherToggles() = VerticalContainerRenderable(
-        buildList {
-            addRenderableButton(
-                label = "Ray Visibility",
-                current = currentVisibilityType,
-                onChange = {
-                    currentVisibilityType = it
-                    regenDebugRenderable()
-                },
-            )
-            add(this@wrapWithOtherToggles)
-        }
-    )
-
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!enabled || !debugEnabled) return
@@ -231,13 +210,50 @@ object TestCanSeeFace {
         config.debugPosition.renderRenderable(renderable, "Can See Face Debug")
     }
 
+    private fun recalcContext(force: Boolean = false) {
+        val vec1 = faceCheckContext.vec1 ?: return
+        val vec2 = faceCheckContext.vec2 ?: return
+        if (!force && faceCheckContext.finished) return
+        faceCheckContext.generallySeen = LocationUtils.anyFaceCanBeSeen(
+            min = vec1,
+            max = vec2,
+            stepCount = config.stepCount.get(),
+            stepDensity = config.stepDensity.get(),
+            pointFill = faceCheckContext.pointSet,
+        )
+        regenDebugRenderable()
+        faceCheckContext.finished = true
+        DelayedRun.runDelayed(config.refreshInterval.get().seconds) {
+            recalcContext(true)
+        }
+    }
+
+    private fun regenDebugRenderable() {
+        if (!enabled || !debugEnabled) return
+        faceCheckContext.debugRenderable = faceCheckContext.buildSummaryRenderable().wrapWithOtherToggles()
+    }
+
+    private fun Renderable.wrapWithOtherToggles() = VerticalContainerRenderable(
+        buildList {
+            addRenderableButton(
+                label = "Ray Visibility",
+                current = currentVisibilityState,
+                onChange = {
+                    currentVisibilityState = it
+                    regenDebugRenderable()
+                },
+            )
+            add(this@wrapWithOtherToggles)
+        }
+    )
+
     private fun SkyHanniRenderWorldEvent.drawRaysFromFacePoints(
         face: EnumFacing,
         points: List<Pair<LorenzVec, Boolean>>,
     ) {
         if (!config.drawPoints.get() || faceStates[face] == FaceState.HIDDEN) return
         for ((point, isSeen) in points) {
-            if (currentVisibilityType == VisibilityType.SEEN && !isSeen) continue
+            if (currentVisibilityState == RayVisibilityState.SEEN && !isSeen) continue
             val pointColor = if (isSeen) LorenzColor.GREEN else LorenzColor.RED
             drawFaceRayWorld(
                 origin = point,
