@@ -23,6 +23,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.MathHelper
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import kotlin.Boolean
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -1198,9 +1199,9 @@ object WorldRenderUtils {
         val tessellator = Tessellator.getInstance()
         val wr = tessellator.worldRenderer
         wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR)
-        val r = color.red   / 255f
+        val r = color.red / 255f
         val g = color.green / 255f
-        val b = color.blue  / 255f
+        val b = color.blue / 255f
         val a = (color.alpha / 255f) * alpha
 
         for (v in corners) {
@@ -1213,12 +1214,14 @@ object WorldRenderUtils {
         GlStateManager.disableBlend()
     }
 
+    @Suppress("unused")
     fun SkyHanniRenderWorldEvent.drawFaceRayWorld(
         origin: LorenzVec,
         face: EnumFacing,
         color: Color,
         length: Double = 0.5,
-        thickness: Double = 0.02
+        thickness: Double = 0.02,
+        seeThroughBlock: Boolean = false,
     ) {
         val dir = LorenzVec(face.frontOffsetX.toDouble(), face.frontOffsetY.toDouble(), face.frontOffsetZ.toDouble())
         val end = origin + dir * length

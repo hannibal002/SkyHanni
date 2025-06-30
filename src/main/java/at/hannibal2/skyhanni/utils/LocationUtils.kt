@@ -98,7 +98,7 @@ object LocationUtils {
 
         fun wrapCanSee(face: EnumFacing, a: LorenzVec, b: LorenzVec, offset: Double?): Boolean {
             val canSeeResult = canSee(a, b, offset)
-            pointFill?.getOrPut(face) { mutableListOf() }?.add(a to canSeeResult)
+            pointFill?.getOrPut(face) { mutableListOf() }?.add(b to canSeeResult)
             return canSeeResult
         }
 

@@ -871,24 +871,11 @@ object WorldRenderUtils {
             Direction.EAST -> Box(box.maxX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ)
         }
 
-        val effective = if (!renderRelativeToCamera) {
-            val cam = camera.pos
-            Box(
-                faceBox.minX - cam.x, faceBox.minY - cam.y, faceBox.minZ - cam.z,
-                faceBox.maxX - cam.x, faceBox.maxY - cam.y, faceBox.maxZ - cam.z
-            )
-        } else faceBox
-
-        if (isCurrentlyDeferring) {
-            DeferredDrawer.deferBox(effective, color, alpha, depth = !seeThroughBlocks)
-            return
-        }
-
         drawFilledBoundingBox(
-            effective,
+            faceBox,
             color,
             alpha,
-            renderRelativeToCamera = true,
+            renderRelativeToCamera = renderRelativeToCamera,
             seeThroughBlocks = seeThroughBlocks
         )
     }
@@ -898,7 +885,8 @@ object WorldRenderUtils {
         face: Direction,
         color: Color,
         length: Double = 0.5,
-        thickness: Double = 0.02
+        thickness: Double = 0.02,
+        seeThroughBlock: Boolean = false,
     ) {
         val dir = LorenzVec(face.offsetX.toDouble(), face.offsetY.toDouble(), face.offsetZ.toDouble())
         val end = origin + dir * length
@@ -913,7 +901,7 @@ object WorldRenderUtils {
             Box(minX, minY, minZ, maxX, maxY, maxZ),
             color,
             alphaMultiplier = 1f,
-            renderRelativeToCamera = false,
+            seeThroughBlocks = seeThroughBlock,
         )
     }
 
