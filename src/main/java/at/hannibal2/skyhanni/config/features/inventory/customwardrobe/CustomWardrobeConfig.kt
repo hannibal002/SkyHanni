@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyModern;
+import at.hannibal2.skyhanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
