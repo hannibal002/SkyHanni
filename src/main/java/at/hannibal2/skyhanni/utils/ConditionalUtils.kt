@@ -2,6 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import io.github.notenoughupdates.moulconfig.observer.Observer
 import io.github.notenoughupdates.moulconfig.observer.Property
+import java.lang.reflect.Modifier
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 object ConditionalUtils {
 
@@ -70,6 +74,36 @@ object ConditionalUtils {
 
         // Compare the non-null second values
         return second1.compareTo(second2)
+    }
+
+    /**
+     * Recursively scans each given 'root' for any fields of type Property<*>,
+     * then calls the existing onToggle(...) overload with all discovered properties.
+     */
+    fun onToggleAll(vararg roots: Any, observer: Runnable) = roots.forEach { root ->
+        collectProperties(root, mutableSetOf()).forEach {
+            onToggle(it, observer = observer)
+        }
+    }
+
+    private fun collectProperties(
+        current: Any,
+        visited: MutableSet<Any>
+    ): List<Property<*>> = buildList {
+        if (!visited.add(current)) return@buildList
+
+        for (prop in current::class.memberProperties) {
+            // Intentionally ignore transients and static properties
+            if (prop.hasAnnotation<Transient>()) return@buildList
+            prop.isAccessible = true
+            val value = runCatching { prop.getter.call(current) }.getOrNull() ?: continue
+            when (value) {
+                is Property<*> -> add(value)
+                else -> addAll(
+                    collectProperties(value, visited)
+                )
+            }
+        }
     }
 
 }
