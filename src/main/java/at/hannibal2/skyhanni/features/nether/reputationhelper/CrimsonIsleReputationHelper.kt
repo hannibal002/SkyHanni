@@ -70,8 +70,8 @@ object CrimsonIsleReputationHelper {
         update()
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ProfileStorageData.profileSpecific?.crimsonIsle?.let {
             DailyMiniBossHelper.loadData(it)
             DailyKuudraBossHelper.loadData(it)

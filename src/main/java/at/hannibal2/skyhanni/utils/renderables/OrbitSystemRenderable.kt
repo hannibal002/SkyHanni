@@ -8,7 +8,14 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import kotlin.math.cos
 import kotlin.math.sin
 
-enum class OrbitDirection { CLOCKWISE, COUNTER_CLOCKWISE }
+enum class OrbitDirection(private val displayName: String, val dirFactor: Int) {
+    NONE("None", 0),
+    CLOCKWISE("Clockwise", 1),
+    COUNTER_CLOCKWISE("Counter-Clockwise", -1),
+    ;
+
+    override fun toString() = displayName
+}
 
 // A renderable that has other renderables orbiting it, configurable.
 class OrbitSystemRenderable(
@@ -45,8 +52,8 @@ class OrbitSystemRenderable(
         val deltaSeconds = (now - lastTime).inPartialSeconds
         lastTime = now
 
-        val dirFactor = if (orbitDirection == OrbitDirection.CLOCKWISE) 1 else -1
-        currentAngle = (currentAngle + orbitSpeed * deltaSeconds * dirFactor).toFloat() % 360f
+        val angleDelta = orbitSpeed * deltaSeconds * orbitDirection.dirFactor
+        currentAngle = (currentAngle + angleDelta).toFloat() % 360f
         mainBody.renderXYAligned(posX, posY, width, height)
 
         if (subBodies.isEmpty()) return

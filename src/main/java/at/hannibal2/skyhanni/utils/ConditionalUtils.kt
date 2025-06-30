@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import io.github.notenoughupdates.moulconfig.observer.Observer
 import io.github.notenoughupdates.moulconfig.observer.Property
+import java.lang.reflect.Modifier
 
 object ConditionalUtils {
 
@@ -70,6 +71,39 @@ object ConditionalUtils {
 
         // Compare the non-null second values
         return second1.compareTo(second2)
+    }
+
+    /**
+     * Recursively scans each given 'root' for any fields of type Property<*>,
+     * then calls the existing onToggle(...) overload with all discovered properties.
+     */
+    fun onToggleAll(vararg roots: Any, observer: Runnable) = roots.forEach { root ->
+        collectProperties(root, mutableSetOf()).forEach {
+            onToggle(it, observer = observer)
+        }
+    }
+
+    private fun collectProperties(
+        current: Any,
+        visited: MutableSet<Any>,
+    ): List<Property<*>> = buildList {
+        if (visited.contains(current)) return@buildList
+        visited.add(current)
+
+        val clazz = current::class.java
+        for (field in clazz.declaredFields) {
+            if (Modifier.isStatic(field.modifiers)) continue
+            try {
+                field.isAccessible = true
+                when (val value = field.get(current)) {
+                    is Property<*> -> add(value)
+                    null -> continue
+                    else -> addAll(
+                        collectProperties(value, visited)
+                    )
+                }
+            } catch (_: Throwable) { continue }
+        }
     }
 
 }

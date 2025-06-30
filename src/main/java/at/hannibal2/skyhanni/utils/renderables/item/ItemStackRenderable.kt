@@ -21,7 +21,7 @@ open class ItemStackRenderable(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     open val highlight: Boolean = false,
 ) : TimeDependentRenderable() {
-    val stack: ItemStack = item.copy().apply {
+    open val stack: ItemStack = item.copy().apply {
         if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
     }
 
@@ -30,8 +30,8 @@ open class ItemStackRenderable(
 
     override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
         stack.renderOnScreen(
-            xSpacing / 2.0f,
-            0F,
+            xSpacing / 2f,
+            0f,
             scaleMultiplier = scale,
             rescaleSkulls,
         )

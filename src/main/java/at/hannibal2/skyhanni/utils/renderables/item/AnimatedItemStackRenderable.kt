@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.utils.renderables.item
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
@@ -41,8 +43,21 @@ data class ItemStackRotationDefinition(
     val rotationSpeed: Double = 0.0,
 )
 
+/**
+ * A data class that defines behavior for a 'frame' of an ItemStack animation.
+ *
+ * A ticks parameter of 0 will make the frame last permanently.
+ *
+ * @param stack The ItemStack that should render during this frame.
+ * @param ticks How long this frame should last, in ticks (assuming a nominal 20/s)
+ */
+data class ItemStackAnimationFrame(
+    val stack: ItemStack,
+    val ticks: Int = 0,
+)
+
 class AnimatedItemStackRenderable(
-    item: ItemStack,
+    frames: Collection<ItemStackAnimationFrame>,
     private val rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
     private val bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
     scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -53,7 +68,9 @@ class AnimatedItemStackRenderable(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     override val highlight: Boolean = false,
 ) : ItemStackRenderable(
-    item,
+    frames.firstOrNull()?.stack ?: ErrorManager.skyHanniError(
+        "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
+    ),
     scale,
     xSpacing,
     ySpacing,
@@ -62,6 +79,32 @@ class AnimatedItemStackRenderable(
     verticalAlign,
     highlight,
 ) {
+    constructor(
+        item: ItemStack,
+        rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
+        bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
+        xSpacing: Int = 2,
+        ySpacing: Int = 1,
+        rescaleSkulls: Boolean = true,
+        horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+        verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+        highlight: Boolean = false,
+    ) : this(
+        listOf(ItemStackAnimationFrame(item, 0)), rotation, bounce, scale, xSpacing,
+        ySpacing, rescaleSkulls, horizontalAlign, verticalAlign, highlight,
+    )
+
+    private var frameIndex = 0
+    private var ticksInFrame = 0.0
+    private val frameDefs = frames.map { (itemStack, ticks) ->
+        val newStack = itemStack.copy().apply {
+            if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+        }
+        ItemStackAnimationFrame(newStack, ticks)
+    }
+    override val stack: ItemStack get() = frameDefs[frameIndex].stack
+
     override val height = (15.5 * scale + 0.5).toInt() + ySpacing + bounce.upwardBounce + bounce.downwardBounce
     private val startTime = SimpleTimeMark.now()
 
@@ -91,13 +134,25 @@ class AnimatedItemStackRenderable(
         return sinTheta * (if (sinTheta >= 0) upwardBounce else downwardBounce)
     }
 
+    private fun tryMoveNextFrame(dt: Double) {
+        val transitionTicks = frameDefs[frameIndex].ticks
+        if (transitionTicks <= 0) return
+
+        ticksInFrame += dt * 20.0
+        if (ticksInFrame <= transitionTicks) return
+
+        frameIndex = (frameIndex + 1) % frameDefs.size
+        ticksInFrame = 0.0
+    }
+
     override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
         currentRotation = generateNextRotation(deltaTime.inPartialSeconds)
         val currentOffsetY = bounce.calculateBounce()
+        tryMoveNextFrame(deltaTime.inPartialSeconds)
 
         stack.renderOnScreen(
-            x = (posX + (xSpacing / 2f)),
-            y = (posY + currentOffsetY).toFloat(),
+            x = (0 + (xSpacing / 2f)),
+            y = (0 + currentOffsetY).toFloat(),
             scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
             rotationDegrees = currentRotation,
