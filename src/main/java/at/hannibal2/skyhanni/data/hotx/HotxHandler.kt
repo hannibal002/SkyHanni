@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.inventory.Slot
@@ -253,8 +254,9 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
             if (index == null) null
             else {
                 val nextLine = lore[index + 1]
-                itemPatternedCache.firstNotNullOfOrNull { (enum, pattern) ->
-                    if (!pattern.matches(nextLine)) return@firstNotNullOfOrNull null
+                val perkLore = HotxPatterns.rotatingPerkPattern.matchGroup(nextLine, "perk") ?: return
+                itemPatternedCache.firstNotNullOfOrNull { (enum, itemPattern) ->
+                    if (!itemPattern.matches(perkLore)) return@firstNotNullOfOrNull null
                     enum
                 } ?: run {
                     ErrorManager.logErrorStateWithData(
