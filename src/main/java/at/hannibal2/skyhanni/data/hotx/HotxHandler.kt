@@ -264,7 +264,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
                 "no itemPattern matched",
                 "nextLine" to nextLine,
             )
-            return null
         }
+        return null
     }
 }
