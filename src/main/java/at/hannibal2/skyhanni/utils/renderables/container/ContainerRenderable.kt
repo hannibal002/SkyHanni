@@ -17,7 +17,7 @@ abstract class ContainerRenderable(
 ) : Renderable {
     abstract override val width: Int
     abstract override val height: Int
-    abstract override fun render(mousePosX: Int, mousePosY: Int)
+    abstract override fun render(mouseOffsetX: Int, mouseOffsetY: Int)
 }
 
 open class VerticalContainerRenderable(
@@ -31,10 +31,10 @@ open class VerticalContainerRenderable(
 
     override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
 
-    override fun render(mousePosX: Int, mousePosY: Int) {
-        var y = mousePosY
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+        var y = mouseOffsetY
         renderables.forEach {
-            it.renderXAligned(mousePosX, y, width)
+            it.renderXAligned(mouseOffsetX, y, width)
             y += it.height + spacing
             DrawContextUtils.translate(0f, (it.height + spacing).toFloat(), 0f)
         }
@@ -53,10 +53,10 @@ class HorizontalContainerRenderable(
 
     override val height = renderables.maxOfOrNull { it.height } ?: 0
 
-    override fun render(mousePosX: Int, mousePosY: Int) {
-        var x = mousePosX
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+        var x = mouseOffsetX
         renderables.forEach {
-            it.renderYAligned(x, mousePosY, height)
+            it.renderYAligned(x, mouseOffsetY, height)
             x += it.width + spacing
             DrawContextUtils.translate((it.width + spacing).toFloat(), 0f, 0f)
         }

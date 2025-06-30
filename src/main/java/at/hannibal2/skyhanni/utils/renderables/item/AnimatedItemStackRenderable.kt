@@ -91,13 +91,13 @@ class AnimatedItemStackRenderable(
         return sinTheta * (if (sinTheta >= 0) upwardBounce else downwardBounce)
     }
 
-    override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
+    override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         currentRotation = generateNextRotation(deltaTime.inPartialSeconds)
         val currentOffsetY = bounce.calculateBounce()
 
         stack.renderOnScreen(
-            x = (posX + (xSpacing / 2f)),
-            y = (posY + currentOffsetY).toFloat(),
+            x = (mouseOffsetX + (xSpacing / 2f)),
+            y = (mouseOffsetY + currentOffsetY).toFloat(),
             scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
             rotationDegrees = currentRotation,

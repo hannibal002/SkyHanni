@@ -45,11 +45,11 @@ enum class MiningEventType(
             val compass = Renderable.itemStack(ItemStack(Items.compass), 0.45)
             val wind = Renderable.string("§9≈", scale = 0.75)
 
-            override fun render(mousePosX: Int, mousePosY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 1f, -2f)
-                compass.render(mousePosX, mousePosY)
+                compass.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(-1f, -2f, 2f)
-                wind.render(mousePosX, mousePosY)
+                wind.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(0f, 1f, 0f)
             }
         },
@@ -65,11 +65,11 @@ enum class MiningEventType(
             val dyeGreen = Renderable.itemStack(DyeCompat.LIME.createStack(), 0.45)
             val dyePink = Renderable.itemStack(DyeCompat.PINK.createStack(), 0.45)
 
-            override fun render(mousePosX: Int, mousePosY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 0f, 0f)
-                dyePink.render(mousePosX + 1, mousePosY - 1)
+                dyePink.render(mouseOffsetX + 1, mouseOffsetY - 1)
                 DrawContextUtils.translate(-2f, 1.5f, 0f)
-                dyeGreen.render(mousePosX, mousePosY)
+                dyeGreen.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(1f, -1.5f, 0f)
             }
 
@@ -101,11 +101,11 @@ enum class MiningEventType(
                 )
             }
 
-            override fun render(mousePosX: Int, mousePosY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(-1f, 0f, 0f)
-                alexHead.render(mousePosX, mousePosY)
+                alexHead.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(+4f, +3f, 0f)
-                steveHead.render(mousePosX, mousePosY)
+                steveHead.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(-3f, -3f, 0f)
             }
 

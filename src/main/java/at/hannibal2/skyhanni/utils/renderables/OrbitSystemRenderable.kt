@@ -40,19 +40,19 @@ class OrbitSystemRenderable(
     private var lastTime = SimpleTimeMark.now()
     private var currentAngle = 0f
 
-    override fun render(mousePosX: Int, mousePosY: Int) {
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         val now = SimpleTimeMark.now()
         val deltaSeconds = (now - lastTime).inPartialSeconds
         lastTime = now
 
         val dirFactor = if (orbitDirection == OrbitDirection.CLOCKWISE) 1 else -1
         currentAngle = (currentAngle + orbitSpeed * deltaSeconds * dirFactor).toFloat() % 360f
-        mainBody.renderXYAligned(mousePosX, mousePosY, width, height)
+        mainBody.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
 
         if (subBodies.isEmpty()) return
 
-        val centerX = mousePosX + width / 2f
-        val centerY = mousePosY + height / 2f
+        val centerX = mouseOffsetX + width / 2f
+        val centerY = mouseOffsetY + height / 2f
         val orbitRadius = (mainBody.width / 2f) + subBodySpacing + (subBodyW / 2f)
 
         val step = 360f / subBodies.size
@@ -67,10 +67,10 @@ class OrbitSystemRenderable(
             val drawX = centerX + dx - (subBody.width) / 2f
             val drawY = centerY + dy - (subBody.height) / 2f
 
-            val mainBodyHovered = mainBody.isHovered((mousePosX + drawX).toInt(), (mousePosY + drawY).toInt())
+            val mainBodyHovered = mainBody.isHovered((mouseOffsetX + drawX).toInt(), (mouseOffsetY + drawY).toInt())
             val (fPosX, fPosY) = if (mainBodyHovered) {
                 subBody.width + 1 to subBody.height + 1
-            } else mousePosX to mousePosY
+            } else mouseOffsetX to mouseOffsetY
 
             DrawContextUtils.pushPop {
                 DrawContextUtils.translate(drawX, drawY, 0f)
