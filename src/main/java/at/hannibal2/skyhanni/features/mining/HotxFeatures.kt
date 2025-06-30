@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotmData
-import at.hannibal2.skyhanni.data.hotx.HotxData
 import at.hannibal2.skyhanni.data.hotx.HotxHandler
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
