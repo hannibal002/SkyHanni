@@ -47,7 +47,7 @@ enum class ProjectTarget(
         modMenuVersion = "14.0.0-rc.2",
         isModern = true,
         linkTo = null,
-    )
+    ),
     ;
 
     val isBridge get() = name.contains("bridge")
