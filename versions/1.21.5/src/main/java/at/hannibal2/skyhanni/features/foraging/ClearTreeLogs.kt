@@ -22,7 +22,7 @@ object ClearTreeLogs {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onRender(event: CheckRenderEntityEvent<DisplayEntity.BlockDisplayEntity>) {
-        if (!SkyHanniMod.feature.foraging.trees.cleanTreeView) return
+        if (!SkyHanniMod.feature.foraging.trees.cleanView) return
         val block = event.entity.blockState
         if (block in treeBlocks) event.cancel()
     }
