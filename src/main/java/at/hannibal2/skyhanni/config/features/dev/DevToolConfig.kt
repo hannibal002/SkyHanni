@@ -67,7 +67,7 @@ class DevToolConfig {
 
         @Expose
         @ConfigOption(name = "Refresh Interval", desc = "How often to refresh the face check (in seconds).")
-        @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+        @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
         var refreshInterval: Int = 5
 
         @Expose
@@ -78,7 +78,7 @@ class DevToolConfig {
         @Expose
         @ConfigOption(name = "Vectors Per Face", desc = "How many vectors should be displayed per face when debug info is enabled.")
         @ConfigEditorSlider(minValue = 1f, maxValue = 20f, minStep = 1f)
-        var vectorsPerFace: Int = 5
+        var vectorsPerFace: Int = 4
 
         @Expose
         @ConfigLink(owner = TestCanSeeFaceConfig::class, field = "debugInfo")

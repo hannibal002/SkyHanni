@@ -123,6 +123,7 @@ object TestCanSeeFace {
         return "($xFormat, $yFormat, $zFormat)"
     }
 
+    private var lastRenderable: Renderable? = null
     private val config get() = SkyHanniMod.feature.dev.devTool.canSeeFace
     private val faceCheckContext = FaceCheckContext()
 
@@ -209,9 +210,10 @@ object TestCanSeeFace {
     )
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.enabled) return
-        val renderable = faceCheckContext.summaryRenderable ?: return
+        val renderable = faceCheckContext.summaryRenderable ?: lastRenderable ?: return
+        lastRenderable = renderable
         config.debugPosition.renderRenderable(renderable, "Can See Face Debug")
     }
 
