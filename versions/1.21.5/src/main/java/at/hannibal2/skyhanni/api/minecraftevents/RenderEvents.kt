@@ -40,7 +40,7 @@ object RenderEvents {
         // InitializeGuiEvent
 
         HudLayerRegistrationCallback.EVENT.register { context ->
-            context.attachLayerAfter(IdentifiedLayer.SLEEP, Identifier.of("skyhanni", "hotbar_layer"), RenderEvents::postGui)
+            context.attachLayerAfter(IdentifiedLayer.SLEEP, Identifier.of("skyhanni", "gui_render_layer"), RenderEvents::postGui)
         }
     }
 

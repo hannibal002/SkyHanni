@@ -1,4 +1,5 @@
 accessWidener v2 named
+
 accessible field net/minecraft/entity/LivingEntity equipment Lnet/minecraft/entity/EntityEquipment;
 accessible field net/minecraft/entity/EntityEquipment map Ljava/util/EnumMap;
 accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
