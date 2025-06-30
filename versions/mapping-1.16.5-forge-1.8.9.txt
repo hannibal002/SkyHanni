@@ -390,6 +390,7 @@ net.minecraft.world.entity.monster.Ghast net.minecraft.entity.monster.EntityGhas
 net.minecraft.world.entity.monster.Giant net.minecraft.entity.monster.EntityGiantZombie
 net.minecraft.world.entity.monster.Guardian net.minecraft.entity.monster.EntityGuardian
 net.minecraft.world.entity.monster.MagmaCube net.minecraft.entity.monster.EntityMagmaCube
+net.minecraft.world.entity.monster.Monster net.minecraft.entity.monster.EntityMob
 net.minecraft.world.entity.monster.Silverfish net.minecraft.entity.monster.EntitySilverfish
 net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntitySkeleton
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
@@ -402,6 +403,8 @@ net.minecraft.world.entity.monster.Creeper isIgnited() hasIgnited()
 net.minecraft.world.entity.monster.Creeper isPowered() getPowered()
 
 net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
+
+net.minecraft.world.entity.monster.Monster aiStep() onLivingUpdate()
 
 net.minecraft.world.entity.monster.Slime getSize() getSlimeSize()
 net.minecraft.world.entity.monster.Slime squish squishFactor
@@ -577,8 +580,8 @@ net.minecraft.world.item.Items LEATHER_HELMET leather_helmet
 net.minecraft.world.item.Items LEATHER_LEGGINGS leather_leggings
 net.minecraft.world.item.Items MAGMA_CREAM magma_cream
 net.minecraft.world.item.Items MAP map
-net.minecraft.world.item.Items MELON_SLICE melon
 net.minecraft.world.item.Items MELON_SEEDS melon_seeds
+net.minecraft.world.item.Items MELON_SLICE melon
 net.minecraft.world.item.Items MILK_BUCKET milk_bucket
 net.minecraft.world.item.Items MINECART minecart
 net.minecraft.world.item.Items MUSHROOM_STEW mushroom_stew

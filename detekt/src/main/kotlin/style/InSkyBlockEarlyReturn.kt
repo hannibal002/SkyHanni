@@ -20,7 +20,7 @@ class InSkyBlockEarlyReturn(config: Config) : SkyHanniRule(config) {
         Debt.FIVE_MINS
     )
 
-    private fun KtExpression.containsInSkyBlockCheck(): Boolean = text.contains("LorenzUtils.inSkyBlock")
+    private fun KtExpression.containsInSkyBlockCheck(): Boolean = text.contains("SkyBlockUtils.inSkyBlock")
     private fun KtExpression.isEarlyReturn(): Boolean = this is KtIfExpression && then is KtReturnExpression
 
     override fun visitNamedFunction(function: KtNamedFunction) {
