@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.EnumFacing
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
@@ -53,6 +55,126 @@ object LocationUtils {
     fun AxisAlignedBB.isInside(vec: LorenzVec) = isVecInside(vec.toVec3())
 
     fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
+
+    /**
+     * When passed a corner pair of vectors, checks if the player can see the center point of, or optionally
+     * a number of other points on the box, defined by the [stepCount] parameter.
+     *
+     * A note about the [stepCount] parameter - it is linear, but at a rate of increasing by [stepDensity], per face, per step.
+     * So, use both sparingly, as it can lead to a lot of axes being cast across a face.
+     *
+     * Another note, if [pointFill] is provided, this function will continue to fill out points in the map, even after
+     * it finds a point that can be seen - this is useful for debugging, but should not be used in user-facing code.
+     *
+     * @param viewDistance The maximum distance at which the player can see the box.
+     * @param stepCount The number of "middle points" between faces to check. Default is 0, meaning only the center point is checked.
+     * @param stepDensity The number of rays to cast from the center of each face towards the nearest corner.
+     * @param pointFill If provided, this map will be filled with points that can be seen (true) or not (false).
+     * @param offset An optional vertical offset to apply to the box corners.
+     * @param ignoreFaces Which faces, if any, to ignore when checking visibility. Default is none.
+     * @return True if the player can see any face of the box, false otherwise.
+     */
+    fun Pair<LorenzVec, LorenzVec>.anyFaceCanBeSeen(
+        viewDistance: Number = 150.0,
+        stepCount: Int = 0,
+        stepDensity: Int = 4,
+        pointFill: MutableMap<EnumFacing, MutableList<Pair<LorenzVec, Boolean>>>? = null,
+        offset: Double? = null,
+        vararg ignoreFaces: EnumFacing,
+    ): Boolean {
+        val (min, max) = this
+        val aabb = AxisAlignedBB(min.x, min.y, min.z, max.x, max.y, max.z)
+        val eye = playerEyeLocation()
+        val center = aabb.getBoxCenter()
+        val maxDist = viewDistance.toDouble()
+        val halfX = (aabb.maxX - aabb.minX) / 2
+        val halfY = (aabb.maxY - aabb.minY) / 2
+        val halfZ = (aabb.maxZ - aabb.minZ) / 2
+
+        fun wrapCanSee(face: EnumFacing, a: LorenzVec, b: LorenzVec, offset: Double?): Boolean {
+            val canSeeResult = canSee(a, b, offset)
+            pointFill?.getOrPut(face) { mutableListOf() }?.add(a to canSeeResult)
+            return canSeeResult
+        }
+
+        for (face in EnumFacing.entries) {
+            if (ignoreFaces.contains(face)) continue
+
+            val faceCenter = when (face) {
+                EnumFacing.DOWN -> LorenzVec(center.x, aabb.minY, center.z)
+                EnumFacing.UP -> LorenzVec(center.x, aabb.maxY, center.z)
+                EnumFacing.NORTH -> LorenzVec(center.x, center.y, aabb.minZ)
+                EnumFacing.SOUTH -> LorenzVec(center.x, center.y, aabb.maxZ)
+                EnumFacing.WEST -> LorenzVec(aabb.minX, center.y, center.z)
+                EnumFacing.EAST -> LorenzVec(aabb.maxX, center.y, center.z)
+            }
+
+            if (eye.distance(faceCenter) > maxDist) continue
+            if (wrapCanSee(face, eye, faceCenter, offset) && pointFill == null) return true
+            if (stepCount == 0) continue
+
+            val (axis1, axis2, ext1, ext2) = face.getConfig(halfX, halfY, halfZ) ?: continue
+
+            for (stepSeq in 0 until stepDensity) {
+                val angle = 2 * PI * stepSeq / stepDensity
+                val dx = cos(angle)
+                val dy = sin(angle)
+                val boundaryDist = min(
+                    if (dx != 0.0) ext1 / abs(dx) else Double.POSITIVE_INFINITY,
+                    if (dy != 0.0) ext2 / abs(dy) else Double.POSITIVE_INFINITY
+                )
+                val dirVec = axis1 * dx + axis2 * dy
+
+                stepLoop@for (step in 1..stepCount) {
+                    val frac = step.toDouble() / (stepCount + 1)
+                    val testPoint = faceCenter + dirVec * (boundaryDist * frac)
+                    if (eye.distance(testPoint) > maxDist) continue@stepLoop
+                    if (wrapCanSee(face, eye, testPoint, offset) && pointFill == null) return true
+                }
+            }
+        }
+        return pointFill?.values?.any { facedFill ->
+            facedFill.any { (_, success) -> success }
+        } ?: false
+    }
+
+    private val xIdentityVector = LorenzVec(1.0, 0.0, 0.0)
+    private val yIdentityVector = LorenzVec(0.0, 1.0, 0.0)
+    private val zIdentityVector = LorenzVec(0.0, 0.0, 1.0)
+
+    private val faceMap: Map<EnumFacing, Pair<LorenzVec, LorenzVec>> by lazy {
+        val verticalSet = xIdentityVector to zIdentityVector
+        val northSouthSet = xIdentityVector to yIdentityVector
+        val eastWestSet = zIdentityVector to yIdentityVector
+        mapOf(
+            EnumFacing.DOWN to verticalSet,
+            EnumFacing.UP to verticalSet,
+            EnumFacing.NORTH to northSouthSet,
+            EnumFacing.SOUTH to northSouthSet,
+            EnumFacing.WEST to eastWestSet,
+            EnumFacing.EAST to eastWestSet
+        )
+    }
+
+    private fun EnumFacing.getConfig(
+        halfX: Double,
+        halfY: Double,
+        halfZ: Double,
+    ): FaceRayConfig? {
+        val (a1i, a2i) = faceMap[this] ?: return null
+        return when (this) {
+            EnumFacing.UP, EnumFacing.DOWN -> FaceRayConfig(a1i, a2i, halfX, halfZ)
+            EnumFacing.NORTH, EnumFacing.SOUTH -> FaceRayConfig(a1i, a2i, halfX, halfY)
+            EnumFacing.WEST, EnumFacing.EAST -> FaceRayConfig(a1i, a2i, halfZ, halfY)
+        }
+    }
+
+    private data class FaceRayConfig(
+        val axis1: LorenzVec,
+        val axis2: LorenzVec,
+        val ext1: Double,
+        val ext2: Double,
+    )
 
     fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
