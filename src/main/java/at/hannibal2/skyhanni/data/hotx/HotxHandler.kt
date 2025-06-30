@@ -222,15 +222,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
             val foundPerk = chatPatternedCache.firstNotNullOfOrNull { (enum, pattern) ->
                 if (!pattern.matches(perk)) return@firstNotNullOfOrNull null
                 enum
-            } ?: run {
-                ErrorManager.logErrorStateWithData(
-                    "Could not read the $rotatingPerkClassName effect from chat",
-                    "no chatPattern matched",
-                    "chat" to event.message,
-                    "perk" to perk,
-                )
-                return false
-            }
+            } ?: return false
             setRotatingPerk(foundPerk)
             return true
         }
