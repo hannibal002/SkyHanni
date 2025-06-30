@@ -114,6 +114,7 @@ object TestCanSeeFace {
             FaceState.VISIBLE -> FaceState.HIDDEN
             else -> FaceState.VISIBLE
         }
+        regenDebugRenderable()
     }
 
     private fun LorenzVec.shortFormatVec(): String {
@@ -167,7 +168,7 @@ object TestCanSeeFace {
             stepDensity = config.stepDensity,
             pointFill = faceCheckContext.pointSet,
         )
-        faceCheckContext.summaryRenderable = faceCheckContext.buildSummaryRenderable().wrapWithOtherToggles()
+        regenDebugRenderable()
         faceCheckContext.finished = true
         DelayedRun.runDelayed(config.refreshInterval.seconds) {
             faceCheckContext.pointSet.clear()
@@ -175,6 +176,11 @@ object TestCanSeeFace {
             faceCheckContext.generallySeen = false
             faceCheckContext.summaryRenderable = null
         }
+    }
+
+    private fun regenDebugRenderable() {
+        if (!config.enabled || !config.debugInfo) return
+        faceCheckContext.summaryRenderable = faceCheckContext.buildSummaryRenderable().wrapWithOtherToggles()
     }
 
     @HandleEvent
@@ -202,8 +208,10 @@ object TestCanSeeFace {
             addRenderableButton(
                 label = "Ray Visibility",
                 current = currentVisibilityType,
-                getName = { it.toString() },
-                onChange = { currentVisibilityType = it },
+                onChange = {
+                    currentVisibilityType = it
+                    regenDebugRenderable()
+                },
             )
             add(this@wrapWithOtherToggles)
         }
@@ -221,7 +229,7 @@ object TestCanSeeFace {
         face: EnumFacing,
         points: List<Pair<LorenzVec, Boolean>>,
     ) {
-        if (!config.drawPoints) return
+        if (!config.drawPoints || faceStates[face] == FaceState.HIDDEN) return
         for ((point, isSeen) in points) {
             if (currentVisibilityType == VisibilityType.SEEN && !isSeen) continue
             val pointColor = if (isSeen) LorenzColor.GREEN else LorenzColor.RED
@@ -240,7 +248,7 @@ object TestCanSeeFace {
         context: FaceCheckContext,
         face: EnumFacing,
     ) {
-        if (!config.highlightFaces) return
+        if (!config.highlightFaces || faceStates[face] == FaceState.HIDDEN) return
         val vec1 = context.vec1 ?: return
         val vec2 = context.vec2 ?: return
         val points = context.pointSet[face] ?: return

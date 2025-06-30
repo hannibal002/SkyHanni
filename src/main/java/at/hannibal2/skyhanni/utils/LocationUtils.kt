@@ -62,6 +62,7 @@ object LocationUtils {
      * See lower function for more extensive documentation.
      *
      * @param ignoreFaces Which faces, if any, to ignore when checking visibility. Default is none (meaning all faces are checked).
+     * @return True if any face can be seen, false otherwise.
      */
     fun anyFaceCanBeSeen(
         min: LorenzVec,
@@ -84,8 +85,8 @@ object LocationUtils {
     }
 
     /**
-     * When passed a corner pair of vectors, checks if the player can see the center point of, or optionally
-     * a number of other points on the box, defined by the [stepCount] parameter.
+     * When passed a corner pair of vectors, checks if the player can see the center point of, or optionally,
+     * a number of other points on the specified face, defined by the [stepCount] parameter.
      *
      * A note about the [stepCount] parameter - it is linear, but at a rate of increasing by [stepDensity], per face, per step.
      * So, use both sparingly, as it can lead to a lot of axes being cast across a face.
@@ -93,14 +94,14 @@ object LocationUtils {
      * Another note, if [pointFill] is provided, this function will continue to fill out points in the map, even after
      * it finds a point that can be seen - this is useful for debugging, but should not be used in user-facing code.
      *
-     * @param min The first corner of the box (minimum corner).
-     * @param max The second corner of the box (maximum corner).
-     * @param viewDistance The maximum distance at which the player can see the box.
-     * @param stepCount The number of "middle points" between faces to check. Default is 0, meaning only the center point is checked.
+     * @param min The first corner of the face (minimum corner).
+     * @param max The second corner of the face (maximum corner).
+     * @param viewDistance The maximum distance at which the player can see the face.
+     * @param stepCount The number of "middle points" between face<->edge to check. 0 would mean only the center point is checked.
      * @param stepDensity The number of contour rays to cast from the center of each face towards the nearest corner.
      * @param pointFill If provided, this map will be filled with points that can be seen (true) or not (false).
-     * @param offset An optional vertical offset to apply to the box corners.
-     * @return True if the player can see any face of the box, false otherwise.
+     * @param offset An optional vertical offset to apply to the face corners.
+     * @return True if the player can see the specified face, false otherwise.
      */
     fun faceCanBeSeen(
         face: EnumFacing,
