@@ -20,7 +20,7 @@ public class MixinGuiIngame {
     }
 
     @Redirect(method = "renderScoreboard", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/FontRenderer;drawString(Ljava/lang/String;III)I"))
-    private int renderItemOverlayPost(FontRenderer instance, String text, int x, int y, int color) {
+    private int drawScoreboardString(FontRenderer instance, String text, int x, int y, int color) {
         return GuiIngameHook.drawString(instance, text, x, y, color);
     }
 }
