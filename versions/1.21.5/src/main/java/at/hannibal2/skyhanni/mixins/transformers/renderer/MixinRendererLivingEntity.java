@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.render;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
 import net.minecraft.client.render.entity.EntityRenderer;
