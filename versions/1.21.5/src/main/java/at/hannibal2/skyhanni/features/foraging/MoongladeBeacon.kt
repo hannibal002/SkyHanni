@@ -45,6 +45,7 @@ object MoongladeBeacon {
 
     private val config get() = SkyHanniMod.feature.foraging.moongladeBeacon
 
+    // <editor-fold desc="Enums & Enum Helpers">
     /**
      * Represents the order of colors for the beacon minigame.
      * Attempts to auto-fetch the item from the registry if not provided.
@@ -84,11 +85,11 @@ object MoongladeBeacon {
      * @param guiSpeed The speed level as displayed in the GUI (1-5).
      */
     private enum class BeaconSpeed(val tickSpeed: Int, val guiSpeed: Int) {
-        S1(12, 5),
-        S2(22, 4),
-        S3(32, 3),
-        S4(42, 2),
-        S5(52, 1),
+        SPEED_1(12, 5),
+        SPEED_2(22, 4),
+        SPEED_3(32, 3),
+        SPEED_4(42, 2),
+        SPEED_5(52, 1),
         ;
 
         fun getOffsetFromNow(): SimpleTimeMark =
@@ -162,6 +163,7 @@ object MoongladeBeacon {
         val raw = this.ordinal - other.ordinal
         return if (raw < 0) raw + enumValues<E>().size else raw
     }
+    // </editor-fold>
 
     private const val COLOR_SELECT_SLOT = 46
     private const val SPEED_SELECT_SLOT = 48
