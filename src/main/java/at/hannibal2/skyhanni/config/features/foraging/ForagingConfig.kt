@@ -32,6 +32,10 @@ class ForagingConfig {
     val hotf: HotfConfig = HotfConfig()
 
     @Expose
+    @Category(name = "Trees", desc = "Settings for big trees found on the foraging islands.")
+    val trees: TreesConfig = TreesConfig()
+
+    @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
     @Accordion
     @OnlyModern
@@ -60,12 +64,6 @@ class ForagingConfig {
     @OnlyModern
     @Accordion
     val tracker = ForagingTrackerConfig()
-
-    @Expose
-    @ConfigOption(name = "Tree Progress Display", desc = "")
-    @OnlyModern
-    @Accordion
-    val treeProgress = TreeProgressConfig()
 
     @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")

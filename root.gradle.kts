@@ -98,6 +98,18 @@ allprojects {
             }
         }
 
+        // Rei for compat plugin
+        exclusiveContent {
+            forRepository {
+                maven("https://maven.shedaniel.me")
+            }
+            filter {
+                includeGroup("me.shedaniel")
+                includeGroup("dev.architectury")
+                includeGroup("me.shedaniel.cloth")
+            }
+        }
+
         maven("https://maven.minecraftforge.net") {
             metadataSources {
                 artifact() // We love missing POMs
