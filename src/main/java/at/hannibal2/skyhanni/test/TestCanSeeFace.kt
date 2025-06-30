@@ -129,7 +129,7 @@ object TestCanSeeFace {
 
     @HandleEvent
     fun onConfigLoad() {
-        ConditionalUtils.onToggleAll(config) {
+        ConditionalUtils.onAnyToggled(config) {
             regenDebugRenderable()
         }
     }
