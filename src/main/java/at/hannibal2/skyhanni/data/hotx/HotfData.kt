@@ -446,14 +446,13 @@ enum class HotfData(
         }
 
         override fun readFromHeartOrReset(line: String, isHeartItem: Boolean) {
-            (if (isHeartItem) whisperHeartPattern else whisperResetPattern).matchMatcher(line) {
-                val whisper = group("whisper").formatLong()
-                if (isHeartItem) {
-                    whispersCurrent = whisper
-                    whispersTotal = whisper
-                } else {
-                    whispersTotal += whisper
-                }
+            val pattern = if (isHeartItem) whisperHeartPattern else whisperResetPattern
+            val whisper = pattern.matchMatcher(line) { group("whisper").formatLong() } ?: return
+            if (isHeartItem) {
+                whispersCurrent = whisper
+                whispersTotal = whisper
+            } else {
+                whispersTotal += whisper
             }
         }
 
