@@ -216,6 +216,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         getPatternedPerks<ChatRepoPatternEnum>()
     }
 
+    abstract fun tryBlock(event: SkyHanniChatEvent)
+
     fun tryReadRotatingPerkChat(event: SkyHanniChatEvent): Boolean? {
         rotatingPerkPattern.matchMatcher(event.message) {
             val perk = group("perk")
@@ -223,6 +225,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
                 if (!pattern.matches(perk)) return@firstNotNullOfOrNull null
                 enum
             } ?: return false
+            tryBlock(event)
             setRotatingPerk(foundPerk)
             return true
         }

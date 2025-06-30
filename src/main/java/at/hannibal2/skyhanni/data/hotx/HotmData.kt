@@ -637,8 +637,12 @@ enum class HotmData(
         @HandleEvent(onlyOnSkyblock = true)
         override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
 
+        override fun tryBlock(event: SkyHanniChatEvent) {
+            if (!chatConfig.hideSkyMall || IslandTypeTags.MINING.inAny()) return
+            event.blockedReason = "skymall"
+        }
+
         override fun extraChatHandling(event: SkyHanniChatEvent) {
-            if (chatConfig.hideSkyMall && !IslandTypeTags.MINING.inAny()) event.blockedReason = "skymall"
             DelayedRun.runNextTick {
                 mayhemChatPattern.matchMatcher(event.message) {
                     val perk = group("perk")

@@ -437,7 +437,12 @@ enum class HotfData(
         }
 
         override fun extraChatHandling(event: SkyHanniChatEvent) {
-            if (chatConfig.hideSkyMall) event.blockedReason = "lottery"
+            // Hi I'm not empty
+        }
+
+        override fun tryBlock(event: SkyHanniChatEvent) {
+            if (!chatConfig.hideSkyMall) return
+            event.blockedReason = "lottery"
         }
 
         override fun readFromHeartOrReset(line: String, isHeartItem: Boolean) {
