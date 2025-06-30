@@ -112,7 +112,9 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         }
         entry.enabled = lore.any { enabledPattern.matches(it) }
 
-        handleRotatingPerk(entry, lore)
+        fetchRotatingPerk(entry, lore)?.let {
+            setRotatingPerk(it)
+        }
         extraHandling(entry, lore)
     }
 
@@ -239,13 +241,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         getPatternedPerks<ItemRepoPatternEnum>()
     }
 
-    private fun handleRotatingPerk(entry: Data, lore: List<String>) {
-        if (entry != rotatingPerkEntry) return
-        val perk = getPerk(entry, lore) ?: return
-        setRotatingPerk(perk)
-    }
-
-    private fun getPerk(entry: Data, lore: List<String>): RotPerkE? {
+    private fun fetchRotatingPerk(entry: Data, lore: List<String>): RotPerkE? {
+        if (entry != rotatingPerkEntry) return null
         if (!entry.enabled || !entry.isUnlocked) return null
 
         val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: run {
