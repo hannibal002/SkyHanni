@@ -523,4 +523,10 @@ object CollectionUtils {
             }
         }
     }
+
+    // remove every element in MutableList that is not in the Sequence
+    fun <T> MutableList<T>.keepOnlyIn(sequence: Sequence<T>) {
+        retainAll(sequence.toSet())
+    }
+
 }
