@@ -17,6 +17,8 @@ data class PrimitiveItemStack(val internalName: NeuInternalName, val amount: Int
 
     fun toPair() = Pair(internalName, amount)
 
+    fun toPrimitiveIngredient() = PrimitiveIngredient(internalName, amount.toDouble())
+
     companion object {
 
         fun NeuInternalName.makePrimitiveStack(amount: Int = 1) = PrimitiveItemStack(this, amount)

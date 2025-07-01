@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -11,17 +11,16 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
@@ -42,18 +41,19 @@ object FarmingContestApi {
         "sidebarcrop",
         "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*",
     )
+    private val bulkClaimFarmingPattern by patternGroup.pattern(
+        "bulkclaim",
+        "§7Claim multiple farming contest",
+    )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
     private var internalContest = false
     val inContest
-        get() = internalContest && LorenzUtils.skyBlockIsland.isAnyOf(
-            IslandType.GARDEN,
-            IslandType.HUB,
-            IslandType.THE_FARMING_ISLANDS,
-        )
+        get() = internalContest && IslandTypeTags.CONTESTS_SHOWN.inAny()
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false
+        private set
 
     init {
         ContestBracket.entries.forEach { it.bracketPattern }
@@ -114,11 +114,13 @@ object FarmingContestApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName == "Your Contests") {
-            inInventory = true
-        }
+        if (event.inventoryName != "Your Contests") return
+        val bulkClaimStack = event.inventoryItems[50] ?: return
+        val firstLine = bulkClaimStack.getLore().firstOrNull() ?: return
+        if (!bulkClaimFarmingPattern.matches(firstLine)) return
+        inInventory = true
     }
 
     @HandleEvent

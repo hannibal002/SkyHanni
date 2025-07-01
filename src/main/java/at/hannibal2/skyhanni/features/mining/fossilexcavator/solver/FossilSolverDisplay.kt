@@ -9,15 +9,12 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -75,7 +72,7 @@ object FossilSolverDisplay {
     var possibleFossilTypes = setOf<FossilType>()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         clearData()
     }
 
@@ -97,7 +94,7 @@ object FossilSolverDisplay {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         val slots = InventoryUtils.getItemsInOpenChest()
         val itemNames = slots.map { it.stack.displayName.removeColor() }
@@ -172,7 +169,7 @@ object FossilSolverDisplay {
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex == slotToClick) {
-                slot highlight LorenzColor.GREEN.toColor().addAlpha(90)
+                slot.highlight(LorenzColor.GREEN.toColor().addAlpha(90))
             }
         }
     }
@@ -241,5 +238,5 @@ object FossilSolverDisplay {
         isCompleted = true
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled && FossilExcavatorApi.inInventory
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isCurrent() && config.enabled && FossilExcavatorApi.inInventory
 }

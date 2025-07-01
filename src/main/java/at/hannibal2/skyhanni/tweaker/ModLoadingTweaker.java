@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.tweaker;
 
-
+import at.hannibal2.skyhanni.utils.VersionConstants;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.relauncher.CoreModManager;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * The mod loading tweaker makes sure that we are recognized as a Forge Mod, despite having a Tweaker.
  * We also add ourselves as a mixin container for integration with other mixin loaders.
- *
+ * <p>
  * Taken from https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/20821e63057add096e314310ea8fa8e0c411e964/src/main/java/io/github/moulberry/notenoughupdates/loader/ModLoadingTweaker.java
  */
 public class ModLoadingTweaker implements ITweaker {
@@ -29,7 +29,7 @@ public class ModLoadingTweaker implements ITweaker {
             CoreModManager.getIgnoredMods().remove(file);
             CoreModManager.getReparseableCoremods().add(file);
         } catch (URISyntaxException e) {
-            System.err.println("SkyHanni-@MOD_VERSION@ could not re-add itself as mod.");
+            System.err.println("SkyHanni-" + VersionConstants.MOD_VERSION + " could not re-add itself as mod.");
             e.printStackTrace();
         }
     }

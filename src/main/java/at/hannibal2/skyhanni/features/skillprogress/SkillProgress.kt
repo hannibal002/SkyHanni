@@ -22,22 +22,21 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -48,8 +47,8 @@ object SkillProgress {
     val config get() = SkyHanniMod.feature.skillProgress
     private val barConfig get() = config.skillProgressBarConfig
     private val allSkillConfig get() = config.allSkillDisplayConfig
+    private val customGoalConfig get() = config.customGoalConfig
     val etaConfig get() = config.skillETADisplayConfig
-    val customGoalConfig get() = config.customGoalConfig
 
     private var skillExpPercentage = 0.0
     private var display = emptyList<Renderable>()
@@ -100,7 +99,8 @@ object SkillProgress {
     private fun renderDisplay() {
         when (val textAlignment = config.textAlignmentProperty.get()) {
             SkillProgressConfig.TextAlignment.NONE -> {
-                config.displayPosition.renderStringsAndItems(listOf(display), posLabel = "Skill Progress")
+                val content = Renderable.horizontalContainer(display)
+                config.displayPosition.renderRenderable(content, posLabel = "Skill Progress")
             }
 
             SkillProgressConfig.TextAlignment.CENTERED,
@@ -108,7 +108,7 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
                 val horizontalAlignment = textAlignment.alignment ?: RenderUtils.HorizontalAlignment.LEFT
-                val content = horizontalContainer(display, horizontalAlign = horizontalAlignment)
+                val content = Renderable.horizontalContainer(display, horizontalAlign = horizontalAlignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
                 config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
@@ -541,5 +541,5 @@ object SkillProgress {
         xpInfo.isActive = true
     }
 
-    private fun isDisplayEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isDisplayEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get()
 }

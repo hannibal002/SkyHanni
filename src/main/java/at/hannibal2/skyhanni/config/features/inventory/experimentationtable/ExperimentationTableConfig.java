@@ -28,7 +28,7 @@ public class ExperimentationTableConfig {
 
     @Expose
     @ConfigLink(owner = ExperimentationTableConfig.class, field = "superpairDisplay")
-    public Position superpairDisplayPosition = new Position(-372, 161, false, true);
+    public Position superpairDisplayPosition = new Position(-372, 161);
 
     @Expose
     @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")

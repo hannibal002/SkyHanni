@@ -3,32 +3,31 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasHypixelEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MinionCraftHelper {
@@ -53,13 +52,13 @@ object MinionCraftHelper {
     private val alreadyNotified = mutableListOf<String>()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         alreadyNotified.clear()
     }
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
         val mainInventory = InventoryUtils.getItemsInOwnInventory()
@@ -226,7 +225,7 @@ object MinionCraftHelper {
                         newDisplay.removeLast()
                         return
                     }
-                    val format = LorenzUtils.formatPercentage(percentage)
+                    val format = percentage.formatPercentage()
                     val haveFormat = have.addSeparators()
                     val needFormat = needAmount.addSeparators()
                     newDisplay.add("$itemName§8: §e$format §8(§7$haveFormat§8/§7$needFormat§8)")
@@ -243,7 +242,7 @@ object MinionCraftHelper {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
         config.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
@@ -252,7 +251,7 @@ object MinionCraftHelper {
     private fun notify(minionName: String) {
         if (alreadyNotified.contains(minionName)) return
 
-        TitleManager.sendTitle("Can craft $minionName", 3.seconds)
+        TitleManager.sendTitle("Can craft $minionName")
         alreadyNotified.add(minionName)
     }
 
@@ -266,7 +265,7 @@ object MinionCraftHelper {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {

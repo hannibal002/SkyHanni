@@ -29,14 +29,6 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Heat: §c1♨
-     */
-    val heatPattern by mainSB.pattern(
-        "heat",
-        "Heat: (?<heat>.*)",
-    )
-
-    /**
      * REGEX-TEST: Copper: §c3,416
      */
     val copperPattern by mainSB.pattern(
@@ -197,10 +189,14 @@ object ScoreboardPattern {
         "§3§lSolo",
     )
 
+    /**
+     * REGEX-TEST: §a[H] §6Eisengolem §7[Lv48]
+     * REGEX-TEST: §e[M] §b04032006 §a7,361§c❤
+     */
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSB.pattern(
         "teammates",
-        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
+        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§(?<color>.))*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
 
     /**
@@ -257,15 +253,16 @@ object ScoreboardPattern {
      */
     val lockedPattern by farmingSB.pattern(
         "locked",
-        "\\s*§cLocked",
+        "\\s*§cLocked.*",
     )
 
     /**
      * REGEX-TEST:    §fCleanup§7: §e0.3%
+     * REGEX-TEST:    §fCleanup§7: §b2 §4§lൠ§7 x1
      */
     val cleanUpPattern by farmingSB.pattern(
         "cleanup",
-        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*[\\d,.]*%?",
+        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*.*",
     )
 
     /**
@@ -341,7 +338,7 @@ object ScoreboardPattern {
      */
     val miningEventPattern by miningSB.pattern(
         "miningevent",
-        "Event: §.§L.*",
+        "Event: §.§[lL].*",
     )
 
     /**
@@ -770,7 +767,7 @@ object ScoreboardPattern {
      */
     val riftDimensionPattern by riftSB.pattern(
         "dimension",
-        "\\s*§fRift Dimension",
+        "\\s*(?:§f)?Rift Dimension",
     )
     val riftHotdogTitlePattern by riftSB.pattern(
         "hotdogtitle",
@@ -911,6 +908,35 @@ object ScoreboardPattern {
         "(?:§f)?Kills: §.\\d+",
     )
 
+    // Galatea
+    private val galateaSB = scoreboardGroup.group("galatea")
+
+    /**
+     * REGEX-TEST: Whispers: §3141§b (+1)
+     * REGEX-TEST: Whispers: §317.5k§b (+50)
+     */
+    val whispersPattern by galateaSB.pattern(
+        "whispers",
+        "Whispers: §3[\\w,.]+.*"
+    )
+
+    /**
+     * REGEX-TEST:     §aHOTF§f: §a28k§3.7k§b (+35)
+     * REGEX-TEST:     §aHOTF§f: §a28k§9 (+29 Exp)
+     */
+    val hotfPattern by galateaSB.pattern(
+        "hotf",
+        "\\s*§aHOTF§f: §a[\\w,.]+.*",
+    )
+
+    /**
+     * REGEX-TEST: §eAgatha's Contest §a5m28s
+     */
+    val agathasContestPattern by galateaSB.pattern(
+        "agathas-contest",
+        "§eAgatha's Contest §a.*",
+    )
+
     /**
      * Somtimes when the scoreboard updates, it only updates half way,
      * causing some lines to become mixed with other lines -> broken.
@@ -928,7 +954,7 @@ object ScoreboardPattern {
     val brokenPatterns by group.list(
         "broken",
         "\\s*§.§l⚡ §cRedston",
-        "\\s*§ce: §e§b0%",
+        "\\s*§ce: §e§b\\d+%",
         "\\s*Starting in: §a0 §c[\\d:]+",
         "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*",
     )

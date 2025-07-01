@@ -3,13 +3,13 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.PurseApi
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 object CustomScoreboardUtils {
 
     fun formatNumberDisplay(text: String, number: String, color: String): String {
-        val formattedNumber = if (LorenzUtils.isAprilFoolsDay) {
+        val formattedNumber = if (SkyHanniDebugsAndTests.isAprilFoolsDay) {
             "-$number"
         } else {
             number
@@ -73,8 +73,6 @@ object CustomScoreboardUtils {
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
-    internal fun getPurseEarned() = getGroup(PurseApi.coinsPattern, getSBLines(), "earned")?.let { " §7(§e+$it§7)§6" }
-
     internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
         group("amount") + (groupOrNull("personal")?.let { " §7/ §6$it" }.orEmpty())
     } ?: "0"
@@ -91,7 +89,7 @@ object CustomScoreboardUtils {
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
-    internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, getSBLines(), "heat")
+    internal fun getHeat() = MiningApi.heatDisplay
 
     internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSBLines(), "northStars") ?: "0"
 

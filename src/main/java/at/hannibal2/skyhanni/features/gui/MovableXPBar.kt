@@ -2,15 +2,16 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.transform
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.client.event.RenderGameOverlayEvent
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 @SkyHanniModule
 object MovableXPBar {
@@ -21,24 +22,23 @@ object MovableXPBar {
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE || !isEnabled()) return
+        if (event.type != RenderLayer.EXPERIENCE || !isEnabled()) return
         post = true
-        GlStateManager.pushMatrix()
-        val scaled = event.resolution
-        val x = scaled.scaledWidth / 2 - 91
-        val y = scaled.scaledHeight - 29
+        DrawContextUtils.pushMatrix()
+        val x = GuiScreenUtils.scaledWindowWidth / 2 - 91
+        val y = GuiScreenUtils.scaledWindowHeight - 29
         config.position.transform()
-        GlStateManager.translate(-x.toFloat(), -y.toFloat(), 0f) // Must be after transform to work with scaling
+        DrawContextUtils.translate(-x.toFloat(), -y.toFloat(), 0f) // Must be after transform to work with scaling
         GuiEditManager.add(config.position, "XP Bar", 182 - 1, 5 - 1) // -1 since the editor for some reason add +1
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
-        if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE || !post) return
-        GlStateManager.popMatrix()
+        if (event.type != RenderLayer.EXPERIENCE || !post) return
+        DrawContextUtils.popMatrix()
         post = false
     }
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || (Minecraft.getMinecraft().thePlayer != null && config.showOutsideSkyblock)) &&
+    private fun isEnabled() = (SkyBlockUtils.inSkyBlock || (MinecraftCompat.localPlayerExists && config.showOutsideSkyblock)) &&
         config.enabled
 }

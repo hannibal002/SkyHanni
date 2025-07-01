@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNull
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -67,10 +68,9 @@ open class SkyHanniTracker<Data : TrackerData>(
     )
 
     fun modify(modifyFunction: (Data) -> Unit) {
-        getSharedTracker()?.let {
-            it.modify(modifyFunction)
-            update()
-        }
+        val sharedTracker = getSharedTracker() ?: return
+        sharedTracker.modify(modifyFunction)
+        update()
     }
 
     fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
@@ -79,17 +79,12 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
-    private fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
-        getSharedTracker()?.let {
-            it.tryModify(mode, modifyFunction)
-            update()
-        }
-    }
-
     fun modifyEachMode(modifyFunction: (Data) -> Unit) {
-        DisplayMode.entries.forEach {
-            tryModify(it, modifyFunction)
+        val sharedTracker = getSharedTracker() ?: return
+        DisplayMode.entries.forEach { mode ->
+            sharedTracker.tryModify(mode, modifyFunction)
         }
+        update()
     }
 
     fun renderDisplay(position: Position) {
@@ -113,7 +108,7 @@ open class SkyHanniTracker<Data : TrackerData>(
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
                 if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
-                else buildFinalDisplay(Renderable.verticalContainer(searchables.toRenderable()))
+                else buildFinalDisplay(VerticalContainerRenderable(searchables.toRenderable()))
             }.orEmpty()
             dirty = false
         }
@@ -237,13 +232,13 @@ open class SkyHanniTracker<Data : TrackerData>(
         )
     }
 
-    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int) {
+    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat) {
+        if (config.warnings.chat && price >= config.warnings.minimumChat && message) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            TitleManager.sendTitle("§a+ $itemName", 5.seconds)
+            TitleManager.sendTitle("§a+ $itemName", weight = price)
         }
     }
 

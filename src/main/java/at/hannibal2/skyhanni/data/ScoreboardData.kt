@@ -1,24 +1,32 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.features.inventory.FixIronman
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
-import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//#endif
 
 @SkyHanniModule
 object ScoreboardData {
@@ -27,8 +35,9 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() =
-        Minecraft.getMinecraft().theWorld?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
+    val objectiveTitle: String
+        get() =
+            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -70,18 +79,19 @@ object ScoreboardData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        val packet = event.packet
-        when (packet) {
+        when (val packet = event.packet) {
             is S3CPacketUpdateScore -> {
                 if (packet.objectiveName == "update") {
                     dirty = true
                 }
             }
+
             is S3EPacketTeams -> {
                 if (packet.name.startsWith("team_")) {
                     dirty = true
                 }
             }
+
             is S3BPacketScoreboardObjective -> {
                 val type = packet.func_179817_d()
                 if (type != IScoreObjectiveCriteria.EnumRenderType.INTEGER) return
@@ -113,7 +123,7 @@ object ScoreboardData {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!dirty) return
         dirty = false
         monitor()
@@ -134,20 +144,13 @@ object ScoreboardData {
         }
     }
 
-    fun toggleMonitor() {
-        monitor = !monitor
-        val action = if (monitor) "Enabled" else "Disabled"
-        ChatUtils.chat("$action scoreboard monitoring in the console.")
-
-    }
-
     private fun cleanSB(scoreboard: String) = scoreboard.toCharArray().filter {
         // 10735 = Rift Blood Effigies symbol
         it.code in 21..126 || it.code == 167 || it.code == 10735
     }.joinToString(separator = "")
 
     private fun fetchScoreboardLines(): List<String> {
-        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
+        val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.getPlayerNames(scoreboard)
@@ -161,8 +164,68 @@ object ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
         //#else
-        //$$ return list.map { it.formattedTextCompat() }
+        //$$ return list.map { it.formattedTextCompatLessResets() }
         //#endif
+    }
+
+    /**
+     * Tries to replace a scoreboard line with a modified one
+     * @param text The line to check and possibly replace
+     * @return The replaced line, or null if it should be hidden
+     */
+    fun tryToReplaceScoreboardLine(text: String): String? {
+        try {
+            return tryToReplaceScoreboardLineHarder(text)
+        } catch (t: Throwable) {
+            ErrorManager.logErrorWithData(
+                t,
+                "Error while changing the scoreboard text.",
+                "text" to text,
+            )
+            return text
+        }
+    }
+
+    private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+        //#if MC < 1.21
+        if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
+            return null
+        }
+        //#endif
+        if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
+            PurseApi.piggyPattern.matchMatcher(text) {
+                val coins = group("coins")
+                return "Purse: $coins"
+            }
+        }
+
+        if (SkyHanniMod.feature.misc.colorMonthNames) {
+            for (season in Season.entries) {
+                if (text.trim().startsWith(season.prefix)) {
+                    return season.colorCode + text
+                }
+            }
+        }
+        FixIronman.fixScoreboard(text)?.let {
+            return it
+        }
+
+        return text
+    }
+
+    enum class Season(val prefix: String, val colorCode: String) {
+        EARLY_SPRING("Early Spring", "§d"),
+        SPRING("Spring", "§d"),
+        LATE_SPRING("Late Spring", "§d"),
+        EARLY_SUMMER("Early Summer", "§6"),
+        SUMMER("Summer", "§6"),
+        LATE_SUMMER("Late Summer", "§6"),
+        EARLY_AUTUMN("Early Autumn", "§e"),
+        AUTUMN("Autumn", "§e"),
+        LATE_AUTUMN("Late Autumn", "§e"),
+        EARLY_WINTER("Early Winter", "§9"),
+        WINTER("Winter", "§9"),
+        LATE_WINTER("Late Winter", "§9")
     }
 
     // TODO USE SH-REPO
@@ -183,4 +246,19 @@ object ScoreboardData {
         "\uD83C\uDF82",
         "\uD83D\uDD2B",
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shdebugscoreboard") {
+            description =
+                "Monitors the scoreboard changes: " +
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                monitor = !monitor
+                val action = if (monitor) "Enabled" else "Disabled"
+                ChatUtils.chat("$action scoreboard monitoring in the console.")
+            }
+        }
+    }
 }

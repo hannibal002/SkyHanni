@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -24,7 +25,7 @@ object WarpMenuUniques {
     )
 
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>?
-        get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations
+        get() = CFApi.profileStorage?.collectedEggLocations
 
     private val config get() = SkyHanniMod.feature.event.hoppityEggs.warpMenu
 
@@ -32,7 +33,7 @@ object WarpMenuUniques {
     fun onToolTip(event: ToolTipEvent) {
         if (!config.enabled) return
         if (!HoppityApi.isHoppityEvent()) return
-        if (event.slot.inventory.name != "Fast Travel") return
+        if (InventoryUtils.openInventoryName() != "Fast Travel") return
 
         val name = islandNamePattern.matchMatcher(event.slot.stack.displayName) {
             group("name")

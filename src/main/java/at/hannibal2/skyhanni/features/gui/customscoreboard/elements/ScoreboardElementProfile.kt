@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.features.inventory.FixIronman
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 // internal and scoreboard
@@ -15,7 +16,7 @@ object ScoreboardElementProfile : ScoreboardElement() {
             append(HypixelData.profileName.firstLetterUppercase())
         } else {
             when {
-                HypixelData.ironman -> append("Ironman")
+                HypixelData.ironman -> append(FixIronman.getIronmanName())
                 HypixelData.stranded -> append("Stranded")
                 HypixelData.bingo -> append("Bingo")
                 else -> append("Normal")

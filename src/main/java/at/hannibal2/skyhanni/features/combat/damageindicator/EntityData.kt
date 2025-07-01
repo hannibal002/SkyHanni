@@ -17,13 +17,15 @@ class EntityData(
 
     var lastHealth: Long = 0L,
     var healthText: String = "",
-    var timeLastTick: Long = 0,
+    var timeLastTick: SimpleTimeMark = SimpleTimeMark.now(),
     var namePrefix: String = "",
     var nameSuffix: String = "",
     var nameAbove: String = "",
     var dead: Boolean = false,
     var firstDeath: Boolean = false, // TODO this defines if hp is very low, replace dead with this later
     var deathLocation: LorenzVec? = null,
+
+    var serverTicksAlive: Long = 0L,
 ) {
 
     val timeToKill by lazy {

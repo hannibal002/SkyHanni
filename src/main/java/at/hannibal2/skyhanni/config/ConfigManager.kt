@@ -3,30 +3,40 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringFileHandler
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
+//#if MC < 1.21
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybindL
+//#endif
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOptionImpl
 import java.io.File
 import java.io.IOException
+import java.lang.reflect.Field
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.concurrent.fixedRateTimer
@@ -53,7 +63,7 @@ class ConfigManager {
 
     private val jsonHolder: Map<ConfigFileType, Any> = enumMapOf()
 
-    lateinit var processor: MoulConfigProcessor<Features>
+    lateinit var processor: BlockingMoulConfigProcessor
     private var disableSaving = false
 
     private fun setConfigHolder(type: ConfigFileType, value: Any) {
@@ -80,12 +90,7 @@ class ConfigManager {
         }
 
         val features = SkyHanniMod.feature
-        processor = MoulConfigProcessor(SkyHanniMod.feature)
-        BuiltinMoulConfigGuis.addProcessors(processor)
-        UpdateManager.injectConfigProcessor(processor)
-        val driver = ConfigProcessorDriver(processor)
-        driver.warnForPrivateFields = false
-        driver.processConfig(features)
+        recreateConfig()
 
         try {
             findPositionLinks(features, mutableSetOf())
@@ -107,6 +112,8 @@ class ConfigManager {
         "features.misc.MiscConfig.collectionCounterPos",
         "features.misc.MiscConfig.carryPosition",
         "features.misc.MiscConfig.lockedMouseDisplay",
+        "features.gui.GuiConfig.titlePosition",
+        "features.gui.GuiConfig.titleIntentionPositions",
 
         // debug features
         "features.dev.DebugConfig.trackSoundPosition",
@@ -242,6 +249,17 @@ class ConfigManager {
     fun disableSaving() {
         disableSaving = true
     }
+
+    fun recreateConfig() {
+        ConfigGuiManager.editor = null
+        val features = SkyHanniMod.feature
+        processor = BlockingMoulConfigProcessor()
+        BuiltinMoulConfigGuis.addProcessors(processor)
+        UpdateManager.injectConfigProcessor(processor)
+        val driver = ConfigProcessorDriver(processor)
+        driver.warnForPrivateFields = false
+        driver.processConfig(features)
+    }
 }
 
 private fun getBackupFile(file: File): File {
@@ -264,8 +282,48 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
+    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
     val backupFile get() = getBackupFile(file)
+}
+
+class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.feature) {
+    override fun createOptionGui(
+        processedOption: ProcessedOption,
+        field: Field,
+        option: ConfigOption,
+    ): GuiOptionEditor? {
+        val default = super.createOptionGui(processedOption, field, option) ?: return null
+        if (processedOption !is ProcessedOptionImpl) return default
+        var extraPath = ""
+        val categoryParent = processedOption.category.parentCategoryId
+        if (categoryParent != null) {
+            extraPath = categoryParent.split(".").last() + "."
+        }
+        extraPath += processedOption.getPath()
+        if (default is GuiOptionEditorKeybind) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#if MC < 1.21
+        if (default is GuiOptionEditorKeybindL) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#endif
+        if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
+            return GuiOptionEditorBlocked(default)
+        }
+
+        if (PlatformUtils.IS_LEGACY) {
+            if (field.isAnnotationPresent(OnlyModern::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
+        } else {
+            if (field.isAnnotationPresent(OnlyLegacy::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
+        }
+        return default
+    }
 }

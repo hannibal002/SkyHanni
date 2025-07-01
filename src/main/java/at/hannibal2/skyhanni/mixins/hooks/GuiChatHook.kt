@@ -4,9 +4,14 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
+//#if MC < 1.21
 import net.minecraft.util.IChatComponent
+//#endif
 
 object GuiChatHook {
+
+    @JvmStatic
+    var currentComponent: IChatComponent? = null
 
     lateinit var replacement: ChatComponentText
 
@@ -24,9 +29,13 @@ object GuiChatHook {
         if (!this::replacement.isInitialized) return
 
         // Initialise new component
-        val newComponent = replacement.chatComponentText_TextValue.asComponent {
+        val newComponent = replacement.unformattedTextForChat.asComponent {
             chatStyle = replacement.chatStyle
+            //#if MC < 1.21
             chatStyle.chatHoverEvent = hoverEvent
+            //#else
+            //$$ style.withHoverEvent(hoverEvent)
+            //#endif
         }
 
         replacement = newComponent

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils.compat
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.potion.Potion
 import net.minecraft.potion.PotionEffect
-//#if MC > 1.12
-//$$ import net.minecraft.init.MobEffects
+//#if MC > 1.16
+//$$ import net.minecraft.world.effect.MobEffects
 //#endif
 //#if MC > 1.21
 //$$ import net.minecraft.registry.entry.RegistryEntry
@@ -18,14 +18,14 @@ enum class EffectsCompat(
     //#endif
 ) {
     INVISIBILITY(
-        //#if MC < 1.12
+        //#if MC < 1.16
         Potion.invisibility
         //#else
         //$$ MobEffects.INVISIBILITY
         //#endif
     ),
     BLINDNESS(
-        //#if MC < 1.12
+        //#if MC < 1.16
         Potion.blindness
         //#else
         //$$ MobEffects.BLINDNESS

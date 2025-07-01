@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import java.time.Instant
+import kotlin.time.Duration
 
 /**
  * SkyBlockTime Utility
@@ -16,15 +17,30 @@ data class SkyBlockTime(
     val hour: Int = 0,
     val minute: Int = 0,
     val second: Int = 0,
-) {
+) : Comparable<SkyBlockTime> {
 
     val monthName get() = monthName(month)
-    val dayName get() = "$day${daySuffix(day)}"
 
-    fun toInstant(): Instant? = Instant.ofEpochMilli(toMillis())
+    fun toTimeMark(): SimpleTimeMark = SimpleTimeMark(toMillis())
 
     fun toMillis(): Long =
         calculateTimeInSkyBlockMillis(year, month, day, hour, minute, second) + SKYBLOCK_EPOCH_START_MILLIS
+
+    override fun compareTo(other: SkyBlockTime): Int {
+        return when {
+            year != other.year -> year.compareTo(other.year)
+            month != other.month -> month.compareTo(other.month)
+            day != other.day -> day.compareTo(other.day)
+            hour != other.hour -> hour.compareTo(other.hour)
+            minute != other.minute -> minute.compareTo(other.minute)
+            else -> second.compareTo(other.second)
+        }
+    }
+
+    operator fun plus(duration: Duration): SkyBlockTime {
+        val millis = toMillis() + duration.inWholeMilliseconds
+        return fromTimeMark(SimpleTimeMark(millis))
+    }
 
     companion object {
         private const val SKYBLOCK_EPOCH_START_MILLIS = 1559829300000L // Day 1, Year 1
@@ -36,15 +52,19 @@ data class SkyBlockTime(
         private const val SKYBLOCK_MINUTE_MILLIS = SKYBLOCK_HOUR_MILLIS / 60
         private const val SKYBLOCK_SECOND_MILLIS = SKYBLOCK_MINUTE_MILLIS / 60
 
+        @Deprecated("Use fromTimeMark() instead")
         fun fromInstant(instant: Instant): SkyBlockTime =
             calculateSkyBlockTime(instant.toEpochMilli() - SKYBLOCK_EPOCH_START_MILLIS)
 
-        fun fromSBYear(year: Int): SkyBlockTime =
-            fromInstant(Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
+        fun fromTimeMark(timeMark: SimpleTimeMark): SkyBlockTime =
+            calculateSkyBlockTime(timeMark.toMillis() - SKYBLOCK_EPOCH_START_MILLIS)
 
-        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeason.SkyblockSeasonModifier? = null): SkyBlockTime {
-            return fromInstant(
-                Instant.ofEpochMilli(
+        fun fromSBYear(year: Int): SkyBlockTime =
+            fromTimeMark(SimpleTimeMark(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
+
+        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeasonModifier? = null): SkyBlockTime {
+            return fromTimeMark(
+                SimpleTimeMark(
                     SKYBLOCK_EPOCH_START_MILLIS +
                         (SKYBLOCK_YEAR_MILLIS * year) +
                         (SKYBLOCK_MONTH_MILLIS * (season.getMonth(modifier))),
@@ -52,7 +72,7 @@ data class SkyBlockTime(
             )
         }
 
-        fun now(): SkyBlockTime = fromInstant(Instant.now())
+        fun now(): SkyBlockTime = fromTimeMark(SimpleTimeMark.now())
 
         private fun calculateSkyBlockTime(realMillis: Long): SkyBlockTime {
             var remainingMillis = realMillis
@@ -120,12 +140,7 @@ data class SkyBlockTime(
             }
         }
 
-        operator fun SkyBlockTime.plus(duration: kotlin.time.Duration): SkyBlockTime {
-            val millis = toMillis() + duration.inWholeMilliseconds
-            return fromInstant(Instant.ofEpochMilli(millis))
-        }
-
-        fun isDay(): Boolean = Minecraft.getMinecraft().theWorld.worldTime % 24000 in 1..12000
+        fun isDay(): Boolean = MinecraftCompat.localWorld.worldTime % 24000 in 1..12000
 
         fun getSBMonthByName(month: String): Int {
             var monthNr = 0

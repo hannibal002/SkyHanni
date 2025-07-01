@@ -15,12 +15,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -87,7 +86,7 @@ object WardrobeApi {
     }
 
     private fun getWardrobeItem(itemStack: ItemStack?) =
-        if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item || itemStack == null) null else itemStack
+        if (itemStack == null || itemStack.isStainedGlassPane()) null else itemStack
 
     private fun getWardrobeSlotFromId(id: Int?) = slots.find { it.id == id }
 
@@ -98,9 +97,10 @@ object WardrobeApi {
         add("§aEstimated Armor Value:")
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
-            val price = EstimatedItemValueCalculator.getTotalPrice(stack)
-            add("  §7- ${stack.displayName}: §6${price.shortFormat()}")
-            totalPrice += price
+            EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
+                add("  §7- ${stack.displayName}: §6${price.shortFormat()}")
+                totalPrice += price
+            }
         }
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
@@ -123,7 +123,7 @@ object WardrobeApi {
         val itemsList = event.inventoryItems
 
         val allGrayDye = slots.all {
-            itemsList[it.inventorySlot]?.itemDamage == EnumDyeColor.GRAY.dyeDamage || !it.isInCurrentPage()
+            itemsList[it.inventorySlot]?.isDye(DyeCompat.GRAY) == true || !it.isInCurrentPage()
         }
 
         if (allGrayDye) {
@@ -179,6 +179,11 @@ object WardrobeApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
+            if (slots.isEmpty()) {
+                add("No slots")
+                return@addIrrelevant
+            }
+
             for (slot in slots) {
                 val slotInfo = buildString {
                     append("Slot ${slot.id}")

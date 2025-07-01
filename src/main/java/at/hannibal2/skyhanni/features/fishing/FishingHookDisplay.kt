@@ -8,11 +8,9 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.entity.item.EntityArmorStand
 
 @SkyHanniModule
@@ -24,7 +22,7 @@ object FishingHookDisplay {
     private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         reset()
     }
 
@@ -34,7 +32,7 @@ object FishingHookDisplay {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         if (armorStand == null) {
@@ -93,5 +91,5 @@ object FishingHookDisplay {
         return pattern.matcher(name).matches()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingApi.holdingRod
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && FishingApi.holdingRod
 }

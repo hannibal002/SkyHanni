@@ -3,22 +3,20 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -27,11 +25,16 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+//#if MC < 1.21
 import net.minecraft.network.play.server.S02PacketChat
+//#else
+//$$ import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket
+//#endif
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
@@ -106,13 +109,6 @@ object InquisitorWaypointShare {
         val spawnTime: SimpleTimeMark,
     )
 
-    private var test = false
-
-    fun test() {
-        test = !test
-        ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
-    }
-
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
@@ -125,7 +121,7 @@ object InquisitorWaypointShare {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         waypoints = emptyMap()
         inquisitorsNearby = emptyList()
     }
@@ -249,14 +245,17 @@ object InquisitorWaypointShare {
     fun onFirstChatEvent(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         val packet = event.packet
+        //#if MC < 1.21
         if (packet !is S02PacketChat) return
         val messageComponent = packet.chatComponent
+        //#else
+        //$$ if (packet !is ChatMessageS2CPacket) return
+        //$$ val messageComponent = packet.unsignedContent
+        //#endif
 
         val message = messageComponent.formattedText.stripHypixelMessage()
-        //#if MC<1.12
+        //#if MC < 1.16
         if (packet.type.toInt() != 0) return
-        //#else
-        //$$ if (packet.type.id.toInt() != 0) return
         //#endif
 
         if (partyInquisitorCheckerPattern.isDetected(message)) {
@@ -298,8 +297,8 @@ object InquisitorWaypointShare {
         val displayName = rawName.cleanPlayerName(displayName = true)
         if (!waypoints.containsKey(name)) {
             ChatUtils.chat("$displayName §l§efound an inquisitor at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
-            if (name != LorenzUtils.getPlayerName()) {
-                TitleManager.sendTitle("§dINQUISITOR §efrom §b$displayName", 5.seconds)
+            if (name != PlayerUtils.getName()) {
+                TitleManager.sendTitle("§dINQUISITOR §efrom §b$displayName")
                 playUserSound()
             }
         }

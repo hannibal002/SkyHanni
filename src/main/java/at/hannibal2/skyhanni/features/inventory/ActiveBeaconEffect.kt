@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -62,8 +61,8 @@ object ActiveBeaconEffect {
         if (!isEnabled()) return
         val slot = slot ?: return
 
-        event.container.getSlot(slot) highlight LorenzColor.GREEN
+        event.container.getSlot(slot).highlight(LorenzColor.GREEN)
     }
 
-    fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.highlightActiveBeaconEffect
+    fun isEnabled() = IslandType.PRIVATE_ISLAND.isCurrent() && config.highlightActiveBeaconEffect
 }
