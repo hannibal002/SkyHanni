@@ -212,12 +212,8 @@ object EntityUtils {
     //$$ }
     //#endif
 
-    fun <T> removeInvalidEntities(list: MutableList<T>, validSource: Sequence<T>) {
-        list.keepOnlyIn(validSource)
-    }
-
     inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
-        removeInvalidEntities(list, getAllEntities().filterIsInstance<T>())
+        list.keepOnlyIn(getEntities<T>())
     }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
