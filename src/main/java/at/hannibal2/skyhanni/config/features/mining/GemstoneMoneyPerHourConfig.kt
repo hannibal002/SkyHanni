@@ -50,5 +50,5 @@ class GemstoneMoneyPerHourConfig {
 
     @Expose
     @ConfigLink(owner = GemstoneMoneyPerHourConfig::class, field = "enabled")
-    var position: Position = Position(189, 52, false, true)
+    val position: Position = Position(189, 52, false, true)
 }
