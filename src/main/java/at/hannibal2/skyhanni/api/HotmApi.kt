@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.hotx.ChatRepoPatternEnum
 import at.hannibal2.skyhanni.data.hotx.HotmData
+import at.hannibal2.skyhanni.data.hotx.ItemRepoPatternEnum
 import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -12,9 +14,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
+import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.seconds
 
 object HotmApi {
@@ -102,30 +105,31 @@ object HotmApi {
 
     var mineshaftMayhem: MayhemPerk? = null
 
-    enum class SkymallPerk(chat: String, itemString: String) {
+    enum class SkymallPerk(
+        @Language("RegExp") override val chatPatternRaw: String,
+        @Language("RegExp") override val itemPatternRaw: String,
+    ) : ChatRepoPatternEnum, ItemRepoPatternEnum {
         MINING_SPEED("Gain §r§6\\+100⸕ Mining Speed§r§f\\.", "Gain §6\\+100⸕ Mining Speed§7\\."),
         MINING_FORTUNE("Gain §r§6\\+50☘ Mining Fortune§r§f\\.", "Gain §6\\+50☘ Mining Fortune§7\\."),
         EXTRA_POWDER("Gain §r§a\\+15% §r§fmore Powder while mining\\.", "Gain §a\\+15% §7more Powder while mining\\."),
         ABILITY_COOLDOWN("§r§a-20%§r§f Pickaxe Ability cooldowns\\.", "§a-20%§7 Pickaxe Ability cooldowns\\."),
         GOBLIN_CHANCE("§r§a10x §r§fchance to find Golden and Diamond Goblins\\.", "§a10x §7chance to find Golden and"),
-        TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a5x §9Titanium §7drops\\.")
+        TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a5x §9Titanium §7drops\\."),
         ;
 
-        private val patternName = name.lowercase().replace("_", ".")
-
-        val chatPattern by RepoPattern.pattern("mining.hotm.skymall.chat.$patternName", chat)
-        val itemPattern by RepoPattern.pattern("mining.hotm.skymall.item.$patternName", itemString)
+        override val basePath = "mining.hotm.skymall"
     }
 
-    enum class MayhemPerk(chat: String) {
+    enum class MayhemPerk(
+        @Language("RegExp") override val chatPatternRaw: String,
+    ) : ChatRepoPatternEnum {
         SCRAP_CHANCE("Your §r§9Suspicious Scrap §r§7chance was buffed by your §r§aMineshaft Mayhem §r§7perk!"),
         MINING_FORTUNE("You received a §r§a§r§6☘ Mining Fortune §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
         MINING_SPEED("You received a §r§a§r§6⸕ Mining Speed §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
         COLD_RESISTANCE("You received a §r§a§r§b❄ Cold Resistance §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
-        ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced §r§7from your §r§aMineshaft Mayhem §r§7perk!");
+        ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced §r§7from your §r§aMineshaft Mayhem §r§7perk!"),
+        ;
 
-        private val patternName = name.lowercase().replace("_", ".")
-
-        val chatPattern by RepoPattern.pattern("mining.hotm.mayhem.chat.$patternName", chat)
+        override val basePath = "mining.hotm.mayhem"
     }
 }

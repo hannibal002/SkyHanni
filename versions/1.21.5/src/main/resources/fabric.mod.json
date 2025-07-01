@@ -19,7 +19,10 @@
             }
         ],
         "modmenu": [
-            "at.hannibal2.skyhanni.config.ConfigModMenuInterop"
+            "at.hannibal2.skyhanni.compat.ConfigModMenuInterop"
+        ],
+        "rei_client": [
+            "at.hannibal2.skyhanni.compat.SkyHanniReiPlugin"
         ]
     },
     "depends": {

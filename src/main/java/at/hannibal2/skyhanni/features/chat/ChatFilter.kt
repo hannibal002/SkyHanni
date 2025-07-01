@@ -305,20 +305,17 @@ object ChatFilter {
         "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
     )
 
+    private val lotteryMessages = listOf(
+        "§r§bNew day! §r§eYour §r§2Lottery §r§ebuff changed!",
+        "§r§8§oYou can disable this messaging by toggling Lottery in your /hotf!"
+    )
+
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYour §9Anita's Talisman §fis giving you §6+25☘ Carrot Fortune §fduring the contest!
      */
     private val anitaFortunePattern by RepoPattern.pattern(
         "chat.jacobevent.accessory",
         "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!",
-    )
-
-    /**
-     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§6+50☘ Mining Fortune§r§f.
-     */
-    private val skymallPerkPattern by RepoPattern.pattern(
-        "chat.skymall.perk",
-        "§eNew buff§r§r§r:.*",
     )
 
     // Winter Gift
@@ -495,6 +492,7 @@ object ChatFilter {
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
         "skymall" to skymallMessages,
+        "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
     )
@@ -548,7 +546,8 @@ object ChatFilter {
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
-        generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
+        generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"
+        generalConfig.hideLottery && !IslandTypeTags.FORAGING.inAny() && message.isPresent("lottery") -> "lottery"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
         dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
