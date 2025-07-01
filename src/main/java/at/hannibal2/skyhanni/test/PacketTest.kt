@@ -27,29 +27,16 @@ import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.client.C0BPacketEntityAction
-//#if MC < 1.21
-import net.minecraft.network.play.client.C0FPacketConfirmTransaction
-//#endif
 import net.minecraft.network.play.server.S00PacketKeepAlive
-//#if MC < 1.21
-import net.minecraft.network.play.server.S32PacketConfirmTransaction
-//#endif
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S03PacketTimeUpdate
 import net.minecraft.network.play.server.S04PacketEntityEquipment
 import net.minecraft.network.play.server.S06PacketUpdateHealth
 import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
-//#if MC < 1.21
-import net.minecraft.network.play.server.S0EPacketSpawnObject
-import net.minecraft.network.play.server.S0FPacketSpawnMob
-//#endif
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraft.network.play.server.S14PacketEntity
-import net.minecraft.network.play.server.S14PacketEntity.S15PacketEntityRelMove as EntityRelMove
-import net.minecraft.network.play.server.S14PacketEntity.S16PacketEntityLook as EntityLook
-import net.minecraft.network.play.server.S14PacketEntity.S17PacketEntityLookMove as EntityLookMove
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.network.play.server.S19PacketEntityHeadLook
 import net.minecraft.network.play.server.S19PacketEntityStatus
@@ -69,6 +56,16 @@ import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
+import net.minecraft.network.play.server.S14PacketEntity.S15PacketEntityRelMove as EntityRelMove
+import net.minecraft.network.play.server.S14PacketEntity.S16PacketEntityLook as EntityLook
+import net.minecraft.network.play.server.S14PacketEntity.S17PacketEntityLookMove as EntityLookMove
+//#if MC < 1.21
+import net.minecraft.network.play.client.C0FPacketConfirmTransaction
+import net.minecraft.network.play.server.S32PacketConfirmTransaction
+import net.minecraft.network.play.server.S0EPacketSpawnObject
+import net.minecraft.network.play.server.S0FPacketSpawnMob
+//#endif
+
 
 @SkyHanniModule
 object PacketTest {
@@ -134,7 +131,6 @@ object PacketTest {
         if (!enabled) return
         val packet = event.packet
         packet.print()
-        return
         if (packet is S13PacketDestroyEntities) {
             packet.entityIDs.forEach {
                 entityMap.getOrDefault(it, mutableListOf()).add(packet)
