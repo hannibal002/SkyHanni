@@ -26,7 +26,10 @@ public class MixinArmorFeatureRenderer {
         BipedEntityModel armorModel,
         CallbackInfo ci
     ) {
-        Entity current = HideArmor.INSTANCE.get();
+        Entity current = HideArmor.getCurrentEntity();
+        if (current == null) {
+            return;
+        }
         if (current instanceof PlayerEntity && HideArmor.INSTANCE.shouldHideArmor(((PlayerEntity) current))) {
             if (!HideArmor.INSTANCE.getConfig().onlyHelmet || slot == EquipmentSlot.HEAD) {
                 ci.cancel();
