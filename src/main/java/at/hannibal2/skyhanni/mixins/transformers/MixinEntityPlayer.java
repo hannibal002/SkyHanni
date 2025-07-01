@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(EntityPlayer.class)
 public class MixinEntityPlayer {
 
+    //#if MC < 1.21
     @ModifyVariable(
         method = "getDisplayName",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ChatStyle;setInsertion(Ljava/lang/String;)Lnet/minecraft/util/ChatStyle;", shift = At.Shift.AFTER)
@@ -18,4 +19,17 @@ public class MixinEntityPlayer {
     public IChatComponent getDisplayName(IChatComponent value) {
         return EntityData.getDisplayName((EntityPlayer) (Object) this, (ChatComponentText) value);
     }
+    //#else
+    //$$ @org.spongepowered.asm.mixin.injection.Inject(method = "getDisplayName", at = @At(value = "RETURN"), cancellable = true)
+    //$$ public void getDisplayName(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Text> cir) {
+    //$$     cir.setReturnValue(
+    //$$         EntityData.getDisplayName((PlayerEntity) (Object) this, cir.getReturnValue())
+    //$$     );
+    //$$ }
+    //$$
+    //$$ @org.spongepowered.asm.mixin.injection.Inject(method = "applyDamage", at = @At("HEAD"))
+    //$$ public void applyDamage(net.minecraft.server.world.ServerWorld world, net.minecraft.entity.damage.DamageSource source, float amount, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+    //$$     at.hannibal2.skyhanni.api.minecraftevents.EntityEvents.postEntityHurt((PlayerEntity) (Object) this, source, amount);
+    //$$ }
+    //#endif
 }

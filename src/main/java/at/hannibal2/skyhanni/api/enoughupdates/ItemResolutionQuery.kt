@@ -1,18 +1,26 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
+import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
@@ -41,13 +49,46 @@ class ItemResolutionQuery {
     private var knownInternalName: String? = null
     private var guiContext: GuiScreen? = null
 
+    @SkyHanniModule
     companion object {
+
+        val patternGroup = RepoPattern.group("itemresoultionquery")
+
+        /**
+         * REGEX-TEST: §6Nature Elemental
+         * REGEX-TEST: §6Berry Eater IX
+         * REGEX-TEST: §6Essence of Ice I
+         * REGEX-TEST: §6Advanced Mode
+         */
+        private val attributeShardNamePattern by patternGroup.pattern(
+            "item.name.attribute.shard",
+            "§6(?<name>.+?) ?(?<tier>[IVXL]+)?$",
+        )
+
+        private var bazaarOverrides = mapOf<String, String>()
+
+        @HandleEvent
+        fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+            val typeToken = object : TypeToken<List<BazaarOverride>>() {}.type
+            val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", typeToken)
+            bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
+        }
+
+        private data class BazaarOverride(
+            @Expose @SerializedName("stock") val bazaarInternalName: String,
+            @Expose @SerializedName("id") val neuInternalName: String,
+        )
+
         private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
+
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
 
         fun transformHypixelBazaarToNeuItemId(hypixelId: String): String {
+            bazaarOverrides[hypixelId]?.let {
+                return it
+            }
             val matcher = BAZAAR_ENCHANTMENT_PATTERN.matcher(hypixelId)
             if (matcher.matches()) {
                 return matcher.group(1) + ";" + matcher.group(2)
@@ -177,7 +218,7 @@ class ItemResolutionQuery {
                 "ABICASE" -> resolvePhoneCase()
                 "PARTY_HAT_SLOTH" -> resolveSlothHatName()
                 "POTION" -> resolvePotionName()
-                "BALLOON_HAT_2024" -> resolveBalloonHatName()
+                "BALLOON_HAT_2024", "BALLOON_HAT_2025" -> resolveBalloonHatName()
                 "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
                 else -> resolvedName
             }
@@ -206,14 +247,14 @@ class ItemResolutionQuery {
 
     private fun resolveRuneName(): String? {
         val runes = getExtraAttributes().getCompoundTag("runes")
-        val runeName = CollectionUtils.getOnlyElement(runes.keySet, null)
+        val runeName = runes.keySet.singleOrNull()
         if (runeName.isNullOrEmpty()) return null
         return runeName.uppercase() + "_RUNE;" + runes.getInteger(runeName)
     }
 
     private fun resolveEnchantedBookNameFromNBT(): String? {
         val enchantments = getExtraAttributes().getCompoundTag("enchantments")
-        val enchantName = CollectionUtils.getOnlyElement(enchantments.keySet, null)
+        val enchantName = enchantments.keySet.singleOrNull()
         if (enchantName.isNullOrEmpty()) return null
         return enchantName.uppercase() + ";" + enchantments.getInteger(enchantName)
     }
@@ -252,12 +293,13 @@ class ItemResolutionQuery {
 
     private fun resolveBalloonHatName(): String {
         val color = getExtraAttributes().getString("party_hat_color")
-        return "BALLOON_HAT_2024_" + color.uppercase()
+        val balloonHatYear = getExtraAttributes().getInteger("party_hat_year")
+        return "BALLOON_HAT_" + balloonHatYear + "_" + color.uppercase()
     }
 
     private fun resolveAttributeShardName(): String? {
         val attributes = getExtraAttributes().getCompoundTag("attributes")
-        val attributeName = CollectionUtils.getOnlyElement(attributes.keySet, null)
+        val attributeName = attributes.keySet.singleOrNull()
         if (attributeName.isNullOrEmpty()) return null
         return "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getInteger(attributeName)
     }
@@ -272,6 +314,19 @@ class ItemResolutionQuery {
             }
         }
 
+        return null
+    }
+
+    private fun resolveItemInAttributeMenu(displayName: String): String? {
+        attributeShardNamePattern.matchMatcher(displayName) {
+            val name = group("name").removeAllNonLettersAndNumbers()
+            val tier = groupOrNull("tier")?.romanToDecimal() ?: 0
+            if (name == "Advanced Mode") return null
+            if (tier == 0) {
+                return "ATTRIBUTE_SHARD_" + name.uppercase() + ";1"
+            }
+            return "ATTRIBUTE_SHARD_" + name.uppercase() + ";$tier"
+        }
         return null
     }
 
@@ -303,6 +358,9 @@ class ItemResolutionQuery {
         }
         if (guiName.endsWith("Experimentation Table RNG")) {
             return resolveEnchantmentByName(displayName)
+        }
+        if (guiName == "Attribute Menu") {
+            return resolveItemInAttributeMenu(displayName)
         }
         return null
     }

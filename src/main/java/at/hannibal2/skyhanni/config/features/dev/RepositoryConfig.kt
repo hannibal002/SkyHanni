@@ -14,24 +14,24 @@ class RepositoryConfig {
     @ConfigOption(
         name = "Repo Auto Update",
         desc = "Update the repository on every startup.\n" +
-            "§cOnly disable this if you know what you are doing!"
+            "§cOnly disable this if you know what you are doing!",
     )
     @ConfigEditorBoolean
     var repoAutoUpdate: Boolean = true
 
     @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    var updateRepo: Runnable = Runnable { RepoManager::updateRepo }
+    val updateRepo: Runnable = Runnable(RepoManager::updateRepo)
 
     @Expose
     @ConfigOption(name = "Repository Location", desc = "")
     @Accordion
-    var location: RepositoryLocation = RepositoryLocation()
+    val location: RepositoryLocation = RepositoryLocation()
 
     class RepositoryLocation {
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
-        var resetRepoLocation: Runnable = Runnable { RepoUtils.resetRepoLocation() }
+        val resetRepoLocation: Runnable = Runnable { RepoUtils.resetRepoLocation() }
 
         @Expose
         @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: hannibal002")

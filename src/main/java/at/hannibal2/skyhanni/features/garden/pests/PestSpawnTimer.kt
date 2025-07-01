@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager.sendTitle
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -81,7 +81,7 @@ object PestSpawnTimer {
             val tablistCooldownEnd = SimpleTimeMark.now() + (minutes?.minutes ?: 0.seconds) + (seconds?.seconds ?: 0.seconds)
 
             if (shouldSetCooldown(tablistCooldownEnd, seconds)) {
-                // hypixel sometimes rounds down times, we'll assume times are rounded down if seconds are null and add a minute
+                // hypixel sometimes rounds time down, we'll assume times are rounded down if seconds are null and add a minute
                 pestCooldownEndTime = if (seconds == null) {
                     tablistCooldownEnd + 1.minutes
                 } else {
@@ -211,6 +211,7 @@ object PestSpawnTimer {
     }
 
     private fun shouldRender(): Boolean = when {
+        !isEnabled() -> false
         config.onlyWithFarmingTool && config.onlyWithVacuum -> hasFarmingToolInHand() || hasVacuumInHand()
         config.onlyWithFarmingTool -> hasFarmingToolInHand()
         config.onlyWithVacuum -> hasVacuumInHand()
@@ -219,14 +220,14 @@ object PestSpawnTimer {
     }
 
     private fun cooldownExpired() {
-        sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
+        TitleManager.sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown has expired!")
         SoundUtils.playPlingSound()
         hasWarned = true
     }
 
     private fun cooldownReminder() {
-        sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
+        TitleManager.sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown expires in ${pestCooldownEndTime.timeUntil().format()}")
         SoundUtils.playPlingSound()
         hasWarned = true

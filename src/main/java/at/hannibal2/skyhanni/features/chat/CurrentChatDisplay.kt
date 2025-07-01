@@ -76,23 +76,14 @@ object CurrentChatDisplay {
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
         changedChatPattern.matchMatcher(message) {
-            currentChat = ChatType.fromName(group("chat"))
-            privateMessagePlayer = null
-            update()
-            return
+            return updateChat(ChatType.fromName(group("chat")))
         }
         if (allChatPattern.matches(message)) {
-            currentChat = ChatType.ALL
-            privateMessagePlayer = null
-            update()
-            return
+            return updateChat(ChatType.ALL)
         }
         openPrivateMessagePattern.matchMatcher(message) {
             privateMessageEnd = maxPrivateMessageTime.fromNow()
-            currentChat = ChatType.PRIVATE
-            privateMessagePlayer = group("player")
-            update()
-            return
+            return updateChat(ChatType.PRIVATE, group("player"))
         }
     }
 
@@ -131,6 +122,12 @@ object CurrentChatDisplay {
         display = drawDisplay()
     }
 
+    private fun updateChat(currentChat: ChatType, privateMessagePlayer: String? = null) {
+        this.currentChat = currentChat
+        this.privateMessagePlayer = privateMessagePlayer
+        update()
+    }
+
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
@@ -163,7 +160,7 @@ object CurrentChatDisplay {
         val displayName = color?.getChatColor().orEmpty() + (displayName ?: toFormattedName())
 
         companion object {
-            fun fromName(name: String) = entries.find { it.chatName.equals(name, true) }
+            fun fromName(name: String) = entries.find { it.chatName.equals(name, true) } ?: error("unknown chat type '$name'")
         }
     }
 

@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import kotlin.time.Duration.Companion.seconds
@@ -21,6 +21,12 @@ import kotlin.time.Duration.Companion.seconds
 object ChargeBottleNotification {
 
     private val config get() = SkyHanniMod.feature.misc
+
+    private val emptyBottles = setOf(
+        "THUNDER_IN_A_BOTTLE_EMPTY",
+        "STORM_IN_A_BOTTLE_EMPTY",
+        "HURRICANE_IN_A_BOTTLE_EMPTY",
+    ).toInternalNames()
 
     private val bottles = setOf(
         "THUNDER_IN_A_BOTTLE",
@@ -37,6 +43,7 @@ object ChargeBottleNotification {
 
         lastChecked = SimpleTimeMark.now()
         if (!isFishing) return
+        if (emptyBottles.any { InventoryUtils.isItemInInventory(it) }) return
         val bottlesInInventory = bottles.filter { InventoryUtils.isItemInInventory(it) }
             .map { it.itemNameWithoutColor }
         if (bottlesInInventory.isEmpty()) return
@@ -56,5 +63,5 @@ object ChargeBottleNotification {
         event.move(76, "misc.thunderBottleNotification", "misc.chargeBottleNotification")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.chargeBottleNotification
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.chargeBottleNotification
 }

@@ -29,14 +29,6 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Heat: §c1♨
-     */
-    val heatPattern by mainSB.pattern(
-        "heat",
-        "Heat: (?<heat>.*)",
-    )
-
-    /**
      * REGEX-TEST: Copper: §c3,416
      */
     val copperPattern by mainSB.pattern(
@@ -261,15 +253,16 @@ object ScoreboardPattern {
      */
     val lockedPattern by farmingSB.pattern(
         "locked",
-        "\\s*§cLocked",
+        "\\s*§cLocked.*",
     )
 
     /**
      * REGEX-TEST:    §fCleanup§7: §e0.3%
+     * REGEX-TEST:    §fCleanup§7: §b2 §4§lൠ§7 x1
      */
     val cleanUpPattern by farmingSB.pattern(
         "cleanup",
-        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*[\\d,.]*%?",
+        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*.*",
     )
 
     /**
@@ -278,7 +271,7 @@ object ScoreboardPattern {
      */
     val pastingPattern by farmingSB.pattern(
         "pasting",
-        "\\s*§f(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
+        "\\s*(?:§.)*(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
     )
 
     /**
@@ -345,7 +338,7 @@ object ScoreboardPattern {
      */
     val miningEventPattern by miningSB.pattern(
         "miningevent",
-        "Event: §.§L.*",
+        "Event: §.§[lL].*",
     )
 
     /**
@@ -564,7 +557,7 @@ object ScoreboardPattern {
      */
     val flightDurationPattern by miscSB.pattern(
         "flightduration",
-        "^\\s*Flight Duration: §a(?::?\\d{1,3})*$",
+        "\\s*Flight Duration: §a(?::?\\d{1,3})*",
     )
 
     /**
@@ -706,7 +699,7 @@ object ScoreboardPattern {
      */
     val newYearPattern by eventsSB.pattern(
         "newyear",
-        "§dNew Year Event!§f \\d*?:?\\d+",
+        "§dNew Year Event!§f \\d*:?\\d+",
     )
 
     /**
@@ -714,7 +707,7 @@ object ScoreboardPattern {
      */
     val spookyPattern by eventsSB.pattern(
         "spooky",
-        "§6Spooky Festival§f \\d*?:?\\d+",
+        "§6Spooky Festival§f \\d*:?\\d+",
     )
 
     /**
@@ -774,7 +767,7 @@ object ScoreboardPattern {
      */
     val riftDimensionPattern by riftSB.pattern(
         "dimension",
-        "\\s*§fRift Dimension",
+        "\\s*(?:§f)?Rift Dimension",
     )
     val riftHotdogTitlePattern by riftSB.pattern(
         "hotdogtitle",
@@ -915,8 +908,37 @@ object ScoreboardPattern {
         "(?:§f)?Kills: §.\\d+",
     )
 
+    // Galatea
+    private val galateaSB = scoreboardGroup.group("galatea")
+
     /**
-     * Somtimes when the scoreboard updates, it only updates half way,
+     * REGEX-TEST: Whispers: §3141§b (+1)
+     * REGEX-TEST: Whispers: §317.5k§b (+50)
+     */
+    val whispersPattern by galateaSB.pattern(
+        "whispers",
+        "Whispers: §3[\\w,.]+.*"
+    )
+
+    /**
+     * REGEX-TEST:     §aHOTF§f: §a28k§3.7k§b (+35)
+     * REGEX-TEST:     §aHOTF§f: §a28k§9 (+29 Exp)
+     */
+    val hotfPattern by galateaSB.pattern(
+        "hotf",
+        "\\s*§aHOTF§f: §a[\\w,.]+.*",
+    )
+
+    /**
+     * REGEX-TEST: §eAgatha's Contest §a5m28s
+     */
+    val agathasContestPattern by galateaSB.pattern(
+        "agathas-contest",
+        "§eAgatha's Contest §a.*",
+    )
+
+    /**
+     * Sometimes when the scoreboard updates, it only updates half way,
      * causing some lines to become mixed with other lines -> broken.
      * This should already get handled fine but sometimes these errors still occur with some lines way too often.
      * This pattern is to catch those lines.
@@ -932,7 +954,7 @@ object ScoreboardPattern {
     val brokenPatterns by group.list(
         "broken",
         "\\s*§.§l⚡ §cRedston",
-        "\\s*§ce: §e§b0%",
+        "\\s*§ce: §e§b\\d+%",
         "\\s*Starting in: §a0 §c[\\d:]+",
         "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*",
     )

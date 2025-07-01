@@ -4,24 +4,22 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
@@ -122,13 +120,6 @@ object ComposterDisplay {
             }
         }
 
-        for (type in DataType.entries) {
-            if (!newData.containsKey(type)) {
-                tabListData = emptyMap()
-                return
-            }
-        }
-
         tabListData = newData
     }
 
@@ -142,7 +133,7 @@ object ComposterDisplay {
             if (config.notifyLow.title) {
                 TitleManager.sendTitle("§cYour Organic Matter is low", duration = 4.seconds)
             }
-            ChatUtils.chat("§cYour Organic Matter is low!")
+            ChatUtils.chat("§cYour Organic Matter is low!", replaceSameMessage = true)
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
         }
 
@@ -150,7 +141,7 @@ object ComposterDisplay {
             if (config.notifyLow.title) {
                 TitleManager.sendTitle("§cYour Fuel is low", duration = 4.seconds)
             }
-            ChatUtils.chat("§cYour Fuel is low!")
+            ChatUtils.chat("§cYour Fuel is low!", replaceSameMessage = true)
             storage.informedAboutLowFuel = 5.0.minutes.fromNow()
         }
     }
@@ -158,19 +149,16 @@ object ComposterDisplay {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
+        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenApi.inGarden() && config.displayEnabled) {
             config.displayPos.renderRenderable(display, posLabel = "Composter Display")
         }
+
+        checkWarningsAndOutsideGarden()
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!event.repeatSeconds(5)) return
-        @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
-
+    private fun checkWarningsAndOutsideGarden() {
         val format = GardenApi.storage?.let {
             if (!it.composterEmptyTime.isFarPast()) {
                 val duration = it.composterEmptyTime.timeUntil()
@@ -186,8 +174,8 @@ object ComposterDisplay {
             } else "?"
         } ?: "§cJoin SkyBlock to show composter timer."
 
-        val inSB = LorenzUtils.inSkyBlock && config.displayOutsideGarden
-        val outsideSB = !LorenzUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
+        val inSB = SkyBlockUtils.inSkyBlock && config.displayOutsideGarden
+        val outsideSB = !SkyBlockUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
         if (!GardenApi.inGarden() && (inSB || outsideSB)) {
             val outsideGardenDisplay = Renderable.line {
                 addItemStack(bucket)
@@ -202,10 +190,11 @@ object ComposterDisplay {
         val storage = GardenApi.storage ?: return
 
         if (ReminderUtils.isBusy()) return
+
         if (storage.lastComposterEmptyWarningTime.passedSince() < 2.0.minutes) return
         storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
-        if (IslandType.GARDEN.isInIsland()) {
-            ChatUtils.chat(warningMessage)
+        if (IslandType.GARDEN.isCurrent()) {
+            ChatUtils.chat(warningMessage, replaceSameMessage = true)
         } else {
             ChatUtils.clickToActionOrDisable(
                 warningMessage,
