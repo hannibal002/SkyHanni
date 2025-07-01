@@ -58,10 +58,6 @@ object GuiEditManager {
             if (it is GuiEditSign && !it.isGardenSign()) return
         }
 
-        //#if MC > 1.21
-        //$$ if (REIRuntime.getInstance().searchTextField?.isFocused == true) return
-        //#endif
-
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
         if (NeuItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
