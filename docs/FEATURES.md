@@ -273,6 +273,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to highlight Current Pet in menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
 + Added Fann Leveling Cost. - minhperry + Daveed (https://github.com/hannibal002/SkyHanni/pull/4061)
     + Coins per XP and XP per Bit.
++ Added Disabled Attributes Highlighter. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4193)
+    + Highlight disabled attributes in /attributemenu.
 
 </details>
 <details open><summary>
@@ -1034,6 +1036,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Hideonleaf Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4172)
 + Added Phantoms Muter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4174)
     + Mutes Phantoms in Galatea.
++ Added Clean Tree View. - nopo (https://github.com/hannibal002/SkyHanni/pull/4200)
+    + Floating blocks hidden when mining trees.
++ Added Hide Lottery Messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4226)
+    + Lottery messages from HOTF hidden outside Foraging Islands.
++ Added Tree Progress Display HUD. - nopo (https://github.com/hannibal002/SkyHanni/pull/4191)
 
 </details>
 <details open><summary>
