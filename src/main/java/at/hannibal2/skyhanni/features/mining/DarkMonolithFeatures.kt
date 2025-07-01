@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
 import at.hannibal2.skyhanni.utils.LocationUtils.minBox
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -148,18 +147,19 @@ object DarkMonolithFeatures {
         }
     }
 
+    private fun canSeeFaces(vec: LorenzVec): Boolean {
+        val aabb = vec.floor().boundingToOffset(1.0, 1.0, 1.0)
+        return LocationUtils.canSeeAnyFace(
+            min = aabb.minBox(),
+            max = aabb.maxBox(),
+            stepCount = 4,
+            ignoreFaces = listOf(EnumFacing.DOWN).toTypedArray(),
+        )
+    }
+
     private fun updateKnownEggs() {
         if (nextBlockCheck.isInFuture()) return
-        foundEggVec = knownEggs.firstOrNull { blockVec ->
-            val base = blockVec.floor()
-            val aabb = base.boundingToOffset(1.0, 1.0, 1.0)
-            LocationUtils.canSeeAnyFace(
-                min = aabb.minBox(),
-                max = aabb.maxBox(),
-                stepCount = 4,
-                ignoreFaces = listOf(EnumFacing.DOWN).toTypedArray(),
-            )
-        }.also {
+        foundEggVec = knownEggs.firstOrNull(::canSeeFaces).also {
             checkTitle()
             lastFoundEggVec = it
             nextBlockCheck = SimpleTimeMark.now().plus(500.milliseconds)
@@ -188,10 +188,23 @@ object DarkMonolithFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        event.tryHighlight()
+        event.tryBeacon()
+    }
+
+    private fun SkyHanniRenderWorldEvent.tryBeacon() {
+        if (!config.beacon.enabled) return
+        val foundVec = foundEggVec ?: return
+        with(WorldRenderUtils) {
+            renderBeaconBeam(foundVec, config.beacon.color.toColor())
+        }
+    }
+
+    private fun SkyHanniRenderWorldEvent.tryHighlight() {
         if (!config.highlight.enabled) return
         val axis = renderBox ?: return
         with(WorldRenderUtils) {
-            event.drawFilledBoundingBox(axis, config.highlight.color.toColor())
+            drawFilledBoundingBox(axis, config.highlight.color.toColor())
         }
     }
 
@@ -200,7 +213,7 @@ object DarkMonolithFeatures {
         event.title("Dark Monolith")
         event.addIrrelevant {
             add("knownEggs: ${knownEggs.size}")
-            add("knownEggs can be seen: ${knownEggs.count { it.canBeSeen() }}")
+            add("knownEggs can be seen: ${knownEggs.count(::canSeeFaces)}")
             add("foundEggVec: $foundEggVec")
             add("lastFoundEggVec: $lastFoundEggVec")
             add("renderBox: $renderBox")

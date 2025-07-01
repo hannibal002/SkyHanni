@@ -25,6 +25,23 @@ class DarkMonolithConfig {
     val trackerPosition: Position = Position(100, 100)
 
     @Expose
+    @ConfigOption(name = "Beacon", desc = "")
+    @Accordion
+    val beacon: BeaconConfig = BeaconConfig()
+
+    class BeaconConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show a beacon at the location of the Dark Monolith.")
+        @ConfigEditorBoolean
+        var enabled: Boolean = false
+
+        @Expose
+        @ConfigOption(name = "Beacon Color", desc = "What color to show the beacon.\n§cCustom alpha values won't work§7.")
+        @ConfigEditorColour
+        var color: ChromaColour = ChromaColour.fromStaticRGB(155, 29, 194, 255)
+    }
+
+    @Expose
     @ConfigOption(name = "Highlight", desc = "")
     @Accordion
     val highlight: HighlightConfig = HighlightConfig()

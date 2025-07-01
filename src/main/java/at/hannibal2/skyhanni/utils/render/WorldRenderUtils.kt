@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -41,6 +42,10 @@ object WorldRenderUtils {
      */
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
+    }
+
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, color: Color) {
+        this.renderBeaconBeam(vec.x, vec.y, vec.z, color.rgb)
     }
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(
