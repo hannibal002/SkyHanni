@@ -28,12 +28,12 @@ public class MixinRenderManager {
     //#if MC > 1.21
     //$$ @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"))
     //$$ private void onRenderStart(Entity entity, double x, double y, double z, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-    //$$     HideArmor.INSTANCE.set(entity);
+    //$$     HideArmor.setCurrentEntity(entity);
     //$$ }
     //$$
     //$$ @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("RETURN"))
     //$$ private void onRenderEnd(Entity entity, double x, double y, double z, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-    //$$     HideArmor.INSTANCE.clear();
+    //$$     HideArmor.clearCurrentEntity();
     //$$ }
     //#endif
 }
