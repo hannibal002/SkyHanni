@@ -27,9 +27,6 @@ import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21
-//$$ import me.shedaniel.rei.api.client.REIRuntime
-//#endif
 
 @SkyHanniModule
 object GuiEditManager {
