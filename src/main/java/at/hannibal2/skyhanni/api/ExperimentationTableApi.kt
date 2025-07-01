@@ -15,10 +15,12 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -41,6 +43,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -225,15 +228,14 @@ object ExperimentationTableApi {
     val inUltrasequencer get() = currentExperimentType == TaskType.ULTRASEQUENCER
     val inAddon get() = inChronomatron || inUltrasequencer
 
-    fun inSuperpairs() = inTable && isActive && currentExperimentType == ExperimentationTaskType.SUPERPAIRS
+    val inSuperpairs get() = inTable && isActive && currentExperimentType == ExperimentationTaskType.SUPERPAIRS
 
     private var lastExpOverHash: Int = 0
     private var currentExpOverHash: Int = 0
     private var queuedCompleteEvent: TableTaskCompletedEvent? = null
     private var handleBottlesOnInvClose: Boolean = false
-    private var lastBottlesInInventory: Map<NeuInternalName, Int> = getBottlesInOwnInventory()
     private var currentBottlesInInventory: Map<NeuInternalName, Int> = mapOf()
-    var miscRewards: List<NeuInternalName> = emptyList()
+    var miscRepoRewards: List<NeuInternalName> = emptyList()
         private set
 
     enum class ExperimentationMessages(private val displayName: String) {
@@ -247,17 +249,15 @@ object ExperimentationTableApi {
         override fun toString() = displayName
     }
 
-    enum class ExperimentationTaskType(private val displayName: String) {
-        CHRONOMATRON("Chronomatron"),
-        ULTRASEQUENCER("Ultrasequencer"),
-        SUPERPAIRS("Superpairs"),
+    enum class ExperimentationTaskType {
+        CHRONOMATRON,
+        ULTRASEQUENCER,
+        SUPERPAIRS,
         ;
-
-        override fun toString() = displayName
 
         companion object {
             fun fromStringOrNull(string: String) = entries.firstOrNull {
-                it.displayName.equals(string, ignoreCase = true) || it.name.equals(string, ignoreCase = true)
+                it.name.equals(string, ignoreCase = true)
             }
         }
     }
@@ -306,7 +306,8 @@ object ExperimentationTableApi {
         override fun reset() {
             super.reset()
             // todo at some point make resettable storage set deal with this stuff
-            // ResettableStorageSet doesn't deal with nulls or clearing mutables
+            //  ResettableStorageSet doesn't deal with nulls or clearing mutables
+            //  It does (^ that) after #4244 gets merged, so I'll do that eventually -David
             otherRewards.clear()
             type = null
             tier = null
@@ -336,7 +337,7 @@ object ExperimentationTableApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards
+        miscRepoRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -346,9 +347,9 @@ object ExperimentationTableApi {
             currentExpOverHash = 0
         }
         if (handleBottlesOnInvClose) DelayedRun.runDelayed(100.milliseconds) {
-            handleExpBottles(true)
+            handleXpBottlesGained()
             handleBottlesOnInvClose = false
-        }
+        } else refreshBottlesInInventory()
         DelayedRun.runDelayed(150.milliseconds) {
             // Catch early closes triggering the event before the inventory is fully opened
             if (expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return@runDelayed
@@ -359,9 +360,15 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onWorldChange() {
-        lastBottlesInInventory = getBottlesInOwnInventory()
+    @HandleEvent(
+        onlyOnIsland = IslandType.PRIVATE_ISLAND,
+        eventTypes = [WorldChangeEvent::class, ItemAddInInventoryEvent::class],
+    )
+    fun refreshBottlesInInventory() {
+        currentBottlesInInventory = getBottlesInOwnInventory().takeIf {
+            it != currentBottlesInInventory
+        } ?: return
+        ChatUtils.debug("Updated bottles in inventory: $currentBottlesInInventory")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -381,7 +388,7 @@ object ExperimentationTableApi {
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentationMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
             experienceBottleChatPattern.matches(reward) && ExperimentationMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-            rewardInternalName in miscRewards && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
+            rewardInternalName in miscRepoRewards && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
             ExperimentationMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
             else -> ""
         }
@@ -396,24 +403,33 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun handleExpBottles(addToLoot: Boolean = false, fireUsageEvent: Boolean = false) {
-        lastBottlesInInventory = currentBottlesInInventory
-        currentBottlesInInventory = getBottlesInOwnInventory()
-        for ((internalName, currentInInv) in currentBottlesInInventory) {
-            val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0).takeIf {
-                it != currentInInv
-            } ?: continue
+    private fun handleXpBottlesUsed() {
+        val applicableDeltas = getXpBottleDelta().filter { it.value < 0 }.takeIfNotEmpty() ?: return
+        if (!inDistanceToTable(15.0)) return
+        applicableDeltas.forEach { (bottleInternalName, delta) ->
+            val absDelta = abs(delta)
+            TableXPBottleUsedEvent(bottleInternalName, abs(absDelta)).post()
+        }
+    }
 
-            val absChange = currentInInv - lastInInv
-            if (absChange < 0 && inDistanceToTable(10.0) && fireUsageEvent) {
-                TableXPBottleUsedEvent(internalName, abs(absChange)).post()
-            } else if (addToLoot) currentExperimentData.addReward(internalName, absChange)
+    private fun handleXpBottlesGained() {
+        val applicableDeltas = getXpBottleDelta().filter { it.value > 0 }.takeIfNotEmpty() ?: return
+        applicableDeltas.forEach { (bottleInternalName, delta) ->
+            currentExperimentData.addReward(bottleInternalName, delta)
+        }
+    }
+
+    private fun getXpBottleDelta(): Map<NeuInternalName, Int> {
+        val lastBottlesInInventory = currentBottlesInInventory
+        currentBottlesInInventory = getBottlesInOwnInventory()
+        return currentBottlesInInventory.subtract(lastBottlesInInventory) {
+            it.toInt()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onClick(event: WorldClickEvent) {
-        if (!inDistanceToTable(10.0)) return
+        if (!inDistanceToTable(15.0)) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
         event.itemInHand?.getInternalNameOrNull()?.takeIf {
@@ -421,7 +437,7 @@ object ExperimentationTableApi {
         } ?: return
 
         DelayedRun.runDelayed(200.milliseconds) {
-            handleExpBottles(false, fireUsageEvent = true)
+            handleXpBottlesUsed()
         }
     }
 
@@ -430,7 +446,7 @@ object ExperimentationTableApi {
         if (!inTable) return
         event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
-        handleExpBottles(false)
+        refreshBottlesInInventory()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -515,10 +531,8 @@ object ExperimentationTableApi {
             return
         }
 
-        val internalName = NeuInternalName.fromItemNameOrNull(this) ?: run {
-            ChatUtils.debug("Could not read item name from $this")
-            return
-        }
+        val internalName = NeuInternalName.fromItemNameOrNull(this)
+            ?: return ChatUtils.debug("Could not read item name from $this")
         currentExperimentData.addReward(internalName, 1)
     }
 

@@ -62,6 +62,12 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Tree Progress Display", desc = "")
+    @OnlyModern
+    @Accordion
+    val treeProgress = TreeProgressConfig()
+
+    @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
     @ConfigEditorBoolean
     @FeatureToggle

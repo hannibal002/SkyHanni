@@ -64,5 +64,5 @@ object UltraRareBookAlert {
         event.move(88, "$pathBase.ultraRareBookAlert", "$pathBase.superpairs.ultraRareBookAlert")
     }
 
-    private fun isEnabled() = config.superpairs.ultraRareBookAlert && ExperimentationTableApi.inSuperpairs()
+    private fun isEnabled() = config.superpairs.ultraRareBookAlert && ExperimentationTableApi.inSuperpairs
 }
