@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -32,6 +33,15 @@ class ForagingTrackerConfig {
     @ConfigEditorBoolean
     @OnlyModern
     var onlyHoldingAxe: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Disappearing Delay",
+        desc = "The delay in seconds before the tracker disappears after you stop holding an axe."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
+    @OnlyModern
+    var disappearingDelay: Int = 15
 
     @Expose
     @ConfigOption(name = "Show Whole Trees", desc = "Estimate how many full trees you have chopped down, using percentage summing.")

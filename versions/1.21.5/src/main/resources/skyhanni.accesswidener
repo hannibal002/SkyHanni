@@ -20,6 +20,7 @@ accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPa
 accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractHandler hand Lnet/minecraft/util/Hand;
 accessible field net/minecraft/world/World blockEntityTickers Ljava/util/List;
 accessible class net/minecraft/client/font/TextRenderer$Drawer
+accessible method net/minecraft/client/gui/hud/ChatHud refresh ()V
 accessible field net/minecraft/client/render/RenderLayer$MultiPhase phases Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
 accessible field net/minecraft/client/render/RenderLayer$MultiPhaseParameters target Lnet/minecraft/client/render/RenderPhase$Target;
 accessible method net/minecraft/client/render/RenderLayer$MultiPhase <init> (Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)V
