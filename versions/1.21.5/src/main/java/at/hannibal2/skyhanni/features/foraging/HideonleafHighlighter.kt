@@ -27,6 +27,6 @@ object HideonleafHighlighter {
 
     @HandleEvent
     fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(90, "foraging.hideonleafHighlight", "foraging.mobHighlight.hideonleafHighlight")
+        event.move(91, "foraging.hideonleafHighlight", "foraging.mobHighlight.hideonleafHighlight")
     }
 }
