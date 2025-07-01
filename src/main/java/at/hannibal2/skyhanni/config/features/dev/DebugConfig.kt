@@ -193,6 +193,11 @@ class DebugConfig {
     val forceGreatSpook: Property<Boolean> = Property.of(false)
 
     @Expose
+    @ConfigOption(name = "Moonglade Beacon", desc = "Add more debug information to the beacon solver.")
+    @ConfigEditorBoolean
+    var moongladeBeacon: Boolean = false
+
+    @Expose
     @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
     @ConfigEditorBoolean
     var dvdLogo: Boolean = false
