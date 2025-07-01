@@ -198,9 +198,9 @@ object MiningApi {
     fun inRegularDwarven() = IslandType.DWARVEN_MINES.isCurrent() && !inGlacialTunnels()
 
     fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isCurrent()
-    
+
     fun inMinesOfDivan() = inCrystalHollows() && minesOfDivanPattern.matches(HypixelData.skyBlockArea)
-    
+
     fun inMineshaft() = IslandType.MINESHAFT.isCurrent()
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
