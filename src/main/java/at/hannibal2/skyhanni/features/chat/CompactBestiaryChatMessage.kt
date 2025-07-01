@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
+import at.hannibal2.skyhanni.utils.compat.value
 
 @SkyHanniModule
 object CompactBestiaryChatMessage {
@@ -13,7 +14,7 @@ object CompactBestiaryChatMessage {
     private var inBestiary = false
     private val bestiaryDescription = mutableListOf<String>()
     private var acceptMoreDescription = true
-    var command = ""
+    private var command = ""
     private var blockedLines = 0
 
     private var milestoneMessage: String? = null
@@ -37,7 +38,7 @@ object CompactBestiaryChatMessage {
 
             for (sibling in event.chatComponent.siblings) {
                 sibling.chatStyle?.chatClickEvent?.let {
-                    command = it.value
+                    command = it.value()
                 }
             }
             inBestiary = true

@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
@@ -83,7 +85,7 @@ object CroesusChestTracker {
                 val state = run.openState ?: OpenedState.UNOPENED
 
                 if (state != OpenedState.KEY_USED) {
-                    slot highlight if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
+                    slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
                 }
             }
         }
@@ -146,7 +148,7 @@ object CroesusChestTracker {
                     "Croesus Chest couldn't be read correctly.",
                     "Open state check failed for chest.",
                     "run" to run,
-                    "lore" to lore
+                    "lore" to lore,
                 ).run { null }
             }
         }
@@ -258,10 +260,19 @@ object CroesusChestTracker {
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }
 
-    fun resetChest() = croesusChests?.let {
-        it.clear()
-        it.addAll(generateMaxChest())
-        ChatUtils.chat("Kismet State was Reset!")
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetkismet") {
+            description = "Resets the saved values of the applied kismet feathers in Croesus"
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                croesusChests?.let {
+                    it.clear()
+                    it.addAll(generateMaxChest())
+                    ChatUtils.chat("Kismet State was Reset!")
+                }
+            }
+        }
     }
 
     @JvmStatic

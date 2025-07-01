@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.blockBreakStreak
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getSpeedBonus
@@ -56,7 +55,7 @@ object FlowstateHelper {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!MiningApi.inCustomMiningIsland()) return
 
         attemptClearDisplay()

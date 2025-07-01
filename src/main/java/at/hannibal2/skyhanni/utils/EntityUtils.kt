@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -7,15 +9,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -27,6 +29,13 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+//#if MC > 1.21
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.player.PlayerInventory
+//$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+//#else
+import net.minecraft.entity.SharedMonsterAttributes
+//#endif
 
 @SkyHanniModule
 object EntityUtils {
@@ -42,7 +51,7 @@ object EntityUtils {
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers().orEmpty()) {
+        for (entity in MinecraftCompat.localWorldOrNull?.getLoadedPlayers().orEmpty()) {
             if (!entity.isNpc() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
@@ -79,12 +88,12 @@ object EntityUtils {
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
-                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
             if (debugRightEntity && result) {
-                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
+                ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))
+                ChatUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+                ChatUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
             }
             result
         }
@@ -95,8 +104,12 @@ object EntityUtils {
         val b = center.add(radius, radius + 3, radius)
         val alignedBB = a.axisAlignedTo(b)
         val clazz = EntityArmorStand::class.java
-        val worldObj = Minecraft.getMinecraft().theWorld ?: return emptyList()
-        return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
+        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
+        //#if MC < 1.21
+        return world.getEntitiesWithinAABB(clazz, alignedBB)
+        //#else
+        //$$ return world.getEntitiesByClass(clazz, alignedBB, net.minecraft.predicate.entity.EntityPredicates.EXCEPT_SPECTATOR)
+        //#endif
     }
 
     @Deprecated("Old. Instead use entity detection feature instead.")
@@ -104,7 +117,7 @@ object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
+        val derpyMultiplier = if (ElectionApi.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
         if (!boss && !DungeonApi.inDungeon()) {
@@ -150,8 +163,19 @@ object EntityUtils {
 
     fun EntityPlayer.isNpc() = !isRealPlayer()
 
+    //#if MC < 1.21
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
+    //#else
+    //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    //$$     if (this !is PlayerEntity) return null
+    //$$     val list = mutableListOf<ItemStack?>()
+    //$$     for (equipmentSlot in PlayerInventory.EQUIPMENT_SLOTS.values) {
+    //$$         list.add(inventory.equipment.get(equipmentSlot).orNull())
+    //$$     }
+    //$$     return list.normalizeAsArray()
+    //$$ }
+    //#endif
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
@@ -164,24 +188,48 @@ object EntityUtils {
     //$$ entitiesForRendering()
     //#endif
 
-    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
+    fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.getAllEntities()?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it
         // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
         //  but *does* make crashes because of it rarer.
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
-    fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft().theWorld?.loadedTileEntityList?.let {
+    //#if MC < 1.21
+    fun getAllTileEntities(): Sequence<TileEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
+    //#else
+    //$$ fun getAllTileEntities(): Sequence<BlockEntity> {
+    //$$     if (!MinecraftCompat.localWorldExists) return emptySequence()
+    //$$     val blockEntityTickers = MinecraftCompat.localWorld.blockEntityTickers.let {
+    //$$         if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
+    //$$     }.asSequence().filterNotNull()
+    //$$
+    //$$     return blockEntityTickers.map { MinecraftCompat.localWorld.getBlockEntity(it.pos) }.filterNotNull()
+    //$$ }
+    //#endif
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
+    fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
+        if (isDead) return false
+        // TODO add cache that only updates e.g. 10 times a second
+        if (!FrustumUtils.isVisible(entityBoundingBox)) return false
+        return getLorenzVec().up(vecYOffset).canBeSeen(viewDistance)
+    }
 
-    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.getEntityLevel()?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int): Entity? = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
     fun Entity.cleanName() = this.name.removeColor()
+
+    // TODO use derpy() on every use case
+    val EntityLivingBase.baseMaxHealth: Int
+        //#if MC < 1.21
+        get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
+    //#else
+    //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
+    //#endif
 }

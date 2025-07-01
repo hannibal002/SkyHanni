@@ -11,23 +11,23 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -41,7 +41,7 @@ object CorpseTracker {
         { drawDisplay(it) },
     )
 
-    class BucketData : BucketedItemTrackerData<CorpseType>() {
+    class BucketData : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
         override fun resetItems() {
             corpsesLooted = enumMapOf()
         }
@@ -53,7 +53,7 @@ object CorpseTracker {
                 } ?: corpsesLooted.sumAllValues().toInt(),
             )
             val percentage = timesGained.toDouble() / divisor
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
@@ -75,8 +75,9 @@ object CorpseTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
-        with(tracker) { event.addItemFromEvent() }
+        if (isEnabled() && event.source == ItemAddManager.Source.COMMAND) {
+            with(tracker) { event.addItemFromEvent() }
+        }
     }
 
     @HandleEvent
@@ -85,9 +86,7 @@ object CorpseTracker {
         for ((itemName, amount) in event.loot) {
             if (itemName.removeColor().trim() == "Glacite Powder") continue
             NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
-                tracker.modify {
-                    it.addItem(event.corpseType, item, amount)
-                }
+                tracker.addItem(event.corpseType, item, amount, command = false, message = false)
             }
         }
     }
@@ -109,7 +108,7 @@ object CorpseTracker {
             applicableKeys.forEach { keyData ->
                 keyData.key?.let { key ->
                     val keyName = key.repoItemName
-                    val price = key.getPrice()
+                    val price = SkyHanniTracker.getPricePer(key)
                     val count = bucketData.corpsesLooted[keyData] ?: 0
                     val totalPrice = price * count
                     if (totalPrice > 0) {
@@ -159,9 +158,9 @@ object CorpseTracker {
         }
     }
 
-    fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && (
-            IslandType.MINESHAFT.isInIsland() ||
+    private fun isEnabled() =
+        SkyBlockUtils.inSkyBlock && config.enabled && (
+            IslandType.MINESHAFT.isCurrent() ||
                 (!config.onlyInMineshaft && MiningApi.inGlacialTunnels())
             )
 }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
+import at.hannibal2.skyhanni.utils.compat.DrawContext;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
@@ -13,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GuiContainer.class)
+// Changed priority to fix compatibity issues with e.g. Skytils' Middle click GUI Items feature
+@Mixin(value = GuiContainer.class, priority = 499)
 public abstract class MixinGuiContainer extends GuiScreen {
 
     @Unique
@@ -36,22 +38,22 @@ public abstract class MixinGuiContainer extends GuiScreen {
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
     private void backgroundDrawn(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.backgroundDrawn(mouseX, mouseY, partialTicks);
+        skyHanni$hook.backgroundDrawn(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     private void preDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.preDraw(mouseX, mouseY, partialTicks, ci);
+        skyHanni$hook.preDraw(new DrawContext(), mouseX, mouseY, partialTicks, ci);
     }
 
     @Inject(method = "drawScreen", at = @At("TAIL"))
     private void postDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.postDraw(mouseX, mouseY, partialTicks);
+        skyHanni$hook.postDraw(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/inventory/GuiContainer;drawGuiContainerForegroundLayer(II)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.foregroundDrawn(mouseX, mouseY, partialTicks);
+        skyHanni$hook.foregroundDrawn(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
@@ -64,8 +66,9 @@ public abstract class MixinGuiContainer extends GuiScreen {
         skyHanni$hook.onDrawSlotPost(slot);
     }
 
-    @Inject(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    @Inject(method = "handleMouseClick", at = @At(value = "HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
+        if (slot == null) return;
         skyHanni$hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
     }
 
@@ -78,7 +81,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
         )
     )
     public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.onDrawScreenAfter(mouseX, mouseY, ci);
+        skyHanni$hook.onDrawScreenAfter(new DrawContext(), mouseX, mouseY, ci);
         ToolTipData.INSTANCE.setLastSlot(this.theSlot);
     }
 }

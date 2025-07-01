@@ -8,8 +8,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -45,7 +44,7 @@ object LavaReplacement {
     }
 
     private fun shouldReplace(): Boolean {
-        if (!LorenzUtils.inSkyBlock || !config.enabled.get()) return false
+        if (!SkyBlockUtils.inSkyBlock || !config.enabled.get()) return false
         if (config.everywhere.get()) return true
         return config.islands.get().any(IslandsToReplace::inIsland)
     }
@@ -58,7 +57,7 @@ object LavaReplacement {
 
         override fun toString() = displayName
 
-        fun inIsland() = island.isInIsland()
+        fun inIsland() = island.isCurrent()
     }
 
     @HandleEvent

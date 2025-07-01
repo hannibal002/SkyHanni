@@ -113,10 +113,10 @@ public abstract class ExtendedColorPatch {
             textColor = skyhanni$colorSR;
             int shadowDivisor = shadow ? 4 : 1;
             setColor(
-                (skyhanni$colorSR >> 16 & 0xFF) / 255.0f / shadowDivisor,
-                (skyhanni$colorSR >> 8 & 0xFF) / 255.0f / shadowDivisor,
-                (skyhanni$colorSR & 0xFF) / 255.0f / shadowDivisor,
-                (skyhanni$colorState == 8 ? (skyhanni$colorSR >> 24 & 0xFF) / 255.0f : this.alpha)
+                (skyhanni$colorSR >> 16 & 0xFF) / 255f / shadowDivisor,
+                (skyhanni$colorSR >> 8 & 0xFF) / 255f / shadowDivisor,
+                (skyhanni$colorSR & 0xFF) / 255f / shadowDivisor,
+                (skyhanni$colorState == 8 ? (skyhanni$colorSR >> 24 & 0xFF) / 255f : this.alpha)
             );
             skyhanni$colorState = -1;
         } else if (0 <= hexCode && skyhanni$colorState != -1) {

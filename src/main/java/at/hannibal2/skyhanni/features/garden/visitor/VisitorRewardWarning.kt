@@ -44,10 +44,10 @@ object VisitorRewardWarning {
 
     private fun renderColor(backgroundSlot: Slot?, outlineSlot: Slot?, outlineColor: LorenzColor) {
         if (!config.bypassKey.isKeyHeld() && backgroundSlot != null) {
-            backgroundSlot highlight LorenzColor.DARK_GRAY.addOpacity(config.opacity)
+            backgroundSlot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
         }
         if (config.optionOutline && outlineSlot != null) {
-            outlineSlot drawBorder outlineColor.addOpacity(200)
+            outlineSlot.drawBorder(outlineColor.addOpacity(200))
         }
     }
 

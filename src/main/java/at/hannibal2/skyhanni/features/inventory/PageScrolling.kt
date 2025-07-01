@@ -8,12 +8,11 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
@@ -78,7 +77,7 @@ object PageScrolling {
         val slot = InventoryUtils.getItemsInOpenChest().firstOrNull {
             patterns.matches(it.stack?.displayName)
         } ?: return
-        clickInventorySlot(slot.slotNumber)
+        InventoryUtils.clickSlot(slot.slotNumber)
 
         currentlyScrollable = false
         cooldown = 1.0.seconds.fromNow()
@@ -90,5 +89,5 @@ object PageScrolling {
         currentlyScrollable = true
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enable && InventoryUtils.inInventory()
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable && InventoryUtils.inInventory()
 }

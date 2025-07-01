@@ -28,7 +28,7 @@ object HighlightOnHoverSlot {
         val list = currentSlots.flatMapTo(mutableSetOf()) { it.value }
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotNumber in list) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }

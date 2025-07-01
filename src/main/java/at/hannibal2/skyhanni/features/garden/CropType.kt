@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
@@ -14,49 +14,53 @@ enum class CropType(
     val baseDrops: Double,
     iconSupplier: () -> ItemStack,
     val simpleName: String,
-    val farmingItem: FarmingItems,
+    val farmingItem: FarmingItemType,
     val replenish: Boolean = false,
+    val enchantName: String = cropName.lowercase()
 ) {
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
-        { ItemStack(Items.wheat) }, "wheat", FarmingItems.WHEAT
+        { ItemStack(Items.wheat) }, "wheat", FarmingItemType.WHEAT
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
-        { ItemStack(Items.carrot) }, "carrot", FarmingItems.CARROT, replenish = true
+        { ItemStack(Items.carrot) }, "carrot", FarmingItemType.CARROT, replenish = true
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
-        { ItemStack(Items.potato) }, "potato", FarmingItems.POTATO, replenish = true
+        { ItemStack(Items.potato) }, "potato", FarmingItemType.POTATO, replenish = true
     ),
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
-        { ItemStack(Items.nether_wart) }, "wart", FarmingItems.NETHER_WART, replenish = true
+        { ItemStack(Items.nether_wart) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
+        enchantName = "warts"
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
-        { ItemStack(Blocks.pumpkin) }, "pumpkin", FarmingItems.PUMPKIN
+        { ItemStack(Blocks.pumpkin) }, "pumpkin", FarmingItemType.PUMPKIN
     ),
     MELON(
         "Melon", "MELON_DICER", "SQUASH", 5.0,
-        { ItemStack(Items.melon) }, "melon", FarmingItems.MELON
+        { ItemStack(Items.melon) }, "melon", FarmingItemType.MELON
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
-        { DyeCompat.BROWN.createStack() }, "cocoa", FarmingItems.COCOA_BEANS, replenish = true
+        { DyeCompat.BROWN.createStack() }, "cocoa",
+        FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco"
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.reeds) }, "cane", FarmingItems.SUGAR_CANE
+        { ItemStack(Items.reeds) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane"
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
-        { ItemStack(Blocks.cactus) }, "cactus", FarmingItems.CACTUS
+        { ItemStack(Blocks.cactus) }, "cactus", FarmingItemType.CACTUS
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
-        { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItems.MUSHROOM
+        { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItemType.MUSHROOM,
+        enchantName = "mushrooms"
     ),
     ;
 
@@ -76,7 +80,8 @@ enum class CropType(
             if (itemName == "Seeds") return WHEAT
             return entries.firstOrNull {
                 it.cropName.equals(itemName, ignoreCase = true) ||
-                    it.simpleName.equals(itemName, ignoreCase = true)
+                    it.simpleName.equals(itemName, ignoreCase = true) ||
+                    it.enchantName.equals(itemName, ignoreCase = true)
             }
         }
 
@@ -98,14 +103,6 @@ enum class CropType(
             }
         }
 
-        fun CropType.getTurboCrop(): String {
-            return when (this) {
-                COCOA_BEANS -> "turbo_coco"
-                SUGAR_CANE -> "turbo_cane"
-                NETHER_WART -> "turbo_warts"
-                MUSHROOM -> "turbo_mushrooms"
-                else -> "turbo_${this.cropName.lowercase()}"
-            }
-        }
+        fun CropType.getTurboCrop() = "turbo_${this.enchantName.lowercase()}"
     }
 }

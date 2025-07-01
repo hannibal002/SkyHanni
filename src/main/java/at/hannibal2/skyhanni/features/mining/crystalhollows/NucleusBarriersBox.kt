@@ -2,16 +2,17 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig.BoundingBoxType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.util.AxisAlignedBB
 
@@ -63,14 +64,24 @@ object NucleusBarriersBox {
         if (!isEnabled()) return
 
         Crystal.entries.forEach { crystal ->
-            event.drawFilledBoundingBoxNea(
-                crystal.boundingBox,
-                crystal.configColorOption.get().toSpecialColor(),
-                renderRelativeToCamera = false,
-            )
+            when (config.boxStyle) {
+                BoundingBoxType.FILLED -> {
+                    event.drawFilledBoundingBox(
+                        crystal.boundingBox,
+                        crystal.configColorOption.get().toSpecialColor(),
+                    )
+                }
+
+                BoundingBoxType.OUTLINE -> {
+                    event.drawHitbox(
+                        crystal.boundingBox,
+                        crystal.configColorOption.get().toSpecialColor(),
+                    )
+                }
+            }
         }
     }
 
-    private fun isEnabled() =
-        IslandType.CRYSTAL_HOLLOWS.isInIsland() && (HoppityApi.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled && inNucleus
+    private fun isEnabled(): Boolean = IslandType.CRYSTAL_HOLLOWS.isCurrent() && inNucleus &&
+        (HoppityApi.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled
 }

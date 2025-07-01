@@ -1,21 +1,22 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.makeMobResult
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.getNextEntity
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -39,7 +40,7 @@ object IslandExceptions {
         armorStand: EntityArmorStand?,
         nextEntity: EntityLivingBase?,
     ): MobData.MobResult? =
-        when (LorenzUtils.skyBlockIsland) {
+        when (SkyBlockUtils.currentIsland) {
             IslandType.CATACOMBS -> dungeon(baseEntity, armorStand, nextEntity)
             IslandType.PRIVATE_ISLAND -> privateIsland(armorStand, baseEntity)
             IslandType.THE_RIFT -> theRift(baseEntity, nextEntity, armorStand)
@@ -51,6 +52,9 @@ object IslandExceptions {
             IslandType.GARDEN -> garden(baseEntity)
             IslandType.KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
             IslandType.WINTER -> winterIsland(baseEntity)
+            //#if MC > 1.21
+            //$$ IslandType.GALATEA -> ModernIslandExceptions.galatea(baseEntity, armorStand, nextEntity)
+            //#endif
 
             else -> null
         }
@@ -81,7 +85,8 @@ object IslandExceptions {
         baseEntity is EntityOtherPlayerMP &&
             baseEntity.isNpc() &&
             (nextEntity is EntityGiantZombie || nextEntity == null) &&
-            baseEntity.name.contains("Livid") -> MobUtils.getClosestArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
+            baseEntity.name.contains("Livid") -> MobUtils.getArmorStand(baseEntity, 10)
+            ?.takeIf { getNextEntity(it, -1)?.takeIf { entity -> entity.name.contains("Livid") } == null }
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
         baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.orEmpty()) ->
@@ -210,6 +215,14 @@ object IslandExceptions {
 
         baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
         baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
+        baseEntity is EntityPig && MobFilter.shinyPig.matches(armorStand?.cleanName()) -> MobData.MobResult.found(
+            Mob(
+                baseEntity,
+                Mob.Type.SPECIAL,
+                armorStand,
+                "SHINY PIG",
+            ),
+        )
 
         else -> null
     }
