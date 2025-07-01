@@ -329,7 +329,7 @@ object CurrentPetDisplay {
 
     @HandleEvent
     fun onConfigLoad() {
-        ConditionalUtils.onToggleAll(config) {
+        ConditionalUtils.onAnyToggled(config) {
             lastPetHash = 0
         }
     }
