@@ -35,9 +35,9 @@ enum class ProjectTarget(
         MinecraftVersion.MC11605,
         yarn("1.16.5+build.10"),
         MappingStyle.YARN,
-        linkTo = "MODERN_1215",
+        linkTo = "MODERN_12105",
     ),
-    MODERN_1215(
+    MODERN_12105(
         "1.21.5",
         MinecraftVersion.MC12105,
         yarn("1.21.5+build.1"),
