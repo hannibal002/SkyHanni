@@ -58,8 +58,7 @@ public class MiscConfig {
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
-    // TODO maybe we can migrate this already
-    public HideArmorConfig hideArmor2 = new HideArmorConfig();
+    public HideArmorConfig hideArmor = new HideArmorConfig();
 
     @Expose
     @ConfigOption(name = "Non-God Pot Effects", desc = "")

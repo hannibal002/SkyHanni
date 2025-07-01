@@ -53,7 +53,6 @@ object ModifyVisualWords {
     }
 
     var changeWords = true
-
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
         if (!SkyBlockUtils.onHypixel) return originalText
@@ -96,7 +95,7 @@ object ModifyVisualWords {
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val oldModifiedWords = SkyHanniMod.feature.storage.modifiedWords
         if (oldModifiedWords.isNotEmpty()) {
-            SkyHanniMod.visualWordsData.modifiedWords = oldModifiedWords
+            SkyHanniMod.visualWordsData.modifiedWords = oldModifiedWords.toMutableList()
             SkyHanniMod.feature.storage.modifiedWords = emptyList()
             SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Migrate visual words")
         }
