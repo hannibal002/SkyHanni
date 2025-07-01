@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -221,15 +222,14 @@ object ExperimentationTableApi {
     val currentExperimentTier get() = currentExperimentData.tier
     val currentExperimentType get() = currentExperimentData.type
 
-    fun inSuperpairs() = inTable && isActive && currentExperimentType == ExperimentationTaskType.SUPERPAIRS
+    val inSuperpairs get() = inTable && isActive && currentExperimentType == ExperimentationTaskType.SUPERPAIRS
 
     private var lastExpOverHash: Int = 0
     private var currentExpOverHash: Int = 0
     private var queuedCompleteEvent: TableTaskCompletedEvent? = null
     private var handleBottlesOnInvClose: Boolean = false
-    private var lastBottlesInInventory: Map<NeuInternalName, Int> = getBottlesInOwnInventory()
     private var currentBottlesInInventory: Map<NeuInternalName, Int> = mapOf()
-    var miscRewards: List<NeuInternalName> = emptyList()
+    var miscRepoRewards: List<NeuInternalName> = emptyList()
         private set
 
     enum class ExperimentationMessages(private val displayName: String) {
@@ -243,17 +243,15 @@ object ExperimentationTableApi {
         override fun toString() = displayName
     }
 
-    enum class ExperimentationTaskType(private val displayName: String) {
-        CHRONOMATRON("Chronomatron"),
-        ULTRASEQUENCER("Ultrasequencer"),
-        SUPERPAIRS("Superpairs"),
+    enum class ExperimentationTaskType {
+        CHRONOMATRON,
+        ULTRASEQUENCER,
+        SUPERPAIRS,
         ;
-
-        override fun toString() = displayName
 
         companion object {
             fun fromStringOrNull(string: String) = entries.firstOrNull {
-                it.displayName.equals(string, ignoreCase = true) || it.name.equals(string, ignoreCase = true)
+                it.name.equals(string, ignoreCase = true)
             }
         }
     }
@@ -332,7 +330,7 @@ object ExperimentationTableApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards
+        miscRepoRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -342,7 +340,7 @@ object ExperimentationTableApi {
             currentExpOverHash = 0
         }
         if (handleBottlesOnInvClose) DelayedRun.runDelayed(100.milliseconds) {
-            handleExpBottles(true)
+            handleXpBottlesGained()
             handleBottlesOnInvClose = false
         }
         DelayedRun.runDelayed(150.milliseconds) {
@@ -357,9 +355,8 @@ object ExperimentationTableApi {
 
     @HandleEvent(eventTypes = [WorldChangeEvent::class, ItemAddInInventoryEvent::class])
     fun refreshBottlesInInventory() {
-        if (handleBottlesOnInvClose) return
-        lastBottlesInInventory = currentBottlesInInventory
         currentBottlesInInventory = getBottlesInOwnInventory()
+        ChatUtils.debug("Refreshing bottles in inventory: $currentBottlesInInventory")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -379,7 +376,7 @@ object ExperimentationTableApi {
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentationMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
             experienceBottleChatPattern.matches(reward) && ExperimentationMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-            rewardInternalName in miscRewards && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
+            rewardInternalName in miscRepoRewards && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
             ExperimentationMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
             else -> ""
         }
@@ -394,24 +391,33 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun handleExpBottles(addToLoot: Boolean = false, fireUsageEvent: Boolean = false) {
-        lastBottlesInInventory = currentBottlesInInventory
-        currentBottlesInInventory = getBottlesInOwnInventory()
-        for ((internalName, currentInInv) in currentBottlesInInventory) {
-            val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0).takeIf {
-                it != currentInInv
-            } ?: continue
+    private fun handleXpBottlesUsed() {
+        val applicableDeltas = getXpBottleDelta().filter { it.value < 0 }.takeIfNotEmpty() ?: return
+        if (!inDistanceToTable(20.0)) return
+        applicableDeltas.forEach { (bottleInternalName, delta) ->
+            val absDelta = abs(delta)
+            TableXPBottleUsedEvent(bottleInternalName, abs(absDelta)).post()
+        }
+    }
 
-            val absChange = currentInInv - lastInInv
-            if (absChange < 0 && inDistanceToTable(10.0) && fireUsageEvent) {
-                TableXPBottleUsedEvent(internalName, abs(absChange)).post()
-            } else if (addToLoot) currentExperimentData.addReward(internalName, absChange)
+    private fun handleXpBottlesGained() {
+        val applicableDeltas = getXpBottleDelta().filter { it.value > 0 }.takeIfNotEmpty() ?: return
+        applicableDeltas.forEach { (bottleInternalName, delta) ->
+            currentExperimentData.addReward(bottleInternalName, delta)
+        }
+    }
+
+    private fun getXpBottleDelta(): Map<NeuInternalName, Int> {
+        val lastBottlesInInventory = currentBottlesInInventory
+        currentBottlesInInventory = getBottlesInOwnInventory()
+        return currentBottlesInInventory.subtract(lastBottlesInInventory) {
+            it.toInt()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onClick(event: WorldClickEvent) {
-        if (!inDistanceToTable(10.0)) return
+        if (!inDistanceToTable(20.0)) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
         event.itemInHand?.getInternalNameOrNull()?.takeIf {
@@ -419,7 +425,7 @@ object ExperimentationTableApi {
         } ?: return
 
         DelayedRun.runDelayed(200.milliseconds) {
-            handleExpBottles(false, fireUsageEvent = true)
+            handleXpBottlesUsed()
         }
     }
 
@@ -430,7 +436,7 @@ object ExperimentationTableApi {
         updateTablePos()
         event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
-        handleExpBottles(false)
+        refreshBottlesInInventory()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -501,10 +507,8 @@ object ExperimentationTableApi {
             return
         }
 
-        val internalName = NeuInternalName.fromItemNameOrNull(this) ?: run {
-            ChatUtils.debug("Could not read item name from $this")
-            return
-        }
+        val internalName = NeuInternalName.fromItemNameOrNull(this)
+            ?: return ChatUtils.debug("Could not read item name from $this")
         currentExperimentData.addReward(internalName, 1)
     }
 

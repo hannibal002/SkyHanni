@@ -349,7 +349,7 @@ object SuperpairDataDisplay {
 
     private fun isReward(reward: String) = rewardPattern.matches(reward) || isPowerUp(reward)
 
-    private fun isMiscReward(item: ItemStack) = item.getInternalNameOrNull() in ExperimentationTableApi.miscRewards
+    private fun isMiscReward(item: ItemStack) = item.getInternalNameOrNull() in ExperimentationTableApi.miscRepoRewards
 
     private fun isWaiting(itemName: String) = waitingMessagesPattern.matches(itemName)
 
