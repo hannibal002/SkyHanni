@@ -406,7 +406,7 @@ object MoongladeBeacon {
                 return target + colorOrder.size - current
             }
             return target - current
-        }t
+        }
 
         fun getSpeedOffset(): Int {
             val target = targetSpeed ?: return -1
