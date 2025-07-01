@@ -110,7 +110,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(name = "Gemstone Money per Hour Display", desc = "")
     @Accordion
-    public GemstoneMoneyPerHourConfig gemstoneMoneyPerHour = new GemstoneMoneyPerHourConfig();
+    val gemstoneMoneyPerHour: GemstoneMoneyPerHourConfig = GemstoneMoneyPerHourConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.GemstoneMoneyPerHourConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -44,6 +44,9 @@ object GemstoneMoneyPerHour {
         "§d§lPRISTINE! §r§fYou found §r§a. Flawed (?<gemstone>\\w+) Gemstone §r§8x(?<amount>\\d+)§r§f!"
     )
 
+    /**
+     * REGEX-TEST: rough jade gem
+     */
     private val roughGemstoneNamePattern by RepoPattern.pattern(
         "mining.roughgemstone",
         "rough (?<gemstone>\\w+) gem"
@@ -162,7 +165,7 @@ object GemstoneMoneyPerHour {
     @HandleEvent
     fun onWorldChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.NONE || !paused) return
-        if (!isEnabled() || !LorenzUtils.inMiningIsland()) return reset()
+        if (!isEnabled() || !IslandTypeTags.MINING.inAny()) return reset()
         paused = true
     }
 
@@ -183,7 +186,7 @@ object GemstoneMoneyPerHour {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetgemstone") {
+        event.registerBrigadier("shresetgemstone") {
             description = "Resets the gemstone money per hour display."
             category = CommandCategory.USERS_ACTIVE
             callback { command() }
