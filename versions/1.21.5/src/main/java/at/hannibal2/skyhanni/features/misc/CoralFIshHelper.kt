@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.ItemBuyApi.buy
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -49,12 +48,10 @@ object CoralFIshHelper {
     private val textInput = SearchTextInput()
 
     private fun checkInventoryItems() {
-        println("checking fish")
         val items = InventoryUtils.getItemsInOpenChest().map { it.stack }
 
         val overviewItem = items[OVERVIEW_FISH_SLOT]
         val overviewItemLore = overviewItem.getLore().map { it.removeColor() }
-        println("overview item lore: $overviewItemLore")
 
         var amountFound = 0
         var totalAmount = 0
@@ -73,7 +70,6 @@ object CoralFIshHelper {
             if (!item.isDye(DyeCompat.GRAY)) continue
             neededFish.add(itemName)
         }
-        println("Found ${neededFish.size} fish, amount found: $amountFound, total amount: $totalAmount")
         constructDisplay(neededFish, amountFound, totalAmount)
     }
 
@@ -135,8 +131,7 @@ object CoralFIshHelper {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         display = emptyList()
     }
-
 }
