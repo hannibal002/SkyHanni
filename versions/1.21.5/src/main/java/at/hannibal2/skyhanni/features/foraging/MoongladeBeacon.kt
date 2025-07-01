@@ -58,13 +58,13 @@ object MoongladeBeacon {
         WHITE("§fWhite"),
         ORANGE("§6Orange"),
         MAGENTA("§dMagenta"),
-        LIGHT_BLUE("§bLight Blue"),
+        LIGHT_BLUE("§9Light Blue"), // Why did hypixel do this
         YELLOW("§eYellow"),
         LIME("§aLime"),
         PINK("§dPink"),
-        CYAN("§bCyan"),
+        CYAN("§bCyan"), // This too
         PURPLE("§5Purple"),
-        BLUE("§1Blue"),
+        BLUE("§1Blue"), // This one makes sense ig
         BROWN("§6Brown"),
         GREEN("§2Green"),
         RED("§cRed"),
@@ -192,7 +192,7 @@ object MoongladeBeacon {
     private const val PITCH_SELECT_SLOT = 50
     private const val PAUSE_SELECT_SLOT = 52
 
-    private val acceptableMargin = 50.milliseconds // ~2.5 ticks
+    private val acceptablePitchMargin = 25.milliseconds
 
     private val colorMinigameInventory = InventoryDetector(
         onInventoryClose = {
@@ -203,7 +203,7 @@ object MoongladeBeacon {
         openInventory = {
             normalTuning = TuneData()
             enchantedTuning = TuneData(isEnchanted = true)
-        }
+        },
     ) { name ->
         upgradingStrength = (name == "Upgrade Signal Strength")
         val inInv = (name == "Tune Frequency" || upgradingStrength)
@@ -260,7 +260,13 @@ object MoongladeBeacon {
             it.reportPitchTimeVariance(pitch) ?: Duration.INFINITE
         } ?: return
 
-        if (targetTuneData.currentPitch == pitch) return
+        // Check if the other tuning data could be to 'blame' for this pitch
+        if (targetTuneData.currentPitch == pitch && targetTuneData.targetPitch == pitch) return
+        val otherTuneData = if (targetTuneData.isEnchanted) normalTuning else enchantedTuning
+        val conflictExists = targetTuneData.targetPitch !in listOf(null, pitch)
+        val shouldIgnore = conflictExists && otherTuneData.currentPitch == pitch && targetTuneData.ignoredPitches < 5
+        if (shouldIgnore) return
+
         targetTuneData.targetPitch = pitch
     }
 
@@ -327,7 +333,6 @@ object MoongladeBeacon {
         private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
         private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
 
-        var targetLastMoved: SimpleTimeMark? = null
         var targetColor: BeaconColor? = null
         var targetSpeed: BeaconSpeed? = null
         var targetPitch: BeaconPitch? = null
@@ -335,6 +340,7 @@ object MoongladeBeacon {
         var currentSpeed: BeaconSpeed? = null
         var currentPitch: BeaconPitch? = null
         var nextExpectedPitch: SimpleTimeMark? = null
+        var ignoredPitches = 0
 
         private var lastServerTickCount = 0
         private var recentTicks: MutableList<Int> = mutableListOf()
@@ -353,11 +359,9 @@ object MoongladeBeacon {
 
         fun reportPitchTimeVariance(pitch: BeaconPitch): Duration? {
             if (isEnchanted && !upgradingStrength) return null
-            val lastTargetMove = targetLastMoved ?: return null
-            if (lastTargetMove.passedSince() > acceptableMargin) return null
             val timeUntil = nextExpectedPitch?.timeUntil() ?: 10.minutes
             val timeSince = nextExpectedPitch?.passedSince() ?: 10.minutes
-            return minOf(timeSince, timeUntil).takeIf { it < acceptableMargin }
+            return minOf(timeSince, timeUntil).takeIf { it < acceptablePitchMargin }
         }
 
         fun readFromSlotLore(slot: Slot): Boolean {
@@ -374,7 +378,6 @@ object MoongladeBeacon {
 
         fun updateMatchSlot(slot: Int) {
             currentMatchSlot = slot.takeIf { it != currentMatchSlot } ?: return
-            targetLastMoved = SimpleTimeMark.now()
             val tickDifference = (currentServerTicks - lastServerTickCount).takeIf { it > 0 } ?: return
             recentTicks.add(tickDifference)
             lastServerTickCount = currentServerTicks
