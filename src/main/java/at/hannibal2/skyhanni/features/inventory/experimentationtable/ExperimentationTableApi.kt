@@ -300,7 +300,8 @@ object ExperimentationTableApi {
         override fun reset() {
             super.reset()
             // todo at some point make resettable storage set deal with this stuff
-            // ResettableStorageSet doesn't deal with nulls or clearing mutables
+            //  ResettableStorageSet doesn't deal with nulls or clearing mutables
+            //  It does (^ that) after #4244 gets merged, so I'll do that eventually -David
             otherRewards.clear()
             type = null
             tier = null
@@ -342,7 +343,7 @@ object ExperimentationTableApi {
         if (handleBottlesOnInvClose) DelayedRun.runDelayed(100.milliseconds) {
             handleXpBottlesGained()
             handleBottlesOnInvClose = false
-        }
+        } else refreshBottlesInInventory()
         DelayedRun.runDelayed(150.milliseconds) {
             // Catch early closes triggering the event before the inventory is fully opened
             if (expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return@runDelayed
@@ -353,10 +354,15 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent(eventTypes = [WorldChangeEvent::class, ItemAddInInventoryEvent::class])
+    @HandleEvent(
+        onlyOnIsland = IslandType.PRIVATE_ISLAND,
+        eventTypes = [WorldChangeEvent::class, ItemAddInInventoryEvent::class],
+    )
     fun refreshBottlesInInventory() {
-        currentBottlesInInventory = getBottlesInOwnInventory()
-        ChatUtils.debug("Refreshing bottles in inventory: $currentBottlesInInventory")
+        currentBottlesInInventory = getBottlesInOwnInventory().takeIf {
+            it != currentBottlesInInventory
+        } ?: return
+        ChatUtils.debug("Updated bottles in inventory: $currentBottlesInInventory")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -393,7 +399,7 @@ object ExperimentationTableApi {
 
     private fun handleXpBottlesUsed() {
         val applicableDeltas = getXpBottleDelta().filter { it.value < 0 }.takeIfNotEmpty() ?: return
-        if (!inDistanceToTable(20.0)) return
+        if (!inDistanceToTable(15.0)) return
         applicableDeltas.forEach { (bottleInternalName, delta) ->
             val absDelta = abs(delta)
             TableXPBottleUsedEvent(bottleInternalName, abs(absDelta)).post()
@@ -417,7 +423,7 @@ object ExperimentationTableApi {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onClick(event: WorldClickEvent) {
-        if (!inDistanceToTable(20.0)) return
+        if (!inDistanceToTable(15.0)) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
         event.itemInHand?.getInternalNameOrNull()?.takeIf {

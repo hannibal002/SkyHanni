@@ -97,7 +97,7 @@ object CollectionUtils {
     /**
      * Same deal as [subtract], but allows you to transform the result of the subtraction into a different type.
      */
-    inline fun <K, V: Number, R> Map<K, V>.subtract(
+    inline fun <K, V : Number, R> Map<K, V>.subtract(
         other: Map<K, V>,
         transform: (Double) -> R
     ): Map<K, R> = (keys + other.keys).associateWith { k ->
