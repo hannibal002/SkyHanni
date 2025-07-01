@@ -27,6 +27,9 @@ import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.21
+//$$ import me.shedaniel.rei.api.client.REIRuntime
+//#endif
 
 @SkyHanniModule
 object GuiEditManager {
@@ -53,12 +56,11 @@ object GuiEditManager {
         guiScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
             if (it is GuiEditSign && !it.isGardenSign()) return
-            //#if MC > 1.21
-            //$$ val focusedWidget = it.focused?.javaClass?.name ?: "unknown"
-            //$$ ChatUtils.debug("Focused widget: $focusedWidget")
-            //$$ if (it.focused is net.minecraft.client.gui.widget.TextFieldWidget) return
-            //#endif
         }
+
+        //#if MC > 1.21
+        //$$ if (REIRuntime.getInstance().searchTextField?.isFocused == true) return
+        //#endif
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
         if (NeuItems.neuHasFocus()) return
