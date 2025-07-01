@@ -225,8 +225,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     abstract val rotatingPerkEntry: Data
 
     private fun fetchRotatingPerk(entry: Data, lore: List<String>): RotPerkE? {
-        if (entry != rotatingPerkEntry) return null
-        if (!entry.enabled || !entry.isUnlocked) return null
+        if (entry != rotatingPerkEntry || !entry.enabled || !entry.isUnlocked) return null
 
         val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: run {
             ErrorManager.logErrorStateWithData(
@@ -238,16 +237,18 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         }
         val nextLine = lore[index + 1]
         val perkLore = HotxPatterns.rotatingPerkPattern.matchGroup(nextLine, "perk") ?: return null
-        rotatingPerks.firstNotNullOfOrNull { perk ->
-            if (perk !is ItemRepoPatternEnum) return@firstNotNullOfOrNull null
-            if (perk.itemPattern.matches(perkLore)) return perk
-        } ?: run {
+        val perkEnum: RotPerkE? = rotatingPerks.firstNotNullOfOrNull { perk ->
+            if (perk !is ItemRepoPatternEnum) null
+            else if (perk.itemPattern.matches(perkLore)) perk
+            else null
+        }
+        if (perkEnum == null) {
             ErrorManager.logErrorStateWithData(
                 "Could not read the $rotatingPerkClassName effect from the $name tree",
                 "no itemPattern matched",
                 "nextLine" to nextLine,
             )
         }
-        return null
+        return perkEnum
     }
 }
