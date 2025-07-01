@@ -188,8 +188,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     }
 
     abstract val rotatingPerkClazz: KClass<RotPerkE>
+    abstract val rotatingPerks: List<RotPerkE>
     private val rotatingPerkClassName by lazy { rotatingPerkClazz.java.simpleName.removeSuffix("Perk") }
-    private val allRotatingPerks by lazy { rotatingPerkClazz.java.enumConstants }
 
     abstract val resetChatPattern: Pattern
     open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
@@ -205,28 +205,15 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         extraChatHandling(event)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private inline fun <reified PType : RepoPatternEnum> getPatternedPerks(): Map<RotPerkE, Pattern> =
-        allRotatingPerks.filterIsInstance<PType>().map {
-            it as RotPerkE to when (PType::class) {
-                ChatRepoPatternEnum::class -> (it as ChatRepoPatternEnum).chatPattern
-                ItemRepoPatternEnum::class -> (it as ItemRepoPatternEnum).itemPattern
-                else -> error("Unsupported pattern type: ${PType::class.java}")
-            }
-        }.associate { it }
-
-    private val chatPatternedCache: Map<RotPerkE, Pattern> by lazy {
-        getPatternedPerks<ChatRepoPatternEnum>()
-    }
-
     abstract fun tryBlock(event: SkyHanniChatEvent)
 
     fun tryReadRotatingPerkChat(event: SkyHanniChatEvent): Boolean? {
         rotatingPerkPattern.matchMatcher(event.message) {
-            val perk = group("perk")
-            val foundPerk = chatPatternedCache.firstNotNullOfOrNull { (enum, pattern) ->
-                if (!pattern.matches(perk)) return@firstNotNullOfOrNull null
-                enum
+            val perkString = group("perk")
+            val foundPerk = rotatingPerks.firstNotNullOfOrNull { perk ->
+                if (perk !is ChatRepoPatternEnum) return@firstNotNullOfOrNull null
+                if (!perk.chatPattern.matches(perkString)) return@firstNotNullOfOrNull null
+                perk
             } ?: return false
             tryBlock(event)
             setRotatingPerk(foundPerk)
@@ -236,10 +223,6 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     }
 
     abstract val rotatingPerkEntry: Data
-
-    private val itemPatternedCache: Map<RotPerkE, Pattern> by lazy {
-        getPatternedPerks<ItemRepoPatternEnum>()
-    }
 
     private fun fetchRotatingPerk(entry: Data, lore: List<String>): RotPerkE? {
         if (entry != rotatingPerkEntry) return null
@@ -255,9 +238,9 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         }
         val nextLine = lore[index + 1]
         val perkLore = HotxPatterns.rotatingPerkPattern.matchGroup(nextLine, "perk") ?: return null
-        itemPatternedCache.firstNotNullOfOrNull { (enum, itemPattern) ->
-            if (itemPattern.matches(perkLore)) return enum
-            return@firstNotNullOfOrNull null
+        rotatingPerks.firstNotNullOfOrNull { perk ->
+            if (perk !is ItemRepoPatternEnum) return@firstNotNullOfOrNull null
+            if (perk.itemPattern.matches(perkLore)) return perk
         } ?: run {
             ErrorManager.logErrorStateWithData(
                 "Could not read the $rotatingPerkClassName effect from the $name tree",
