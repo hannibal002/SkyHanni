@@ -1,12 +1,10 @@
-package at.hannibal2.skyhanni.features.garden.tracking
+package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.features.garden.FarmingStatusTrackerConfig.Crop
-import at.hannibal2.skyhanni.config.features.garden.FarmingStatusTrackerConfig.EmbedConfig.InformationType
-import at.hannibal2.skyhanni.config.features.garden.FarmingStatusTrackerConfig.MessageType
-import at.hannibal2.skyhanni.config.features.garden.FarmingStatusTrackerConfig.Pet
+import at.hannibal2.skyhanni.config.features.garden.tracking.EmbedConfig.InformationType
+import at.hannibal2.skyhanni.config.features.garden.tracking.EmbedConfig.MessageType
 import at.hannibal2.skyhanni.data.BitsApi.cookieBuffTime
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Field
@@ -15,8 +13,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.Thumbnail
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -56,7 +52,17 @@ object FarmingStatusTracker {
         CropType.MUSHROOM to "<:mushroom:1263207580268888096>", // TODO NEW EMOJI
         CropType.CACTUS to "<:cactus:1263207572962414724>",
         CropType.COCOA_BEANS to "<:cocoa_beans:1263207576330567795>",
-        CropType.NETHER_WART to "<:nether_wart:1263207581770579970>"
+        CropType.NETHER_WART to "<:nether_wart:1263207581770579970>",
+    )
+
+    private val petEmojis: Map<String, String> = mapOf(
+        "Bee" to "<:bee:1263201131064983673>",
+        "Chicken" to "<:chicken:1263201132658823178>",
+        "Elephant" to "<:elephant:1263201134466830357>",
+        "Mooshroom Cow" to "<:mooshroom_cow:1263201135884374026>",
+        "Pig" to "<:pig:1263201137188802651",
+        "Rabbit" to "<:rabbit:1263201138371727421>",
+        "Slug" to "<:slug:1263201140086931511>",
     )
 
     // Sends embed periodically
@@ -129,7 +135,7 @@ object FarmingStatusTracker {
         InformationType.STRENGTH -> SkyblockStat.STRENGTH.lastKnownInt()
 
         InformationType.PET -> CurrentPetApi.currentPet?.let { pet ->
-            Pet.entries.find { it.toString() == pet.cleanName }?.petName.orEmpty()
+            "${pet.cleanName} ${petEmojis[pet.cleanName]}"
         }
 
         InformationType.COOKIE_BUFF -> cookieBuffTime.formatTime()
@@ -143,14 +149,15 @@ object FarmingStatusTracker {
             "${crop.cropName} ${cropEmojis[crop]}".takeUnless { status in listOf("Idle", "Offline") }
         }
 
-        InformationType.ANITA_BUFF -> FarmingContestApi.anitaBuffCrop?.cropName?.let { getCropEnum(it) }
+        InformationType.ANITA_BUFF -> FarmingContestApi.anitaBuffCrop?.cropName
         InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.roundTo(2).takeUnless { it == 0.0 }
         InformationType.FARMING_SINCE -> if (GardenApi.farmingSince.isInFuture()) "" else GardenApi.farmingSince.passedSince()
     }
 
     private fun SkyblockStat.lastKnownInt() = lastKnownValue?.roundToInt()
 
-    private fun SimpleTimeMark?.formatTime() = this?.takeIf { it.isInFuture() }?.timeUntil()?.toString() ?: "<:no:1263210393723998278>"
+    private fun SimpleTimeMark?.formatTime() =
+        this?.takeIf { it.isInFuture() }?.timeUntil()?.toString()?.substringBeforeLast(" ") ?: "<:no:1263210393723998278>"
 
     private fun InformationType.getFieldDisplayName(): String {
         return if (this != InformationType.JACOBS_CONTEST) {
@@ -186,14 +193,11 @@ object FarmingStatusTracker {
 
     // Sends the embed to the webhook
     private fun sendOrEditMessage(embed: Embed, threadID: String?, username: String): Boolean {
-        return when (config.messageType) {
+        return when (config.embed.messageType) {
             MessageType.NEW_MESSAGE -> WebhookUtils.sendEmbedsToWebhook(config.webhook.url, listOf(embed), threadID, username)
             MessageType.EDITED_MESSAGE -> WebhookUtils.editMessageEmbeds(config.webhook.url, listOf(embed), threadID, username)
         }
     }
-
-    private fun getCropEnum(cropName: String): Crop? =
-        Crop.entries.find { it.display == cropName }
 
     private fun LorenzColor.toIntColor(): Int {
         val color = this.toColor()
@@ -203,6 +207,22 @@ object FarmingStatusTracker {
         val blue = color.blue
 
         return (red shl 16) or (green shl 8) or blue
+    }
+
+    fun sendTutorial() {
+        ChatUtils.clickableLinkChat(
+            "§aWebhook Tutorial:\n" +
+                "§e1. Open your Discord server, click the arrow next to the server name, and select \"§6Server Settings§e\".\n\n" +
+                "§e2. In the Server Settings, find and click on the \"§6Integrations§e\" tab.\n\n" +
+                "§e3. Click on the \"§6Webhooks§e\" section and then click \"§6Create Webhook§e\".\n\n" +
+                "§e4. You can customize the webhook by:\n" +
+                "§e  -  Giving your webhook a name (e.g. \"§6Farming Status Tracker§e\").\n" +
+                "§e  -  Setting an avatar image for the webhook.\n" +
+                "§e  -  Choosing the specific text channel where you want the webhook to post messages.\n\n" +
+                "§e5. Once you've customized your webhook, click the \"§6Copy Webhook URL§e\" button and paste it in the config.\n",
+            url = "https://www.youtube.com/watch?v=fKksxz2Gdnc",
+            hover = "§eOpen YouTube tutorial",
+        )
     }
 
     fun InformationType.isSelected() = config.embed.information.contains(this)
