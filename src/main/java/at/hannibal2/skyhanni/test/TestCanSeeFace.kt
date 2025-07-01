@@ -177,6 +177,7 @@ object TestCanSeeFace {
             }
             literalCallback("stop") {
                 faceCheckContext.reset()
+                lastRenderable = null
             }
         }
     }
