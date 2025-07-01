@@ -51,7 +51,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
 
         for (msg in history) {
             val messageLines = splitLine(msg.message)
-            val modifiedLines = msg.modified?.let { splitLine(it) } ?: emptyList()
+            val modifiedLines = msg.modified?.let { splitLine(it) }.orEmpty()
             val size = messageLines.size + modifiedLines.size
 
             val isHovered = mouseX in 0..w && mouseY in 0..<(size * 10) && originalMouseY >= t + 5
