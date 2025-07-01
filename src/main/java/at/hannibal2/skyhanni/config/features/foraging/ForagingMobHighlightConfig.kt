@@ -10,17 +10,17 @@ class ForagingMobHighlightConfig {
     @ConfigOption(name = "Birries Highlight", desc = "")
     @OnlyModern
     @Accordion
-    var birriesHighlight = BirriesHighlightConfig()
+    var birries = BirriesHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Hideonleaf Highlight", desc = "")
     @OnlyModern
     @Accordion
-    var hideonleafHighlight = HideonleafHighlightConfig()
+    var hideonleaf = HideonleafHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Invisibug Highlight", desc = "")
     @OnlyModern
     @Accordion
-    var invisibugHighlight = InvisibugHighlightConfig()
+    var invisibug = InvisibugHighlightConfig()
 }
