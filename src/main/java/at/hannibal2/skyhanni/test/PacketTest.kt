@@ -20,65 +20,51 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
-//if MC < 1.21
 import net.minecraft.network.play.client.C00PacketKeepAlive
-//endif
 import net.minecraft.network.play.client.C03PacketPlayer
-//if MC < 1.21
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.client.C0BPacketEntityAction
+//#if MC < 1.21
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction
+//#endif
 import net.minecraft.network.play.server.S00PacketKeepAlive
+//#if MC < 1.21
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
+//#endif
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S03PacketTimeUpdate
-//endif
 import net.minecraft.network.play.server.S04PacketEntityEquipment
-//if MC < 1.21
 import net.minecraft.network.play.server.S06PacketUpdateHealth
-//endif
 import net.minecraft.network.play.server.S0BPacketAnimation
-//#if MC < 1.21
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 //#if MC < 1.21
 import net.minecraft.network.play.server.S0EPacketSpawnObject
-//#endif
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 //#endif
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraft.network.play.server.S14PacketEntity
-//if MC < 1.21
 import net.minecraft.network.play.server.S14PacketEntity.S15PacketEntityRelMove as EntityRelMove
 import net.minecraft.network.play.server.S14PacketEntity.S16PacketEntityLook as EntityLook
 import net.minecraft.network.play.server.S14PacketEntity.S17PacketEntityLookMove as EntityLookMove
-//endif
 import net.minecraft.network.play.server.S18PacketEntityTeleport
-//if MC < 1.21
 import net.minecraft.network.play.server.S19PacketEntityHeadLook
-//endif
 import net.minecraft.network.play.server.S19PacketEntityStatus
 import net.minecraft.network.play.server.S1BPacketEntityAttach
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S1DPacketEntityEffect
-//if MC < 1.21
 import net.minecraft.network.play.server.S1FPacketSetExperience
-//endif
 import net.minecraft.network.play.server.S20PacketEntityProperties
-//if MC < 1.21
 import net.minecraft.network.play.server.S21PacketChunkData
-//endif
 import net.minecraft.network.play.server.S22PacketMultiBlockChange
 import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.network.play.server.S28PacketEffect
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
-//if MC < 1.21
 import net.minecraft.network.play.server.S33PacketUpdateSign
-//endif
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
@@ -124,28 +110,23 @@ object PacketTest {
         val packet = event.packet
         val packetName = packet.javaClass.simpleName
 
-        //#if MC < 1.21
         if (packetName == C00PacketKeepAlive::class.simpleName) return
-
+        //#if MC < 1.21
         if (packetName == C0FPacketConfirmTransaction::class.simpleName) return
+        //#endif
         if (packetName == C04PacketPlayerPosition::class.simpleName) return
 
         if (packetName == C09PacketHeldItemChange::class.simpleName) return
         if (packetName == C06PacketPlayerPosLook::class.simpleName) return
         if (packetName == C0BPacketEntityAction::class.simpleName) return
         if (packetName == C05PacketPlayerLook::class.simpleName) return
-        //#else
+        //#if MC > 1.21
         //$$ if (packetName == net.minecraft.network.packet.c2s.common.CommonPongC2SPacket::class.simpleName) return
         //$$ if (packetName == net.minecraft.network.packet.c2s.play.ClientTickEndC2SPacket::class.simpleName) return
-        //$$ if (packetName == net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket::class.simpleName) return
-        //$$ if (packetName == net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround::class.simpleName) return
-        //$$ if (packetName == net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.LookAndOnGround::class.simpleName) return
-        //$$ if (packetName == net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.Full::class.simpleName) return
         //#endif
         if (packetName == C03PacketPlayer::class.simpleName) return
 
-
-        println("Send: $packetName")
+        println("Send: [$packetName]")
     }
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
@@ -167,15 +148,13 @@ object PacketTest {
     private fun Packet<*>.print() {
         val packetName = javaClass.simpleName
 
-        //#if MC < 1.21
         // Keep alive
         if (packetName == S00PacketKeepAlive::class.simpleName) return
         if (packetName == C00PacketKeepAlive::class.simpleName) return
+        //#if MC < 1.21
         if (packetName == S32PacketConfirmTransaction::class.simpleName) return
         //#else
         //$$ if (packetName == net.minecraft.network.packet.s2c.common.CommonPingS2CPacket::class.simpleName) return
-        //$$ if (packetName == net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket::class.simpleName) return
-        //$$ if (packetName == net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket::class.simpleName) return
         //$$ if (packetName == net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket::class.simpleName) return
         //#endif
 
@@ -184,7 +163,6 @@ object PacketTest {
         if (packetName == S3EPacketTeams::class.simpleName) return
         if (packetName == S38PacketPlayerListItem::class.simpleName) return
         if (packetName == S3CPacketUpdateScore::class.simpleName) return
-        //#if MC < 1.21
         if (packetName == S1FPacketSetExperience::class.simpleName) return
         if (packetName == S06PacketUpdateHealth::class.simpleName) return
 
@@ -192,40 +170,40 @@ object PacketTest {
         if (packetName == S33PacketUpdateSign::class.simpleName) return
         if (packetName == S03PacketTimeUpdate::class.simpleName) return
         if (packetName == S21PacketChunkData::class.simpleName) return
-        //#endif
         if (packetName == S22PacketMultiBlockChange::class.simpleName) return
         if (packetName == S23PacketBlockChange::class.simpleName) return
+        //#if MC > 1.21
+        //$$ if (packetName == net.minecraft.network.packet.s2c.play.BlockEventS2CPacket::class.simpleName) return
+        //$$ if (packetName == net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket::class.simpleName) return
+        //$$ if (packetName == net.minecraft.network.packet.s2c.play.ChunkRenderDistanceCenterS2CPacket::class.simpleName) return
+        //#endif
 
-        //#if MC < 1.21
         // Chat
         if (packetName == S02PacketChat::class.simpleName) return
-        //#endif
 
         // Others
         if (packetName == S29PacketSoundEffect::class.simpleName) return
         if (!full && packetName == S2APacketParticles::class.simpleName) return
+        //#if MC > 1.21
+        //$$ if(packetName == net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket::class.simpleName) return
+        //#endif
 
         // Entity
         if (this is S13PacketDestroyEntities) {
-            println("Receive: $packetName with IDs: ${entityIDs.joinToString(", ")}")
+            println("Receive: [$packetName] with IDs: ${entityIDs.joinToString(", ")}")
             return
         }
 
         if (!full) {
             if (packetName == S18PacketEntityTeleport::class.simpleName) return
             if (packetName == S04PacketEntityEquipment::class.simpleName) return
-            //#if MC < 1.21
             if (packetName == EntityRelMove::class.simpleName) return
             if (packetName == EntityLookMove::class.simpleName) return
             if (packetName == S19PacketEntityHeadLook::class.simpleName) return
             if (packetName == EntityLook::class.simpleName) return
-            //#else
+            //#if MC > 1.21
             //$$ if(packetName == net.minecraft.network.packet.s2c.play.BossBarS2CPacket::class.simpleName) return
-            //$$ if(packetName == net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket::class.simpleName) return
             //$$ if(packetName == net.minecraft.network.packet.s2c.play.EntityPositionSyncS2CPacket::class.simpleName) return
-            //$$ if(packetName == net.minecraft.network.packet.s2c.play.EntityS2CPacket.MoveRelative::class.simpleName) return
-            //$$ if(packetName == net.minecraft.network.packet.s2c.play.EntityS2CPacket.RotateAndMoveRelative::class.simpleName) return
-            //$$ if(packetName == net.minecraft.network.packet.s2c.play.EntityS2CPacket.Rotate::class.simpleName) return
             //#endif
             if (packetName == S12PacketEntityVelocity::class.simpleName) return
             if (packetName == S1CPacketEntityMetadata::class.simpleName) return
@@ -239,10 +217,8 @@ object PacketTest {
 //        if (packetName == S19PacketEntityStatus::class.simpleName) return
 //        if (packetName == S1BPacketEntityAttach::class.simpleName) return
 
-
-
         buildString {
-            append("Receive: $packetName")
+            append("Receive: [$packetName]")
 
             val id = getEntityId()
             if (id != null) {
@@ -276,18 +252,21 @@ object PacketTest {
         if (packet is S2APacketParticles) {
             return LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate)
         }
-        if (packet is S0EPacketSpawnObject) {
-            return LorenzVec(packet.x, packet.y, packet.z)
-        }
+
         if (packet is S0CPacketSpawnPlayer) {
             return LorenzVec(packet.x, packet.y, packet.z)
         }
-        if (packet is C03PacketPlayer) {
-            return packet.getLocation()
+        //#if MC < 1.21
+        if (packet is S0EPacketSpawnObject) {
+            return LorenzVec(packet.x, packet.y, packet.z)
         }
-
         if (packet is S0FPacketSpawnMob) {
             return LorenzVec(packet.x, packet.y, packet.z)
+        }
+        //#endif
+
+        if (packet is C03PacketPlayer) {
+            return packet.getLocation()
         }
         if (packet is S28PacketEffect) {
             return packet.soundPos.toLorenzVec()

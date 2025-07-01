@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.entity.item.EntityArmorStand
-//#if MC < 1.21
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
-//#endif
+//#if MC < 1.21
 import net.minecraft.network.play.server.S0FPacketSpawnMob
+//#endif
 import net.minecraft.network.play.server.S13PacketDestroyEntities
 
 /**
@@ -42,20 +42,22 @@ object FixGhostEntities {
 
         val packet = event.packet
 
-        //#if MC < 1.21
-        if (packet is S0CPacketSpawnPlayer) {
-            if (packet.entityID in recentlyRemovedEntities) {
-                event.cancel()
-            }
-            recentlySpawnedEntities.addLast(packet.entityID)
-        } else
-        //#endif
-            if (packet is S0FPacketSpawnMob) {
+        when (packet) {
+            is S0CPacketSpawnPlayer -> {
                 if (packet.entityID in recentlyRemovedEntities) {
                     event.cancel()
                 }
                 recentlySpawnedEntities.addLast(packet.entityID)
-            } else if (packet is S13PacketDestroyEntities) {
+            }
+            //#if MC < 1.21
+            is S0FPacketSpawnMob -> {
+                if (packet.entityID in recentlyRemovedEntities) {
+                    event.cancel()
+                }
+                recentlySpawnedEntities.addLast(packet.entityID)
+            }
+            //#endif
+            is S13PacketDestroyEntities -> {
                 for (entityID in packet.entityIDs) {
                     // ignore entities that got properly spawned and then removed
                     if (entityID !in recentlySpawnedEntities) {
@@ -66,6 +68,7 @@ object FixGhostEntities {
                     }
                 }
             }
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)

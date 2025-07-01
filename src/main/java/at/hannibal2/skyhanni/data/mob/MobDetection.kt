@@ -361,9 +361,9 @@ object MobDetection {
     @HandleEvent
     fun onEntitySpawnPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
-            is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
-            //#if TODO
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
+            //#if MC < 1.21
+            is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
             //#endif
             is S01PacketJoinGame -> {
