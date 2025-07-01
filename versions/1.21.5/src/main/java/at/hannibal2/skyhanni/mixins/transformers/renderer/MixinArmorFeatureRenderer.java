@@ -1,33 +1,36 @@
-package at.hannibal2.skyhanni.mixins.transformers.render;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.features.misc.HideArmor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.render.entity.feature.HeadFeatureRenderer;
+import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.client.render.entity.model.BipedEntityModel;
 
-@Mixin(HeadFeatureRenderer.class)
-public class MixinHeadFeatureRenderer {
-    @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
+@Mixin(ArmorFeatureRenderer.class)
+public class MixinArmorFeatureRenderer {
+    @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
     private void onRenderArmor(
         MatrixStack matrixStack,
         VertexConsumerProvider vertexConsumerProvider,
+        ItemStack stack,
+        EquipmentSlot slot,
         int light,
-        LivingEntityRenderState renderState,
-        float f,
-        float g,
+        BipedEntityModel armorModel,
         CallbackInfo ci
     ) {
         Entity current = HideArmor.INSTANCE.get();
         if (current instanceof PlayerEntity && HideArmor.INSTANCE.shouldHideArmor(((PlayerEntity) current))) {
-            ci.cancel();
+            if (!HideArmor.INSTANCE.getConfig().onlyHelmet || slot == EquipmentSlot.HEAD) {
+                ci.cancel();
+            }
         }
     }
 }

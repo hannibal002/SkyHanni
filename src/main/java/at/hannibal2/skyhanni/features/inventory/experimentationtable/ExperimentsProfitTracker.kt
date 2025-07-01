@@ -137,6 +137,13 @@ object ExperimentsProfitTracker {
             experienceBottlePattern.matches(it.asString())
         } ?: return
 
+        // If you click the button with a bottle of that type already in your inventory,
+        // hypixel uses that one instead of buying one from the bazaar.
+        val hasApplicableBottle = InventoryUtils.getItemsInOwnInventory().any {
+            it.getInternalNameOrNull() == internalName
+        }
+        if (hasApplicableBottle) return
+
         tracker.modify {
             it.startCost -= calculateBottlePrice(internalName)
         }

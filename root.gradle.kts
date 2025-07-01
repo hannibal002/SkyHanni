@@ -25,24 +25,91 @@ allprojects {
     repositories {
         mavenCentral()
         mavenLocal()
+
+        // Fabric
+        exclusiveContent {
+            forRepository {
+                maven("https://maven.fabricmc.net")
+            }
+            filter {
+                includeGroup("net.fabricmc")
+                includeGroup("net.fabricmc.fabric-api")
+            }
+        }
+
+        // Mixin
+        exclusiveContent {
+            forRepository {
+                maven("https://repo.spongepowered.org/repository/maven-public")
+            }
+            filter {
+                includeGroup("org.spongepowered")
+            }
+        }
+
+        // DevAuth
+        exclusiveContent {
+            forRepository {
+                maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+            }
+            filter {
+                includeGroup("me.djtheredstoner")
+            }
+        }
+
+        // libautoupdate and shots
+        exclusiveContent {
+            forRepository {
+                maven("https://repo.nea.moe/releases")
+            }
+            filter {
+                includeGroup("moe.nea")
+            }
+        }
+
+        // moulconfig and a few detekt rules
+        exclusiveContent {
+            forRepository {
+                maven("https://maven.notenoughupdates.org/releases")
+            }
+            filter {
+                includeGroup("org.notenoughupdates")
+                includeGroup("org.notenoughupdates.moulconfig")
+            }
+        }
+
+        // Hypixel mod api
+        exclusiveContent {
+            forRepository {
+                maven("https://repo.hypixel.net/repository/Hypixel")
+            }
+            filter {
+                includeGroup("net.hypixel")
+            }
+        }
+
+        // Modrinth
+        exclusiveContent {
+            forRepository {
+                maven("https://api.modrinth.com/maven")
+            }
+            filter {
+                includeGroup("maven.modrinth")
+            }
+        }
+
         maven("https://maven.minecraftforge.net") {
             metadataSources {
                 artifact() // We love missing POMs
             }
         }
-        maven("https://maven.fabricmc.net/") // prefer for fabricmc, for when sponge dies
-        maven("https://repo.spongepowered.org/repository/maven-public/") // mixin
-        maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+
         maven("https://jitpack.io") {
             // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
-        maven("https://repo.nea.moe/releases") // libautoupdate
-        maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
-        maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
-        maven("https://api.modrinth.com/maven") // Modrinth
     }
 }
 
