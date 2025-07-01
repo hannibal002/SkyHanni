@@ -20,7 +20,7 @@ import net.minecraft.particle.ParticleTypes
 
 @SkyHanniModule
 object InvisibugHighlighter {
-    val config get() = SkyHanniMod.feature.foraging.mobHighlight.invisibug
+    private val config get() = SkyHanniMod.feature.foraging.mobHighlight.invisibug
 
     private val invisibugEntities = mutableListOf<LivingEntity>()
 

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeNotContainedFromList
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.keepOnlyIn
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
@@ -36,6 +36,7 @@ import net.minecraft.tileentity.TileEntity
 //$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
+
 //#endif
 
 @SkyHanniModule
@@ -211,11 +212,8 @@ object EntityUtils {
     //$$ }
     //#endif
 
-    fun <T> removeInvalidEntities(
-        list: MutableList<T>,
-        validSource: Sequence<T>
-    ) {
-        validSource.removeNotContainedFromList(list)
+    fun <T> removeInvalidEntities(list: MutableList<T>, validSource: Sequence<T>) {
+        list.keepOnlyIn(validSource)
     }
 
     inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
