@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.render;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.features.misc.HideArmor;
 import net.minecraft.entity.Entity;
@@ -25,7 +25,10 @@ public class MixinHeadFeatureRenderer {
         float g,
         CallbackInfo ci
     ) {
-        Entity current = HideArmor.INSTANCE.get();
+        Entity current = HideArmor.getCurrentEntity();
+        if (current == null) {
+            return;
+        }
         if (current instanceof PlayerEntity && HideArmor.INSTANCE.shouldHideArmor(((PlayerEntity) current))) {
             ci.cancel();
         }

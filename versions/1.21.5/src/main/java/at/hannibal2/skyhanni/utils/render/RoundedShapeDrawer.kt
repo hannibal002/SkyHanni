@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.shader.CircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
@@ -112,4 +113,15 @@ object RoundedShapeDrawer {
                 { color(topColor) },
             ),
         )
+
+    fun drawCircle(left: Int, top: Int, right: Int, bottom: Int, color: Int) =
+        CircleShader.performVQuadAndUniforms(
+            SkyHanniRenderPipeline.CIRCLE(),
+            x1 = left, y1 = top, x2 = right, y2 = bottom,
+            postVertexOps = listOf { color(color) },
+        ) {
+            setUniform("angle1", CircleShader.angle1)
+            setUniform("angle2", CircleShader.angle2)
+        }
+
 }

@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.data.hotx
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.HotmApi.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -22,7 +24,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -421,9 +422,10 @@ enum class HotmData(
 
     // TODO move all object functions into hotm api?
     @SkyHanniModule
-    companion object : HotxHandler<HotmData, HotmReward>(entries) {
+    companion object : HotxHandler<HotmData, HotmReward, SkymallPerk>(entries) {
 
         override val name: String = "HotM"
+        override val rotatingPerkClazz = SkymallPerk::class
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
@@ -435,6 +437,7 @@ enum class HotmData(
             "Heart of the Mountain",
         )
 
+        // <editor-fold desc="Patterns">
         /**
          * REGEX-TEST: §5§o§7Level 1§8/50 §7(§b0 §l0%§7):skull:
          * REGEX-TEST: §7Level 1§8/50
@@ -477,7 +480,7 @@ enum class HotmData(
             "(?:§.)*§7Cost",
         )
 
-        private val resetChatPattern by patternGroup.pattern(
+        override val resetChatPattern by patternGroup.pattern(
             "reset.chat",
             "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset\\.",
         )
@@ -507,11 +510,6 @@ enum class HotmData(
             "\\s+§8- §5(?<token>\\d+) Token of the Mountain",
         )
 
-        private val skymallPattern by patternGroup.pattern(
-            "skymall",
-            "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?<perk>.*)",
-        )
-
         private val mayhemChatPattern by patternGroup.pattern(
             "mayhem",
             "§b§lMAYHEM! §r§7(?<perk>.*)",
@@ -525,6 +523,7 @@ enum class HotmData(
             "widget.powder",
             "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
         )
+        // </editor-fold>
 
         override var tokens: Int
             get() = ProfileStorageData.profileSpecific?.mining?.tokens ?: 0
@@ -581,7 +580,7 @@ enum class HotmData(
         }
 
         override fun Slot.extraHandling(entry: HotmData, lore: List<String>) {
-            if (entry == SKY_MALL) handleSkyMall(lore)
+            // Hi I'm not empty
         }
 
         override val core = CORE_OF_THE_MOUNTAIN
@@ -593,37 +592,6 @@ enum class HotmData(
                     if (isHeartItem) it.setAmount(powder)
                     else it.total += powder
                     return
-                }
-            }
-        }
-
-        private val skyMallCurrentEffect by patternGroup.pattern(
-            "skymall.current",
-            "§aYour Current Effect",
-        )
-
-        private fun handleSkyMall(lore: List<String>) {
-            if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmApi.skymall = null
-            else {
-                val index = skyMallCurrentEffect.indexOfFirstMatch(lore) ?: run {
-                    ErrorManager.logErrorStateWithData(
-                        "Could not read the skymall effect from the hotm tree",
-                        "skyMallCurrentEffect didn't match",
-                        "lore" to lore,
-                    )
-                    return
-                }
-                skymallPattern.matchMatcher(lore[index + 1]) {
-                    val perk = group("perk")
-                    HotmApi.skymall = SkymallPerk.entries.firstOrNull { it.itemPattern.matches(perk) } ?: run {
-                        ErrorManager.logErrorStateWithData(
-                            "Could not read the skymall effect from the hotm tree",
-                            "no itemPattern matched",
-                            "lore" to lore,
-                            "perk" to perk,
-                        )
-                        null
-                    }
                 }
             }
         }
@@ -661,26 +629,20 @@ enum class HotmData(
             }
         }
 
+        override fun setRotatingPerk(newRotatingPerk: SkymallPerk?) {
+            HotmApi.skymall = newRotatingPerk
+            ChatUtils.debug("setting skymall to ${HotmApi.skymall}")
+        }
+
         @HandleEvent(onlyOnSkyblock = true)
-        fun onChat(event: SkyHanniChatEvent) {
-            if (resetChatPattern.matches(event.message)) {
-                resetTree()
-                return
-            }
-            skymallPattern.matchMatcher(event.message) {
-                val perk = group("perk")
-                HotmApi.skymall = SkymallPerk.entries.firstOrNull { it.chatPattern.matches(perk) } ?: run {
-                    ErrorManager.logErrorStateWithData(
-                        "Could not read the skymall effect from chat",
-                        "no chatPattern matched",
-                        "chat" to event.message,
-                        "perk" to perk,
-                    )
-                    null
-                }
-                ChatUtils.debug("setting skymall to ${HotmApi.skymall}")
-                return
-            }
+        override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
+
+        override fun tryBlock(event: SkyHanniChatEvent) {
+            if (!chatConfig.hideSkyMall || IslandTypeTags.MINING.inAny()) return
+            event.blockedReason = "skymall"
+        }
+
+        override fun extraChatHandling(event: SkyHanniChatEvent) {
             DelayedRun.runNextTick {
                 mayhemChatPattern.matchMatcher(event.message) {
                     val perk = group("perk")
@@ -697,6 +659,8 @@ enum class HotmData(
                 }
             }
         }
+
+        override val rotatingPerkEntry: HotmData = SKY_MALL
 
         @HandleEvent
         fun onIslandChange(event: IslandChangeEvent) {
@@ -722,6 +686,8 @@ enum class HotmData(
         }
     }
 }
+
+private val chatConfig get() = SkyHanniMod.feature.chat
 
 private val coreOfTheMountainPerks = mutableMapOf<Int, Map<HotmReward, Double>>()
 

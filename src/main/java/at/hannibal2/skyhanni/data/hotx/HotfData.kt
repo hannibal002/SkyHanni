@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.data.hotx
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.HotfApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -8,9 +11,9 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
@@ -300,9 +303,10 @@ enum class HotfData(
     override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.foraging?.hotFTree
 
     @SkyHanniModule
-    companion object : HotxHandler<HotfData, HotfReward>(entries) {
+    companion object : HotxHandler<HotfData, HotfReward, HotfApi.LotteryPerk>(entries) {
         override val name: String = "HotF"
         override val core: HotfData = CENTER_OF_THE_FOREST
+        override val rotatingPerkClazz = HotfApi.LotteryPerk::class
         override var tokens: Int
             get() = ProfileStorageData.profileSpecific?.foraging?.tokens ?: 0
             set(value) {
@@ -326,6 +330,7 @@ enum class HotfData(
                 ProfileStorageData.profileSpecific?.foraging?.whispers?.total = value
             }
 
+        // <editor-fold desc="Patterns">
         /**
          * REGEX-TEST: §7§a§lSELECTED
          * REGEX-TEST: §a§lENABLED
@@ -398,7 +403,7 @@ enum class HotfData(
         /**
          * REGEX-TEST:  §7You have reset your §r§aHeart of the Forest§r§7! Your §r§aPerks §r§7and §r§aAbilities §r§7have been reset.
          */
-        private val resetChatPattern by patternGroup.pattern(
+        override val resetChatPattern by patternGroup.pattern(
             "reset.chat",
             "\\s*§7You have reset your §r§aHeart of the Forest§r§7! Your §r§aPerks §r§7and §r§aAbilities §r§7have been reset\\.",
         )
@@ -418,6 +423,7 @@ enum class HotfData(
             "whisper.reset",
             "\\s+§8- §.(?<whisper>[\\d,]*) Forest Whispers",
         )
+        // </editor-fold>
 
         override val readingLevelTransform: Matcher.() -> Int = {
             group("level").toInt()
@@ -431,15 +437,23 @@ enum class HotfData(
             // Hi I'm not empty
         }
 
+        override fun extraChatHandling(event: SkyHanniChatEvent) {
+            // Hi I'm not empty
+        }
+
+        override fun tryBlock(event: SkyHanniChatEvent) {
+            if (!chatConfig.hideLottery || IslandTypeTags.FORAGING.inAny()) return
+            event.blockedReason = "lottery"
+        }
+
         override fun readFromHeartOrReset(line: String, isHeartItem: Boolean) {
-            (if (isHeartItem) whisperHeartPattern else whisperResetPattern).matchMatcher(line) {
-                val whisper = group("whisper").formatLong()
-                if (isHeartItem) {
-                    whispersCurrent = whisper
-                    whispersTotal = whisper
-                } else {
-                    whispersTotal += whisper
-                }
+            val pattern = if (isHeartItem) whisperHeartPattern else whisperResetPattern
+            val whisper = pattern.matchMatcher(line) { group("whisper").formatLong() } ?: return
+            if (isHeartItem) {
+                whispersCurrent = whisper
+                whispersTotal = whisper
+            } else {
+                whispersTotal += whisper
             }
         }
 
@@ -459,13 +473,15 @@ enum class HotfData(
         @HandleEvent(onlyOnSkyblock = true)
         override fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) = super.onInventoryFullyOpened(event)
 
-        @HandleEvent(onlyOnSkyblock = true)
-        fun onChat(event: SkyHanniChatEvent) {
-            if (resetChatPattern.matches(event.message)) {
-                resetTree()
-                return
-            }
+        override fun setRotatingPerk(newRotatingPerk: HotfApi.LotteryPerk?) {
+            HotfApi.lottery = newRotatingPerk
+            ChatUtils.debug("setting lottery to ${HotfApi.lottery}")
         }
+
+        @HandleEvent(onlyOnSkyblock = true)
+        override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
+
+        override val rotatingPerkEntry = LOTTERY
 
         @HandleEvent
         fun onDebug(event: DebugDataCollectEvent) {
@@ -479,6 +495,8 @@ enum class HotfData(
 
     }
 }
+
+private val chatConfig get() = SkyHanniMod.feature.chat
 
 private val patternGroup = RepoPattern.group("foraging.hotf")
 

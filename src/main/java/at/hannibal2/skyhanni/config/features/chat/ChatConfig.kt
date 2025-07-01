@@ -188,6 +188,12 @@ class ChatConfig {
     var hideSkyMall: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Hide Lottery Messages", desc = "Hide the Lottery messages outside of Foraging Islands.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideLottery: Boolean = true
+
+    @Expose
     @ConfigOption(
         name = "Shorten Coin Amounts",
         desc = "Replace coin amounts in chat messages with their shortened version.\n" +

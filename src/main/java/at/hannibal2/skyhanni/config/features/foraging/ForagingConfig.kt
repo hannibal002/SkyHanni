@@ -32,6 +32,10 @@ class ForagingConfig {
     val hotf: HotfConfig = HotfConfig()
 
     @Expose
+    @Category(name = "Trees", desc = "Settings for big trees found on the foraging islands.")
+    val trees: TreesConfig = TreesConfig()
+
+    @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
     @Accordion
     @OnlyModern
@@ -44,10 +48,9 @@ class ForagingConfig {
     var moongladeBeacon = MoongladeBeaconConfig()
 
     @Expose
-    @ConfigOption(name = "Birries Highlight", desc = "")
     @OnlyModern
-    @Accordion
-    var birriesHighlight = BirriesHighlightConfig()
+    @Category(name = "Foraging Mob Highlights", desc = "Settings for foraging mob highlights")
+    var mobHighlight = ForagingMobHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
@@ -60,6 +63,13 @@ class ForagingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var lassoDisplay = true
+
+    @Expose
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Galatea.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var mutePhantoms = true
 
     @Expose
     @ConfigLink(owner = ForagingConfig::class, field = "lassoDisplay")
