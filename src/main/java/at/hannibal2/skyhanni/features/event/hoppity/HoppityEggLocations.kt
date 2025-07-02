@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 @SkyHanniModule
 object HoppityEggLocations {
