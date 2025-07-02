@@ -98,6 +98,10 @@ object CustomScoreboardConfigFix {
         }
 
         event.addEvent(89, ScoreboardConfigEventElement.GALATEA)
+
+        event.transform(90, EVENT_ENTRIES_KEY) { element ->
+            JsonArray().apply { element.asJsonArray.toSet().forEach(::add) }
+        }
     }
 
     private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {

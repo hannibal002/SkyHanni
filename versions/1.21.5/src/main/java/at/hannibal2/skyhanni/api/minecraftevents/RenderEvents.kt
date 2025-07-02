@@ -1,13 +1,19 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.util.Identifier
 
 @SkyHanniModule
 object RenderEvents {
@@ -33,6 +39,14 @@ object RenderEvents {
 
         // InitializeGuiEvent
 
+        HudLayerRegistrationCallback.EVENT.register { context ->
+            context.attachLayerAfter(IdentifiedLayer.SLEEP, Identifier.of("skyhanni", "hotbar_layer"), RenderEvents::postGui)
+        }
+    }
+
+    private fun postGui(context: DrawContext, tick: RenderTickCounter) {
+        if (MinecraftClient.getInstance().options.hudHidden) return
+        RenderData.postRenderOverlay(context)
     }
 
     // GameOverlayRenderPreEvent
@@ -43,8 +57,13 @@ object RenderEvents {
     }
 
     @JvmStatic
-    fun postExperienceLayerEventPre(context: DrawContext): Boolean {
-        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE).post()
+    fun postExperienceBarLayerEventPre(context: DrawContext): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_BAR).post()
+    }
+
+    @JvmStatic
+    fun postExperienceNumberLayerEventPre(context: DrawContext): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 
     @JvmStatic
@@ -60,8 +79,13 @@ object RenderEvents {
     }
 
     @JvmStatic
-    fun postExperienceLayerEventPost(context: DrawContext) {
-        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE).post()
+    fun postExperienceBarLayerEventPost(context: DrawContext) {
+        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_BAR).post()
+    }
+
+    @JvmStatic
+    fun postExperienceNumberLayerEventPost(context: DrawContext) {
+        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 }
 
@@ -76,11 +100,13 @@ enum class RenderLayer {
     FOOD,
     AIR,
     HOTBAR,
-    EXPERIENCE,
+    EXPERIENCE_BAR,
     TEXT,
     HEALTHMOUNT,
     JUMPBAR,
     CHAT,
     PLAYER_LIST,
-    DEBUG;
+    DEBUG,
+    // Not a real forge layer but is used on modern Minecraft versions
+    EXPERIENCE_NUMBER,
 }

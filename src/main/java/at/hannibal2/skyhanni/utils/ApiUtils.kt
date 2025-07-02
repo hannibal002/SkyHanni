@@ -17,7 +17,9 @@ import org.apache.http.HttpEntity
 import org.apache.http.client.HttpResponseException
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.CloseableHttpResponse
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.client.protocol.RequestAcceptEncoding
@@ -342,19 +344,7 @@ object ApiUtils {
     }
     // </editor-fold>
 
-    // <editor-fold desc="POSTs">
-    /**
-     * Posts a JSON body to the given static Api path.
-     * This function is a wrapper around [postJSON] that uses the URL and Api name from the [StaticApiPath].
-     *
-     * @param static The [StaticApiPath] containing the URL and Api name.
-     * @param jsonBody The JSON body to post.
-     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
-     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
-     */
-    suspend fun postJSON(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse<JsonObject> =
-        withContext(Dispatchers.IO) { internalPostJSON(static.url, jsonBody, static.apiName, silentError) }
-
+    // <editor-fold desc="POSTs & PATCHes">
     /**
      * Posts a JSON body to the given URL.
      *
@@ -365,26 +355,71 @@ object ApiUtils {
      * @return An [ApiResponse] containing the success status, message, and data from the Api response.
      */
     suspend fun postJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse<JsonObject> =
-        withContext(Dispatchers.IO) { internalPostJSON(url, jsonBody, apiName, silentError) }
+        withContext(Dispatchers.IO) {
+            internalSendJSONBody<JsonObject, HttpPost>(url, jsonBody, apiName, silentError)
+        }
 
     /**
-     * Driving logic for posting a JSON body to the Api.
-     * This function executes the HTTP POST request and processes the response.
+     * Posts a JSON body to the given static Api path.
+     * This function is a wrapper around [postJSON] that uses the URL and Api name from the [StaticApiPath].
      *
-     * @param url The URL to post the JSON body to.
+     * @param static The [StaticApiPath] containing the URL and Api name.
      * @param jsonBody The JSON body to post.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     */
+    suspend fun postJSONStatic(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse<JsonObject> =
+        postJSON(static.url, jsonBody, static.apiName, silentError)
+
+    /**
+     * Patches a JSON body to the given URL.
+     *
+     * @param url The URL to patch the JSON body to.
+     * @param jsonBody The JSON body to patch.
+     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     */
+    suspend fun patchJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse<JsonObject> =
+        withContext(Dispatchers.IO) {
+            internalSendJSONBody<JsonObject, HttpPatch>(url, jsonBody, apiName, silentError)
+        }
+
+    /**
+     * Patches a JSON body to the given static Api path.
+     * This function is a wrapper around [patchJSON] that uses the URL and Api name from the [StaticApiPath].
+     *
+     * @param static The [StaticApiPath] containing the URL and Api name.
+     * @param jsonBody The JSON body to patch.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     */
+    suspend fun patchJSONStatic(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse<JsonObject> =
+        patchJSON(static.url, jsonBody, static.apiName, silentError)
+
+    /**
+     * Driving logic for sending a JSON body to an Api.
+     * This function executes the HTTP [H] request and processes the response.
+     *
+     * NOTE:
+     * PLEASE DO NOT CALL THIS DIRECTLY UNLESS YOU'RE IN AN IO COROUTINE :). - Daveed
+     *
+     * @param url The URL to [H] the JSON body to.
+     * @param jsonBody The JSON body to [H].
      * @param apiName The name of the Api being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @return An [ApiResponse] containing the success status, message, and data from the Api response.
      */
     @PublishedApi
-    internal inline fun <reified T : JsonElement> internalPostJSON(
+    internal inline fun <reified T : JsonElement, reified H : HttpEntityEnclosingRequestBase>
+    internalSendJSONBody(
         url: String,
         jsonBody: String,
         apiName: String,
         silentError: Boolean = true
     ): ApiResponse<T> {
-        val method = HttpPost(url).apply {
+        val ctor = H::class.java.getConstructor(String::class.java)
+        val method = ctor.newInstance(url).apply {
             entity = StringEntity(jsonBody, ContentType.APPLICATION_JSON)
         }
         val apiIntention = ApiIntentionContext(method, apiName)

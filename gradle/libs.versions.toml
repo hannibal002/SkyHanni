@@ -10,6 +10,8 @@ hypixelmodapi_forge = "1.0.1.2"
 
 modmenu = "14.0.0-rc.2"
 
+roughlyenoughitems = "19.0.806"
+
 [libraries]
 moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
 moulconfigModern = { module = "org.notenoughupdates.moulconfig:modern-1.21.5", version.ref = "moulconfig" }
@@ -26,3 +28,5 @@ hypixelmodapi = { module = "net.hypixel:mod-api", version.ref = "hypixelmodapi" 
 hypixelmodapi_fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixelmodapi_fabric" }
 
 modmenu = { module = "maven.modrinth:modmenu", version.ref = "modmenu" }
+
+roughlyenoughitems = { module = "me.shedaniel:RoughlyEnoughItems-api-fabric", version.ref = "roughlyenoughitems" }
