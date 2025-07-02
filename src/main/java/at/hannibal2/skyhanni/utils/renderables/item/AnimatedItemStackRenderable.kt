@@ -135,7 +135,7 @@ class AnimatedItemStackRenderable(
     )
 
     private fun ItemStackBounceDefinition.calculateBounce(): Double {
-       if (!bounce.isEnabled()) return 0.0
+        if (!bounce.isEnabled()) return 0.0
 
         val t = startTime.passedSince().inPartialSeconds
         val period = fullBounceHeight * 2.0 / bounceSpeed
