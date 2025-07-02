@@ -41,11 +41,12 @@ object CompactSweepDetails {
      * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818.19 Logs
      * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818.04 Logs
      * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818 Logs
+     * REGEX-TEST:   §r§7Dark Oak Tree Toughness: §r§60 §r§a35 Logs
      */
     @Suppress("MaxLineLength")
     private val sweepToughnessLogsPattern by patternGroup.pattern(
         "toughness-and-logs",
-        "\\s+(?:§.)+(?<treeType>\\w+) Tree Toughness: (?<toughnessDisplay>§r§6(?<toughnessAmount>[\\d,]+(?:\\.\\d+)?)) (?<logsDisplay>(?:§.)+(?<isItGreen>§.)(?<logsAmount>[\\d,]+(?:\\.\\d+)?)) Logs"
+        "\\s+(?:§.)+(?<treeType>[\\S ]+) Tree Toughness: (?<toughnessDisplay>§r§6(?<toughnessAmount>[\\d,]+(?:\\.\\d+)?)) (?<logsDisplay>(?:§.)+(?<isItGreen>§.)(?<logsAmount>[\\d,]+(?:\\.\\d+)?)) Logs",
     )
 
     /**
@@ -195,6 +196,6 @@ object CompactSweepDetails {
         sweepDetailsVariablesDirty = false
     }
 
-    // allow on multiple islands 
-    private fun isInIsland() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.inAnyIsland(IslandType.THE_PARK, IslandType.GALATEA, IslandType.HUB)
+    private fun isInIsland() =
+        SkyBlockUtils.inSkyBlock && SkyBlockUtils.inAnyIsland(IslandType.THE_PARK, IslandType.GALATEA, IslandType.HUB)
 }
