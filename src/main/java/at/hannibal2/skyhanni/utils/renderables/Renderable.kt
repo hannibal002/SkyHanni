@@ -960,22 +960,6 @@ interface Renderable {
             return VerticalContainerRenderable(buildList { builderAction() }, spacing = 2)
         }
 
-        @Deprecated(
-            "Use HorizontalContainerRenderable instead",
-            ReplaceWith("HorizontalContainerRenderable(content, spacing, horizontalAlign, verticalAlign)"),
-        )
-        fun horizontalContainer(
-            content: List<Renderable>,
-            spacing: Int = 0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ): Renderable = HorizontalContainerRenderable(
-            content,
-            spacing,
-            horizontalAlign,
-            verticalAlign,
-        )
-
         fun scrollList(
             list: List<Renderable>,
             height: Int,
