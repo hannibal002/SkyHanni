@@ -22,7 +22,7 @@ object MovableXPBar {
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (event.type != RenderLayer.EXPERIENCE || !isEnabled()) return
+        if ((event.type != RenderLayer.EXPERIENCE_BAR && event.type != RenderLayer.EXPERIENCE_NUMBER) || !isEnabled()) return
         post = true
         DrawContextUtils.pushMatrix()
         val x = GuiScreenUtils.scaledWindowWidth / 2 - 91
@@ -34,7 +34,7 @@ object MovableXPBar {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
-        if (event.type != RenderLayer.EXPERIENCE || !post) return
+        if ((event.type != RenderLayer.EXPERIENCE_BAR && event.type != RenderLayer.EXPERIENCE_NUMBER) || !post) return
         DrawContextUtils.popMatrix()
         post = false
     }
