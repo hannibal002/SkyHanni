@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -148,8 +147,8 @@ object AttributeShardsData {
     fun onChat(event: SkyHanniChatEvent) {
         shardSyphonedPattern.matchMatcher(event.message) {
             val attributeName = group("attributeName")
-            val level = group("level").formatInt()
-            val untilNext = group("untilNext").formatInt()
+            val level = group("level").toInt()
+            val untilNext = group("untilNext").toInt()
             val shardName = attributeAbilityNameToShard[attributeName]
                 ?: ErrorManager.skyHanniError("Unknown attribute shard name for ability: $attributeName")
             val shardInternalName = shardNameToInternalName(shardName)
@@ -169,7 +168,7 @@ object AttributeShardsData {
         andMoreMessagePattern.matchMatcher(event.message) {
             if (lastSyphonedMessage.passedSince() > 1.seconds) return
             if (!config.enabled) return
-            val amount = group("amount").formatInt()
+            val amount = group("amount").toInt()
             DelayedRun.runNextTick {
                 ChatUtils.clickableChat(
                     "§aClick here and scroll through to refresh SkyHanni's attribute overlay data with $amount shards",
@@ -190,7 +189,7 @@ object AttributeShardsData {
                 tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             }
             syphonAmountPattern.firstMatcher(item.getLore()) {
-                toNextTier = group("amount").formatInt()
+                toNextTier = group("amount").toInt()
             }
             processShard(internalName, tier, toNextTier)
         }
@@ -210,7 +209,7 @@ object AttributeShardsData {
                     tier = groupOrNull("tier")?.romanToDecimal() ?: 0
                 }
                 syphonAmountPattern.matchMatcher(line) {
-                    toNextTier = group("amount").formatInt()
+                    toNextTier = group("amount").toInt()
                 }
             }
             processShard(internalName, tier, toNextTier)
