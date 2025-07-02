@@ -453,24 +453,6 @@ interface Renderable {
             }
         }
 
-        @Deprecated(
-            "Use StringRenderable instead",
-            ReplaceWith("StringRenderable(text, scale, color, horizontalAlign, verticalAlign)"),
-        )
-        fun string(
-            text: String,
-            scale: Double = 1.0,
-            color: Color = Color.WHITE,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-        ) = StringRenderable(
-            text,
-            scale,
-            color,
-            horizontalAlign,
-            verticalAlign,
-        )
-
         fun placeholder(width: Int, height: Int = 10) = object : Renderable {
             override val width = width
             override val height = height
