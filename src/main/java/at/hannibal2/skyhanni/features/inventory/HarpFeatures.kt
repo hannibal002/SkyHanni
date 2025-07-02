@@ -47,10 +47,11 @@ object HarpFeatures {
 
     /**
      * REGEX-TEST: Harp - Amazing Grace
+     * REGEX-FAIL: Harpy ➜ Instant Buy
      */
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventory",
-        "Harp.*",
+        "Harp -.*",
     )
     private val menuTitlePattern by patternGroup.pattern(
         "menu",

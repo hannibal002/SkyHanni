@@ -6,12 +6,14 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledApiJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
@@ -56,6 +58,19 @@ object ApiUtils {
     }
 
     data class ApiResponse(val success: Boolean, val message: String?, val data: JsonObject)
+
+    enum class SkinBodyPart(val path: String) {
+        FRONT("body/front"),
+        LEFT("body/left"),
+        BACK("body/back"),
+        RIGHT("body/right"),
+        FACE("face"),
+        HEAD("head");
+
+        override fun toString(): String {
+            return "§9${name.lowercase().firstLetterUppercase()}"
+        }
+    }
 
     private val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
@@ -185,11 +200,54 @@ object ApiUtils {
         }
     }
 
+    fun patchJSON(urlString: String, body: String, apiName: String, silentError: Boolean = false): ApiResponse {
+        val client = builder.build()
+
+        try {
+            val method = HttpPatch(urlString)
+            method.entity = StringEntity(body, ContentType.APPLICATION_JSON)
+
+            client.execute(method).use { response ->
+                val status = response.statusLine
+                val entity = response.entity
+
+                if (status.statusCode in 200..299) {
+                    val data = readResponse(entity)
+                    return ApiResponse(true, "Request successful", data)
+                }
+
+                val message = "PATCH request to '$urlString' returned status ${status.statusCode}"
+                ErrorManager.logErrorStateWithData(
+                    "Error communicating with $apiName API", "APIUtil PATCH request returned an error code",
+                    "statusCode" to status.statusCode,
+                    "urlString" to urlString,
+                    "body" to body,
+                )
+                return ApiResponse(false, message, JsonObject())
+            }
+        } catch (throwable: Throwable) {
+            if (silentError) {
+                throw throwable
+            }
+            ErrorManager.logErrorWithData(
+                throwable, "SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource",
+                "urlString" to urlString,
+                "body" to body,
+            )
+            return ApiResponse(false, throwable.message, JsonObject())
+        } finally {
+            client.close()
+        }
+    }
+
+    fun getPlayerSkin(part: SkinBodyPart, scale: Int) =
+        "https://api.mineatar.io/${part.path}/${PlayerUtils.getUuid()}?scale=$scale"
+
+
     private fun readResponse(entity: HttpEntity?): JsonObject {
         if (entity == null || entity.contentLength == 0L) {
             return JsonObject() // Handle responses without a body
         }
-
         val retSrc = EntityUtils.toString(entity) ?: return JsonObject()
 
         try {

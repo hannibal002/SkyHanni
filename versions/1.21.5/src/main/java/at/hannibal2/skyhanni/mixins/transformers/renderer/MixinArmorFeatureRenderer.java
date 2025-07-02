@@ -1,8 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.render;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.features.misc.HideArmor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import at.hannibal2.skyhanni.mixins.hooks.HideArmorHookKt;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,11 +24,9 @@ public class MixinArmorFeatureRenderer {
         BipedEntityModel armorModel,
         CallbackInfo ci
     ) {
-        Entity current = HideArmor.INSTANCE.get();
-        if (current instanceof PlayerEntity && HideArmor.INSTANCE.shouldHideArmor(((PlayerEntity) current))) {
-            if (!HideArmor.INSTANCE.getConfig().onlyHelmet || slot == EquipmentSlot.HEAD) {
-                ci.cancel();
-            }
+        if (HideArmorHookKt.shouldHideHead(slot)) {
+            ci.cancel();
         }
     }
+
 }

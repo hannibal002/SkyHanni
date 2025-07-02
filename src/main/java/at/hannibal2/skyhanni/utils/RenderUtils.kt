@@ -269,9 +269,9 @@ object RenderUtils {
         if (centered) {
             val strLen: Int = fr.getStringWidth(string)
             val x2 = offsetX - strLen / 2f
-            GuiRenderUtils.drawString(display, x2, 0f, 0)
+            GuiRenderUtils.drawString(display, x2, 0f, -1)
         } else {
-            GuiRenderUtils.drawString(display, 0f, 0f, 0)
+            GuiRenderUtils.drawString(display, 0f, 0f, -1)
         }
 
         DrawContextUtils.popMatrix()
@@ -585,7 +585,7 @@ object RenderUtils {
         DrawContextUtils.pushPop {
             DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 200f)
             DrawContextUtils.scale(scale, scale, 1f)
-            GuiRenderUtils.drawString(text, 0f, 0f, 16777215)
+            GuiRenderUtils.drawString(text, 0f, 0f, -1)
 
             val reverseScale = 1 / scale
 

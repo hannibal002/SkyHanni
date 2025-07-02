@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.render;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.render.BufferBuilder;
