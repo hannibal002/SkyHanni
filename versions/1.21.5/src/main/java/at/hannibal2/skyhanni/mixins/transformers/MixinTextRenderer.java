@@ -20,14 +20,12 @@ public class MixinTextRenderer {
     )
     private OrderedText modifyOrderedText(OrderedText value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.orderedTextToLegacyString(value)
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+            value
         );
 
         if (replaced == null) return value;
-        return OrderedTextUtils.legacyTextToOrderedText(
-            replaced
-        );
+        return replaced;
     }
 
     @ModifyVariable(
@@ -38,12 +36,12 @@ public class MixinTextRenderer {
     )
     private String modifyString(String value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            value
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+            OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
         if (replaced == null) return value;
-        return replaced;
+        return OrderedTextUtils.orderedTextToLegacyString(replaced);
     }
 
     @ModifyVariable(
@@ -52,17 +50,14 @@ public class MixinTextRenderer {
         at = @At("HEAD"),
         argsOnly = true
     )
-
     private OrderedText modifyWidth(OrderedText value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.orderedTextToLegacyString(value)
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+            value
         );
 
         if (replaced == null) return value;
-        return OrderedTextUtils.legacyTextToOrderedText(
-            replaced
-        );
+        return replaced;
     }
 
     @ModifyVariable(
@@ -73,12 +68,12 @@ public class MixinTextRenderer {
     )
     private String modifyWidth(String value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            value
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+            OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
         if (replaced == null) return value;
-        return replaced;
+        return OrderedTextUtils.orderedTextToLegacyString(replaced);
     }
 
     @ModifyVariable(
@@ -89,13 +84,11 @@ public class MixinTextRenderer {
     )
     private StringVisitable modifyWidth(StringVisitable value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.stringVisitableToLegacyString(value)
+        StringVisitable replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(
+            value
         );
 
         if (replaced == null) return value;
-        return OrderedTextUtils.legacyStringToStringVisitable(
-            replaced
-        );
+        return replaced;
     }
 }

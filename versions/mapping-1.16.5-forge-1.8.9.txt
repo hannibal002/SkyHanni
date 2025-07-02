@@ -689,6 +689,7 @@ net.minecraft.world.level.block.Blocks CACTUS cactus
 net.minecraft.world.level.block.Blocks CAKE cake
 net.minecraft.world.level.block.Blocks CARPET carpet
 net.minecraft.world.level.block.Blocks CARROTS carrots
+net.minecraft.world.level.block.Blocks CARVED_PUMPKIN pumpkin
 net.minecraft.world.level.block.Blocks CAULDRON cauldron
 net.minecraft.world.level.block.Blocks CHEST chest
 net.minecraft.world.level.block.Blocks CLAY clay
@@ -797,7 +798,6 @@ net.minecraft.world.level.block.Blocks POTATOES potatoes
 net.minecraft.world.level.block.Blocks POWERED_COMPARATOR powered_comparator
 net.minecraft.world.level.block.Blocks POWERED_REPEATER powered_repeater
 net.minecraft.world.level.block.Blocks PRISMARINE prismarine
-net.minecraft.world.level.block.Blocks PUMPKIN pumpkin
 net.minecraft.world.level.block.Blocks PUMPKIN_STEM pumpkin_stem
 net.minecraft.world.level.block.Blocks QUARTZ_BLOCK quartz_block
 net.minecraft.world.level.block.Blocks QUARTZ_STAIRS quartz_stairs

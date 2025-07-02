@@ -63,6 +63,11 @@ object CustomWardrobe {
     // TODO use inventory InventoryDetector
     private const val GUI_NAME = "Custom Wardrobe"
 
+    var renderableTopCorner: Pair<Int, Int> = 0 to 0
+        private set
+    var renderableDimensions: Pair<Int, Int> = 0 to 0
+        private set
+
     @HandleEvent
     fun onGuiRender(event: GuiContainerEvent.PreDraw) {
         if (!isEnabled() || editMode) return
@@ -84,8 +89,13 @@ object CustomWardrobe {
         }
 
         val (width, height) = renderable.width to renderable.height
+        renderableDimensions = width to height
 
-        position.moveTo((gui.width - width) / 2, (gui.height - height) / 2)
+        val left = (gui.width - width) / 2
+        val top = (gui.height - height) / 2
+        position.moveTo(left, top)
+        renderableTopCorner = left to top
+
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.string(
                 "§cLoading...",
@@ -645,11 +655,14 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
 
-    fun centerString(
+    private fun centerString(
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
     ) = Renderable.string(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
+
+    @JvmStatic
+    fun shouldHideNormalTooltip(): Boolean = WardrobeApi.inCustomWardrobe && !editMode
 }

@@ -20,7 +20,7 @@ allprojects {
      * Beta version
      * Bugfix version
      */
-    version = "3.14.0"
+    version = "3.15.0"
 
     repositories {
         mavenCentral()
@@ -95,6 +95,18 @@ allprojects {
             }
             filter {
                 includeGroup("maven.modrinth")
+            }
+        }
+
+        // Rei for compat plugin
+        exclusiveContent {
+            forRepository {
+                maven("https://maven.shedaniel.me")
+            }
+            filter {
+                includeGroup("me.shedaniel")
+                includeGroup("dev.architectury")
+                includeGroup("me.shedaniel.cloth")
             }
         }
 

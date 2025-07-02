@@ -21,10 +21,10 @@ import net.minecraft.entity.decoration.ArmorStandEntity
 @SkyHanniModule
 object TreeProgressDisplay {
 
-    private val config get() = SkyHanniMod.feature.foraging.treeProgress
+    private val config get() = SkyHanniMod.feature.foraging.trees.progress
     private var display: Renderable? = null
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (display == null) return
