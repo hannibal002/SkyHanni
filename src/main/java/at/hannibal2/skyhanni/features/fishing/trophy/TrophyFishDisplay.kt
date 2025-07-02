@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.milliseconds
@@ -145,7 +146,7 @@ object TrophyFishDisplay {
         row[TextPart.NAME] = string(getItemName(rawName))
 
         val internalName = getInternalName(rawName)
-        row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
+        row[TextPart.ICON] = ItemStackRenderable(internalName.getItemStack())
 
         val recentlyDroppedRarity = recentlyDroppedTrophies[internalName]?.takeIf { config.highlightNew.get() }
 

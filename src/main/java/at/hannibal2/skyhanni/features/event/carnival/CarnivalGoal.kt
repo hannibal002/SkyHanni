@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -223,7 +224,7 @@ enum class CarnivalGoal(
             val singleDisplay by lazy {
                 Renderable.horizontalContainer(
                     listOf(
-                        Renderable.itemStack(ItemStack(item)),
+                        ItemStackRenderable(ItemStack(item)),
                         Renderable.string(display),
                     ),
                 )

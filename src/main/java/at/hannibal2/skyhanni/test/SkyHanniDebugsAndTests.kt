@@ -69,6 +69,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
@@ -534,7 +535,7 @@ object SkyHanniDebugsAndTests {
             ItemStack(Blocks.melon_block),
         ).map { item ->
             generateSequence(scale) { it + 0.1 }.take(25).map {
-                Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
+                ItemStackRenderable(item, it, xSpacing = 0).renderBounds()
             }.toList()
         }.editCopy {
             this.add(
@@ -548,7 +549,7 @@ object SkyHanniDebugsAndTests {
                 HorizontalContainerRenderable(
                     listOf(
                         StringRenderable("Test:").renderBounds(),
-                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
+                        ItemStackRenderable(ItemStack(Items.diamond_sword)).renderBounds(),
                     ),
                     1,
                     RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
