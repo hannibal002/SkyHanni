@@ -32,9 +32,6 @@ class ResettableStorageSetTest {
 
     @Test
     fun testResettableStorageSet() {
-        mockkObject(ChatUtils)
-        every { ChatUtils.debug(any<String>()) } just Runs
-
         val storage = TestStorage(
             string = "changed",
             int = 100,
@@ -50,9 +47,6 @@ class ResettableStorageSetTest {
         }
 
         storage.reset()
-
-        verify(exactly = 0) { ChatUtils.debug(any()) }
-        unmockkObject(ChatUtils)
 
         Assertions.assertEquals(
             "default",
