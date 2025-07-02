@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.feature
-import at.hannibal2.skyhanni.SkyHanniMod.launchIOCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.features.garden.tracking.EmbedConfig.InformationType
@@ -57,6 +56,7 @@ object FarmingStatusTracker {
     var status = "Offline"
     private var lastNotification = SimpleTimeMark.farPast()
     private var playerFaceURL = ""
+    private var inCoroutineAlready = false
 
     private val cropEmojis: Map<CropType, String> = mapOf(
         CropType.WHEAT to "<:wheat:1263207588296790048>",
@@ -85,6 +85,7 @@ object FarmingStatusTracker {
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
         if (!config.enabled) return
+        if (inCoroutineAlready) return
         if (lastNotification.passedSince() < config.webhook.interval.minutes) return
 
         status = when {
@@ -96,6 +97,7 @@ object FarmingStatusTracker {
         }
 
         SkyHanniMod.launchIOCoroutine {
+            inCoroutineAlready = true
             val success = prepareAndSendEmbed(status)
 
             lastNotification = if (success) {
@@ -104,13 +106,14 @@ object FarmingStatusTracker {
                 ChatUtils.chat("§cCouldn't send embed (Farming Status Tracker).")
                 SimpleTimeMark.now() + 10.seconds
             }
+            inCoroutineAlready = false
         }
     }
 
     fun registerShutdownHook(runtime: Runtime) = runtime.addShutdownHook(
         Thread {
             if (!feature.garden.tracking.enabled) return@Thread
-            launchIOCoroutine { prepareAndSendEmbed("Offline") }
+            SkyHanniMod.launchIOCoroutine { prepareAndSendEmbed("Offline") }
         }
     )
 
