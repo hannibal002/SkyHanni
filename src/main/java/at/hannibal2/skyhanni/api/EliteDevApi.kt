@@ -108,7 +108,7 @@ object EliteDevApi {
                 contest.startTime.toMillis() / 1000 to contest.crops.map { crop -> crop.cropName }
             },
         )
-        val response = ApiUtils.postJSON(contestStatic, body)
+        val response = ApiUtils.postJSONStatic(contestStatic, body)
         response.success
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
