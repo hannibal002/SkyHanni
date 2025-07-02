@@ -22,7 +22,6 @@ import kotlin.reflect.jvm.jvmErasure
  */
 abstract class ResettableStorageSet {
     private val classSimpleName by lazy { this::class.simpleName ?: "UnknownClass" }
-    private val defaults by lazy { this::class.createInstance() }
     private val props = run {
         val vars = this::class.memberProperties.filterIsInstance<KMutableProperty1<out ResettableStorageSet, Any?>>()
         val (cols, maps, iters) = listOf(
@@ -41,14 +40,22 @@ abstract class ResettableStorageSet {
         }
     }
 
-    open fun reset() = props.forEach(::tryResetProp)
+    open fun reset() {
+        val defaults = this::class.createInstance()
+        props.forEach { prop ->
+            tryResetProp(prop, defaults)
+        }
+    }
 
-    private fun tryResetProp(prop: KProperty1<out ResettableStorageSet, *>) {
+    private fun tryResetProp(
+        prop: KProperty1<out ResettableStorageSet, *>,
+        defaults: ResettableStorageSet,
+    ) {
         val originalAccessibility = prop.isAccessible
         try {
             prop.isAccessible = true
             val current = prop.getter.call(this)
-            prop.resetFun(current)
+            prop.resetFun(current, defaults)
             prop.isAccessible = originalAccessibility
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
@@ -61,7 +68,10 @@ abstract class ResettableStorageSet {
         }
     }
 
-    private fun KProperty1<out ResettableStorageSet, *>.resetFun(current: Any?) = when {
+    private fun KProperty1<out ResettableStorageSet, *>.resetFun(
+        current: Any?,
+        defaults: ResettableStorageSet,
+    ) = when {
         this is KMutableProperty1<*, *> -> {
             @Suppress("UNCHECKED_CAST")
             val mutableProp = this as KMutableProperty1<Any, Any?>

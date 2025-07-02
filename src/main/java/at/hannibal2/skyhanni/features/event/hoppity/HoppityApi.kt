@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTr
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicateDoradoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -132,14 +133,28 @@ object HoppityApi {
     // </editor-fold>
 
     data class HoppityStateDataSet(
-        var hoppityMessages: MutableList<String> = mutableListOf(),
+        val hoppityMessages: MutableList<String> = mutableListOf(),
         var duplicate: Boolean = false,
         var lastRarity: LorenzRarity? = null,
         var lastName: String = "",
         var lastProfit: String = "",
         var lastMeal: HoppityEggType? = null,
         var lastDuplicateAmount: Long? = null,
-    ) : ResettableStorageSet()
+    ) : ResettableStorageSet() {
+        override fun reset() {
+            logPre()
+            super.reset()
+            logPost()
+        }
+
+        fun logPre() {
+            ChatUtils.chat("Reset called: $this")
+        }
+
+        fun logPost() {
+            ChatUtils.chat("After reset: $this")
+        }
+    }
 
     val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()
