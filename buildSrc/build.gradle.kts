@@ -14,4 +14,5 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("com.github.SkyHanniStudios:SkyHanniChangelogBuilder:1.1.2")
+    implementation(files("../sharedVariables/build/libs/sharedVariables.jar"))
 }
