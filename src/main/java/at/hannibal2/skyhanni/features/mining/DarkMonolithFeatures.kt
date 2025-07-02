@@ -88,6 +88,7 @@ object DarkMonolithFeatures {
         foundEggVec = null
         lastFoundEggVec = null
         renderBox = null
+        nextBlockCheck = SimpleTimeMark.farPast()
     }
 
     init {
@@ -141,6 +142,7 @@ object DarkMonolithFeatures {
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onTick() {
         if (!anyEnabled()) return
+        updateKnownEggs()
         val knownEggVec = foundEggVec ?: return
         with(WorldRenderUtils) {
             renderBox = knownEggVec.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
@@ -159,15 +161,14 @@ object DarkMonolithFeatures {
 
     private fun updateKnownEggs() {
         if (nextBlockCheck.isInFuture()) return
-        foundEggVec = knownEggs.firstOrNull(::canSeeFaces).also {
-            checkTitle()
-            lastFoundEggVec = it
-            nextBlockCheck = SimpleTimeMark.now().plus(500.milliseconds)
-        }
+        foundEggVec = knownEggs.firstOrNull(::canSeeFaces)
+        checkTitle()
+        nextBlockCheck = SimpleTimeMark.now().plus(500.milliseconds)
     }
 
     private fun checkTitle() {
-        if (lastFoundEggVec != null || foundEggVec == null) return
+        if (foundEggVec == null || foundEggVec == lastFoundEggVec) return
+        lastFoundEggVec = foundEggVec
         if (!config.title.enabled) return
         val titleText = config.title.text.takeIf { it.isNotEmpty() }
             ?: DarkMonolithConfig.DEFAULT_TITLE
