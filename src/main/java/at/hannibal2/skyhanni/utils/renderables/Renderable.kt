@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
@@ -32,7 +31,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
