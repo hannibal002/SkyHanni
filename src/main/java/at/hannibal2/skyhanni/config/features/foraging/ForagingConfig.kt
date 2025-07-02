@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.garden.AnitaShopConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -34,6 +35,11 @@ class ForagingConfig {
     @Expose
     @Category(name = "Trees", desc = "Settings for big trees found on the foraging islands.")
     val trees: TreesConfig = TreesConfig()
+
+    @Expose
+    @ConfigOption(name = "Starlyn Contests", desc = "")
+    @Accordion
+    val starlynContest: StarlynContestsConfig = StarlynContestsConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
