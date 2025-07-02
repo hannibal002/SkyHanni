@@ -98,8 +98,7 @@ object CompactSweepDetails {
                 sendCompactedResults()
             }
             isInsideSweepDetails = true // always set this to true so future messages get blocked properly regardless of Axe Throw status
-            sweepDetailsVariablesDirty =
-                true // always set this to true so future messages get blocked properly regardless of Axe Throw status
+            sweepDetailsVariablesDirty = true // always set this to true so future messages get blocked properly regardless of Axe Throw status
             addedInitialLogs = false
             sweepDisplay = group("sweep")
             sweepPenaltyHoverHistory.add("§eClick to open the Tree Gifts guide!")
