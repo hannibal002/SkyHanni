@@ -32,6 +32,10 @@ class ForagingConfig {
     val hotf: HotfConfig = HotfConfig()
 
     @Expose
+    @Category(name = "Trees", desc = "Settings for big trees found on the foraging islands.")
+    val trees: TreesConfig = TreesConfig()
+
+    @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
     @Accordion
     @OnlyModern
@@ -44,28 +48,15 @@ class ForagingConfig {
     var moongladeBeacon = MoongladeBeaconConfig()
 
     @Expose
-    @ConfigOption(name = "Birries Highlight", desc = "")
     @OnlyModern
-    @Accordion
-    var birriesHighlight = BirriesHighlightConfig()
-
-    @Expose
-    @ConfigOption(name = "Hideonleaf Highlight", desc = "")
-    @OnlyModern
-    @Accordion
-    var hideonleafHighlight = HideonleafHighlightConfig()
+    @Category(name = "Foraging Mob Highlights", desc = "Settings for foraging mob highlights")
+    var mobHighlight = ForagingMobHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
     @OnlyModern
     @Accordion
     val tracker = ForagingTrackerConfig()
-
-    @Expose
-    @ConfigOption(name = "Tree Progress Display", desc = "")
-    @OnlyModern
-    @Accordion
-    val treeProgress = TreeProgressConfig()
 
     @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")

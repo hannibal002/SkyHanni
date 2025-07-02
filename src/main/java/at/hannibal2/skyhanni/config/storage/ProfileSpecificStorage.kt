@@ -906,5 +906,12 @@ class ProfileSpecificStorage(
     )
 
     @Expose
+    var attributeShards: MutableMap<String, AttributeShardData> = mutableMapOf()
+
+    data class AttributeShardData(
+        @Expose var amountSyphoned: Int = 0,
+    )
+
+    @Expose
     var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
 }
