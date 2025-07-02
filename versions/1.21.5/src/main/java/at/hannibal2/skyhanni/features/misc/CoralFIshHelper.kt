@@ -94,7 +94,7 @@ object CoralFIshHelper {
     private fun createRenderableLine(internalName: NeuInternalName): CoralFishHelperLine {
         val stack = ItemStackRenderable(internalName.getItemStack())
         val price = internalName.getPrice()
-        val priceString = if (price > 0.0) "§6$${price.shortFormat()}" else "§cNo Price Found"
+        val priceString = if (price > 0.0) "§6${price.shortFormat()}" else "§cNo Price Found"
         val itemName = internalName.repoItemName
 
         val tooltip = buildList {
