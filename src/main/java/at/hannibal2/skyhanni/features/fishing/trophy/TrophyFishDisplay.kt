@@ -140,7 +140,10 @@ object TrophyFishDisplay {
         }
         val hover = TrophyFishApi.hoverInfo(rawName)
         fun string(string: String): Renderable = hover?.let {
-            Renderable.hoverTips(StringRenderable(string),tips = it.split("\n"))
+            Renderable.hoverTips(
+                StringRenderable(string),
+                tips = it.split("\n"),
+            )
         } ?: StringRenderable(string)
 
         val row = mutableMapOf<TextPart, Renderable>()
