@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
+import at.hannibal2.skyhanni.features.garden.FarmingStatusTracker
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -63,6 +64,13 @@ object SkyHanniMod {
         MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
+        )
+        Runtime.getRuntime().addShutdownHook(
+            Thread {
+                if (feature.garden.tracking.enabled) {
+                    FarmingStatusTracker.prepareAndSendEmbed("Offline")
+                }
+            },
         )
         try {
             RepoManager.initRepo()

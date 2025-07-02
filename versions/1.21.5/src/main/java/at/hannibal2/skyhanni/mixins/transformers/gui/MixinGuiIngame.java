@@ -35,14 +35,26 @@ public class MixinGuiIngame {
 
     @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
     public void renderExperienceBar(DrawContext context, int x, CallbackInfo ci) {
-        if (RenderEvents.postExperienceLayerEventPre(context)) {
+        if (RenderEvents.postExperienceBarLayerEventPre(context)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "renderExperienceBar", at = @At("TAIL"))
     public void renderExperienceBarTail(DrawContext context, int x, CallbackInfo ci) {
-        RenderEvents.postExperienceLayerEventPost(context);
+        RenderEvents.postExperienceBarLayerEventPost(context);
+    }
+
+    @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
+    public void renderExperienceLevel(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderExperienceLevel", at = @At("TAIL"))
+    public void renderExperienceLevelTail(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        RenderEvents.postExperienceNumberLayerEventPost(context);
     }
 
     @Inject(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/PlayerListHud;render(Lnet/minecraft/client/gui/DrawContext;ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", shift = At.Shift.BEFORE), cancellable = true)
