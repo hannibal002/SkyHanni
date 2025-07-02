@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
@@ -222,7 +223,7 @@ enum class CarnivalGoal(
             ZOMBIE_SHOOTOUT(Items.arrow, "§cZombie Shootout");
 
             val singleDisplay by lazy {
-                Renderable.horizontalContainer(
+                HorizontalContainerRenderable(
                     listOf(
                         ItemStackRenderable(ItemStack(item)),
                         Renderable.string(display),

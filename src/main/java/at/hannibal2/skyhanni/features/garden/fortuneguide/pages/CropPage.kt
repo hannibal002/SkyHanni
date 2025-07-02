@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
@@ -58,7 +59,7 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
             VerticalContainerRenderable(
                 listOf(
                     crop.farmingItem.getDisplay(),
-                    Renderable.horizontalContainer(
+                    HorizontalContainerRenderable(
                         listOf(
                             VerticalContainerRenderable(FarmingItemType.getArmorDisplay(), 2),
                             VerticalContainerRenderable(FarmingItemType.getEquipmentDisplay(), 2),
@@ -66,7 +67,7 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
                         2,
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                     ),
-                    Renderable.horizontalContainer(FarmingItemType.getPetsDisplay(true), 2),
+                    HorizontalContainerRenderable(FarmingItemType.getPetsDisplay(true), 2),
                 ),
                 2,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,

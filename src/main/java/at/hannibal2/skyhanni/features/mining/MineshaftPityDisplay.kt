@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import com.google.gson.annotations.Expose
@@ -189,9 +190,9 @@ object MineshaftPityDisplay {
                     .filter { it.multiplier == multiplier }
                     .map { ItemStackRenderable(it.displayItem) }
                 add(
-                    Renderable.horizontalContainer(
+                    HorizontalContainerRenderable(
                         listOf(
-                            Renderable.horizontalContainer(iconsList),
+                            HorizontalContainerRenderable(iconsList),
                             Renderable.string("§b${pityCounter / multiplier}"),
                         ),
                         2,
@@ -203,7 +204,7 @@ object MineshaftPityDisplay {
         val neededToPityRenderable = VerticalContainerRenderable(
             listOf(
                 Renderable.string("§3Needed to pity:"),
-                Renderable.horizontalContainer(
+                HorizontalContainerRenderable(
                     listOf(
                         Renderable.placeholder(10, 0),
                         VerticalContainerRenderable(blocksToPityList),

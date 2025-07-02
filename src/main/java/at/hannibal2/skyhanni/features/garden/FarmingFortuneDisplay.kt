@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -185,7 +186,7 @@ object FarmingFortuneDisplay {
             list.add(Renderable.hoverTips("$farmingFortuneText§c???", listOf(wrongTabCropText)))
         }
 
-        add(Renderable.horizontalContainer(list))
+        add(HorizontalContainerRenderable(list))
 
         if (ffReduction > 0) {
             if (config.compactFormat) {

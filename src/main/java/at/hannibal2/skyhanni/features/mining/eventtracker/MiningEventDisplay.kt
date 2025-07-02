@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 
 @SkyHanniModule
@@ -75,11 +76,11 @@ object MiningEventDisplay {
             if (!shouldShow) continue
             val upcomingEvents = formatUpcomingEvents(eventDetails.islandEvents, eventDetails.lastEvent)
             val islandName = if (config.islandAsIcon) {
-                Renderable.horizontalContainer(getIslandIcon(islandType))
+                HorizontalContainerRenderable(getIslandIcon(islandType))
             } else {
                 Renderable.string("§a${islandType.displayName}§8:")
             }
-            add(Renderable.horizontalContainer(listOf(islandName) + upcomingEvents, 3))
+            add(HorizontalContainerRenderable(listOf(islandName) + upcomingEvents, 3))
         }
     }
 

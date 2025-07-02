@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.tableStretchXPadding
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.tableStretchYPadding
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 abstract class GuideTablePage(
@@ -27,7 +28,7 @@ abstract class GuideTablePage(
                         xPadding = content.tableStretchXPadding(sizeX - paddingX * 2),
                         yPadding = ySpace,
                     ),
-                    Renderable.horizontalContainer(footer, footerSpacing, horizontalAlign = HorizontalAlignment.CENTER),
+                    HorizontalContainerRenderable(footer, footerSpacing, horizontalAlign = HorizontalAlignment.CENTER),
                 ),
                 spacing = ySpace,
             )

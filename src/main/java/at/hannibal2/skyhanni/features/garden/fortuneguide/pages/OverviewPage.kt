@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) : GuideTablePage(
@@ -208,7 +209,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             ),
         )
 
-        val petFooter = Renderable.horizontalContainer(
+        val petFooter = HorizontalContainerRenderable(
             FarmingItemType.getPetsDisplay(true),
             4,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -245,7 +246,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         content.addTable(
             0,
-            Renderable.horizontalContainer(
+            HorizontalContainerRenderable(
                 FarmingItemType.getArmorDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -254,7 +255,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         )
         content.addTable(
             0,
-            Renderable.horizontalContainer(
+            HorizontalContainerRenderable(
                 FarmingItemType.getEquipmentDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -265,7 +266,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         val realFooter = VerticalContainerRenderable(
             listOf(
                 petFooter,
-                Renderable.horizontalContainer(
+                HorizontalContainerRenderable(
                     footer,
                     spacing = 15,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER, verticalAlign = RenderUtils.VerticalAlignment.CENTER,

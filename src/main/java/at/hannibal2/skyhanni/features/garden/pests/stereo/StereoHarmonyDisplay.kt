@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -81,7 +82,7 @@ object StereoHarmonyDisplay {
         val pestLine = mutableListOf<Renderable>()
         pestLine.add(Renderable.string("§ePest: §c$pestName "))
         if (pest?.crop != null && config.showCrop.get()) pestLine.add(ItemStackRenderable(pest.crop.icon))
-        list.add(Renderable.horizontalContainer(pestLine))
+        list.add(HorizontalContainerRenderable(pestLine))
         add(VerticalContainerRenderable(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
@@ -105,7 +106,7 @@ object StereoHarmonyDisplay {
         if (activeVinyl == VinylType.NONE && config.hideWhenNone) return
         else if (display.isEmpty()) update()
         if (display.isEmpty()) return
-        val content = Renderable.horizontalContainer(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
+        val content = HorizontalContainerRenderable(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
         val renderables = listOf(content)
         config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
     }

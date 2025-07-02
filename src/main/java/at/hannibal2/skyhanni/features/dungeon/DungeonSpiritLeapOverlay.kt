@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.client.gui.inventory.GuiChest
@@ -126,7 +127,7 @@ object DungeonSpiritLeapOverlay {
             verticalAlign = VerticalAlignment.CENTER,
         )
 
-        val buttonLayout = Renderable.horizontalContainer(
+        val buttonLayout = HorizontalContainerRenderable(
             listOf(
                 Renderable.placeholder((containerWidth * 0.01).toInt(), 0),
                 itemRenderable,

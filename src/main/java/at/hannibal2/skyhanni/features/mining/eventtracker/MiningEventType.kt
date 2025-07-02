@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -146,13 +147,13 @@ enum class MiningEventType(
     private val compactText = Renderable.string("${color.getChatColor()}$shortName")
     private val normalText = Renderable.string("${color.getChatColor()}$eventName")
 
-    private var compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), 0)
-    private var normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), 0)
+    private var compactTextWithIcon = HorizontalContainerRenderable(listOf(icon, compactText), 0)
+    private var normalTextWithIcon = HorizontalContainerRenderable(listOf(icon, normalText), 0)
 
     private fun rebuildIcons(iconInput: ItemStack) {
         icon = Renderable.hoverTips(iconInput, listOf(eventName))
-        compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), 0)
-        normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), 0)
+        compactTextWithIcon = HorizontalContainerRenderable(listOf(icon, compactText), 0)
+        normalTextWithIcon = HorizontalContainerRenderable(listOf(icon, normalText), 0)
     }
 
     fun getRenderable(): Renderable = when (config.compressedFormat) {

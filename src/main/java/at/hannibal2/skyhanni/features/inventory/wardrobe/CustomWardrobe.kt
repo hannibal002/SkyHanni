@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -378,7 +379,7 @@ object CustomWardrobe {
 
                 Renderable.doubleLayered(playerBackground, playerRenderable, false)
             }
-            Renderable.horizontalContainer(slotsRenderables, horizontalSpacing)
+            HorizontalContainerRenderable(slotsRenderables, horizontalSpacing)
         }
 
         val allSlotsRenderable = VerticalContainerRenderable(
@@ -470,7 +471,7 @@ object CustomWardrobe {
             },
         )
 
-        val row = Renderable.horizontalContainer(
+        val row = HorizontalContainerRenderable(
             listOf(backButton, exitButton, onlyFavoriteButton),
             horizontalSpacing.toInt(),
             horizontalAlign = HorizontalAlignment.CENTER,

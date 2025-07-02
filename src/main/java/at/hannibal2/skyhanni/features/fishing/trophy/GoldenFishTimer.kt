@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -186,7 +187,7 @@ object GoldenFishTimer {
     }
 
     private fun updateDisplay() {
-        display = Renderable.horizontalContainer(drawDisplay())
+        display = HorizontalContainerRenderable(drawDisplay())
     }
 
     private fun drawDisplay() = buildList {

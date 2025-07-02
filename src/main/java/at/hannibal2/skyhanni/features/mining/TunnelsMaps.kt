@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -338,7 +339,7 @@ object TunnelsMaps {
         if (!config.excludeFairy.get()) {
             add(
                 Renderable.hoverable(
-                    Renderable.horizontalContainer(
+                    HorizontalContainerRenderable(
                         listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
                             Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))

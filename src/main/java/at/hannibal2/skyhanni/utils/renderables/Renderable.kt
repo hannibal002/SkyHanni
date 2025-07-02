@@ -955,6 +955,7 @@ interface Renderable {
             return HorizontalContainerRenderable(buildList { builderAction() })
         }
 
+        // todo add spacing as a parameter here, or remove this function (hardcoded = 2?)
         fun vertical(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
             return VerticalContainerRenderable(buildList { builderAction() }, spacing = 2)
         }

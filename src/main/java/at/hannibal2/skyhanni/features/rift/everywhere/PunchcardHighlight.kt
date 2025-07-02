@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
@@ -230,7 +231,7 @@ object PunchcardHighlight {
         string += "§d" + if (!config.reverseGUI.get()) playerList.size
         else 20 - playerList.size
 
-        return Renderable.horizontalContainer(
+        return HorizontalContainerRenderable(
             listOf(
                 ItemStackRenderable(displayIcon),
                 Renderable.string(string),

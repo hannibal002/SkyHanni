@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
@@ -113,7 +114,7 @@ object FrogMaskFeatures {
     private fun updateDisplay(helmetRegion: String, nextDay: SimpleTimeMark) {
         val timeRemaining = nextDay.timeUntil()
 
-        display = Renderable.horizontalContainer(
+        display = HorizontalContainerRenderable(
             listOf(
                 frogMaskRenderable,
                 Renderable.string("§5Frog Mask§6 - $helmetRegion §6for §b${timeRemaining.format()}"),
