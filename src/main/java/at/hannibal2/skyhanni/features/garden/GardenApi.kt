@@ -60,6 +60,18 @@ object GardenApi {
     var cropInHand: CropType? = null
     var pestCooldownEndTime = SimpleTimeMark.farPast()
     var lastCropBrokenTime = SimpleTimeMark.farPast()
+    var farmingSince: SimpleTimeMark = SimpleTimeMark.farFuture()
+        get() {
+            field = when {
+                isCurrentlyFarming() && field.isInFuture() -> SimpleTimeMark.now()
+                !isCurrentlyFarming() -> SimpleTimeMark.farFuture()
+                else -> field
+            }
+            return field
+        }
+        set(value) {
+            field = value
+        }
     val mushroomCowPet
         get() = CurrentPetApi.isCurrentPetOrHigherRarity(RARE_MOOSHROOM_COW_PET_ITEM)
     private var inBarn = false

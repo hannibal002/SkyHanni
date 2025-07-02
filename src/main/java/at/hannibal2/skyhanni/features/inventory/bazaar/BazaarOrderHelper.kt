@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -16,11 +17,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object BazaarOrderHelper {
     private val patternGroup = RepoPattern.group("bazaar.orderhelper")
+    private val config get() = SkyHanniMod.feature.inventory.bazaar
+
+    private var highlightedSlots = mapOf<Int, LorenzColor>()
 
     /**
      * REGEX-TEST: §a§lBUY §fWheat
@@ -46,39 +50,62 @@ object BazaarOrderHelper {
         "§7Price per unit: §6(?<number>.*) coins",
     )
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!SkyHanniMod.feature.inventory.bazaar.orderHelper) return
-        if (event.gui !is GuiChest) return
+    private val inventory = InventoryDetector(
+        openInventory = { highlightedSlots = load(it.inventoryItems) },
+        checkInventoryName = { name -> BazaarApi.isBazaarOrderInventory(name) && config.orderHelper },
+    )
 
-        val chest = event.container as ContainerChest
-        val inventoryName = InventoryUtils.openInventoryName()
-        if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
 
-        for ((slot, stack) in chest.getUpperItems()) {
+    private fun load(inventoryItems: Map<Int, ItemStack>): Map<Int, LorenzColor> {
+        val slots = mutableMapOf<Int, LorenzColor>()
+        val errorItems = mutableSetOf<NeuInternalName>()
+        for ((slot, stack) in inventoryItems) {
             bazaarItemNamePattern.matchMatcher(stack.displayName) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
-                if (buyOrSell.let { !it.first && !it.second }) return
+                if (buyOrSell.let { !it.first && !it.second }) return@matchMatcher
 
-                highlightItem(group("name"), slot, buyOrSell)
+                val internalName = NeuInternalName.fromItemName(group("name"))
+                internalName.getBazaarData()?.let {
+                    highlightItem(slot, stack, buyOrSell, it, slots)
+                } ?: run {
+                    errorItems.add(internalName)
+                }
+            }
+        }
+        errorItems.firstOrNull()?.getBazaarDataOrError()
+
+        return slots
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!inventory.isInside()) return
+        if (event.gui !is GuiChest) return
+        val chest = event.container as ContainerChest
+        for ((slot, _) in chest.getUpperItems()) {
+            highlightedSlots[slot.slotNumber]?.let {
+                slot.highlight(it)
             }
         }
     }
 
-    private fun highlightItem(itemName: String, slot: Slot, buyOrSell: Pair<Boolean, Boolean>) {
-        val data = NeuInternalName.fromItemName(itemName).getBazaarDataOrError()
-
-        val itemLore = slot.stack.getLore()
-        for (line in itemLore) {
+    private fun highlightItem(
+        slot: Int,
+        stack: ItemStack,
+        buyOrSell: Pair<Boolean, Boolean>,
+        data: BazaarData,
+        map: MutableMap<Int, LorenzColor>,
+    ) {
+        for (line in stack.getLore()) {
             filledPattern.matchMatcher(line) {
-                slot.highlight(LorenzColor.GREEN)
+                map[slot] = LorenzColor.GREEN
                 return
             }
 
             pricePattern.matchMatcher(line) {
                 val price = group("number").formatDouble()
                 if (buyOrSell.first && price < data.instantBuyPrice || buyOrSell.second && price > data.sellOfferPrice) {
-                    slot.highlight(LorenzColor.GOLD)
+                    map[slot] = LorenzColor.GOLD
                     return
                 }
             }
