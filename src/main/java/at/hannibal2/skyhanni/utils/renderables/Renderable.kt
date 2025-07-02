@@ -471,28 +471,6 @@ interface Renderable {
             verticalAlign,
         )
 
-        @Deprecated(
-            "use WrappedStringRenderable instead",
-            ReplaceWith("WrappedStringRenderable(text, width, scale, color, horizontalAlign, verticalAlign)"),
-        )
-        fun wrappedString(
-            text: String,
-            width: Int,
-            scale: Double = 1.0,
-            color: Color = Color.WHITE,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-            internalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-        ) = WrappedStringRenderable(
-            text,
-            width,
-            scale,
-            color,
-            horizontalAlign,
-            verticalAlign,
-            internalAlign,
-        )
-
         fun placeholder(width: Int, height: Int = 10) = object : Renderable {
             override val width = width
             override val height = height
