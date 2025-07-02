@@ -437,33 +437,6 @@ interface Renderable {
             }
         }
 
-        @Deprecated(
-            "Use ItemStackRenderable instead",
-            ReplaceWith("ItemStackRenderable(item, scale, xSpacing, ySpacing, rescaleSkulls, horizontalAlign, verticalAlign)"),
-        )
-        fun itemStack(
-            item: ItemStack,
-            scale: Double = NeuItems.ITEM_FONT_SIZE,
-            xSpacing: Int = 2,
-            ySpacing: Int = 1,
-            rescaleSkulls: Boolean = true,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-            highlight: Boolean = false,
-        ) = object : Renderable {
-            override val width = (15.5 * scale + 0.5).toInt() + xSpacing
-            override val height = (15.5 * scale + 0.5).toInt() + ySpacing
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                if (highlight) {
-                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
-                }
-                item.renderOnScreen(xSpacing / 2f, 0F, scaleMultiplier = scale, rescaleSkulls)
-            }
-        }
-
         fun Renderable.darken(amount: Float = 1f) = object : Renderable {
             override val width = this@darken.width
             override val height = this@darken.height
