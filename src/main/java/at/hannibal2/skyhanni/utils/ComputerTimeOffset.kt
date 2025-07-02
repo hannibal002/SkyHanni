@@ -24,10 +24,10 @@ object ComputerTimeOffset {
 
     private var state = State.NORMAL
 
-    enum class State {
-        NORMAL,
-        SLOW,
-        TOTALLY_OFF,
+    enum class State(val duration: Duration) {
+        NORMAL(1.seconds),
+        SLOW(10.seconds),
+        TOTALLY_OFF(Duration.INFINITE),
     }
 
     private var currentlyChecking = false
@@ -44,12 +44,10 @@ object ComputerTimeOffset {
         }
     }
 
-    private val distanceBetweenTrials get() = if (state == State.NORMAL) 1000L else 10_0000L
-
     init {
         SkyHanniMod.launchIOCoroutine {
             while (state != State.TOTALLY_OFF) {
-                delay(distanceBetweenTrials)
+                delay(state.duration)
                 detectTimeChange()
             }
         }
@@ -85,7 +83,6 @@ object ComputerTimeOffset {
     private val clientTimeout = 10.seconds
     private fun getNtpOffset(ntpServer: String): Duration? =
         runCatching {
-            // called from launchIOCoroutine, so already on IO dispatcher
             NTPUDPClient().use { client ->
                 client.setDefaultTimeout(clientTimeout.toJavaDuration())
                 val address = InetAddress.getByName(ntpServer)
