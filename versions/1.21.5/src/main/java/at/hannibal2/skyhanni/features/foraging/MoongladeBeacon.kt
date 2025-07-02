@@ -68,7 +68,7 @@ object MoongladeBeacon {
         BLUE("§1Blue"), // This one makes sense ig
         BROWN("§6Brown"),
         GREEN("§2Green"),
-        RED("§cRed"),
+        RED("§4Red"),
         ;
 
         override fun toString() = displayName
@@ -331,9 +331,9 @@ object MoongladeBeacon {
     data class BeaconTuneData(
         val isEnchanted: Boolean = false,
     ) : ResettableStorageSet() {
-        @Transient private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
-        @Transient private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
-        @Transient private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
+        private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
+        private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
+        private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
 
         var targetColor: BeaconColor? = null
         var targetSpeed: BeaconSpeed? = null
@@ -348,10 +348,10 @@ object MoongladeBeacon {
         private var recentTicks: MutableList<Int> = mutableListOf()
         private var currentMatchSlot: Int = BeaconSlotRange.MATCH.range.first
 
-        @Transient val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
-        @Transient val speedSelectSlot = SPEED_SELECT_SLOT + slotOffset
-        @Transient val pitchSelectSlot = PITCH_SELECT_SLOT + slotOffset
-        @Transient val pauseSelectSlot = PAUSE_SELECT_SLOT + slotOffset
+        val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
+        val speedSelectSlot = SPEED_SELECT_SLOT + slotOffset
+        val pitchSelectSlot = PITCH_SELECT_SLOT + slotOffset
+        val pauseSelectSlot = PAUSE_SELECT_SLOT + slotOffset
 
         val colorOffset: Int? get() = currentColor?.let { targetColor?.getOffset(it) }
         val speedOffset: Int? get() = currentSpeed?.let { targetSpeed?.getOffset(it) }
@@ -430,11 +430,12 @@ object MoongladeBeacon {
         }
 
         override fun toString() = buildString {
-            if (isEnchanted) appendLine()
+            if (isEnchanted) appendLine(" ")
             appendLine(title)
             appendLine(" §7Target Color: ${targetColor.formatOrDefault()}")
             appendLine(" §7Target Speed: §a${targetSpeed.formatOrDefault("§eCalculating..")}")
             appendLine(" §7Target Pitch: §a${targetPitch.formatOrDefault()}")
+
             if (debugConfig.moongladeBeacon) {
                 appendLine("  §8Current Color: ${currentColor.formatOrDefault()}")
                 appendLine("  §8Current Speed: §a${currentSpeed.formatOrDefault()}")
