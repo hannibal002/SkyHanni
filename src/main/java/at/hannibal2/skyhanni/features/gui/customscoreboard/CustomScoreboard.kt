@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
@@ -166,7 +167,7 @@ object CustomScoreboard {
     }
 
     private fun List<ScoreboardLine>.createRenderable() = VerticalContainerRenderable(
-        map { Renderable.string(it.display, horizontalAlign = it.alignment) },
+        map { StringRenderable(it.display, horizontalAlign = it.alignment) },
         displayConfig.lineSpacing - 10,
         horizontalAlign = HorizontalAlignment.CENTER,
         verticalAlign = VerticalAlignment.CENTER,

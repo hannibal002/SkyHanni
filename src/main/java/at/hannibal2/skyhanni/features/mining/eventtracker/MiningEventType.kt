@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Items
@@ -45,7 +46,7 @@ enum class MiningEventType(
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
             val compass = ItemStackRenderable(ItemStack(Items.compass), 0.45)
-            val wind = Renderable.string("§9≈", scale = 0.75)
+            val wind = StringRenderable("§9≈", scale = 0.75)
 
             override fun render(posX: Int, posY: Int) {
                 DrawContextUtils.translate(1f, 1f, -2f)
@@ -144,8 +145,8 @@ enum class MiningEventType(
     )
 
     private var icon = Renderable.hoverTips(iconInput, listOf(eventName))
-    private val compactText = Renderable.string("${color.getChatColor()}$shortName")
-    private val normalText = Renderable.string("${color.getChatColor()}$eventName")
+    private val compactText = StringRenderable("${color.getChatColor()}$shortName")
+    private val normalText = StringRenderable("${color.getChatColor()}$eventName")
 
     private var compactTextWithIcon = HorizontalContainerRenderable(listOf(icon, compactText), 0)
     private var normalTextWithIcon = HorizontalContainerRenderable(listOf(icon, normalText), 0)

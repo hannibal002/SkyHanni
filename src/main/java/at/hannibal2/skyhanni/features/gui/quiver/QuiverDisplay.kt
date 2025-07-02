@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Items
@@ -58,10 +59,8 @@ object QuiverDisplay {
         if (config.showIcon.get()) {
             add(ItemStackRenderable(itemStack, 1.0))
         }
-        if (!hideAmount) {
-            add(Renderable.string("§b${amount.addSeparators()}x"))
-        }
-        add(Renderable.string(" $rarity$arrowDisplayName"))
+        if (!hideAmount) add(StringRenderable("§b${amount.addSeparators()}x"))
+        add(StringRenderable(" $rarity$arrowDisplayName"))
     }
 
     @HandleEvent

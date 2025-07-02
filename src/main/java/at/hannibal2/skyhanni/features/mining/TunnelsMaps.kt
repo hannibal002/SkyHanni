@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -293,7 +294,7 @@ object TunnelsMaps {
 
         return buildList {
             if (goal == campfire && active != campfire.name) {
-                add(Renderable.string("§6Override for ${campfire.name}"))
+                add(StringRenderable("§6Override for ${campfire.name}"))
                 add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
             } else {
                 add(
@@ -322,7 +323,7 @@ object TunnelsMaps {
 
     private fun generateLocationsDisplay() = buildList {
         val campfireName = campfire.name ?: return@buildList
-        add(Renderable.string("§6Locations:"))
+        add(StringRenderable("§6Locations:"))
         add(
             Renderable.clickable(
                 campfireName,
@@ -340,12 +341,12 @@ object TunnelsMaps {
             add(
                 Renderable.hoverable(
                     HorizontalContainerRenderable(
-                        listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                        listOf(StringRenderable("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))
+                            Renderable.clickable(StringRenderable("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
-                    Renderable.string("§dFairy Souls"),
+                    StringRenderable("§dFairy Souls"),
                 ),
             )
         }
@@ -357,11 +358,14 @@ object TunnelsMaps {
     }
 
     private fun Map<String, List<GraphNode>>.toRenderables() = map {
-        Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
+        Renderable.clickable(
+            StringRenderable(it.key),
+            onLeftClick = guiSetActive(it.key)
+        )
     }
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickable(
-        Renderable.string(
+        StringRenderable(
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),

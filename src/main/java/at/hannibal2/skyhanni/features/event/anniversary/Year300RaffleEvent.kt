@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Items
@@ -68,7 +69,7 @@ object Year300RaffleEvent {
         overlay = HorizontalContainerRenderable(
             listOf(
                 ItemStackRenderable(displayItem),
-                Renderable.string("§eTime Left: ${timeLeft.format()}"),
+                StringRenderable("§eTime Left: ${timeLeft.format()}"),
             ),
         )
     }

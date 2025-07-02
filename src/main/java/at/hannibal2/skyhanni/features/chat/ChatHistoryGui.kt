@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
 //#if MC > 1.21
@@ -88,7 +89,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         wasMouseButtonDown = isMouseButtonDown
         DrawContextUtils.popMatrix()
         queuedTooltip?.let { tooltip ->
-            RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
+            RenderableTooltips.setTooltipForRender(tooltip.map { StringRenderable(it) })
         }
     }
 

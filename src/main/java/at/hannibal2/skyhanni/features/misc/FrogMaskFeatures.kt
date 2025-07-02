@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -117,7 +118,7 @@ object FrogMaskFeatures {
         display = HorizontalContainerRenderable(
             listOf(
                 frogMaskRenderable,
-                Renderable.string("§5Frog Mask§6 - $helmetRegion §6for §b${timeRemaining.format()}"),
+                StringRenderable("§5Frog Mask§6 - $helmetRegion §6for §b${timeRemaining.format()}"),
             ),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,

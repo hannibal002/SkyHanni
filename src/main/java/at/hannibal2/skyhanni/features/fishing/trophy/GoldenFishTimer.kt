@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
@@ -228,7 +229,7 @@ object GoldenFishTimer {
 
         add(
             VerticalContainerRenderable(
-                text.map { Renderable.string(it) },
+                text.map { StringRenderable(it) },
                 spacing = 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ),

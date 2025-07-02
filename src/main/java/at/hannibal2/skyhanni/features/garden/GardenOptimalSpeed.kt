@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -92,7 +93,7 @@ object GardenOptimalSpeed {
                 val renderable = HorizontalContainerRenderable(
                     listOf(
                         HorizontalContainerRenderable(crops.map { ItemStackRenderable(it.icon) }),
-                        Renderable.string("${color.getChatColor()} - $speed"),
+                        StringRenderable("${color.getChatColor()} - $speed"),
                     ),
                     spacing = 2,
                 )
@@ -104,7 +105,7 @@ object GardenOptimalSpeed {
                 val renderable = HorizontalContainerRenderable(
                     listOf(
                         ItemStackRenderable(crop.icon),
-                        Renderable.string("${color.getChatColor()}${crop.cropName} - $speed"),
+                        StringRenderable("${color.getChatColor()}${crop.cropName} - $speed"),
                     ),
                     spacing = 2,
                 )

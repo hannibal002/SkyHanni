@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
@@ -193,7 +194,7 @@ object MineshaftPityDisplay {
                     HorizontalContainerRenderable(
                         listOf(
                             HorizontalContainerRenderable(iconsList),
-                            Renderable.string("§b${pityCounter / multiplier}"),
+                            StringRenderable("§b${pityCounter / multiplier}"),
                         ),
                         2,
                     ),
@@ -203,7 +204,7 @@ object MineshaftPityDisplay {
 
         val neededToPityRenderable = VerticalContainerRenderable(
             listOf(
-                Renderable.string("§3Needed to pity:"),
+                StringRenderable("§3Needed to pity:"),
                 HorizontalContainerRenderable(
                     listOf(
                         Renderable.placeholder(10, 0),
@@ -214,22 +215,22 @@ object MineshaftPityDisplay {
         )
 
         val map = mapOf(
-            MineshaftPityLine.TITLE to Renderable.string("§9§lMineshaft Pity Counter"),
-            MineshaftPityLine.COUNTER to Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
-            MineshaftPityLine.CHANCE to Renderable.string(
+            MineshaftPityLine.TITLE to StringRenderable("§9§lMineshaft Pity Counter"),
+            MineshaftPityLine.COUNTER to StringRenderable("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
+            MineshaftPityLine.CHANCE to StringRenderable(
                 "§3Chance: §e1§6/§e${
                     chance.roundTo(1).addSeparators()
                 } §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
             ),
             MineshaftPityLine.NEEDED_TO_PITY to neededToPityRenderable,
             MineshaftPityLine.TIME_SINCE_MINESHAFT to
-                Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
+                StringRenderable("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
             MineshaftPityLine.AVERAGE_BLOCKS_MINESHAFT to
-                Renderable.string(
+                StringRenderable(
                     "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
                 ),
-            MineshaftPityLine.MINESHAFTS_TOTAL to Renderable.string("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
-            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_TOTAL to StringRenderable("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_SESSION to StringRenderable("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
         display = listOf(

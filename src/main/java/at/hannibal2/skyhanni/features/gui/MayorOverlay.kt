@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
@@ -21,9 +22,7 @@ private val config get() = SkyHanniMod.feature.gui.mayorOverlay
 enum class MayorOverlay(private val configLine: String, private val createLines: () -> Renderable) {
     TITLE(
         "Title",
-        {
-            Renderable.string("§6§lMAYOR OVERLAY")
-        },
+        { StringRenderable("§6§lMAYOR OVERLAY") },
     ),
     MAYOR(
         "Mayor",
@@ -67,7 +66,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     NEW_MAYOR(
         "New Mayor Time",
         {
-            Renderable.string("§7New Mayor in: §e${ElectionApi.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}")
+            StringRenderable("§7New Mayor in: §e${ElectionApi.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}")
         },
     ),
     ;
@@ -109,10 +108,10 @@ private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Rend
         }.map { (key, value) ->
             value?.let {
                 Renderable.hoverTips(
-                    Renderable.string(key),
+                    StringRenderable(key),
                     listOf(WrappedStringRenderable(it, 200)),
                 )
-            } ?: Renderable.string(key)
+            } ?: StringRenderable(key)
         },
     )
 }

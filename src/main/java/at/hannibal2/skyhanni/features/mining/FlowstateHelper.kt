@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -154,8 +155,11 @@ object FlowstateHelper {
     }
 }
 
-enum class FlowstateElements(val label: String, var renderable: Renderable = Renderable.string("")) {
-    TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
+enum class FlowstateElements(
+    val label: String,
+    var renderable: Renderable = StringRenderable(""),
+) {
+    TITLE("§d§lFlowstate Helper", StringRenderable("§d§lFlowstate Helper")),
     TIMER("§fTime Remaining: §b9.71"),
     STREAK("§7Streak: §f123/200"),
     SPEED("§6+600⸕"),
@@ -171,23 +175,23 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
             TIMER -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                Renderable.string("§7Time Remaining: ${timeRemaining.formatTime()}")
+                StringRenderable("§7Time Remaining: ${timeRemaining.formatTime()}")
             }
 
             STREAK -> {
                 val textColor = getStreakColor()
                 val string = "§7Streak: $textColor$blockBreakStreak"
-                Renderable.string(string + if (blockBreakStreak < 200) "§8/200" else "")
+                StringRenderable(string + if (blockBreakStreak < 200) "§8/200" else "")
             }
 
             SPEED -> {
-                Renderable.string("§6+${getSpeedBonus()}⸕")
+                StringRenderable("§6+${getSpeedBonus()}⸕")
             }
 
             COMPACT -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                Renderable.string(
+                StringRenderable(
                     "§7x${getStreakColor()}$blockBreakStreak " +
                         "§6+${getSpeedBonus()}⸕ " +
                         timeRemaining.formatTime(),

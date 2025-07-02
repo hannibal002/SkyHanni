@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import kotlin.math.ceil
@@ -357,22 +358,22 @@ object SkillProgress {
             }
         }
 
-        add(Renderable.string("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel"))
+        add(StringRenderable("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel"))
 
         if (useCustomGoalLevel)
-            add(Renderable.string("§7Needed XP: §e${remaining.addSeparators()}"))
+            add(StringRenderable("§7Needed XP: §e${remaining.addSeparators()}"))
 
         var xpInterp = xpInfo.xpGainHour
 
         if (have > need) {
-            add(Renderable.string("§7In §cIncrease level cap!"))
+            add(StringRenderable("§7In §cIncrease level cap!"))
         } else if (xpInfo.xpGainHour < 1000) {
-            add(Renderable.string("§7In §cN/A"))
+            add(StringRenderable("§7In §cN/A"))
         } else {
             val duration = ((remaining) * 1000 * 60 * 60 / xpInterp.toLong()).milliseconds
             val format = duration.format(TimeUnit.DAY)
             add(
-                Renderable.string(
+                StringRenderable(
                     "§7In §b$format " +
                         if (xpInfo.isActive) "" else "§c(PAUSED)",
                 ),
@@ -380,11 +381,11 @@ object SkillProgress {
         }
 
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
-            add(Renderable.string("§7XP/h: §cN/A"))
+            add(StringRenderable("§7XP/h: §cN/A"))
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
             add(
-                Renderable.string(
+                StringRenderable(
                     "§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
                         if (xpInfo.isActive) "" else "§c(PAUSED)",
                 ),
@@ -437,14 +438,14 @@ object SkillProgress {
                 SkillLevel(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
 
         if (config.showLevel.get())
-            add(Renderable.string("§9[§d$level§9] "))
+            add(StringRenderable("§9[§d$level§9] "))
 
         if (config.useIcon.get()) {
             add(ItemStackRenderable(activeSkill.item, 1.0))
         }
 
         add(
-            Renderable.string(
+            StringRenderable(
                 buildString {
                     append("§b+${skill.lastGain} ")
 

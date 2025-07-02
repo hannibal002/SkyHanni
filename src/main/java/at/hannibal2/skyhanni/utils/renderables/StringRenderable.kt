@@ -24,6 +24,10 @@ open class StringRenderable(
     override fun render(posX: Int, posY: Int) {
         RenderableUtils.renderString(text, scale, color, inverseScale)
     }
+
+    companion object {
+        fun from(text: String) = StringRenderable(text)
+    }
 }
 
 class WrappedStringRenderable(

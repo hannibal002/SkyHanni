@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.line
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import kotlinx.coroutines.launch
 
 @SkyHanniModule
@@ -195,9 +196,9 @@ object CropMoneyDisplay {
                 ChatUtils.debug(message)
                 ready = false
                 loaded = false
-                return Renderable.string("§eStill Loading...")
+                return StringRenderable("§eStill Loading...")
             }
-            return Renderable.string("§cFarm crops to add them to this list!")
+            return StringRenderable("§cFarm crops to add them to this list!")
         }
         val cropList = createDescendingCropList(moneyPerHour)
         return Renderable.vertical {

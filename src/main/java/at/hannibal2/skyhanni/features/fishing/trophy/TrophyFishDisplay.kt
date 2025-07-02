@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -139,8 +140,8 @@ object TrophyFishDisplay {
         }
         val hover = TrophyFishApi.hoverInfo(rawName)
         fun string(string: String): Renderable = hover?.let {
-            Renderable.hoverTips(Renderable.string(string), tips = it.split("\n"))
-        } ?: Renderable.string(string)
+            Renderable.hoverTips(StringRenderable(string),tips = it.split("\n"))
+        } ?: StringRenderable(string)
 
         val row = mutableMapOf<TextPart, Renderable>()
         row[TextPart.NAME] = string(getItemName(rawName))
