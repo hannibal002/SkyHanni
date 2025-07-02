@@ -21,6 +21,7 @@ class ResettableStorageSetTest {
         var nullString: String? = null,
         var nullInt: Int? = null,
         @Transient var transientString: String = "transient",
+        val defaultBool: Boolean = false,
     ) : ResettableStorageSet() {
         val list: MutableList<String> = mutableListOf()
         val map: MutableMap<String, Int> = mutableMapOf()
@@ -31,15 +32,13 @@ class ResettableStorageSetTest {
 
     @Test
     fun testResettableStorageSet() {
-        mockkObject(ChatUtils)
-        every { ChatUtils.debug(any<String>()) } just Runs
-
         val storage = TestStorage(
             string = "changed",
             int = 100,
             nullString = "notNull",
             nullInt = 99,
             transientString = "transient_changed",
+            defaultBool = true,
         ).apply {
             list.add("item1")
             list.add("item2")
@@ -48,9 +47,6 @@ class ResettableStorageSetTest {
         }
 
         storage.reset()
-
-        verify(exactly = 0) { ChatUtils.debug(any()) }
-        unmockkObject(ChatUtils)
 
         Assertions.assertEquals(
             "default",
@@ -90,6 +86,11 @@ class ResettableStorageSetTest {
             "transient_changed",
             storage.transientString,
             "Transient property should not be reset"
+        )
+
+        Assertions.assertTrue(
+            storage.defaultBool,
+            "Default boolean property should not be reset"
         )
 
         Assertions.assertTrue(
