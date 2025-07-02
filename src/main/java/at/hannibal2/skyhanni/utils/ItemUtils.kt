@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
@@ -49,6 +50,9 @@ import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -651,6 +655,13 @@ object ItemUtils {
     }
 
     private var compactNameReplace = mapOf<String, String>()
+    var bazaarOverrides = mapOf<String, String>()
+        private set
+
+    private data class BazaarOverride(
+        @Expose @SerializedName("stock") val bazaarInternalName: String,
+        @Expose @SerializedName("id") val neuInternalName: String,
+    )
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -658,6 +669,13 @@ object ItemUtils {
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
         @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
         compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
+    }
+
+    @HandleEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val bazaarOverridesTypeToken = object : TypeToken<List<BazaarOverride>>() {}.type
+        val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", bazaarOverridesTypeToken)
+        bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
