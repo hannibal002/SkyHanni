@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -40,6 +42,10 @@ object MobUtils {
     fun EntityArmorStand.isDefaultValue() = defaultArmorStandName.matches(this.name)
 
     fun EntityArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
+
+    fun EntityArmorStand.hasEmptyInventory() = getInventoryItems().none { it.isNotEmpty() }
+
+    fun EntityArmorStand.isCompletelyDefault() = isDefaultValue() && hasEmptyInventory()
 
     class OwnerShip(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }

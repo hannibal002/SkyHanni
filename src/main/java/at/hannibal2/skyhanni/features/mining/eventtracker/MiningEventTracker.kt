@@ -184,7 +184,7 @@ object MiningEventTracker {
 
     private suspend fun sendData(json: String) {
         val response = try {
-            ApiUtils.postJSON(miningSendStatic, json)
+            ApiUtils.postJSONStatic(miningSendStatic, json)
         } catch (e: IOException) {
             if (SkyHanniDebugsAndTests.enabled) {
                 ErrorManager.logErrorWithData(
