@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -55,19 +56,24 @@ object BazaarOrderHelper {
         val inventoryName = InventoryUtils.openInventoryName()
         if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
 
+        val errorItems = mutableSetOf<NeuInternalName>()
         for ((slot, stack) in chest.getUpperItems()) {
             bazaarItemNamePattern.matchMatcher(stack.displayName) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return
 
-                highlightItem(group("name"), slot, buyOrSell)
+                val internalName = NeuInternalName.fromItemName(group("name"))
+                internalName.getBazaarData()?.let {
+                    highlightItem(slot, buyOrSell, it)
+                } ?: run {
+                    errorItems.add(internalName)
+                }
             }
         }
+        errorItems.firstOrNull()?.getBazaarDataOrError()
     }
 
-    private fun highlightItem(itemName: String, slot: Slot, buyOrSell: Pair<Boolean, Boolean>) {
-        val data = NeuInternalName.fromItemName(itemName).getBazaarDataOrError()
-
+    private fun highlightItem(slot: Slot, buyOrSell: Pair<Boolean, Boolean>, data: BazaarData) {
         val itemLore = slot.stack.getLore()
         for (line in itemLore) {
             filledPattern.matchMatcher(line) {
