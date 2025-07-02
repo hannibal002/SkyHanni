@@ -29,8 +29,8 @@ object ExperimentationTableApi {
     private val inTable get() = inventoriesPattern.matches(openInventoryName())
     var currentExperiment: Experiment? = null
     val superpairInventory = InventoryDetector(
-        openInventory = { name ->
-            currentExperiment = superpairsPattern.matchMatcher(name) {
+        openInventory = { event ->
+            currentExperiment = superpairsPattern.matchMatcher(event.inventoryName) {
                 Experiment.entries.find { it.nameString == group("experiment") }
             }
         },

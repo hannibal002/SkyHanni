@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestone
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
+import at.hannibal2.skyhanni.config.features.garden.tracking.FarmingStatusTrackerConfig
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -50,6 +51,11 @@ class GardenConfig {
     @ConfigOption(name = "Farming Lane", desc = "")
     @Accordion
     val farmingLane: FarmingLaneConfig = FarmingLaneConfig()
+
+    @Expose
+    @ConfigOption(name = "Farming Status Tracker", desc = "")
+    @Accordion
+    val tracking: FarmingStatusTrackerConfig = FarmingStatusTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
