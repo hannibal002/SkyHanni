@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import java.lang.reflect.Modifier
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
@@ -26,10 +27,11 @@ abstract class ResettableStorageSet {
         val annotatedIgnore = prop.hasAnnotation<Transient>()
         val modifiedIgnore = prop.javaField?.let { Modifier.isTransient(it.modifiers) } ?: false
         val isGetter = prop.javaField == null
-        val isTypeValid = when (prop) {
-            is KMutableProperty1<*, *> -> true
-            else -> !prop.returnType.jvmErasure.java.isPrimitive
-        }
+        val isVar = prop is KMutableProperty1<*, *>
+        val isMutableColl = prop.returnType.jvmErasure.isSubclassOf(MutableCollection::class)
+        val isMutableMap = prop.returnType.jvmErasure.isSubclassOf(MutableMap::class)
+        val isMutableIter = prop.returnType.jvmErasure.isSubclassOf(MutableIterator::class)
+        val isTypeValid = isVar || isMutableColl || isMutableMap || isMutableIter
 
         !annotatedIgnore && !modifiedIgnore && !isGetter && isTypeValid
     }
@@ -63,6 +65,7 @@ abstract class ResettableStorageSet {
         }
         current is MutableCollection<*> -> current.clear()
         current is MutableMap<*, *> -> current.clear()
+        current is MutableIterator<*> -> current.removeIf { true }
         else -> ChatUtils.debug(
             message = "ResettableStorageSet $classSimpleName tried to reset property '${this.name}' " +
                 "but it is of type ${current?.javaClass?.simpleName}, which is not handled.",
