@@ -274,9 +274,8 @@ object CompactStarlynSisters {
                         "placing you in the $lastBracketPrefix$lastBracket §ebracket! " +
                         "Your previous §dpersonal best §ewas $lastPersonalBestDisplay §epoints!"
                 val hoverableResults = formattedResults.asComponent()
-                val formattedDate = lastContestStartTime.formattedDate("MMM d, h:MM a")
                 hoverableResults.hover = (
-                    "§eClick to claim your rewards!\n§eContest started on $formattedDate"
+                    "§eClick to claim your rewards!"
                     ).asComponent()
                 hoverableResults.onClick(onClick = {
                     ChatUtils.sendMessageToServer("/starlynsisterlevels")
