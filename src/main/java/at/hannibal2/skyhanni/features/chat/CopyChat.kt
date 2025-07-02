@@ -16,6 +16,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
+//#endif
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
@@ -34,9 +37,17 @@ object CopyChat {
         val formatted = chatLine.fullComponent.formattedText
 
         val (clipboard, infoMessage) = when {
-            KeyboardManager.isMenuKeyDown() -> formatted.stripHypixelMessage() to "formatted message"
+            KeyboardManager.isMenuKeyDown() ->
+                formatted.stripHypixelMessage() to "formatted message"
 
-            KeyboardManager.isShiftKeyDown() -> (ModifyVisualWords.modifyText(formatted)?.removeColor() ?: formatted) to "modified message"
+            KeyboardManager.isShiftKeyDown() -> (
+                //#if MC < 1.21
+                ModifyVisualWords.modifyText(formatted)?.removeColor()
+                    //#else
+                    //$$ OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.asOrderedText()))
+                    //#endif
+                    ?: formatted
+                ) to "modified message"
 
             KeyboardManager.isControlKeyDown() -> chatLine.chatMessage.removeColor() to "line"
 
