@@ -7,9 +7,11 @@ import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
+import kotlin.reflect.jvm.jvmErasure
 
 /**
  * Defines a storage set that can be reset to its default values.
@@ -23,7 +25,13 @@ abstract class ResettableStorageSet {
     private val props = this::class.memberProperties.filter { prop ->
         val annotatedIgnore = prop.hasAnnotation<Transient>()
         val modifiedIgnore = prop.javaField?.let { Modifier.isTransient(it.modifiers) } ?: false
-        !annotatedIgnore && !modifiedIgnore
+        val isGetter = prop.javaField == null
+        val isTypeValid = when (prop) {
+            is KMutableProperty1<*, *> -> true
+            else -> !prop.returnType.jvmErasure.java.isPrimitive
+        }
+
+        !annotatedIgnore && !modifiedIgnore && !isGetter && isTypeValid
     }
 
     open fun reset() = props.forEach(::tryResetProp)
@@ -56,8 +64,9 @@ abstract class ResettableStorageSet {
         current is MutableCollection<*> -> current.clear()
         current is MutableMap<*, *> -> current.clear()
         else -> ChatUtils.debug(
-            "ResettableStorageSet $classSimpleName tried to reset property '${this.name}' " +
-                "but it is of type ${current?.javaClass?.simpleName}, which is not handled."
+            message = "ResettableStorageSet $classSimpleName tried to reset property '${this.name}' " +
+                "but it is of type ${current?.javaClass?.simpleName}, which is not handled.",
+            replaceSameMessage = true,
         )
     }
 }
