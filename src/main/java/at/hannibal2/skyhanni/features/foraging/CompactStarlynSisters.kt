@@ -185,8 +185,10 @@ object CompactStarlynSisters {
             val foragingSister = group("foragingSister")
             val previousRecord = group("previousRecord")
             val woodType = group("woodType")
-            val formattedLockInWarning = ("§b$foragingSister's §eContest: §fYou broke a §dpersonal best §fof " +
-                "§b$previousRecord §e$woodType logs §fcollected during a contest! §eKeep it up!").asComponent()
+            val formattedLockInWarning = (
+                "§b$foragingSister's §eContest: §fYou broke a §dpersonal best §fof " +
+                    "§b$previousRecord §e$woodType logs §fcollected during a contest! §eKeep it up!"
+                ).asComponent()
             ChatUtils.chat(formattedLockInWarning)
             blockedReason = "STARLYN_COLLECTION_PB"
             return
@@ -219,8 +221,8 @@ object CompactStarlynSisters {
                 val hoverablePersonalBest = formattedPersonalBest.asComponent()
                 hoverablePersonalBest.hover = (
                     "§eClick to check your personal bests!\n§2Sweep Increase§7: $lastPBSweepIncreaseDisplay\n" +
-                    "§6Collected§7: $lastPBCollectionIncreaseDuringContestDisplay $lastPBWoodTypeDisplay §eLogs\n" +
-                    "§6PB Increase: $lastPBPreviousBestDifferenceDisplay $lastPBWoodTypeDisplay §eLogs"
+                        "§6Collected§7: $lastPBCollectionIncreaseDuringContestDisplay $lastPBWoodTypeDisplay §eLogs\n" +
+                        "§6PB Increase: $lastPBPreviousBestDifferenceDisplay $lastPBWoodTypeDisplay §eLogs"
                     ).asComponent()
                 hoverablePersonalBest.onClick(onClick = {
                     ChatUtils.sendMessageToServer("/starlynsisterlevels")
