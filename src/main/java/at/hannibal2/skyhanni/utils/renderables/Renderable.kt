@@ -975,22 +975,6 @@ interface Renderable {
             verticalAlign,
         )
 
-        @Deprecated(
-            "Use VerticalContainerRenderable instead",
-            ReplaceWith("VerticalContainerRenderable(content, spacing, horizontalAlign, verticalAlign)"),
-        )
-        fun verticalContainer(
-            content: List<Renderable>,
-            spacing: Int = 0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ): Renderable = VerticalContainerRenderable(
-            content,
-            spacing,
-            horizontalAlign,
-            verticalAlign,
-        )
-
         fun scrollList(
             list: List<Renderable>,
             height: Int,
