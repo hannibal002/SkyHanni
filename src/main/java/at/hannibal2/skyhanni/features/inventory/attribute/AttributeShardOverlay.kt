@@ -62,8 +62,8 @@ object AttributeShardOverlay {
     }
 
     enum class AttributeShardPriceSource(val displayName: String, val priceSource: ItemPriceSource) {
-        INSTANT_BUY("Instant Buy", ItemPriceSource.BAZAAR_INSTANT_BUY),
-        SELL_ORDER("Sell Order", ItemPriceSource.BAZAAR_INSTANT_SELL),
+        INSTANT_BUY("BZ Instant Buy", ItemPriceSource.BAZAAR_INSTANT_BUY),
+        SELL_ORDER("BZ Sell Order", ItemPriceSource.BAZAAR_INSTANT_SELL),
         ;
 
         override fun toString(): String = displayName
@@ -139,9 +139,9 @@ object AttributeShardOverlay {
 
     private fun MutableList<Renderable>.addButtons() {
         addRenderableButton<AttributeShardSorting>(
-            label = "Sorting Method",
+            label = "Sorted By",
             current = config.displaySortingMethod,
-            getName = { "§a${it.displayName}" },
+            getName = { "§e${it.displayName}" },
             onChange = {
                 config.displaySortingMethod = it
                 reconstructDisplay()
@@ -149,9 +149,9 @@ object AttributeShardOverlay {
         )
 
         addRenderableButton<AttributeShardPriceSource>(
-            label = "Sorting Method",
+            label = "Price Source",
             current = config.overlayPriceSource,
-            getName = { "§a${it.displayName}" },
+            getName = { "§e${it.displayName}" },
             onChange = {
                 config.overlayPriceSource = it
                 reconstructDisplay()
