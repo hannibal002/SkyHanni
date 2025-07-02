@@ -119,7 +119,7 @@ object TabListRenderer {
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     headerY.toFloat(),
-                    0xFFFFFF,
+                    -1,
                 )
                 headerY += 8 + 1
             }
@@ -134,7 +134,7 @@ object TabListRenderer {
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     footerY.toFloat(),
-                    -0x1,
+                    -1,
                 )
                 footerY += LINE_HEIGHT
             }
@@ -199,14 +199,14 @@ object TabListRenderer {
                         text,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
-                        0xFFFFFF,
+                        -1,
                     )
                 } else {
                     GuiRenderUtils.drawString(
                         text,
                         middleX.toFloat(),
                         middleY.toFloat(),
-                        0xFFFFFF,
+                        -1,
                     )
                 }
                 middleY += LINE_HEIGHT
