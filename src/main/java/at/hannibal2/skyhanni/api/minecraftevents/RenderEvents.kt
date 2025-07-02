@@ -123,13 +123,16 @@ enum class RenderLayer {
     FOOD,
     AIR,
     HOTBAR,
-    EXPERIENCE,
+    EXPERIENCE_BAR,
     TEXT,
     HEALTHMOUNT,
     JUMPBAR,
     CHAT,
     PLAYER_LIST,
-    DEBUG;
+    DEBUG,
+    // Not a real forge layer but is used on modern Minecraft versions
+    EXPERIENCE_NUMBER,
+    ;
 
     companion object {
         fun fromForge(element: RenderGameOverlayEvent.ElementType): RenderLayer {
