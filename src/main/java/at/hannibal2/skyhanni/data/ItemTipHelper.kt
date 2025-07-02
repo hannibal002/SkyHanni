@@ -70,7 +70,7 @@ object ItemTipHelper {
             } else 0
             val y = guiTop + yDisplayPosition + 9 + itemTipEvent.offsetY
 
-            GuiRenderUtils.drawString(stackTip, x, y, 16777215)
+            GuiRenderUtils.drawString(stackTip, x, y, -1)
         }
         DrawContextUtils.popMatrix()
         GlStateManager.enableLighting()
