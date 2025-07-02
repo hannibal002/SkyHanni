@@ -45,7 +45,7 @@ object PlayerUtils {
         //#if MC < 1.21
         return (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
         //#else
-        //$$ return MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED).toInt()
+        //$$ return (MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED) * 1000).toInt()
         //#endif
     }
 

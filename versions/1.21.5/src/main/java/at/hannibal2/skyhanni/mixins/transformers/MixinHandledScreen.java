@@ -59,7 +59,7 @@ public abstract class MixinHandledScreen {
 
     @ModifyArg(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), index = 1)
     private List<Text> renderBackground(List<Text> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) DrawContext drawContext) {
-        if (WardrobeApi.INSTANCE.getInCustomWardrobe() && !CustomWardrobe.INSTANCE.getEditMode()) {
+        if (CustomWardrobe.shouldHideNormalTooltip()) {
             return new ArrayList<>();
         }
         return ToolTipData.processModernTooltip(drawContext, itemStack, textTooltip);
