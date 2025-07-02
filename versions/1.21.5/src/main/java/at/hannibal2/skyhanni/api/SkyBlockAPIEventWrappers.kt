@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiProfile
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
-import at.hannibal2.skyhanni.events.SkyBlockPvDataLoadedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
@@ -58,9 +58,12 @@ object SkyBlockAPIEventWrappers {
     @JvmStatic
     fun onPvLoad(data: JsonObject) {
         try {
-            val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(data)
-            NeuProfileDataLoadedEvent(playerData).post()
+            // SbPv only sends the active/selected profile, not all profiles
+            val profileData = hypixelApiGson.fromJson<HypixelApiProfile>(data)
+            val playerData = HypixelPlayerApiJson(listOf(profileData))
 
+            NeuProfileDataLoadedEvent(playerData).post()
+            println("NeuProfileDataLoadedEvent posted with data: $playerData")
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error reading hypixel player api data",

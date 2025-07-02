@@ -25,10 +25,7 @@
             "at.hannibal2.skyhanni.compat.SkyHanniReiPlugin"
         ],
         "skyblockapi:imc/pv-profile": [
-            {
-                "value": "at.hannibal2.skyhanni.api.SkyBlockAPIEventWrappers::onPvLoad",
-                "adapter": "kotlin"
-            }
+            "at.hannibal2.skyhanni.api.SkyBlockAPIEventWrappers::onPvLoad"
         ]
     },
     "depends": {

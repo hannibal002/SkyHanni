@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 @SkyHanniModule
 object HoppityEggLocations {
@@ -99,8 +100,14 @@ object HoppityEggLocations {
 
         val locationStr = StringUtils.pluralize(diff, "location", "locations")
 
+        //#if FORGE
+        val message = "Click here to load $diff more collected egg $locationStr from NEU PV!"
+        //#else
+        //$$val message = "Click here to load $diff more collected egg $locationStr from SkyBlock Profile Viewer!"
+        //#endif
+
         ChatUtils.clickableChat(
-            message = "Click here to load $diff more collected egg $locationStr from NEU PV!",
+            message = message,
             onClick = {
                 loadApiCollectedEggs(collectedEggsApiData)
                 ChatUtils.chat("Updated Hoppity egg location data!")

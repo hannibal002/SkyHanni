@@ -77,8 +77,13 @@ object TrophyFishManager {
             }
         }
         if (changed) {
+            //#if FORGE
+            val message = "Click here to load Trophy Fishing data from NEU PV!"
+            //#else
+            //$$val message = "Click here to load Trophy Fishing data from SkyBlock Profile Viewer!"
+            //#endif
             ChatUtils.clickableChat(
-                "Click here to load Trophy Fishing data from NEU PV!",
+                message,
                 onClick = {
                     updateFromNeuPv(savedFishes, neuData)
                 },
@@ -145,11 +150,21 @@ object TrophyFishManager {
             val current = saved[rarity] ?: 0
             if (newValue > current) {
                 saved[rarity] = newValue
-                ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue")
+                //#if FORGE
+                val message = "Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue"
+                //#else
+                //$$val message = "Updated trophy fishing data from SkyBlock Profile Viewer:  $name $rarity: $current -> $newValue"
+                //#endif
+                ChatUtils.debug(message)
             }
         }
         TrophyFishDisplay.update()
-        ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
+        //#if FORGE
+        val message = "Updated Trophy Fishing data via NEU PV!"
+        //#else
+        //$$val message = "Updated Trophy Fishing data via SkyBlock Profile Viewer!"
+        //#endif
+        ChatUtils.chat(message)
     }
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
