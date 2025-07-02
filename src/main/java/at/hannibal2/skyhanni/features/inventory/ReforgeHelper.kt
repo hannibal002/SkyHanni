@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
@@ -305,7 +306,7 @@ object ReforgeHelper {
 
     private fun getReforgeEffect(reforge: ReforgeApi.Reforge?, rarity: LorenzRarity) =
         reforge?.extraProperty?.get(rarity)?.let {
-            Renderable.wrappedString(
+            WrappedStringRenderable(
                 it,
                 190,
                 color = LorenzColor.GRAY.toColor(),

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 private val config get() = SkyHanniMod.feature.gui.mayorOverlay
@@ -109,7 +110,7 @@ private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Rend
             value?.let {
                 Renderable.hoverTips(
                     Renderable.string(key),
-                    listOf(Renderable.wrappedString(it, 200)),
+                    listOf(WrappedStringRenderable(it, 200)),
                 )
             } ?: Renderable.string(key)
         },

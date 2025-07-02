@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.guide.GuideScrollPage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import java.text.DecimalFormat
 
@@ -56,7 +57,7 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
 
     private fun FortuneUpgrade.print() = buildList {
         add(
-            Renderable.wrappedString(
+            WrappedStringRenderable(
                 description,
                 136,
                 0.75,
@@ -71,7 +72,7 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
             ).withTip()
         )
         add(
-            Renderable.wrappedString(
+            WrappedStringRenderable(
                 requiredItem.repoItemName.let { if (itemQuantity == 1) it else "$it §fx$itemQuantity" }, // TODO wtf
                 70,
                 0.75,
