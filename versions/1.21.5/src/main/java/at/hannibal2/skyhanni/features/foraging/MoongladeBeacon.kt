@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -195,14 +196,14 @@ object MoongladeBeacon {
     private val acceptablePitchMargin = 25.milliseconds
 
     private val colorMinigameInventory = InventoryDetector(
-        onInventoryClose = {
-            normalTuning.clear()
-            enchantedTuning.clear()
-            display = emptyList()
-        },
         openInventory = {
             normalTuning = TuneData()
             enchantedTuning = TuneData(isEnchanted = true)
+        },
+        closeInventory = {
+            normalTuning.reset()
+            enchantedTuning.reset()
+            display = emptyList()
         },
     ) { name ->
         upgradingStrength = (name == "Upgrade Signal Strength")
@@ -267,6 +268,7 @@ object MoongladeBeacon {
         val shouldIgnore = conflictExists && otherTuneData.currentPitch == pitch && targetTuneData.ignoredPitches < 5
         if (shouldIgnore) return
 
+        targetTuneData.ignoredPitches = 0
         targetTuneData.targetPitch = pitch
     }
 
@@ -328,10 +330,10 @@ object MoongladeBeacon {
 
     private data class TuneData(
         val isEnchanted: Boolean = false,
-    ) {
-        private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
-        private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
-        private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
+    ) : ResettableStorageSet() {
+        @Transient private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
+        @Transient private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
+        @Transient private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
 
         var targetColor: BeaconColor? = null
         var targetSpeed: BeaconSpeed? = null
@@ -346,10 +348,10 @@ object MoongladeBeacon {
         private var recentTicks: MutableList<Int> = mutableListOf()
         private var currentMatchSlot: Int = SlotRange.MATCH.range.first
 
-        val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
-        val speedSelectSlot = SPEED_SELECT_SLOT + slotOffset
-        val pitchSelectSlot = PITCH_SELECT_SLOT + slotOffset
-        val pauseSelectSlot = PAUSE_SELECT_SLOT + slotOffset
+        @Transient val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
+        @Transient val speedSelectSlot = SPEED_SELECT_SLOT + slotOffset
+        @Transient val pitchSelectSlot = PITCH_SELECT_SLOT + slotOffset
+        @Transient val pauseSelectSlot = PAUSE_SELECT_SLOT + slotOffset
 
         val colorOffset: Int? get() = currentColor?.let { targetColor?.getOffset(it) }
         val speedOffset: Int? get() = currentSpeed?.let { targetSpeed?.getOffset(it) }
@@ -425,20 +427,6 @@ object MoongladeBeacon {
             targetSpeed = BeaconSpeed.byClosestTickSpeed(calculatedSpeed) ?: return
             val targetSpeed = this.targetSpeed ?: return
             nextExpectedPitch = targetSpeed.getOffsetFromNow()
-        }
-
-        // todo make this class a ResettableStorageSet so we don't need this
-        fun clear() {
-            targetColor = null
-            targetSpeed = null
-            targetPitch = null
-            currentColor = null
-            currentSpeed = null
-            currentPitch = null
-            nextExpectedPitch = null
-            currentMatchSlot = SlotRange.MATCH.range.first
-            recentTicks.clear()
-            lastServerTickCount = 0
         }
 
         override fun toString() = buildString {
