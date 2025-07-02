@@ -55,7 +55,7 @@ object MoongladeBeacon {
      * @param displayName The display name of the color as shown in the GUI.
      * @param itemOverride Optional override for the item to use for this color.
      */
-    private enum class BeaconColor(private val displayName: String, itemOverride: Item? = null) {
+    enum class BeaconColor(private val displayName: String, itemOverride: Item? = null) {
         WHITE("§fWhite"),
         ORANGE("§6Orange"),
         MAGENTA("§dMagenta"),
@@ -94,7 +94,7 @@ object MoongladeBeacon {
      * @param tickSpeed The number of ticks it takes to move (one slot) at this speed level.
      * @param guiSpeed The speed level as displayed in the GUI (1-5).
      */
-    private enum class BeaconSpeed(val tickSpeed: Int, val guiSpeed: Int) {
+    enum class BeaconSpeed(val tickSpeed: Int, val guiSpeed: Int) {
         SPEED_1(12, 5),
         SPEED_2(22, 4),
         SPEED_3(32, 3),
@@ -127,7 +127,7 @@ object MoongladeBeacon {
      * @param displayName The display name of the pitch as shown in the GUI.
      * @param pitch The pitch value used in the sound system.
      */
-    private enum class BeaconPitch(private val displayName: String, val pitch: Float) {
+    enum class BeaconPitch(private val displayName: String, val pitch: Float) {
         LOW("Low", 0.0952381f),
         NORMAL("Normal", 0.7936508f),
         HIGH("High", 1.4920635f),
@@ -152,18 +152,18 @@ object MoongladeBeacon {
      * @param displayName The display name of the slot range for debugging purposes.
      * @param range The range of slots (inclusive) that this enum covers.
      */
-    private enum class SlotRange(
+    enum class BeaconSlotRange(
         private val displayName: String,
         val range: IntRange,
     ) {
         MATCH("Match Slots", 10..16) {
-            override fun Pair<BeaconColor, TuneData>.slotMod(slot: Slot) {
+            override fun Pair<BeaconColor, BeaconTuneData>.slotMod(slot: Slot) {
                 second.targetColor = first
                 second.updateMatchSlot(slot.index)
             }
         },
         CHANGE("Change Slots", 28..34){
-            override fun Pair<BeaconColor, TuneData>.slotMod(slot: Slot) {
+            override fun Pair<BeaconColor, BeaconTuneData>.slotMod(slot: Slot) {
                 second.currentColor = first
             }
         },
@@ -174,7 +174,7 @@ object MoongladeBeacon {
             else slot.performColorApplicableSet { it.slotMod(slot) }
         }
 
-        protected abstract fun Pair<BeaconColor, TuneData>.slotMod(slot: Slot)
+        protected abstract fun Pair<BeaconColor, BeaconTuneData>.slotMod(slot: Slot)
         override fun toString(): String = displayName
     }
 
@@ -197,8 +197,8 @@ object MoongladeBeacon {
 
     private val colorMinigameInventory = InventoryDetector(
         openInventory = {
-            normalTuning = TuneData()
-            enchantedTuning = TuneData(isEnchanted = true)
+            normalTuning = BeaconTuneData()
+            enchantedTuning = BeaconTuneData(isEnchanted = true)
         },
         closeInventory = {
             normalTuning.reset()
@@ -212,8 +212,8 @@ object MoongladeBeacon {
     }
 
     private var upgradingStrength = false
-    private var normalTuning = TuneData()
-    private var enchantedTuning = TuneData(isEnchanted = true)
+    private var normalTuning = BeaconTuneData()
+    private var enchantedTuning = BeaconTuneData(isEnchanted = true)
     private var display = emptyList<Renderable>()
 
     private fun solverEnabled(): Boolean = colorMinigameInventory.isInside() && config.enabled
@@ -308,13 +308,13 @@ object MoongladeBeacon {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (normalTuning.readFromSlotLore(slot)) continue
             else if (enchantedTuning.readFromSlotLore(slot)) continue
-            else if (SlotRange.MATCH.handleSlot(slot)) continue
-            else if (SlotRange.CHANGE.handleSlot(slot)) continue
+            else if (BeaconSlotRange.MATCH.handleSlot(slot)) continue
+            else if (BeaconSlotRange.CHANGE.handleSlot(slot)) continue
         }
         display = drawDisplay()
     }
 
-    private fun Slot.performColorApplicableSet(block: (Pair<BeaconColor, TuneData>) -> Unit): Boolean {
+    private fun Slot.performColorApplicableSet(block: (Pair<BeaconColor, BeaconTuneData>) -> Unit): Boolean {
         val stackColor = this.stack?.item?.getColorOrNull() ?: return false
         val tuningData = if (this.stack.isEnchanted()) enchantedTuning else normalTuning
         block.invoke(stackColor to tuningData)
@@ -328,7 +328,7 @@ object MoongladeBeacon {
         }
     }
 
-    private data class TuneData(
+    data class BeaconTuneData(
         val isEnchanted: Boolean = false,
     ) : ResettableStorageSet() {
         @Transient private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
@@ -346,7 +346,7 @@ object MoongladeBeacon {
 
         private var lastServerTickCount = 0
         private var recentTicks: MutableList<Int> = mutableListOf()
-        private var currentMatchSlot: Int = SlotRange.MATCH.range.first
+        private var currentMatchSlot: Int = BeaconSlotRange.MATCH.range.first
 
         @Transient val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
         @Transient val speedSelectSlot = SPEED_SELECT_SLOT + slotOffset
