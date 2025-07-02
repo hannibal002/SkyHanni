@@ -192,6 +192,7 @@ object ComponentUtils {
             strippedId == "wool" -> getColor(damage) + "_wool"
             strippedId == "trapdoor" -> "oak_trapdoor"
             strippedId == "speckled_melon" -> "glistering_melon_slice"
+            strippedId == "melon" -> "melon_slice"
             strippedId == "melon_block" -> "melon"
             strippedId == "fish" -> when (damage) {
                 0 -> "cod"
@@ -235,6 +236,7 @@ object ComponentUtils {
             strippedId == "fence" -> "oak_fence"
             strippedId == "fence_gate" -> "oak_fence_gate"
             strippedId == "grass" -> "grass_block"
+            strippedId == "pumpkin" -> "carved_pumpkin"
             strippedId == "lit_pumpkin" -> "jack_o_lantern"
             strippedId == "planks" -> getWood(damage) + "_planks"
             strippedId == "mob_spawner" -> "spawner"

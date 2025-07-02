@@ -102,15 +102,6 @@ public class EstimatedItemValueConfig {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Use Attribute Price",
-        desc = "Show composite price for attributes instead of lowest bin. " +
-            "This will drastically decrease the estimated value but might be correct when buying multiple low tier items and combining them."
-    )
-    @ConfigEditorBoolean
-    public Property<Boolean> useAttributeComposite = Property.of(false);
-
-    @Expose
     @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
     // TODO rename "position"
     public Position itemPriceDataPos = new Position(140, 90);
