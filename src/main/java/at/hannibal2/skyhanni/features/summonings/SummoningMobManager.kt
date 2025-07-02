@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.seconds
@@ -128,7 +129,7 @@ object SummoningMobManager {
             }
         }.map { Renderable.string(it) }
 
-        val renderable = Renderable.verticalContainer(list)
+        val renderable = VerticalContainerRenderable(list)
         config.summoningMobDisplayPos.renderRenderable(renderable, posLabel = "Summoning Mob Display")
     }
 

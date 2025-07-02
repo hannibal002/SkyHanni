@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -71,7 +72,7 @@ object HitmanSlots {
             it % 9 != 0 && (it + 1) % 9 != 0 // Vertical borders
     }
 
-    private fun getSlotPriceRenderable(): Renderable = Renderable.verticalContainer(
+    private fun getSlotPriceRenderable(): Renderable = VerticalContainerRenderable(
         buildList {
             add(Renderable.string("§eHitman Slot Progress"))
 

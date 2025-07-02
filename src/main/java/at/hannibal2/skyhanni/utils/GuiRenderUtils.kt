@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -102,7 +103,7 @@ object GuiRenderUtils {
         val percent = current.fractionOf(maxValue)
         val scale = textScale.toDouble()
         return Renderable.hoverTips(
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 listOf(
                     Renderable.string(label, scale = scale),
                     Renderable.fixedSizeLine(

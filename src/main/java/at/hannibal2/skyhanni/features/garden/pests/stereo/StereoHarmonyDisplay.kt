@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -81,7 +82,7 @@ object StereoHarmonyDisplay {
         pestLine.add(Renderable.string("§ePest: §c$pestName "))
         if (pest?.crop != null && config.showCrop.get()) pestLine.add(ItemStackRenderable(pest.crop.icon))
         list.add(Renderable.horizontalContainer(pestLine))
-        add(Renderable.verticalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
+        add(VerticalContainerRenderable(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

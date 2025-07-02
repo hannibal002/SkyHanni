@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
@@ -199,13 +200,13 @@ object MineshaftPityDisplay {
             }
         }
 
-        val neededToPityRenderable = Renderable.verticalContainer(
+        val neededToPityRenderable = VerticalContainerRenderable(
             listOf(
                 Renderable.string("§3Needed to pity:"),
                 Renderable.horizontalContainer(
                     listOf(
                         Renderable.placeholder(10, 0),
-                        Renderable.verticalContainer(blocksToPityList),
+                        VerticalContainerRenderable(blocksToPityList),
                     ),
                 ),
             ),
@@ -231,7 +232,7 @@ object MineshaftPityDisplay {
         )
 
         display = listOf(
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
                 spacing = 2,
             ),

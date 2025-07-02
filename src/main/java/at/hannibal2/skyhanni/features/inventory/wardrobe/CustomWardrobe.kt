@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.item.ItemStack
@@ -246,7 +247,7 @@ object CustomWardrobe {
             }
             loreList.add(renderable)
         }
-        return Renderable.verticalContainer(loreList, spacing = 1)
+        return VerticalContainerRenderable(loreList, spacing = 1)
     }
 
     private fun getToolTip(
@@ -347,7 +348,7 @@ object CustomWardrobe {
                 3.0 * (activeScale / 100.0),
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
-            val withButtons = Renderable.verticalContainer(
+            val withButtons = VerticalContainerRenderable(
                 listOf(warningRenderable, button),
                 buttonVerticalSpacing,
                 horizontalAlign = HorizontalAlignment.CENTER,
@@ -380,13 +381,13 @@ object CustomWardrobe {
             Renderable.horizontalContainer(slotsRenderables, horizontalSpacing)
         }
 
-        val allSlotsRenderable = Renderable.verticalContainer(
+        val allSlotsRenderable = VerticalContainerRenderable(
             rowsRenderables,
             verticalSpacing,
             horizontalAlign = HorizontalAlignment.CENTER,
         )
 
-        val withButtons = Renderable.verticalContainer(
+        val withButtons = VerticalContainerRenderable(
             listOf(allSlotsRenderable, button),
             buttonVerticalSpacing,
             horizontalAlign = HorizontalAlignment.CENTER,
@@ -475,7 +476,7 @@ object CustomWardrobe {
             horizontalAlign = HorizontalAlignment.CENTER,
         )
 
-        val total = Renderable.verticalContainer(
+        val total = VerticalContainerRenderable(
             listOf(row, editButton),
             verticalSpacing.toInt(),
             horizontalAlign = HorizontalAlignment.CENTER,
@@ -526,7 +527,7 @@ object CustomWardrobe {
             }
         }
 
-        return Renderable.verticalContainer(list, 1, HorizontalAlignment.RIGHT)
+        return VerticalContainerRenderable(list, 1, HorizontalAlignment.RIGHT)
     }
 
     private fun createLabeledButton(

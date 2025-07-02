@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) : GuideTablePage(
     sizeX, sizeY, paddingX, paddingY, footerSpacing,
@@ -261,7 +262,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             ),
         )
 
-        val realFooter = Renderable.verticalContainer(
+        val realFooter = VerticalContainerRenderable(
             listOf(
                 petFooter,
                 Renderable.horizontalContainer(

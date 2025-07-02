@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
     GuideTablePage(
@@ -22,7 +23,7 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
         FFStats.getCropStats(crop, item.getItemOrNull())
 
         FarmingItemType.resetClickState()
-        val toolLines = toolLines().split().map { Renderable.verticalContainer(it, 2) }
+        val toolLines = toolLines().split().map { VerticalContainerRenderable(it, 2) }
         update(
             listOf(
                 header(),
@@ -54,13 +55,13 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
 
     private fun equipDisplay(): Renderable =
         Renderable.fixedSizeColumn(
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 listOf(
                     crop.farmingItem.getDisplay(),
                     Renderable.horizontalContainer(
                         listOf(
-                            Renderable.verticalContainer(FarmingItemType.getArmorDisplay(), 2),
-                            Renderable.verticalContainer(FarmingItemType.getEquipmentDisplay(), 2),
+                            VerticalContainerRenderable(FarmingItemType.getArmorDisplay(), 2),
+                            VerticalContainerRenderable(FarmingItemType.getEquipmentDisplay(), 2),
                         ),
                         2,
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

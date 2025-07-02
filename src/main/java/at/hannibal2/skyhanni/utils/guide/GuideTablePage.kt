@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.tableStretchXPadding
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.tableStretchYPadding
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 abstract class GuideTablePage(
     val sizeX: Int,
@@ -19,7 +20,7 @@ abstract class GuideTablePage(
     ) {
         val ySpace = (content + listOf(footer)).tableStretchYPadding(sizeY - paddingY * 2)
         renderable =
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 listOf(
                     Renderable.table(
                         content,

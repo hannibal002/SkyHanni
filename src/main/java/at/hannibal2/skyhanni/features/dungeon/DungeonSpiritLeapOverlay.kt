@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -107,7 +108,7 @@ object DungeonSpiritLeapOverlay {
             radius = 5,
         )
 
-        val playerInfoRenderable = Renderable.verticalContainer(
+        val playerInfoRenderable = VerticalContainerRenderable(
             listOf(
                 Renderable.wrappedString(
                     player.username,

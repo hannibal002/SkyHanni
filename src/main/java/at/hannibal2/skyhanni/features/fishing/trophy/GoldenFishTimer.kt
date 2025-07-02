@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
@@ -225,7 +226,7 @@ object GoldenFishTimer {
         }
 
         add(
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 text.map { Renderable.string(it) },
                 spacing = 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,

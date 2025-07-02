@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 private val config get() = SkyHanniMod.feature.gui.mayorOverlay
 
@@ -50,7 +51,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         {
             val candidates = ElectionApi.rawMayorData?.current?.candidates.orEmpty()
 
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 candidates.map { candidate ->
                     renderPerson(
                         "Candidate",
@@ -80,7 +81,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         fun onSecondPassed(event: SecondPassedEvent) {
             if (!isEnabled()) return
             with(config) {
-                display = mayorOverlay.map { it.createLines() }.let { Renderable.verticalContainer(it, spacing = spacing) }
+                display = VerticalContainerRenderable(mayorOverlay.map { it.createLines() }, spacing = spacing)
             }
         }
 
@@ -100,7 +101,7 @@ private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Rend
         " ${if (perk.minister) "§6✯ " else ""}§e${perk.perkName}" to "§7${perk.description}"
     }.orEmpty()
 
-    return Renderable.verticalContainer(
+    return VerticalContainerRenderable(
         buildMap {
             name?.let { put("$colorCode$title $it", null) }
             putAll(perkLines)

@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.tileentity.TileEntityBeacon
@@ -170,7 +171,7 @@ object CrimsonMinibossRespawnTimer {
                 },
             )
         }
-        return Renderable.verticalContainer(lines)
+        return VerticalContainerRenderable(lines)
     }
 
     @HandleEvent

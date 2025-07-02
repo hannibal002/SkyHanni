@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.item.ItemStack
 import kotlin.math.ceil
@@ -117,7 +118,7 @@ object RenderableInventory {
             }
         }
 
-        return Renderable.verticalContainer(
+        return VerticalContainerRenderable(
             finalList.map { Renderable.horizontalContainer(it, 0) },
             0,
             horizontalAlign = horizontalAlign,
