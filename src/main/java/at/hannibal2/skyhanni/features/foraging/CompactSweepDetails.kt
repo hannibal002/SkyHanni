@@ -29,6 +29,7 @@ object CompactSweepDetails {
      * REGEX-TEST: §6Sweep Details: §r§2430.65∮ Sweep
      * REGEX-TEST: §6Sweep Details: §r§234,442.2∮ Sweep
      */
+    @Suppress("MaxLineLength")
     private val sweepDetailsPattern by patternGroup.pattern(
         "header",
         "(?:§.)+Sweep Details: (?<sweep>(?:§.)+(?<sweepAmt>[\\d,]+(?:\\.\\d+)?)).? Sweep"
@@ -41,6 +42,7 @@ object CompactSweepDetails {
      * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818.04 Logs
      * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818 Logs
      */
+    @Suppress("MaxLineLength")
     private val sweepToughnessLogsPattern by patternGroup.pattern(
         "toughness-and-logs",
         "\\s+(?:§.)+(?<treeType>\\w+) Tree Toughness: (?<toughnessDisplay>§r§6(?<toughnessAmount>[\\d,]+(?:\\.\\d+)?)) (?<logsDisplay>(?:§.)+(?<isItGreen>§.)(?<logsAmount>[\\d,]+(?:\\.\\d+)?)) Logs"
@@ -54,6 +56,7 @@ object CompactSweepDetails {
      * REGEX-TEST:   §r§7Wrong Style: §c-50% Sweep §a2.38 Logs §cCut branches and trunk first!!
      * REGEX-TEST:   §r§7Wrong Style: §r§c-50% Sweep §r§a2.38 Logs §r§cCut branches and trunk first!!
      */
+    @Suppress("MaxLineLength")
     private val penaltyPattern by patternGroup.pattern(
         "penalty",
         "\\s+(?:§.)+(?<penaltyReason>[\\S ]+): (?<penaltyDisplay>(?:§.)+-(?<penaltyPercent>[\\d,]+(?:\\.\\d+)?)%) Sweep (?<logsDisplay>(?:§.)?(?<isItGreen>§.)(?<logsAmount>[\\d,]+(?:\\.\\d+)?)) Logs(?: (?<proTip>(?:§.)+[\\S ]+))?",
