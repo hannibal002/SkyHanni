@@ -156,6 +156,7 @@ class ItemResolutionQuery {
             return ItemUtils.bazaarOverrides[shardName]
         }
 
+        // TODO repo
         private val shardNameOverrides = mapOf(
             "STRIDERSURFER" to "STRIDER_SURFER",
             "ABYSSAL_LANTERNFISH" to "ABYSSAL_LANTERN",

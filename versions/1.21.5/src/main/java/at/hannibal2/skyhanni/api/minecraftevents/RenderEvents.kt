@@ -57,8 +57,13 @@ object RenderEvents {
     }
 
     @JvmStatic
-    fun postExperienceLayerEventPre(context: DrawContext): Boolean {
-        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE).post()
+    fun postExperienceBarLayerEventPre(context: DrawContext): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_BAR).post()
+    }
+
+    @JvmStatic
+    fun postExperienceNumberLayerEventPre(context: DrawContext): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 
     @JvmStatic
@@ -74,8 +79,13 @@ object RenderEvents {
     }
 
     @JvmStatic
-    fun postExperienceLayerEventPost(context: DrawContext) {
-        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE).post()
+    fun postExperienceBarLayerEventPost(context: DrawContext) {
+        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_BAR).post()
+    }
+
+    @JvmStatic
+    fun postExperienceNumberLayerEventPost(context: DrawContext) {
+        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 }
 
@@ -90,11 +100,13 @@ enum class RenderLayer {
     FOOD,
     AIR,
     HOTBAR,
-    EXPERIENCE,
+    EXPERIENCE_BAR,
     TEXT,
     HEALTHMOUNT,
     JUMPBAR,
     CHAT,
     PLAYER_LIST,
-    DEBUG;
+    DEBUG,
+    // Not a real forge layer but is used on modern Minecraft versions
+    EXPERIENCE_NUMBER,
 }
