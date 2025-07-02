@@ -61,7 +61,11 @@ class EmbedConfig {
     var useDefault: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Embed Color", desc = "Which color the embed sidebar should be (Chroma displays as black).")
+    @ConfigOption(
+        name = "Embed Color",
+        desc = "Which color the embed sidebar should be (Chroma displays as black). " +
+            "§eThis only gets used when 'Use Default' above is disabled.",
+    )
     @ConfigEditorDropdown
     var color: LorenzColor = LorenzColor.YELLOW
 }

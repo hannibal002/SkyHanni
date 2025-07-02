@@ -20,7 +20,7 @@ class WebhookConfig {
     var threadId: String = ""
 
     @Expose
-    @ConfigOption(name = "Interval", desc = "The interval in which status updated will be sent.")
+    @ConfigOption(name = "Interval", desc = "The interval in minutes in which status updated will be sent.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
     var interval: Int = 5
 }
