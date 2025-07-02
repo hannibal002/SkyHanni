@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.compat.ReiCompat;
 import at.hannibal2.skyhanni.events.minecraft.CharEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
@@ -20,6 +21,10 @@ public class MixinKeyboard {
         if (MinecraftClient.getInstance().player == null) return;
         if (key == GLFW.GLFW_KEY_UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
+
+        // dont send key events if Rei search bar is selected
+        if (ReiCompat.searchHasFocus()) return;
+
         /*
             * action = 0: Key released
             * action = 1: Key pressed
