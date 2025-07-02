@@ -37,5 +37,9 @@ open class ItemStackRenderable(
         )
     }
 
-    fun withTip() = Renderable.hoverTips(stack, stack.getTooltipCompat(false), stack = stack)
+    fun withTip() = Renderable.hoverTips(
+        stack,
+        stack.getTooltipCompat(false),
+        stack = stack
+    )
 }

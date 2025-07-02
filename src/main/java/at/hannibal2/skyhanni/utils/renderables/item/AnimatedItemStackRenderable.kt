@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.item.ItemStack
@@ -26,7 +27,10 @@ data class ItemStackBounceDefinition(
     val upwardBounce: Int = 0,
     val downwardBounce: Int = 0,
     val bounceSpeed: Double = 0.0,
-)
+) {
+    fun isEnabled() = (upwardBounce > 0 || downwardBounce > 0) && bounceSpeed > 0.0
+    fun getTotalBounceHeight(): Int = upwardBounce + downwardBounce
+}
 
 /**
  * A data class that defines the rotation behavior of an item stack.
@@ -102,13 +106,19 @@ class AnimatedItemStackRenderable(
             if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
         }
         ItemStackAnimationFrame(newStack, ticks)
-    }
+    }.takeIfNotEmpty() ?: ErrorManager.skyHanniError(
+        "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
+    )
+
+    private val startTime = SimpleTimeMark.now()
+    private val baseItemHeight = (15.5 * scale + 0.5).toInt() + ySpacing
+    private val fullBounceHeight = if (bounce.isEnabled()) bounce.getTotalBounceHeight() else 0
+    private val bounceOffset = fullBounceHeight / 2.0
+
+    override val height = baseItemHeight + fullBounceHeight
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
 
-    override val height = (15.5 * scale + 0.5).toInt() + ySpacing + bounce.upwardBounce + bounce.downwardBounce
-    private val startTime = SimpleTimeMark.now()
-
-    private var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
+    var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
         currentRotation.xCoord + when (rotation.axis) {
             Axis.X -> rotation.rotationSpeed * deltaTime
@@ -125,18 +135,18 @@ class AnimatedItemStackRenderable(
     )
 
     private fun ItemStackBounceDefinition.calculateBounce(): Double {
-        if (bounceSpeed == 0.0 || (upwardBounce == 0 && downwardBounce == 0)) return 0.0
+        if (!bounce.isEnabled()) return 0.0
 
         val t = startTime.passedSince().inPartialSeconds
-        val period = (upwardBounce + downwardBounce) * 2.0 / bounceSpeed
+        val period = fullBounceHeight * 2.0 / bounceSpeed
         val theta = (t % period) / period * (2 * Math.PI)
         val sinTheta = sin(theta)
-        return sinTheta * (if (sinTheta >= 0) upwardBounce else downwardBounce)
+        val pureBounce = sinTheta * (if (sinTheta >= 0) upwardBounce else downwardBounce)
+        return pureBounce + bounceOffset
     }
 
     private fun tryMoveNextFrame(dt: Double) {
-        val transitionTicks = frameDefs[frameIndex].ticks
-        if (transitionTicks <= 0) return
+        val transitionTicks = frameDefs[frameIndex].ticks.takeIf { it > 0 } ?: return
 
         ticksInFrame += dt * 20.0
         if (ticksInFrame <= transitionTicks) return
@@ -151,8 +161,8 @@ class AnimatedItemStackRenderable(
         tryMoveNextFrame(deltaTime.inPartialSeconds)
 
         stack.renderOnScreen(
-            x = (0 + (xSpacing / 2f)),
-            y = (0 + currentOffsetY).toFloat(),
+            x = (xSpacing / 2f),
+            y = currentOffsetY.toFloat(),
             scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
             rotationDegrees = currentRotation,
