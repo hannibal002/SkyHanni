@@ -111,6 +111,8 @@ object CompactStarlynSisters {
      * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e1,235,129 §r§fFig logs collected in my Contest!
      * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e129 §fFig logs collected in my Contest!
      * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e129 §r§fFig logs collected in my Contest!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e2,678 §fMangrove logs collected in my Contest!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e22,989 §fFig logs collected in my Contest!
      */
     @Suppress("MaxLineLength")
     private val sisterCollPBDuringContestPattern by patternGroup.pattern(
@@ -128,7 +130,7 @@ object CompactStarlynSisters {
      */
     @Suppress("MaxLineLength")
     private val sisterKeepItUpPattern by patternGroup.pattern(
-        "coll-pb-during-contest",
+        "keep-it-up-during-contest",
         "(?:§.)*\\[NPC] (?<foragingSister>(?:§.)*[\\w ]+)(?:§.)*: (?:§.)*Keep it up!",
     )
 
@@ -181,20 +183,20 @@ object CompactStarlynSisters {
 
     private fun SkyHanniChatEvent.compactCollectionPB(message: String) {
         sisterCollPBDuringContestPattern.matchMatcher(message) {
-            // (?:§.)*\[NPC] (?<foragingSister>(?:§.)*[\w ]+)(?:§.)*: (?:§.)*PERSONAL BEST(?:§.)*! You've surpassed your previous record of (?:§.)*§e(?<previousRecord>[\d, ]+) (?:§.)*(?<woodType>\w+) logs collected in my Contest!
             val foragingSister = group("foragingSister")
             val previousRecord = group("previousRecord")
             val woodType = group("woodType")
             val formattedLockInWarning = (
                 "§b$foragingSister's §eContest: §fYou broke a §dpersonal best §fof " +
                     "§b$previousRecord §e$woodType logs §fcollected during a contest! §eKeep it up!"
-                ).asComponent()
-            ChatUtils.chat(formattedLockInWarning)
-            blockedReason = "STARLYN_COLLECTION_PB"
+                )
+            val hoverableLockInWarning = formattedLockInWarning.asComponent()
+            ChatUtils.chat(hoverableLockInWarning)
+            blockedReason = "STARLYN_COLLECTION"
             return
         }
         sisterKeepItUpPattern.matchMatcher(message) {
-            blockedReason = "STARLYN_COLLECTION_PB"
+            blockedReason = "STARLYN_COLLECTION"
             return
         }
         if (!isInPersonalBest) {
@@ -207,7 +209,7 @@ object CompactStarlynSisters {
                 lastPBCollectionIncreaseDuringContest = group("duringContest").formatInt()
                 lastPBPreviousBestDifferenceDisplay = group("aLotMore")
                 lastPBPreviousBestDifference = group("byHowMuch").formatInt()
-                blockedReason = "STARLYN_COLLECTION_PB"
+                blockedReason = "STARLYN_COLLECTION"
                 return
             }
         } else {
