@@ -46,7 +46,7 @@ object CompactStarlynSisters {
     )
 
     /**
-     * * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b230 §fpoints!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b230 §fpoints!
      * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b2,506 §fpoints!
      * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b700 §fpoints! That's a new §d§lPERSONAL BEST§f!
      * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b123,700 §fpoints! That's a new §d§lPERSONAL BEST§f!
