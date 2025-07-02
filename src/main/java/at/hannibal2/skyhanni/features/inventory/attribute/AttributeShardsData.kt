@@ -95,8 +95,7 @@ object AttributeShardsData {
      * REGEX-TEST: §7Owned: §b71 Shards
      * REGEX-TEST: §7Owned: §b1,729 Shards
      */
-    @Suppress("unused")
-    private val amountOwnedPattern by patternGroup.pattern(
+    val amountOwnedPattern by patternGroup.pattern(
         "owned",
         "§7Owned: §b(?<amount>[\\d,]+) Shards?",
     )
@@ -199,7 +198,8 @@ object AttributeShardsData {
     }
 
     private fun processHuntingBoxItems() {
-        val items = InventoryUtils.getItemsInOpenChest().map { it.stack }
+        val slots = InventoryUtils.getItemsInOpenChest()
+        val items = slots.map { it.stack }
         for (item in items) {
             val internalName = item.getInternalNameOrNull() ?: continue
             if (!isAttributeShard(internalName)) continue
@@ -215,6 +215,7 @@ object AttributeShardsData {
             }
             processShard(internalName, tier, toNextTier)
         }
+        HuntingBoxValue.processInventory(slots)
     }
 
     private fun processShard(
