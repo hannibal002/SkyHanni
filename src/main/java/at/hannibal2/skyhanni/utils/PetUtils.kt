@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 
 @SkyHanniModule
 object PetUtils {
-
     // Late load from NEU repo
     private var petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
     private var basePetLeveling: List<Int> = listOf()
@@ -44,20 +43,20 @@ object PetUtils {
 
     private fun getSeasonalVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val variantId = SkyblockSeason.currentSeason?.name ?: "SPRING"
-        val variantInternalName = "${skinInternalName.asString()}_$variantId".toInternalName()
-        return animatedPetSkins[variantInternalName.asString()]
+        val variantFauxInternalName = "${skinInternalName.asString()}_$variantId"
+        return animatedPetSkins[variantFauxInternalName]
     }
 
     private fun getDayNightVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val variantId = if (SkyBlockTime.isDay()) "DAY" else "NIGHT"
-        val variantInternalName = "${skinInternalName.asString()}_$variantId".toInternalName()
-        return animatedPetSkins[variantInternalName.asString()]
+        val variantFauxInternalName = "${skinInternalName.asString()}_$variantId"
+        return animatedPetSkins[variantFauxInternalName]
     }
 
     private fun getCiFactionVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val playerFaction = CrimsonIsleReputationHelper.factionType ?: FactionType.BARBARIAN
-        val variantInternalName = "${skinInternalName.asString()}_${playerFaction.name}".toInternalName()
-        return animatedPetSkins[variantInternalName.asString()]
+        val variantFauxInternalName = "${skinInternalName.asString()}_${playerFaction.name}"
+        return animatedPetSkins[variantFauxInternalName]
     }
 
     fun getAnimatedJsonOrNull(
