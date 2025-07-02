@@ -99,25 +99,26 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val sweepIncreasePattern by patternGroup.pattern(
         "sweep-from-collection-pb",
-        "(?:(?:§.)*Your total (?:§.)*. Sweep (?:§.)*is now increased by (?<sweepIncreaseDisplay>(?:§.)*(?<sweepIncreasePercent>\\d+(?:\\.\\d+)?)%)(?:§.)*!)",
+        "(?:§.)*Your total (?:§.)*. Sweep (?:§.)*is now increased by (?<sweepIncreaseDisplay>(?:§.)*(?<sweepIncreasePercent>\\d+(?:\\.\\d+)?)%)(?:§.)*!",
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e5129 §fFig logs collected in my Contest!
-     * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e5129 §r§fFig logs collected in my Contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e5,129 §fFig logs collected in my Contest!
-     * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e5,129 §r§fFig logs collected in my Contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e1,235,129 §fFig logs collected in my Contest!
-     * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e1,235,129 §r§fFig logs collected in my Contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e129 §fFig logs collected in my Contest!
-     * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e129 §r§fFig logs collected in my Contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e2,678 §fMangrove logs collected in my Contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e22,989 §fFig logs collected in my Contest!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e5129 §fFig logs collected in my Contest§f!
+     * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e5129 §r§fFig logs collected in my Contest§r§f!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e5,129 §fFig logs collected in my Contest§f!
+     * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e5,129 §r§fFig logs collected in my Contest§r§f!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e1,235,129 §fFig logs collected in my Contest§f!
+     * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e1,235,129 §r§fFig logs collected in my Contest§r§f!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e129 §fFig logs collected in my Contest§f!
+     * REGEX-TEST: §r§e[NPC] §r§bAgatha§r§f: §r§6§lPERSONAL BEST§r§f! You've surpassed your previous record of §r§e129 §r§fFig logs collected in my Contest§r§f!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e2,678 §fMangrove logs collected in my Contest§f!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e22,989 §fFig logs collected in my Contest§r§f!
+     * REGEX-TEST: §e[NPC] §bAgatha§f: §r§6§lPERSONAL BEST§f! You've surpassed your previous record of §e2,696 §fMangrove logs collected in my Contest§f!
      */
     @Suppress("MaxLineLength")
     private val sisterCollPBDuringContestPattern by patternGroup.pattern(
         "coll-pb-during-contest",
-        "(?:§.)*\\[NPC] (?<foragingSister>(?:§.)*[\\w ]+)(?:§.)*: (?:§.)*PERSONAL BEST(?:§.)*! You've surpassed your previous record of (?:§.)*§e(?<previousRecord>[\\d, ]+) (?:§.)*(?<woodType>\\w+) logs collected in my Contest!",
+        "(?:§.)*\\[NPC] (?<foragingSister>(?:§.)*[\\w ]+)(?:§.)*: (?:§.)*PERSONAL BEST(?:§.)*! You've surpassed your previous record of (?:§.)*§e(?<previousRecord>[\\d, ]+) (?:§.)*(?<woodType>\\w+) logs collected in my Contest(?:§.)*!",
     )
 
     /**
