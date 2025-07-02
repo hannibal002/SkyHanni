@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
@@ -129,34 +130,27 @@ object AgathaCouponProfit {
 
     private fun getRequiredItems(item: ItemStack): MutableMap<NeuInternalName, Int> {
         val items = mutableMapOf<NeuInternalName, Int>()
-        var next = false
+
         val lore = item.getLore()
-        for (line in lore) {
-            if (line == "§7Cost") {
-                next = true
+        val costLines = lore
+            .sublistAfter({ it == "§7Cost" }, skip = 1, amount = lore.size)
+            .takeWhile { it.isNotEmpty() }
+
+        for (line in costLines) {
+            val rawItemName = line.replace("§8 ", " §8")
+
+            val originalPair = ItemUtils.readItemAmount(rawItemName)
+            if (originalPair == null) {
+                ErrorManager.logErrorStateWithData(
+                    "Error in AnitaCoupon Profit", "Could not read item amount",
+                    "rawItemName" to rawItemName,
+                    "name" to item.displayName,
+                    "lore" to lore,
+                )
                 continue
             }
-            if (next) {
-                if (line == "") {
-                    next = false
-                    continue
-                }
-
-                val rawItemName = line.replace("§8 ", " §8")
-
-                val originalPair = ItemUtils.readItemAmount(rawItemName)
-                if (originalPair == null) {
-                    ErrorManager.logErrorStateWithData(
-                        "Error in AnitaCoupon Profit", "Could not read item amount",
-                        "rawItemName" to rawItemName,
-                        "name" to item.displayName,
-                        "lore" to lore,
-                    )
-                    continue
-                }
-                val newPair = NeuInternalName.fromItemName(originalPair.first) to originalPair.second
-                items.add(newPair)
-            }
+            val newPair = NeuInternalName.fromItemName(originalPair.first) to originalPair.second
+            items.add(newPair)
         }
         return items
     }
