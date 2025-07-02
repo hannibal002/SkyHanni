@@ -1,6 +1,13 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.utils.ChatUtils
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -18,10 +25,15 @@ class ResettableStorageSetTest {
         val list: MutableList<String> = mutableListOf()
         val map: MutableMap<String, Int> = mutableMapOf()
         @Transient val transientList: MutableList<String> = mutableListOf("transientListItem")
+
+        val intGetter: Int get() = staticInt + 1
     }
 
     @Test
     fun testResettableStorageSet() {
+        mockkObject(ChatUtils)
+        every { ChatUtils.debug(any<String>()) } just Runs
+
         val storage = TestStorage(
             string = "changed",
             int = 100,
@@ -34,7 +46,11 @@ class ResettableStorageSetTest {
             map["key1"] = 1
             map["key2"] = 2
         }
+
         storage.reset()
+
+        verify(exactly = 0) { ChatUtils.debug(any()) }
+        unmockkObject(ChatUtils)
 
         Assertions.assertEquals(
             "default",
