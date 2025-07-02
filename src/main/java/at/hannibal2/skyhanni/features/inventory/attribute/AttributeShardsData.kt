@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -129,6 +130,11 @@ object AttributeShardsData {
         "§aand (?<amount>\\d+) more\\.\\.\\.",
     )
 
+    private val advancedModeNotUnlocked by patternGroup.pattern(
+        "advanced.mode",
+        "§7§cAdvanced Mode unlocked at 30",
+    )
+
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val attributesJson = event.getConstant<NeuAttributeShardJson>("attribute_shards")
@@ -194,7 +200,26 @@ object AttributeShardsData {
             }
             processShard(internalName, tier, toNextTier)
         }
+
+        val advancedModeStack = InventoryUtils.getSlotAtIndex(52)?.stack?.orNull()
+        val advancedModeLore = advancedModeStack?.getLore().orEmpty()
+        advancedModeNotUnlocked.firstMatcher(advancedModeLore) {
+            addAllMissingShards()
+        }
+
         AttributeShardOverlay.updateDisplay()
+    }
+
+    private fun addAllMissingShards() {
+        val currentShards = storage?.keys.orEmpty()
+        if (currentShards.size > 30) return
+        for ((shardName, shardInfo) in attributeInfo) {
+            if (shardName in currentShards) continue
+            if (shardName in unconsumableAttributes) continue
+
+            val internalName = shardInfo.internalName
+            processShard(internalName, 0, 1)
+        }
     }
 
     private fun processHuntingBoxItems() {
