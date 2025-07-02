@@ -23,17 +23,22 @@ import kotlin.reflect.jvm.jvmErasure
 abstract class ResettableStorageSet {
     private val classSimpleName by lazy { this::class.simpleName ?: "UnknownClass" }
     private val defaults by lazy { this::class.createInstance() }
-    private val props = this::class.memberProperties.filter { prop ->
-        val annotatedIgnore = prop.hasAnnotation<Transient>()
-        val modifiedIgnore = prop.javaField?.let { Modifier.isTransient(it.modifiers) } ?: false
-        val isGetter = prop.javaField == null
-        val isVar = prop is KMutableProperty1<*, *>
-        val isMutableColl = prop.returnType.jvmErasure.isSubclassOf(MutableCollection::class)
-        val isMutableMap = prop.returnType.jvmErasure.isSubclassOf(MutableMap::class)
-        val isMutableIter = prop.returnType.jvmErasure.isSubclassOf(MutableIterator::class)
-        val isTypeValid = isVar || isMutableColl || isMutableMap || isMutableIter
-
-        !annotatedIgnore && !modifiedIgnore && !isGetter && isTypeValid
+    private val props = run {
+        val vars = this::class.memberProperties.filterIsInstance<KMutableProperty1<out ResettableStorageSet, Any?>>()
+        val (cols, maps, iters) = listOf(
+            MutableCollection::class,
+            MutableMap::class,
+            MutableIterator::class
+        ).map { type ->
+            this::class.memberProperties.filter {
+                it.returnType.jvmErasure.isSubclassOf(type)
+            }
+        }
+        (vars + cols + maps + iters).filter { prop ->
+            val annotatedIgnore = prop.hasAnnotation<Transient>()
+            val modifiedIgnore = prop.javaField?.let { Modifier.isTransient(it.modifiers) } ?: false
+            !annotatedIgnore && !modifiedIgnore
+        }
     }
 
     open fun reset() = props.forEach(::tryResetProp)
