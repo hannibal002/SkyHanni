@@ -62,7 +62,6 @@ class ForagingConfig {
     @ConfigOption(name = "Compact Sweep Details", desc = "Compacts messages related to Sweep Details calculations")
     @ConfigEditorBoolean
     @FeatureToggle
-    @OnlyModern
     var compactSweepDetails = true
 
     @Expose

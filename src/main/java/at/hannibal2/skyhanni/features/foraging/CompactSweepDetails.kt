@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -98,7 +98,8 @@ object CompactSweepDetails {
                 sendCompactedResults()
             }
             isInsideSweepDetails = true // always set this to true so future messages get blocked properly regardless of Axe Throw status
-            sweepDetailsVariablesDirty = true // always set this to true so future messages get blocked properly regardless of Axe Throw status
+            sweepDetailsVariablesDirty =
+                true // always set this to true so future messages get blocked properly regardless of Axe Throw status
             addedInitialLogs = false
             sweepDisplay = group("sweep")
             sweepPenaltyHoverHistory.add("§eClick to open the Tree Gifts guide!")
@@ -194,5 +195,6 @@ object CompactSweepDetails {
         sweepDetailsVariablesDirty = false
     }
 
-    private fun isInIsland() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny()
+    // allow on multiple islands 
+    private fun isInIsland() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.inAnyIsland(IslandType.THE_PARK, IslandType.GALATEA, IslandType.HUB)
 }
