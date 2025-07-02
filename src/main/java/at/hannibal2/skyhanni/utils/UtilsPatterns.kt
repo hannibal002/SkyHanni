@@ -18,10 +18,12 @@ object UtilsPatterns {
      * REGEX-TEST: §5§lEPIC BOOTS
      * REGEX-TEST: §f§lCOMMON
      * REGEX-TEST: §f§lCOMMON COMBAT SHARD §8(ID C9)
+     * REGEX-TEST: §7Rarity: §6§lLEGENDARY
+     * REGEX-TEST: §7Rarity: §9§lRARE
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
-        "^(?:§.){2,3}(?:.§. (?:§.){2})?(?:SHINY )?(?<rarity>" +
+        "^(?:§7Rarity: )?(?:§.){2,3}(?:.§. (?:§.){2})?(?:SHINY )?(?<rarity>" +
             enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") } +
             ") ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?(?: §8\\(ID \\w\\d+\\))?$",
     )
@@ -171,5 +173,18 @@ object UtilsPatterns {
     val skyblockMenuGuiPattern by patternGroup.pattern(
         "inventory.skyblockmenu",
         "SkyBlock Menu",
+    )
+
+    /**
+     * REGEX-TEST: §7Source: §fVerdant Shard §8(C11)
+     * REGEX-TEST: §7Source: §9Drowned Shard §8(R18)
+     * REGEX-TEST: §7Source: §5Barbarian Duke X Shard §8(E27)
+     * REGEX-TEST: §7Source: §6Galaxy Fish Shard §8(L41)
+     * REGEX-TEST: §7Source: §6Starborn Shard §8(L44)
+     * REGEX-TEST: §7Source: §fSea Archer Shard §8(C14)
+     */
+    val attributeSourcePattern by patternGroup.pattern(
+        "attribute.shard.source",
+        "§7Source: §.(?<source>.+) Shard §8\\(\\w\\d+\\)"
     )
 }
