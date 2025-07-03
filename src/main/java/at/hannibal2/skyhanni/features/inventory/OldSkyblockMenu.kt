@@ -20,6 +20,7 @@ import net.minecraft.item.ItemStack
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
+import kotlin.reflect.KFunction
 
 /**
  * Taken with permission from NotEnoughUpdates
@@ -64,7 +65,7 @@ object OldSkyblockMenu {
         event.cancel()
 
         val canClick = !sbButton.requiresBoosterCookie || BitsApi.hasCookieBuff()
-        if (canClick) sbButton.command.invoke()
+        if (canClick) sbButton.command.call()
     }
 
     private val slotMap: Map<Int, SkyBlockButton> by lazy {
@@ -76,7 +77,7 @@ object OldSkyblockMenu {
     class SkullItemData(val uuid: String, val repoSkullId: String) : ItemData
 
     private enum class SkyBlockButton(
-        val command: () -> Unit,
+        val command: KFunction<Unit>,
         val slot: Int,
         private val displayName: String,
         private vararg val displayDescription: String,
@@ -150,7 +151,7 @@ object OldSkyblockMenu {
             if (showCookieWarning) {
                 add("§cYou need a booster cookie active")
                 add("§cto use this shortcut!")
-            } else add("§eClick to execute /$command")
+            } else add("§eClick to execute /${command.name.lowercase()}")
         }
 
         private fun createItem(showCookieWarning: Boolean): ItemStack {
