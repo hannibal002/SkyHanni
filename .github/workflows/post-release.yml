@@ -36,5 +36,8 @@ jobs:
             -   name: List all files in build/downloadedJars
                 run: ls -la build/downloadedJars
 
+            -   name: Build Shared Variables Submodule
+                run: ./gradlew :sharedVariables:build
+
             -   name: Publish to Modrinth
                 run: ./gradlew publishModrinth -Pchangelog="${CHANGELOG}" -Pversion="${UPDATE_VERSION}"
