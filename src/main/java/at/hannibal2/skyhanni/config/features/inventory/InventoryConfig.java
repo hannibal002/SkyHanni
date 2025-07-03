@@ -66,6 +66,11 @@ public class InventoryConfig {
     public CFConfig chocolateFactory = new CFConfig();
 
     @Expose
+    @ConfigOption(name = "Improved SB Menus", desc = "")
+    @Accordion
+    public ImprovedSBMenusConfig improvedSBMenus = new ImprovedSBMenusConfig();
+
+    @Expose
     @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
     @Accordion
     // TODO remove the suffix "config"
