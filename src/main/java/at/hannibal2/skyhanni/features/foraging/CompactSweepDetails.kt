@@ -46,7 +46,7 @@ object CompactSweepDetails {
     @Suppress("MaxLineLength")
     private val sweepToughnessLogsPattern by patternGroup.pattern(
         "toughness-and-logs",
-        "\\s+(?:§.)+(?<treeType>[\\S ]+) Tree Toughness: (?<toughnessDisplay>§r§6(?<toughnessAmount>[\\d,]+(?:\\.\\d+)?)) (?<logsDisplay>(?:§.)+(?<isItGreen>§.)(?<logsAmount>[\\d,]+(?:\\.\\d+)?)) Logs",
+        "\\s+(?:§.)+(?<treeType>[\\S ]+) Tree Toughness: (?<toughnessDisplay>§r§6(?<toughnessAmount>[\\d,.]+)) (?<logsDisplay>(?:§.)+(?<isItGreen>§.)(?<logsAmount>[\\d,.]+)) Logs",
     )
 
     /**
