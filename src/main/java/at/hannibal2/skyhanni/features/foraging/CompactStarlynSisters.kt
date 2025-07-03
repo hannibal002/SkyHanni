@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -65,7 +66,7 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val previousBestPattern by patternGroup.pattern(
         "previous-best",
-        "§e\\[NPC] (?<foragingSister>[\\S ]+)§f: §rYour previous Personal Best was (?<previousBest>§.(?<prevBestInt>[\\d,]+))(?:§.)?\\."
+        "(?:§.)*\\[NPC] (?<foragingSister>[\\S ]+)(?:§.)*: (?:§.)*Your previous Personal Best was (?<previousBest>(?:§.)*(?<prevBestInt>[\\d,]+))(?:§.)*\\."
     )
 
     /***
@@ -75,7 +76,7 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val seeMePattern by patternGroup.pattern(
         "claim-rewards",
-        "§e\\[NPC] (?<foragingSister>[\\S ]+)§f: §rCome see me at (?<location>(?:§.)?.+) (?:§.)?to claim your rewards!"
+        "(?:§.)*\\[NPC] (?<foragingSister>[\\S ]+)(?:§.)*: (?:§.)*Come see me at (?<location>(?:§.)*.+) (?:§.)*to claim your rewards!"
     )
 
     /**
@@ -99,7 +100,7 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val sweepIncreasePattern by patternGroup.pattern(
         "sweep-from-collection-pb",
-        "(?:§.)*Your total (?:§.)*. Sweep (?:§.)*is now increased by (?<sweepIncreaseDisplay>(?:§.)*(?<sweepIncreasePercent>\\d+(?:\\.\\d+)?)%)(?:§.)*!",
+        "(?:§.)*Your total (?:§.)*. Sweep (?:§.)*is now increased by (?<sweepIncreaseDisplay>(?:§.)*(?<sweepIncreasePercent>[\\d.]+)%)(?:§.)*!",
     )
 
     /**
@@ -118,7 +119,7 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val sisterCollPBDuringContestPattern by patternGroup.pattern(
         "coll-pb-during-contest",
-        "(?:§.)*\\[NPC] (?<foragingSister>(?:§.)*[\\w ]+)(?:§.)*: (?:§.)*PERSONAL BEST(?:§.)*! You've surpassed your previous record of (?:§.)*§e(?<previousRecord>[\\d, ]+) (?:§.)*(?<woodType>\\w+) logs collected in my Contest(?:§.)*!",
+        "(?:§.)*\\[NPC] (?<foragingSister>(?:§.)*[\\w ]+)(?:§.)*: (?:§.)*PERSONAL BEST(?:§.)*! You've surpassed your previous record of (?:§.)*§e(?<previousRecord>[\\d,]+) (?:§.)*(?<woodType>[\\S ]+) logs collected in my Contest(?:§.)*!",
     )
 
     /**
@@ -228,7 +229,7 @@ object CompactStarlynSisters {
                         "§6PB Increase: $lastPBPreviousBestDifferenceDisplay $lastPBWoodTypeDisplay §eLogs"
                     ).asComponent()
                 hoverablePersonalBest.onClick(onClick = {
-                    ChatUtils.sendMessageToServer("/starlynsisterlevels")
+                    HypixelCommands.starlynSisters()
                 })
                 ChatUtils.chat(hoverablePersonalBest)
                 isInPersonalBest = false

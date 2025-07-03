@@ -207,6 +207,10 @@ object HypixelCommands {
         send("locraw")
     }
 
+    fun starlynSisters() {
+        send("starlynsisterlevels")
+    }
+
     fun attributeMenu() {
         send("attributemenu")
     }
