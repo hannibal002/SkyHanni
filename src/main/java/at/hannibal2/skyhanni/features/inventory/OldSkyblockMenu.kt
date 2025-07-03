@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -23,6 +24,7 @@ import java.util.Locale
 /**
  * Taken with permission from NotEnoughUpdates
  */
+@SkyHanniModule
 object OldSkyblockMenu {
 
     private val decimalFormat = DecimalFormat("##,##0", DecimalFormatSymbols(Locale.US))
@@ -48,7 +50,7 @@ object OldSkyblockMenu {
             val format = decimalFormat.format(magicalPower)
             lore.add(5, "§7Magical Power: §6$format")
 
-            val newItem = ItemStack.copyItemStack(item)
+            val newItem = item.copy()
             newItem.setLore(lore)
             event.replace(newItem)
         } else event.replace(item)
