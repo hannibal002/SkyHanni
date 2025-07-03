@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.container
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
@@ -42,6 +43,8 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object BetterContainers {
 
+    private val patternGroup = RepoPattern.group("inventory.bettercontainers")
+
     private val config get() = SkyHanniMod.feature.inventory.improvedSBMenus
 
     private val x: Identifier = Identifier.of("skyhanni", "dynamic_54")
@@ -53,9 +56,11 @@ object BetterContainers {
     private val dynamic54Button = Identifier.of("skyhanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
     private val customDynamicChest = Identifier.of("skyhanni", "dynamic_chest_inventory.png")
 
-    val disallowedInventory = InventoryDetector { name ->
-        name.lowercase().trim().startsWith("navigate the maze")
-    }
+    private val disallowedInventoryPattern by patternGroup.pattern(
+        "disallowed",
+        "(?i)navigate the maze.*"
+    )
+    val disallowedInventory = InventoryDetector(disallowedInventoryPattern)
 
     val isRendering: Boolean get() = loaded && gpuTex != null
     val isOverriding: Boolean get() = chestOpen && isRendering && !disallowedInventory.isInside()
@@ -384,7 +389,17 @@ object BetterContainers {
                 else -> updateDynamicTexture(bufferedImageNew)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to generate dynamic texture for inventory",
+                "lastClickedSlot" to lastClickedSlot,
+                "clickedSlot" to clickedSlot,
+                "lastInvHashcode" to lastInvHashcode,
+                "chestOpen" to chestOpen,
+                "hasItem" to hasItem,
+                "hasNullPane" to hasNullPane,
+                "openInventoryName" to InventoryUtils.openInventoryName()
+            )
         }
     }
 }
