@@ -30,15 +30,14 @@ abstract class PublishToModrinth : DefaultTask() {
     @get:Input
     abstract var versionNumber: String
 
+    @get:Input
+    abstract var modrinthToken: String
+
     private val userAgent: String
         get() = "SkyHanni-$versionNumber"
 
-    private lateinit var modrinthToken: String
-
     @TaskAction
     fun publishToModrinth() {
-        modrinthToken = requireNotNull(System.getenv("MODRINTH_TOKEN")) { "No 'MODRINTH_TOKEN' env value has been found." }
-
         val jars = jarDirectory.get().asFile.listFiles()?.filter { it.extension == "jar" }.orEmpty()
 
         for (jar in jars) {
