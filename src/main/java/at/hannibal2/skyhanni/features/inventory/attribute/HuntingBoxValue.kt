@@ -61,18 +61,18 @@ object HuntingBoxValue {
         val hover = buildList {
             add(internalName.repoItemName)
             add("")
-            add("§7Price per Instant Sell: §6${pricePerInstantSell.addSeparators()}")
-            add("§7Price per Instant Buy: §6${pricePerInstantBuy.addSeparators()}")
+            add("§7Price per Instant Sell: §6${pricePerInstantSell.toInt().addSeparators()}")
+            add("§7Price per Instant Buy: §6${pricePerInstantBuy.toInt().addSeparators()}")
             add("")
             add("§7Amount Owned: §a$amountOwned")
-            add("§7Total Price Instant Sell: §6${totalPriceInstantSell.addSeparators()}")
-            add("§7Total Price Instant Buy: §6${totalPriceInstantBuy.addSeparators()}")
+            add("§7Total Price Instant Sell: §6${totalPriceInstantSell.toInt().addSeparators()}")
+            add("§7Total Price Instant Buy: §6${totalPriceInstantBuy.toInt().addSeparators()}")
         }
 
         table.add(
             DisplayTableEntry(
                 "${internalName.repoItemName} §8x$amountOwned",
-                "§6${totalPriceInstantSell.addSeparators()}",
+                "§6${totalPriceInstantSell.toInt().addSeparators()}",
                 totalPriceInstantSell,
                 internalName,
                 hover,
