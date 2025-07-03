@@ -2,8 +2,11 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.hotx.ChatRepoPatternEnum
 import at.hannibal2.skyhanni.data.hotx.ItemRepoPatternEnum
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
 
+@SkyHanniModule
 object HotfApi {
 
     var lottery: LotteryPerk? = null
@@ -27,6 +30,8 @@ object HotfApi {
         ;
 
         override val basePath = "foraging.hotf.lottery"
+        override val chatPattern by RepoPattern.pattern("$basePath.chat.$patternId", chatPatternRaw)
+        override val itemPattern by RepoPattern.pattern("$basePath.item.$patternId", itemPatternRaw)
     }
 
 }
