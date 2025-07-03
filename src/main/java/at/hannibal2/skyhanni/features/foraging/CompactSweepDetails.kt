@@ -60,7 +60,7 @@ object CompactSweepDetails {
     @Suppress("MaxLineLength")
     private val penaltyPattern by patternGroup.pattern(
         "penalty",
-        "\\s+(?:§.)+(?<penaltyReason>[\\S ]+): (?<penaltyDisplay>(?:§.)+-(?<penaltyPercent>[\\d,]+(?:\\.\\d+)?)%) Sweep (?<logsDisplay>(?:§.)?(?<isItGreen>§.)(?<logsAmount>[\\d,]+(?:\\.\\d+)?)) Logs(?: (?<proTip>(?:§.)+[\\S ]+))?",
+        "\\s+(?:§.)+(?<penaltyReason>[\\S ]+): (?<penaltyDisplay>(?:§.)+-(?<penaltyPercent>[\\d,.]+)%) Sweep (?<logsDisplay>(?:§.)?(?<isItGreen>§.)(?<logsAmount>[\\d,.]+)) Logs(?: (?<proTip>(?:§.)+[\\S ]+))?",
     )
 
     private var sweepDetailsVariablesDirty = false
