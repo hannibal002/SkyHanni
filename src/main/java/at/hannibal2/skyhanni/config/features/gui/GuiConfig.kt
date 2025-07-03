@@ -164,6 +164,7 @@ class GuiConfig {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @OnlyLegacy
     var configButtonOnPause: Boolean = true
 
     @Expose
