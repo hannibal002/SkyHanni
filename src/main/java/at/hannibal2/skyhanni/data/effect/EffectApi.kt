@@ -38,7 +38,7 @@ object EffectApi {
      */
     private val godPotTabPattern by RepoPattern.pattern(
         "stats.tabpatterns.godpot",
-        "\\s?(?:§.)*God Potion(?:§.)*: (?:§.)*(?<time>[dhms0-9 ]+)(?:§.)*",
+        "(?:§.)*God Potion(?:§.)*: (?:§.)*(?<time>[dhms0-9 ]+)(?:§.)*",
     )
 
     /**
