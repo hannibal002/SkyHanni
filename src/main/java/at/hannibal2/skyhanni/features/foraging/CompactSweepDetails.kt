@@ -32,7 +32,7 @@ object CompactSweepDetails {
     @Suppress("MaxLineLength")
     private val sweepDetailsPattern by patternGroup.pattern(
         "header",
-        "(?:§.)+Sweep Details: (?<sweep>(?:§.)+(?<sweepAmt>[\\d,]+(?:\\.\\d+)?)).? Sweep"
+        "(?:§.)+Sweep Details: (?<sweep>(?:§.)+(?<sweepAmt>[\\d,.]+)).? Sweep",
     )
 
     /**
