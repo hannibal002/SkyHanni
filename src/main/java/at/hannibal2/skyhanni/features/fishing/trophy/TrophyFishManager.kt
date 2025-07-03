@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.util.ChatStyle
 
 @SkyHanniModule
@@ -77,11 +78,9 @@ object TrophyFishManager {
             }
         }
         if (changed) {
-            //#if FORGE
-            val message = "Click here to load Trophy Fishing data from NEU PV!"
-            //#else
-            //$$val message = "Click here to load Trophy Fishing data from SkyBlock Profile Viewer!"
-            //#endif
+            val message = if (PlatformUtils.IS_LEGACY) "Click here to load Trophy Fishing data from NEU PV!"
+            else "Click here to load Trophy Fishing data from SkyBlock Profile Viewer!"
+
             ChatUtils.clickableChat(
                 message,
                 onClick = {
@@ -150,20 +149,14 @@ object TrophyFishManager {
             val current = saved[rarity] ?: 0
             if (newValue > current) {
                 saved[rarity] = newValue
-                //#if FORGE
-                val message = "Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue"
-                //#else
-                //$$val message = "Updated trophy fishing data from SkyBlock Profile Viewer:  $name $rarity: $current -> $newValue"
-                //#endif
+                val message = if (PlatformUtils.IS_LEGACY) "Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue"
+                else "Updated trophy fishing data from SkyBlock Profile Viewer:  $name $rarity: $current -> $newValue"
                 ChatUtils.debug(message)
             }
         }
         TrophyFishDisplay.update()
-        //#if FORGE
-        val message = "Updated Trophy Fishing data via NEU PV!"
-        //#else
-        //$$val message = "Updated Trophy Fishing data via SkyBlock Profile Viewer!"
-        //#endif
+        val message = if (PlatformUtils.IS_LEGACY) "Updated Trophy Fishing data via NEU PV!"
+        else "Updated Trophy Fishing data via SkyBlock Profile Viewer!"
         ChatUtils.chat(message)
     }
 

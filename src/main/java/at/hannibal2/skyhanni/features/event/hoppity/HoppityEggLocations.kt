@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 @SkyHanniModule
 object HoppityEggLocations {
@@ -99,11 +100,8 @@ object HoppityEggLocations {
 
         val locationStr = StringUtils.pluralize(diff, "location", "locations")
 
-        //#if FORGE
-        val message = "Click here to load $diff more collected egg $locationStr from NEU PV!"
-        //#else
-        //$$val message = "Click here to load $diff more collected egg $locationStr from SkyBlock Profile Viewer!"
-        //#endif
+        val message = if (PlatformUtils.IS_LEGACY) "Click here to load $diff more collected egg $locationStr from NEU PV!"
+        else "Click here to load $diff more collected egg $locationStr from SkyBlock Profile Viewer!"
 
         ChatUtils.clickableChat(
             message = message,
