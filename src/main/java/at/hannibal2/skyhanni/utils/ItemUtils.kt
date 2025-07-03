@@ -360,6 +360,9 @@ object ItemUtils {
         //#endif
     }
 
+    fun createSkull(displayName: String, uuid: String, value: String, loreColl: Collection<String>) =
+        createSkull(displayName, uuid, value, *loreColl.toTypedArray())
+
     // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
         //#if MC < 1.21
