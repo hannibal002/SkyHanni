@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object CompactSweepDetails {
 
-    private val config get() = SkyHanniMod.feature.foraging
+    private val config get() = SkyHanniMod.feature.foraging.trees
     private val patternGroup = RepoPattern.group("foraging.sweep-details")
 
     /**
@@ -165,7 +165,7 @@ object CompactSweepDetails {
 
         chatComponent.hover = hoverComponent
         chatComponent.onClick(onClick = {
-            ChatUtils.sendMessageToServer("/treegifts")
+            HypixelCommands.treeGifts()
         })
 
         ChatUtils.chat(chatComponent)

@@ -59,12 +59,6 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Compact Sweep Details", desc = "Compacts messages related to Sweep Details calculations")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var compactSweepDetails = true
-
-    @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
     @ConfigEditorBoolean
     @FeatureToggle
