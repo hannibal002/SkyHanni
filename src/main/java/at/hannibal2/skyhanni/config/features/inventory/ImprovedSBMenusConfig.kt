@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.features.inventory.LegacyBetterContainers
 import com.google.gson.annotations.Expose
@@ -12,6 +13,7 @@ class ImprovedSBMenusConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Change the way that menus in SkyBlock look.")
     @ConfigEditorBoolean
+    @FeatureToggle
     @OnlyModern
     var enabled: Boolean = false
 
