@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.features.inventory.BetterContainers
+import at.hannibal2.skyhanni.config.OnlyModern
+import at.hannibal2.skyhanni.features.inventory.LegacyBetterContainers
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -11,6 +12,7 @@ class ImprovedSBMenusConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Change the way that menus in SkyBlock look.")
     @ConfigEditorBoolean
+    @OnlyModern
     var enabled: Boolean = false
 
     @Expose
@@ -19,7 +21,8 @@ class ImprovedSBMenusConfig {
         desc = "Change the background style of SkyBlock menus."
     )
     @ConfigEditorDropdown
-    var menuBackgroundStyle: BetterContainers.BackgroundStyle = BetterContainers.BackgroundStyle.DARK_1
+    @OnlyModern
+    var menuBackgroundStyle: LegacyBetterContainers.BackgroundStyle = LegacyBetterContainers.BackgroundStyle.DARK_1
 
     @Expose
     @ConfigOption(
@@ -27,6 +30,7 @@ class ImprovedSBMenusConfig {
         desc = "Change the background style of foreground elements in SkyBlock menus."
     )
     @ConfigEditorDropdown
-    var buttonBackgroundStyle: BetterContainers.BackgroundStyle = BetterContainers.BackgroundStyle.DARK_1
+    @OnlyModern
+    var buttonBackgroundStyle: LegacyBetterContainers.BackgroundStyle = LegacyBetterContainers.BackgroundStyle.DARK_1
 
 }
