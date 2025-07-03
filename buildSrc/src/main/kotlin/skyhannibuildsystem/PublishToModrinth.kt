@@ -30,9 +30,9 @@ abstract class PublishToModrinth : DefaultTask() {
     @get:Input
     abstract var versionNumber: String
 
-
     private val userAgent: String
         get() = "SkyHanni-$versionNumber"
+
     private lateinit var modrinthToken: String
 
     @TaskAction
@@ -46,8 +46,8 @@ abstract class PublishToModrinth : DefaultTask() {
         }
     }
 
-    val jarNamePattern = "SkyHanni-(?<modVersion>[\\d.]+)-mc(?<mcVersion>[\\d.]+)\\.jar".toPattern()
-    val client by lazy { constructClient() }
+    private val jarNamePattern = "SkyHanni-(?<modVersion>[\\d.]+)-mc(?<mcVersion>[\\d.]+)\\.jar".toPattern()
+    private val client by lazy { constructClient() }
 
     private fun processJar(file: File) {
         val fileName = file.name
@@ -78,9 +78,9 @@ abstract class PublishToModrinth : DefaultTask() {
         val loader = modrinthInfo.loader
         val versionType = if (modVersionObj.isBeta) "beta" else "release"
         val loaders = loader.toLoadersArray()
-        val featured = (ProjectTarget.values().last() == projectTarget).toString()
-        val status = "draft"
-        val requestedStatus = "draft"
+        val featured = ProjectTarget.values().last() == projectTarget
+        val status = "listed"
+        val requestedStatus = "listed"
 
         val fileParts = JsonArray()
         fileParts.add(fileName)
@@ -96,7 +96,7 @@ abstract class PublishToModrinth : DefaultTask() {
         modrinthJson.addProperty("featured", featured)
         modrinthJson.addProperty("status", status)
         modrinthJson.addProperty("requested_status", requestedStatus)
-        modrinthJson.addProperty("project_id", ModrinthDependency.SKYHANNI.projectId)
+        modrinthJson.addProperty("project_id", ModrinthDependency.NOPO.projectId)
         modrinthJson.add("file_parts", fileParts)
         modrinthJson.addProperty("primary_file", fileName)
 
@@ -115,6 +115,9 @@ abstract class PublishToModrinth : DefaultTask() {
         if (responseCode !in 200..201) {
             throw RuntimeException("Failed to publish to Modrinth: HTTP $responseCode - ${modrinthRespnse.body()}")
         }
+
+        val responseBody = modrinthRespnse.body()
+        println("Successfully published to Modrinth: $responseBody")
     }
 
     private fun Map<ModrinthDependency, DependencyType>.createDependencyArray(): JsonArray {

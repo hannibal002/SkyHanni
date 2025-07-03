@@ -5,14 +5,14 @@ enum class ModrinthInfo(
     val loader: String,
     val dependencies: Map<ModrinthDependency, DependencyType>,
 ) {
-    SKYHANNI_189(
+    FORGE_1_8_9(
         minecraftVersions = listOf("1.8.9"),
         loader = "forge",
         dependencies = mapOf(
             ModrinthDependency.NOT_ENOUGH_UPDATES to DependencyType.OPTIONAL,
         ),
     ),
-    SKYHANNI_12105(
+    FABRIC_1_21_5(
         minecraftVersions = listOf("1.21.5"),
         loader = "fabric",
         dependencies = mapOf(
@@ -25,6 +25,7 @@ enum class ModrinthInfo(
 enum class ModrinthDependency(
     val projectId: String,
 ) {
+    NOPO("KHETkdnF"),
     SKYHANNI("byNkmv5G"),
     NOT_ENOUGH_UPDATES("GGamhqbw"),
     FABRIC_API("P7dR8mSH"),

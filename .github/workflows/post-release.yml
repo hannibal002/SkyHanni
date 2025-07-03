@@ -1,0 +1,40 @@
+name: Post-Release
+
+on:
+    release:
+        types:
+            - published
+
+env:
+    UPDATE_VERSION: ${{ github.event.release.tag_name }}
+    REPO: ${{ github.repository }}
+    CHANGELOG: ${{ github.event.release.body }}
+    MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+
+jobs:
+    post-publish:
+        # if: github.repository_id == '511310721'
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+
+            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Download release file
+                env:
+                    GITHUB_TOKEN: ${{ github.token }}
+                run: |
+                    mkdir -p build/downloadedJars
+                    gh release download "${UPDATE_VERSION}" -p '*.jar' --repo "${REPO}"
+                    mv *.jar build/downloadedJars/
+
+            -   name: List all files in build/downloadedJars
+                run: ls -la build/downloadedJars
+
+            -   name: Publish to Modrinth
+                run: ./gradlew publishModrinth -Pchangelog="${CHANGELOG}" -Pversion="${UPDATE_VERSION}"

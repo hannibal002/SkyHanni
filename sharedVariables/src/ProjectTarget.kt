@@ -21,7 +21,7 @@ enum class ProjectTarget(
         "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
         MappingStyle.SEARGE,
         forgeDep = "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
-        modrinthInfo = ModrinthInfo.SKYHANNI_189,
+        modrinthInfo = ModrinthInfo.FORGE_1_8_9,
         linkTo = "BRIDGE116FORGE",
     ),
     BRIDGE116FORGE(
@@ -48,7 +48,7 @@ enum class ProjectTarget(
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5",
         modMenuVersion = "14.0.0-rc.2",
         isModern = true,
-        modrinthInfo = ModrinthInfo.SKYHANNI_12105,
+        modrinthInfo = ModrinthInfo.FABRIC_1_21_5,
         linkTo = null,
     ),
     ;
