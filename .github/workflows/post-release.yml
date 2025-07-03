@@ -13,7 +13,7 @@ env:
 
 jobs:
     post-publish:
-        # if: github.repository_id == '511310721'
+        if: github.repository_id == '511310721'
         runs-on: ubuntu-latest
 
         steps:

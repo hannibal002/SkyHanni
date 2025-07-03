@@ -25,7 +25,6 @@ enum class ModrinthInfo(
 enum class ModrinthDependency(
     val projectId: String,
 ) {
-    NOPO("KHETkdnF"),
     SKYHANNI("byNkmv5G"),
     NOT_ENOUGH_UPDATES("GGamhqbw"),
     FABRIC_API("P7dR8mSH"),

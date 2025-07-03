@@ -95,7 +95,7 @@ abstract class PublishToModrinth : DefaultTask() {
         modrinthJson.addProperty("featured", featured)
         modrinthJson.addProperty("status", status)
         modrinthJson.addProperty("requested_status", requestedStatus)
-        modrinthJson.addProperty("project_id", ModrinthDependency.NOPO.projectId)
+        modrinthJson.addProperty("project_id", ModrinthDependency.SKYHANNI.projectId)
         modrinthJson.add("file_parts", fileParts)
         modrinthJson.addProperty("primary_file", fileName)
 
