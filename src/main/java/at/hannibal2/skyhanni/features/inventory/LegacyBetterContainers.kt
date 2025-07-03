@@ -4,6 +4,7 @@ package at.hannibal2.skyhanni.features.inventory
 //$$ import net.minecraft.util.Identifier
 //#endif
 
+@SuppressWarnings("unused")
 object LegacyBetterContainers {
 
     enum class BackgroundStyle(private val displayName: String) {

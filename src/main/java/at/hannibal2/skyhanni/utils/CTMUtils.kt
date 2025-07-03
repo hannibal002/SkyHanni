@@ -4,6 +4,7 @@ package at.hannibal2.skyhanni.utils
  * Taken with love (and permission), and adapted from, the NEU source code.
  * https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/miscfeatures/BetterContainers.java#L424
  */
+@Suppress("CyclomaticComplexMethod")
 object CTMUtils {
 
     data class CTMData(
