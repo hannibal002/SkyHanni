@@ -451,7 +451,7 @@ enum class HotmData(
 
         override val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked",
-            "(?:§.)*Requires.*|.*Mountain!|(?:§.)*Click to unlock!|",
+            "(?:§.)*Requires.*|.*Mountain(?:§.)*!|(?:§.)*Click to unlock!",
         )
 
         /**
