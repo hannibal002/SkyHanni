@@ -426,6 +426,8 @@ enum class HotmData(
 
         override val name: String = "HotM"
         override val rotatingPerkClazz = SkymallPerk::class
+        override val rotatingPerks = SkymallPerk.entries
+        override val rotatingPerkEntry: HotmData = SKY_MALL
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
@@ -659,8 +661,6 @@ enum class HotmData(
                 }
             }
         }
-
-        override val rotatingPerkEntry: HotmData = SKY_MALL
 
         @HandleEvent
         fun onIslandChange(event: IslandChangeEvent) {
