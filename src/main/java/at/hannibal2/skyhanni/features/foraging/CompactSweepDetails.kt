@@ -88,7 +88,6 @@ object CompactSweepDetails {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.oldIsland != IslandType.GALATEA) return
         resetSweepDetailsVariables()
     }
 
@@ -96,12 +95,11 @@ object CompactSweepDetails {
         val message = message
         sweepDetailsPattern.matchMatcher(message) {
             if (sweepPenaltyHoverHistory.isNotEmpty()) {
-                // this flow needs to be here in case Axe Throw ability from HOTF screws up all the detection
                 sendCompactedResults()
             }
-            isInsideSweepDetails = true // always set this to true so future messages get blocked properly regardless of Axe Throw status
-            sweepDetailsVariablesDirty =
-                true // always set this to true so future messages get blocked properly regardless of Axe Throw status
+            // Set these to true so future messages get blocked properly regardless of Axe Throw status
+            isInsideSweepDetails = true
+            sweepDetailsVariablesDirty = true
             addedInitialLogs = false
             sweepDisplay = group("sweep")
             sweepPenaltyHoverHistory.add("§eClick to open the Tree Gifts guide!")
@@ -117,10 +115,12 @@ object CompactSweepDetails {
                 toughness = group("toughnessAmount").formatDouble()
                 logCountDisplay = group("logsDisplay")
                 logs = group("logsAmount").formatDouble()
-                sweepPenaltyHoverHistory.add("§6Initial Logs: $logs $treeType Logs §7(§6$toughness toughness§7)")
+                val fixedToughness = toughness.toString().removeSuffix(".0")
+                sweepPenaltyHoverHistory.add("§6Initial Logs: $logs $treeType Logs §7(§6$fixedToughness toughness§7)")
                 blockedReason = "SWEEP_DETAILS"
-                if (isFinalCalculation(group("isItGreen")))
+                if (isFinalCalculation(group("isItGreen"))) {
                     sendCompactedResults()
+                }
             }
             penaltyPattern.matchMatcher(message) {
                 if (!addedInitialLogs) {
@@ -133,8 +133,9 @@ object CompactSweepDetails {
                 sweepDetailsChatBreakdown.add("§7(${group("penaltyDisplay")}§7)")
                 proTip = groupOrEmpty("proTip")
                 blockedReason = "SWEEP_DETAILS"
-                if (isFinalCalculation(group("isItGreen")))
+                if (isFinalCalculation(group("isItGreen"))) {
                     sendCompactedResults()
+                }
             }
         }
     }
@@ -197,6 +198,5 @@ object CompactSweepDetails {
         sweepDetailsVariablesDirty = false
     }
 
-    private fun isInIsland() =
-        SkyBlockUtils.inSkyBlock && SkyBlockUtils.inAnyIsland(IslandType.THE_PARK, IslandType.GALATEA, IslandType.HUB)
+    private fun isInIsland() = SkyBlockUtils.inAnyIsland(IslandType.THE_PARK, IslandType.GALATEA, IslandType.HUB)
 }
