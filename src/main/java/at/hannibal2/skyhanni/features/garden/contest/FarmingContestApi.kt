@@ -3,11 +3,9 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -16,7 +14,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -49,32 +46,6 @@ object FarmingContestApi {
         "§7Claim multiple farming contest",
     )
 
-    /**
-     * REGEX-TEST:  §r§6☘ §r§fSugar Cane
-     */
-    private val tablistUpcomingCropPattern by patternGroup.pattern(
-        "tablistcrop",
-        " §r§6☘ §r§f(?<crop>.+)",
-    )
-
-    /**
-     * REGEX-TEST:  §r§6☘ §r§fNether Wart §r§f◆ Top §r§e95.3%
-     * REGEX-TEST:  §r§e○ §r§fPumpkin §r§f◆ Top §r§c52.4%
-     */
-    private val tablistActiveContestPattern by patternGroup.pattern(
-        "tablist.contest.active",
-        " §r§.(?<boost>[☘○]) §r§f(?<crop>.+) §r§f◆ Top §r§.(?<placement>\\S+)%",
-    )
-
-    /**
-     *  REGEX-TEST:  §r§c§lBRONZE §r§fwith §r§e14,430
-     *  REGEX-TEST:  Collected §r§e10,642
-     */
-    private val tablistContestInfoPattern by patternGroup.pattern(
-        "tablist.contest.active.info",
-        " (?:§r§.§l(?<bracket>\\S+)|Collected) (?:§r§fwith )?§r§e(?<farmed>\\S+)",
-    )
-
     private val contests = mutableMapOf<Long, FarmingContest>()
     private var internalContest = false
     val inContest
@@ -83,14 +54,6 @@ object FarmingContestApi {
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false
         private set
-    var anitaBuffCrop: CropType? = null
-    val contestData
-        get() = ContestData(contestBracket, contestPlacement, contestCollected ?: 0)
-    private var contestPlacement: Double = 100.0
-    private var contestBracket: ContestBracket? = null
-    private var contestCollected: Int? = null
-
-    data class ContestData(val bracket: ContestBracket?, val placement: Double, val collected: Int)
 
     init {
         ContestBracket.entries.forEach { it.bracketPattern }
@@ -136,51 +99,20 @@ object FarmingContestApi {
         val line = ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest") ?: return null
         return sidebarCropPattern.matchMatcher(line) {
             val cropName = group("crop")
-            convertNameToCrop(cropName, line, ScoreboardData.sidebarLinesFormatted)
-        }
-    }
-
-    @HandleEvent
-    fun onWidgetUpdated(event: WidgetUpdateEvent) {
-        val widget = event.widget
-        if (widget != TabWidget.JACOB_CONTEST) return
-
-        val widgetLines = widget.lines
-        if (widgetLines.isEmpty()) return
-
-        if (widgetLines[1].contains("Starts In:")) {
-            tablistUpcomingCropPattern.matchAll(widgetLines) {
-                val cropName = group("crop")
-                anitaBuffCrop = convertNameToCrop(cropName, "/", widgetLines)
-            }
-        } else {
-            val typeLine = widgetLines[1]
-            tablistActiveContestPattern.matchMatcher(typeLine) {
-                contestPlacement = group("placement").toDouble()
-                val cropName = group("crop")
-                if (group("boost") == "☘") anitaBuffCrop = convertNameToCrop(cropName, typeLine, widgetLines)
-            }
-
-            val infoLine = widgetLines[2]
-            tablistContestInfoPattern.matchMatcher(infoLine) {
-                contestBracket = ContestBracket.entries.find { it.name == group("bracket") }
-                contestCollected = group("amount").replace(",", "").toInt()
+            try {
+                CropType.getByName(cropName)
+            } catch (e: IllegalStateException) {
+                ScoreboardData.sidebarLinesFormatted
+                ErrorManager.logErrorWithData(
+                    e, "Farming contest read current crop failed",
+                    "cropName" to cropName,
+                    "line" to line,
+                    "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
+                )
+                null
             }
         }
     }
-
-    private fun convertNameToCrop(cropName: String, line: String, all: List<String>): CropType? =
-        try {
-            CropType.getByName(cropName)
-        } catch (e: IllegalStateException) {
-            ErrorManager.logErrorWithData(
-                e, "Farming contest read upcoming crop failed",
-                "cropName" to cropName,
-                "line" to line,
-                "all" to all,
-            )
-            null
-        }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
