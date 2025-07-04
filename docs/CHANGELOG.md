@@ -64,6 +64,12 @@
 + Added Hide Lottery Messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4226)
     + Lottery messages from HOTF hidden outside Foraging Islands.
 + Added Tree Progress Display HUD. - nopo (https://github.com/hannibal002/SkyHanni/pull/4191)
++ Added Attribute Shard Overlay to /am menu. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4203)
+    + Shows cheapest Skyblock XP for Shards.
+    + Opens the Bazaar when clicking an attribute name.
++ Added Attribute Tier as Stack Size. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4203)
+    + Displays Attribute Shard tier as stack size in Attribute Menu.
++ Added Invisibug Highlight. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4195)
 
 #### Misc
 
@@ -173,6 +179,7 @@
 + Added Mod Menu button support, linking to SkyHanni Discord and Modrinth. - nopo (https://github.com/hannibal002/SkyHanni/pull/4173)
 + Changed Account Upgrade Reminder to warp directly to Elizabeth. - Luna (https://github.com/hannibal002/SkyHanni/pull/4224)
 + Made Hide Fire and Blaze Particles work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4209)
++ Updated Visual Words for supporting custom-font mods. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4210)
 
 ### Fixes
 
@@ -200,6 +207,9 @@
 + Fixed errors in Jacob's Contests participation. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4165)
 + Fixed missing message when fetching contests from EliteDev. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4153)
 + Fixed Custom Scoreboard error in Garden on 1.21. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4207)
++ Fixed Custom Scoreboard error in 1.8 Garden. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4255)
++ Fixed incorrect speed warning when farming on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4248)
++ Fixed SkyHanni failing to detect pumpkin farming on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4228)
 
 #### Chat
 
@@ -208,6 +218,7 @@
 + Fixed chat display when guild chat is disabled. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4022)
 + Fixed Hypixel Lobby chat filter failing on pet consumable messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4104)
 + Fixed issue with temporary chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4128)
++ Fixed chat filters not hiding “autopet”, “you tipped” and “event level up” messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4256)
 
 #### Rift
 
@@ -238,6 +249,8 @@
 + Fixed Harp GUI scale affecting other inventories (e.g., Harpy on Bazaar). - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4204)
 + Fixed item ability cooldown for Weirder Tuba on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4220)
 + Fixed REI item list overlapping Custom Wardrobe. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4219)
++ Fixed Bazaar Order Helper sometimes not showing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4252)
++ Fixed tooltips hiding when editing wardrobe sets on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4230)
 
 #### Mining
 
@@ -271,6 +284,10 @@
 + Fixed changelog viewer crash on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4132)
 + Fixed Visual Words stripping non-Minecraft colors. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4159)
 + Fixed Visual Words removing emojis. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4178)
++ Fixed Edit GUI keybind in REI search. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4241)
++ Fixed movable XP bar not moving XP number on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4235)
++ Fixed potential Hide Armour crash. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4231)
++ Fixed rare GUI input bug. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4240)
 
 #### Slayer
 
@@ -293,6 +310,9 @@
     + Blame Hypixel for including a percentage in Lore.
 + Fixed Custom Scoreboard error when gaining whispers outside Galatea. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4223)
 + Fixed Custom Scoreboard showing Galatea lines twice. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4194)
++ Fixed HotM/HotF errors. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4245)
++ Fixed Park and Galatea chat errors. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4227)
++ Fixed Tree Progress displaying on other islands. - nopo (https://github.com/hannibal002/SkyHanni/pull/4236)
 
 #### Misc
 
@@ -492,6 +512,10 @@
 + Refactored HotX classes around Rotating Perk enum. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4226)
 + Registered /sendcoords on client. - nopo (https://github.com/hannibal002/SkyHanni/pull/4208)
 + Removed direct use of hotbar layer for GUI rendering. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4217)
++ Added caching to BZ Order Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4253)
++ Cleaned up Attribute Shard item-resolution query and enabled Fusion Box support. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4203)
++ Made default text color white. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4232)
++ Used a mixin hook for Custom Wardrobe. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4254)
 
 ### Removed Features
 
