@@ -331,7 +331,7 @@ object ExperimentationTableApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRepoRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards
+        miscRepoRewards = event.getConstant<ExperimentsJson>("ExperimentationTable").miscRewards
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
