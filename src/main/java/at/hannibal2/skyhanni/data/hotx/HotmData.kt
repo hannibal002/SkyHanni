@@ -450,11 +450,11 @@ enum class HotmData(
         )
 
         /**
-          * REGEX-TEST: §7§cRequires Mining Speed
-          * REGEX-TEST: §7§cRequires Tier 10
-          * REGEX-TEST: §5Mountain§c!
-          * REGEX-TEST: §7§eClick to unlock!
-          */
+         * REGEX-TEST: §7§cRequires Mining Speed
+         * REGEX-TEST: §7§cRequires Tier 10
+         * REGEX-TEST: §5Mountain§c!
+         * REGEX-TEST: §7§eClick to unlock!
+         */
         override val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked",
             "(?:§.)*Requires.*|.*Mountain(?:§.)*!|(?:§.)*Click to unlock!",
