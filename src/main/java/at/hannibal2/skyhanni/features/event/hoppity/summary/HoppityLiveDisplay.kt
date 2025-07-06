@@ -365,7 +365,7 @@ object HoppityLiveDisplay {
                 val isEmpty = renderableList.isEmpty() || renderableList.all { it.isEmpty() }
 
                 if (isEmpty) buildEmptyFallback(isCurrentEvent).map {
-                    StringRenderable(it.string)
+                    StringRenderable(it.string.partyModeReplace())
                 } else renderableList
             },
     )
@@ -375,7 +375,7 @@ object HoppityLiveDisplay {
         statYear: Int,
     ): MutableList<Renderable> = map { (stat, statStrings) ->
         val baseRenderable = VerticalContainerRenderable(
-            statStrings.map { StringRenderable(it.string) },
+            statStrings.map { StringRenderable(it.string.partyModeReplace()) },
         )
         renderableOverridesOperationList[stat]?.invoke(
             RenderableOverrideOperation(
