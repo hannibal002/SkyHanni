@@ -190,6 +190,15 @@ object HoppityCollectionStats {
         "rabbit.hotspot",
         "§7Current Hotspot: §.(?<location>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Obtained by spending §6800B
+     * REGEX_TEST: §7Obtained by reaching §6400B
+     */
+    private val milestoneRabbitLorePattern by patternGroup.pattern(
+        "rabbit.milestone.lore",
+        "§7Obtained by (?:reaching|spending).*",
+    )
     // </editor-fold>
 
     private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
@@ -262,8 +271,11 @@ object HoppityCollectionStats {
         strayRabbit to HighlightRabbitTypes.STRAYS,
     )
 
+    private fun ItemStack.isMilestoneRabbit(): Boolean =
+        this.getLore().any { milestoneRabbitLorePattern.matches(it) }
+
     private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean =
-        stack.isDye() && (stack.isDye(8) || stack.getLore().any { it.lowercase().contains("milestone") })
+        stack.displayName.isNotEmpty() && stack.isDye() && (stack.isDye(8) || stack.isMilestoneRabbit())
 
     private val replacementCache: MutableMap<String, ItemStack> = mutableMapOf()
 
@@ -320,7 +332,7 @@ object HoppityCollectionStats {
             return
         }
 
-        event.inventoryItems.values.filter { it.displayName.isNotEmpty() && missingRabbitStackNeedsFix(it) }.forEach { stack ->
+        event.inventoryItems.values.filter(::missingRabbitStackNeedsFix).forEach { stack ->
             val rarity = HoppityApi.rarityByRabbit(stack.displayName)
             // Add NBT for the dye color itself
             val newItemStack = if (collectionConfig.rarityDyeRecolor) DyeCompat.createDyeStack(
@@ -338,7 +350,10 @@ object HoppityCollectionStats {
             )
             else stack
 
-            newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
+            val newLore = if (!collectionConfig.descriptiveMilestones) stack.getLore()
+            else buildDescriptiveMilestoneLore(stack)
+
+            newItemStack.setLore(newLore)
             newItemStack.setCustomItemName(stack.displayName)
             replacementCache[stack.displayName] = newItemStack
         }
@@ -779,13 +794,11 @@ object HoppityCollectionStats {
 
     private fun logRabbits(event: InventoryFullyOpenedEvent) {
         for (item in event.inventoryItems.values) {
-            val itemName = item.displayName?.removeColor() ?: continue
-            val isRabbit = HoppityCollectionData.isKnownRabbit(itemName)
-
-            if (!isRabbit) continue
+            val itemName = item.displayName?.removeColor()?.takeIf {
+                HoppityCollectionData.isKnownRabbit(it)
+            } ?: continue
 
             val itemLore = item.getLore()
-
             saveLocationRabbit(itemName, itemLore)
 
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
