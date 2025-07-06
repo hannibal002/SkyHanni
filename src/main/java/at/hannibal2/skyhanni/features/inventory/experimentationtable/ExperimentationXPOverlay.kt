@@ -45,5 +45,5 @@ object ExperimentationXPOverlay {
         }
     }
 
-    private fun isEnabled() = ExperimentationTableApi.superpairInventory.isInside() && config.superpairsXPOverlay
+    private fun isEnabled() = ExperimentationTableApi.inSuperpairs && config.superpairsXPOverlay
 }
