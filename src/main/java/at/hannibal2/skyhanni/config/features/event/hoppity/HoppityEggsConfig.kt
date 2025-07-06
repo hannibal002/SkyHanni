@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.event.hoppity
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -89,6 +90,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(name = "Mute Egg Sounds", desc = "Mute the note block sounds when opening an egg.")
     @ConfigEditorBoolean
+    @OnlyModern
     @FeatureToggle
     var muteEggSounds: Boolean = false
 }
