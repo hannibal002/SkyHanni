@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi;
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.DelayedRun;
+import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.sugar.Local;
 import kotlin.jvm.JvmStatic;
@@ -77,7 +78,10 @@ public abstract class MixinHandledScreen {
         boolean shouldCfStrayWarningContinue = CFStrayWarning.shouldContinueWithKeypress(keyCode);
         boolean shouldCfStrayTimerContinue = CFStrayTimer.shouldContinueWithKeypress(keyCode);
 
-        return shouldHoppityRabbitTheFishContinue && shouldCfStrayWarningContinue && shouldCfStrayTimerContinue;
+        boolean shiftHeld = KeyboardManager.isShiftKeyDown();
+        boolean shouldContinue = (shouldHoppityRabbitTheFishContinue && shouldCfStrayWarningContinue && shouldCfStrayTimerContinue);
+
+        return shiftHeld || shouldContinue;
     }
 
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
