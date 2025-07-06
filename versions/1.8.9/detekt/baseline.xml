@@ -132,7 +132,6 @@
     <ID>RepoPatternRegexTestMissing:HighlightPlaceableNpcs.kt$HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
     <ID>RepoPatternRegexTestMissing:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "mayhem", "§b§lMAYHEM! §r§7(?&lt;perk&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "perk.notunlocked", "(?:§.)*Requires.*|.*Mountain!|(?:§.)*Click to unlock!|", )</ID>
-    <ID>RepoPatternRegexTestMissing:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "skymall", "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?&lt;perk&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:HypixelData.kt$HypixelData$by patternGroup.pattern( "lobbytype", "(?&lt;lobbyType&gt;.*lobby)\\d+", )</ID>
     <ID>RepoPatternRegexTestMissing:HypixelData.kt$HypixelData$by patternGroup.pattern( "servername.connection", "(?&lt;prefix&gt;.+\\.)?hypixel\\.net", )</ID>
     <ID>RepoPatternRegexTestMissing:InquisitorWaypointShare.kt$InquisitorWaypointShare$by patternGroup.pattern( "died", "(?&lt;party&gt;§9Party §8&gt; )?(?&lt;playerName&gt;.*)§f: §rInquisitor dead!", )</ID>
