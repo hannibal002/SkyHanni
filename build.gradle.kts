@@ -250,6 +250,12 @@ dependencies {
         include(libs.hypixelmodapi.fabric)
     }
 
+    if (target == ProjectTarget.MODERN) {
+        modCompileOnly(libs.roughlyenoughitems) {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
+    }
+
     // getting clock offset
     shadowImpl("commons-net:commons-net:3.11.1")
 

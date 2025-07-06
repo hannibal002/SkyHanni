@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -66,7 +68,6 @@ open class TextInput {
         updateEvents.remove(key)
     }
 
-    // Skyhanni Module is only for 1.21
     @SkyHanniModule
     companion object {
         private var activeInstance: TextInput? = null
@@ -84,6 +85,11 @@ open class TextInput {
             activeInstance = null
         }
 
+        @HandleEvent
+        fun onInventoryClose(event: InventoryCloseEvent) {
+            disable()
+        }
+
         @Suppress("UnusedParameter")
         fun onMinecraftInput(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
@@ -94,7 +100,7 @@ open class TextInput {
 
         fun onGuiInput(
             //#if MC < 1.21
-            ci: CallbackInfo
+            ci: CallbackInfo,
             //#else
             //$$ ci: CallbackInfoReturnable<Boolean>
             //#endif
@@ -135,7 +141,7 @@ open class TextInput {
         }
 
         //#if MC > 1.21
-        //$$ @at.hannibal2.skyhanni.api.event.HandleEvent
+        //$$ @HandleEvent
         //$$ fun onChar(event: at.hannibal2.skyhanni.events.minecraft.CharEvent) {
         //$$     handleTextInput(event.keyCode.toChar())
         //$$ }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
@@ -164,6 +165,7 @@ class GuiConfig {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @OnlyLegacy
     var configButtonOnPause: Boolean = true
 
     @Expose
