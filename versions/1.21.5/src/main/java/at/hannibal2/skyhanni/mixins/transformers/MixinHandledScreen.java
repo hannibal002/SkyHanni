@@ -84,7 +84,7 @@ public abstract class MixinHandledScreen {
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         TextInput.Companion.onGuiInput(cir);
         boolean shouldContinue = shouldContinueWithKeypress(keyCode);
-        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post() || shouldContinue) {
+        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post() || !shouldContinue) {
             cir.setReturnValue(false);
         }
     }
