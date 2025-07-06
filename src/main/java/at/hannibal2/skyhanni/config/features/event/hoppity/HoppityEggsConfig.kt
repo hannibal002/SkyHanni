@@ -85,4 +85,10 @@ class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var preventMissingRabbitTheFish: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Mute Egg Sounds", desc = "Mute the note block sounds when opening an egg.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteEggSounds: Boolean = false
 }
