@@ -79,6 +79,32 @@ object CollectionUtils {
         }
     }
 
+    /**
+     * Subtracts the values of the [other] map FROM the values of [this] map, for each key that exists in both maps.
+     * If a key exists in [this] map but not in [other], its value remains unchanged.
+     * If a key exists in [other] but not in [this], the result will reflect a -1 * of [other]'s value.
+     */
+    fun <K, V : Number> Map<K, V>.subtract(other: Map<K, V>): Map<K, Double> {
+        val combKeys = (this.keys + other.keys).toSet()
+        return combKeys.associateWith {
+            val thisValue = (this[it] ?: 0).toDouble()
+            val otherValue = (other[it] ?: 0).toDouble()
+            val diff = thisValue - otherValue
+            diff
+        }
+    }
+
+    /**
+     * Same deal as [subtract], but allows you to transform the result of the subtraction into a different type.
+     */
+    inline fun <K, V : Number, R> Map<K, V>.subtract(
+        other: Map<K, V>,
+        transform: (Double) -> R
+    ): Map<K, R> = (keys + other.keys).associateWith { k ->
+        val diff = (this[k]?.toDouble() ?: 0.0) - (other[k]?.toDouble() ?: 0.0)
+        transform(diff)
+    }
+
     fun <K, V : Number> List<Map<K, V>>.sumByKey(): Map<K, Double> =
         flatMap { it.entries }.groupBy({ it.key }, { it.value.toDouble() }).mapValues { (_, values) -> values.sum() }
 
