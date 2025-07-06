@@ -38,9 +38,9 @@ object CFStrayWarning {
 
     private val config get() = CFApi.config
     private val warningConfig get() = config.rabbitWarning
-    private val chromaColor = ChromaColour.fromRGB(255, 85, 85, 249, 255)
-    private val chromaColorAlt = ChromaColour.fromRGB(255, 85, 85, 246, 255)
-    private val chromaColorAlt2 = ChromaColour.fromRGB(255, 85, 85, 243, 255)
+    private val chromaColor = ChromaColour.fromRGB(255, 85, 85, 2500, 255)
+    private val chromaColorAlt = ChromaColour.fromRGB(255, 85, 85, 2400, 255)
+    private val chromaColorAlt2 = ChromaColour.fromRGB(255, 85, 85, 2300, 255)
 
     private var flashScreen = false
     private var activeStraySlots: Set<Int> = setOf()
