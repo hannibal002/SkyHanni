@@ -428,11 +428,11 @@ object SkyHanniDebugsAndTests {
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val data = internalName.getBazaarData() ?: return
+        val instantSellPrice = data.instantSellPrice
         val instantBuyPrice = data.instantBuyPrice
-        val sellOfferPrice = data.sellOfferPrice
 
+        event.toolTip.add("§7BZ instantSellPrice: ${instantSellPrice.addSeparators()}")
         event.toolTip.add("§7BZ instantBuyPrice: ${instantBuyPrice.addSeparators()}")
-        event.toolTip.add("§7BZ sellOfferPrice: ${sellOfferPrice.addSeparators()}")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
