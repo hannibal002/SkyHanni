@@ -75,8 +75,8 @@ val sb = StringBuilder().apply {
 
     if (rulesBroken.size > 1) {
         val ceilingedKeys = rulesBroken.keys.take(6)
-        val xMoreFormat = when (ceilingedKeys) {
-            rulesBroken.keys -> ""
+        val xMoreFormat = when (ceilingedKeys.size) {
+            rulesBroken.keys.size -> ""
             else -> " (+ ${rulesBroken.size - ceilingedKeys.size} more)"
         }
         val ruleViolationsFormat = ceilingedKeys.joinToString(", ") {

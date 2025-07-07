@@ -29,6 +29,7 @@ class BazaarConfig {
     @FeatureToggle
     var bestSellMethod: Boolean = false
 
+    // TODO rename to bestSellMethodPosition
     @Expose
     @ConfigLink(owner = BazaarConfig::class, field = "bestSellMethod")
     val bestSellMethodPos: Position = Position(394, 142)
