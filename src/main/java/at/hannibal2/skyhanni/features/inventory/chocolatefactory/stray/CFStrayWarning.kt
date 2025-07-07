@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.specialRa
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
@@ -25,9 +26,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -38,9 +38,9 @@ object CFStrayWarning {
 
     private val config get() = CFApi.config
     private val warningConfig get() = config.rabbitWarning
-    private const val CHROMA_COLOR = "249:255:255:85:85"
-    private const val CHROMA_COLOR_ALT = "246:255:255:85:85"
-    private const val CHROMA_COLOR_ALT2 = "243:255:255:85:85"
+    private val chromaColor = ChromaColour.fromRGB(255, 85, 85, 2500, 255)
+    private val chromaColorAlt = ChromaColour.fromRGB(255, 85, 85, 2400, 255)
+    private val chromaColorAlt2 = ChromaColour.fromRGB(255, 85, 85, 2300, 255)
 
     private var flashScreen = false
     private var activeStraySlots: Set<Int> = setOf()
@@ -71,7 +71,6 @@ object CFStrayWarning {
         StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
-        else -> false
     }
 
     private fun handleRabbitWarnings(item: ItemStack) {
@@ -99,11 +98,11 @@ object CFStrayWarning {
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = getEventChest() ?: return
-        eventChest.getUpperItems().keys.forEach { it.highlight(CHROMA_COLOR_ALT.toSpecialColor()) }
+        eventChest.getUpperItems().keys.forEach { it.highlight(chromaColorAlt) }
         eventChest.inventorySlots.filter {
             it.slotNumber != it.slotIndex
         }.forEach {
-            it.highlight(CHROMA_COLOR_ALT2.toSpecialColor())
+            it.highlight(chromaColorAlt2)
         }
     }
 
@@ -112,7 +111,7 @@ object CFStrayWarning {
         eventChest.getUpperItems().keys.filter {
             it.slotNumber in activeStraySlots
         }.forEach {
-            it.highlight(warningConfig.inventoryHighlightColor.toSpecialColor())
+            it.highlight(warningConfig.inventoryHighlightColor)
         }
     }
 
@@ -141,7 +140,6 @@ object CFStrayWarning {
                 }
 
                 StrayTypeEntry.NONE -> false
-                else -> false
             }
         }
     }
@@ -162,8 +160,8 @@ object CFStrayWarning {
         if (!CFApi.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
         val alpha = ((2 + sin(SimpleTimeMark.now().toMillis() / 1000.0)) * 255 / 4).toInt().coerceIn(0..255)
-        val toUse = if (config.partyMode.get()) CHROMA_COLOR else warningConfig.flashColor
-        val color = (alpha shl 24) or (toUse.toSpecialColorInt() and 0xFFFFFF)
+        val toUse = if (config.partyMode.get()) chromaColor else warningConfig.flashColor
+        val color = (alpha shl 24) or (toUse.toColor().rgb and 0xFFFFFF)
         GuiRenderUtils.drawRect(0, 0, GuiScreenUtils.displayWidth, GuiScreenUtils.displayHeight, color)
         GlStateManager.color(1F, 1F, 1F, 1F)
     }

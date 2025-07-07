@@ -83,8 +83,8 @@ object HypixelBazaarFetcher {
 
     private fun process(products: Map<String, BazaarProduct>) = products.mapNotNull { (key, product) ->
         val internalName = NeuItems.transHypixelNameToInternalName(key)
-        val sellOfferPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
-        val instantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantBuyPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantSellPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
 
         if (product.quickStatus.isEmpty()) {
             return@mapNotNull null
@@ -96,7 +96,7 @@ object HypixelBazaarFetcher {
             if (!isUnobtainableBazaarProduct(key) && SkyHanniDebugsAndTests.enabled) println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
-        internalName to BazaarData(internalName.repoItemName, sellOfferPrice, instantBuyPrice, product)
+        internalName to BazaarData(internalName.repoItemName, instantBuyPrice, instantSellPrice, product)
     }.toMap()
 
     private fun isUnobtainableBazaarProduct(key: String): Boolean = when (key) {
