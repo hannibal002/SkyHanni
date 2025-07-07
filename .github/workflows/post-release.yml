@@ -10,14 +10,10 @@ on:
             update_version:
                 description: 'Tag name of the release'
                 required: true
-            changelog:
-                description: 'Changelog for the release'
-                required: true
 
 env:
     UPDATE_VERSION: ${{ inputs.update_version || github.event.release.tag_name }}
     REPO: ${{ github.repository }}
-    CHANGELOG: ${{ inputs.changelog || github.event.release.body }}
     MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 
 jobs:
@@ -45,8 +41,27 @@ jobs:
             -   name: List all files in build/downloadedJars
                 run: ls -la build/downloadedJars
 
+            -   name: Get changelog from release tag
+                id: get_changelog
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    release_info=$(gh release view "${UPDATE_VERSION}" --repo "${REPO}" --json body -q .body)
+                    echo "changelog<<EOF" >> $GITHUB_OUTPUT
+                    echo "$release_info" >> $GITHUB_OUTPUT
+                    echo "EOF" >> $GITHUB_OUTPUT
+
+            -   name: Print environment variables
+                run: |
+                    echo "UPDATE_VERSION=${UPDATE_VERSION}"
+                    echo "REPO=${REPO}"
+                    echo "CHANGELOG=${{ steps.get_changelog.outputs.changelog }}"
+
             -   name: Build Shared Variables Submodule
                 run: ./gradlew :sharedVariables:build
 
             -   name: Publish to Modrinth
-                run: ./gradlew publishModrinth -Pchangelog="${CHANGELOG}" -PmodVersion="${UPDATE_VERSION}" -PmodrinthToken="${MODRINTH_TOKEN}"
+                run: ./gradlew publishModrinth \
+                    -Pchangelog="${{ steps.get_changelog.outputs.changelog }}" \
+                    -PmodVersion="${UPDATE_VERSION}" \
+                    -PmodrinthToken="${MODRINTH_TOKEN}"
