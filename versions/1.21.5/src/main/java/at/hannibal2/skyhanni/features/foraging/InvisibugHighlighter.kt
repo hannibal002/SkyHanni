@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.isCompletelyDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -47,9 +48,9 @@ object InvisibugHighlighter {
             if (!entity.canBeSeen(32)) continue
 
             event.drawWaypointFilled(
-                entity.getLorenzVec(),
+                entity.getLorenzVec() - LorenzVec(0.4, -0.2, 0.4),
                 config.color.toColor(),
-                extraSize = -0.2
+                extraSize = -0.2,
             )
         }
     }

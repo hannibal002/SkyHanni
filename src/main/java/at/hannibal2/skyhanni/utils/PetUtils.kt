@@ -82,6 +82,8 @@ object PetUtils {
     fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName]
         ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf { !it.isPet }
 
+    fun isKnownPetInternalName(internalName: NeuInternalName) = internalName in petInternalNames
+
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: PET_SKIN_ENDERMAN

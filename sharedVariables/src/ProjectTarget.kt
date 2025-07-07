@@ -7,7 +7,11 @@ enum class ProjectTarget(
     val minecraftVersion: MinecraftVersion,
     val mappingDependency: String,
     val mappingStyle: MappingStyle,
-    val forgeDep: String?,
+    val forgeDep: String? = null,
+    val fabricLoaderVersion: String? = null,
+    val fabricApiVersion: String? = null,
+    val modMenuVersion: String? = null,
+    val isModern: Boolean = false,
     linkTo: String?,
 ) {
     MAIN(
@@ -15,33 +19,35 @@ enum class ProjectTarget(
         MinecraftVersion.MC189,
         "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
         MappingStyle.SEARGE,
-        "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
-        "BRIDGE116FORGE",
+        forgeDep = "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
+        linkTo = "BRIDGE116FORGE",
     ),
     BRIDGE116FORGE(
         "1.16.5-forge",
         MinecraftVersion.MC11605,
         "official",
         MappingStyle.SEARGE,
-        "net.minecraftforge:forge:1.16.5-36.2.39",
-        "BRIDGE116FABRIC",
+        forgeDep = "net.minecraftforge:forge:1.16.5-36.2.39",
+        linkTo = "BRIDGE116FABRIC",
     ),
     BRIDGE116FABRIC(
         "1.16.5-fabric",
         MinecraftVersion.MC11605,
         yarn("1.16.5+build.10"),
         MappingStyle.YARN,
-        null,
-        "MODERN",
+        linkTo = "MODERN_12105",
     ),
-    MODERN(
+    MODERN_12105(
         "1.21.5",
         MinecraftVersion.MC12105,
         yarn("1.21.5+build.1"),
         MappingStyle.YARN,
-        null,
-        null,
-    )
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.16.13",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5",
+        modMenuVersion = "14.0.0-rc.2",
+        isModern = true,
+        linkTo = null,
+    ),
     ;
 
     val isBridge get() = name.contains("bridge")
