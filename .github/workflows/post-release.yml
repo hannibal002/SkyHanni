@@ -1,14 +1,23 @@
 name: Post-Release
 
 on:
-    release:
-        types:
-            - published
+#    release:
+#        types:
+#            - published
+
+    workflow_dispatch:
+        inputs:
+            update_version:
+                description: 'Tag name of the release'
+                required: true
+            changelog:
+                description: 'Changelog for the release'
+                required: true
 
 env:
-    UPDATE_VERSION: ${{ github.event.release.tag_name }}
+    UPDATE_VERSION: ${{ inputs.update_version || github.event.release.tag_name }}
     REPO: ${{ github.repository }}
-    CHANGELOG: ${{ github.event.release.body }}
+    CHANGELOG: ${{ inputs.changelog || github.event.release.body }}
     MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 
 jobs:
