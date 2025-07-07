@@ -63,7 +63,7 @@ object AttributeShardOverlay {
 
     enum class AttributeShardPriceSource(val displayName: String, val priceSource: ItemPriceSource) {
         INSTANT_BUY("BZ Instant Buy", ItemPriceSource.BAZAAR_INSTANT_BUY),
-        SELL_ORDER("BZ Sell Order", ItemPriceSource.BAZAAR_INSTANT_SELL),
+        SELL_ORDER("BZ Buy Order", ItemPriceSource.BAZAAR_INSTANT_SELL),
         ;
 
         override fun toString(): String = displayName
