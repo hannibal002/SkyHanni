@@ -148,7 +148,9 @@ object SkyHanniRenderLayers {
         }
     }
 
-    fun getChromaStandard() = CHROMA_STANDARD
+    fun getChromaTexturedWithIdentifier(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
 
-    fun getChromaTextured(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
+    fun getChromaStandard() = CHROMA_STANDARD
+    fun getChromaTextured() = SkyHanniRenderLayers::getChromaTexturedWithIdentifier
+    fun getMinecraftGuiTextured() = RenderLayer::getGuiTextured
 }

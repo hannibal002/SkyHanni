@@ -813,10 +813,10 @@ interface Renderable {
                     )
                     //#else
                     //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                    //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderLayer::getGuiTextured, createResourceLocation("hud/experience_bar_background"),
+                    //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
                     //$$         mouseOffsetX, mouseOffsetY, width, height)
                     //$$ } else {
-                    //$$     DrawContextUtils.drawContext.drawTexture(RenderLayer::getGuiTextured, createResourceLocation(texture.path),
+                    //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation(texture.path),
                     //$$         mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1)
                     //$$ }
                     //#endif
@@ -832,10 +832,10 @@ interface Renderable {
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers::getChromaTextured, createResourceLocation("hud/experience_bar_progress"),
+                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
                         //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
                         //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers::getChromaTextured, createResourceLocation(texture.path),
+                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
                         //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
                         //$$ }
                         //#endif
@@ -849,10 +849,10 @@ interface Renderable {
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderLayer::getGuiTextured, createResourceLocation("hud/experience_bar_progress"),
+                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
                         //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
                         //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(RenderLayer::getGuiTextured, createResourceLocation(texture.path),
+                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation(texture.path),
                         //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
                         //$$ }
                         //#endif

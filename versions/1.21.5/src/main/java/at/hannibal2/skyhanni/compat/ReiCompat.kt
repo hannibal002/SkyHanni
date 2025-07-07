@@ -7,7 +7,7 @@ object ReiCompat {
     fun searchHasFocus(): Boolean {
         return try {
             REIRuntime.getInstance().searchTextField?.isFocused == true
-        } catch (e: NoClassDefFoundError) {
+        } catch (e: Throwable) {
             false
         }
     }
