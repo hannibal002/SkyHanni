@@ -23,7 +23,6 @@ at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket.java
 at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal.java
 at.hannibal2.skyhanni.mixins.transformers.MixinBlockLiquid.java
-at.hannibal2.skyhanni.mixins.transformers.MixinDataWatcher.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityAgeable.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityHorse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinFontRenderer.java
@@ -54,7 +53,6 @@ at.hannibal2.skyhanni.utils.HolographicEntities.kt
 at.hannibal2.skyhanni.utils.json.NBTTypeAdapter.kt
 at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory.kt
 at.hannibal2.skyhanni.features.rift.area.mirrorverse.CraftRoomHolographicMob.kt
-at.hannibal2.skyhanni.api.DataWatcherApi.kt
 
 at.hannibal2.skyhanni.test.ComponentSpanTest.kt
 at.hannibal2.skyhanni.test.RepoPatternTest.kt
