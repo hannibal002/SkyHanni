@@ -167,6 +167,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
                 onLeftClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
+                    // TODO remove unnecessary update call, as both invokes above call the modify fun. in modify there is also a update call
                     update()
                 },
             ) else Renderable.string(string)

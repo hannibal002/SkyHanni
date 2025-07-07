@@ -181,7 +181,7 @@ object BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
         for (shield in HellionShield.entries) {
-            if (shield.formattedName + "§r" == event.title) {
+            if (shield.formattedName in event.title) {
                 for (dagger in Dagger.entries.filter { shield in it.shields }) {
                     dagger.shields.forEach { it.active = false }
                     dagger.updated = true

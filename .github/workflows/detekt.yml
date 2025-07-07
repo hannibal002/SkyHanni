@@ -88,19 +88,35 @@ jobs:
                 with:
                     name: detekt-output
                     path: .
-            -   name: Set up Node.js
-                uses: actions/setup-node@v4
-                with:
-                    node-version: '>=21'
             -   name: Process detekt output and create comment
                 env:
                     PR_SHA: ${{ github.event.pull_request.head.sha }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                 run: |
-                    node .github/scripts/process_detekt_output.js
+                    kotlinc -script .github/scripts/processDetektOutput.kts
+            -   name: Check for duplicate comment
+                id: check_duplicate
+                uses: actions/github-script@v6
+                with:
+                    script: |
+                        const fs = require('fs');
+                        const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
+                        const m = commentBody.match(/<!--\s*detekt-sarif-hash:(-?\d+)\s*-->/);
+                        if (!m) return false;
+                        const hash = m[1];
+                        const { data: comments } = await github.rest.issues.listComments({
+                            owner: context.repo.owner,
+                            repo:  context.repo.repo,
+                            issue_number: context.issue.number
+                        });
+                        return comments.some(c => c.body.includes(hash));
+            -   name: Skip comment if duplicate
+                if: steps.check_duplicate.outputs.result == 'true'
+                run: echo "Duplicate comment found, skipping..."
 
             -   name: Add comment to PR
                 uses: actions/github-script@v6
+                if: steps.check_duplicate.outputs.result != 'true'
                 with:
                     github-token: ${{ secrets.GITHUB_TOKEN }}
                     script: |

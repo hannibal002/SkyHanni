@@ -10,13 +10,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.compat.convertToJsonString
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
-//#if MC > 1.21
-//$$ import net.minecraft.registry.DynamicRegistryManager
-//#endif
 
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
 
@@ -69,12 +67,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
             if (isHovered && KeyboardManager.isShiftKeyDown() && msg.hoverExtraInfo.isNotEmpty()) queuedTooltip = msg.hoverExtraInfo
             if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
-                    //#if MC < 1.21
-                    OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
-                    //#else
-                    //$$ val serialize = Text.Serializer(DynamicRegistryManager.EMPTY).serialize(msg.message, null, null)
-                    //$$ OSUtils.copyToClipboard(serialize.toString())
-                    //#endif
+                    OSUtils.copyToClipboard(msg.message.convertToJsonString())
                     ChatUtils.chat("Copied structured chat line to clipboard", false)
                 } else {
                     val message = msg.message.formattedText.stripHypixelMessage()
@@ -88,7 +81,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         wasMouseButtonDown = isMouseButtonDown
         DrawContextUtils.popMatrix()
         queuedTooltip?.let { tooltip ->
-            RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
+            RenderableTooltips.setTooltipForRender(tooltip.map { StringRenderable(it) })
         }
     }
 

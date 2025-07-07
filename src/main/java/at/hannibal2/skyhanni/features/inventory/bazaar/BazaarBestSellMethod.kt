@@ -58,7 +58,7 @@ object BazaarBestSellMethod {
         if (having <= 0) return ""
 
         val data = internalName.getBazaarDataOrError()
-        val totalDiff = (data.sellOfferPrice - data.instantBuyPrice) * having
+        val totalDiff = (data.instantBuyPrice - data.instantSellPrice) * having
         val result = totalDiff.toInt().shortFormat()
 
         val name = internalName.repoItemName
