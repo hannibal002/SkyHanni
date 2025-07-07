@@ -93,7 +93,7 @@ jobs:
                     PR_SHA: ${{ github.event.pull_request.head.sha }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                 run: |
-                    kotlinc -script .github/scripts/processDetektOutput.kts
+                    kotlinc -script .github/scripts/process-detekt-output.kts
             -   name: Check for duplicate comment
                 id: check_duplicate
                 uses: actions/github-script@v6
