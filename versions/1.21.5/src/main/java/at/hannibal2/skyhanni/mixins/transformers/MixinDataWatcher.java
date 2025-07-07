@@ -11,18 +11,33 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(DataTracker.class)
-public class MixinDataTracker {
+public abstract class MixinDataWatcher {
     @Shadow
     @Final
     private DataTracked trackedEntity;
 
+    @Shadow
+    @Final
+    private DataTracker.Entry<?>[] entries;
+
+    @Shadow
+    protected abstract void copyToFrom(DataTracker.Entry<?> par1, DataTracker.SerializedEntry<?> par2);
+
     @Inject(method = "writeUpdatedEntries", at = @At("TAIL"))
-    public void onWhatever(List<DataTracker.Entry<?>> entries, CallbackInfo ci) {
+    public void onWhatever(List<DataTracker.SerializedEntry<?>> entries, CallbackInfo ci) {
         if (trackedEntity instanceof Entity entity) {
-            new DataWatcherUpdatedEvent(entity, entries).post();
+            List<DataTracker.Entry<?>> dataEntries = new ArrayList<>();
+            for (DataTracker.SerializedEntry<?> serializedEntry : entries) {
+                DataTracker.Entry<?> entry = this.entries[serializedEntry.id()];
+                this.copyToFrom(entry, serializedEntry);
+                dataEntries.add(entry);
+            }
+
+            new DataWatcherUpdatedEvent<>(entity, dataEntries).post();
         }
     }
 }

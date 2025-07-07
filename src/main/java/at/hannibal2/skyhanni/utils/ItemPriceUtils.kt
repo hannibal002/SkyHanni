@@ -50,7 +50,7 @@ object ItemPriceUtils {
 
         if (priceSource != ItemPriceSource.NPC_SELL) {
             getBazaarData()?.let {
-                return if (priceSource == ItemPriceSource.BAZAAR_INSTANT_BUY) it.sellOfferPrice else it.instantBuyPrice
+                return if (priceSource == ItemPriceSource.BAZAAR_INSTANT_BUY) it.instantBuyPrice else it.instantSellPrice
             }
 
             getLowestBinOrNull()?.let {
@@ -127,8 +127,8 @@ object ItemPriceUtils {
             add("getLowestBinOrNull: §6${internalName.getLowestBinOrNull()?.addSeparators()}")
 
             internalName.getBazaarData().let {
-                add("getBazaarData sellOfferPrice: §6${it?.sellOfferPrice?.addSeparators()}")
                 add("getBazaarData instantBuyPrice: §6${it?.instantBuyPrice?.addSeparators()}")
+                add("getBazaarData instantSellPrice: §6${it?.instantSellPrice?.addSeparators()}")
             }
 
             add("getNpcPriceOrNull: §6${internalName.getNpcPriceOrNull()?.addSeparators()}")

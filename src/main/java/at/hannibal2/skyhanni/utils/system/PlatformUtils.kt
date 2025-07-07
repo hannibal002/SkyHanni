@@ -23,7 +23,6 @@ import net.minecraftforge.fml.common.Loader
  */
 object PlatformUtils {
 
-
     //#if MC < 1.21
     const val MC_VERSION: String = VersionConstants.MC_VERSION
     //#else
