@@ -64,11 +64,12 @@ object ModifyVisualWords {
 
             for (character in characters) {
                 if (character.style != lastStyle) {
-                    outputTexts.add(OrderedText.styledForwardsVisitedString(textStringBuilder.toString(), lastStyle))
+                    if (textStringBuilder.isNotEmpty())
+                        outputTexts.add(OrderedText.styledForwardsVisitedString(textStringBuilder.toString(), lastStyle))
 
                     lastStyle = character.style
 
-                    outputTexts.clear()
+                    textStringBuilder.clear()
                 }
                 textStringBuilder.appendCodePoint(character.codePoint)
             }
