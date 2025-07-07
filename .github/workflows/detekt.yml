@@ -29,9 +29,10 @@ jobs:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
             -   uses: ./.github/actions/setup-normal-workspace
-            -   name: Run detekt main (w/ typing analysis)
-                run: |
-                  ./gradlew detektMain --stacktrace
+            -   name: Run detekt main (w/ typing analysis) w/gradle retry
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: detektMain --stacktrace
             -   name: Check if SARIF file exists
                 if: always()
                 id: check_sarif
