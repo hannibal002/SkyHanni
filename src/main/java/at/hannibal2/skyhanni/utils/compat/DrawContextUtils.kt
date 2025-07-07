@@ -30,7 +30,12 @@ object DrawContextUtils {
     val drawContext: DrawContext
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
-            ErrorManager.skyHanniError("drawContext is null")
+            //#if MC < 1.21
+            ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
+            DrawContext()
+            //#else
+            //$$ ErrorManager.skyHanniError("drawContext is null")
+            //#endif
         }
 
     fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.drawItem(item, x, y)
