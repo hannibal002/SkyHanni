@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getHitmanTimeToAll
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getOpenSlots
@@ -92,7 +91,7 @@ object CFStats {
         val text = config.statsDisplayList.filter {
             it.shouldDisplay()
         }.flatMap {
-            map[it]?.partyModeReplace()?.split("\n").orEmpty()
+            map[it]?.let { text -> CFApi.partyModeReplace(text) }?.split("\n").orEmpty()
         }
         display = createDisplay(text)
     }
