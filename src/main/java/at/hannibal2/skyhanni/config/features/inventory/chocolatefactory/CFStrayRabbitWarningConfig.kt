@@ -22,7 +22,7 @@ class CFStrayRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Highlight Color", desc = "Choose the color that stray rabbits should be highlighted as.")
     @ConfigEditorColour
-    var inventoryHighlightColor: ChromaColour = LorenzColor.RED.toChromaColor(alpha = 127)
+    var inventoryHighlightColor: ChromaColour = LorenzColor.RED.toChromaColor()
 
     @Expose
     @ConfigOption(
@@ -70,7 +70,7 @@ class CFStrayRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Flash Color", desc = "Color of the screen when flashing")
     @ConfigEditorColour
-    var flashColor: ChromaColour = ChromaColour.fromRGB(0, 238, 255, 0, 127)
+    var flashColor: ChromaColour = ChromaColour.fromStaticRGB(0, 238, 255, 127)
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")

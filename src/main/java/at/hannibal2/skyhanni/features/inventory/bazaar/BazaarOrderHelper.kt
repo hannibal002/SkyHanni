@@ -104,7 +104,7 @@ object BazaarOrderHelper {
 
             pricePattern.matchMatcher(line) {
                 val price = group("number").formatDouble()
-                if (buyOrSell.first && price < data.instantBuyPrice || buyOrSell.second && price > data.sellOfferPrice) {
+                if (buyOrSell.first && price < data.instantSellPrice || buyOrSell.second && price > data.instantBuyPrice) {
                     map[slot] = LorenzColor.GOLD
                     return
                 }
