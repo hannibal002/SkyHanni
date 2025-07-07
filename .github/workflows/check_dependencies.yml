@@ -8,15 +8,15 @@ jobs:
     check-dependencies:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+            -   name: Check out the repository
+                uses: actions/checkout@v4
 
-            - name: Evaluate dependency PRs
-              uses: actions/github-script@v7
-              env:
-                  INPUT_DEPS: ${{ steps.extract_deps.outputs.deps }}
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  script: |
-                      const check = require('./.github/scripts/check-dependencies.js');
-                      await check({ github, context, core });
+            -   name: Evaluate dependency PRs
+                uses: actions/github-script@v7
+                env:
+                    INPUT_DEPS: ${{ steps.extract_deps.outputs.deps }}
+                with:
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                        const check = require('./.github/scripts/check-dependencies.js');
+                        await check({ github, context, core });
