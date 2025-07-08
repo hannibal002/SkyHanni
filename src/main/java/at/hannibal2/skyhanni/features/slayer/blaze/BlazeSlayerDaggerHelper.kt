@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.FirstDaggerEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -199,7 +199,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBlockClick(event: BlockClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (clientSideClicked) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
