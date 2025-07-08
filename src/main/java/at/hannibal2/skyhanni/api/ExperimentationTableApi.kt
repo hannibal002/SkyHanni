@@ -48,7 +48,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
