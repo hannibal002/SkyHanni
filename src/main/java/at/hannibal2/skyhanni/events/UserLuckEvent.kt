@@ -28,7 +28,9 @@ class UserLuckEvent : SkyHanniEvent() {
             }
         }
         if (slot == -1) {
-            ErrorManager.skyHanniError("Looks like we ran out of space in the user luck menu! This means *someone* has to add pages to it :)")
+            ErrorManager.skyHanniError(
+                "Looks like we ran out of space in the user luck menu! This means *someone* has to add pages to it :)"
+            )
         }
         stacks[slot] = stack
     }
