@@ -27,7 +27,6 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     private val commonName: String,
     private val commonNamePlural: String = commonName + "s",
 ) {
-
     abstract val config: TrackCommandConfig
     abstract val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit
 
@@ -35,14 +34,12 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     abstract fun onTrackable(event: T)
     abstract fun T.getTypeIdentifier(): K
 
+    private var lastKeyToggle: SimpleTimeMark = SimpleTimeMark.farPast()
     private var isRecording = false
     private var display: List<Renderable> = emptyList()
-    var cutOffTime = SimpleTimeMark.farPast()
-        private set
-    var startTime = SimpleTimeMark.farPast()
-        private set
-    var worldTracked: Map<LorenzVec, List<T>> = emptyMap()
-        private set
+    private var cutOffTime = SimpleTimeMark.farPast()
+    private var startTime = SimpleTimeMark.farPast()
+    private var worldTracked: Map<LorenzVec, List<T>> = emptyMap()
 
     private val ignoredTypes: MutableList<K> = mutableListOf()
     private val tracked = ConcurrentLinkedDeque<Pair<Duration, T>>()
@@ -129,22 +126,25 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     }
     abstract fun SkyHanniRenderWorldEvent.drawSingle(vec: LorenzVec, event: T)
 
-    @HandleEvent
-    fun onTrackableEvent(event: T) {
+    // Functions below are event handlers that will be called by
+    // extending objects that are SkyHanniModules
+    // <editor-fold desc="Event Handlers">
+    open fun onTrackableEvent(event: T) {
         if (cutOffTime.isInPast()) return
         if (event.getTypeIdentifier() in ignoredTypes) return
         onTrackable(event)
     }
 
-    @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
+    open fun onKeyPress(event: KeyPressEvent) {
         if (event.keyCode != config.toggleKeybind) return
-        else if (isRecording) endRecording()
+        if (lastKeyToggle.passedSince() < 1.seconds) return
+
+        if (isRecording) endRecording()
         else tryStartRecording(emptyArray())
+        lastKeyToggle = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    open fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (cutOffTime.isInPast()) return
         for ((vec, eventList) in worldTracked) {
             if (eventList.isEmpty()) continue
@@ -153,14 +153,12 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    open fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (cutOffTime.isInPast()) return
         config.position.renderRenderables(display, posLabel = "Track $commonName log")
     }
 
-    @HandleEvent
-    fun onTick() {
+    open fun onTick() {
         if (!isRecording) return
 
         val trackedToDisplay = tracked.takeWhile { startTime.passedSince() - it.first < 3.seconds }
@@ -170,8 +168,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         tryPutTrackedInClipboard()
     }
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    open fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier(commandName) {
             description = "Tracks the $commonNamePlural for the specified duration (in seconds) and copies it to the clipboard"
             category = CommandCategory.DEVELOPER_TEST
@@ -184,4 +181,5 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
             legacyCallbackArgs(::tryStartRecording)
         }
     }
+    // </editor-fold>
 }

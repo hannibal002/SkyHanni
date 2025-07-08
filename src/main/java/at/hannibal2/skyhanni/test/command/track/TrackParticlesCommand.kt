@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -62,7 +64,6 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     }
 
     override fun onTrackable(event: ReceiveParticleEvent) {
-        if (cutOffTime.isInPast()) return
         event.distanceToPlayer // Need to call to initialize Lazy
         addTrackable(event)
     }
@@ -75,6 +76,22 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
             scaleMultiplier = 0.8,
         )
     }
+
+    @HandleEvent
+    fun onParticleReceive(event: ReceiveParticleEvent) = super.onTrackableEvent(event)
+
+    @HandleEvent
+    override fun onKeyPress(event: KeyPressEvent) = super.onKeyPress(event)
+
+    @HandleEvent
+    override fun onRenderWorld(event: SkyHanniRenderWorldEvent) = super.onRenderWorld(event)
+
+    @HandleEvent
+    override fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) = super.onRenderOverlay(event)
+
+    @HandleEvent
+    override fun onTick() = super.onTick()
+
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
