@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import com.google.gson.annotations.Expose
 
 class PlayerSpecificStorage {
@@ -71,6 +72,11 @@ class PlayerSpecificStorage {
         @Expose
         var personalBest: Int = 0
 
+        /**
+         * Do NOT use if you are trying to get the players total user luck
+         *
+         * @see UserLuckBreakdown.getTotalUserLuck
+         */
         @Expose
         var userLuck: Float = 0f
     }

@@ -417,4 +417,9 @@ object UserLuckBreakdown {
             createItemLore("mainMenu", totalLuck),
         )
     }
+
+    fun getTotalUserLuck(): Float {
+        val luckEvent = getOrPostLuckEvent()
+        return luckEvent.getTotalLuck()
+    }
 }
