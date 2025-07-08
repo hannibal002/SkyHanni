@@ -174,7 +174,7 @@ object ItemPriceUtils {
     private val lbinStatic = ApiUtils.StaticApiPath(LBIN_URL, LBIN_API_NAME, tryForceGzip = true)
 
     private suspend fun refreshLowestBins() {
-        lowestBins = ApiUtils.getJSONResponse(lbinStatic)
+        lowestBins = ApiUtils.getTypedJSONResponse<JsonObject>(lbinStatic)
             ?: lowestBins
     }
 
@@ -216,7 +216,7 @@ object ItemPriceUtils {
                     val timeNow = SimpleTimeMark.now()
                     val fetchedLowestBins = ApiUtils.getJSONResponse(lbinStatic)
                     if (fetchedLowestBins != null) {
-                        lowestBins = fetchedLowestBins
+                        lowestBins = fetchedLowestBins.asJsonObject
                         ChatUtils.chat("Fetched Moulberry's lowest bin data in ${timeNow.passedSince()}!")
                     } else {
                         ChatUtils.userError("Failed to fetch Moulberry's lowest bin data!")

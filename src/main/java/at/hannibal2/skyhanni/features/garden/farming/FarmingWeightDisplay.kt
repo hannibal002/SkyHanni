@@ -499,7 +499,7 @@ object FarmingWeightDisplay {
 
         val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/" +
             "$uuid/$profileId$upcomingPlayersParam$atRankParam"
-        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Leaderboard")
+        val apiResponse = ApiUtils.getTypedJSONResponse<JsonObject>(url, apiName = "Elitebot Farming Leaderboard")
             ?: return leaderboardPosition
 
         try {

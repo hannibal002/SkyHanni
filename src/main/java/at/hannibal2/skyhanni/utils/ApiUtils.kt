@@ -309,7 +309,24 @@ object ApiUtils {
         silentError: Boolean = true,
         tryForceGzip: Boolean = false,
     ): T? = withContext(Dispatchers.IO) {
-        internalGetJSONResponse(url, apiName, silentError, tryForceGzip)
+        internalGetJSONResponse<T>(url, apiName, silentError, tryForceGzip)
+    }
+
+    /**
+     * Fetches a typed JSON response from the given static Api path.
+     *
+     * @param T The specific subtype of [JsonElement] you expect (e.g., [JsonObject] or [com.google.gson.JsonArray]).
+     * @param static The [StaticApiPath] containing the URL and Api name.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @param tryForceGzip If true, the request will attempt to use gzip compression.
+     * @return A [T] containing the parsed JSON response, or null if the request failed or returned no content.
+     */
+    suspend inline fun <reified T : JsonElement> getTypedJSONResponse(
+        static: StaticApiPath,
+        silentError: Boolean = true,
+        tryForceGzip: Boolean = false,
+    ): T? = withContext(Dispatchers.IO) {
+        internalGetJSONResponse<T>(static.url, static.apiName, silentError, tryForceGzip)
     }
 
     /**
