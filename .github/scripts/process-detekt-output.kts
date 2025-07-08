@@ -23,7 +23,7 @@ val lines = detektOutput.split('\n')
 val sarifRegex = Regex("^::warning file=(?<filePath>src\\/[^,]*\\/(?<file>[^,]+)),line=(?<line>\\d+),title=(?<wholeRule>(?<provider>[^.]+)\\.(?:(?:\\w+)\\.)+(?<rule>[^.]+)),col=(?<col>\\d+),endColumn=(?<endcol>\\d+)::(?<message>(?:.|)*\\n*)\$")
 val sarifPattern = sarifRegex.toPattern()
 
-val urlBase = "https://github.com/$githubRepo/blob/$prSha/"
+val urlBase = "https://github.com/$githubRepo/blob/$prSha/src/"
 
 val rulesBroken: MutableMap<String, Int> = mutableMapOf()
 val violatingFiles: MutableMap<String, Int> = mutableMapOf()
