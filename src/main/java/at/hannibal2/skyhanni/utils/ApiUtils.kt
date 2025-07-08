@@ -266,12 +266,12 @@ object ApiUtils {
      *
      * @param static The [StaticApiPath] containing the URL and Api name.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
-     * @return A [JsonObject] containing the JSON response, or null if the request failed or returned no content.
+     * @return A [JsonElement] containing the JSON response, or null if the request failed or returned no content.
      */
     suspend fun getJSONResponse(
         static: StaticApiPath,
         silentError: Boolean = true,
-    ): JsonObject? = withContext(Dispatchers.IO) {
+    ): JsonElement? = withContext(Dispatchers.IO) {
         internalGetJSONResponse(static.url, static.apiName, silentError, static.tryForceGzip)
     }
 
@@ -282,14 +282,14 @@ object ApiUtils {
      * @param apiName The name of the Api being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @param tryForceGzip If true, the request will attempt to use gzip compression.
-     * @return A [JsonObject] containing the JSON response, or null if the request failed or returned no content.
+     * @return A [JsonElement] containing the JSON response, or null if the request failed or returned no content.
      */
     suspend fun getJSONResponse(
         url: String,
         apiName: String,
         silentError: Boolean = true,
         tryForceGzip: Boolean = false,
-    ): JsonObject? = withContext(Dispatchers.IO) {
+    ): JsonElement? = withContext(Dispatchers.IO) {
         internalGetJSONResponse(url, apiName, silentError, tryForceGzip)
     }
 
@@ -352,7 +352,7 @@ object ApiUtils {
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @return An [ApiResponse] containing the success status, message, and data from the Api response.
      */
-    suspend fun postJSON(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse<JsonObject> =
+    suspend fun postJSON(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse<JsonElement> =
         withContext(Dispatchers.IO) { internalPostJSON(static.url, jsonBody, static.apiName, silentError) }
 
     /**
@@ -364,7 +364,7 @@ object ApiUtils {
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @return An [ApiResponse] containing the success status, message, and data from the Api response.
      */
-    suspend fun postJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse<JsonObject> =
+    suspend fun postJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse<JsonElement> =
         withContext(Dispatchers.IO) { internalPostJSON(url, jsonBody, apiName, silentError) }
 
     /**
