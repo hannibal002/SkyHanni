@@ -16,5 +16,5 @@ runs:
           shell: bash
           run: |
               export MAX_RETRIES=${{ inputs.max-attempts }}
-              chmod +x scripts/gradlew-retry.kts
-              scripts/gradlew-retry.kts ${{ inputs.gradle-command }}
+              chmod +x .github/scripts/gradlew-retry.kts
+              .github/scripts/gradlew-retry.kts ${{ inputs.gradle-command }}
