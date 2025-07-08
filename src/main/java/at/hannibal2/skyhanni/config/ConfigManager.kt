@@ -116,8 +116,8 @@ class ConfigManager {
         "features.gui.GuiConfig.titleIntentionPositions",
 
         // debug features
-        "features.dev.DebugConfig.trackSoundPosition",
-        "features.dev.DebugConfig.trackParticlePosition",
+        "features.dev.DebugConfig.trackSound.position",
+        "features.dev.DebugConfig.trackParticle.position",
         "features.dev.DevConfig.debugPos",
         "features.dev.DevConfig.debugLocationPos",
         "features.dev.DevConfig.debugItemPos",
