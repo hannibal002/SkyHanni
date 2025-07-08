@@ -204,9 +204,36 @@ object UpdateKeybinds {
             return
         }
         if (lastMcVersion == currentMcVersion || lastMcVersion != "1.8.9" && currentMcVersion != "1.8.9") {
+            tryFixLegacyKeybinds()
             return
         }
 
         fixKeybinds(lastMcVersion != "1.8.9")
+    }
+
+    private fun tryFixLegacyKeybinds() {
+        if (!PlatformUtils.IS_LEGACY) return
+        for (keybind in keybinds) {
+            val shimmy = Shimmy.makeShimmy(SkyHanniMod.feature, keybind.split("."))
+            if (shimmy == null) {
+                try {
+                    ErrorManager.skyHanniError("Could not create shimmy for path $keybind")
+                } catch (_: Exception) {
+                    continue
+                }
+            }
+
+            val currentValue = shimmy.getJson().asInt
+
+            if (currentValue >= 255) {
+                SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$keybind"))
+                logger.log("$keybind old $currentValue")
+                logger.log("$keybind resetting to default because it was above 255 on 1.8")
+
+                DelayedRun.runDelayed(3.seconds) {
+                    ChatUtils.chat("Keybind $keybind was invalid and it has been reset, please set it manually in /sh")
+                }
+            }
+        }
     }
 }
