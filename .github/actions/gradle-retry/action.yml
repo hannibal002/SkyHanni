@@ -1,0 +1,20 @@
+name: 'Gradle with resolution-error-only retry'
+description: 'Run ./gradlew [...] and retry only on HTTP/resolution errors'
+inputs:
+    gradle-command:
+        description: 'Arguments to pass to gradlew'
+        required: false
+        default: 'build --stacktrace'
+    max-attempts:
+        description: 'How many times to retry'
+        required: false
+        default: '3'
+runs:
+    using: composite
+    steps:
+        - name: Retryable Gradle
+          shell: bash
+          run: |
+              export MAX_RETRIES=${{ inputs.max-attempts }}
+              chmod +x scripts/gradlew-retry.kts
+              scripts/gradlew-retry.kts ${{ inputs.gradle-command }}
