@@ -154,16 +154,7 @@ object UpdateKeybinds {
         }
         var shouldNotify = false
         for (keybind in keybinds) {
-            val shimmy = Shimmy.makeShimmy(SkyHanniMod.feature, keybind.split("."))
-            if (shimmy == null) {
-                try {
-                    ErrorManager.skyHanniError("Could not create shimmy for path $keybind")
-                } catch (_: Exception) {
-                    continue
-                }
-            }
-
-            val currentValue = shimmy.getJson().asInt
+            val (shimmy, currentValue) = readKeybindConfig(keybind) ?: continue
 
             if (keybindMap.containsKey(currentValue)) {
                 val newValue = keybindMap[currentValue]
@@ -190,6 +181,17 @@ object UpdateKeybinds {
         }
     }
 
+    private fun readKeybindConfig(keybind: String): Pair<Shimmy, Int>? {
+        val shimmy = Shimmy.makeShimmy(SkyHanniMod.feature, keybind.split("."))
+            ?: try {
+                ErrorManager.skyHanniError("Could not create shimmy for path $keybind")
+            } catch (_: Exception) {
+                return null
+            }
+
+        return shimmy to shimmy.getJson().asInt
+    }
+
     private var hasUpdated = false
 
     @HandleEvent(priority = HandleEvent.HIGH)
@@ -214,16 +216,7 @@ object UpdateKeybinds {
     private fun tryFixLegacyKeybinds() {
         if (!PlatformUtils.IS_LEGACY) return
         for (keybind in keybinds) {
-            val shimmy = Shimmy.makeShimmy(SkyHanniMod.feature, keybind.split("."))
-            if (shimmy == null) {
-                try {
-                    ErrorManager.skyHanniError("Could not create shimmy for path $keybind")
-                } catch (_: Exception) {
-                    continue
-                }
-            }
-
-            val currentValue = shimmy.getJson().asInt
+            val (_, currentValue) = readKeybindConfig(keybind) ?: continue
 
             if (currentValue >= 255) {
                 SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$keybind"))
