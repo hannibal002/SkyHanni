@@ -41,8 +41,10 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
 ) {
     private data class Tracked<T>(
         val event: T,
-        val time: SimpleTimeMark = SimpleTimeMark.now(),
-    )
+        private val manualTime: SimpleTimeMark? = null
+    ) {
+        val time: SimpleTimeMark = manualTime ?: SimpleTimeMark.now()
+    }
 
     protected abstract val config: TrackCommandConfig
     protected abstract val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit
@@ -188,7 +190,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
 
         val cutoff = SimpleTimeMark.now() - recencyWindow.seconds
         val trackedToDisplay = tracked.takeWhile { it.time > cutoff }
-        display = trackedToDisplay.take(maxListLength).reversed().map { (event, _) ->
+        display = trackedToDisplay.take(maxListLength).reversed().map { (event) ->
             StringRenderable(event.formatForDisplay())
         }
         worldTracked = trackedToDisplay.map { it.event }.groupBy { it.location }
