@@ -153,7 +153,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         if (cutOffTime.isInPast()) return
         if (event.getTypeIdentifier() in ignoredTypes) return
         if (event.shouldAcceptTrackableEvent()) {
-            tracked.addFirst(Tracked(startTime, event))
+            tracked.addFirst(Tracked(SimpleTimeMark.now(), event))
         }
     }
 
@@ -197,10 +197,8 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         event.registerBrigadier(commandName) {
             description = "Tracks the $commonNamePlural for the specified duration (in seconds) and copies it to the clipboard"
             category = CommandCategory.DEVELOPER_TEST
-            literal("end") {
-                endRecording()
-            }
-            literal("ignore") {
+            literalCallback("end") { endRecording() }
+            literalCallback("ignore") {
                 registerIgnoreBlock()
             }
             legacyCallbackArgs(::tryStartRecording)

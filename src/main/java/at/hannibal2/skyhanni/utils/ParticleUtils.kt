@@ -15,7 +15,7 @@ object ParticleUtils {
             it.name.equals(name, ignoreCase = true)
         }
     //#else
-    //$$ fun getParticleTypeByName(name: String, shouldError: Boolean = false): ParticleType<*>? = Identifier.of(name)?.let { id ->
+    //$$ fun getParticleTypeByName(name: String, shouldError: Boolean = false): ParticleType<*>? = Identifier.of(name.lowercase())?.let { id ->
     //$$    Registries.PARTICLE_TYPE.get(id) ?: run {
     //$$        if (shouldError) ChatUtils.userError("Unknown particle type: '$name'")
     //$$        null

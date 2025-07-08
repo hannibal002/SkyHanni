@@ -41,7 +41,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
         }
         //#else
         //$$ argCallback("name", BrigadierArguments.string()) {
-        //$$    val type = ParticleUtils.getParticleTypeByName(it) ?: return@argCallback
+        //$$    val type = ParticleUtils.getParticleTypeByName(it, shouldError = true) ?: return@argCallback
         //$$    handleIgnorable(type)
         //$$ }
         //#endif
