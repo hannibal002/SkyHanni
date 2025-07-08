@@ -9,6 +9,7 @@ import java.util.Queue
 import java.util.WeakHashMap
 import java.util.regex.Pattern
 import kotlin.math.ceil
+import kotlin.time.Duration
 
 @Suppress("TooManyFunctions")
 object CollectionUtils {
@@ -63,6 +64,10 @@ object CollectionUtils {
 
     fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
         this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
+    @Suppress("UnsafeCallOnNullableType")
+    fun <K> MutableMap<K, Duration>.addOrPut(key: K, number: Duration): Duration =
+        this.merge(key, number, Duration::plus)!! // Never returns null since "plus" can't return null
 
     @Suppress("UnsafeCallOnNullableType")
     fun <K> MutableMap<K, MinMaxNumber>.addOrPut(key: K, number: MinMaxNumber): MinMaxNumber =
