@@ -3,34 +3,22 @@ package at.hannibal2.skyhanni.test.command.track
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.track.TrackParticlesCommand.ignoredTypes
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.ParticleUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 //#if MC < 1.21
 import net.minecraft.util.EnumParticleTypes
-//#endif
-import java.util.concurrent.ConcurrentLinkedDeque
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21
+//#else
 //$$ import net.minecraft.particle.ParticleType
 //#endif
+import kotlin.time.Duration
 
 @SkyHanniModule
 //#if MC < 1.21
@@ -43,7 +31,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     override val config get() = SkyHanniMod.feature.dev.debug.trackParticle
 
     //#if MC < 1.21
-    override fun ReceiveParticleEvent.getGroupKey(): EnumParticleTypes = type
+    override fun ReceiveParticleEvent.getTypeIdentifier(): EnumParticleTypes = type
     //#else
     //$$ override fun ReceiveParticleEvent.getGroupKey(): ParticleType<*> = type
     //#endif
@@ -59,32 +47,22 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     //$$ private val ignoredTypes = mutableListOf<ParticleType<*>>()
     //#endif
 
-    override fun earlyArgHandler(args: Array<String>, isRecording: Boolean): Boolean {
-        //#if TODO
-        if (args.isEmpty()) return false
-        val type = ParticleUtils.getParticleTypeByName(args[0]) ?: run {
-            ChatUtils.userError("Unknown particle type: '${args[0]}'")
-            return true
+    // todo add suggestion provider for particle types, maybe when we're fully in 1.21
+    override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
+        //#if MC < 1.21
+        argCallback("name", EnumArgumentType.name<EnumParticleTypes>()) {
+            handleIgnorable(it)
         }
-        if (ignoredTypes.contains(type)) {
-            ignoredTypes.remove(type)
-            ChatUtils.chat("Removed $type from ignored types.")
-        } else {
-            ignoredTypes.add(type)
-            ChatUtils.chat("Added $type to ignored types.")
-        }
-        return true
         //#else
-        //$$ return false
+        //$$ argCallback("name", BrigadierArguments.string()) {
+        //$$    val type = ParticleUtils.getParticleTypeByName(it) ?: return@argCallback
+        //$$    handleIgnorable(type)
+        //$$ }
         //#endif
     }
 
-    @HandleEvent
     override fun onTrackable(event: ReceiveParticleEvent) {
         if (cutOffTime.isInPast()) return
-        //#if TODO
-        if (event.type in ignoredTypes) return
-        //#endif
         event.distanceToPlayer // Need to call to initialize Lazy
         addTrackable(event)
     }

@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -32,7 +34,18 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
 ) {
     override val config get() = SkyHanniMod.feature.dev.debug.trackSound
 
-    override fun PlaySoundEvent.getGroupKey() = soundName
+    override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
+        argCallback("sound_name", BrigadierArguments.string()) {
+            val soundName = it.trim()
+            if (soundName.isEmpty()) {
+                ChatUtils.chat("§cSound name cannot be empty")
+                return@argCallback
+            }
+            handleIgnorable(soundName)
+        }
+    }
+
+    override fun PlaySoundEvent.getTypeIdentifier() = soundName
 
     override fun drawDisplay(tracked: List<Pair<Duration, PlaySoundEvent>>): List<Renderable> =
         tracked.take(10).reversed().map {
@@ -56,7 +69,6 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
 
     @HandleEvent
     override fun onTrackable(event: PlaySoundEvent) {
-        if (cutOffTime.isInPast()) return
         if (event.soundName == "game.player.hurt" && event.pitch == 0f && event.volume == 0f) return // remove random useless sound
         if (event.soundName == "") return // sound with empty name aren't useful
         event.distanceToPlayer // Need to call to initialize Lazy
