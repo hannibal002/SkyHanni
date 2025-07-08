@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.dev
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -227,6 +228,16 @@ class DebugConfig {
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
     val animatedItemStackPosition: Position = Position(-300, 300)
+
+    @Expose
+    @ConfigOption(name = "Track Sound", desc = "")
+    @Accordion
+    val trackSound: TrackCommandConfig = TrackCommandConfig()
+
+    @Expose
+    @ConfigOption(name = "Track Particle", desc = "")
+    @Accordion
+    val trackParticle: TrackCommandConfig = TrackCommandConfig()
 
     // Does not have a config element!
     @Expose

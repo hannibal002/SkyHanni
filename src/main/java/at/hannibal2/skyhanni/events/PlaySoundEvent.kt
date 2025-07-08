@@ -5,7 +5,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 
-class PlaySoundEvent(val rawSoundName: String, val location: LorenzVec, val pitch: Float, val volume: Float) : CancellableSkyHanniEvent() {
+class PlaySoundEvent(
+    val rawSoundName: String,
+    override val location: LorenzVec,
+    val pitch: Float,
+    val volume: Float
+) : CancellableWorldEvent() {
 
     val soundName by lazy { getSoundName(rawSoundName) }
 
