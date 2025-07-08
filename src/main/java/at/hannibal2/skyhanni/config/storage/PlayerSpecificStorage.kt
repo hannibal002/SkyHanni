@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.config.storage
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
+import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
-import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import com.google.gson.annotations.Expose
 
 class PlayerSpecificStorage {
