@@ -56,7 +56,7 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
     fun onPlaySound(event: PlaySoundEvent) = super.onTrackableEvent(event)
 
     @HandleEvent

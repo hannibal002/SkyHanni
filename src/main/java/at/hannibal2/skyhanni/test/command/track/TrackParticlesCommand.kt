@@ -60,7 +60,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     // No explicit filtering for particles, all particles are tracked in this context.
     override fun ReceiveParticleEvent.shouldAcceptTrackableEvent(): Boolean = true
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
     fun onParticleReceive(event: ReceiveParticleEvent) = super.onTrackableEvent(event)
 
     @HandleEvent

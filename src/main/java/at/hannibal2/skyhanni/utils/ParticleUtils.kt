@@ -9,7 +9,7 @@ import net.minecraft.util.EnumParticleTypes
 
 object ParticleUtils {
 
-    //#if TODO
+    //#if MC < 1.21
     fun getParticleTypeByName(name: String): EnumParticleTypes? =
         EnumParticleTypes.entries.firstOrNull {
             it.name.equals(name, ignoreCase = true)

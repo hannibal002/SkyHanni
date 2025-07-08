@@ -125,7 +125,9 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         if (cutOffTime.passedSince() <= 0.1.seconds) return
 
         val string = tracked.reversed().joinToString("\n") {
-            "Time: ${it.time.passedSince().inWholeMilliseconds}  ${it.event}"
+            val isCancelled = it.event.isCancelled
+            val cancelFormat = if (isCancelled) "❌" else "✅"
+            "Time: ${it.time.passedSince().inWholeMilliseconds} $cancelFormat ${it.event}"
         }
         OSUtils.copyToClipboard(string)
         ChatUtils.chat("${tracked.size} $commonNamePlural copied into the clipboard!")
