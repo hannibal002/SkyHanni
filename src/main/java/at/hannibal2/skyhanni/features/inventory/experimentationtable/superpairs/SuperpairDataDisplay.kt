@@ -367,7 +367,7 @@ object SuperpairDataDisplay {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val pathBase = "inventory.experimentationTable"
-        event.move(89, "$pathBase.superpairDisplay", "$pathBase.superpairs.display")
-        event.move(89, "$pathBase.superpairDisplayPosition", "$pathBase.superpairs.displayPosition")
+        event.move(92, "$pathBase.superpairDisplay", "$pathBase.superpairs.display")
+        event.move(92, "$pathBase.superpairDisplayPosition", "$pathBase.superpairs.displayPosition")
     }
 }

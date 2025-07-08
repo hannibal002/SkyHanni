@@ -17,7 +17,7 @@ import net.minecraft.client.Minecraft
 object ExperimentationXPOverlay {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.superpairs
 
-    private val patternGroup = RepoPattern.Companion.group("enchanting.experiments")
+    private val patternGroup = RepoPattern.group("enchanting.experiments")
 
     /**
      * REGEX-TEST: §331k Enchanting Exp
