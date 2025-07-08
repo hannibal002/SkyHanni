@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test.command.track
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
@@ -18,20 +17,27 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+// todo currently this abstraction assumes that the tracked events have a location
+//  if this is not in the case for an implementation in the future, this should be
+//  abstracted further to `TrackCommand` and `TrackWorldCommand`
 abstract class TrackCommand<T : CancellableWorldEvent, K>(
     private val onlyOnSkyblock: Boolean = true,
     private val commonName: String,
     private val commonNamePlural: String = commonName + "s",
 ) {
-    abstract val config: TrackCommandConfig
-    abstract val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit
+    protected abstract val config: TrackCommandConfig
+    protected abstract val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit
 
-    abstract fun drawDisplay(tracked: List<Pair<Duration, T>>): List<Renderable>
-    abstract fun onTrackable(event: T)
+    // todo if there is ever a need for something besides a StringRenderable,
+    //  this can and should be made to return a Renderable rather than a String
+    abstract fun T.formatForDisplay(): String
+    abstract fun T.formatForWorldRender(): String
+    abstract fun T.shouldAcceptTrackableEvent(): Boolean
     abstract fun T.getTypeIdentifier(): K
 
     private var lastKeyToggle: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -45,27 +51,18 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     private val tracked = ConcurrentLinkedDeque<Pair<Duration, T>>()
     private val commandName = "shtrack$commonNamePlural"
 
-    protected fun addTrackable(event: T) {
-        if (cutOffTime.isInPast()) return
-        tracked.addFirst(startTime.passedSince() to event)
+    protected fun handleIgnorable(ignorable: K) = if (ignorable in ignoredTypes) {
+        ignoredTypes.remove(ignorable)
+        ChatUtils.chat("§cRemoved $commonName '§e$ignorable§c' from the ignore list")
+    } else {
+        ignoredTypes.add(ignorable)
+        ChatUtils.chat("§aAdded $commonName '§e$ignorable§c' to the ignore list")
     }
 
-    protected fun handleIgnorable(ignorable: K) {
-        if (ignorable in ignoredTypes) {
-            ignoredTypes.remove(ignorable)
-            ChatUtils.chat("§cRemoved $commonName '§e$ignorable§c' from the ignore list")
-        } else {
-            ignoredTypes.add(ignorable)
-            ChatUtils.chat("§aAdded $commonName '§e$ignorable§c' to the ignore list")
-        }
-    }
-
-    private fun skyBlockCheck(): Boolean {
-        return if (onlyOnSkyblock && !SkyBlockUtils.inSkyBlock) {
-            ChatUtils.userError("This command only works in SkyBlock!")
-            false
-        } else true
-    }
+    private fun skyBlockCheck(): Boolean = if (onlyOnSkyblock && !SkyBlockUtils.inSkyBlock) {
+        ChatUtils.userError("This command only works in SkyBlock!")
+        false
+    } else true
 
     private fun endRecording() {
         if (!isRecording) ChatUtils.userError("Nothing to end")
@@ -82,20 +79,23 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         } else true
     }
 
-    open fun earlyArgHandler(args: Array<String>, isRecording: Boolean): Boolean = false
-
     private fun tryStartRecording(args: Array<String>) {
-        if (!skyBlockCheck()) return
-        if (earlyArgHandler(args, isRecording)) return
-        if (!alreadyRecordingCheck()) return
+        if (!skyBlockCheck() || !alreadyRecordingCheck()) return
+
+        val raw = args.firstOrNull()
+        val durSec = raw?.toIntOrNull()
+        if (raw != null && durSec == null) {
+            ChatUtils.userError("Invalid duration: \"§e$raw§c\" isn’t a number")
+            return
+        }
 
         isRecording = true
         tracked.clear()
         startTime = SimpleTimeMark.now()
-        cutOffTime = args.firstOrNull()?.toInt()?.seconds?.let {
-            ChatUtils.chat("Now started tracking $commonNamePlural for ${it.inWholeSeconds} Seconds")
-            it.fromNow()
-        } ?: run {
+        cutOffTime = if (durSec != null) {
+            ChatUtils.chat("Now started tracking $commonNamePlural for $durSec seconds")
+            durSec.seconds.fromNow()
+        } else {
             ChatUtils.chat("Now started tracking $commonNamePlural until manually ended")
             SimpleTimeMark.farFuture()
         }
@@ -113,18 +113,23 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         isRecording = false
     }
 
-    private fun SkyHanniRenderWorldEvent.drawMultiple(
-        vec: LorenzVec,
-        events: List<T>,
-    ) {
-        drawDynamicText(vec, "§e${events.size} sounds", 0.8)
+    private fun SkyHanniRenderWorldEvent.drawSingleInWorld(vec: LorenzVec, event: T) {
+        drawDynamicText(vec, "§7§l${event.getTypeIdentifier()}", 0.8)
+        drawDynamicText(
+            vec.down(0.2),
+            event.formatForWorldRender(),
+            scaleMultiplier = 0.8,
+        )
+    }
+
+    private fun SkyHanniRenderWorldEvent.drawMultipleInWorld(vec: LorenzVec, events: List<T>) {
+        drawDynamicText(vec, "§e${events.size} $commonNamePlural", 0.8)
         var offset = 0.2
         events.groupBy { it.getTypeIdentifier() }.forEach { (groupName, events) ->
             drawDynamicText(vec.down(offset), "§7§l$groupName §7(§e${events.size}§7)", 0.8)
             offset += 0.2
         }
     }
-    abstract fun SkyHanniRenderWorldEvent.drawSingle(vec: LorenzVec, event: T)
 
     // Functions below are event handlers that will be called by
     // extending objects that are SkyHanniModules
@@ -132,7 +137,9 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     open fun onTrackableEvent(event: T) {
         if (cutOffTime.isInPast()) return
         if (event.getTypeIdentifier() in ignoredTypes) return
-        onTrackable(event)
+        if (event.shouldAcceptTrackableEvent()) {
+            tracked.addFirst(startTime.passedSince() to event)
+        }
     }
 
     open fun onKeyPress(event: KeyPressEvent) {
@@ -148,8 +155,8 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         if (cutOffTime.isInPast()) return
         for ((vec, eventList) in worldTracked) {
             if (eventList.isEmpty()) continue
-            else if (eventList.size != 1) event.drawMultiple(vec, eventList)
-            else event.drawSingle(vec, eventList.first())
+            else if (eventList.size != 1) event.drawMultipleInWorld(vec, eventList)
+            else event.drawSingleInWorld(vec, eventList.first())
         }
     }
 
@@ -162,7 +169,9 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         if (!isRecording) return
 
         val trackedToDisplay = tracked.takeWhile { startTime.passedSince() - it.first < 3.seconds }
-        display = drawDisplay(trackedToDisplay)
+        display = trackedToDisplay.take(10).reversed().map { (_, event) ->
+            StringRenderable(event.formatForDisplay())
+        }
         worldTracked = trackedToDisplay.map { it.second }.groupBy { it.location }
 
         tryPutTrackedInClipboard()

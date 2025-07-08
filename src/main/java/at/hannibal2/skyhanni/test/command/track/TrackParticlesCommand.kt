@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.command.track
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -10,17 +11,12 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 //#if MC < 1.21
 import net.minecraft.util.EnumParticleTypes
 //#else
 //$$ import net.minecraft.particle.ParticleType
 //#endif
-import kotlin.time.Duration
 
 @SkyHanniModule
 //#if MC < 1.21
@@ -31,23 +27,6 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     commonName = "particle",
 ) {
     override val config get() = SkyHanniMod.feature.dev.debug.trackParticle
-
-    //#if MC < 1.21
-    override fun ReceiveParticleEvent.getTypeIdentifier(): EnumParticleTypes = type
-    //#else
-    //$$ override fun ReceiveParticleEvent.getGroupKey(): ParticleType<*> = type
-    //#endif
-
-    override fun drawDisplay(tracked: List<Pair<Duration, ReceiveParticleEvent>>): List<Renderable> =
-        tracked.take(10).reversed().map {
-            StringRenderable("§3" + it.second.type + " §8c:" + it.second.count + " §7s:" + it.second.speed)
-        }
-
-    //#if MC < 1.21
-    private val ignoredTypes = mutableListOf<EnumParticleTypes>()
-    //#else
-    //$$ private val ignoredTypes = mutableListOf<ParticleType<*>>()
-    //#endif
 
     // todo add suggestion provider for particle types, maybe when we're fully in 1.21
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
@@ -63,19 +42,18 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
         //#endif
     }
 
-    override fun onTrackable(event: ReceiveParticleEvent) {
-        event.distanceToPlayer // Need to call to initialize Lazy
-        addTrackable(event)
-    }
+    //#if MC < 1.21
+    override fun ReceiveParticleEvent.getTypeIdentifier(): EnumParticleTypes = type
+    //#else
+    //$$ override fun ReceiveParticleEvent.getGroupKey(): ParticleType<*> = type
+    //#endif
 
-    override fun SkyHanniRenderWorldEvent.drawSingle(vec: LorenzVec, event: ReceiveParticleEvent) {
-        drawDynamicText(vec, "§7§l${event.type}", 0.8)
-        drawDynamicText(
-            vec.down(0.2),
-            "§7C: §e${event.count} §7S: §a${event.speed.roundTo(2)}",
-            scaleMultiplier = 0.8,
-        )
-    }
+    override fun ReceiveParticleEvent.formatForDisplay() = "§3$type §8c:$count §7s:$speed"
+
+    override fun ReceiveParticleEvent.formatForWorldRender() = "§7C: §e${count} §7S: §a${speed.roundTo(2)}"
+
+    // No explicit filtering for particles, all particles are tracked in this context.
+    override fun ReceiveParticleEvent.shouldAcceptTrackableEvent(): Boolean = true
 
     @HandleEvent
     fun onParticleReceive(event: ReceiveParticleEvent) = super.onTrackableEvent(event)
@@ -92,6 +70,8 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     @HandleEvent
     override fun onTick() = super.onTick()
 
+    @HandleEvent
+    override fun onCommandRegistration(event: CommandRegistrationEvent) = super.onCommandRegistration(event)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
