@@ -75,7 +75,8 @@ object FlowstateHelper {
         if (blockBreakStreak > personalBest) {
             // no point telling them it's a new personal best if they never got to max speed before
             if (personalBest > 200 && config.personalBestMessage) {
-                ChatUtils.chat("§d§lNEW FLOWSTATE PERSONAL BEST!§f Streak: $blockBreakStreak. You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!")
+                ChatUtils.chat("§d§lNEW FLOWSTATE PERSONAL BEST!§f Streak: $blockBreakStreak." +
+                    " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!")
             }
             personalBest = blockBreakStreak
         }
