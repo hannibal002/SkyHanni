@@ -53,6 +53,6 @@ object ExperimentationXPOverlay {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val pathBase = "inventory.experimentationTable"
-        event.move(88, "$pathBase.superpairsXPOverlay", "$pathBase.superpairs.xpOverlay")
+        event.move(93, "$pathBase.superpairsXPOverlay", "$pathBase.superpairs.xpOverlay")
     }
 }

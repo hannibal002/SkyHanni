@@ -61,7 +61,7 @@ object UltraRareBookAlert {
         event.move(59, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
 
         val pathBase = "inventory.experimentationTable"
-        event.move(88, "$pathBase.ultraRareBookAlert", "$pathBase.superpairs.ultraRareBookAlert")
+        event.move(93, "$pathBase.ultraRareBookAlert", "$pathBase.superpairs.ultraRareBookAlert")
     }
 
     private fun isEnabled() = config.superpairs.ultraRareBookAlert && ExperimentationTableApi.inSuperpairs

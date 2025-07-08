@@ -71,6 +71,6 @@ object SuperpairsClicksAlert {
         event.move(59, "inventory.helper.enchanting.superpairsClicksAlert", "inventory.experimentationTable.superpairsClicksAlert")
 
         val pathBase = "inventory.experimentationTable"
-        event.move(88, "$pathBase.superpairsClicksAlert", "$pathBase.addons.maxSequenceAlert")
+        event.move(93, "$pathBase.superpairsClicksAlert", "$pathBase.addons.maxSequenceAlert")
     }
 }
