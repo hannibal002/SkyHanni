@@ -8,9 +8,8 @@ val prSha = System.getenv("PR_SHA")
 val githubRepo = System.getenv("GITHUB_REPOSITORY")
     ?: error("GITHUB_REPOSITORY environment variable not set")
 
-val detektFile = File("detekt_output.txt")
-val detektFileHash = detektFile.hashCode()
-val detektOutput = detektFile.readText()
+val detektOutput = File("detekt_output.txt").readText()
+val detektOutputHash = detektOutput.hashCode()
 val lines = detektOutput.split('\n')
 
 /**
@@ -113,7 +112,7 @@ val sb = StringBuilder().apply {
     }
 
     appendLine()
-    appendLine("<!-- detekt-sarif-hash:$detektFileHash -->")
+    appendLine("<!-- detekt-sarif-hash:$detektOutputHash -->")
 }
 
 File("detekt_comment.txt").writeText(sb.toString())
