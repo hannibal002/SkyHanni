@@ -203,7 +203,7 @@ object UpdateKeybinds {
         if (!config.storage.hasPlayedBefore) {
             return
         }
-        if (lastMcVersion == currentMcVersion || lastMcVersion != "1.8.9" && currentMcVersion != "1.8.9") {
+        if (lastMcVersion == currentMcVersion || (lastMcVersion != "1.8.9" && currentMcVersion != "1.8.9")) {
             tryFixLegacyKeybinds()
             return
         }
