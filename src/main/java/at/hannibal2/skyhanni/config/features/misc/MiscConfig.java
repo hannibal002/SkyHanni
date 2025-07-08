@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
+import at.hannibal2.skyhanni.config.ConfigManager;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.OnlyLegacy;
 import at.hannibal2.skyhanni.config.core.config.Position;
@@ -186,9 +187,11 @@ public class MiscConfig {
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
+    @ConfigManager.NoConfigLink
     public Position collectionCounterPos = new Position(10, 10);
 
     @Expose
+    @ConfigManager.NoConfigLink
     public Position carryPosition = new Position(10, 10);
 
     @Expose
@@ -343,8 +346,8 @@ public class MiscConfig {
     @ConfigEditorBoolean
     public boolean lockMouseLookChatMessage = true;
 
-    // Does not have a config element!
     @Expose
+    @ConfigManager.NoConfigLink
     public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose

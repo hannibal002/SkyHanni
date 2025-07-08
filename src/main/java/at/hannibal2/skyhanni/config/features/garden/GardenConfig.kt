@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
@@ -217,8 +218,8 @@ class GardenConfig {
     @FeatureToggle
     var jacobContestSummary: Boolean = true
 
-    // Does not have a config element!
     @Expose
+    @ConfigManager.NoConfigLink
     val cropSpeedMeterPos: Position = Position(278, -236)
 
     @Expose
