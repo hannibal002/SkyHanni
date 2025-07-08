@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.item.ItemStack
 
-class UserLuckEvent : SkyHanniEvent() {
+// gets fired when we want to calculate what the current player user luck values are
+class UserLuckCalculateEvent : SkyHanniEvent() {
 
     private var totalLuck = 0f
     lateinit var mainLuckStack: ItemStack

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.UserLuckEvent
+import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
@@ -337,20 +337,20 @@ object UserLuckBreakdown {
         }
     }
 
-    private var userLuckEvent: UserLuckEvent? = null
+    private var userLuckEvent: UserLuckCalculateEvent? = null
 
-    private fun getOrPostLuckEvent(): UserLuckEvent {
+    private fun getOrPostLuckEvent(): UserLuckCalculateEvent {
         val oldLuckEvent = userLuckEvent
         if (oldLuckEvent != null && itemCreateCoolDown.passedSince() < 3.seconds) return oldLuckEvent
         itemCreateCoolDown = SimpleTimeMark.now()
-        val userLuckEvent = UserLuckEvent()
+        val userLuckEvent = UserLuckCalculateEvent()
         userLuckEvent.post()
         this.userLuckEvent = userLuckEvent
         return userLuckEvent
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun skillLuck(event: UserLuckEvent) {
+    fun skillLuck(event: UserLuckCalculateEvent) {
         val lore = createItemLore("skills")
         val luck = skillOverflowLuck.values.sum().toFloat()
         event.addLuck(luck)
@@ -363,7 +363,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun limboLuck(event: UserLuckEvent) {
+    fun limboLuck(event: UserLuckCalculateEvent) {
         val luck = storage?.limbo?.userLuck ?: 0f
         event.addLuck(luck)
         val stack = ItemUtils.createItemStack(
@@ -375,7 +375,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun modernLuck(event: UserLuckEvent) {
+    fun modernLuck(event: UserLuckCalculateEvent) {
         if (PlatformUtils.IS_LEGACY) return
         event.addLuck(5f)
         //#if MC > 1.21
@@ -396,7 +396,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun jerryLuck(event: UserLuckEvent) {
+    fun jerryLuck(event: UserLuckCalculateEvent) {
         if (!Perk.STATSPOCALYPSE.isActive) return
         val jerryLuck = event.getTotalLuck() * .1f
         event.addLuck(jerryLuck)
@@ -409,7 +409,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(priority = 100)
-    fun totalLuck(event: UserLuckEvent) {
+    fun totalLuck(event: UserLuckCalculateEvent) {
         val totalLuck = event.getTotalLuck()
         event.mainLuckStack = ItemUtils.createItemStack(
             mainLuckID,
