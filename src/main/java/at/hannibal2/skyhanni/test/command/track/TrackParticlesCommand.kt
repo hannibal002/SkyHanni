@@ -55,7 +55,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
 
     override fun ReceiveParticleEvent.formatForDisplay() = "§3$type §8c:$count §7s:$speed"
 
-    override fun ReceiveParticleEvent.formatForWorldRender() = "§7C: §e${count} §7S: §a${speed.roundTo(2)}"
+    override fun ReceiveParticleEvent.formatForWorldRender() = "§7C: §e$count §7S: §a${speed.roundTo(2)}"
 
     // No explicit filtering for particles, all particles are tracked in this context.
     override fun ReceiveParticleEvent.shouldAcceptTrackableEvent(): Boolean = true

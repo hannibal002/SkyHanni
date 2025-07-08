@@ -203,7 +203,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
             description = "Tracks the $commonNamePlural for the specified duration (in seconds) and copies it to the clipboard"
             category = CommandCategory.DEVELOPER_TEST
             literalCallback("end") { endRecording() }
-            literalCallback("ignore") {
+            literal("ignore") {
                 registerIgnoreBlock()
             }
             legacyCallbackArgs(::tryStartRecording)
