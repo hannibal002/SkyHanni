@@ -8,9 +8,8 @@ val prSha = System.getenv("PR_SHA")
 val githubRepo = System.getenv("GITHUB_REPOSITORY")
     ?: error("GITHUB_REPOSITORY environment variable not set")
 
-val detektFile = File("detekt_output.txt")
-val detektFileHash = detektFile.hashCode()
-val detektOutput = detektFile.readText()
+val detektOutput = File("detekt_output.txt").readText()
+val detektOutputHash = detektOutput.hashCode()
 val lines = detektOutput.split('\n')
 
 /**
@@ -23,7 +22,7 @@ val lines = detektOutput.split('\n')
 val sarifRegex = Regex("^::warning file=(?<filePath>src\\/[^,]*\\/(?<file>[^,]+)),line=(?<line>\\d+),title=(?<wholeRule>(?<provider>[^.]+)\\.(?:(?:\\w+)\\.)+(?<rule>[^.]+)),col=(?<col>\\d+),endColumn=(?<endcol>\\d+)::(?<message>(?:.|)*\\n*)\$")
 val sarifPattern = sarifRegex.toPattern()
 
-val urlBase = "https://github.com/$githubRepo/blob/$prSha/"
+val urlBase = "https://github.com/$githubRepo/blob/$prSha/src/"
 
 val rulesBroken: MutableMap<String, Int> = mutableMapOf()
 val violatingFiles: MutableMap<String, Int> = mutableMapOf()
@@ -113,7 +112,7 @@ val sb = StringBuilder().apply {
     }
 
     appendLine()
-    appendLine("<!-- detekt-sarif-hash:$detektFileHash -->")
+    appendLine("<!-- detekt-sarif-hash:$detektOutputHash -->")
 }
 
 File("detekt_comment.txt").writeText(sb.toString())
