@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
@@ -73,16 +74,16 @@ class DevConfig {
     @Expose
     val waypoint: WaypointsConfig = WaypointsConfig()
 
-    // Does not have a config element!
     @Expose
+    @ConfigManager.NoConfigLink
     val debugPos: Position = Position(10, 10)
 
-    // Does not have a config element!
     @Expose
+    @ConfigManager.NoConfigLink
     val debugLocationPos: Position = Position(1, 160)
 
-    // Does not have a config element!
     @Expose
+    @ConfigManager.NoConfigLink
     val debugItemPos: Position = Position(90, 70)
 
     @Expose
