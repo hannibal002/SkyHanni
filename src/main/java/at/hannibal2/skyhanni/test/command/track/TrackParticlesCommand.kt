@@ -5,7 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+//#else
+//$$ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+//#endif
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -15,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 //#if MC < 1.21
 import net.minecraft.util.EnumParticleTypes
 //#else
+//$$ import at.hannibal2.skyhanni.utils.ParticleUtils
 //$$ import net.minecraft.particle.ParticleType
 //#endif
 
@@ -45,7 +50,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     //#if MC < 1.21
     override fun ReceiveParticleEvent.getTypeIdentifier(): EnumParticleTypes = type
     //#else
-    //$$ override fun ReceiveParticleEvent.getGroupKey(): ParticleType<*> = type
+    //$$ override fun ReceiveParticleEvent.getTypeIdentifier(): ParticleType<*> = type
     //#endif
 
     override fun ReceiveParticleEvent.formatForDisplay() = "§3$type §8c:$count §7s:$speed"

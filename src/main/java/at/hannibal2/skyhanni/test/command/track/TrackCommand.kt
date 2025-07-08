@@ -19,17 +19,28 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import java.util.concurrent.ConcurrentLinkedDeque
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 // todo currently this abstraction assumes that the tracked events have a location
 //  if this is not in the case for an implementation in the future, this should be
 //  abstracted further to `TrackCommand` and `TrackWorldCommand`
+/**
+ * Abstract class for commands that track specific events in the game.
+ *
+ * @param T The type of event to track, which must extend [CancellableWorldEvent].
+ * @param K The type of identifier used to categorize the tracked events. Ideally, if possible, this should be an enum.
+ * @param onlyOnSkyblock If true, the command will only work in SkyBlock.
+ * @param commonName The singular name of the tracked event, used for command naming and display. (e.g., "sound", "particle").
+ * @param commonNamePlural The plural name of the tracked event, used for command naming and display.
+ *  Defaults to `commonName + "s"` (e.g., "sounds", "particles").
+ */
 abstract class TrackCommand<T : CancellableWorldEvent, K>(
     private val onlyOnSkyblock: Boolean = true,
     private val commonName: String,
     private val commonNamePlural: String = commonName + "s",
 ) {
+    private data class Tracked<T>(val time: SimpleTimeMark, val event: T)
+
     protected abstract val config: TrackCommandConfig
     protected abstract val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit
 
@@ -48,8 +59,11 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     private var worldTracked: Map<LorenzVec, List<T>> = emptyMap()
 
     private val ignoredTypes: MutableList<K> = mutableListOf()
-    private val tracked = ConcurrentLinkedDeque<Pair<Duration, T>>()
+    private val tracked = ConcurrentLinkedDeque<Tracked<T>>()
     private val commandName = "shtrack$commonNamePlural"
+
+    private val recencyWindow get() = config.recencyWindow
+    private val maxListLength get() = config.maxListLength
 
     protected fun handleIgnorable(ignorable: K) = if (ignorable in ignoredTypes) {
         ignoredTypes.remove(ignorable)
@@ -105,10 +119,11 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         // The function must run after cutOffTime has passed to ensure thread safety
         if (cutOffTime.passedSince() <= 0.1.seconds) return
 
-        val string = tracked.reversed().joinToString("\n") { "Time: ${it.first.inWholeMilliseconds}  ${it.second}" }
-        val counter = tracked.size
+        val string = tracked.reversed().joinToString("\n") {
+            "Time: ${it.time.passedSince().inWholeMilliseconds}  ${it.event}"
+        }
         OSUtils.copyToClipboard(string)
-        ChatUtils.chat("$counter $commonNamePlural copied into the clipboard!")
+        ChatUtils.chat("${tracked.size} $commonNamePlural copied into the clipboard!")
         tracked.clear()
         isRecording = false
     }
@@ -138,7 +153,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         if (cutOffTime.isInPast()) return
         if (event.getTypeIdentifier() in ignoredTypes) return
         if (event.shouldAcceptTrackableEvent()) {
-            tracked.addFirst(startTime.passedSince() to event)
+            tracked.addFirst(Tracked(startTime, event))
         }
     }
 
@@ -168,11 +183,12 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     open fun onTick() {
         if (!isRecording) return
 
-        val trackedToDisplay = tracked.takeWhile { startTime.passedSince() - it.first < 3.seconds }
-        display = trackedToDisplay.take(10).reversed().map { (_, event) ->
+        val cutoff = SimpleTimeMark.now() - recencyWindow.seconds
+        val trackedToDisplay = tracked.takeWhile { it.time > cutoff }
+        display = trackedToDisplay.take(maxListLength).reversed().map { (_, event) ->
             StringRenderable(event.formatForDisplay())
         }
-        worldTracked = trackedToDisplay.map { it.second }.groupBy { it.location }
+        worldTracked = trackedToDisplay.map { it.event }.groupBy { it.location }
 
         tryPutTrackedInClipboard()
     }
