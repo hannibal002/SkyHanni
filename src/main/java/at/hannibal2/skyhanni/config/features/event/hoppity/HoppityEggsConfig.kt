@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.event.hoppity
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -11,37 +12,37 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(name = "Hoppity Abiphone Calls", desc = "")
     @Accordion
-    var hoppityCallWarning: HoppityCallWarningConfig = HoppityCallWarningConfig()
+    val hoppityCallWarning: HoppityCallWarningConfig = HoppityCallWarningConfig()
 
     @Expose
     @ConfigOption(name = "Hoppity Hunt Stats Summary", desc = "")
     @Accordion
-    var eventSummary: HoppityEventSummaryConfig = HoppityEventSummaryConfig()
+    val eventSummary: HoppityEventSummaryConfig = HoppityEventSummaryConfig()
 
     @Expose
     @ConfigOption(name = "Warp Menu", desc = "")
     @Accordion
-    var warpMenu: HoppityWarpMenuConfig = HoppityWarpMenuConfig()
+    val warpMenu: HoppityWarpMenuConfig = HoppityWarpMenuConfig()
 
     @Expose
     @ConfigOption(name = "Stray Timer", desc = "")
     @Accordion
-    var strayTimer: HoppityStrayTimerConfig = HoppityStrayTimerConfig()
+    val strayTimer: HoppityStrayTimerConfig = HoppityStrayTimerConfig()
 
     @Expose
     @ConfigOption(name = "Chat Messages", desc = "")
     @Accordion
-    var chat: HoppityChatConfig = HoppityChatConfig()
+    val chat: HoppityChatConfig = HoppityChatConfig()
 
     @Expose
     @ConfigOption(name = "Egg Waypoints", desc = "")
     @Accordion
-    var waypoints: HoppityWaypointsConfig = HoppityWaypointsConfig()
+    val waypoints: HoppityWaypointsConfig = HoppityWaypointsConfig()
 
     @Expose
     @ConfigOption(name = "Unclaimed Eggs", desc = "")
     @Accordion
-    var unclaimedEggs: HoppityUnclaimedEggsConfig = HoppityUnclaimedEggsConfig()
+    val unclaimedEggs: HoppityUnclaimedEggsConfig = HoppityUnclaimedEggsConfig()
 
     @Expose
     @ConfigOption(

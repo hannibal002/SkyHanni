@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
@@ -51,6 +52,8 @@ object ItemTipHelper {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         GlStateManager.disableBlend()
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(0f, 0f, 300f)
         for (slot in gui.inventorySlots.inventorySlots) {
             val stack = slot.stack ?: continue
 
@@ -67,8 +70,9 @@ object ItemTipHelper {
             } else 0
             val y = guiTop + yDisplayPosition + 9 + itemTipEvent.offsetY
 
-            GuiRenderUtils.drawString(stackTip, x, y, 16777215)
+            GuiRenderUtils.drawString(stackTip, x, y, -1)
         }
+        DrawContextUtils.popMatrix()
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
     }

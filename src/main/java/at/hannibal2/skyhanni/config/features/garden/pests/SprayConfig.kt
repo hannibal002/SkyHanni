@@ -25,7 +25,7 @@ class SprayConfig {
 
     @Expose
     @ConfigLink(owner = SprayConfig::class, field = "pestWhenSelector")
-    var position: Position = Position(315, -200, 2.3f)
+    val position: Position = Position(315, -200, 2.3f)
 
     @Expose
     @ConfigOption(name = "Spray Display", desc = "Show the active spray and duration for your current plot.")
@@ -50,5 +50,5 @@ class SprayConfig {
 
     @Expose
     @ConfigLink(owner = SprayConfig::class, field = "displayEnabled")
-    var displayPosition: Position = Position(390, 75)
+    val displayPosition: Position = Position(390, 75)
 }

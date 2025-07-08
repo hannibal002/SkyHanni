@@ -21,10 +21,10 @@ class CenturyPartyInvitationConfig {
     @Expose
     @ConfigOption(name = "Can Invite", desc = "Color for players you can invite.")
     @ConfigEditorColour
-    var canColor: Property<String> = Property.of("0:1:85:255:85")
+    val canColor: Property<String> = Property.of("0:1:85:255:85")
 
     @Expose
     @ConfigOption(name = "No invitation", desc = "Color for players you can't invite.")
     @ConfigEditorColour
-    var canNotColor: Property<String> = Property.of("0:1:76:76:76")
+    val canNotColor: Property<String> = Property.of("0:1:76:76:76")
 }

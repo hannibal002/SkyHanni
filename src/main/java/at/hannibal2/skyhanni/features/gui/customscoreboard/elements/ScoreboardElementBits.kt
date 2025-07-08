@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlinx.coroutines.Job
 
 // internal
@@ -34,7 +34,7 @@ object ScoreboardElementBits : ScoreboardElement(), CustomScoreboardNumberTracki
 
     override val elementPatterns = listOf(BitsApi.bitsScoreboardPattern)
 
-    override fun showIsland() = !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
+    override fun showIsland() = !SkyBlockUtils.inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 }
 
 // click: open /sbmenu

@@ -3,7 +3,10 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -11,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -55,17 +57,32 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             if (isHidden != null) sharedData.modify { it.items[internalName]?.hidden = isHidden }
         }
 
-        if (command) {
-            TrackerManager.commandEditTrackerSuccess = true
-            val displayName = internalName.repoItemName
-            if (amount > 0) {
-                ChatUtils.chat("Manually added to $name: §r$displayName §7(${amount}x§7)")
-            } else {
-                ChatUtils.chat("Manually removed from $name: §r$displayName §7(${-amount}x§7)")
-            }
-            return
-        }
+        if (command) logCommandAdd(internalName, amount)
         handlePossibleRareDrop(internalName, amount, message)
+    }
+
+    open fun ItemAddEvent.addItemFromEvent() {
+        val command = source == ItemAddManager.Source.COMMAND
+        modify { data ->
+            data.addItem(internalName, amount, command)
+            logCompletedAddEvent()
+        }
+    }
+
+    fun logCommandAdd(internalName: NeuInternalName, amount: Int) {
+        val displayName = internalName.repoItemName
+        val message = if (amount > 0) {
+            "Manually added to $name: §r$displayName §7(${amount}x§7)"
+        } else {
+            "Manually removed from $name: §r$displayName §7(${-amount}x§7)"
+        }
+        ChatUtils.chat(message)
+    }
+
+    fun ItemAddEvent.logCompletedAddEvent() {
+        if (source != ItemAddManager.Source.COMMAND) return
+        TrackerManager.commandEditTrackerSuccess = true
+        logCommandAdd(internalName, amount)
     }
 
     private fun NeuInternalName.getCleanName(
@@ -95,7 +112,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         },
         itemHider: (NeuInternalName, Boolean) -> Unit = { item, currentlyHidden ->
             modify {
-                it.items[item]?.hidden = !currentlyHidden
+                it.toggleItemHide(item, currentlyHidden)
             }
         },
         getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String> = { internalName, item ->
@@ -150,6 +167,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
                 onLeftClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
+                    // TODO remove unnecessary update call, as both invokes above call the modify fun. in modify there is also a update call
                     update()
                 },
             ) else Renderable.string(string)
@@ -213,7 +231,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         add("§7to edit the number.")
         add("§7Use negative numbers to remove items.")
 
-        if (LorenzUtils.debug) {
+        if (SkyHanniDebugsAndTests.enabled) {
             add("")
             add("§7$internalName")
         }

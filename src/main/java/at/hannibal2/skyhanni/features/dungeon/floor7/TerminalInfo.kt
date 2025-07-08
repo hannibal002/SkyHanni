@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 
 private typealias BossPhase = DungeonBossApi.DungeonBossPhase
@@ -42,7 +46,18 @@ enum class TerminalInfo(val location: LorenzVec, val phase: BossPhase, val text:
 
     var highlight: Boolean = true
 
+    @SkyHanniModule
     companion object {
+
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+            event.registerBrigadier("shresetterminal") {
+                description = "Resets terminal highlights in F7."
+                category = CommandCategory.USERS_RESET
+                simpleCallback { TerminalInfo.resetTerminals() }
+            }
+        }
+
         fun resetTerminals() = entries.forEach { it.highlight = true }
 
         fun getClosestTerminal(input: LorenzVec): TerminalInfo? {
