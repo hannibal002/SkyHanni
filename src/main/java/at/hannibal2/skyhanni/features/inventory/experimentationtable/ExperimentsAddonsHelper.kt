@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -44,7 +43,6 @@ object ExperimentsAddonsHelper {
     private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
 
     private var chronHasBeenEmpty: Boolean = false
-    private var lastUserClickChron: LorenzColor? = null
     private var lastChronomatronSound: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentAddonPhase: HelperPhase? = null
     private var chronomatronSequenceIndex: Int = 0
@@ -97,8 +95,8 @@ object ExperimentsAddonsHelper {
         currentUltraSequencerRound = 0
         chronomatronSequenceIndex = 0
         lastChronomatronSound = SimpleTimeMark.farPast()
-        lastUserClickChron = null
         currentAddonPhase = null
+        chronHasBeenEmpty = false
     }
 
     private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (displayName.removeColor()) {
@@ -167,7 +165,6 @@ object ExperimentsAddonsHelper {
         } ?: return cancel()
         userChronomatronProgress.add(clickedColor)
         makePickblock()
-        lastUserClickChron = clickedColor
     }
 
     private fun GuiContainerEvent.SlotClickEvent.handleUltrasequencerClick() {
@@ -244,57 +241,38 @@ object ExperimentsAddonsHelper {
     private fun InventoryUpdatedEvent.readNextChronomatron(oldPhase: HelperPhase? = null) {
         currentChronomatronRound = readChronomatronRoundOrNull() ?: return
         val hypixelSizeNow = hypixelChronomatronData.size
-
-        val shouldReadLastReplicate = oldPhase == HelperPhase.READ || hypixelSizeNow < currentChronomatronRound
-        val isReadingReady = oldPhase == null || oldPhase == HelperPhase.READ
-        val shouldEarlyReturn = when {
-            currentAddonPhase == HelperPhase.REPLICATE -> !shouldReadLastReplicate
-            currentAddonPhase == HelperPhase.READ -> !isReadingReady
-            else -> true
-        }
-        if (shouldEarlyReturn) return
+        val userSizeNow = userChronomatronProgress.size
 
         val activeColors = inventoryItems.values.filter {
             nextChronomatronItemPattern.matches(it.item.getIdentifierString())
         }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
-        val emptyScreen = activeColors.isEmpty()
 
-        if (emptyScreen && lastUserClickChron != null) lastUserClickChron = null
-        chronHasBeenEmpty = if (emptyScreen) true
-        else if (!chronHasBeenEmpty) {
-            ChatUtils.debug("WEE WOO WEE WOO BAD!! Double detection being skipped.")
-            return
-        } else false
-
-
-        if (lastUserClickChron != null) return
-
-        if (userChronomatronProgress.size < hypixelSizeNow) {
-            ChatUtils.debug("User chronomatron progress is not complete, returning early")
-            return
-        }
-
-        ChatUtils.debug("Active colors: $activeColors")
+        chronHasBeenEmpty = if (activeColors.isEmpty()) true
+        else if (!chronHasBeenEmpty) return
+        else false
 
         val clickedColor = activeColors.firstOrNull { itemColor ->
             val expectedColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex)
             expectedColor == null || itemColor == expectedColor
         } ?: return
 
+        val shouldReadLastReplicate = oldPhase == HelperPhase.READ || hypixelSizeNow < currentChronomatronRound
+        val isReadingReady = oldPhase == null || oldPhase == HelperPhase.READ
+        val shouldNotReadYet = when (currentAddonPhase) {
+            HelperPhase.REPLICATE -> !shouldReadLastReplicate
+            HelperPhase.READ -> !isReadingReady
+            else -> userSizeNow < hypixelSizeNow || // User hasn't progressed enough
+                lastChronomatronSound.isFarPast() && chronomatronSequenceIndex != 0 // Last sound was too long ago
+        }
+        if (shouldNotReadYet) return
+
         // Only record if we're exactly at the next slot, otherwise increment the index
         if (chronomatronSequenceIndex == hypixelSizeNow) {
-            if (lastChronomatronSound.isFarPast() && chronomatronSequenceIndex != 0) {
-                ChatUtils.debug("Ignoring color $clickedColor due to no sound")
-                return
-            }
             hypixelChronomatronData.add(clickedColor)
             lastChronomatronSound = SimpleTimeMark.farPast()
             chronomatronSequenceIndex = 0
             userChronomatronProgress.clear()
-        } else {
-            ChatUtils.debug("Ignoring color $clickedColor due to already being at index $chronomatronSequenceIndex")
-            chronomatronSequenceIndex++
-        }
+        } else chronomatronSequenceIndex++
     }
 
     private data class UltraSequencerSlot(
