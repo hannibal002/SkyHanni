@@ -201,7 +201,7 @@ object BazaarApi {
                 if (item.getLore().contains("Click to sell!")) {
                     for (line in item.getLore()) {
                         taxPattern.matchMatcher(line) {
-                            storage?.taxRate = group("tax").formatDouble()
+                            taxRate = group("tax").formatDouble()
                         }
                     }
                 }
