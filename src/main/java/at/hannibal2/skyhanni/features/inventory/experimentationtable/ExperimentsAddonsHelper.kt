@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ExperimentsAddonsHelper {
@@ -150,14 +151,12 @@ object ExperimentsAddonsHelper {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
-        // todo ?
         if (!config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
         event.handleChronomatronClick()
         event.handleUltrasequencerClick()
     }
 
     private fun GuiContainerEvent.SlotClickEvent.handleChronomatronClick() {
-        if (lastChronomatronSound.isFarPast()) return cancel()
         if (!ExperimentationTableApi.inChronomatron || slot == null) return
         if (userChronomatronProgress.size == hypixelChronomatronData.size) return
         val clickedColor = item?.getLorenzColorOrNull()?.takeIf {
