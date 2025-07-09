@@ -25,7 +25,14 @@ class DrawContext {
     }
 
     fun enableScissor(left: Int, top: Int, right: Int, bottom: Int) {
-        GlScissorStack.push(left, top, right, bottom, ScaledResolution(Minecraft.getMinecraft()))
+        GlScissorStack.push(
+            left,
+            top,
+            right,
+            bottom,
+            ScaledResolution(Minecraft.getMinecraft()),
+            false, // bypassInclusion
+        )
     }
 
     fun disableScissor() {

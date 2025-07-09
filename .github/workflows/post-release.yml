@@ -1,0 +1,67 @@
+name: Post-Release
+
+on:
+#    release:
+#        types:
+#            - published
+
+    workflow_dispatch:
+        inputs:
+            update_version:
+                description: 'Tag name of the release'
+                required: true
+
+env:
+    UPDATE_VERSION: ${{ inputs.update_version || github.event.release.tag_name }}
+    REPO: ${{ github.repository }}
+    MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+
+jobs:
+    post-publish:
+        if: github.repository_id == '511310721'
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+
+            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Download release file
+                env:
+                    GITHUB_TOKEN: ${{ github.token }}
+                run: |
+                    mkdir -p build/downloadedJars
+                    gh release download "${UPDATE_VERSION}" -p '*.jar' --repo "${REPO}"
+                    mv *.jar build/downloadedJars/
+
+            -   name: List all files in build/downloadedJars
+                run: ls -la build/downloadedJars
+
+            -   name: Get changelog from release tag
+                id: get_changelog
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    release_info=$(gh release view "${UPDATE_VERSION}" --repo "${REPO}" --json body -q .body)
+                    echo "changelog<<EOF" >> $GITHUB_OUTPUT
+                    echo "$release_info" >> $GITHUB_OUTPUT
+                    echo "EOF" >> $GITHUB_OUTPUT
+
+            -   name: Print environment variables
+                run: |
+                    echo "UPDATE_VERSION=${UPDATE_VERSION}"
+                    echo "REPO=${REPO}"
+                    echo "CHANGELOG=${{ steps.get_changelog.outputs.changelog }}"
+
+            -   name: Build Shared Variables Submodule
+                run: ./gradlew :sharedVariables:build
+
+            -   name: Publish to Modrinth
+                run: ./gradlew publishToModrinth \
+                    -Pchangelog="${{ steps.get_changelog.outputs.changelog }}" \
+                    -PmodVersion="${UPDATE_VERSION}" \
+                    -PmodrinthToken="${MODRINTH_TOKEN}"

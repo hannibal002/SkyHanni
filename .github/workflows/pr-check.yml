@@ -23,12 +23,13 @@ jobs:
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
-            -   name: Run ChangeLog verification
+            -   name: Run ChangeLog verification w/retry
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
                     PR_BODY: ${{ github.event.pull_request.body }}
-                run: |
-                    ./gradlew checkPrDescription -PprTitle="${PR_TITLE}" -PprBody="${PR_BODY}"
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: checkPrDescription -PprTitle="${PR_TITLE}" -PprBody="${PR_BODY}"
 
             -   name: Add label if changelog verification fails
                 if: failure()
