@@ -272,6 +272,7 @@ object IslandGraphs {
             return
         }
 
+        // todo don't use RepoUtils.getConstant here
         val graph = RepoUtils.getConstant(RepoManager.repoFileLocation, constant, Graph.gson, Graph::class.java)
         IslandAreas.display = null
         setNewGraph(graph)

@@ -29,7 +29,6 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
 import java.io.File
-import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 import java.security.KeyStore
 import java.util.zip.GZIPInputStream
@@ -250,7 +249,6 @@ object ApiUtils {
      * @param apiIntention The Api intention to execute, containing the request and Api name.
      * @param silentError If true, the error will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @param exceptionHandler The function to handle exceptions, must return an ApiResponse of type [R].
-     * @param entityHandler The function to handle the HttpEntity, must return the parsed data of type [T] or null.
      * @return An [R] (ApiResponse subtype) indicating success or failure, with populated data where applicable.
      */
     @PublishedApi
@@ -258,7 +256,6 @@ object ApiUtils {
         apiIntention: ApiIntentionContext,
         silentError: Boolean = true,
         exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> R,
-        entityHandler: (HttpEntity?) -> T?,
         responseHandler: (CloseableHttpResponse) -> R
     ): R = runCatching {
         httpClient.execute(apiIntention.request).use(responseHandler)
@@ -276,6 +273,7 @@ object ApiUtils {
      * @param silentError If true, the error will not be logged unless debugConfig.apiUtilsNeverSilent is true.
      * @param exceptionHandler The function to handle exceptions, must return a ZipApiResponse.
      * @param entityHandler The function to handle the HttpEntity, must return the number of bytes written to the file or null.
+     * @return A [ZipApiResponse] indicating success or failure, with the number of bytes written to the file if successful.
      */
     private fun withZipHttpClient(
         file: File,
@@ -283,13 +281,13 @@ object ApiUtils {
         silentError: Boolean = true,
         exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> ZipApiResponse = ::defaultZIPExceptionHandler,
         entityHandler: (HttpEntity?) -> Long? = { it.readEntityToFile(file) },
-    ): ZipApiResponse = withHttpClient(apiIntention, silentError, exceptionHandler, entityHandler) { resp ->
+    ): ZipApiResponse = withHttpClient(apiIntention, silentError, exceptionHandler) { resp ->
         apiIntention.response = resp
         if (resp.statusLine.statusCode !in 200..299)
             throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)
         val entity = resp.getEntityOrNull()
-        val bytesWritten = entityHandler.invoke(entity) ?:
-            throw HttpResponseException(resp.statusLine.statusCode, "No content in response")
+        val bytesWritten = entityHandler.invoke(entity)
+            ?: throw HttpResponseException(resp.statusLine.statusCode, "No content in response")
         ZipApiResponse(true, "OK", bytesWritten)
     }
 
@@ -311,7 +309,7 @@ object ApiUtils {
         silentError: Boolean = true,
         exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> JsonApiResponse<T> = ::defaultJSONExceptionHandler,
         entityHandler: (HttpEntity?) -> T? = { it.readEntityJsonResponse() },
-    ): JsonApiResponse<T> = withHttpClient(apiIntention, silentError, exceptionHandler, entityHandler) { resp ->
+    ): JsonApiResponse<T> = withHttpClient(apiIntention, silentError, exceptionHandler) { resp ->
         apiIntention.response = resp
         if (resp.statusLine.statusCode !in 200..299)
             throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)

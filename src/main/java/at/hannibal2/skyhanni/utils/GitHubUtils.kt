@@ -2,19 +2,15 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.io.File
 import java.time.Instant
 
 object GitHubUtils {
-
-    abstract class GenericRepoLocationConfig() {
-        abstract var user: String
-        abstract var name: String
-        abstract var branch: String
-    }
 
     /**
      * Represents the location of a GitHub repository.
@@ -29,9 +25,9 @@ object GitHubUtils {
         val branch: String = "main",
         private val shouldError: Boolean = false,
     ) {
-        constructor(config: GenericRepoLocationConfig, shouldError: Boolean = false): this(
+        constructor(config: AbstractRepoLocationConfig, shouldError: Boolean = false) : this(
             config.user,
-            config.name,
+            config.repoName,
             config.branch,
             shouldError,
         )
@@ -46,8 +42,9 @@ object GitHubUtils {
             }
             _internalSha
         }
-        val apiName = "GitHub - $user/$repo/$branch"
-        val commitApiUrl: String = "https://api.github.com/repos/$user/$repo/commits/$branch"
+        val location = "$user/$repo/$branch"
+        private val apiName = "GitHub - $location"
+        private val commitApiUrl: String = "https://api.github.com/repos/$user/$repo/commits/$branch"
 
         suspend fun getLatestCommit(silentError: Boolean = true): CommitsApiResponse? {
             val jsonResponse = ApiUtils.getJSONResponse(commitApiUrl, apiName, silentError) ?: return null
@@ -70,77 +67,72 @@ object GitHubUtils {
         }
     }
 
-    @KSerializable
     data class CommitsApiResponse(
-        val sha: String,
-        @SerializedName("node_id") val nodeId: String,
-        val commit: Commit,
-        val url: String,
-        @SerializedName("html_url") val htmlUrl: String,
-        @SerializedName("comments_url") val commentsUrl: String,
-        val author: CommitAuthor,
-        val committer: CommitAuthor,
-        val parents: List<CommitTree>,
-        val stats: CommitStats,
-        val files: List<CommitFile>,
+        @Expose val sha: String,
+        @Expose @field:SerializedName("node_id") val nodeId: String,
+        @Expose val commit: Commit,
+        @Expose val url: String,
+        @Expose @field:SerializedName("html_url") val htmlUrl: String,
+        @Expose @field:SerializedName("comments_url") val commentsUrl: String,
+        @Expose val author: CommitAuthor,
+        @Expose val committer: CommitAuthor,
+        @Expose val parents: List<CommitTree>,
+        @Expose val stats: CommitStats,
+        @Expose val files: List<CommitFile>,
     )
 
     data class Commit(
-        val author: ShortCommitAuthor,
-        val committer: ShortCommitAuthor,
-        val message: String,
-        val tree: CommitTree,
-        val url: String,
-        @SerializedName("comment_count") val commentCount: Int,
-        val verification: CommitVerification,
+        @Expose val author: ShortCommitAuthor,
+        @Expose val committer: ShortCommitAuthor,
+        @Expose val message: String,
+        @Expose val tree: CommitTree,
+        @Expose val url: String,
+        @Expose @field:SerializedName("comment_count") val commentCount: Int,
+        @Expose val verification: CommitVerification,
     )
 
-    @KSerializable
     data class ShortCommitAuthor(
-        val name: String,
-        val email: String,
-        @SerializedName("date") private val dateString: String,
+        @Expose val name: String,
+        @Expose val email: String,
+        @Expose @field:SerializedName("date") private val dateString: String,
     ) {
         val date: SimpleTimeMark get() = Instant.parse(dateString).toEpochMilli().asTimeMark()
     }
 
-    @KSerializable
     data class CommitAuthor(
-        val login: String,
-        val id: Int,
-        @SerializedName("node_id") val nodeId: String,
-        @SerializedName("avatar_url") val avatarUrl: String,
-        @SerializedName("gravatar_id") val gravatarId: String,
-        val url: String,
-        @SerializedName("html_url") val htmlUrl: String,
-        @SerializedName("followers_url") val followersUrl: String,
-        @SerializedName("following_url") val followingUrl: String,
-        @SerializedName("gists_url") val gistsUrl: String,
-        @SerializedName("starred_url") val starredUrl: String,
-        @SerializedName("subscriptions_url") val subscriptionsUrl: String,
-        @SerializedName("organizations_url") val organizationsUrl: String,
-        @SerializedName("repos_url") val reposUrl: String,
-        @SerializedName("events_url") val eventsUrl: String,
-        @SerializedName("received_events_url") val receivedEventsUrl: String,
-        val type: String,
-        @SerializedName("user_view_type") val userViewType: String,
-        @SerializedName("site_admin") val siteAdmin: Boolean,
+        @Expose val login: String,
+        @Expose val id: Int,
+        @Expose @field:SerializedName("node_id") val nodeId: String,
+        @Expose @field:SerializedName("avatar_url") val avatarUrl: String,
+        @Expose @field:SerializedName("gravatar_id") val gravatarId: String,
+        @Expose val url: String,
+        @Expose @field:SerializedName("html_url") val htmlUrl: String,
+        @Expose @field:SerializedName("followers_url") val followersUrl: String,
+        @Expose @field:SerializedName("following_url") val followingUrl: String,
+        @Expose @field:SerializedName("gists_url") val gistsUrl: String,
+        @Expose @field:SerializedName("starred_url") val starredUrl: String,
+        @Expose @field:SerializedName("subscriptions_url") val subscriptionsUrl: String,
+        @Expose @field:SerializedName("organizations_url") val organizationsUrl: String,
+        @Expose @field:SerializedName("repos_url") val reposUrl: String,
+        @Expose @field:SerializedName("events_url") val eventsUrl: String,
+        @Expose @field:SerializedName("received_events_url") val receivedEventsUrl: String,
+        @Expose val type: String,
+        @Expose @field:SerializedName("user_view_type") val userViewType: String,
+        @Expose @field:SerializedName("site_admin") val siteAdmin: Boolean,
     )
 
-    @KSerializable
     data class CommitTree(
-        val sha: String,
-        val url: String,
-        @SerializedName("html_url") val htmlUrl: String? = null,
+        @Expose val sha: String,
+        @Expose val url: String,
+        @Expose @field:SerializedName("html_url") val htmlUrl: String? = null,
     )
 
-    @KSerializable
     data class CommitVerification(
-        val verified: Boolean,
-        val reason: String,
-        val signature: String? = null,
-        val payload: String? = null,
-        @SerializedName("verified_at") private val verifiedAtString: String? = null,
+        @Expose val verified: Boolean,
+        @Expose val reason: String,
+        @Expose val signature: String? = null,
+        @Expose val payload: String? = null,
+        @Expose @field:SerializedName("verified_at") private val verifiedAtString: String? = null,
     ) {
         val verifiedAt: SimpleTimeMark? get() = verifiedAtString?.let {
             Instant.parse(it).toEpochMilli().asTimeMark()
@@ -148,22 +140,22 @@ object GitHubUtils {
     }
 
     data class CommitStats(
-        val total: Long,
-        val additions: Long,
-        val deletions: Long,
+        @Expose val total: Long,
+        @Expose val additions: Long,
+        @Expose val deletions: Long,
     )
 
     data class CommitFile(
-        val sha: String,
-        val filename: String,
-        val status: String,
-        val additions: Int,
-        val deletions: Int,
-        val changes: Int,
-        @SerializedName("blob_url") val blobUrl: String,
-        @SerializedName("raw_url") val rawUrl: String,
-        @SerializedName("contents_url") val contentsUrl: String,
-        @SerializedName("patch") val patch: String,
+        @Expose val sha: String,
+        @Expose val filename: String,
+        @Expose val status: String,
+        @Expose val additions: Int,
+        @Expose val deletions: Int,
+        @Expose val changes: Int,
+        @Expose @field:SerializedName("blob_url") val blobUrl: String,
+        @Expose @field:SerializedName("raw_url") val rawUrl: String,
+        @Expose @field:SerializedName("contents_url") val contentsUrl: String,
+        @Expose @field:SerializedName("patch") val patch: String,
     )
 
 }

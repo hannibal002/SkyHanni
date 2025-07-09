@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -57,17 +56,8 @@ object RepoManager {
     }
 
     fun getRepoLocation(): String {
-        return "${config.location.user}/${config.location.name}/${config.location.branch}"
+        return "${config.location.user}/${config.location.repoName}/${config.location.branch}"
     }
-
-    private const val DEFAULT_USER = "hannibal002"
-    private const val DEFAULT_NAME = "SkyHanni-REPO"
-    private const val DEFAULT_BRANCH = "main"
-
-    fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
-        user.lowercase() == DEFAULT_USER.lowercase() &&
-            name.lowercase() == DEFAULT_NAME.lowercase() &&
-            branch.lowercase() == DEFAULT_BRANCH.lowercase()
 
     fun initRepo() {
         shouldManuallyReload = true
@@ -117,11 +107,12 @@ object RepoManager {
         }
     }
 
-    private suspend fun fetchRepository(command: Boolean, silentError: Boolean = true) {
-        if (currentlyFetching) return
+    private suspend fun fetchRepository(command: Boolean, silentError: Boolean = true): Boolean? {
+        if (currentlyFetching) return null
         currentlyFetching = true
-        fetchAndUnpackRepo(command, silentError)
+        val success = fetchAndUnpackRepo(command, silentError)
         currentlyFetching = false
+        return success
     }
 
     // todo this is basically entirely duplicated with EnoughUpdatesRepo.kt, refactor
@@ -338,9 +329,7 @@ object RepoManager {
                 return
             }
 
-            user = DEFAULT_USER
-            name = DEFAULT_NAME
-            branch = DEFAULT_BRANCH
+            reset()
             if (manual) {
                 ChatUtils.clickableChat(
                     "Reset Repo settings to default. " +
@@ -355,7 +344,7 @@ object RepoManager {
     }
 
     private fun checkRepoLocation() {
-        if (config.location.run { user.isEmpty() || name.isEmpty() || branch.isEmpty() }) {
+        if (config.location.run { user.isEmpty() || repoName.isEmpty() || branch.isEmpty() }) {
             ChatUtils.userError("Invalid Repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }

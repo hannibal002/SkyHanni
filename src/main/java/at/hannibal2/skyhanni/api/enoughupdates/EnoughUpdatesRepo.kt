@@ -60,14 +60,14 @@ object EnoughUpdatesRepo {
     private const val DEFAULT_BRANCH = "master"
 
     fun hasDefaultRepositoryLocation(): Boolean =
-        config.location.user == DEFAULT_USER && config.location.name == DEFAULT_NAME && config.location.branch == DEFAULT_BRANCH
+        config.location.user == DEFAULT_USER && config.location.repoName == DEFAULT_NAME && config.location.branch == DEFAULT_BRANCH
 
     fun getRepoLocation(): String {
-        return "${config.location.user}/${config.location.name}/${config.location.branch}"
+        return "${config.location.user}/${config.location.repoName}/${config.location.branch}"
     }
 
     private fun checkRepoLocation() {
-        if (config.run { location.user.isEmpty() || location.name.isEmpty() || location.branch.isEmpty() }) {
+        if (config.run { location.user.isEmpty() || location.repoName.isEmpty() || location.branch.isEmpty() }) {
             ChatUtils.chat("Invalid NEU Repo settings detected, resetting default settings.")
             resetRepoLocation()
         }
@@ -79,7 +79,7 @@ object EnoughUpdatesRepo {
             ChatUtils.chat("NEU Repo location is already set to default.")
         }
         config.location.user = DEFAULT_USER
-        config.location.name = DEFAULT_NAME
+        config.location.repoName = DEFAULT_NAME
         config.location.branch = DEFAULT_BRANCH
 
         if (manual) {

@@ -104,9 +104,4 @@ object RepoUtils {
             }
         }
     }
-
-    @JvmStatic
-    fun resetRepoLocation() {
-        RepoManager.resetRepositoryLocation(manual = true)
-    }
 }

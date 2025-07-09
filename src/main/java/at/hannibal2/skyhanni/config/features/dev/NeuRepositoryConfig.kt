@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo
-import at.hannibal2.skyhanni.utils.GitHubUtils
+import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -30,7 +30,7 @@ class NeuRepositoryConfig {
     @Accordion
     val location: RepositoryLocation = RepositoryLocation()
 
-    class RepositoryLocation : GitHubUtils.GenericRepoLocationConfig() {
+    class RepositoryLocation : AbstractRepoLocationConfig() {
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your NEU repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
         val resetRepoLocation: Runnable = Runnable { EnoughUpdatesRepo.resetRepoLocation() }
@@ -43,11 +43,15 @@ class NeuRepositoryConfig {
         @Expose
         @ConfigOption(name = "Repository Name", desc = "The Repository Name, default: NotEnoughUpdates-REPO")
         @ConfigEditorText
-        override var name: String = "NotEnoughUpdates-REPO"
+        override var repoName: String = "NotEnoughUpdates-REPO"
 
         @Expose
         @ConfigOption(name = "Repository Branch", desc = "The Repository Branch, default: master")
         @ConfigEditorText
         override var branch: String = "master"
+
+        @Transient override val defaultUser = "NotEnoughUpdates"
+        @Transient override val defaultRepoName = "NotEnoughUpdates-REPO"
+        @Transient override val defaultBranch = "master"
     }
 }
