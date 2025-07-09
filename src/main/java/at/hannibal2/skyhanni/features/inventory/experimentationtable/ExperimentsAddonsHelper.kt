@@ -43,6 +43,7 @@ object ExperimentsAddonsHelper {
     private val userUltrasequencerProgress: MutableList<Int> = mutableListOf()
     private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
 
+    private var lastUserClickChron: LorenzColor? = null
     private var lastChronomatronSound: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentAddonPhase: HelperPhase? = null
     private var chronomatronSequenceIndex: Int = 0
@@ -94,6 +95,8 @@ object ExperimentsAddonsHelper {
         currentChronomatronRound = 0
         currentUltraSequencerRound = 0
         chronomatronSequenceIndex = 0
+        lastChronomatronSound = SimpleTimeMark.farPast()
+        lastUserClickChron = null
         currentAddonPhase = null
     }
 
@@ -164,6 +167,7 @@ object ExperimentsAddonsHelper {
         userChronomatronProgress.add(clickedColor)
         ChatUtils.debug("Added color $clickedColor to user chronomatron progress")
         makePickblock()
+        lastUserClickChron = clickedColor
     }
 
     private fun GuiContainerEvent.SlotClickEvent.handleUltrasequencerClick() {
@@ -254,6 +258,9 @@ object ExperimentsAddonsHelper {
             nextChronomatronItemPattern.matches(it.item.getIdentifierString())
         }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
 
+        if (activeColors.isEmpty() && lastUserClickChron != null) lastUserClickChron = null
+        if (lastUserClickChron != null) return
+
         ChatUtils.debug("Active colors: $activeColors")
 
         val clickedColor = activeColors.firstOrNull { itemColor ->
@@ -311,6 +318,9 @@ object ExperimentsAddonsHelper {
     // </editor-fold>
 
     // <editor-fold desc="Debugging">
+    private fun formatColorSet(list: List<LorenzColor>): String =
+        list.joinToString(", ") { it.toString().substring(0, 3) }
+
     init {
         RenderDisplayHelper(
             inventory = ExperimentationTableApi.experimentationTableInventory,
@@ -321,19 +331,19 @@ object ExperimentsAddonsHelper {
                     buildList {
                         addString("Current Addon Phase: $currentAddonPhase")
                         if (ExperimentationTableApi.inChronomatron) {
-                            addString("Current Chronomatron Round: $currentChronomatronRound")
-                            addString("Current Chronomatron Sequence Index: $chronomatronSequenceIndex")
+                            addString("Current Round: $currentChronomatronRound")
+                            addString("Current Sequence Index: $chronomatronSequenceIndex")
                             addString("")
-                            addString("Hypixel Chronomatron Data: $hypixelChronomatronData")
-                            addString("User Chronomatron Progress: $userChronomatronProgress")
+                            addString("Hypixel Data: ${formatColorSet(hypixelChronomatronData)}")
+                            addString("User Progress: ${formatColorSet(userChronomatronProgress)}")
                             addString("")
-                            addString("Last Chronomatron Sound: $lastChronomatronSound")
+                            addString("Last Sound: $lastChronomatronSound")
                         } else if (ExperimentationTableApi.inUltrasequencer) {
-                            addString("Current Ultrasequencer Round: $currentUltraSequencerRound")
+                            addString("Current Round: $currentUltraSequencerRound")
                             addString("")
-                            addString("Hypixel Ultrasequencer Data: $hypixelUltrasequencerData")
-                            addString("User Ultrasequencer Progress: $userUltrasequencerProgress")
-                            addString("Ultrasequencer Dye Map: $ultrasequencerDyeMap")
+                            addString("Hypixel Data: $hypixelUltrasequencerData")
+                            addString("User Progress: $userUltrasequencerProgress")
+                            addString("Dye Map: $ultrasequencerDyeMap")
                         } else return@buildList
                     }
                 )
