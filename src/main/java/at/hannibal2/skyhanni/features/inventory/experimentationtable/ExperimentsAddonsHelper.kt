@@ -243,12 +243,13 @@ object ExperimentsAddonsHelper {
 
     private fun InventoryUpdatedEvent.readNextChronomatron(oldPhase: HelperPhase? = null) {
         currentChronomatronRound = readChronomatronRoundOrNull() ?: return
+        val hypixelSizeNow = hypixelChronomatronData.size
 
-        val shouldReadLastReplicate = oldPhase == HelperPhase.READ || hypixelChronomatronData.size < currentChronomatronRound
+        val shouldReadLastReplicate = oldPhase == HelperPhase.READ || hypixelSizeNow < currentChronomatronRound
         val isReadingReady = oldPhase == null || oldPhase == HelperPhase.READ
-        val shouldEarlyReturn = when (currentAddonPhase) {
-            HelperPhase.REPLICATE -> !shouldReadLastReplicate
-            HelperPhase.READ -> !isReadingReady
+        val shouldEarlyReturn = when {
+            currentAddonPhase == HelperPhase.REPLICATE -> !shouldReadLastReplicate
+            currentAddonPhase == HelperPhase.READ -> !isReadingReady
             else -> true
         }
         if (shouldEarlyReturn) return
@@ -258,16 +259,17 @@ object ExperimentsAddonsHelper {
         }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
         val emptyScreen = activeColors.isEmpty()
 
-        if (emptyScreen) chronHasBeenEmpty = true
+        if (emptyScreen && lastUserClickChron != null) lastUserClickChron = null
+        chronHasBeenEmpty = if (emptyScreen) true
         else if (!chronHasBeenEmpty) {
             ChatUtils.debug("WEE WOO WEE WOO BAD!! Double detection being skipped.")
             return
-        }
+        } else false
 
-        if (emptyScreen && lastUserClickChron != null) lastUserClickChron = null
+
         if (lastUserClickChron != null) return
 
-        if (userChronomatronProgress.size < hypixelChronomatronData.size) {
+        if (userChronomatronProgress.size < hypixelSizeNow) {
             ChatUtils.debug("User chronomatron progress is not complete, returning early")
             return
         }
@@ -280,7 +282,7 @@ object ExperimentsAddonsHelper {
         } ?: return
 
         // Only record if we're exactly at the next slot, otherwise increment the index
-        if (chronomatronSequenceIndex == hypixelChronomatronData.size) {
+        if (chronomatronSequenceIndex == hypixelSizeNow) {
             if (lastChronomatronSound.isFarPast() && chronomatronSequenceIndex != 0) {
                 ChatUtils.debug("Ignoring color $clickedColor due to no sound")
                 return
@@ -343,8 +345,11 @@ object ExperimentsAddonsHelper {
                             addString("Current Round: $currentChronomatronRound")
                             addString("Current Sequence Index: $chronomatronSequenceIndex")
                             addString("")
-                            addString("Hypixel Data: ${formatColorSet(hypixelChronomatronData)}")
-                            addString("User Progress: ${formatColorSet(userChronomatronProgress)}")
+                            addString("Hypixel Data:")
+                            addString(formatColorSet(hypixelChronomatronData))
+                            addString("")
+                            addString("User Progress:")
+                            addString(formatColorSet(userChronomatronProgress))
                             addString("")
                             addString("Last Sound: $lastChronomatronSound")
                         } else if (ExperimentationTableApi.inUltrasequencer) {
