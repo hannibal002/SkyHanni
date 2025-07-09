@@ -4,21 +4,26 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -29,6 +34,7 @@ object ExperimentsAddonsHelper {
     private const val ROUND_STATUS_SLOT = 4
     private const val PHASE_STATUS_SLOT = 49
 
+    private val debugConfig get() = SkyHanniMod.feature.dev.debug
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.addons
     private val hypixelChronomatronData: MutableList<LorenzColor> = mutableListOf()
     private val userChronomatronProgress: MutableList<LorenzColor> = mutableListOf()
@@ -36,7 +42,7 @@ object ExperimentsAddonsHelper {
     private val userUltrasequencerProgress: MutableList<Int> = mutableListOf()
     private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
 
-    private var lastChronomatronLevelUp: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastChronomatronSound: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentAddonPhase: HelperPhase? = null
     private var chronomatronSequenceIndex: Int = 0
     var currentChronomatronRound: Int = 0
@@ -143,7 +149,7 @@ object ExperimentsAddonsHelper {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
-        if (!config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
+        if (!config.preventMisclicks) return
         event.handleChronomatronClick()
         event.handleUltrasequencerClick()
     }
@@ -201,7 +207,7 @@ object ExperimentsAddonsHelper {
         if (!ExperimentationTableApi.inChronomatron) return
         // This sound indicates when the player has finished a round in chronomatron
         if (event.soundName != "random.levelup" || event.pitch != 1.7619047f || event.volume != 0.7f) return
-        lastChronomatronLevelUp = SimpleTimeMark.now()
+        lastChronomatronSound = SimpleTimeMark.now()
     }
 
     @HandleEvent
@@ -246,18 +252,30 @@ object ExperimentsAddonsHelper {
         }
         if (shouldEarlyReturn) return
 
-        val clickedColor = inventoryItems.values.firstOrNull {
+        val activeColors = inventoryItems.values.filter {
             nextChronomatronItemPattern.matches(it.item.getIdentifierString())
-        }?.getLorenzColorOrNull()?.takeIf { itemColor ->
+        }.mapNotNull { it.getLorenzColorOrNull() }
+
+        ChatUtils.debug("Active colors: $activeColors")
+
+        val clickedColor = activeColors.firstOrNull { itemColor ->
             val expectedColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex)
-            expectedColor == null || itemColor == expectedColor
+            val isPossiblyFromOldSolve = userChronomatronProgress.last() == itemColor
+            val shouldWeTake = !isPossiblyFromOldSolve || activeColors.size == 1
+            val isRightColor = (expectedColor == null || itemColor == expectedColor)
+
+            shouldWeTake && isRightColor
         } ?: return
 
         // Only record if we're exactly at the next slot, otherwise increment the index
         if (chronomatronSequenceIndex == hypixelChronomatronData.size) {
-            if (lastChronomatronLevelUp.isFarPast() && chronomatronSequenceIndex != 0) return
+            if (lastChronomatronSound.isFarPast() && chronomatronSequenceIndex != 0) {
+                ChatUtils.debug("Ignoring color $clickedColor due to no sound")
+                return
+            }
             hypixelChronomatronData.add(clickedColor)
-            lastChronomatronLevelUp = SimpleTimeMark.farPast()
+            ChatUtils.debug("Added color $clickedColor to hypixel chronomatron data at index $chronomatronSequenceIndex")
+            lastChronomatronSound = SimpleTimeMark.farPast()
         } else chronomatronSequenceIndex++
     }
 
@@ -289,6 +307,36 @@ object ExperimentsAddonsHelper {
 
         userUltrasequencerProgress.clear()
         hypixelUltrasequencerData.addAll(orderedUltrasequencerSlots.map { it.slotIndex })
+    }
+    // </editor-fold>
+
+    // <editor-fold desc="Debugging">
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!debugConfig.addonsDebug || !ExperimentationTableApi.inAddon) return
+
+        val renderable = VerticalContainerRenderable(
+            buildList {
+                addString("Current Addon Phase: $currentAddonPhase")
+                if (ExperimentationTableApi.inChronomatron) {
+                    addString("Current Chronomatron Round: $currentChronomatronRound")
+                    addString("Current Chronomatron Sequence Index: $chronomatronSequenceIndex")
+                    addString("")
+                    addString("Hypixel Chronomatron Data: $hypixelChronomatronData")
+                    addString("User Chronomatron Progress: $userChronomatronProgress")
+                    addString("")
+                    addString("Last Chronomatron Sound: $lastChronomatronSound")
+                } else if (ExperimentationTableApi.inUltrasequencer) {
+                    addString("Current Ultrasequencer Round: $currentUltraSequencerRound")
+                    addString("")
+                    addString("Hypixel Ultrasequencer Data: $hypixelUltrasequencerData")
+                    addString("User Ultrasequencer Progress: $userUltrasequencerProgress")
+                    addString("Ultrasequencer Dye Map: $ultrasequencerDyeMap")
+                } else return
+            }
+        )
+
+        debugConfig.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")
     }
     // </editor-fold>
 }
