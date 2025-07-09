@@ -19,10 +19,10 @@ import java.time.Duration
 
 abstract class PublishToModrinth : DefaultTask() {
 
-    lateinit var jarDirectory: DirectoryProperty
-    lateinit var changelog: String
-    lateinit var versionNumber: String
-    lateinit var modrinthToken: String
+    private lateinit var jarDirectory: DirectoryProperty
+    private lateinit var changelog: String
+    private lateinit var versionNumber: String
+    private lateinit var modrinthToken: String
 
     private val userAgent: String
         get() = "SkyHanni-$versionNumber"
