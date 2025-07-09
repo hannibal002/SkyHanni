@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
@@ -34,6 +36,7 @@ object ExperimentsAddonsHelper {
     private val userUltrasequencerProgress: MutableList<Int> = mutableListOf()
     private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
 
+    private var lastChronomatronLevelUp: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentAddonPhase: HelperPhase? = null
     private var chronomatronSequenceIndex: Int = 0
     var currentChronomatronRound: Int = 0
@@ -194,6 +197,14 @@ object ExperimentsAddonsHelper {
 
     // <editor-fold desc="Inventory Update reading logic">
     @HandleEvent
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (!ExperimentationTableApi.inChronomatron) return
+        // This sound indicates when the player has finished a round in chronomatron
+        if (event.soundName != "random.levelup" || event.pitch != 1.7619047f || event.volume != 0.7f) return
+        lastChronomatronLevelUp = SimpleTimeMark.now()
+    }
+
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ExperimentationTableApi.inAddon) return
 
@@ -243,7 +254,11 @@ object ExperimentsAddonsHelper {
         } ?: return
 
         // Only record if we're exactly at the next slot, otherwise increment the index
-        if (chronomatronSequenceIndex == hypixelChronomatronData.size) hypixelChronomatronData.add(clickedColor)
+        if (chronomatronSequenceIndex == hypixelChronomatronData.size) {
+            if (lastChronomatronLevelUp.isFarPast() && chronomatronSequenceIndex != 0) return
+            hypixelChronomatronData.add(clickedColor)
+            lastChronomatronLevelUp = SimpleTimeMark.farPast()
+        }
         else chronomatronSequenceIndex++
     }
 
