@@ -261,8 +261,10 @@ object ExperimentsAddonsHelper {
         val shouldNotReadYet = when (currentAddonPhase) {
             HelperPhase.REPLICATE -> !shouldReadLastReplicate
             HelperPhase.READ -> !isReadingReady
-            else -> userSizeNow < hypixelSizeNow || // User hasn't progressed enough
-                lastChronomatronSound.isFarPast() && chronomatronSequenceIndex != 0 // Last sound was too long ago
+            else -> {
+								userSizeNow < hypixelSizeNow || // User hasn't progressed enough
+		                lastChronomatronSound.isFarPast() && chronomatronSequenceIndex != 0 // Last sound was too long ago
+						}
         }
         if (shouldNotReadYet) return
 
