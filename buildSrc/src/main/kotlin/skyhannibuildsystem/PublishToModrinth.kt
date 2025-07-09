@@ -33,9 +33,7 @@ abstract class PublishToModrinth : DefaultTask() {
 
     @TaskAction
     fun publishToModrinth() {
-
-        initStuff()
-
+        initVariables()
         val jars = jarDirectory?.get()?.asFile?.listFiles()?.filter { it.extension == "jar" }.orEmpty()
 
         for (jar in jars) {
@@ -43,7 +41,7 @@ abstract class PublishToModrinth : DefaultTask() {
         }
     }
 
-    private fun initStuff() {
+    private fun initVariables() {
         changelog = project.findProperty("changelog") as String
         versionNumber = project.findProperty("modVersion") as String
         modrinthToken = project.findProperty("modrinthToken") as String
