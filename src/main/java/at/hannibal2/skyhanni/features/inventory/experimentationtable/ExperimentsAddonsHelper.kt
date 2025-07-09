@@ -237,13 +237,13 @@ object ExperimentsAddonsHelper {
         }
     }
 
-    private fun InventoryUpdatedEvent.readRoundOrNull(): Int? {
+    private fun InventoryUpdatedEvent.readChronomatronRoundOrNull(): Int? {
         val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.displayName ?: return null
         return roundItemPattern.matchGroup(roundItemName, "round")?.formatIntOrNull()
     }
 
     private fun InventoryUpdatedEvent.readNextChronomatron(oldPhase: HelperPhase? = null) {
-        currentChronomatronRound = readRoundOrNull() ?: return
+        currentChronomatronRound = readChronomatronRoundOrNull() ?: return
         val hypixelSizeNow = hypixelChronomatronData.size
         val userSizeNow = userChronomatronProgress.size
 
@@ -286,13 +286,6 @@ object ExperimentsAddonsHelper {
     )
 
     private fun InventoryUpdatedEvent.readUltrasequencer() {
-        currentUltraSequencerRound = readRoundOrNull() ?: run {
-            ChatUtils.debug("Could not read current round in ultrasequencer, aborting reading.")
-            return
-        }
-        if (currentAddonPhase != HelperPhase.READ) return
-        hypixelUltrasequencerData.clear()
-
         val orderedUltrasequencerSlots = inventoryItems.filter {
             it.value.displayName.trim().isNotEmpty()
         }.mapNotNull { (slot, stack) ->
@@ -306,9 +299,11 @@ object ExperimentsAddonsHelper {
             )
         }.sortedBy { it.sequenceNumber }
 
-        // Discard any old results that might've been cached
-        if (currentUltraSequencerRound != orderedUltrasequencerSlots.size) return
+        val isOld = currentUltraSequencerRound != orderedUltrasequencerSlots.size
+        val alreadyKnown = hypixelChronomatronData.size == orderedUltrasequencerSlots.size
+        if (isOld || alreadyKnown) return
 
+        hypixelUltrasequencerData.clear()
         userUltrasequencerProgress.clear()
         hypixelUltrasequencerData.addAll(orderedUltrasequencerSlots.map { it.slotIndex })
     }
