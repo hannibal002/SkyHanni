@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.blockBreakStreak
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getSpeedBonus
@@ -17,6 +18,8 @@ import at.hannibal2.skyhanni.features.mining.FlowstateHelper.streakEndTimer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -25,6 +28,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import net.minecraft.init.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -75,8 +79,11 @@ object FlowstateHelper {
         if (blockBreakStreak > personalBest) {
             // no point telling them it's a new personal best if they never got to max speed before
             if (personalBest > 200 && config.personalBestMessage) {
+                val newLuck = calculateFlowstateLuck(blockBreakStreak)
+                val oldLuck = calculateFlowstateLuck(personalBest)
+                val userLuckSegment = if (personalBest > 500) " §aYou Gained +${newLuck-oldLuck}✴ SkyHanni User Luck" else ""
                 ChatUtils.chat("§d§lNEW FLOWSTATE PERSONAL BEST!§f Streak: $blockBreakStreak." +
-                    " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!")
+                    " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!" + userLuckSegment)
             }
             personalBest = blockBreakStreak
         }
@@ -169,6 +176,52 @@ object FlowstateHelper {
             return
         }
         flowstateCache = enchantList.getValue("ultimate_flowstate")
+    }
+
+
+    /**
+     * Best below 500 blocks gets no luck
+     * Every block between 500-1000 gets 0.005 per block (500*0.005 = 2.5)
+     * Every block between 1000-2000 gets 0.0025 per block (1000*0.0025 = 2.5)
+     * Every block between 2000-7000 gets 0.001 per block (5000*0.001 = 5)
+     * 10 Luck is the max
+     */
+    private fun calculateFlowstateLuck(best: Int): Float {
+        var extraBlocks = best - 500
+        if (0 > extraBlocks) return 0f
+        if (extraBlocks <= 500) {
+            return (0.005f * extraBlocks).roundTo(2)
+        }
+        extraBlocks -= 500
+        if (extraBlocks <= 1000) {
+            return (0.0025f * extraBlocks + 2.5f).roundTo(2)
+        }
+        extraBlocks -= 1000
+        if (extraBlocks <= 5000) {
+            return (0.001f * extraBlocks + 5f).roundTo(2)
+        }
+        // 10 is the max luck
+        return 10f
+    }
+
+    @HandleEvent
+    fun onUserLuck(event: UserLuckCalculateEvent) {
+        if (personalBest < 500) return
+        val luck = calculateFlowstateLuck(personalBest)
+        event.addLuck(luck)
+        val stack = ItemUtils.createItemStack(
+            Items.enchanted_book,
+            "§a✴ Flowstate Personal Best",
+            arrayOf(
+                "§8Enchantment",
+                "",
+                "§7Value: §a+$luck✴",
+                "",
+                "§8Gain more by getting a higher flowstate personal best",
+                "§8Maxes out at §a+10✴ §8luck"
+            ),
+        )
+        event.addItem(stack)
     }
 }
 
