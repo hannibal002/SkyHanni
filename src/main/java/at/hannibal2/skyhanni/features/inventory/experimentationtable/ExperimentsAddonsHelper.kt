@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -84,7 +85,7 @@ object ExperimentsAddonsHelper {
     )
     // </editor-fold>
 
-    @HandleEvent(InventoryCloseEvent::class)
+    @HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun resetAddonsData() {
         hypixelChronomatronData.clear()
         userChronomatronProgress.clear()
@@ -111,7 +112,7 @@ object ExperimentsAddonsHelper {
     }
 
     // <editor-fold desc="Next click highlighting">
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
@@ -146,21 +147,24 @@ object ExperimentsAddonsHelper {
     // </editor-fold>
 
     // <editor-fold desc="Slot click stuff">
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
-        if (!config.preventMisclicks) return
+        // todo ?
+        if (!config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
         event.handleChronomatronClick()
         event.handleUltrasequencerClick()
     }
 
     private fun GuiContainerEvent.SlotClickEvent.handleChronomatronClick() {
+        if (lastChronomatronSound.isFarPast()) return cancel()
         if (!ExperimentationTableApi.inChronomatron || slot == null) return
         if (userChronomatronProgress.size == hypixelChronomatronData.size) return
         val clickedColor = item?.getLorenzColorOrNull()?.takeIf {
             it == hypixelChronomatronData[userChronomatronProgress.size]
         } ?: return cancel()
         userChronomatronProgress.add(clickedColor)
+        ChatUtils.debug("Added color $clickedColor to user chronomatron progress")
         makePickblock()
     }
 
@@ -172,12 +176,13 @@ object ExperimentsAddonsHelper {
             it == expectedSlot
         } ?: return cancel()
         userUltrasequencerProgress.add(clickedSlot)
-        makePickblock() // Prevents a flashbang
+        ChatUtils.debug("Added slot $clickedSlot to user ultrasequencer progress")
+        makePickblock()
     }
     // </editor-fold>
 
     // <editor-fold desc="Next click highlighting">
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onReplaceItem(event: ReplaceItemEvent) {
         if (!ExperimentationTableApi.inAddon || !config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
@@ -202,7 +207,7 @@ object ExperimentsAddonsHelper {
     // </editor-fold>
 
     // <editor-fold desc="Inventory Update reading logic">
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!ExperimentationTableApi.inChronomatron) return
         // This sound indicates when the player has finished a round in chronomatron
@@ -210,7 +215,7 @@ object ExperimentsAddonsHelper {
         lastChronomatronSound = SimpleTimeMark.now()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ExperimentationTableApi.inAddon) return
 
@@ -236,12 +241,7 @@ object ExperimentsAddonsHelper {
     }
 
     private fun InventoryUpdatedEvent.readNextChronomatron(oldPhase: HelperPhase? = null) {
-        val oldChronomatronRound = currentChronomatronRound
         currentChronomatronRound = readChronomatronRoundOrNull() ?: return
-        if (currentChronomatronRound != oldChronomatronRound) {
-            chronomatronSequenceIndex = 0
-            userChronomatronProgress.clear()
-        }
 
         val shouldReadLastReplicate = oldPhase == HelperPhase.READ || hypixelChronomatronData.size < currentChronomatronRound
         val isReadingReady = oldPhase == null || oldPhase == HelperPhase.READ
@@ -260,7 +260,7 @@ object ExperimentsAddonsHelper {
 
         val clickedColor = activeColors.firstOrNull { itemColor ->
             val expectedColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex)
-            val isPossiblyFromOldSolve = userChronomatronProgress.last() == itemColor
+            val isPossiblyFromOldSolve = userChronomatronProgress.lastOrNull() == itemColor
             val shouldWeTake = !isPossiblyFromOldSolve || activeColors.size == 1
             val isRightColor = (expectedColor == null || itemColor == expectedColor)
 
@@ -276,6 +276,8 @@ object ExperimentsAddonsHelper {
             hypixelChronomatronData.add(clickedColor)
             ChatUtils.debug("Added color $clickedColor to hypixel chronomatron data at index $chronomatronSequenceIndex")
             lastChronomatronSound = SimpleTimeMark.farPast()
+            chronomatronSequenceIndex = 0
+            userChronomatronProgress.clear()
         } else chronomatronSequenceIndex++
     }
 
@@ -311,7 +313,7 @@ object ExperimentsAddonsHelper {
     // </editor-fold>
 
     // <editor-fold desc="Debugging">
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!debugConfig.addonsDebug || !ExperimentationTableApi.inAddon) return
 
