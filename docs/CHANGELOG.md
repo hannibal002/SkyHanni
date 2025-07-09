@@ -81,7 +81,7 @@
 
 #### Misc
 
-+ Added Bouncy Beach Balls features. - Thunderblade + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3432)
++ Added Bouncy Beach Balls features. - Thunderblade73 + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3432)
     + Predictive Line, Landing Spot and Current Counter.
     + Works only with Bouncy Beach Balls, not with Giant Bouncy Beach Ball yet.
 + Added In-Game Changelog Viewer. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1636)
@@ -372,7 +372,7 @@
 + Fixed Fairy Soul Pathfinder sometimes displaying paths from the previous island. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4056)
     + Switching islands during path calculation triggered the issue.
 + Fixed best-friend detection in chat messages. - FlyMode (https://github.com/hannibal002/SkyHanni/pull/4084)
-+ Fixed Lobby Kick Timer. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4107)
++ Fixed Lobby Kick Timer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4107)
 + Fixed ParticleHider issue on initial world join. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4118)
 + Fixed custom scoreboard image in 1.21. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4129)
 + Fixed dungeon finder features. - nopo (https://github.com/hannibal002/SkyHanni/pull/4139)
@@ -514,7 +514,7 @@
 + Started porting pets to their own config category. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
 + Updated Renderables for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4009)
 + Updated SackApi, GardenApi, PestApi, FishingApi and TitleManager for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4012)
-+ Added debug logging for PetStorageApi. - Davee (https://github.com/hannibal002/SkyHanni/pull/4114)
++ Added debug logging for PetStorageApi. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4114)
 + Added EquipmentApi. - Empa (https://github.com/hannibal002/SkyHanni/pull/3842)
 + Added Pet Storage reset command. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4114)
 + Added rendering code for modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4113)
