@@ -47,9 +47,8 @@ object HuntingBoxValue {
     private fun processAttributeShardSlot(slotNumber: Int, stack: ItemStack, table: MutableList<DisplayTableEntry>) {
         val internalName = stack.getInternalNameOrNull() ?: return
 
-        var amountOwned = 0
-        AttributeShardsData.amountOwnedPattern.firstMatcher(stack.getLore()) {
-            amountOwned = group("amount").formatInt()
+        val amountOwned = AttributeShardsData.amountOwnedPattern.firstMatcher(stack.getLore()) {
+            group("amount").formatInt()
         } ?: return
 
         val pricePerInstantSell = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
@@ -87,12 +86,10 @@ object HuntingBoxValue {
         return modNine != 0 && modNine != 8
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnSkyblock = true)
+    fun onRenderOverlay() {
         if (!config.huntingBoxValue) return
         if (!AttributeShardsData.huntingBoxInventory.isInside()) return
-
-        if (display.isEmpty()) return
 
         config.huntingBoxValuePosition.renderRenderables(display, posLabel = "Hunting Box Value")
     }
