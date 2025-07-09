@@ -11,8 +11,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.net.http.HttpClient
@@ -21,28 +19,31 @@ import java.time.Duration
 
 abstract class PublishToModrinth : DefaultTask() {
 
-    @get:InputDirectory
-    abstract val jarDirectory: DirectoryProperty
-
-    @get:Input
-    abstract var changelog: String
-
-    @get:Input
-    abstract var versionNumber: String
-
-    @get:Input
-    abstract var modrinthToken: String
+    lateinit var jarDirectory: DirectoryProperty
+    lateinit var changelog: String
+    lateinit var versionNumber: String
+    lateinit var modrinthToken: String
 
     private val userAgent: String
         get() = "SkyHanni-$versionNumber"
 
     @TaskAction
     fun publishToModrinth() {
+
+        initStuff()
+
         val jars = jarDirectory.get().asFile.listFiles()?.filter { it.extension == "jar" }.orEmpty()
 
         for (jar in jars) {
             processJar(jar)
         }
+    }
+
+    private fun initStuff() {
+        jarDirectory.set(project.rootProject.layout.buildDirectory.dir("downloadedJars"))
+        changelog = project.findProperty("changelog") as String
+        versionNumber = project.findProperty("modVersion") as String
+        modrinthToken = project.findProperty("modrinthToken") as String
     }
 
     private val jarNamePattern = "SkyHanni-(?<modVersion>[\\d.]+)-mc(?<mcVersion>[\\d.]+)\\.jar".toPattern()
