@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class ExperimentsAddonsConfig {
 
@@ -20,7 +21,8 @@ class ExperimentsAddonsConfig {
         desc = "Prevent clicking wrong colors in Chronomatron, and wrong slots in Ultrasequencer."
     )
     @ConfigEditorBoolean
-    var preventMisclicks: Boolean = false
+    @SearchTag("missclick")
+    var preventMisclicks: Boolean = true
 
     @Expose
     @ConfigOption(
