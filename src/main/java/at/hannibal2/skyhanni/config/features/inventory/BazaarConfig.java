@@ -27,6 +27,16 @@ public class BazaarConfig {
     @FeatureToggle
     public boolean bestSellMethod = false;
 
+    @Expose
+    @ConfigOption(name = "Daily Limit Tracker", desc = "Show your progress towards the daily 15 billion coin trade limit on the bazaar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean dailyLimitTracker = true;
+
+    @Expose
+    @ConfigLink(owner = BazaarConfig.class, field = "dailyLimitTracker")
+    public Position dailyLimitTrackerPosition = new Position(550, 150);
+
     // TODO rename to bestSellMethodPosition
     @Expose
     @ConfigLink(owner = BazaarConfig.class, field = "bestSellMethod")

@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
+import at.hannibal2.skyhanni.events.bazaar.BazaarTransactionEvent
+import at.hannibal2.skyhanni.events.bazaar.BazaarTransactionEvent.TransactionType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -57,10 +59,15 @@ object BazaarApi {
 
     /**
      * REGEX-TEST: [Bazaar] Bought 1x Small Storage for 3,999.5 coins!
+     * REGEX-TEST: [Bazaar] Sold 1x Coal for 4.2 coins!
+     * REGEX-TEST: [Bazaar] Buy Order Setup! 1x Coal for 4.4 coins.
+     * REGEX-TEST: [Bazaar] Order Flipped! 5x Coal for 13.0 coins of total expected profit.
+     * REGEX-TEST: [Bazaar] Sell Offer Setup! 447,199x Spider Essence for 486,999,711 coins.
      */
-    private val resetCurrentSearchPattern by patternGroup.pattern(
-        "reset-current-search",
-        "\\[Bazaar] (?:Buy Order Setup!|Bought) \\d+x (?<item>.*) for .*",
+    @Suppress("MaxLineLength")
+    private val transactionPattern by patternGroup.pattern(
+        "transaction",
+        "\\[Bazaar] (?<type>Bought|Buy Order Setup!|Sold|Sell Offer Setup!|Order Flipped!) [\\d,]+x (?<item>.*) for (?<coins>[\\d,.]+) coins.*",
     )
 
     /**
@@ -202,12 +209,21 @@ object BazaarApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message.removeColor()
-        val item = resetCurrentSearchPattern.matchMatcher(message) {
-            group("item")
-        } ?: return
-
-        if (currentSearchedItem == item) {
-            currentSearchedItem = ""
+        transactionPattern.matchMatcher(message) {
+            val item = group("item")
+            val coins = group("coins").replace(",", "").toDoubleOrNull() ?: return
+            val transactionType = when (group("type")) {
+                "Bought" -> TransactionType.INSTANT_BUY
+                "Buy Order Setup!" -> TransactionType.BUY_ORDER
+                "Sold" -> TransactionType.INSTANT_SELL
+                "Sell Offer Setup!" -> TransactionType.SELL_OFFER
+                "Order Flipped!" -> TransactionType.FLIP_ORDER
+                else -> return
+            }
+            BazaarTransactionEvent(transactionType, coins).post()
+            if (currentSearchedItem == item) {
+                currentSearchedItem = ""
+            }
         }
     }
 
