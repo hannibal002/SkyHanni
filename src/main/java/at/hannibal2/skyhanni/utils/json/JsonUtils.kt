@@ -7,7 +7,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import java.io.File
+import java.io.IOException
 import java.io.Reader
+import kotlin.jvm.Throws
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.typeOf
 
@@ -18,14 +20,20 @@ inline fun <reified T : Any> Gson.fromJson(jsonElement: JsonElement): T =
 
 inline fun <reified T : Any> Gson.fromJson(reader: Reader): T = this.fromJson(reader, typeOf<T>().javaType)
 
-fun File.getJson(): JsonObject? {
-    return try {
-        this.inputStream().use {
-            ConfigManager.gson.fromJson(it.reader(), JsonObject::class.java)
-        }
-    } catch (e: Exception) {
-        null
+fun File.getJson(): JsonObject? = runCatching {
+    this.inputStream().use {
+        ConfigManager.gson.fromJson(it.reader(), JsonObject::class.java)
     }
+}.getOrNull()
+
+fun File.writeJson(json: JsonElement): Boolean = runCatching {
+    if (!this.exists()) this.createNewFile()
+    this.outputStream().use { outputStream ->
+        ConfigManager.gson.toJson(json, outputStream.writer())
+    }
+    true
+}.getOrElse { e ->
+    return false
 }
 
 /**

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.data.repo.AbstractRepoConfig
 import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
 import com.google.gson.annotations.Expose
@@ -24,7 +24,7 @@ class NeuRepositoryConfig : AbstractRepoConfig<NeuRepositoryConfig.NeuRepository
 
     @ConfigOption(name = "Update NEU Repo Now", desc = "Update your NEU repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    override val updateRepo: Runnable = Runnable(EnoughUpdatesRepo::downloadRepo)
+    override val updateRepo: Runnable = Runnable(EnoughUpdatesRepoManager::updateRepo)
 
     @Expose
     @ConfigOption(name = "NEU Repository Location", desc = "")
@@ -34,7 +34,7 @@ class NeuRepositoryConfig : AbstractRepoConfig<NeuRepositoryConfig.NeuRepository
     class NeuRepositoryLocation : AbstractRepoLocationConfig() {
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your NEU repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
-        val resetRepoLocation: Runnable = Runnable { EnoughUpdatesRepo.resetRepoLocation() }
+        val resetRepoLocation: Runnable = Runnable { reset() }
 
         @Expose
         @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: NotEnoughUpdates")

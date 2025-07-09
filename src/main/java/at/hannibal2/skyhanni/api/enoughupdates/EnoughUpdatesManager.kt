@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.api.enoughupdates
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -21,7 +19,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -56,8 +53,8 @@ import net.minecraft.nbt.NBTException
 @SkyHanniModule
 object EnoughUpdatesManager {
 
-    val configFileLocation = File("config/notenoughupdates")
-    val repoFileLocation = File(configFileLocation, "repo")
+    val configDirectory = File("config/notenoughupdates")
+    val repoDirectory = File(configDirectory, "repo")
 
     private val itemMap = TreeMap<String, JsonObject>()
     private val itemStackCache = mutableMapOf<String, ItemStack>()
@@ -72,11 +69,16 @@ object EnoughUpdatesManager {
 
     fun getItemInformation() = itemMap
 
-    fun downloadRepo() = EnoughUpdatesRepo.downloadRepo()
+    fun downloadRepo() {
+        if (SkyHanniMod.feature.dev.neuRepo.repoAutoUpdate) {
+            EnoughUpdatesRepoManager.updateRepo()
+            reloadRepo()
+        } else reloadRepo()
+    }
 
     private var isLoading = false
 
-    fun reloadRepo() {
+    fun prepRepoReload() {
         if (isLoading) return
         isLoading = true
         itemStackCache.clear()
@@ -85,24 +87,28 @@ object EnoughUpdatesManager {
         titleWordMap.clear()
         recipes.clear()
         recipesMap.clear()
+    }
 
+    fun reloadItemsFromRepo() {
+        if (!isLoading) return // Sanity check to prevent double loading
         val tempItemMap = TreeMap<String, JsonObject>()
-        SkyHanniMod.launchIOCoroutine {
-            loadItemMap(tempItemMap)
-            synchronized(itemMap) {
-                itemMap.clear()
-                itemMap.putAll(tempItemMap)
-            }
-            NeuRepositoryReloadEvent.post()
-            ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
-            isLoading = false
+        loadItemMap(tempItemMap)
+        synchronized(itemMap) {
+            itemMap.clear()
+            itemMap.putAll(tempItemMap)
         }
+        isLoading = false
+    }
+
+    fun reloadRepo() {
+        if (isLoading) return
+        EnoughUpdatesRepoManager.reloadLocalRepo()
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
-        val itemDir = File(repoFileLocation, "items")
+        val itemDir = File(repoDirectory, "items")
         if (!itemDir.exists()) return
         for (file in itemDir.listFiles() ?: return) {
             if (file.extension != "json") continue
@@ -454,7 +460,7 @@ object EnoughUpdatesManager {
     }
 
     private fun itemCountInRepoFolder(): Int {
-        val itemsFolder = File(repoFileLocation, "items")
+        val itemsFolder = File(repoDirectory, "items")
         return itemsFolder.listFiles()?.size ?: 0
     }
 
@@ -468,43 +474,24 @@ object EnoughUpdatesManager {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        neuPetsJson = event.readConstant<NeuPetsJson>("pets")
-        neuPetNums = event.readConstant<JsonObject>("petnums")
+        neuPetsJson = event.getConstant<NeuPetsJson>("pets")
+        neuPetNums = event.getConstant<JsonObject>("petnums")
+        if (itemMap.isNotEmpty()) {
+            ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
+        }
     }
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        if (!PlatformUtils.isNeuLoaded()) {
-            event.registerBrigadier("neureloadrepo") {
-                aliases = listOf("shreloadneurepo")
-                description = "Reloads the NEU repo"
-                category = CommandCategory.DEVELOPER_TEST
-                simpleCallback { reloadRepo() }
-            }
-            event.registerBrigadier("neuresetrepo") {
-                aliases = listOf("shresetneurepo")
-                description = "Redownload the NEU repo"
-                category = CommandCategory.DEVELOPER_TEST
-                simpleCallback { downloadRepo() }
-            }
-        }
+    fun reportItemStatus() {
+        val loadedItems = itemMap.size
+        val directorySize = itemCountInRepoFolder()
 
-        event.registerBrigadier("shneurepostatus") {
-            description = "Get the status of the NEU repo"
-            category = CommandCategory.DEVELOPER_TEST
-            simpleCallback {
-                val loadedItems = itemMap.size
-                val directorySize = itemCountInRepoFolder()
-
-                ChatUtils.chat("NEU Repo Status:")
-                when {
-                    directorySize == 0 -> ChatUtils.chat("§cNo items directory found!", prefix = false)
-                    loadedItems == 0 -> ChatUtils.chat("§cNo items loaded!", prefix = false)
-                    loadedItems < directorySize -> ChatUtils.chat("§eLoaded $loadedItems/$directorySize items", prefix = false)
-                    loadedItems > directorySize -> ChatUtils.chat("§eLoaded Items: $loadedItems (more than directory size)", prefix = false)
-                    else -> ChatUtils.chat("§aLoaded all $loadedItems items!", prefix = false)
-                }
-            }
+        ChatUtils.chat("NEU Repo Item Status:")
+        when {
+            directorySize == 0 -> ChatUtils.chat("§cNo items directory found!", prefix = false)
+            loadedItems == 0 -> ChatUtils.chat("§cNo items loaded!", prefix = false)
+            loadedItems < directorySize -> ChatUtils.chat("§eLoaded $loadedItems/$directorySize items", prefix = false)
+            loadedItems > directorySize -> ChatUtils.chat("§eLoaded Items: $loadedItems (more than directory size)", prefix = false)
+            else -> ChatUtils.chat("§aLoaded all $loadedItems items!", prefix = false)
         }
     }
 }

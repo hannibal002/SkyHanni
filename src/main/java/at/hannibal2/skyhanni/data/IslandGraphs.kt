@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
@@ -44,7 +43,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.ChatComponentText
 import java.awt.Color
-import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -264,18 +262,14 @@ object IslandGraphs {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
 
-        val constant = "island_graphs/$islandName"
-        val name = "constants/$constant.json"
-        val jsonFile = File(RepoManager.repoFileLocation, name)
-        if (!jsonFile.isFile) {
+        try {
+            val graph = RepoManager.getRepoData<Graph>("island_graphs", islandName, gson = Graph.gson)
+            IslandAreas.display = null
+            setNewGraph(graph)
+        } catch (e: Error) {
             currentIslandGraph = null
             return
         }
-
-        // todo don't use RepoUtils.getConstant here
-        val graph = RepoUtils.getConstant(RepoManager.repoFileLocation, constant, Graph.gson, Graph::class.java)
-        IslandAreas.display = null
-        setNewGraph(graph)
     }
 
     fun setNewGraph(graph: Graph) {
