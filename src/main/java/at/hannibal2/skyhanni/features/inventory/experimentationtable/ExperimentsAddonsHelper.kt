@@ -258,8 +258,7 @@ object ExperimentsAddonsHelper {
             if (lastChronomatronLevelUp.isFarPast() && chronomatronSequenceIndex != 0) return
             hypixelChronomatronData.add(clickedColor)
             lastChronomatronLevelUp = SimpleTimeMark.farPast()
-        }
-        else chronomatronSequenceIndex++
+        } else chronomatronSequenceIndex++
     }
 
     private data class UltraSequencerSlot(
