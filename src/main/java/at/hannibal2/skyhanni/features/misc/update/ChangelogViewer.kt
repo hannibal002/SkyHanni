@@ -89,7 +89,7 @@ object ChangelogViewer {
                 sub.isInBetween(startVersion, endVersion)
             }
             neededData.forEach { entry ->
-                cache[ModVersion.fromString(entry.tagName)] = formatData(formatSttring(getBasic(entry.body)))
+                cache[ModVersion.fromString(entry.tagName)] = formatData(formatString(getBasic(entry.body)))
             }
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Changelog Loading Failed")
@@ -118,7 +118,7 @@ object ChangelogViewer {
             }
     }
 
-    private fun formatSttring(basic: String): String = basic.replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
+    private fun formatString(basic: String): String = basic.replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
         fun String.help(s: String): String =
             toRegex().find(basic.subSequence(0, it.range.first).reversed())?.groups?.get(s)?.value?.reversed().orEmpty()
 
