@@ -258,18 +258,24 @@ object ExperimentsAddonsHelper {
             nextChronomatronItemPattern.matches(it.item.getIdentifierString())
         }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
 
-        if (activeColors.isEmpty() && lastUserClickChron != null) lastUserClickChron = null
-        if (lastUserClickChron != null) return
+        if (activeColors.isEmpty() && lastUserClickChron != null) {
+            ChatUtils.debug("Setting last user click chron to null due to no active colors")
+            lastUserClickChron = null
+        }
+        if (lastUserClickChron != null) {
+            ChatUtils.debug("Last user click is $lastUserClickChron, returning early")
+            return
+        }
+        if (userChronomatronProgress.size < hypixelChronomatronData.size) {
+            ChatUtils.debug("User chronomatron progress is not complete, returning early")
+            return
+        }
 
         ChatUtils.debug("Active colors: $activeColors")
 
         val clickedColor = activeColors.firstOrNull { itemColor ->
             val expectedColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex)
-            val isPossiblyFromOldSolve = userChronomatronProgress.lastOrNull() == itemColor
-            val shouldWeTake = !isPossiblyFromOldSolve || activeColors.size == 1
-            val isRightColor = (expectedColor == null || itemColor == expectedColor)
-
-            shouldWeTake && isRightColor
+            expectedColor == null || itemColor == expectedColor
         } ?: return
 
         // Only record if we're exactly at the next slot, otherwise increment the index
@@ -283,7 +289,10 @@ object ExperimentsAddonsHelper {
             lastChronomatronSound = SimpleTimeMark.farPast()
             chronomatronSequenceIndex = 0
             userChronomatronProgress.clear()
-        } else chronomatronSequenceIndex++
+        } else {
+            ChatUtils.debug("Ignoring color $clickedColor due to already being at index $chronomatronSequenceIndex")
+            chronomatronSequenceIndex++
+        }
     }
 
     private data class UltraSequencerSlot(
