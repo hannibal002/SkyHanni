@@ -29,7 +29,10 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object ExperimentsAddonsHelper {
 
-    private enum class HelperPhase { READ, REPLICATE }
+    private enum class HelperPhase {
+        READ,
+        REPLICATE
+    }
 
     private const val ROUND_STATUS_SLOT = 4
     private const val PHASE_STATUS_SLOT = 49
@@ -58,7 +61,7 @@ object ExperimentsAddonsHelper {
      */
     private val roundItemPattern by ExperimentationTableApi.patternGroup.pattern(
         "addons.round-item",
-        "§7Round: §e(?<round>\\d+)"
+        "§7Round: §e(?<round>\\d+)",
     )
 
     /**
@@ -67,12 +70,12 @@ object ExperimentsAddonsHelper {
      */
     private val replicatePhaseItemPattern by ExperimentationTableApi.patternGroup.pattern(
         "addons.replicate-phase-item",
-        "§7Timer: §a\\d+s"
+        "§7Timer: §a\\d+s",
     )
 
     private val readPhaseItemPattern by ExperimentationTableApi.patternGroup.pattern(
         "addons.read-phase-item",
-        "§aRemember the pattern!"
+        "§aRemember the pattern!",
     )
 
     /**
@@ -81,7 +84,7 @@ object ExperimentsAddonsHelper {
      */
     private val nextChronomatronItemPattern by ExperimentationTableApi.patternGroup.pattern(
         "addons.chronomatron.read-item",
-        "(?:minecraft:)?(?:stained_hardened_clay|\\w+_terracotta)"
+        "(?:minecraft:)?(?:stained_hardened_clay|\\w+_terracotta)",
     )
     // </editor-fold>
 
@@ -198,7 +201,7 @@ object ExperimentsAddonsHelper {
 
     private fun ReplaceItemEvent.replaceUltrasequencerItems() {
         val newItem = ultrasequencerDyeMap[
-            hypixelUltrasequencerData.indexOfFirst { it == slot } + 1
+            hypixelUltrasequencerData.indexOfFirst { it == slot } + 1,
         ] ?: return
         replace(newItem)
     }
@@ -261,8 +264,8 @@ object ExperimentsAddonsHelper {
         val shouldNotReadYet = when (currentAddonPhase) {
             HelperPhase.REPLICATE -> !shouldReadLastReplicate
             HelperPhase.READ -> !isReadingReady
-            else -> userSizeNow < hypixelSizeNow || // User hasn't progressed enough
-                lastChronomatronSound.isFarPast() && chronomatronSequenceIndex != 0 // Last sound was too long ago
+            // User hasn't progressed enough or the last sound was too long ago
+            else -> userSizeNow < hypixelSizeNow || lastChronomatronSound.isFarPast() && chronomatronSequenceIndex != 0
         }
         if (shouldNotReadYet) return
 
@@ -337,11 +340,11 @@ object ExperimentsAddonsHelper {
                             addString("User Progress: $userUltrasequencerProgress")
                             addString("Dye Map: $ultrasequencerDyeMap")
                         } else return@buildList
-                    }
+                    },
                 )
 
                 debugConfig.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")
-            }
+            },
         )
     }
     // </editor-fold>
