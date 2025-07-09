@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
+import at.hannibal2.skyhanni.utils.GitHubUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -28,7 +29,7 @@ class RepositoryConfig {
     @Accordion
     val location: RepositoryLocation = RepositoryLocation()
 
-    class RepositoryLocation {
+    class RepositoryLocation : GitHubUtils.GenericRepoLocationConfig() {
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
         val resetRepoLocation: Runnable = Runnable { RepoUtils.resetRepoLocation() }
@@ -36,16 +37,16 @@ class RepositoryConfig {
         @Expose
         @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: hannibal002")
         @ConfigEditorText
-        var user: String = "hannibal002"
+        override var user: String = "hannibal002"
 
         @Expose
         @ConfigOption(name = "Repository Name", desc = "The Repository Name, default: SkyHanni-REPO")
         @ConfigEditorText
-        var name: String = "SkyHanni-REPO"
+        override var name: String = "SkyHanni-REPO"
 
         @Expose
         @ConfigOption(name = "Repository Branch", desc = "The Repository Branch, default: main")
         @ConfigEditorText
-        var branch: String = "main"
+        override var branch: String = "main"
     }
 }

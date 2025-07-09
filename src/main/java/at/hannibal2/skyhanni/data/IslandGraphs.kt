@@ -266,13 +266,13 @@ object IslandGraphs {
 
         val constant = "island_graphs/$islandName"
         val name = "constants/$constant.json"
-        val jsonFile = File(RepoManager.repoLocation, name)
+        val jsonFile = File(RepoManager.repoFileLocation, name)
         if (!jsonFile.isFile) {
             currentIslandGraph = null
             return
         }
 
-        val graph = RepoUtils.getConstant(RepoManager.repoLocation, constant, Graph.gson, Graph::class.java)
+        val graph = RepoUtils.getConstant(RepoManager.repoFileLocation, constant, Graph.gson, Graph::class.java)
         IslandAreas.display = null
         setNewGraph(graph)
     }

@@ -97,10 +97,10 @@ object RepoUtils {
             throw RepoError("Repo file '$name' not found.")
         }
         BufferedReader(InputStreamReader(FileInputStream(jsonFile), StandardCharsets.UTF_8)).use { reader ->
-            if (type == null) {
-                return gson.fromJson(reader, clazz)
+            return if (type == null) {
+                gson.fromJson(reader, clazz)
             } else {
-                return gson.fromJson(reader, type)
+                gson.fromJson(reader, type)
             }
         }
     }

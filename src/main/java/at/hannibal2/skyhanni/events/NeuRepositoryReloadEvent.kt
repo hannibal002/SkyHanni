@@ -16,7 +16,7 @@ import java.io.File
 import java.lang.reflect.Type
 
 object NeuRepositoryReloadEvent : SkyHanniEvent() {
-    fun getConstant(file: String): JsonObject? = File(EnoughUpdatesManager.repoLocation, "constants/$file.json").getJson()
+    fun getConstant(file: String): JsonObject? = File(EnoughUpdatesManager.repoFileLocation, "constants/$file.json").getJson()
 
     inline fun <reified T : Any> readConstant(file: String, gson: Gson = ConfigManager.gson): T {
         val data = getConstant(file) ?: ErrorManager.skyHanniError("$file failed to load from neu repo!")
@@ -32,8 +32,8 @@ object NeuRepositoryReloadEvent : SkyHanniEvent() {
     }
 
     inline fun <reified T : Any> getConstant(constant: String, type: Type? = null, gson: Gson = ConfigManager.gson): T = try {
-        if (!EnoughUpdatesManager.repoLocation.exists()) throw RepoError("NEU-Repo folder does not exist!")
-        RepoUtils.getConstant(EnoughUpdatesManager.repoLocation, constant, gson, T::class.java, type)
+        if (!EnoughUpdatesManager.repoFileLocation.exists()) throw RepoError("NEU-Repo folder does not exist!")
+        RepoUtils.getConstant(EnoughUpdatesManager.repoFileLocation, constant, gson, T::class.java, type)
     } catch (e: Exception) {
         throw RepoError("Repo parsing error while trying to read constant '$constant'", e)
     }

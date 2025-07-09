@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.GitHubUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import com.google.gson.JsonObject
 import net.minecraft.util.IChatComponent
-import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -27,18 +27,16 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.time.Instant
 
 @SkyHanniModule
 object RepoManager {
 
     private val gson get() = ConfigManager.gson
-    private val configLocation = ConfigManager.configDirectory
-    val repoLocation: File = File(configLocation, "repo")
+    private val configFileLocation = ConfigManager.configDirectory
+    val repoFileLocation: File = File(configFileLocation, "repo")
     private var error = false
     private var lastRepoUpdate = SimpleTimeMark.now()
     private var repoDownloadFailed = false
@@ -119,129 +117,94 @@ object RepoManager {
         }
     }
 
-    private fun fetchRepository(command: Boolean) {
+    private suspend fun fetchRepository(command: Boolean, silentError: Boolean = true) {
         if (currentlyFetching) return
         currentlyFetching = true
-        doTheFetching(command)
+        fetchAndUnpackRepo(command, silentError)
         currentlyFetching = false
     }
 
-    private fun doTheFetching(command: Boolean) {
-        try {
-            val (currentDownloadedCommit, currentDownloadedCommitTime) = readCurrentCommit() ?: (null to null)
-            commitTime = currentDownloadedCommitTime
-            var latestRepoCommit: String? = null
-            var latestRepoCommitTime: SimpleTimeMark? = null
-            try {
-                InputStreamReader(URL(getCommitApiUrl()).openStream())
-                    .use { inReader ->
-                        val commits: JsonObject = gson.fromJson(inReader, JsonObject::class.java)
-                        latestRepoCommit = commits["sha"].asString
-                        val formattedDate = commits["commit"].asJsonObject["committer"].asJsonObject["date"].asString
-                        latestRepoCommitTime = Instant.parse(formattedDate).toEpochMilli().asTimeMark()
-                    }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(
-                    e,
-                    "Error while loading data from repo",
-                    "command" to command,
-                    "currentDownloadedCommit" to currentDownloadedCommit,
-                )
-                repoDownloadFailed = true
-            }
+    // todo this is basically entirely duplicated with EnoughUpdatesRepo.kt, refactor
+    private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true): Boolean {
+        val githubRepoLocation = GitHubUtils.RepoLocation(config.location, shouldError = !silentError)
 
-            if (repoLocation.exists() &&
-                currentDownloadedCommit == latestRepoCommit &&
-                unsuccessfulConstants.isEmpty()
-            ) {
-                if (command) {
-                    ChatUtils.clickToClipboard(
-                        "§7The repo is already up to date!",
-                        lines = buildList {
-                            add("latest commit sha: §e$currentDownloadedCommit")
-                            latestRepoCommitTime?.let { latestTime ->
-                                add("latest commit time: §b$latestTime")
-                                add("  (§b${latestTime.passedSince().format()} ago§7)")
-                            }
-                        },
-                    )
-                    shouldManuallyReload = false
-                }
-                return
-            }
+        val (currentSha, currentTime) = readCurrentCommit() ?: (null to null)
+        commitTime = currentTime
+
+        val (latestRepoCommit, latestRepoCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
+            response.sha to response.commit.committer.date
+        } ?: run {
+            repoDownloadFailed = true
+            null to null
+        }
+
+        if (repoFileLocation.exists() && currentSha == latestRepoCommit && unsuccessfulConstants.isEmpty()) {
             if (command) {
                 ChatUtils.clickToClipboard(
-                    "Repo is outdated, updating..",
+                    "§7The repo is already up to date!",
                     lines = buildList {
-                        add("local commit sha: §e$latestRepoCommit")
-                        currentDownloadedCommitTime?.let { localTime ->
-                            add("local commit time: §b$localTime")
-                            add("  (§b${localTime.passedSince().format()} ago§7)")
-                        }
-                        add("")
-                        add("latest commit sha: §e$currentDownloadedCommit")
-                        latestRepoCommitTime?.let<SimpleTimeMark, Unit> { latestTime ->
+                        add("latest commit sha: §e$currentSha")
+                        latestRepoCommitTime?.let { latestTime ->
                             add("latest commit time: §b$latestTime")
                             add("  (§b${latestTime.passedSince().format()} ago§7)")
-                            currentDownloadedCommitTime?.let<SimpleTimeMark, Unit> { localTime ->
-                                val outdatedDuration = latestTime - localTime
-                                add("")
-                                add("outdated by: §b${outdatedDuration.format()}")
-                            }
                         }
                     },
                 )
+                shouldManuallyReload = false
             }
-            lastRepoUpdate = SimpleTimeMark.now()
-
-            repoLocation.mkdirs()
-            val itemsZip = File(repoLocation, "sh-repo-main.zip")
-            itemsZip.createNewFile()
-
-            val url = URL(getDownloadUrl(latestRepoCommit))
-            val urlConnection = url.openConnection()
-            urlConnection.connectTimeout = 15000
-            urlConnection.readTimeout = 30000
-
-            RepoUtils.recursiveDelete(repoLocation)
-            repoLocation.mkdirs()
-
-            try {
-                urlConnection.getInputStream().use { stream ->
-                    FileUtils.copyInputStreamToFile(
-                        stream,
-                        itemsZip,
-                    )
-                }
-            } catch (e: IOException) {
-                ErrorManager.logErrorWithData(
-                    e,
-                    "Failed to download SkyHanni Repo",
-                    "url" to url,
-                    "command" to command,
-                )
-                repoDownloadFailed = true
-                return
-            }
-            RepoUtils.unzipIgnoreFirstFolder(
-                itemsZip.absolutePath,
-                repoLocation.absolutePath,
-            )
-            if (currentDownloadedCommit == null || currentDownloadedCommit != latestRepoCommit) {
-                writeCurrentCommit(latestRepoCommit, latestRepoCommitTime)
-            }
-            commitTime = latestRepoCommitTime
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Failed to download SkyHanni Repo",
-                "command" to command,
-            )
-            repoDownloadFailed = true
-            return
+            return true
         }
+
+        if (command) {
+            ChatUtils.clickToClipboard(
+                "Repo is outdated, updating..",
+                lines = buildList {
+                    add("local commit sha: §e$latestRepoCommit")
+                    currentTime?.let { localTime ->
+                        add("local commit time: §b$localTime")
+                        add("  (§b${localTime.passedSince().format()} ago§7)")
+                    }
+                    add("")
+                    add("latest commit sha: §e$currentSha")
+                    latestRepoCommitTime?.let { latestTime ->
+                        add("latest commit time: §b$latestTime")
+                        add("  (§b${latestTime.passedSince().format()} ago§7)")
+                        currentTime?.let { localTime ->
+                            val outdatedDuration = latestTime - localTime
+                            add("")
+                            add("outdated by: §b${outdatedDuration.format()}")
+                        }
+                    }
+                },
+            )
+        }
+        lastRepoUpdate = SimpleTimeMark.now()
+
+        RepoUtils.recursiveDelete(repoFileLocation)
+        repoFileLocation.mkdirs()
+        val itemsZip = File(repoFileLocation, "sh-repo-main.zip")
+        try {
+            itemsZip.createNewFile()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Error creating sh repo zip file")
+            return false
+        }
+
+        if (!githubRepoLocation.downloadCommitZipToFile(itemsZip)) {
+            repoDownloadFailed = true
+            return false
+        }
+        RepoUtils.unzipIgnoreFirstFolder(
+            itemsZip.absolutePath,
+            repoFileLocation.absolutePath,
+        )
+        if (currentSha == null || currentSha != latestRepoCommit) {
+            writeCurrentCommit(latestRepoCommit, latestRepoCommitTime)
+        }
+        commitTime = latestRepoCommitTime
         repoDownloadFailed = false
         usingBackupRepo = false
+        return true
     }
 
     private fun reloadRepository(answerMessage: String = "") {
@@ -251,7 +214,7 @@ object RepoManager {
         unsuccessfulConstants.clear()
         lastConstant = null
 
-        RepositoryReloadEvent(repoLocation, gson).post {
+        RepositoryReloadEvent(repoFileLocation, gson).post {
             error = true
             lastConstant?.let {
                 unsuccessfulConstants.add(it)
@@ -283,13 +246,13 @@ object RepoManager {
             newCurrentCommitJSON.addProperty("time", it.toMillis())
         }
         try {
-            writeJson(newCurrentCommitJSON, File(configLocation, "currentCommit.json"))
+            writeJson(newCurrentCommitJSON, File(configFileLocation, "currentCommit.json"))
         } catch (ignored: IOException) {
         }
     }
 
     private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
-        val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
+        val currentCommitJSON: JsonObject? = getJsonFromFile(File(configFileLocation, "currentCommit.json"))
         val sha = currentCommitJSON?.get("sha")?.asString
         val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark()
         return sha?.let { it to time }
@@ -354,19 +317,6 @@ object RepoManager {
         }
     }
 
-    private fun getCommitApiUrl(): String {
-        val repoUser = config.location.user
-        val repoName = config.location.name
-        val repoBranch = config.location.branch
-        return "https://api.github.com/repos/$repoUser/$repoName/commits/$repoBranch"
-    }
-
-    private fun getDownloadUrl(commitId: String?): String {
-        val repoUser = config.location.user
-        val repoName = config.location.name
-        return "https://github.com/$repoUser/$repoName/archive/$commitId.zip"
-    }
-
     @Throws(IOException::class)
     fun writeJson(json: JsonObject?, file: File) {
         file.createNewFile()
@@ -417,15 +367,15 @@ object RepoManager {
         println("Attempting to switch to backup repo")
 
         try {
-            repoLocation.mkdirs()
-            val destinationFile = File(repoLocation, "sh-repo-main.zip").apply { createNewFile() }
+            repoFileLocation.mkdirs()
+            val destinationFile = File(repoFileLocation, "sh-repo-main.zip").apply { createNewFile() }
             val destinationPath = destinationFile.toPath()
 
             val inputStream = RepoManager::class.java.classLoader.getResourceAsStream("assets/skyhanni/repo.zip")
                 ?: throw IOException("Failed to find backup repo")
 
             Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING)
-            RepoUtils.unzipIgnoreFirstFolder(destinationPath.toAbsolutePath().toString(), repoLocation.absolutePath)
+            RepoUtils.unzipIgnoreFirstFolder(destinationPath.toAbsolutePath().toString(), repoFileLocation.absolutePath)
             writeCurrentCommit("backup-repo", time = null)
 
             println("Successfully switched to backup repo")

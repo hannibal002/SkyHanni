@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -57,8 +56,8 @@ import net.minecraft.nbt.NBTException
 @SkyHanniModule
 object EnoughUpdatesManager {
 
-    val configLocation = File("config/notenoughupdates")
-    val repoLocation = File(configLocation, "repo")
+    val configFileLocation = File("config/notenoughupdates")
+    val repoFileLocation = File(configFileLocation, "repo")
 
     private val itemMap = TreeMap<String, JsonObject>()
     private val itemStackCache = mutableMapOf<String, ItemStack>()
@@ -73,11 +72,7 @@ object EnoughUpdatesManager {
 
     fun getItemInformation() = itemMap
 
-    fun downloadRepo() {
-        SkyHanniMod.coroutineScope.launch {
-            EnoughUpdatesRepo.downloadRepo()
-        }
-    }
+    fun downloadRepo() = EnoughUpdatesRepo.downloadRepo()
 
     private var isLoading = false
 
@@ -92,7 +87,7 @@ object EnoughUpdatesManager {
         recipesMap.clear()
 
         val tempItemMap = TreeMap<String, JsonObject>()
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             loadItemMap(tempItemMap)
             synchronized(itemMap) {
                 itemMap.clear()
@@ -107,7 +102,7 @@ object EnoughUpdatesManager {
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
-        val itemDir = File(repoLocation, "items")
+        val itemDir = File(repoFileLocation, "items")
         if (!itemDir.exists()) return
         for (file in itemDir.listFiles() ?: return) {
             if (file.extension != "json") continue
@@ -459,7 +454,7 @@ object EnoughUpdatesManager {
     }
 
     private fun itemCountInRepoFolder(): Int {
-        val itemsFolder = File(repoLocation, "items")
+        val itemsFolder = File(repoFileLocation, "items")
         return itemsFolder.listFiles()?.size ?: 0
     }
 
