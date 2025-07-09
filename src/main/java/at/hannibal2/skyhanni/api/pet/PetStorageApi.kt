@@ -218,7 +218,7 @@ object PetStorageApi {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent) {
         autoPetMessagePattern.matchMatcher(event.message) {
             if (config.hideAutopet) event.blockedReason = "autopet"

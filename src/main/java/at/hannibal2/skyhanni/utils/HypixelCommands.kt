@@ -207,6 +207,10 @@ object HypixelCommands {
         send("locraw")
     }
 
+    fun attributeMenu() {
+        send("attributemenu")
+    }
+
     private fun send(command: String) {
         if (command.startsWith("/")) {
             debug("Sending wrong command to server? ($command)")
