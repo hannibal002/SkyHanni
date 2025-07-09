@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.item.ItemStack
-import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ExperimentsAddonsHelper {
