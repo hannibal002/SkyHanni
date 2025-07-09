@@ -8,7 +8,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import java.awt.Color
@@ -31,17 +30,24 @@ class ExperimentsSuperpairsConfig {
             @ConfigOption(
                 name = "Enabled",
                 desc = "Enable highlighting for items under certain conditions.\n" +
-                    "Individual highlight types can be turned off by setting the color to transparent."
+                    "Individual highlight types can be turned off by setting the color to transparent.",
             )
             @ConfigEditorBoolean
             var enabled: Boolean = true
 
-            enum class HighlightType { BORDER, FULL }
+            enum class HighlightType(val display: String) {
+                BORDER("Border"),
+                FULL("Full"),
+                ;
 
-            @Expose
-            @ConfigOption(name = "Highlight Type", desc = "How the slot will be highlighted.")
-            @ConfigEditorDropdown
-            var type: HighlightType = HighlightType.FULL
+                override fun toString(): String = display
+            }
+
+            // TODO add back once the option is getting used
+//             @Expose
+//             @ConfigOption(name = "Highlight Type", desc = "How the slot will be highlighted.")
+//             @ConfigEditorDropdown
+//             var type: HighlightType = HighlightType.FULL
 
             @Expose
             @ConfigOption(name = "Matched Pairs", desc = "Color for pairs you have already matched, and will receive in rewards.")
