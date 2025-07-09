@@ -39,10 +39,12 @@ object CoralFIshHelper {
 
     private const val OVERVIEW_FISH_SLOT = 4
 
-    val bazaarShardsInventory = InventoryDetector(
-        pattern = "\\(\\d+/\\d+\\) Fish Family".toPattern(),
-        openInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
-    )
+    init {
+        InventoryDetector(
+            pattern = "\\(\\d+/\\d+\\) Fish Family".toPattern(),
+            openInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
+        )
+    }
 
     private var display = emptyList<Renderable>()
     private val textInput = SearchTextInput()
@@ -53,12 +55,8 @@ object CoralFIshHelper {
         val overviewItem = items[OVERVIEW_FISH_SLOT]
         val overviewItemLore = overviewItem.getLore().map { it.removeColor() }
 
-        var amountFound = 0
-        var totalAmount = 0
-
-        ModernPatterns.coralFishFoundPattern.firstMatcher(overviewItemLore) {
-            amountFound = group("found").toInt()
-            totalAmount = group("total").toInt()
+        val (amountFound, totalAmount) = ModernPatterns.coralFishFoundPattern.firstMatcher(overviewItemLore) {
+            group("found").toInt() to group("total").toInt()
         } ?: return
 
         val neededFish = mutableListOf<String>()
@@ -100,7 +98,8 @@ object CoralFIshHelper {
         val tooltip = buildList {
             add(itemName)
             add("§7Lowest bin: $priceString")
-            add("§7Click to open on the ah")
+            add("")
+            add("§eClick to open on the ah!")
         }
 
         val clickable = Renderable.clickable(
@@ -123,8 +122,8 @@ object CoralFIshHelper {
         val searchable: Searchable,
     )
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GALATEA)
+    fun onRenderOverlay() {
         if (!config.coralFishHelper) return
         if (display.isEmpty()) return
         config.coralFishHelperPosition.renderRenderables(display, posLabel = "Coral Fish Helper")
