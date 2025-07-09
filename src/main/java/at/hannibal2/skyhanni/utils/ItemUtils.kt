@@ -686,8 +686,8 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
-        if (this.getItemStackOrNull()?.getPetInfo() != null) {
-            return PetUtils.getCleanPetName(this@grabItemName, colored = true) + " Pet"
+        if (this.isPet) {
+            return PetUtils.getCleanPetName(this, colored = true) + " Pet"
         }
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
