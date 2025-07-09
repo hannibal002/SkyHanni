@@ -108,6 +108,7 @@ object PartyChatCommands {
     }
 
     private fun isTrustedUser(name: String): Boolean {
+        if (name == PlayerUtils.getName()) return true
         val friend = FriendApi.getAllFriends().find { it.name == name }
         return when (config.defaultRequiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
