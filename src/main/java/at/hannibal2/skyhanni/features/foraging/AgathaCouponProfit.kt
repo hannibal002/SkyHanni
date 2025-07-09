@@ -33,6 +33,7 @@ object AgathaCouponProfit {
 
     private var display = emptyList<Renderable>()
 
+    // TODO replace with inventory detector
     private var inInventory = false
     private val AGATHA_COUPON = "AGATHA_COUPON".toInternalName()
 
@@ -51,7 +52,9 @@ object AgathaCouponProfit {
         val table = mutableListOf<DisplayTableEntry>()
         for ((slot, item) in event.inventoryItems) {
             try {
-                readItem(slot, item, table)
+                readItem(slot, item)?.let {
+                    table.add(it)
+                }
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
                     e, "Error in AgathaCouponProfit while reading item '${item.repoItemName}'",
@@ -62,19 +65,15 @@ object AgathaCouponProfit {
             }
         }
 
-        val newList = mutableListOf<Renderable>()
-        newList.add(StringRenderable("§eProfit per Agatha Coupon"))
-        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
-        display = newList
+        display = buildList {
+            add(StringRenderable("§eProfit per Agatha Coupon"))
+            add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+        }
     }
 
-    private fun readItem(
-        slot: Int,
-        item: ItemStack,
-        table: MutableList<DisplayTableEntry>,
-    ) {
-        if (!isValidSlotNumber(slot)) return
-        val (internalName, itemName) = workOutInternalNameOrNull(item) ?: return
+    private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {
+        if (!isValidSlotNumber(slot)) return null
+        val (internalName, itemName) = workOutInternalNameOrNull(item) ?: return null
         val requiredItems = getRequiredItems(item)
         val price = internalName.getPrice()
         var totalCost = 0.0
@@ -105,18 +104,17 @@ object AgathaCouponProfit {
             }
         }
 
-        table.add(
-            DisplayTableEntry(
-                itemName,
-                "§6${profitPerCoupon.shortFormat()}",
-                profitPerCoupon,
-                internalName,
-                hover,
-                highlightsOnHoverSlots = listOf(slot),
-            ),
+        return DisplayTableEntry(
+            itemName,
+            "§6${profitPerCoupon.shortFormat()}",
+            profitPerCoupon,
+            internalName,
+            hover,
+            highlightsOnHoverSlots = listOf(slot),
         )
     }
 
+    // TODO merge logic into core item utils logic, i think
     private fun workOutInternalNameOrNull(item: ItemStack): Pair<NeuInternalName, String>? {
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
