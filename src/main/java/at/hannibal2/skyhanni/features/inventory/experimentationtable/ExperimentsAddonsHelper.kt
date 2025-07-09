@@ -43,6 +43,7 @@ object ExperimentsAddonsHelper {
     private val userUltrasequencerProgress: MutableList<Int> = mutableListOf()
     private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
 
+    private var chronHasBeenEmpty: Boolean = false
     private var lastUserClickChron: LorenzColor? = null
     private var lastChronomatronSound: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentAddonPhase: HelperPhase? = null
@@ -165,7 +166,6 @@ object ExperimentsAddonsHelper {
             it == hypixelChronomatronData[userChronomatronProgress.size]
         } ?: return cancel()
         userChronomatronProgress.add(clickedColor)
-        ChatUtils.debug("Added color $clickedColor to user chronomatron progress")
         makePickblock()
         lastUserClickChron = clickedColor
     }
@@ -178,7 +178,6 @@ object ExperimentsAddonsHelper {
             it == expectedSlot
         } ?: return cancel()
         userUltrasequencerProgress.add(clickedSlot)
-        ChatUtils.debug("Added slot $clickedSlot to user ultrasequencer progress")
         makePickblock()
     }
     // </editor-fold>
@@ -257,15 +256,17 @@ object ExperimentsAddonsHelper {
         val activeColors = inventoryItems.values.filter {
             nextChronomatronItemPattern.matches(it.item.getIdentifierString())
         }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
+        val emptyScreen = activeColors.isEmpty()
 
-        if (activeColors.isEmpty() && lastUserClickChron != null) {
-            ChatUtils.debug("Setting last user click chron to null due to no active colors")
-            lastUserClickChron = null
-        }
-        if (lastUserClickChron != null) {
-            ChatUtils.debug("Last user click is $lastUserClickChron, returning early")
+        if (emptyScreen) chronHasBeenEmpty = true
+        else if (!chronHasBeenEmpty) {
+            ChatUtils.debug("WEE WOO WEE WOO BAD!! Double detection being skipped.")
             return
         }
+
+        if (emptyScreen && lastUserClickChron != null) lastUserClickChron = null
+        if (lastUserClickChron != null) return
+
         if (userChronomatronProgress.size < hypixelChronomatronData.size) {
             ChatUtils.debug("User chronomatron progress is not complete, returning early")
             return
@@ -285,7 +286,6 @@ object ExperimentsAddonsHelper {
                 return
             }
             hypixelChronomatronData.add(clickedColor)
-            ChatUtils.debug("Added color $clickedColor to hypixel chronomatron data at index $chronomatronSequenceIndex")
             lastChronomatronSound = SimpleTimeMark.farPast()
             chronomatronSequenceIndex = 0
             userChronomatronProgress.clear()
