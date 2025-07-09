@@ -100,7 +100,7 @@ abstract class AbstractRepoManager {
             category = CommandCategory.USERS_BUG_FIX
             simpleCallback { updateRepo() }
         }
-        if (shouldRegisterUpdateCommand) event.registerBrigadier(statusCommand) {
+        if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
             simpleCallback { displayRepoStatus(false) }
