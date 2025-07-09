@@ -25,15 +25,19 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: ./.github/actions/setup-normal-workspace
-            -   name: Build with Gradle
-                run: ./gradlew assemble -x test --stacktrace -PskipDetekt=true
+            -   name: Build with Gradle w/retry
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true
             -   uses: actions/upload-artifact@v4
                 name: Upload development build
                 with:
                     name: "Development Build"
                     path: build/libs/*.jar
-            -   name: Test with Gradle
-                run: ./gradlew test
+            -   name: Test with Gradle w/retry
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: test
             -   uses: actions/upload-artifact@v4
                 name: "Upload test report"
                 if: ${{ !cancelled() }}
@@ -56,8 +60,10 @@ jobs:
                 run: |
                     mkdir -p .gradle
                     echo skyhanni.multi-version=compile > .gradle/private.properties
-            -   name: Build with Gradle
-                run: ./gradlew build --stacktrace -PskipDetekt=true
+            -   name: Build with Gradle w/retry
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: build --stacktrace -PskipDetekt=true
 
             -   name: Add label if build fails
                 if: ${{ failure() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}

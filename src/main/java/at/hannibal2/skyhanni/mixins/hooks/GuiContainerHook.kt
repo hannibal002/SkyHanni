@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -66,11 +67,13 @@ class GuiContainerHook(guiAny: Any) {
 
     fun foregroundDrawn(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (!PlatformUtils.IS_LEGACY) {
-            context.matrices.translate(0.0, 0.0, 200.0)
+            DrawContextUtils.setContext(context)
+            DrawContextUtils.translate(0.0, 0.0, 200.0)
         }
         GuiContainerEvent.ForegroundDrawnEvent(context, gui, container, mouseX, mouseY, partialTicks).post()
         if (!PlatformUtils.IS_LEGACY) {
-            context.matrices.translate(0.0, 0.0, -200.0)
+            DrawContextUtils.translate(0.0, 0.0, -200.0)
+            DrawContextUtils.clearContext()
         }
     }
 
