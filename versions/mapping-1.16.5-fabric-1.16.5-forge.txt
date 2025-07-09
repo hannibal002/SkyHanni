@@ -39,8 +39,6 @@ net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack
 net.minecraft.item.ItemStack getEnchantments() getEnchantmentTags()
 net.minecraft.item.ItemStack getName() getDisplayName()
 
-net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket net.minecraft.network.protocol.game.ClientboundAddPlayerPacket
-
 net.minecraft.screen.ScreenHandler net.minecraft.world.inventory.AbstractContainerMenu
 
 net.minecraft.screen.ScreenHandler getSlot() getSlot()
