@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -252,7 +253,7 @@ object ExperimentsAddonsHelper {
 
         val activeColors = inventoryItems.values.filter {
             nextChronomatronItemPattern.matches(it.item.getIdentifierString())
-        }.mapNotNull { it.getLorenzColorOrNull() }
+        }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
 
         ChatUtils.debug("Active colors: $activeColors")
 
@@ -311,32 +312,36 @@ object ExperimentsAddonsHelper {
     // </editor-fold>
 
     // <editor-fold desc="Debugging">
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!debugConfig.addonsDebug || !ExperimentationTableApi.inAddon) return
+    init {
+        RenderDisplayHelper(
+            inventory = ExperimentationTableApi.experimentationTableInventory,
+            condition = { ExperimentationTableApi.inAddon && debugConfig.addonsDebug },
+            onlyOnIsland = IslandType.PRIVATE_ISLAND,
+            onRender = {
+                val renderable = VerticalContainerRenderable(
+                    buildList {
+                        addString("Current Addon Phase: $currentAddonPhase")
+                        if (ExperimentationTableApi.inChronomatron) {
+                            addString("Current Chronomatron Round: $currentChronomatronRound")
+                            addString("Current Chronomatron Sequence Index: $chronomatronSequenceIndex")
+                            addString("")
+                            addString("Hypixel Chronomatron Data: $hypixelChronomatronData")
+                            addString("User Chronomatron Progress: $userChronomatronProgress")
+                            addString("")
+                            addString("Last Chronomatron Sound: $lastChronomatronSound")
+                        } else if (ExperimentationTableApi.inUltrasequencer) {
+                            addString("Current Ultrasequencer Round: $currentUltraSequencerRound")
+                            addString("")
+                            addString("Hypixel Ultrasequencer Data: $hypixelUltrasequencerData")
+                            addString("User Ultrasequencer Progress: $userUltrasequencerProgress")
+                            addString("Ultrasequencer Dye Map: $ultrasequencerDyeMap")
+                        } else return@buildList
+                    }
+                )
 
-        val renderable = VerticalContainerRenderable(
-            buildList {
-                addString("Current Addon Phase: $currentAddonPhase")
-                if (ExperimentationTableApi.inChronomatron) {
-                    addString("Current Chronomatron Round: $currentChronomatronRound")
-                    addString("Current Chronomatron Sequence Index: $chronomatronSequenceIndex")
-                    addString("")
-                    addString("Hypixel Chronomatron Data: $hypixelChronomatronData")
-                    addString("User Chronomatron Progress: $userChronomatronProgress")
-                    addString("")
-                    addString("Last Chronomatron Sound: $lastChronomatronSound")
-                } else if (ExperimentationTableApi.inUltrasequencer) {
-                    addString("Current Ultrasequencer Round: $currentUltraSequencerRound")
-                    addString("")
-                    addString("Hypixel Ultrasequencer Data: $hypixelUltrasequencerData")
-                    addString("User Ultrasequencer Progress: $userUltrasequencerProgress")
-                    addString("Ultrasequencer Dye Map: $ultrasequencerDyeMap")
-                } else return
+                debugConfig.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")
             }
         )
-
-        debugConfig.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")
     }
     // </editor-fold>
 }
