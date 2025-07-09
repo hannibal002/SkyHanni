@@ -397,11 +397,14 @@ object ScoreboardPattern {
     )
 
     /**
+     * REGEX-TEST: Nearby Players: §a0
+     * REGEX-TEST: Nearby Players: §a1
      * REGEX-TEST: Nearby Players: §a5 §cMAX
+     * REGEX-TEST: Nearby Players: §cN/A
      */
     val nearbyPlayersPattern by miningSB.pattern(
         "nearbyplayers",
-        "Nearby Players: §.*",
+        "Nearby Players: §.(?:\\d+|N/A)(?: §cMAX)?",
     )
     val goblinUselessPattern by miningSB.pattern(
         "goblinguseless",
