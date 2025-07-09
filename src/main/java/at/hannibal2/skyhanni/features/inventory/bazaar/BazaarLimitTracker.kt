@@ -36,11 +36,10 @@ object BazaarLimitTracker {
 
     @HandleEvent
     fun onBazaarTransaction(event: BazaarTransactionEvent) {
-        if (event.transactionType != BazaarTransactionEvent.TransactionType.FLIP_ORDER) {
-            coinsTowardsLimit += event.coinAmount
-            if (coinsTowardsLimit >= DAILY_LIMIT) {
-                ChatUtils.chat("You reached your daily trade limit in the bazaar!")
-            }
+        if (event.transactionType == BazaarTransactionEvent.TransactionType.FLIP_ORDER) return
+        coinsTowardsLimit += event.coinAmount
+        if (coinsTowardsLimit >= DAILY_LIMIT) {
+            ChatUtils.chat("You reached your daily trade limit in the bazaar!")
         }
     }
 

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.OwnInventoryData
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -44,6 +46,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object BazaarApi {
+
+    private val storage get() = ProfileStorageData.playerSpecific?.bazaar
 
     private var loadedNpcPriceData = false
 
@@ -99,6 +103,20 @@ object BazaarApi {
         "Co-op Bazaar Orders",
     )
 
+    /**
+     * REGEX-TEST: §8Current tax: 1%
+     */
+    private val taxPattern by patternGroup.pattern(
+        "instantsell.tax",
+        "§8Current tax: (?<tax>[\\d,.]+)%",
+    )
+
+    private var taxRate: Double
+        get() = storage?.taxRate ?: 1.25
+        private set(value) {
+            storage?.taxRate = value
+        }
+
     fun NeuInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
 
     fun NeuInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
@@ -130,6 +148,8 @@ object BazaarApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
         if (inBazaarInventory) {
+            updateTaxRate(event.inventoryItems)
+
             val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
             currentlyOpenedProduct = openedProduct
             lastOpenedProduct = openedProduct
@@ -175,6 +195,20 @@ object BazaarApi {
         return NeuInternalName.fromItemName(bazaarItem.displayName)
     }
 
+    private fun updateTaxRate(items: Map<Int, ItemStack>) {
+        for ((_, item) in items) {
+            if (item.displayName.contains("Sell Instantly")) {
+                if (item.getLore().contains("Click to sell!")) {
+                    for (line in item.getLore()) {
+                        taxPattern.matchMatcher(line) {
+                            storage?.taxRate = group("tax").formatDouble()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (ApiUtils.isHypixelItemsDisabled()) return
@@ -212,6 +246,10 @@ object BazaarApi {
         transactionPattern.matchMatcher(message) {
             val item = group("item")
             val coins = group("coins").replace(",", "").toDoubleOrNull() ?: return
+            val adjustedCoins = when (group("type")) {
+                "Sold" -> coins * (1 - taxRate / 100)
+                else -> coins
+            }
             val transactionType = when (group("type")) {
                 "Bought" -> TransactionType.INSTANT_BUY
                 "Buy Order Setup!" -> TransactionType.BUY_ORDER
@@ -220,7 +258,7 @@ object BazaarApi {
                 "Order Flipped!" -> TransactionType.FLIP_ORDER
                 else -> return
             }
-            BazaarTransactionEvent(transactionType, coins).post()
+            BazaarTransactionEvent(transactionType, adjustedCoins).post()
             if (currentSearchedItem == item) {
                 currentSearchedItem = ""
             }

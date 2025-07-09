@@ -42,6 +42,9 @@ class PlayerSpecificStorage {
 
     class BazaarStorage {
         @Expose
+        var taxRate: Double = 1.25
+
+        @Expose
         var coinsTowardsLimit: Double = 0.0
 
         @Expose
