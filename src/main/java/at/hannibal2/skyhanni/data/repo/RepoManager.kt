@@ -4,12 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
-object RepoManager : AbstractRepoManager<RepositoryConfig, RepositoryReloadEvent>() {
+object RepoManager : AbstractRepoManager() {
 
     override val commonName = "SkyHanni"
     override val commonShortNameCased = "SH"
@@ -20,7 +19,7 @@ object RepoManager : AbstractRepoManager<RepositoryConfig, RepositoryReloadEvent
     override fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
     override fun fireReloadEvent(
-        manager: AbstractRepoManager<RepositoryConfig, RepositoryReloadEvent>,
+        manager: AbstractRepoManager,
         onError: (Throwable) -> Unit,
     ): Boolean = RepositoryReloadEvent(manager).post(onError)
 }

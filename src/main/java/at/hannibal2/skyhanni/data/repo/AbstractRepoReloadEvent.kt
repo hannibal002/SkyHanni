@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import java.lang.reflect.Type
 
 abstract class AbstractRepoReloadEvent(
-    open val manager: AbstractRepoManager<*, *>
+    open val manager: AbstractRepoManager,
 ) : SkyHanniEvent() {
     val repoDirectory = manager.repoDirectory
     val gson = manager.getGson()
@@ -13,6 +13,6 @@ abstract class AbstractRepoReloadEvent(
     inline fun <reified T : Any> getConstant(
         constant: String,
         type: Type? = null,
-        gson: Gson = this.gson
+        gson: Gson = this.gson,
     ): T = manager.getConstant(constant, type, gson)
 }

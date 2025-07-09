@@ -7,9 +7,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import java.io.File
-import java.io.IOException
 import java.io.Reader
-import kotlin.jvm.Throws
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.typeOf
 
