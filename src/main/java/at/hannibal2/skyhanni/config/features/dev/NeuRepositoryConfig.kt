@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo
+import at.hannibal2.skyhanni.data.repo.AbstractRepoConfig
 import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -9,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class NeuRepositoryConfig {
+class NeuRepositoryConfig : AbstractRepoConfig<NeuRepositoryConfig.NeuRepositoryLocation>() {
 
     @Expose
     @ConfigOption(
@@ -19,18 +20,18 @@ class NeuRepositoryConfig {
             "§eThis only works if NEU is not installed, if it is use their settings.",
     )
     @ConfigEditorBoolean
-    var repoAutoUpdate: Boolean = true
+    override var repoAutoUpdate: Boolean = true
 
     @ConfigOption(name = "Update NEU Repo Now", desc = "Update your NEU repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    val updateRepo: Runnable = Runnable(EnoughUpdatesRepo::downloadRepo)
+    override val updateRepo: Runnable = Runnable(EnoughUpdatesRepo::downloadRepo)
 
     @Expose
     @ConfigOption(name = "NEU Repository Location", desc = "")
     @Accordion
-    val location: RepositoryLocation = RepositoryLocation()
+    override val location: NeuRepositoryLocation = NeuRepositoryLocation()
 
-    class RepositoryLocation : AbstractRepoLocationConfig() {
+    class NeuRepositoryLocation : AbstractRepoLocationConfig() {
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your NEU repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
         val resetRepoLocation: Runnable = Runnable { EnoughUpdatesRepo.resetRepoLocation() }

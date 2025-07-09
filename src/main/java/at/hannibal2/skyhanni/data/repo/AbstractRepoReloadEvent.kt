@@ -9,11 +9,11 @@ import java.io.File
 import java.lang.reflect.Type
 
 abstract class AbstractRepoReloadEvent(
-    val repoFileLocation: File,
-    val manager: AbstractRepoManager<*, *>
+    open val manager: AbstractRepoManager<*, *>
 ) : SkyHanniEvent() {
+    val repoFileLocation = manager.repoFileLocation
     val gson = manager.getGson()
-    val repoName = manager.commonRepoName
+    val repoName = manager.commonName
 
     @PublishedApi
     internal fun getConstantFile(fileName: String): JsonObject? =

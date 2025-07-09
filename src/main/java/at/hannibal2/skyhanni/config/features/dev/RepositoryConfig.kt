@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.dev
 
+import at.hannibal2.skyhanni.data.repo.AbstractRepoConfig
 import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
 import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.data.repo.RepoUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class RepositoryConfig {
+class RepositoryConfig : AbstractRepoConfig<RepositoryConfig.RepositoryLocation>() {
     @Expose
     @ConfigOption(
         name = "Repo Auto Update",
@@ -18,16 +18,16 @@ class RepositoryConfig {
             "§cOnly disable this if you know what you are doing!",
     )
     @ConfigEditorBoolean
-    var repoAutoUpdate: Boolean = true
+    override var repoAutoUpdate: Boolean = true
 
     @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    val updateRepo: Runnable = Runnable(RepoManager::updateRepo)
+    override val updateRepo: Runnable = Runnable(RepoManager::updateRepo)
 
     @Expose
     @ConfigOption(name = "Repository Location", desc = "")
     @Accordion
-    val location: RepositoryLocation = RepositoryLocation()
+    override val location: RepositoryLocation = RepositoryLocation()
 
     class RepositoryLocation : AbstractRepoLocationConfig() {
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your repository location to the default.")

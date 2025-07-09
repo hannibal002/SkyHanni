@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -31,29 +32,26 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 @SkyHanniModule
-object RepoManager {
+object RepoManager : AbstractRepoManager<RepositoryConfig, RepositoryReloadEvent>() {
+
+    override val commonName = "SkyHanni"
+    override val commonShortName = "SH"
+    override val configFileLocation = ConfigManager.configDirectory
 
     private val gson get() = ConfigManager.gson
-    private val configFileLocation = ConfigManager.configDirectory
+
     val repoFileLocation: File = File(configFileLocation, "repo")
     private var error = false
     private var lastRepoUpdate = SimpleTimeMark.now()
     private var repoDownloadFailed = false
 
-    private val config get() = SkyHanniMod.feature.dev.repo
+    override val config get() = SkyHanniMod.feature.dev.repo
 
     val successfulConstants = mutableListOf<String>()
     val unsuccessfulConstants = mutableListOf<String>()
     var usingBackupRepo = false
 
     private var lastConstant: String? = null
-
-    fun setLastConstant(constant: String) {
-        lastConstant?.let {
-            successfulConstants.add(it)
-        }
-        lastConstant = constant
-    }
 
     fun getRepoLocation(): String {
         return "${config.location.user}/${config.location.repoName}/${config.location.branch}"
