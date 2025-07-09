@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -236,13 +237,13 @@ object ExperimentsAddonsHelper {
         }
     }
 
-    private fun InventoryUpdatedEvent.readChronomatronRoundOrNull(): Int? {
+    private fun InventoryUpdatedEvent.readRoundOrNull(): Int? {
         val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.displayName ?: return null
         return roundItemPattern.matchGroup(roundItemName, "round")?.formatIntOrNull()
     }
 
     private fun InventoryUpdatedEvent.readNextChronomatron(oldPhase: HelperPhase? = null) {
-        currentChronomatronRound = readChronomatronRoundOrNull() ?: return
+        currentChronomatronRound = readRoundOrNull() ?: return
         val hypixelSizeNow = hypixelChronomatronData.size
         val userSizeNow = userChronomatronProgress.size
 
@@ -285,6 +286,10 @@ object ExperimentsAddonsHelper {
     )
 
     private fun InventoryUpdatedEvent.readUltrasequencer() {
+        currentUltraSequencerRound = readRoundOrNull() ?: run {
+            ChatUtils.debug("Could not read current round in ultrasequencer, aborting reading.")
+            return
+        }
         if (currentAddonPhase != HelperPhase.READ) return
         hypixelUltrasequencerData.clear()
 
