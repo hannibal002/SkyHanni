@@ -333,7 +333,7 @@ abstract class AbstractRepoManager(
     open fun extraReloadWork() = Unit
 
     /**
-     * Called before the repo reload event is fired, but in an IO coroutine.
+     * Called before the repo reload event is fired, but inside the IO coroutine.
      */
     open suspend fun extraReloadCoroutineWork() = Unit
 
@@ -347,22 +347,22 @@ abstract class AbstractRepoManager(
 
         SkyHanniMod.launchIOCoroutine {
             extraReloadCoroutineWork()
-        }
 
-        eventConstructor.invoke(this).post { error ->
-            loadingError = true
-        }
+            eventConstructor.invoke(this@AbstractRepoManager).post { error ->
+                loadingError = true
+            }
 
-        if (answerMessage.isNotEmpty() && !loadingError) {
-            ChatUtils.chat("§a$answerMessage")
-        } else if (loadingError) {
-            ChatUtils.clickableChat(
-                "Error with the $commonShortName Repo detected, try /$updateCommand to fix it!",
-                onClick = ::updateRepo,
-                "§eClick to update the Repo!",
-                prefixColor = "§c",
-            )
-            if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
+            if (answerMessage.isNotEmpty() && !loadingError) {
+                ChatUtils.chat("§a$answerMessage")
+            } else if (loadingError) {
+                ChatUtils.clickableChat(
+                    "Error with the $commonShortName Repo detected, try /$updateCommand to fix it!",
+                    onClick = ::updateRepo,
+                    "§eClick to update the Repo!",
+                    prefixColor = "§c",
+                )
+                if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
+            }
         }
     }
 
