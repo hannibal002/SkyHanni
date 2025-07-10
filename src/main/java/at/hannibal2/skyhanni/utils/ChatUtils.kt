@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
+//#if MC < 1.21
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils.CHAT_PREFIX
-import at.hannibal2.skyhanni.utils.ChatUtils.DEBUG_PREFIX
-import at.hannibal2.skyhanni.utils.ChatUtils.USER_ERROR_PREFIX
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
@@ -31,7 +31,7 @@ import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.IChatComponent
 import java.util.LinkedList
 import java.util.Queue
-import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
@@ -58,7 +58,8 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ) {
-        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
+        val debug = SkyHanniDebugsAndTests.enabled
+        if (debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             consoleLog("[Debug] $message")
         }
     }
@@ -280,6 +281,7 @@ object ChatUtils {
 
     private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
 
+    //#if MC < 1.21
     var chatLines: MutableList<ChatLine>
         get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
         set(value) {
@@ -291,6 +293,19 @@ object ChatUtils {
         set(value) {
             (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
         }
+    //#else
+    //$$ var chatLines: MutableList<ChatHudLine>
+    //$$     get() = chatGui.messages
+    //$$     set(value) {
+    //$$         chatGui.messages = value
+    //$$     }
+    //$$
+    //$$ var drawnChatLines: MutableList<ChatHudLine.Visible>
+    //$$     get() = chatGui.visibleMessages
+    //$$     set(value) {
+    //$$         chatGui.visibleMessages = value
+    //$$     }
+    //#endif
 
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
     fun editFirstMessage(
@@ -299,7 +314,7 @@ object ChatUtils {
         predicate: (ChatLine) -> Boolean,
     ) {
         chatLines.editChatLine(component, predicate, reason)
-        chatGui.refreshChat()
+        refreshChat()
     }
 
     /**
@@ -311,7 +326,13 @@ object ChatUtils {
         predicate: (ChatLine) -> Boolean,
     ) {
         chatLines.deleteChatLine(amount, reason, predicate)
-        chatGui.refreshChat()
+        refreshChat()
+    }
+
+    private fun refreshChat() {
+        DelayedRun.onThread.execute {
+            chatGui.refreshChat()
+        }
     }
 
     private var deleteNext: Pair<String, (String) -> Boolean>? = null
@@ -324,6 +345,12 @@ object ChatUtils {
         if (predicate(event.message)) {
             event.blockedReason = reason
         }
+    }
+
+    @HandleEvent
+    fun onSendMessage(event: MessageSendToServerEvent) {
+        if (event.senderIsSkyhanni()) return
+        lastMessageSent = SimpleTimeMark.now()
     }
 
     fun deleteNextMessage(
@@ -373,7 +400,7 @@ object ChatUtils {
     fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
         MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
 
-    fun chatAndOpenConfig(message: String, property: KMutableProperty0<*>) {
+    fun chatAndOpenConfig(message: String, property: KProperty0<*>) {
         clickableChat(
             message,
             onClick = { property.jumpToEditor() },
@@ -383,7 +410,7 @@ object ChatUtils {
 
     fun clickToActionOrDisable(
         message: String,
-        option: KMutableProperty0<*>,
+        option: KProperty0<*>,
         actionName: String,
         action: () -> Unit,
         oneTimeClick: Boolean = false,
@@ -403,14 +430,14 @@ object ChatUtils {
         )
     }
 
-    //#if MC < 1.16
-    val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
     var ChatLine.fullComponent: IChatComponent
         get() = (this as ChatLineData).skyHanni_fullComponent
         set(value) {
             (this as ChatLineData).skyHanni_fullComponent = value
         }
 
+    //#if MC < 1.16
+    val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
     fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
     //#elseif MC < 1.21
     //$$ val GuiMessage<Component>.chatMessage get() = message.formattedTextCompat().stripHypixelMessage()

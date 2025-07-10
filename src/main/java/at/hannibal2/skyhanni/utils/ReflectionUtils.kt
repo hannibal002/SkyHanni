@@ -1,12 +1,17 @@
 package at.hannibal2.skyhanni.utils
 
+import java.lang.invoke.LambdaMetafactory
+import java.lang.invoke.MethodHandles
+import java.lang.invoke.MethodType
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.TypeVariable
 import java.lang.reflect.WildcardType
+import java.util.function.Consumer
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -128,6 +133,39 @@ object ReflectionUtils {
             } else {
                 return null
             }
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun createConsumerFromMethod(instance: Any, method: Method): Consumer<Any> {
+        try {
+            val handle = MethodHandles.lookup().unreflect(method)
+            return LambdaMetafactory.metafactory(
+                MethodHandles.lookup(),
+                "accept",
+                MethodType.methodType(Consumer::class.java, instance::class.java),
+                MethodType.methodType(Nothing::class.javaPrimitiveType, Object::class.java),
+                handle,
+                MethodType.methodType(Nothing::class.javaPrimitiveType, method.parameterTypes[0]),
+            ).target.bindTo(instance).invokeExact() as Consumer<Any>
+        } catch (e: Throwable) {
+            throw IllegalArgumentException("Method ${instance.javaClass.name}#${method.name} is not a valid consumer", e)
+        }
+    }
+
+    fun createRunnableFromMethod(instance: Any, method: Method): Runnable {
+        try {
+            val handle = MethodHandles.lookup().unreflect(method)
+            return LambdaMetafactory.metafactory(
+                MethodHandles.lookup(),
+                "run",
+                MethodType.methodType(Runnable::class.java, instance::class.java),
+                MethodType.methodType(Nothing::class.javaPrimitiveType),
+                handle,
+                MethodType.methodType(Nothing::class.javaPrimitiveType),
+            ).target.bindTo(instance).invokeExact() as Runnable
+        } catch (e: Throwable) {
+            throw IllegalArgumentException("Method ${instance.javaClass.name}#${method.name} is not a valid runnable", e)
         }
     }
 }

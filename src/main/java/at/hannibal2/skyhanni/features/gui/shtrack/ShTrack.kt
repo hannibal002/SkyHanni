@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.CollectionApi.getMultipleMap
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.ComplexCommand
@@ -25,11 +26,11 @@ import at.hannibal2.skyhanni.utils.CommandUtils
 import at.hannibal2.skyhanni.utils.CommandUtils.ItemGroup
 import at.hannibal2.skyhanni.utils.CommandUtils.numberCalculate
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.move
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -435,7 +436,7 @@ object ShTrack {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable
 
     val tracker get() = ProfileStorageData.profileSpecific?.tracking
 

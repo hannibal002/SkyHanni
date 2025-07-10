@@ -16,12 +16,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.BlockCarpet
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,19 +44,15 @@ object MiningCommissionsBlocksColor {
 
     private var color = EnumDyeColor.RED
 
-    private fun glass(state: IBlockState, result: Boolean): IBlockState = if (result) {
-        state.withProperty(BlockCarpet.COLOR, color)
-    } else {
-        state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
+    private fun glass(state: IBlockState, result: Boolean): IBlockState {
+        val newColor = if (result) color else EnumDyeColor.GRAY
+        return ColoredBlockCompat.fromMeta(newColor.metadata).createGlassBlockState(state)
     }
 
+
     private fun block(result: Boolean): IBlockState {
-        val wool = Blocks.wool.defaultState
-        return if (result) {
-            wool.withProperty(BlockCarpet.COLOR, color)
-        } else {
-            wool.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
-        }
+        val newColor = if (result) color else EnumDyeColor.GRAY
+        return ColoredBlockCompat.fromMeta(newColor.metadata).createWoolBlockState()
     }
 
     private var oldSneakState = false

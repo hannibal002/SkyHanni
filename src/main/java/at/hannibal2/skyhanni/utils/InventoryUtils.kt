@@ -7,25 +7,26 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.convertEmptyToNull
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.filterNotNullOrEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.client.resources.I18n
-import net.minecraft.entity.IMerchant
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
-import net.minecraft.world.IWorldNameable
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
@@ -39,7 +40,7 @@ object InventoryUtils {
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
     fun getItemsInOpenChest(): List<Slot> {
-        return getItemsInOpenChestWithNull().filter { it.stack != null }
+        return getItemsInOpenChestWithNull().filter { it.stack.isNotEmpty() }
     }
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
@@ -58,7 +59,7 @@ object InventoryUtils {
     fun getSlotsInOwnInventory(): List<Slot> {
         val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return emptyList()
         return guiInventory.slots()
-            .filter { it.inventory is InventoryPlayer && it.stack != null }
+            .filter { it.inventory is InventoryPlayer && it.stack.isNotEmpty() }
     }
 
     fun openInventoryName(): String = InventoryCompat.getOpenChestName()
@@ -72,10 +73,10 @@ object InventoryUtils {
     fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
 
     fun getItemsInOwnInventory(): List<ItemStack> =
-        getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
+        getItemsInOwnInventoryWithNull()?.filterNotNullOrEmpty().orEmpty()
 
     fun getItemsInOwnInventoryWithNull(): Array<ItemStack?>? =
-        MinecraftCompat.localPlayerOrNull?.inventory?.mainInventory?.normalizeAsArray()
+        MinecraftCompat.localPlayerOrNull?.inventory?.mainInventory?.normalizeAsArray().convertEmptyToNull()
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar(): List<ItemStack> =
@@ -151,21 +152,9 @@ object InventoryUtils {
     fun ContainerChest.getAllItems(): Map<Slot, ItemStack> = buildMap {
         for (slot in inventorySlots) {
             if (slot == null) continue
-            val stack = slot.stack ?: continue
+            val stack = slot.stack.orNull() ?: continue
             this[slot] = stack
         }
-    }
-
-    fun Gui.getTitle(): String = when (this) {
-        is IWorldNameable -> {
-            name
-        }
-
-        is IMerchant -> {
-            displayName.unformattedText
-        }
-
-        else -> ""
     }
 
     fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {

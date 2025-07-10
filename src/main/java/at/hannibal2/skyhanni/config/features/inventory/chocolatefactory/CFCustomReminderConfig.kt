@@ -38,5 +38,5 @@ class CFCustomReminderConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "customReminder")
-    var position: Position = Position(390, 90, 1f, true)
+    val position: Position = Position(390, 90, 1f, true)
 }

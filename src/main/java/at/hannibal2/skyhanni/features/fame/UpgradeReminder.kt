@@ -3,9 +3,6 @@ package at.hannibal2.skyhanni.features.fame
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -16,13 +13,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -85,7 +81,7 @@ object UpgradeReminder {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (ReminderUtils.isBusy()) return
-        if (inInventory || LorenzUtils.skyBlockArea == "Community Center") return
+        if (inInventory || SkyBlockUtils.graphArea == "Community Center") return
         if (lastReminderSend.passedSince() < 30.seconds) return
 
         currentProfileUpgrade?.sendReminderIfClaimable()
@@ -163,7 +159,7 @@ object UpgradeReminder {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.accountUpgradeReminder
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.accountUpgradeReminder
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -195,16 +191,9 @@ object UpgradeReminder {
             ChatUtils.clickToActionOrDisable(
                 "The §a$name §eupgrade has completed!",
                 config::accountUpgradeReminder,
-                actionName = "warp to Hub",
+                actionName = "warp to Elizabeth",
                 action = {
-                    HypixelCommands.warp("hub")
-                    EntityMovementData.onNextTeleport(IslandType.HUB) {
-                        IslandGraphs.pathFind(
-                            LorenzVec(-2.6, 73.0, -101.6),
-                            "§eCommunity Shop",
-                            condition = { config.accountUpgradeReminder },
-                        )
-                    }
+                    HypixelCommands.warp("elizabeth")
                 },
             )
         }

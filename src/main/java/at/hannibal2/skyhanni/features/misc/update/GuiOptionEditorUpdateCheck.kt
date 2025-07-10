@@ -2,25 +2,25 @@ package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
-import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.EnumChatFormatting.GREEN
-import net.minecraft.util.EnumChatFormatting.RED
+import kotlin.math.max
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
-    val button = GuiElementButton("", -1) {}
+    val button = GuiElementButton()
+    val changelog = GuiElementButton().apply { text = "Show Changelog" }
 
-    override fun render(context: RenderContext?, x: Int, y: Int, width: Int) {
-        val fr = Minecraft.getMinecraft().fontRendererObj
+    val currentVersion = SkyHanniMod.VERSION
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x.toFloat() + 10, y.toFloat(), 1F)
+    override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
+        val fr = context.minecraft.defaultFontRenderer
+
+        context.pushMatrix()
+        context.translate(x.toFloat() + 10, y.toFloat())
         val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
@@ -30,27 +30,33 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             UpdateManager.UpdateState.DOWNLOADED -> "Downloaded"
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
-        button.render(getButtonPosition(adjustedWidth), 10)
+        button.width = button.getWidth(context)
+        button.render(context, getButtonPosition(adjustedWidth), 10)
+
+        if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
+            changelog.width = changelog.getWidth(context)
+            changelog.render(context, getChangelogPosition(adjustedWidth), 30)
+        }
+
+        val widthRemaining = adjustedWidth - max(button.width, changelog.width) - 10
 
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
-            TextRenderUtils.drawStringCentered(
-                "${GREEN}The update will be installed after your next restart.",
+            context.drawStringCenteredScaledMaxWidth(
+                "§aThe update will be installed after your next restart.",
                 fr,
-                adjustedWidth / 2F,
+                widthRemaining / 2F,
                 40F,
                 true,
+                widthRemaining,
                 -1,
             )
         }
 
-        val widthRemaining = adjustedWidth - button.width - 10
-
-        GlStateManager.scale(2F, 2F, 1F)
-        val currentVersion = SkyHanniMod.VERSION
+        context.scale(2F, 2F)
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +
-                if (nextVersion != null && !sameVersion) "➜ $GREEN$nextVersion" else "",
+        context.drawStringCenteredScaledMaxWidth(
+            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +
+                if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else "",
             fr,
             widthRemaining / 4F,
             10F,
@@ -59,20 +65,23 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             -1,
         )
 
-        GlStateManager.popMatrix()
+        context.popMatrix()
     }
 
     private fun getButtonPosition(width: Int) = width - button.width
+    private fun getChangelogPosition(width: Int) = width - changelog.width
     override fun getHeight(): Int {
         return 55
     }
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
-        val adjustedWidth = width - 20
-        if (MouseCompat.getEventButtonState() &&
-            (mouseX - getButtonPosition(adjustedWidth) - x) in (0..button.width) &&
-            (mouseY - 10 - y) in (0..button.height)
-        ) {
+        fun isInside(width: Int, height: Int, def: GuiElementButton): Boolean {
+            val inX = (mouseX - width - x) in (0..def.width)
+            val inY = (mouseY - height - y) in (0..def.height)
+            return MouseCompat.getEventButtonState() && inX && inY
+        }
+
+        if (isInside(getButtonPosition(width - 20), height = 10, button)) {
             when (UpdateManager.updateState) {
                 UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
                 UpdateManager.UpdateState.QUEUED -> {}
@@ -81,7 +90,17 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             }
             return true
         }
-        return false
+        if (!isInside(getChangelogPosition(width - 20), height = 30, changelog)) return false
+
+        if (UpdateManager.updateState != UpdateManager.UpdateState.NONE)
+            UpdateManager.getNextVersion()?.let { ChangelogViewer.showChangelog(currentVersion, it) }
+                ?: ErrorManager.logErrorStateWithData(
+                    "Can't get Changelog because of internal error",
+                    "UpdateManager.getNextVersion is null even though updateState is != NONE",
+                    "state" to UpdateManager.updateState,
+                )
+
+        return true
     }
 
     override fun keyboardInput(): Boolean {

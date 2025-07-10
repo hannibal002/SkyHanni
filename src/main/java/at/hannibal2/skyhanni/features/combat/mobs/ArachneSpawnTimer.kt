@@ -6,13 +6,12 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -103,11 +102,11 @@ object ArachneSpawnTimer {
 
         val location = event.location.roundTo(2)
         if (arachneAltarLocation.distance(location) > 30) return
-        if (event.type == EnumParticleTypes.REDSTONE && event.speed == 1.0f) {
+        if (event.type == EnumParticleTypes.REDSTONE && event.speed == 1f) {
             particleCounter += 1
         }
     }
 
     fun isEnabled() =
-        IslandType.SPIDER_DEN.isInIsland() && IslandAreas.currentAreaName == "Arachne's Sanctuary" && config.showArachneSpawnTimer
+        IslandType.SPIDER_DEN.isCurrent() && SkyBlockUtils.graphArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
 }

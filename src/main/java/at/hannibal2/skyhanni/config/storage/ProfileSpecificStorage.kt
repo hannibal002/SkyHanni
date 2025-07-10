@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
-import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.gui.shtrack.TrackingList
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -47,6 +49,7 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
@@ -62,10 +65,13 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.time.Duration
 
 // put everything under its respective feature, the order of the features is the same as in the folder structure
-class ProfileSpecificStorage {
+class ProfileSpecificStorage(
+    @Expose var profileName: String = "",
+) {
     // api
     @Expose
     var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
@@ -75,6 +81,9 @@ class ProfileSpecificStorage {
 
     @Expose
     var collection: MutableMap<NeuInternalName, Long> = mutableMapOf()
+
+    @Expose
+    var crimsonIsleFaction: FactionType? = null
 
     // features
     // - combat
@@ -299,19 +308,12 @@ class ProfileSpecificStorage {
         @Expose
         var hotChocolateMixinExpiry = farPast()
 
-        class HitmanStatsStorage {
-            @Expose
-            var availableHitmanEggs: Int = 0
-
-            @Expose
-            var singleSlotCooldownMark: SimpleTimeMark? = null
-
-            @Expose
-            var allSlotsCooldownMark: SimpleTimeMark? = null
-
-            @Expose
-            var purchasedHitmanSlots: Int = 0
-        }
+        data class HitmanStatsStorage(
+            @Expose var availableHitmanEggs: Int = 0,
+            @Expose var singleSlotCooldownMark: SimpleTimeMark? = null,
+            @Expose var allSlotsCooldownMark: SimpleTimeMark? = null,
+            @Expose var purchasedHitmanSlots: Int = 0,
+        ) : ResettableStorageSet()
 
         @Expose
         var hitmanStats: HitmanStatsStorage = HitmanStatsStorage()
@@ -576,6 +578,7 @@ class ProfileSpecificStorage {
         var farmingWeight: FarmingWeightConfig = FarmingWeightConfig()
 
         class FarmingWeightConfig {
+            // TODO rename to lastLeaderboard
             @Expose
             var lastFarmingWeightLeaderboard: Int = -1
         }
@@ -624,7 +627,7 @@ class ProfileSpecificStorage {
             var attemptsSince: Int = 0
 
             @Expose
-            var xpSince: Int = 0
+            var xpSince: Long = 0
         }
 
         @Expose
@@ -650,11 +653,52 @@ class ProfileSpecificStorage {
         var currentSlot: Int? = null
     }
 
+    @Expose
+    var equipment: EquipmentStorage = EquipmentStorage()
+
+    class EquipmentStorage {
+        @Expose
+        var slots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+
+        @Expose
+        var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+    }
+
+    // - foraging
+    @Expose
+    val foraging: ForagingStorage = ForagingStorage()
+
+    class ForagingStorage {
+        @Expose
+        var hotFTree: HotxTree = HotxTree()
+
+        @Expose
+        var tokens: Int = 0
+
+        @Expose
+        var availableTokens: Int = 0
+
+        @Expose
+        var whispers: PowderStorage = PowderStorage()
+
+        // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
+        @Expose
+        var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
+    }
+
     // - mining
     @Expose
-    var mining: MiningConfig = MiningConfig()
+    var mining: MiningStorage = MiningStorage()
 
-    class MiningConfig {
+    class PowderStorage {
+        @Expose
+        var available: Long? = null
+
+        @Expose
+        var total: Long? = null
+    }
+
+    class MiningStorage {
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 
@@ -662,18 +706,10 @@ class ProfileSpecificStorage {
         var fossilExcavatorProfitTracker: ExcavatorProfitTracker.Data = ExcavatorProfitTracker.Data()
 
         @Expose
-        var hotmTree: HotmTree = HotmTree()
+        var hotmTree: HotxTree = HotxTree()
 
         @Expose
         var powder: MutableMap<PowderType, PowderStorage> = enumMapOf()
-
-        class PowderStorage {
-            @Expose
-            var available: Long? = null
-
-            @Expose
-            var total: Long? = null
-        }
 
         @Expose
         var tokens: Int = 0
@@ -804,7 +840,7 @@ class ProfileSpecificStorage {
 
     // data
     @Expose
-    var currentPet: String = ""
+    var currentPetUuid: UUID? = null
 
     @Expose
     var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()
@@ -875,4 +911,14 @@ class ProfileSpecificStorage {
         @Expose var cakesEaten: Int? = -1,
         @Expose var soulsFound: Int = 0,
     )
+
+    @Expose
+    var attributeShards: MutableMap<String, AttributeShardData> = mutableMapOf()
+
+    data class AttributeShardData(
+        @Expose var amountSyphoned: Int = 0,
+    )
+
+    @Expose
+    var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
 }

@@ -27,5 +27,5 @@ public class ExperimentsDryStreakConfig {
 
     @Expose
     @ConfigLink(owner = ExperimentsDryStreakConfig.class, field = "enabled")
-    public Position position = new Position(200, -187, false, true);
+    public Position position = new Position(200, -187);
 }

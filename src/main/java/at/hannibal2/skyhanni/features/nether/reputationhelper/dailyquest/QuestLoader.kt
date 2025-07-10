@@ -21,10 +21,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.item.ItemStack
 
@@ -136,8 +136,8 @@ object QuestLoader {
     }
 
     fun checkInventory(event: InventoryFullyOpenedEvent) {
-        val inMageRegion = LorenzUtils.skyBlockArea == "Community Center"
-        val inBarbarianRegion = LorenzUtils.skyBlockArea == "Dragontail"
+        val inMageRegion = SkyBlockUtils.graphArea == "Community Center"
+        val inBarbarianRegion = SkyBlockUtils.graphArea == "Dragontail"
         if (!inMageRegion && !inBarbarianRegion) return
 
         val name = event.inventoryName
@@ -146,7 +146,7 @@ object QuestLoader {
             if (!categoryName.equals(name, ignoreCase = true)) continue
             val stack = event.inventoryItems[22] ?: continue
 
-            val completed = stack.getLore().any { DailyQuestHelper.completedPattern.matches(it) }
+            val completed = stack.getLore().any { DailyQuestHelper.townBoardCompletedPattern.matches(it) }
             if (completed && quest.state != QuestState.COLLECTED) {
                 quest.state = QuestState.COLLECTED
                 DailyQuestHelper.update()

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.TempStringRenderable
 import com.google.gson.JsonElement
 import com.google.gson.stream.JsonWriter
 import kotlin.time.Duration.Companion.seconds
@@ -102,7 +103,7 @@ abstract class TrackingElement<T : Number> {
                 gain = current.getZero()
                 return Renderable.placeholder(0, 0)
             }
-            return Renderable.tempString(sinceGain, gainDisplayModifier(gain).toStringWithPlusAndColor())
+            return TempStringRenderable(sinceGain, gainDisplayModifier(gain).toStringWithPlusAndColor())
         }
 
     open fun generateHover(): List<String> = listOf(

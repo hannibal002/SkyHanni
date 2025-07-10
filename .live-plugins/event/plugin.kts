@@ -12,6 +12,7 @@ import liveplugin.registerInspection
 import org.jetbrains.kotlin.idea.base.utils.fqname.fqName
 import org.jetbrains.kotlin.idea.codeinsight.api.classic.inspections.AbstractKotlinInspection
 import org.jetbrains.kotlin.idea.util.AnnotationModificationHelper
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.nj2k.postProcessing.type
 import org.jetbrains.kotlin.psi.KtClassOrObject
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 // depends-on-plugin org.jetbrains.kotlin
+// depends-on-plugin com.intellij.java
 
 fun buildPrimaryNameMap(project: Project): Map<String, String> {
     val result = mutableMapOf<String, String>()
@@ -72,8 +74,12 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                 val isPrimaryName = primaryNameMap.containsKey(functionName)
 
                 // Check if the function's parameter is a SkyHanniEvent or its subtype
-                val isEvent = function.valueParameters.firstOrNull()?.type()?.supertypes()
-                    ?.any { it.fqName?.asString() == skyhanniEvent } ?: false
+                // TODO fix it for K2 mode instead of leaving the function (the try catch)
+                val isEvent = try {
+                    function.valueParameters.firstOrNull()?.type()?.supertypes()?.any { it.fqName?.asString() == skyhanniEvent }
+                } catch (e: Throwable) {
+                    return
+                } ?: false
 
                 // Find the annotation entry
                 val annotationEntry = function.annotationEntries
@@ -88,6 +94,17 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                             (annotationEntry.valueArguments.indexOf(argument) == 0 &&
                                 argument.getArgumentExpression()?.text != null)
                     } ?: false
+
+                // Check if the function is isPublic or accessible
+                val isPublic = function.isPublic || function.hasModifier(KtTokens.PUBLIC_KEYWORD)
+                val needsPublic = (hasEventAnnotation && (hasEventType || isPrimaryName))
+                if (!isPublic && needsPublic) {
+                    holder.registerProblem(
+                        function,
+                        "Function must be public to be annotated with @HandleEvent",
+                        ProblemHighlightType.GENERIC_ERROR
+                    )
+                }
 
                 // Validate function annotation and parameters
                 if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic) {

@@ -27,9 +27,10 @@ public class BazaarConfig {
     @FeatureToggle
     public boolean bestSellMethod = false;
 
+    // TODO rename to bestSellMethodPosition
     @Expose
     @ConfigLink(owner = BazaarConfig.class, field = "bestSellMethod")
-    public Position bestSellMethodPos = new Position(394, 142, false, true);
+    public Position bestSellMethodPos = new Position(394, 142);
 
     @Expose
     @ConfigOption(name = "Cancelled Buy Order Clipboard",

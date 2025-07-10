@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat.mobs
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,6 +22,7 @@ object AreaMiniBossFeatures {
     private var lastSpawnTime = SimpleTimeMark.farPast()
     private var miniBossType: AreaMiniBossType? = null
     private var respawnCooldown = 11.seconds
+    val currentMobs = mutableSetOf<Mob>()
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -35,6 +37,12 @@ object AreaMiniBossFeatures {
         if (config.areaBossHighlight) {
             event.mob.highlight(type.color.addOpacity(type.colorOpacity))
         }
+        currentMobs.add(event.mob)
+    }
+
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
+        currentMobs.remove(event.mob)
     }
 
     @HandleEvent

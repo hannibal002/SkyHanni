@@ -9,12 +9,11 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -228,7 +227,7 @@ class MobFinder {
     }
 
     private fun tryAddDungeonF5(entity: EntityLivingBase): EntityResult? {
-        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.livid?.baseEntity) {
+        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.livid) {
             return EntityResult(
                 bossType = BossType.DUNGEON_F5,
                 ignoreBlocks = true,
@@ -361,8 +360,8 @@ class MobFinder {
     // TODO testing and use sidebar data
     @Suppress("UnusedParameter")
     private fun tryAddEntityDragon(entity: EntityLivingBase) = when {
-        IslandType.THE_END.isInIsland() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
-        IslandType.WINTER.isInIsland() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
+        IslandType.THE_END.isCurrent() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
+        IslandType.WINTER.isCurrent() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
 
         else -> null
     }
@@ -589,7 +588,7 @@ class MobFinder {
 
             // F5
             "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
-                floor5lividEntity = DungeonLividFinder.livid?.baseEntity as? EntityOtherPlayerMP?
+                floor5lividEntity = DungeonLividFinder.livid
                 floor5lividEntitySpawnTime = 13.seconds.fromNow()
             }
 
