@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.LorenzUtils.formatCurrentTime
+import at.hannibal2.skyhanni.utils.TimeUtils.formatCurrentTime
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -61,7 +61,7 @@ class LorenzLogger(filePath: String) {
             e.printStackTrace()
         }
 
-        if (!hasDone && LorenzUtils.onHypixel) {
+        if (!hasDone && SkyBlockUtils.onHypixel) {
             hasDone = true
             OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
         }

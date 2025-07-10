@@ -7,13 +7,13 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -49,7 +49,7 @@ object HoppityEggDisplayManager {
 
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 100f)
+        GlStateManager.color(1f, 1f, 1f, config.playerOpacity / 100f)
     }
 
     @HandleEvent
@@ -84,7 +84,7 @@ object HoppityEggDisplayManager {
                     !it.isClaimed() // Or eggs that have not been claimed
             }.let { entries ->
                 if (unclaimedEggsConfig.displayOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil }
-                else entries
+                else entries.sortedWith(compareBy<HoppityEggType> { it.altDay }.thenBy { it.resetsAt })
             }.forEach {
                 val (color, timeFormat) = if (it.hasRemainingSpawns()) {
                     it.mealColor to it.timeUntil.format()
@@ -94,7 +94,7 @@ object HoppityEggDisplayManager {
                 add("§7 - ${it.formattedName}$color $timeFormat")
             }
 
-            if (!unclaimedEggsConfig.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
+            if (!unclaimedEggsConfig.showCollectedLocationCount || !SkyBlockUtils.inSkyBlock) return@buildList
 
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
@@ -102,7 +102,7 @@ object HoppityEggDisplayManager {
                 val collectedFormat = formatEggsCollected(collectedEggs)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }
-        }.map { it.partyModeReplace() }
+        }.map { CFApi.partyModeReplace(it) }
 
         if (displayList.size == 1) return emptyList()
 

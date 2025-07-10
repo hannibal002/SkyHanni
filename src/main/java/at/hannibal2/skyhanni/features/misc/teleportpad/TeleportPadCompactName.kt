@@ -41,7 +41,11 @@ object TeleportPadCompactName {
         }
 
         namePattern.matchMatcher(name) {
+            //#if MC < 1.21
             entity.customNameTag = group("name")
+            //#else
+            //$$ entity.setCustomName(net.minecraft.text.Text.of(group("name")))
+            //#endif
         }
     }
 }

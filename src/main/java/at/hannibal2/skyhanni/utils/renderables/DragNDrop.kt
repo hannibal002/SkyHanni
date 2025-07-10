@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import net.minecraft.client.renderer.GlStateManager
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -31,13 +31,13 @@ object DragNDrop {
             currentDrag = null
             return
         }
-        GlStateManager.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
+        DrawContextUtils.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
         if (isInvalidDrop) {
             invalidItem.render(event.mouseX, event.mouseY)
         } else {
             item.onRender(event.mouseX, event.mouseY)
         }
-        GlStateManager.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
+        DrawContextUtils.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
     }
 
     fun draggable(

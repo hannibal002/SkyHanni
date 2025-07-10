@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtVisitorVoid
 
 // depends-on-plugin org.jetbrains.kotlin
+// depends-on-plugin com.intellij.java
 
 val skyhanniEventFQN = "at.hannibal2.skyhanni.api.event.SkyHanniEvent"
 val primaryAnnotationName = "PrimaryFunction"

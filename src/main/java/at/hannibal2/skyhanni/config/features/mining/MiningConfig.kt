@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -23,83 +24,88 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class MiningConfig {
     @Expose
     @Category(name = "Mining Event Tracker", desc = "Settings for the Mining Event Tracker.")
-    var miningEvent: MiningEventConfig = MiningEventConfig()
+    val miningEvent: MiningEventConfig = MiningEventConfig()
 
     @Expose
     @Category(name = "HotM", desc = "Settings for Heart of the Mountain.")
-    var hotm: HotmConfig = HotmConfig()
+    val hotm: HotmConfig = HotmConfig()
 
     @Expose
     @ConfigOption(name = "Powder Tracker", desc = "")
     @Accordion
-    var powderTracker: PowderTrackerConfig = PowderTrackerConfig()
+    val powderTracker: PowderTrackerConfig = PowderTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Powder Chest Timer", desc = "")
+    @Accordion
+    val powderChestTimer: PowderChestTimerConfig = PowderChestTimerConfig()
 
     @Expose
     @ConfigOption(name = "King Talisman", desc = "")
     @Accordion
-    var kingTalisman: KingTalismanConfig = KingTalismanConfig()
+    val kingTalisman: KingTalismanConfig = KingTalismanConfig()
 
     @Expose
     @ConfigOption(name = "Deep Caverns Guide", desc = "")
     @Accordion
-    var deepCavernsGuide: DeepCavernsGuideConfig = DeepCavernsGuideConfig()
+    val deepCavernsGuide: DeepCavernsGuideConfig = DeepCavernsGuideConfig()
 
     @Expose
     @ConfigOption(name = "Area Walls", desc = "")
     @Accordion
-    var crystalHollowsAreaWalls: AreaWallsConfig = AreaWallsConfig()
+    val crystalHollowsAreaWalls: AreaWallsConfig = AreaWallsConfig()
 
     @Expose
     @ConfigOption(name = "Crystal Nucleus Tracker", desc = "")
     @Accordion
-    var crystalNucleusTracker: CrystalNucleusTrackerConfig = CrystalNucleusTrackerConfig()
+    val crystalNucleusTracker: CrystalNucleusTrackerConfig = CrystalNucleusTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
     @Accordion
-    var coldOverlay: ColdOverlayConfig = ColdOverlayConfig()
+    val coldOverlay: ColdOverlayConfig = ColdOverlayConfig()
 
     @Expose
     @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features.")
-    var fossilExcavator: FossilExcavatorConfig = FossilExcavatorConfig()
+    val fossilExcavator: FossilExcavatorConfig = FossilExcavatorConfig()
 
     @Expose
     @Category(name = "Glacite Mineshaft", desc = "Settings for the Glacite Mineshaft.")
-    var glaciteMineshaft: GlaciteMineshaftConfig = GlaciteMineshaftConfig()
+    val glaciteMineshaft: GlaciteMineshaftConfig = GlaciteMineshaftConfig()
 
     @Expose
     @ConfigOption(name = "Notifications", desc = "")
     @Accordion
-    var notifications: MiningNotificationsConfig = MiningNotificationsConfig()
+    val notifications: MiningNotificationsConfig = MiningNotificationsConfig()
 
     @Expose
     @Category(name = "Tunnel Maps", desc = "Settings for the Tunnel Maps.")
-    var tunnelMaps: TunnelMapsConfig = TunnelMapsConfig()
+    val tunnelMaps: TunnelMapsConfig = TunnelMapsConfig()
 
     @Expose
     @ConfigOption(name = "Commissions Blocks Color", desc = "")
     @Accordion
-    var commissionsBlocksColor: CommissionsBlocksColorConfig = CommissionsBlocksColorConfig()
+    val commissionsBlocksColor: CommissionsBlocksColorConfig = CommissionsBlocksColorConfig()
 
     @Expose
     @ConfigOption(name = "Mineshaft", desc = "")
     @Accordion
-    var mineshaft: MineshaftConfig = MineshaftConfig()
+    val mineshaft: MineshaftConfig = MineshaftConfig()
 
     @Expose
     @ConfigOption(name = "Mineshaft Pity Display", desc = "")
     @Accordion
-    var mineshaftPityDisplay: MineshaftPityDisplayConfig = MineshaftPityDisplayConfig()
+    val mineshaftPityDisplay: MineshaftPityDisplayConfig = MineshaftPityDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Crystal Nucleus Crystal Highlights", desc = "")
     @Accordion
-    var crystalHighlighter: CrystalHighlighterConfig = CrystalHighlighterConfig()
+    val crystalHighlighter: CrystalHighlighterConfig = CrystalHighlighterConfig()
 
     @Expose
     @ConfigOption(name = "Flowstate Helper", desc = "")
     @Accordion
-    var flowstateHelper: FlowstateHelperConfig = FlowstateHelperConfig()
+    val flowstateHelper: FlowstateHelperConfig = FlowstateHelperConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
@@ -110,7 +116,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(
         name = "Names in Core",
-        desc = "Show the names of the 4 areas while in the center of the Crystal Hollows."
+        desc = "Show the names of the 4 areas while in the center of the Crystal Hollows.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -132,7 +138,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(
         name = "Line to your Golden Goblin",
-        desc = "Also makes a line to your goblin. §eNeeds the option above to work."
+        desc = "Also makes a line to your goblin. §eNeeds the option above to work.",
     )
     @ConfigEditorBoolean
     var lineToYourGoldenGoblin: Boolean = false
@@ -142,4 +148,10 @@ class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightPrecisionMiningParticles: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Mute High Heat", desc = "Mutes the panting sound when above 90 heat in the Magma Fields.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteHighHeat: Boolean = true
 }

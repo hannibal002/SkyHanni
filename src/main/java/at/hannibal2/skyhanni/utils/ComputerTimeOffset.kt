@@ -62,11 +62,11 @@ object ComputerTimeOffset {
             if (state == State.TOTALLY_OFF) {
                 ErrorManager.logErrorStateWithData(
                     "Error when checking Computer Time Offset",
-                    "trying to check again even though the previous check is stil not done",
+                    "trying to check again even though the previous check is still not done",
                 )
             }
             if (state == State.SLOW) {
-                ChatUtils.chat("Computer Time Offset calculation takes longer than normal. Checkign now less often.")
+                ChatUtils.chat("Computer Time Offset calculation took longer than normal. Checking less often now.")
             }
             currentlyChecking = false
             return
@@ -91,7 +91,7 @@ object ComputerTimeOffset {
         timeInfo.computeDetails()
         timeInfo.offset.milliseconds
     } catch (e: Exception) {
-        if (LorenzUtils.inSkyBlock && config.warnAboutPcTimeOffset) ErrorManager.logErrorWithData(
+        if (SkyBlockUtils.inSkyBlock && config.warnAboutPcTimeOffset) ErrorManager.logErrorWithData(
             e, "Failed to get NTP offset",
             "server" to ntpServer,
         )
@@ -125,7 +125,7 @@ object ComputerTimeOffset {
     }
 
     private fun tryDisplayOffset(wasOffsetBefore: Boolean) {
-        if (!config.warnAboutPcTimeOffset || !LorenzUtils.onHypixel) return
+        if (!config.warnAboutPcTimeOffset || !SkyBlockUtils.onHypixel) return
         val offsetMillis = offsetMillis ?: return
         if (offsetMillis.absoluteValue < 5.seconds) {
             if (wasOffsetBefore) {
