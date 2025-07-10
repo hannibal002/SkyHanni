@@ -187,8 +187,8 @@ object CompactStarlynSisters {
             val previousRecord = group("previousRecord")
             val woodType = group("woodType")
             val formattedLockInWarning = (
-                "§b$foragingSister's §eContest: You broke a §dpersonal best §eof " +
-                    "§b$previousRecord §6$woodType logs §ecollected during a contest! Keep it up!"
+                "§b$foragingSister's §eContest: §fYou broke a §dpersonal best §fof " +
+                    "§b$previousRecord §e$woodType logs §fcollected during a contest! §eKeep it up!"
                 )
             val hoverableLockInWarning = formattedLockInWarning.asComponent()
             ChatUtils.chat(hoverableLockInWarning)
@@ -218,8 +218,8 @@ object CompactStarlynSisters {
                     "§6${collectionPB.lastPBWoodType} PB§e: Your §2Sweep §eincreased " +
                         "by ${collectionPB.lastPBSweepIncreaseDisplay} §efrom collecting " +
                         "${collectionPB.lastPBCollectionIncreaseDuringContestDisplay} " +
-                        "${collectionPB.lastPBWoodTypeDisplay} §bLogs " +
-                        "§e(${collectionPB.lastPBPreviousBestDifferenceDisplay} " +
+                        "${collectionPB.lastPBWoodTypeDisplay} §eLogs " +
+                        "(${collectionPB.lastPBPreviousBestDifferenceDisplay} " +
                         "§emore than your previous record)!"
                 val hoverablePersonalBest = formattedPersonalBest.asComponent()
                 hoverablePersonalBest.hover = (

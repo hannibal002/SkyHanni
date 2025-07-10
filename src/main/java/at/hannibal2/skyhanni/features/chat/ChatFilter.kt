@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.chat.ChatFilter.block
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -449,44 +448,6 @@ object ChatFilter {
         "§4This Teleport Pad does not have a destination set!",
     )
 
-    /**
-     ** REGEX-TEST: §eYou haven't claimed your §6Summer Rewards §eyet!
-     ** REGEX-TEST: §r§eYou haven't claimed your §r§6Summer Rewards §r§eyet!
-     ** REGEX-TEST: §eYou haven't claimed your §6Easter Rewards §eyet!
-     ** REGEX-TEST: §r§eYou haven't claimed your §r§6Easter Rewards §r§eyet!
-     ** REGEX-TEST: §eYou haven't claimed your Summer Rewards yet!
-     ** REGEX-TEST: §eYou haven't claimed your Easter Rewards yet!
-     ** REGEX-TEST: §eYou have not claimed your §6Summer Rewards §eyet!
-     ** REGEX-TEST: §r§eYou have not claimed your §r§6Summer Rewards §r§eyet!
-     ** REGEX-TEST: §eYou have not claimed your §6Easter Rewards §eyet!
-     ** REGEX-TEST: §r§eYou have not claimed your §r§6Easter Rewards §r§eyet!
-     ** REGEX-TEST: §eYou have not claimed your Summer Rewards yet!
-     ** REGEX-TEST: §eYou have not claimed your Easter Rewards yet!
-     ** REGEX-TEST: §eTalk to the §bSummer Sloth §ein the §aHub§e!
-     ** REGEX-TEST: §eTalk to the §bSpooky Man §ein the §aHub§e!
-     ** REGEX-TEST: §r§eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
-     ** REGEX-TEST: §r§eTalk to the §r§bSpooky Man §r§ein the §r§aHub§r§e!
-     ** REGEX-TEST: §eTalk to the Summer Sloth in the Hub!
-     ** REGEX-TEST: §eTalk to the Spooky Man in the Hub!
-     */
-    private val rewardBundlesPatterns = listOf(
-        "(?:§.)*You have(?:n't| not) claimed your (?:§.)*[\\S ]+ (?:§.)*yet!".toPattern(),
-        "(?:§.)*Talk to the (?:§.)*[\\S ]+ (?:§.)*in the (?:§.)*Hub(?:§.)*!".toPattern()
-    )
-
-    /**
-     ** REGEX-TEST: §cYou cannot damage a tree while it is regenerating!
-     ** REGEX-TEST: §cYou cannot damage a tree while it's regenerating!
-     ** REGEX-TEST: §cYou can't damage a tree while it is regenerating!
-     ** REGEX-TEST: §cYou can't damage a tree while it's regenerating!
-     ** REGEX-TEST: §c§oThe toughness of this tree is way too high!
-     ** REGEX-TEST: §cThe toughness of this tree is way too high!
-     */
-    private val cannotMineTreePatterns = listOf(
-        "(?:§.)*You can(?:not|'t) damage a tree while it(?: is|'s) regenerating!".toPattern(),
-        "(?:§.)*The toughness of this tree is way too high!".toPattern()
-    )
-
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -512,8 +473,6 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
-        "reward_bundles" to rewardBundlesPatterns,
-        "unmineable_tree" to cannotMineTreePatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -586,7 +545,6 @@ object ChatFilter {
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
-        config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"
         generalConfig.hideLottery && !IslandTypeTags.FORAGING.inAny() && message.isPresent("lottery") -> "lottery"
