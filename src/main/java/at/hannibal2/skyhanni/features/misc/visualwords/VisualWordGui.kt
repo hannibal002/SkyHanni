@@ -1,38 +1,39 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import java.io.File
 import java.io.FileInputStream
-import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-open class VisualWordGui : GuiScreen() {
+open class VisualWordGui : SkyhanniBaseScreen() {
 
     private var guiLeft = 0
     private var guiTop = 0
@@ -65,11 +66,12 @@ open class VisualWordGui : GuiScreen() {
 
     private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
 
+    @SkyHanniModule
     companion object {
 
         @JvmStatic
         fun onCommand() {
-            if (!LorenzUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel) {
                 ChatUtils.userError("You need to join Hypixel to use this feature!")
             } else {
                 if (sbeConfigPath.exists()) drawImport = true
@@ -96,11 +98,18 @@ open class VisualWordGui : GuiScreen() {
                 value = SkullTextureHolder.getTexture("DOWN_ARROW"),
             )
         }
+
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+            event.registerBrigadier("shwords") {
+                description = "Opens the config list for modifying visual words"
+                callback { onCommand() }
+            }
+        }
     }
 
-    override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
-        super.drawScreen(unusedX, unusedY, partialTicks)
-        drawDefaultBackground()
+    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         screenHeight = height
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2
@@ -108,8 +117,8 @@ open class VisualWordGui : GuiScreen() {
         mouseX = GuiScreenUtils.mouseX
         mouseY = GuiScreenUtils.mouseY
 
-        GlStateManager.pushMatrix()
-        drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
+        DrawContextUtils.pushMatrix()
+        GuiRenderUtils.drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
         val scale = 0.75f
         val inverseScale = 1 / scale
 
@@ -124,22 +133,20 @@ open class VisualWordGui : GuiScreen() {
 
             drawUnmodifiedStringCentered("§aAdd New", x, y)
             val color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
             if (shouldDrawImport) {
                 val importX = guiLeft + sizeX - 45
                 val importY = guiTop + sizeY - 10
                 GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
                 val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) colorA else colorB
-                drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
+                GuiRenderUtils.drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
             }
 
-            GlStateManager.scale(scale, scale, 1f)
+            DrawContextUtils.scale(scale, scale, 1f)
 
             drawUnmodifiedStringCentered(
-                "§7Modify Words. Replaces the top with the bottom",
-                (guiLeft + 180) * inverseScale,
-                (guiTop + 9) * inverseScale,
+                "§7Modify Words. Replaces the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 9) * inverseScale,
             )
             drawUnmodifiedString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
             drawUnmodifiedString("§bStatus", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
@@ -202,12 +209,12 @@ open class VisualWordGui : GuiScreen() {
                 }
 
                 val statusBlock = if (phrase.enabled) {
-                    ItemStack(Blocks.stained_hardened_clay, 1, 13)
+                    ColoredBlockCompat.GREEN.createStainedClay()
                 } else {
-                    ItemStack(Blocks.stained_hardened_clay, 1, 14)
+                    ColoredBlockCompat.RED.createStainedClay()
                 }
 
-                GlStateManager.scale(inverseScale, inverseScale, 1f)
+                DrawContextUtils.scale(inverseScale, inverseScale, 1f)
 
                 if (index != 0) {
                     GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
@@ -218,7 +225,7 @@ open class VisualWordGui : GuiScreen() {
 
                 GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
 
-                GlStateManager.scale(scale, scale, 1f)
+                DrawContextUtils.scale(scale, scale, 1f)
 
                 if (inBox) {
                     drawUnmodifiedString(
@@ -245,8 +252,11 @@ open class VisualWordGui : GuiScreen() {
                 }
             }
 
-            if (modifiedWords.size < 1) {
-                modifiedWords = ModifyVisualWords.modifiedWords
+            if (modifiedWords.isEmpty()) {
+                modifiedWords = ModifyVisualWords.userModifiedWords
+                //#if MC > 1.21
+                //$$ .map { it.toVisualWord() }.toMutableList()
+                //#endif
             }
 
             if (toRemove != null) {
@@ -254,7 +264,7 @@ open class VisualWordGui : GuiScreen() {
                 saveChanges()
             }
 
-            GlStateManager.scale(inverseScale, inverseScale, 1f)
+            DrawContextUtils.scale(inverseScale, inverseScale, 1f)
 
             scrollScreen()
         } else {
@@ -262,11 +272,11 @@ open class VisualWordGui : GuiScreen() {
             var y = guiTop + 140
             drawUnmodifiedStringCentered("§cDelete", x, y)
             var color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
             y += 30
             drawUnmodifiedStringCentered("§eBack", x, y)
             color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
                 val currentPhrase = modifiedWords[currentIndex]
@@ -276,75 +286,57 @@ open class VisualWordGui : GuiScreen() {
                 var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
                 drawUnmodifiedStringCentered(status, x, y)
                 color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                drawRect(x - 30, y - 10, x + 30, y + 10, color)
+                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
                 x += 200
                 drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
                 status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
                 drawUnmodifiedStringCentered(status, x, y)
                 color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                drawRect(x - 30, y - 10, x + 30, y + 10, color)
+                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
                 drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
                 if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
+                    GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
                 }
                 if (currentTextBox == SelectedTextBox.PHRASE) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
+                    GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
                 }
 
                 if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
+                    GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
                 }
                 if (currentTextBox == SelectedTextBox.REPLACEMENT) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
+                    GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
                 }
 
-                GlStateManager.scale(0.75f, 0.75f, 1f)
+                DrawContextUtils.scaled(scale, scale) {
+                    // TODO remove more code duplication
+                    drawUnmodifiedString(
+                        "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
+                    )
+                    drawUnmodifiedString(
+                        "§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale,
+                    )
 
-                // TODO remove more code duplication
-                drawUnmodifiedString(
-                    "§bThe top line of each section",
-                    (guiLeft + 10) * inverseScale,
-                    (guiTop + 12) * inverseScale,
-                )
-                drawUnmodifiedString(
-                    "§bis the preview of the bottom text",
-                    (guiLeft + 10) * inverseScale,
-                    (guiTop + 22) * inverseScale,
-                )
+                    drawUnmodifiedString("§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
+                    drawUnmodifiedString(
+                        "§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale,
+                    )
 
-                drawUnmodifiedString(
-                    "§bTo get the Minecraft",
-                    (guiLeft + 220) * inverseScale,
-                    (guiTop + 12) * inverseScale,
-                )
-                drawUnmodifiedString(
-                    "§b formatting character use \"&&\"",
-                    (guiLeft + 220) * inverseScale,
-                    (guiTop + 22) * inverseScale,
-                )
+                    drawUnmodifiedString(
+                        currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale,
+                    )
+                    drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
-                drawUnmodifiedString(
-                    currentPhrase.phrase.convertToFormatted(),
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 40) * inverseScale,
-                )
-                drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
-
-                drawUnmodifiedString(
-                    currentPhrase.replacement.convertToFormatted(),
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 95) * inverseScale,
-                )
-                drawUnmodifiedString(
-                    currentPhrase.replacement,
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 110) * inverseScale,
-                )
-
-                GlStateManager.scale(inverseScale, inverseScale, 1f)
+                    drawUnmodifiedString(
+                        currentPhrase.replacement.convertToFormatted(),
+                        (guiLeft + 30) * inverseScale,
+                        (guiTop + 95) * inverseScale,
+                    )
+                    drawUnmodifiedString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
+                }
             }
         }
 
@@ -368,7 +360,7 @@ open class VisualWordGui : GuiScreen() {
             saveChanges()
         }
 
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     private fun isPointInMousePos(left: Int, top: Int, width: Int, height: Int) =
@@ -377,22 +369,16 @@ open class VisualWordGui : GuiScreen() {
     private fun isPointInLastClicked(left: Int, top: Int, width: Int, height: Int) =
         GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, left, top, width, height)
 
-    override fun handleMouseInput() {
-        super.handleMouseInput()
-
-        if (Mouse.getEventButtonState()) {
-            mouseClickEvent()
-        }
-        if (!Mouse.getEventButtonState()) {
-            if (Mouse.getEventDWheel() != 0) {
-                lastMouseScroll = Mouse.getEventDWheel()
+    override fun onHandleMouseInput() {
+        if (!MouseCompat.getEventButtonState()) {
+            if (MouseCompat.getScrollDelta() != 0) {
+                lastMouseScroll = MouseCompat.getScrollDelta()
                 noMouseScrollFrames = 0
             }
         }
     }
 
-    @Throws(IOException::class)
-    fun mouseClickEvent() {
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         if (!currentlyEditing) {
             if (isPointInMousePos(guiLeft, guiTop, sizeX, sizeY - 25)) {
                 lastClickedWidth = mouseX
@@ -469,14 +455,12 @@ open class VisualWordGui : GuiScreen() {
             val importY = guiTop + sizeY - 10
             if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) {
                 SoundUtils.playClickSound()
-                tryImportFromSBE()
+                tryImportFromSbe()
             }
         }
     }
 
-    @Throws(IOException::class)
-    override fun keyTyped(typedChar: Char, keyCode: Int) {
-        super.keyTyped(typedChar, keyCode)
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (!currentlyEditing) {
             if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
                 if (KeyboardManager.isModifierKeyDown()) {
@@ -514,7 +498,7 @@ open class VisualWordGui : GuiScreen() {
             return
         }
 
-        if (currentText.length < maxTextLength && !Character.isISOControl(typedChar)) {
+        if (currentText.length < maxTextLength && (typedChar != null && !Character.isISOControl(typedChar))) {
             currentText += typedChar
             saveTextChanges()
             return
@@ -568,13 +552,17 @@ open class VisualWordGui : GuiScreen() {
     }
 
     private fun saveChanges() {
-        ModifyVisualWords.modifiedWords = modifiedWords
-        ModifyVisualWords.textCache.clear()
-        SkyHanniMod.visualWordsData.modifiedWords = modifiedWords
+
+        ModifyVisualWords.userModifiedWords = modifiedWords
+        //#if MC > 1.21
+        //$$ .map { VisualWordText.fromVisualWord(it) }.toMutableList()
+        //#endif
+        ModifyVisualWords.update()
+
         SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }
 
-    private fun tryImportFromSBE() {
+    private fun tryImportFromSbe() {
         if (!drawImport) return
         try {
             val reader = InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8)
@@ -600,7 +588,7 @@ open class VisualWordGui : GuiScreen() {
             }
             if (importedWords > 0 || skippedWords > 0) {
                 chat(
-                    "§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !"
+                    "§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !",
                 )
                 SkyHanniMod.feature.storage.visualWordsImported = true
                 drawImport = false

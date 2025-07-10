@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -17,16 +21,10 @@ import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
 // TODO in the future change something here
+@SkyHanniModule
 object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
-
-    fun command(args: Array<String>) {
-        SkyHanniMod.coroutineScope.launch {
-            ChatUtils.chat(runCommand(args))
-        }
-        lastCommand = args
-    }
 
     private suspend fun runCommand(args: Array<String>): String {
         if (args.isEmpty()) {
@@ -43,7 +41,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private fun resetCommand(args: Array<String>): String {
+    fun resetCommand(args: Array<String>): String {
         if (args.size != 2) return "§c/shconfig reset <config element>"
         val term = args[1]
         if (term.startsWith("playerSpecific")) return "§cCannot reset playerSpecific! Use §e/shconfig set §cinstead."
@@ -169,7 +167,7 @@ object SkyHanniConfigSearchResetCommand {
         val elements = findConfigElements(configFilter, classFilter)
         val builder = StringBuilder()
         builder.append("```\n")
-        builder.append("Search config for SkyHanni ${SkyHanniMod.version}\n")
+        builder.append("Search config for SkyHanni ${SkyHanniMod.VERSION}\n")
         builder.append("configSearchTerm: $configSearchTerm\n")
         builder.append("classSearchTerm: $classSearchTerm\n")
         builder.append("\n")
@@ -255,7 +253,7 @@ object SkyHanniConfigSearchResetCommand {
         val line = term.split(".").drop(1)
         var field: Field? = null
         for (entry in line) {
-            field = obj.javaClass.getField(entry).makeAccessible()
+            field = obj.javaClass.getDeclaredField(entry).makeAccessible()
             parentObject = obj
             obj = field.get(obj)
         }
@@ -265,16 +263,20 @@ object SkyHanniConfigSearchResetCommand {
         return Triple(field, obj, parentObject)
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun loadAllFields(parentName: String, obj: Any, depth: Int = 0): Map<String, Any?> {
         val map = mutableMapOf<String, Any?>()
         if (depth == 8) { // this is only a backup for safety, needs increasing someday maybe
             map["$parentName.<end of depth>"] = null
             return map
         }
-        for (field in obj.javaClass.fields) {
+        for (field in obj.javaClass.declaredFields) {
             if ((field.modifiers and Modifier.STATIC) != 0) continue
 
             val name = field.name
+            if (parentName == "playerSpecific" && name == "profiles") continue
+            if (parentName == "config.storage" && name == "players") continue
+            if (parentName == "config" && name == "storage") continue
             val fieldName = "$parentName.$name"
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
@@ -285,7 +287,10 @@ object SkyHanniConfigSearchResetCommand {
                 newObj !is Long &&
                 newObj !is Int &&
                 newObj !is Double &&
+                newObj !is Float &&
                 newObj !is Position &&
+                newObj !is Map<*, *> &&
+                newObj !is List<*> &&
                 !newObj.javaClass.isEnum
             ) {
                 map.putAll(loadAllFields(fieldName, newObj, depth + 1))
@@ -348,5 +353,19 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Runnable) return "<Runnable>"
 
         return toString()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shconfig") {
+            description = "Searches or resets config elements §c(warning, dangerous!)"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs {
+                SkyHanniMod.coroutineScope.launch {
+                    ChatUtils.chat(runCommand(it))
+                }
+                lastCommand = it
+            }
+        }
     }
 }

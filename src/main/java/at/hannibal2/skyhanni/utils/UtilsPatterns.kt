@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils.enumJoinToPattern
+import at.hannibal2.skyhanni.utils.EnumUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -9,22 +9,28 @@ object UtilsPatterns {
 
     private val patternGroup = RepoPattern.group("utils")
 
-    /** Examples:
-     * §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
-     * §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
-     * §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
-     * §6§lSHINY LEGENDARY DUNGEON BOOTS
-     * §6§lLEGENDARY DUNGEON BOOTS
-     * §5§lEPIC BOOTS
-     * §f§lCOMMON
+    /**
+     * REGEX-TEST: §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
+     * REGEX-TEST: §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
+     * REGEX-TEST: §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
+     * REGEX-TEST: §6§lSHINY LEGENDARY DUNGEON BOOTS
+     * REGEX-TEST: §6§lLEGENDARY DUNGEON BOOTS
+     * REGEX-TEST: §5§lEPIC BOOTS
+     * REGEX-TEST: §f§lCOMMON
+     * REGEX-TEST: §f§lCOMMON COMBAT SHARD §8(ID C9)
+     * REGEX-TEST: §7Rarity: §6§lLEGENDARY
+     * REGEX-TEST: §7Rarity: §9§lRARE
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
-        "^(?:§.){2,3}(?:.§. (?:§.){2})?(?:SHINY )?(?<rarity>" +
+        "^(?:§7Rarity: )?(?:§.){2,3}(?:.§. (?:§.){2})?(?:SHINY )?(?<rarity>" +
             enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") } +
-            ") ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?$",
+            ") ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?(?: §8\\(ID \\w\\d+\\))?$",
     )
 
+    /**
+     * REGEX-TEST: §5Abiphone XIII Pro Giga
+     */
     val abiPhonePattern by patternGroup.pattern(
         "item.name.abiphone",
         ".{2}Abiphone .*",
@@ -94,6 +100,10 @@ object UtilsPatterns {
         "string.playerchat",
         "(?<important>.*?)(?:§[f7r])*: .*",
     )
+
+    /**
+     * REGEX-TEST: 8[§r§2164§r§8] §r§7❤ §r§a[VIP§6+§a] Heaven_Reaper§f§r§f: stop
+     */
     val chatUsernamePattern by patternGroup.pattern(
         "string.chatusername",
         "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?",
@@ -103,9 +113,28 @@ object UtilsPatterns {
         "^M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})",
     )
 
+    /**
+     * REGEX-TEST: §5Large Enchanted Husbandry Sack
+     */
     val sackPattern by patternGroup.pattern(
         "item.sack",
         ".*Sack",
+    )
+
+    /**
+     * REGEX-TEST: §5§kX§5 Rift-Transferable §kX
+     */
+    val riftTransferablePattern by patternGroup.pattern(
+        "item.rift.transferable",
+        "§5§kX§5 Rift-Transferable §kX",
+    )
+    /**
+     * REGEX-TEST: §5§kX§5 Rift-Exportable §kX
+     * REGEX-TEST: §5§kX§5 Rift-Exported §kX
+     */
+    val riftExportablePattern by patternGroup.pattern(
+        "item.rift.exportable",
+        "§5§kX§5 Rift-Export(?:able|ed) §kX",
     )
 
     /**
@@ -127,8 +156,35 @@ object UtilsPatterns {
         "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",
     )
 
+    /**
+     * REGEX-TEST: oxsss
+     * REGEX-TEST: Gillsplash
+     */
+    val playerNamePattern by patternGroup.pattern(
+        "string.playername",
+        "[a-zA-Z0-9_]{2,16}",
+    )
+
     val shopOptionsPattern by patternGroup.pattern(
         "inventory.shopoptions",
         "Shop Trading Options",
+    )
+
+    val skyblockMenuGuiPattern by patternGroup.pattern(
+        "inventory.skyblockmenu",
+        "SkyBlock Menu",
+    )
+
+    /**
+     * REGEX-TEST: §7Source: §fVerdant Shard §8(C11)
+     * REGEX-TEST: §7Source: §9Drowned Shard §8(R18)
+     * REGEX-TEST: §7Source: §5Barbarian Duke X Shard §8(E27)
+     * REGEX-TEST: §7Source: §6Galaxy Fish Shard §8(L41)
+     * REGEX-TEST: §7Source: §6Starborn Shard §8(L44)
+     * REGEX-TEST: §7Source: §fSea Archer Shard §8(C14)
+     */
+    val attributeSourcePattern by patternGroup.pattern(
+        "attribute.shard.source",
+        "§7Source: §.(?<source>.+) Shard §8\\(\\w\\d+\\)"
     )
 }

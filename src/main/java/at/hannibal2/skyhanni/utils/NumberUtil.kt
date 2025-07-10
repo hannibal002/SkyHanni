@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
@@ -254,13 +256,15 @@ object NumberUtil {
 
     // Sometimes we just take an L, never find it and forget to write it down
     val Int.million get() = this * 1_000_000.0
-    private val Int.billion get() = this * 1_000_000_000.0
+    val Int.billion get() = this * 1_000_000_000.0
     val Double.million get() = (this * 1_000_000.0).toLong()
 
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
+
+    fun Int?.isPositive(): Boolean = (this ?: 0) > 0
 
     fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
         var interp = now
@@ -272,4 +276,18 @@ object NumberUtil {
         return interp
     }
 
+    fun Int.intPow(n: Int): Int = toDouble().pow(n).toInt()
+
+    fun Double.formatPercentage(): String = formatPercentage(this, "0.00")
+
+    private fun formatPercentage(percentage: Double, format: String?): String =
+        DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
+
+    fun Double.oneDecimal() = "%.1f".format(this)
+}
+
+class MinMaxNumber(val min: Double, val max: Double) {
+    override fun toString(): String = "${min.formatCoin()}§7-${max.formatCoin()}"
+
+    operator fun plus(other: MinMaxNumber): MinMaxNumber = MinMaxNumber(min + other.min, max + other.max)
 }

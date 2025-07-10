@@ -1,23 +1,21 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
@@ -225,7 +223,7 @@ enum class TabWidget(
     ),
     REPUTATION(
         // language=RegExp
-        "(?:§.)*(Barbarian|Mage) Reputation:",
+        "(?:§.)*(?<faction>Barbarian|Mage) Reputation:",
     ),
     FACTION_QUESTS(
         // language=RegExp
@@ -325,10 +323,34 @@ enum class TabWidget(
         // language=RegExp
         "§e§lEvent Trackers:",
     ),
+    AGATHA_CONTEST(
+        // language=RegExp
+        "(?:§.)*Agatha's Contest:.*",
+    ),
+    MOONGLADE_BEACON(
+        // language=RegExp
+        "(?:§.)*Moonglade Beacon: §r§b(?<stacks>\\d+) Stacks?",
+    ),
+    SALTS(
+        // language=RegExp
+        "(?:§.)*Salts:",
+    ),
+    FOREST_WHISPERS(
+        // language=RegExp
+        "(?:§.)*Forest Whispers: (?:§.)*(?<amount>.*)",
+    ),
+    SHARD_TRAPS(
+        // language=RegExp
+        "(?:§.)*Shard Traps"
+    ),
+    STARBORN_TEMPLE(
+        // language=RegExp
+        "§9§lStarborn Temple:",
+    ),
     ;
 
     /** The pattern for the first line of the widget*/
-    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*$pattern0")
+    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*(?:$pattern0)")
 
     /** The current active information from tab list.
      *
@@ -347,6 +369,8 @@ enum class TabWidget(
 
     /** Internal value for the checking to set [isActive] */
     private var gotChecked = false
+
+    private var sendOnThisIsland = false
 
     /** A [matchMatcher] for the first line using the pattern from the widget*/
     inline fun <T> matchMatcherFirstLine(consumer: Matcher.() -> T) =
@@ -393,10 +417,10 @@ enum class TabWidget(
 
         private val FORCE_UPDATE_DELAY = 2.seconds
 
-        @SubscribeEvent
-        fun onSecond(event: SecondPassedEvent) {
-            if (sentSinceWorldChange || !LorenzUtils.inSkyBlock) return
-            if (LorenzUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
+        @HandleEvent(onlyOnSkyblock = true)
+        fun onSecondPassed(event: SecondPassedEvent) {
+            if (sentSinceWorldChange) return
+            if (SkyBlockUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
             @Suppress("DEPRECATION")
             update(TabListData.getTabList())
@@ -405,7 +429,7 @@ enum class TabWidget(
 
         @HandleEvent(priority = HandleEvent.HIGH)
         fun onTabListUpdate(event: TabListUpdateEvent) {
-            if (!LorenzUtils.inSkyBlock) {
+            if (!SkyBlockUtils.inSkyBlock) {
                 if (separatorIndexes.isNotEmpty()) {
                     separatorIndexes.forEach { it.second?.updateIsActive() }
                     separatorIndexes.clear()
@@ -413,6 +437,23 @@ enum class TabWidget(
                 return
             }
             update(event.tabList)
+        }
+
+        // TODO remove this workaround once the WidgetUpdateEvent gets send when the tab list gets first loaded, as intended.
+        @HandleEvent(priority = HandleEvent.HIGHEST)
+        fun onIslandChange(event: IslandChangeEvent) {
+            for (widget in entries) {
+                widget.sendOnThisIsland = false
+            }
+
+            DelayedRun.runDelayed(2.seconds) {
+                TabWidget.reSendEvents()
+                for (widget in entries) {
+                    if (widget.isActive && !widget.sendOnThisIsland) {
+                        WidgetUpdateEvent(widget, widget.lines).post()
+                    }
+                }
+            }
         }
 
         private fun update(newTablist: List<String>) {
@@ -440,12 +481,12 @@ enum class TabWidget(
             }
         }
 
-        @SubscribeEvent
-        fun onWorldChange(event: LorenzWorldChangeEvent) {
+        @HandleEvent
+        fun onWorldChange() {
             sentSinceWorldChange = false
         }
 
-        @SubscribeEvent(priority = EventPriority.LOW)
+        @HandleEvent(priority = HandleEvent.LOW)
         fun onRepoReload(event: RepositoryReloadEvent) {
             extraPatterns = repoGroup.getUnusedPatterns()
         }

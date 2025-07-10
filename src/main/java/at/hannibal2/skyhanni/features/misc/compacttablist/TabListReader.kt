@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
@@ -29,28 +29,31 @@ object TabListReader {
      */
     val usernamePattern by patternGroup.pattern(
         "username",
-        "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
+        "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)",
     )
+
     /**
      * REGEX-TEST: §r§r§7You have a §r§cGod Potion §r§7active! §r§d12 Hours§r
      */
     private val godPotPattern by patternGroup.pattern(
         "effects.godpot",
-        "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r"
+        "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r",
     )
+
     /**
      * REGEX-TEST: §r§r§a§lActive Effects§r
      */
     private val activeEffectPattern by patternGroup.pattern(
         "effects.active",
-        "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*"
+        "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*",
     )
+
     /**
      * REGEX-TEST: §r§r§7§r§7You have §r§e1 §r§7active effect. Use "§r§6/effects§r§7" to see it!§r
      */
     private val effectCountPattern by patternGroup.pattern(
         "effects.count",
-        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect"
+        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect",
     )
 
     /**
@@ -58,7 +61,7 @@ object TabListReader {
      */
     private val cookiePattern by patternGroup.pattern(
         "cookie",
-        "Cookie Buff(?:§.)*(?:\\n(?:§.)*§7.+)*"
+        "Cookie Buff(?:§.)*(?:\\n(?:§.)*§7.+)*",
     )
 
     /**
@@ -66,7 +69,7 @@ object TabListReader {
      */
     private val dungeonBuffPattern by patternGroup.pattern(
         "dungeonbuff",
-        "Dungeon Buffs(?:§.)*(?:\\n(?:§.)*§7.+)*"
+        "Dungeon Buffs(?:§.)*(?:\\n(?:§.)*§7.+)*",
     )
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
@@ -82,7 +85,7 @@ object TabListReader {
     val renderColumns = mutableListOf<RenderColumn>()
 
     private fun updateTablistData(tablist: List<String>? = null) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
 
         var tabLines = tablist ?: TabListData.getTabList()
 
@@ -103,6 +106,7 @@ object TabListReader {
         val renderColumn = RenderColumn()
         renderColumns.add(renderColumn)
         combineColumnsToRender(columns, renderColumn)
+
     }
 
     @HandleEvent

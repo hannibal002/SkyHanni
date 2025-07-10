@@ -2,21 +2,22 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -65,36 +66,32 @@ object WorldEdit {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         leftPos = null
         rightPos = null
     }
 
-    @SubscribeEvent
-    fun onRenderWorldLast(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         leftPos?.let { l ->
-            RenderUtils.drawWireframeBoundingBoxNea(
+            event.drawHitbox(
                 funAABB(l, l).expandBlock(),
                 Color.RED,
-                event.partialTicks,
             )
         }
         rightPos?.let { r ->
-            RenderUtils.drawWireframeBoundingBoxNea(
+            event.drawHitbox(
                 funAABB(r, r).expandBlock(),
                 Color.BLUE,
-                event.partialTicks,
             )
         }
         aabb?.let {
-            RenderUtils.drawFilledBoundingBoxNea(
+            event.drawFilledBoundingBox(
                 it.expandBlock(),
                 Color.CYAN.addAlpha(60),
-                partialTicks = event.partialTicks,
-                renderRelativeToCamera = false,
             )
         }
     }
@@ -136,6 +133,16 @@ object WorldEdit {
             else -> {
                 ChatUtils.chat("Unknown subcommand")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shworldedit") {
+            description = "Select regions in the world"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { command(it) }
+            autoComplete { listOf("copy", "reset", "help", "left", "right") }
         }
     }
 

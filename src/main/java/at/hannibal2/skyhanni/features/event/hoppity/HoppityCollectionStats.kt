@@ -2,7 +2,10 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage.HotspotRabbitStorage
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage.HotspotRabbitStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
@@ -16,13 +19,9 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.collectWhile
-import at.hannibal2.skyhanni.utils.CollectionUtils.consumeWhile
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -31,10 +30,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -47,18 +44,28 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.collectWhile
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.consumeWhile
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumOfPair
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.DyeCompat
+import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
+private typealias RabbitData = ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData
+
 @SkyHanniModule
 object HoppityCollectionStats {
-    private val collectionConfig get() = ChocolateFactoryAPI.config.hoppityCollectionStats
-    private val patternGroup = ChocolateFactoryAPI.patternGroup.group("collection")
+    private val collectionConfig get() = CFApi.config.hoppityCollectionStats
+    private val patternGroup = CFApi.patternGroup.group("collection")
 
     // <editor-fold desc="Patterns">
     /**
@@ -183,14 +190,24 @@ object HoppityCollectionStats {
         "rabbit.hotspot",
         "§7Current Hotspot: §.(?<location>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Obtained by spending §6800B
+     * REGEX_TEST: §7Obtained by reaching §6400B
+     */
+    private val milestoneRabbitLorePattern by patternGroup.pattern(
+        "rabbit.milestone.lore",
+        "§7Obtained by (?:reaching|spending).*",
+    )
     // </editor-fold>
 
+    private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
     private var shCountData: HoppityEggLocationsJson? = null
     private var neuCountData: HoppityInfo? = null
     private var hotspotRabbitCount = 0
     private var display = emptyList<Renderable>()
     private val loggedRabbits
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
+        get() = profileStorage?.rabbitCounts ?: mutableMapOf()
 
     enum class HighlightRabbitTypes(
         private val displayName: String,
@@ -229,17 +246,17 @@ object HoppityCollectionStats {
     }
 
     private val locationRabbitRequirements: MutableMap<String, LocationRabbit>
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.locationRabbitRequirements ?: mutableMapOf()
+        get() = profileStorage?.locationRabbitRequirements ?: mutableMapOf()
 
     private val residentRabbitData: MutableMap<IslandType, MutableMap<String, Boolean?>>
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.residentRabbits ?: mutableMapOf()
+        get() = profileStorage?.residentRabbits ?: mutableMapOf()
 
     private val hotspotRabbitData: HotspotRabbitStorage?
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.hotspotRabbitStorage?.let { storage ->
+        get() = profileStorage?.hotspotRabbitStorage?.let { storage ->
             val yearNow = SkyBlockTime.now().year
             if (storage.skyblockYear != yearNow) {
                 HotspotRabbitStorage(yearNow).also {
-                    ProfileStorageData.profileSpecific?.chocolateFactory?.hotspotRabbitStorage = it
+                    profileStorage?.hotspotRabbitStorage = it
                 }
             } else storage
         }
@@ -254,8 +271,11 @@ object HoppityCollectionStats {
         strayRabbit to HighlightRabbitTypes.STRAYS,
     )
 
+    private fun ItemStack.isMilestoneRabbit(): Boolean =
+        this.getLore().any { milestoneRabbitLorePattern.matches(it) }
+
     private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean =
-        stack.item == Items.dye && (stack.metadata == 8 || stack.getLore().any { it.lowercase().contains("milestone") })
+        stack.displayName.isNotEmpty() && stack.isDye() && (stack.isDye(8) || stack.isMilestoneRabbit())
 
     private val replacementCache: MutableMap<String, ItemStack> = mutableMapOf()
 
@@ -281,7 +301,7 @@ object HoppityCollectionStats {
         hotspotRabbitCount -= 1
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
         for ((island, residents) in data.residentLocations) {
@@ -304,20 +324,18 @@ object HoppityCollectionStats {
         reCalcHotspotCount()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!(LorenzUtils.inSkyBlock)) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!pagePattern.matches(event.inventoryName)) {
             // Clear highlight cache in case options are toggled
             highlightMap.clear()
             return
         }
 
-        event.inventoryItems.values.filter { it.hasDisplayName() && missingRabbitStackNeedsFix(it) }.forEach { stack ->
-            val rarity = HoppityAPI.rarityByRabbit(stack.displayName)
+        event.inventoryItems.values.filter(::missingRabbitStackNeedsFix).forEach { stack ->
+            val rarity = HoppityApi.rarityByRabbit(stack.displayName)
             // Add NBT for the dye color itself
-            val newItemStack = if (collectionConfig.rarityDyeRecolor) ItemStack(
-                Items.dye, 1,
+            val newItemStack = if (collectionConfig.rarityDyeRecolor) DyeCompat.createDyeStack(
                 when (rarity) {
                     LorenzRarity.COMMON -> 7 // Light gray dye
                     LorenzRarity.UNCOMMON -> 10 // Lime dye
@@ -329,10 +347,14 @@ object HoppityCollectionStats {
                     LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
                     else -> return
                 },
-            ) else stack
+            )
+            else stack
 
-            newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
-            newItemStack.setStackDisplayName(stack.displayName)
+            val newLore = if (!collectionConfig.descriptiveMilestones) stack.getLore()
+            else buildDescriptiveMilestoneLore(stack)
+
+            newItemStack.setLore(newLore)
+            newItemStack.setCustomItemName(stack.displayName)
             replacementCache[stack.displayName] = newItemStack
         }
 
@@ -368,7 +390,7 @@ object HoppityCollectionStats {
         }
 
         replaceIndex?.let {
-            ChocolateFactoryAPI.milestoneByRabbit(itemStack.displayName)?.let {
+            CFApi.milestoneByRabbit(itemStack.displayName)?.let {
                 val displayAmount = it.amount.shortFormat()
                 val operationFormat = when (milestoneType) {
                     HoppityEggType.CHOCOLATE_SHOP_MILESTONE -> "spending"
@@ -386,13 +408,15 @@ object HoppityCollectionStats {
         return existingLore
     }
 
+    private fun String.takeIfKnownRabbit(): String? = takeIf { HoppityCollectionData.isKnownRabbit(it) }
+
     private fun setResidentDataFromStack(stack: ItemStack) {
         val lore = stack.getLore()
         if (lore.isEmpty()) return
 
         residentRabbitPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("island")) ?: return@firstMatcher
-            stack.displayName.removeColor().takeIf { HoppityCollectionData.isKnownRabbit(it) }?.let { residentName ->
+            stack.displayName.removeColor().takeIfKnownRabbit()?.let { residentName ->
                 residentRabbitData.getOrPut(island) {
                     mutableMapOf()
                 }[residentName] = !rabbitNotFoundPattern.anyMatches(lore)
@@ -407,7 +431,7 @@ object HoppityCollectionStats {
         val hotspotData = hotspotRabbitData ?: return
         hotspotLocationPattern.firstMatcher(lore) {
             val location = IslandType.getByNameOrNull(group("location")) ?: return@firstMatcher
-            stack.displayName.removeColor().takeIf { HoppityCollectionData.isKnownRabbit(it) }?.let { rabbitName ->
+            stack.displayName.removeColor().takeIfKnownRabbit()?.let { rabbitName ->
                 hotspotData.hotspotRabbits.getOrPut(location) {
                     mutableMapOf()
                 }[rabbitName] = !rabbitNotFoundPattern.anyMatches(lore)
@@ -438,14 +462,14 @@ object HoppityCollectionStats {
 
         residentRabbitPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("island")) ?: return@firstMatcher
-            if (island.isInIsland() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.RESIDENTS)) {
+            if (island.isCurrent() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.RESIDENTS)) {
                 highlightMap[stack.displayName] = HighlightRabbitTypes.RESIDENTS.color
             }
         }
 
         hotspotLocationPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("location")) ?: return@firstMatcher
-            if (island.isInIsland() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.HOTSPOTS)) {
+            if (island.isCurrent() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.HOTSPOTS)) {
                 highlightMap[stack.displayName] = HighlightRabbitTypes.HOTSPOTS.color
             }
         }
@@ -453,14 +477,14 @@ object HoppityCollectionStats {
 
     private val highlightMap = mutableMapOf<String, LorenzColor>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         display = emptyList()
         replacementCache.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory || !collectionConfig.enabled) return
 
@@ -471,7 +495,7 @@ object HoppityCollectionStats {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!inInventory || collectionConfig.highlightRabbits.isEmpty()) return
 
@@ -480,13 +504,13 @@ object HoppityCollectionStats {
 
             if (name.isEmpty()) continue
             highlightMap[name]?.let {
-                slot highlight it
+                slot.highlight(it)
             }
         }
     }
 
     private fun addHotspotRabbitsInformationToHud(newList: MutableList<Renderable>) {
-        if (!collectionConfig.showHotspotSummary || !HoppityAPI.isHoppityEvent()) return
+        if (!collectionConfig.showHotspotSummary || !HoppityApi.isHoppityEvent()) return
         val hotspotRabbitData = hotspotRabbitData ?: return
 
         val totalHotspotCount = hotspotRabbitData.hotspotRabbits.values.sumOf { it.size }
@@ -551,7 +575,7 @@ object HoppityCollectionStats {
                         if (indeterminateResidents > 0) "???"
                         else foundResidents.toString()
                     "$islandName: $color$foundFormat§7/§a$totalResidents"
-                }
+                },
             )
             if (indeterminateResidentRabbitsCount > 0) {
                 add("")
@@ -603,7 +627,7 @@ object HoppityCollectionStats {
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
-        newList.add(LorenzUtils.fillTable(getRabbitStats(), padding = 5))
+        newList.add(RenderableUtils.fillTable(getRabbitStatsFormat(), padding = 5))
 
         addLocationRequirementRabbitsToHud(newList)
         addResidentRabbitsInformationToHud(newList)
@@ -624,7 +648,27 @@ object HoppityCollectionStats {
         return newList
     }
 
-    private fun getRabbitStats(): MutableList<DisplayTableEntry> {
+    fun getTypeCountSnapshot(): RabbitData {
+        val (uniqueCount, duplicateCount) = RabbitCollectionRarity.entries.sumOfPair(
+            selector = { rarity ->
+                val foundOfRarity = loggedRabbits.filterKeys {
+                    HoppityCollectionData.getRarity(it) == rarity
+                }
+                val uniquesFound = foundOfRarity.size
+                val duplicates = foundOfRarity.values.sum() - uniquesFound
+                uniquesFound to duplicates
+            },
+            resultConverter = Double::toInt,
+        )
+
+        return RabbitData(
+            uniques = uniqueCount,
+            dupes = duplicateCount,
+            strays = profileStorage?.strayTracker?.straysCaught?.sumAllValues()?.toInt() ?: 0,
+        )
+    }
+
+    private fun getRabbitStatsFormat(): MutableList<DisplayTableEntry> {
         var totalUniquesFound = 0
         var totalDuplicates = 0
         var totalChocolatePerSecond = 0
@@ -694,14 +738,13 @@ object HoppityCollectionStats {
     }
 
     fun getRabbitCount(name: String): Int = name.removeColor().run {
-        loggedRabbits[this]?.takeIf { HoppityCollectionData.isKnownRabbit(this) } ?: 0
+        takeIfKnownRabbit().let { loggedRabbits[this] } ?: 0
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRabbitFound(event: RabbitFoundEvent) {
         DelayedRun.runDelayed(1.seconds) {
-            val rabbit = event.rabbitName.removeColor()
-            if (!HoppityCollectionData.isKnownRabbit(rabbit)) return@runDelayed
+            val rabbit = event.rabbitName.removeColor().takeIfKnownRabbit() ?: return@runDelayed
             loggedRabbits.addOrPut(rabbit, 1)
             residentRabbitData.entries.firstOrNull { (_, residentMap) ->
                 residentMap.any { it.key == rabbit && (it.value == false || it.value == null) }
@@ -752,13 +795,9 @@ object HoppityCollectionStats {
 
     private fun logRabbits(event: InventoryFullyOpenedEvent) {
         for (item in event.inventoryItems.values) {
-            val itemName = item.displayName?.removeColor() ?: continue
-            val isRabbit = HoppityCollectionData.isKnownRabbit(itemName)
-
-            if (!isRabbit) continue
+            val itemName = item.displayName?.removeColor()?.takeIfKnownRabbit() ?: continue
 
             val itemLore = item.getLore()
-
             saveLocationRabbit(itemName, itemLore)
 
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
@@ -777,17 +816,11 @@ object HoppityCollectionStats {
         }
     }
 
-    // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
-    fun resetSavedRabbits() {
-        loggedRabbits.clear()
-        ChatUtils.chat("Reset saved rabbit data.")
-    }
-
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
 
     enum class RabbitCollectionRarity(
         val displayName: String,
-        val item: NEUInternalName,
+        val item: NeuInternalName,
     ) {
         COMMON("§fCommon", "STAINED_GLASS".toInternalName()),
         UNCOMMON("§aUncommon", "STAINED_GLASS-5".toInternalName()),
@@ -818,6 +851,19 @@ object HoppityCollectionStats {
             "$bp.showHotspotSummaryInHoppityStats" to "$bp.hoppityCollectionStats.showHotspotSummary",
         ).forEach { (oldPath, newPath) ->
             event.move(67, oldPath, newPath)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
+        event.registerBrigadier("shresetsavedrabbits") {
+            description = "Resets the saved rabbits on this profile."
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                loggedRabbits.clear()
+                ChatUtils.chat("Reset saved rabbit data.")
+            }
         }
     }
 }
