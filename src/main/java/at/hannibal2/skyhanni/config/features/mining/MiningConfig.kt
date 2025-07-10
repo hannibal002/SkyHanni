@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.features.mining.caverns.DeepCavernsGuideConfig
 import at.hannibal2.skyhanni.config.features.mining.dwarves.KingTalismanConfig
+import at.hannibal2.skyhanni.config.features.mining.dwarves.RaffleTicketHighlighterConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.ColdOverlayConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.GlaciteMineshaftConfig
@@ -106,6 +108,12 @@ class MiningConfig {
     @ConfigOption(name = "Flowstate Helper", desc = "")
     @Accordion
     val flowstateHelper: FlowstateHelperConfig = FlowstateHelperConfig()
+
+    @Expose
+    @ConfigOption(name = "Raffle Ticket Highlighter", desc = "")
+    @Accordion
+    @OnlyModern
+    val raffleHighlighter: RaffleTicketHighlighterConfig = RaffleTicketHighlighterConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
