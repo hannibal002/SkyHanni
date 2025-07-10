@@ -42,6 +42,6 @@ object NoBitsWarning {
         event.move(35, "misc.noBitsWarning", "misc.noBitsWarning.enabled")
         event.move(40, "misc.noBitsWarning.enabled", "misc.bits.enableWarning")
         event.move(40, "misc.noBitsWarning.notificationSound", "misc.bits.notificationSound")
-        event.move(89, "misc.bits.threshold", "misc.bits.messageThreshold")
+        event.move(94, "misc.bits.threshold", "misc.bits.messageThreshold")
     }
 }
