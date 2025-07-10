@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -9,21 +10,18 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object CompactStarlynSisters {
 
-    private val config get() = SkyHanniMod.feature.foraging.starlyn
+    private val config get() = SkyHanniMod.feature.foraging.starlynContest
     private val patternGroup = RepoPattern.group("foraging.agatha")
 
     // would rather keep the extra int-related capture groups, you never know when you'll need them
@@ -136,31 +134,31 @@ object CompactStarlynSisters {
         "(?:§.)*\\[NPC] (?<foragingSister>(?:§.)*[\\w ]+)(?:§.)*: (?:§.)*Keep it up!",
     )
 
+    data class StarlynContestResults(
+        var lastBracket: String = "",
+        var lastBracketPrefix: String = "",
+        var lastPBScore: Int = -1,
+        var lastPersonalBestDisplay: String = "",
+        var hadPreviousPB: Boolean = false,
+        var lastScoreDisplay: String = "",
+        var lastSister: String = "",
+    ) : ResettableStorageSet()
+
+    data class StarlynCollectionPersonalBests(
+        var lastPBWoodType: String = "",
+        var lastPBWoodTypeDisplay: String = "",
+        var lastPBCollectionIncreaseDuringContestDisplay: String = "",
+        var lastPBPreviousBestDifferenceDisplay: String = "",
+        var lastPBSweepIncreaseDisplay: String = "",
+    ) : ResettableStorageSet()
+
     private var isInResults = false
     private var contestVariablesAreDirty = false
-
-    private var lastBracket = ""
-    private var lastBracketPrefix = ""
-    private var lastContestStartTime: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var lastLocation = ""
-    private var lastPersonalBest = -1
-    private var lastPersonalBestDisplay = ""
-    private var lastPersonalBestStatus = false
-    private var lastScore = -1
-    private var lastScoreDisplay = ""
-    private var lastSister = ""
+    private var contestResult = StarlynContestResults()
 
     private var isInPersonalBest = false
     private var personalBestVariablesAreDirty = false
-
-    private var lastPBWoodType = ""
-    private var lastPBWoodTypeDisplay = ""
-    private var lastPBCollectionIncreaseDuringContest = -1
-    private var lastPBCollectionIncreaseDuringContestDisplay = ""
-    private var lastPBPreviousBestDifference = -1
-    private var lastPBPreviousBestDifferenceDisplay = ""
-    private var lastPBSweepIncreaseDisplay = ""
-    private var lastPBSweepIncrease = -1.0
+    private var collectionPB = StarlynCollectionPersonalBests()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -205,28 +203,32 @@ object CompactStarlynSisters {
             duringContestPersonalBestPattern.matchMatcher(message) {
                 isInPersonalBest = true
                 personalBestVariablesAreDirty = true
-                lastPBWoodTypeDisplay = group("woodTypeDisplay")
-                lastPBWoodType = group("woodType")
-                lastPBCollectionIncreaseDuringContestDisplay = group("duringContestDisplay")
-                lastPBCollectionIncreaseDuringContest = group("duringContest").formatInt()
-                lastPBPreviousBestDifferenceDisplay = group("aLotMore")
-                lastPBPreviousBestDifference = group("byHowMuch").formatInt()
+                collectionPB = StarlynCollectionPersonalBests()
+                collectionPB.lastPBWoodTypeDisplay = group("woodTypeDisplay")
+                collectionPB.lastPBWoodType = group("woodType")
+                collectionPB.lastPBCollectionIncreaseDuringContestDisplay = group("duringContestDisplay")
+                collectionPB.lastPBPreviousBestDifferenceDisplay = group("aLotMore")
                 blockedReason = "STARLYN_COLLECTION"
                 return
             }
         } else {
             sweepIncreasePattern.matchMatcher(message) {
-                lastPBSweepIncreaseDisplay = group("sweepIncreaseDisplay")
-                lastPBSweepIncrease = group("sweepIncreasePercent").formatDouble()
+                collectionPB.lastPBSweepIncreaseDisplay = group("sweepIncreaseDisplay")
                 val formattedPersonalBest =
-                    "§6$lastPBWoodType PB§e: Your §2Sweep §eincreased by $lastPBSweepIncreaseDisplay §efrom collecting " +
-                        "$lastPBCollectionIncreaseDuringContestDisplay $lastPBWoodTypeDisplay §eLogs " +
-                        "($lastPBPreviousBestDifferenceDisplay §emore than your previous record)!"
+                    "§6${collectionPB.lastPBWoodType} PB§e: Your §2Sweep §eincreased " +
+                        "by ${collectionPB.lastPBSweepIncreaseDisplay} §efrom collecting " +
+                        "${collectionPB.lastPBCollectionIncreaseDuringContestDisplay} " +
+                        "${collectionPB.lastPBWoodTypeDisplay} §eLogs " +
+                        "(${collectionPB.lastPBPreviousBestDifferenceDisplay} " +
+                        "§emore than your previous record)!"
                 val hoverablePersonalBest = formattedPersonalBest.asComponent()
                 hoverablePersonalBest.hover = (
-                    "§eClick to check your personal bests!\n§2Sweep Increase§7: $lastPBSweepIncreaseDisplay\n" +
-                        "§6Collected§7: $lastPBCollectionIncreaseDuringContestDisplay $lastPBWoodTypeDisplay §eLogs\n" +
-                        "§6PB Increase: $lastPBPreviousBestDifferenceDisplay $lastPBWoodTypeDisplay §eLogs"
+                    "§eClick to check your personal bests!\n§2Sweep Increase§7: " +
+                        "${collectionPB.lastPBSweepIncreaseDisplay}\n" +
+                        "§6Collected§7: ${collectionPB.lastPBCollectionIncreaseDuringContestDisplay} " +
+                        "${collectionPB.lastPBWoodTypeDisplay} §eLogs\n" +
+                        "§6PB Increase: ${collectionPB.lastPBPreviousBestDifferenceDisplay} " +
+                        "${collectionPB.lastPBWoodTypeDisplay} §eLogs"
                     ).asComponent()
                 hoverablePersonalBest.onClick(onClick = {
                     HypixelCommands.starlynSisters()
@@ -244,43 +246,44 @@ object CompactStarlynSisters {
             startContestResultsPattern.matchMatcher(message) {
                 isInResults = true
                 contestVariablesAreDirty = true
-                lastContestStartTime = SimpleTimeMark.now().minus(20.minutes)
-                lastSister = group("foragingSister")
-                lastBracketPrefix = group("formattingCode")
-                lastBracket = group("bracket")
+                contestResult = StarlynContestResults()
+                contestResult.lastSister = group("foragingSister")
+                contestResult.lastBracketPrefix = group("formattingCode")
+                contestResult.lastBracket = group("bracket")
                 blockedReason = "STARLYN_RESULTS"
             }
         } else {
             pointsEarnedPattern.matchMatcher(message) {
-                lastScore = group("pointsInteger").formatInt()
-                lastScoreDisplay = group("pointsString")
+                contestResult.lastScoreDisplay = group("pointsString")
                 // if group is null or empty, it was not a personal best. otherwise it was
-                lastPersonalBestStatus = !this.groupOrNull("personalBest").isNullOrEmpty()
+                contestResult.hadPreviousPB = !this.groupOrNull("personalBest").isNullOrEmpty()
                 blockedReason = "STARLYN_RESULTS"
             }
-            if (lastPersonalBestStatus) {
+            if (contestResult.hadPreviousPB) {
                 previousBestPattern.matchMatcher(message) {
-                    lastPersonalBest = group("prevBestInt").formatInt()
-                    lastPersonalBestDisplay = group("previousBest")
+                    contestResult.lastPBScore = group("prevBestInt").formatInt()
+                    contestResult.lastPersonalBestDisplay = group("previousBest")
                     blockedReason = "STARLYN_RESULTS"
                 }
             }
             seeMePattern.matchMatcher(message) {
-                lastLocation = group("location")
-                val formattedResults = if (!lastPersonalBestStatus || lastPersonalBest < 1)
-                    "$lastSister's §eContest: You earned §r$lastScoreDisplay §epoints, " +
-                        "placing you in the $lastBracketPrefix$lastBracket §ebracket!"
-                else
-                    "$lastSister's §eContest: You earned §r$lastScoreDisplay §epoints, " +
-                        "placing you in the $lastBracketPrefix$lastBracket §ebracket! " +
-                        "Your previous §dpersonal best §ewas $lastPersonalBestDisplay §epoints!"
+                var formattedResults =
+                    "${contestResult.lastSister}'s §eContest: " +
+                        "You earned §r${contestResult.lastScoreDisplay} §epoints, " +
+                        "placing you in the " +
+                        "${contestResult.lastBracketPrefix}${contestResult.lastBracket} " +
+                        "§ebracket!"
+                if (contestResult.hadPreviousPB && contestResult.lastPBScore > 1)
+                    formattedResults += "Your previous §dpersonal best §ewas ${contestResult.lastPersonalBestDisplay} §epoints!"
                 val hoverableResults = formattedResults.asComponent()
                 hoverableResults.hover = (
                     "§eClick to claim your rewards!"
                     ).asComponent()
-                hoverableResults.onClick(onClick = {
-                    ChatUtils.sendMessageToServer("/starlynsisterlevels")
-                })
+                hoverableResults.onClick(
+                    onClick = {
+                        HypixelCommands.starlynSisters()
+                    },
+                )
                 ChatUtils.chat(hoverableResults)
                 isInResults = false
                 blockedReason = "STARLYN_RESULTS"
@@ -293,16 +296,7 @@ object CompactStarlynSisters {
     private fun resetContestResultVariables() {
         if (!contestVariablesAreDirty) return
 
-        lastBracket = ""
-        lastBracketPrefix = ""
-        lastContestStartTime = SimpleTimeMark.farPast()
-        lastLocation = ""
-        lastPersonalBest = -1
-        lastPersonalBestDisplay = ""
-        lastPersonalBestStatus = false
-        lastScore = -1
-        lastScoreDisplay = ""
-        lastSister = ""
+        contestResult.reset()
 
         contestVariablesAreDirty = false
     }
@@ -310,14 +304,7 @@ object CompactStarlynSisters {
     private fun resetPersonalBestVariables() {
         if (!personalBestVariablesAreDirty) return
 
-        lastPBWoodType = ""
-        lastPBWoodTypeDisplay = ""
-        lastPBCollectionIncreaseDuringContest = -1
-        lastPBCollectionIncreaseDuringContestDisplay = ""
-        lastPBPreviousBestDifference = -1
-        lastPBPreviousBestDifferenceDisplay = ""
-        lastPBSweepIncreaseDisplay = ""
-        lastPBSweepIncrease = -1.0
+        collectionPB.reset()
 
         personalBestVariablesAreDirty = false
     }

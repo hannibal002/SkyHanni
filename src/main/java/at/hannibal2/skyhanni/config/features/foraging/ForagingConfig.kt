@@ -38,6 +38,7 @@ class ForagingConfig {
 
     @Expose
     @ConfigOption(name = "Starlyn Contests", desc = "")
+    @SearchTag("Agatha")
     @Accordion
     val starlynContest: StarlynContestsConfig = StarlynContestsConfig()
 
@@ -46,13 +47,6 @@ class ForagingConfig {
     @Accordion
     @OnlyModern
     val tutorialQuest: ForagingTutorialQuestConfig = ForagingTutorialQuestConfig()
-
-    @Expose
-    @ConfigOption(name = "Starlyn Sisters", desc = "Settings for the Starlyn Sisters contests.")
-    @SearchTag("Agatha")
-    @OnlyModern
-    @Accordion
-    val starlyn = StarlynSistersConfig()
 
     @Expose
     @ConfigOption(name = "Moonglade Beacon", desc = "Settings for the moonglade beacon.")
