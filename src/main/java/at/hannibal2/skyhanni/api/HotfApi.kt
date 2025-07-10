@@ -16,15 +16,15 @@ object HotfApi {
         @Language("RegExp") override val itemPatternRaw: String,
     ) : ChatRepoPatternEnum, ItemRepoPatternEnum {
         SWEEP(
-            chatPatternRaw = "§r§fGain §r§a\\+5% §r§2∮ Sweep§r§f\\.",
+            chatPatternRaw = "Gain §r§a\\+5% §r§2∮ Sweep§r§f\\.",
             itemPatternRaw = "Gain §a\\+5% §2∮ Sweep§7\\."
         ),
         MANGROVE_FORTUNE(
-            chatPatternRaw = "§r§fGain §r§a\\+50 §r§6☘ Mangrove Fortune§r§f\\.",
+            chatPatternRaw = "Gain §r§a\\+50 §r§6☘ Mangrove Fortune§r§f\\.",
             itemPatternRaw = "Gain §a\\+50 §6☘ Mangrove Fortune§7\\."
         ),
         FIG_FORTUNE(
-            chatPatternRaw = "§r§fGain §r§a\\+50 §r§6☘ Fig Fortune§r§f\\.",
+            chatPatternRaw = "Gain §r§a\\+50 §r§6☘ Fig Fortune§r§f\\.",
             itemPatternRaw = "Gain §a\\+50 §6☘ Fig Fortune§7\\."
         ),
         ;
