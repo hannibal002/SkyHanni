@@ -9,7 +9,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     @Deprecated(
         "Use getDescription(bucket, timesGained) instead",
-        ReplaceWith("getDescription(bucket, timesGained)")
+        ReplaceWith("getDescription(bucket, timesGained)"),
     )
     override fun getDescription(timesGained: Long): List<String> =
         throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
@@ -18,7 +18,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     @Deprecated(
         "Use getCoinName(bucket, item) instead",
-        ReplaceWith("getCoinName(bucket, item)")
+        ReplaceWith("getCoinName(bucket, item)"),
     )
     override fun getCoinName(item: TrackedItem): String =
         throw UnsupportedOperationException("Use getCoinName(bucket, item) instead")
@@ -27,7 +27,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     @Deprecated(
         "Use getCoinDescription(bucket, item) instead",
-        ReplaceWith("getCoinDescription(bucket, item)")
+        ReplaceWith("getCoinDescription(bucket, item)"),
     )
     override fun getCoinDescription(item: TrackedItem): List<String> =
         throw UnsupportedOperationException("Use getCoinDescription(bucket, item) instead")
@@ -36,7 +36,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     @Deprecated(
         "Use addItem(bucket, internalName, amount) instead",
-        ReplaceWith("addItem(bucket, internalName, amount)")
+        ReplaceWith("addItem(bucket, internalName, amount)"),
     )
     override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount) instead")
@@ -57,7 +57,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     @Deprecated(
         "Use removeItem(bucket, internalName) instead",
-        ReplaceWith("removeItem(bucket, internalName)")
+        ReplaceWith("removeItem(bucket, internalName)"),
     )
     override fun removeItem(internalName: NeuInternalName) =
         throw UnsupportedOperationException("Use removeItem(bucket, internalName) instead")
@@ -72,7 +72,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     @Deprecated(
         "Use toggleItemHide(bucket, internalName, currentlyHidden) instead",
-        ReplaceWith("toggleItemHide(bucket, internalName, currentlyHidden)")
+        ReplaceWith("toggleItemHide(bucket, internalName, currentlyHidden)"),
     )
     override fun toggleItemHide(internalName: NeuInternalName, currentlyHidden: Boolean) =
         throw UnsupportedOperationException("Use toggleItemHide(bucket, internalName, currentlyHidden) instead")
@@ -104,8 +104,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
         buckets.distinct().fold(mutableMapOf()) { acc, bucket ->
-            bucket.items.filter { (_, item) -> !item.hidden }
-                .entries.distinctBy { it.key }
+            bucket.items.entries.distinctBy { it.key }
                 .forEach { (key, value) ->
                     acc.merge(key, value, ::mergeBuckets)
                 }
