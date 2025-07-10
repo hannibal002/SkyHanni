@@ -18,7 +18,7 @@ class GoblinRaidConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    val superProtectronHighlight: Boolean = true
+    var superprotectronHighlight: Boolean = true
 
     @Expose
     @ConfigOption(
