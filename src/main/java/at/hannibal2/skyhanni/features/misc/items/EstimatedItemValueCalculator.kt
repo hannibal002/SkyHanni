@@ -55,7 +55,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRodUpgrades
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRodParts
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
@@ -68,6 +68,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -85,7 +86,7 @@ object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     var starChange = 0
-        get() = if (SkyHanniDebugsAndTests.enabled) field else 0
+        get() = if (SkyBlockUtils.debug) field else 0
 
     private val additionalCostFunctions = listOf(
         ::addReforgeStone,
@@ -562,7 +563,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addRodUpgrades(stack: ItemStack, list: MutableList<String>): Double {
-        val rodUpgrades = stack.getRodUpgrades() ?: return 0.0
+        val rodUpgrades = stack.getRodParts()
 
         val (totalPrice, names) = getTotalAndNames(rodUpgrades)
         if (names.isNotEmpty()) {

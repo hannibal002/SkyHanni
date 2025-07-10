@@ -40,6 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FishingApi {
+
     enum class RodPart {
         HOOK,
         LINE,
@@ -155,8 +156,11 @@ object FishingApi {
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? =
-        getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")?.toInternalName()
+    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
+        val rodPartName = getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")
+        if (rodPartName.isNullOrEmpty()) return null
+        return rodPartName.toInternalName()
+    }
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 

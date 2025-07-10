@@ -889,7 +889,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-        if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
+        if (!SkyBlockUtils.debug && !PlatformUtils.isDevEnvironment) return
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()
