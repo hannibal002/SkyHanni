@@ -36,6 +36,11 @@ class ForagingConfig {
     val trees: TreesConfig = TreesConfig()
 
     @Expose
+    @ConfigOption(name = "Starlyn Contests", desc = "")
+    @Accordion
+    val starlynContest: StarlynContestsConfig = StarlynContestsConfig()
+
+    @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
     @Accordion
     @OnlyModern

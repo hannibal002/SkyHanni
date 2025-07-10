@@ -416,6 +416,13 @@ object ItemUtils {
         //$$ val stack = ItemStack(item, amount)
         //$$ stack.setCustomItemName(displayName)
         //$$ stack.setLore(lore)
+        //$$ var tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent.DEFAULT.with(DataComponentTypes.DAMAGE, true)
+        //$$ tooltipDisplay = tooltipDisplay.with(DataComponentTypes.ATTRIBUTE_MODIFIERS, true)
+        //$$ tooltipDisplay = tooltipDisplay.with(DataComponentTypes.UNBREAKABLE, true)
+        //$$ if (displayName.isBlank() && lore.isEmpty()) {
+        //$$     tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent(true, tooltipDisplay.hiddenComponents)
+        //$$ }
+        //$$ stack.set(DataComponentTypes.TOOLTIP_DISPLAY, tooltipDisplay)
         //$$ return stack
         //#endif
     }
@@ -686,8 +693,8 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
-        if (this.getItemStackOrNull()?.getPetInfo() != null) {
-            return PetUtils.getCleanPetName(this@grabItemName, colored = true) + " Pet"
+        if (this.isPet) {
+            return PetUtils.getCleanPetName(this, colored = true) + " Pet"
         }
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"

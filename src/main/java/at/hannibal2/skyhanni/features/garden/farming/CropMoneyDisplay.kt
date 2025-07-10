@@ -178,7 +178,7 @@ object CropMoneyDisplay {
                 val bazaarData = internalName.getBazaarData()
                 val price =
                     if (SkyBlockUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
-                    else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
+                    else (bazaarData.instantSellPrice + bazaarData.instantBuyPrice) / 320
                 extraMoneyPerHour.dicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
@@ -319,8 +319,8 @@ object CropMoneyDisplay {
         val bazaarData = internalName.getBazaarData() ?: return null
 
         val npcCoins = internalName.getNpcPrice() * cropsPerHour
-        val sellOfferCoins = bazaarData.sellOfferPrice * cropsPerHour
-        val instantSellCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val sellOfferCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val instantSellCoins = bazaarData.instantSellPrice * cropsPerHour
         val bountifulCoins = if (toolHasBountiful?.get(crop) == true && config.bountiful) speedPerHour * 0.2 else 0.0
 
         return CropMoneyData(
