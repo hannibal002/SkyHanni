@@ -106,11 +106,12 @@ object CompactSweepDetails {
         }
         if (!isInsideSweepDetails) return
         sweepToughnessLogsPattern.matchMatcher(event.message) {
+            val toughnessAmount = group("toughnessAmount")
+            val fixedToughness = toughnessAmount.removeSuffix(".0")
             sweepDetails.treeType = group("treeType")
-            sweepDetails.toughness = group("toughnessAmount").formatDouble()
+            sweepDetails.toughness = toughnessAmount.formatDouble()
             sweepDetails.logCountDisplay = group("logsDisplay")
             sweepDetails.logs = group("logsAmount").formatDouble()
-            val fixedToughness = sweepDetails.toughness.toString().removeSuffix(".0")
             sweepDetails.penalties.add(
                 "§6Initial Logs: ${sweepDetails.logs} " +
                     "${sweepDetails.treeType} Logs §7(§6$fixedToughness toughness§7)",
@@ -147,7 +148,10 @@ object CompactSweepDetails {
     }
 
     private fun sendCompactedResults() {
-        sweepDetails.penalties.add("§6Final Logs: §a${sweepDetails.logs} §6${sweepDetails.treeType} Logs")
+        sweepDetails.penalties.add(
+            "§6Final Logs: §a${sweepDetails.logs} " +
+                "§6${sweepDetails.treeType} Logs",
+        )
         isInsideSweepDetails = false
 
         val builder = StringBuilder()
@@ -156,17 +160,23 @@ object CompactSweepDetails {
             builder.append(penalty)
             if (penalty != sweepDetails.penalties.last()) builder.append("\n")
         }
-        if (sweepDetails.proTip.isNotEmpty()) builder.append("\n§6Pro tip: ${sweepDetails.proTip}")
+        if (sweepDetails.proTip.isNotEmpty()) {
+            builder.append("\n§6Pro tip: ${sweepDetails.proTip}")
+        }
         val hoverText = builder.toString()
 
         builder.clear()
 
         sweepDetails.breakdown.forEach { section ->
             builder.append(section)
-            if (!section.startsWith("§2Sweep: ") || !sweepDetails.addedInitialLogs) builder.append(" ")
+            if (!section.startsWith("§2Sweep: ") || !sweepDetails.addedInitialLogs) {
+                builder.append(" ")
+            }
         }
         builder.append("§7-> §a${sweepDetails.logs} logs")
-        if (sweepDetails.proTip.isNotEmpty()) builder.append("\n  §6Pro tip: ${sweepDetails.proTip}")
+        if (sweepDetails.proTip.isNotEmpty()) {
+            builder.append("\n  §6Pro tip: ${sweepDetails.proTip}")
+        }
         val chatText = builder.toString()
         val chatComponent = chatText.asComponent()
 
