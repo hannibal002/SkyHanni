@@ -124,7 +124,11 @@ object CompactSweepDetails {
             }
             sweepDetails.logs = group("logsAmount").formatDouble()
             sweepDetails.logCountDisplay = group("logsDisplay")
-            sweepDetails.penalties.add("§e${group("penaltyReason")}§7: §c-${group("penaltyPercent").formatDouble()}% §7(${sweepDetails.logs} logs)")
+            sweepDetails.penalties.add(
+                "§e${group("penaltyReason")}§7: " +
+                    "§c-${group("penaltyPercent").formatDouble()}% " +
+                    "§7(${sweepDetails.logs} logs)",
+            )
             sweepDetails.breakdown.add("§7(${group("penaltyDisplay")}§7)")
             sweepDetails.proTip = groupOrEmpty("proTip")
             event.blockedReason = "SWEEP_DETAILS"
