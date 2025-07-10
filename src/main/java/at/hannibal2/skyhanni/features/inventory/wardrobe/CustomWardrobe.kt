@@ -655,11 +655,14 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
 
-    fun centerString(
+    private fun centerString(
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
     ) = Renderable.string(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
+
+    @JvmStatic
+    fun shouldHideNormalTooltip(): Boolean = WardrobeApi.inCustomWardrobe && !editMode
 }

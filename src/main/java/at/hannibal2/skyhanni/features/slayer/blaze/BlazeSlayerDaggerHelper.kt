@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -179,7 +179,7 @@ object BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
         for (shield in HellionShield.entries) {
-            if (shield.formattedName + "§r" == event.title) {
+            if (shield.formattedName in event.title) {
                 for (dagger in Dagger.entries.filter { shield in it.shields }) {
                     dagger.shields.forEach { it.active = false }
                     dagger.updated = true
@@ -197,7 +197,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBlockClick(event: BlockClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (clientSideClicked) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
