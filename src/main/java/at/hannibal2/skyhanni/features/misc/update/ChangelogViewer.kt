@@ -132,7 +132,7 @@ object ChangelogViewer {
         .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
         .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
         .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
-        .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b§l$1") // Color contributors
+        .replace("(- [^-\r\n]*(?:\r\n|$))".toRegex(), "§b§l$1") // Color contributors
         .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
         .replace("`", "\"") // Fix Code Blocks to look better
         .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body

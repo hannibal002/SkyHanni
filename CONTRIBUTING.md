@@ -31,7 +31,6 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
 ### Setting up IntelliJ
 
-
 Once your project is imported into IntelliJ from the previous step, all dependencies like Minecraft, NEU, and so on should be automatically
 downloaded. If not, you might need to link the Gradle project in the Gradle tab (little elephant) on the right.
 
@@ -53,8 +52,39 @@ build tools.
 
 </details>
 
-After all importing is done (which might take a few minutes the first time you download the project), you should find a new IntelliJ run
-configuration.
+Now that gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java version for the project.
+
+To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
+
+<details>
+<summary>🖼️ What the project structure will look like originally</summary>
+
+![Default Project Structure](docs/default-project-structure.png)
+
+</details>
+
+We want to also set the project structure to use java 21, but then we also want to set the project language level to 8, as Minecraft 1.8.9
+uses Java 1.8.
+
+<details>
+<summary>🖼️ What you should set the project structure to be</summary>
+
+![Target Project Structure](docs/target-project-structure.png)
+
+</details>
+
+Finally, we then want to reload gradle which can be done from the gradle tab from earlier.
+
+<details>
+
+<summary>🖼️ Show Gradle reload button</summary>
+
+![Gradle reload button](docs/gradle-reload-button.png)
+
+</details>
+
+After all importing is done (which should be much quicker this time), you should find a new IntelliJ run
+configuration. If not, you can restart intellij and reload the gradle project again.
 
 <details>
 <summary>🖼️Show run configuration selection image</summary>
@@ -83,7 +113,8 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 ## Pull Requests
 
-General infos about Pull Request can be found on the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
+General infos about Pull Request can be found on
+the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
 
 ### Creating a Pull Request
 
@@ -151,7 +182,7 @@ Internal changes that do not impact the end user. Examples include:
 
 Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
 We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
-everything else can go in the normal PR description (What area). 
+everything else can go in the normal PR description (What area).
 
 #### Removed Features
 
@@ -170,12 +201,15 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
--  **My build is failing due to `detekt`, what do I do?**
+- **My build is failing due to `detekt`, what do I do?**
     - `detekt` is our code quality tool. It checks for code smells and style issues.
-    - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can check `versions/[target version]/build/reports/detekt/` for a comprehensive list of issues.
+    - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can
+      check `versions/[target version]/build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
-        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaselineMain`.
-          After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
+        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file,
+          using `./gradlew detektBaselineMain`.
+          After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file
+          to
           `baseline.xml` replacing the old one.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
@@ -186,9 +220,11 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
-    - If the feature needs to register Forge/Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature classs it with `@SkyHanniModule`
+    - If the feature needs to register Forge/Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature classs it
+      with `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
-    - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error in `SkyHanniMod.kt`.
+    - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error
+      in `SkyHanniMod.kt`.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
@@ -199,10 +235,10 @@ Make sure such pull requests have a good explanation in the **What** section.
     - To expand the event systems you can create a new event that is called from a Mixin
     - Or you can subscribe to a Forge event and then post a SkyHanni event from that. See the `api/minecraftevents` package for examples.
     - If you make a new event there are a few different types of events that you can make, make sure your event extends one of these.
-      - SkyHanniEvent: This is just a normal event.
-      - CancelableSkyHanniEvent: This is a cancellable event. It has a `cancel()` method that you can call to cancel the event.
-      - GenericSkyHanniEvent: This is a generic event, typically used for entities but can be used for any generics.
-      - RenderingSkyHanniEvent: This is an event that you are allowed to do GUI rendering in.
+        - SkyHanniEvent: This is just a normal event.
+        - CancelableSkyHanniEvent: This is a cancellable event. It has a `cancel()` method that you can call to cancel the event.
+        - GenericSkyHanniEvent: This is a generic event, typically used for entities but can be used for any generics.
+        - RenderingSkyHanniEvent: This is an event that you are allowed to do GUI rendering in.
 - Please use existing utils methods.
 - We try to avoid calling the NEU code too often.
     - (We plan to remove NEU as a dependency in the future.)
@@ -218,39 +254,48 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
-    - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+    -
+    See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
     - All repo patterns must be accompanied by a regex test. Look at other patterns for examples, more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
   the main thread.
-- When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
+- When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and
+  event.transform() when updating a
+  value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
-- Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve readability and maintain encapsulation.
+- Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
+  readability and maintain encapsulation.
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 - Always combine title messages with chat message.
-  - This way users know what feature and what mod sends the title, if they want to disable it.
-  - Also we can include more informations why the title just showed up, as the title should not be too long.
+    - This way users know what feature and what mod sends the title, if they want to disable it.
+    - Also we can include more informations why the title just showed up, as the title should not be too long.
 
 ### Compatibility with modern versions
+
 As SkyHanni gets closer to supporting multiple Minecraft versions, there are a few additional coding conventions to follow. Below are some
 of the main conventions to follow to ensure that code you write should work on both 1.8.9 and modern versions. Remember that the best
 way to ensure you are writing the correct code is to look at existing code for similar features and then try to follow that code. Also
 looking in the `at.hannibal2.skyhanni.utils.compat` package is a good idea, as this is where most of the compatibility code will be located.
+
 - When accessing either the player or the world use `MinecraftCompat.localPlayer()` and `MinecraftCompat.localWorld()`. These methods
-both have a nullable version as well: `MinecraftCompat.localPlayerOrNull()` and `MinecraftCompat.localWorldOrNull()`. This is because on
-1.8.9 while the player and world can be nullable at times, Minecraft's source code does not reflect this.
+  both have a nullable version as well: `MinecraftCompat.localPlayerOrNull()` and `MinecraftCompat.localWorldOrNull()`. This is because on
+  1.8.9 while the player and world can be nullable at times, Minecraft's source code does not reflect this.
 - Rendering on modern versions is done completely differently than on 1.8.9. As such, on 1.8.9 we have adjusted our rendering code to more
-closely resemble modern rendering code. You may notice a `DrawContext` or `WorldRenderContext` object being passed around. These both hold
-a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack, translating and scaling.
-To do most of these calls instead of using `GlStateManager` directly, you should use `DrawContextUtils` instead. If you are unsure, make sure
-to look at existing code to see how it is done and if you are still unsure, ask for help.
+  closely resemble modern rendering code. You may notice a `DrawContext` or `WorldRenderContext` object being passed around. These both hold
+  a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack, translating and
+  scaling.
+  To do most of these calls instead of using `GlStateManager` directly, you should use `DrawContextUtils` instead. If you are unsure, make
+  sure
+  to look at existing code to see how it is done and if you are still unsure, ask for help.
 - When making GUI screens or other GUI elements, you should try to use Renderables where possible as these should already account for
-most modern rendering changes. If you are making a new GUI screen, make sure to extend `SkyHanniBaseScreen` instead of `GuiScreen` to ensure
-compatibility for modern versions.
+  most modern rendering changes. If you are making a new GUI screen, make sure to extend `SkyHanniBaseScreen` instead of `GuiScreen` to
+  ensure
+  compatibility for modern versions.
 
 ## Additional Useful Development Tools
 
@@ -328,7 +373,8 @@ This library is not part of SkyHanni or Forge, but we bundle it.
 
 It allows to easily modify methods in Minecraft itself, without conflicting with other mods.
 
-For more information, see https://github.com/SpongePowered/Mixin or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
+For more information, see https://github.com/SpongePowered/Mixin
+or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
 When creating new Mixins, try to keep the code inside the mixin as small as possible, and calling a hook as soon as
 possible.
@@ -346,7 +392,8 @@ folder for how to properly do this. You also may have to disable repo auto updat
 ### Discord IPC
 
 DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
-For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+For info on usage, look
+at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
 ### Auto Updater
 
@@ -362,6 +409,7 @@ a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with s
 ### TLDR
 
 How to make it work:
+
 1. Go to `.gradle/`.
 2. Create a text file `private.properties`.
 3. Write `skyhanni.multi-version=compile` into the file.
@@ -379,7 +427,8 @@ To do so (while not disrupting regular development) we use [preprocessor](https:
 automatically transforms code based on mappings as well as comment directives to create multiple variants of your source code for
 different Minecraft versions.
 
-Note also that the only targets we consider are 1.8.9 and 1.21 (or whatever the latest version we may target). The other versions are only there
+Note also that the only targets we consider are 1.8.9 and 1.21 (or whatever the latest version we may target). The other versions are only
+there
 to make mappings translate more easily (more on that later).
 
 ### Goals
@@ -388,13 +437,15 @@ It is the explicit goal of this operation to passively generate a 1.21 version o
 encouraged to add mappings and preprocessing directives to their features to make them compile on 1.21. *However*, this is considered a very
 low priority. Due to the confusing nature (and the slower initial setup time due to decompiling four versions of Minecraft), this feature
 is disabled by default. Similarly, it is up to each contributor to decide if they want to learn how to use preprocessor mappings and
-directives. An explicit non-goal is to maintain two SH versions continuously; instead, we only want to make the eventual transition to 1.21 a task
+directives. An explicit non-goal is to maintain two SH versions continuously; instead, we only want to make the eventual transition to 1.21
+a task
 that can be slowly worked on over a long span of time.
 
 ### Set Up
 
 The modern version variants can be set using `skyhanni.multi-version` in `.gradle/private.properties` to three levels.
-You will have to create this file yourself, for example if you want to set it to compile the file should contain `skyhanni.multi-version=compile` 
+You will have to create this file yourself, for example if you want to set it to compile the file should
+contain `skyhanni.multi-version=compile`
 
 `off` completely disables any preprocessor action or alternative versions. There will be only one project (although still at the `:1.8.9`
 subproject path), and alternative version sources will not be generated (although old generated sources **will not be deleted**). To make
@@ -410,7 +461,8 @@ specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect 
 
 `compile` enables compilation for the `:1.21` subproject. This means that a `build` or `assemble` task will try (and fail) to compile a
 1.21 (as well as 1.8.9) JAR. This mode may be useful for someone seeking out issues to fix, but is generally not useful in day to day
-operations since the compile task will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from completing.
+operations since the compile task will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from
+completing.
 
 ### Compiling and Testing
 
@@ -418,12 +470,13 @@ To compile the mod, simply run `./gradlew build` (without a version number), and
 version up to 1.21. By default, only a few files will be compiled, these files can be found in the `versions/<version>/buildpaths.txt` file.
 If you want to compile more files, you can add them to this file or if you want to compile all files you can temporarily remove the file.
 
-> ⚠️ **Notice:** For this to work you **Must** have the `skyhanni.multi-version` set too `compile` in your `.gradle/private.properties` file.
+> ⚠️ **Notice:** For this to work you **Must** have the `skyhanni.multi-version` set too `compile` in your `.gradle/private.properties`
+> file.
 
 If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
 Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
 
-You may notice some `//#if TODO` comments in the code, these are preprocessor comments that we are using to signify that we need to make 
+You may notice some `//#if TODO` comments in the code, these are preprocessor comments that we are using to signify that we need to make
 this functionality work again on 1.21.
 
 ### Improving mappings
@@ -431,8 +484,9 @@ this functionality work again on 1.21.
 The different project versions are set up in such a way that each version depends on a slightly older version from which it is then adapted.
 There are two main versions (1.8.9 and 1.21), but there are also a few bridge versions. These exist to make remapping easier since automatic
 name mappings between 1.8.9 and 1.21 do not really exist. This is the current layout for our remaps: First, we remap to 1.16 which is a big
-jump from 1.8.9, but still has a lot of the old rendering code and is still on Forge. We jump to 1.16 because it is a version with Fabric and
-also has Fabric intermediary mappings available. We also can't really jump to an earlier version since 1.14 and 1.15 have a really poor 
+jump from 1.8.9, but still has a lot of the old rendering code and is still on Forge. We jump to 1.16 because it is a version with Fabric
+and
+also has Fabric intermediary mappings available. We also can't really jump to an earlier version since 1.14 and 1.15 have a really poor
 Fabric API. Despite the preprocessor's best efforts, this version will likely have the most manual mapping changes. Note that we
 actually have two projects on 1.16. There is the Forge project, which is the one we remap to first. Then we remap to the corresponding
 Fabric/Yarn mappings. This is because remapping between Searge and Yarn is very inconsistent unless it is done on one and the same version.
@@ -498,11 +552,12 @@ same result as on previous versions.
 #### Conditional compilation
 
 > [!NOTE]  
-> These examples were written back when we had a 1.12 step in the remapping process. The 1.12 step is no longer used but the same general 
+> These examples were written back when we had a 1.12 step in the remapping process. The 1.12 step is no longer used but the same general
 > principals apply to every other step. If you are confused make sure to look at code to see actual examples of how this works.
 
 In addition to the built-in remapping, there is also the more complicated art of preprocessor directives. Directives allow you to comment or
-uncomment sections of the code depending on the version you are on. Uncommented sections are renamed as usual, so even within those directives,
+uncomment sections of the code depending on the version you are on. Uncommented sections are renamed as usual, so even within those
+directives,
 you only need to write code for the *lowest* version that your comment is active in. As such, I once again highly recommend to target your
 directive to the lowest version in which it applies, so that other sections that call into that code as well as your code can make use of
 as many automatic renames as possible.
@@ -518,8 +573,10 @@ private fun WorldClient.getAllEntities(): Iterable<Entity> =
 //#endif
 ```
 
-The first `#if` instructs the preprocessor to only uncomment the following code if the Minecraft version is less than 1.16. Then, the `#else`
-uncomments the other section on versions 1.16 and above. Finally, the `#endif` ends the else block and lets the following functions always remain
+The first `#if` instructs the preprocessor to only uncomment the following code if the Minecraft version is less than 1.16. Then,
+the `#else`
+uncomments the other section on versions 1.16 and above. Finally, the `#endif` ends the else block and lets the following functions always
+remain
 active. To distinguish regular comments from preprocessor comments, preprocessor only works with comments that start with `//$$`. So let's
 walk through what is happening here.
 
@@ -529,7 +586,8 @@ The preprocessor will never change the `src/` directory**.
 Next, the preprocessor converts the code to 1.12. 1.12 still has the `loadedEntityList` as well as the same name for the `WorldClient` and
 `Entity` classes, so nothing is changed.
 
-Next, the code gets converted to 1.16 Forge. Since 1.16 is not less than 1.16, it will comment out the first line and uncomment the second line.
+Next, the code gets converted to 1.16 Forge. Since 1.16 is not less than 1.16, it will comment out the first line and uncomment the second
+line.
 1.16 Forge also uses a different name for `WorldClient` and a different package for `Entity`, so those are also changed (the package change
 is only visible in the imports):
 
@@ -591,8 +649,8 @@ You can also check if you are on Forge using the `FORGE` variable. It is set to 
 check the Java version this Minecraft version is on. For the `FORGE` variable there is an implicit `!= 0` to check added if you just check
 for the variable using `#if FORGE`.
 
-We also have a `#if TODO` directive. This is a special directive that is used to mark code that needs to be changed on modern versions. 
-Anything within this directive will only compile on 1.8 and otherwise will be commented out. This is useful for marking code that needs to 
+We also have a `#if TODO` directive. This is a special directive that is used to mark code that needs to be changed on modern versions.
+Anything within this directive will only compile on 1.8 and otherwise will be commented out. This is useful for marking code that needs to
 be changed in the future, but you don't want to do it right now.
 
 #### Helpers
@@ -606,14 +664,14 @@ compatability methods for. For example, `WorldClient.getAllEntities()` could be 
 it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files
 themselves.
 
-
 ### Access Wideners
 
-You may want to use private minecraft methods or fields, this is where access wideners come in. 
-Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or 
+You may want to use private minecraft methods or fields, this is where access wideners come in.
+Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or
 field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
-To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and 
-select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<version number>/src/main/resources/skyhanni.accesswidener`.
+To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and
+select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom
+of `versions/<version number>/src/main/resources/skyhanni.accesswidener`.
 Then you need to reload gradle for the changes to apply.
 
 This requires you to have the Minecraft Development plugin installed as mentioned earlier.
