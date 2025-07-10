@@ -24,11 +24,12 @@ object AnitaExtraFarmingFortune {
     private val config get() = GardenApi.config.anitaShop
 
     /**
+     * REGEX-TEST: §aJacob's Ticket §8x450
      * REGEX-TEST: §5§o§aJacob's Ticket §8x450
      */
     private val realAmountPattern by RepoPattern.pattern(
         "garden.inventory.anita.extrafortune.realamount",
-        "§5§o§aJacob's Ticket §8x(?<realAmount>.*)",
+        "(?:§5§o)?§aJacob's Ticket §8x(?<realAmount>.*)",
     )
 
     private var levelPrice = mapOf<Int, AnitaUpgradePrice>()
@@ -62,7 +63,7 @@ object AnitaExtraFarmingFortune {
         }
         jacobTickets = (contributionFactor * jacobTickets).toInt()
 
-        val index = event.toolTip.indexOfFirst("§5§o§eClick to trade!")?.let { it - 1 } ?: return
+        val index = event.toolTipRemovedPrefix().indexOfFirst("§eClick to trade!")?.let { it - 1 } ?: return
 
         // TODO: maybe only show the price when playing classic
 //        if (!LorenzUtils.noTradeMode) {
