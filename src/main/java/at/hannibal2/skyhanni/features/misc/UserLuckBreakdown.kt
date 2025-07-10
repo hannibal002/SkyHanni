@@ -329,7 +329,7 @@ object UserLuckBreakdown {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(90, "misc.userluckEnabled", "misc.userLuck")
+        event.move(94, "misc.userluckEnabled", "misc.userLuck")
     }
 
     private fun calcSkillLuck() {
