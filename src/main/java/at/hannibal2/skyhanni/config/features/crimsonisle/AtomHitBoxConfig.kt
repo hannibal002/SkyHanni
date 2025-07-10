@@ -6,12 +6,14 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class AtomHitBoxConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show Exes, Wais and Zees hitbox.")
     @ConfigEditorBoolean
+    @SearchTag("atom x y z xyz")
     @FeatureToggle
     var enabled: Boolean = false
 
