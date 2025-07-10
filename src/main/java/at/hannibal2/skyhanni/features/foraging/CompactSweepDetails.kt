@@ -174,8 +174,6 @@ object CompactSweepDetails {
         resetSweepDetailsVariables()
     }
 
-    private fun isFinalCalculation(regexGroup: String): Boolean = regexGroup == "§a"
-
     private fun resetSweepDetailsVariables() {
         if (!sweepDetailsVariablesDirty) return
 
@@ -187,5 +185,7 @@ object CompactSweepDetails {
         sweepDetailsVariablesDirty = false
     }
 
-    private fun isInIsland() = IslandTypeTags.FORAGING.inAny()
+    private fun isFinalCalculation(regexGroup: String): Boolean = regexGroup == "§a"
+
+    private fun isInIsland(): Boolean = IslandTypeTags.FORAGING.inAny()
 }
