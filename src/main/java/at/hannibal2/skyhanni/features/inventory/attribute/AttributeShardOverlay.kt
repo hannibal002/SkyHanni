@@ -37,6 +37,7 @@ object AttributeShardOverlay {
     private var unlockedShards = 0
     private var maxedShards = 0
     private var totalShardLevels = 0
+    private var priceToMax = 0.0
 
     private var lastShardsData: Map<String, ProfileSpecificStorage.AttributeShardData> = emptyMap()
     private var lastTotalSyphoned = 0
@@ -82,6 +83,7 @@ object AttributeShardOverlay {
         unlockedShards = 0
         maxedShards = 0
         totalShardLevels = 0
+        priceToMax = 0.0
 
         val lines = mutableListOf<AttributeShardDisplayLine>()
 
@@ -132,6 +134,9 @@ object AttributeShardOverlay {
                 add(StringRenderable("§cTry changing your settings below."))
             } else {
                 add(filtered.map { it.renderLine }.buildSearchableScrollable(height = 225, textInput, velocity = 25.0))
+            }
+            if (priceToMax > 0) {
+                add(StringRenderable("§7Total Price to Max All Shards: §6${priceToMax.shortFormat()}"))
             }
             addButtons()
         }
@@ -189,6 +194,8 @@ object AttributeShardOverlay {
         val priceUntilNextTier = individualPrice * amountToNextTier
         val priceUntilMaxed = individualPrice * amountUntilMaxed
         val shardItemName = internalName.repoItemName
+
+        priceToMax += priceUntilMaxed
 
         val priceString = when {
             currentTier == 10 -> "§a§lMaxed"
