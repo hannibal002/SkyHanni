@@ -76,7 +76,6 @@ object CompactSweepDetails {
     private val sweepPenaltyHoverHistory = mutableListOf<String>()
     private var sweep = -1.0
     private var toughness = -1.0
-    private var toughnessDisplay = ""
     private var treeType = ""
 
     @HandleEvent
@@ -109,7 +108,6 @@ object CompactSweepDetails {
         if (!isInsideSweepDetails) return
         sweepToughnessLogsPattern.matchMatcher(message) {
             treeType = group("treeType")
-            toughnessDisplay = group("toughnessDisplay")
             toughness = group("toughnessAmount").formatDouble()
             logCountDisplay = group("logsDisplay")
             logs = group("logsAmount").formatDouble()
@@ -189,7 +187,6 @@ object CompactSweepDetails {
         sweepPenaltyHoverHistory.clear()
         sweep = -1.0
         toughness = -1.0
-        toughnessDisplay = ""
         treeType = ""
 
         sweepDetailsVariablesDirty = false
