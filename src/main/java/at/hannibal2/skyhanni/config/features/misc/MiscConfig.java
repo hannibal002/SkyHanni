@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.OnlyLegacy;
+import at.hannibal2.skyhanni.config.OnlyModern;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig;
-import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
+import at.hannibal2.skyhanni.config.features.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -50,11 +52,14 @@ public class MiscConfig {
     @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
     public AreaNavigationConfig areaNavigation = new AreaNavigationConfig();
 
+    @Expose
+    @Category(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
+    public PathfindConfig pathfinding = new PathfindConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
-    // TODO maybe we can migrate this already
-    public HideArmorConfig hideArmor2 = new HideArmorConfig();
+    public HideArmorConfig hideArmor = new HideArmorConfig();
 
     @Expose
     @ConfigOption(name = "Non-God Pot Effects", desc = "")
@@ -182,10 +187,10 @@ public class MiscConfig {
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
-    public Position collectionCounterPos = new Position(10, 10, false, true);
+    public Position collectionCounterPos = new Position(10, 10);
 
     @Expose
-    public Position carryPosition = new Position(10, 10, false, true);
+    public Position carryPosition = new Position(10, 10);
 
     @Expose
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
@@ -217,6 +222,7 @@ public class MiscConfig {
     // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
+    @OnlyLegacy
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideScoreboardNumbers = false;
@@ -254,6 +260,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Better Sign Editing", desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
     @ConfigEditorBoolean
+    @OnlyLegacy
     @FeatureToggle
     public boolean betterSignEditing = true;
 
@@ -265,7 +272,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
-    public Position playerMovementSpeedPos = new Position(394, 124, false, true);
+    public Position playerMovementSpeedPos = new Position(394, 124);
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
@@ -297,6 +304,7 @@ public class MiscConfig {
         name = "Fix Patcher Lines",
         desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else."
     )
+    @OnlyLegacy
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixPatcherLines = true;
@@ -342,7 +350,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
-    public Position inventoryLoadPos = new Position(394, 124, false, true);
+    public Position inventoryLoadPos = new Position(394, 124);
 
     @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Remove ghost entities caused by a Hypixel bug.\n" +
@@ -419,9 +427,28 @@ public class MiscConfig {
     public boolean warnAboutPcTimeOffset = true;
 
     @Expose
+    @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    public boolean coralFishHelper = true;
+
+    @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "coralFishHelper")
+    public Position coralFishHelperPosition = new Position(174, 139);
+
+    @Expose
     @ConfigOption(name = "Transparent Tooltips", desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!")
     @ConfigEditorBoolean
     public boolean transparentTooltips = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Co-op Member Collections", desc = "Hides specific co-op members from collections.\n" +
+        "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) to update the list."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideExCoopMembers = false;
 
     @Expose
     @ConfigOption(

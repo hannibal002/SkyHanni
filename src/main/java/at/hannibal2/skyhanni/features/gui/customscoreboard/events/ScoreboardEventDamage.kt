@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 // scoreboard
@@ -19,5 +18,5 @@ object ScoreboardEventDamage : ScoreboardEvent() {
         ScoreboardPattern.bossDamagePattern,
     )
 
-    override fun showIsland() = IslandType.THE_END.isInIsland()
+    override fun showIsland() = IslandType.THE_END.isCurrent()
 }

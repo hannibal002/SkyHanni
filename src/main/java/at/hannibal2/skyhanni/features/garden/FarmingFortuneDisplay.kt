@@ -142,7 +142,7 @@ object FarmingFortuneDisplay {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return
-        config.pos.renderRenderables(display, posLabel = "True Farming Fortune")
+        config.position.renderRenderables(display, posLabel = "True Farming Fortune")
     }
 
     private fun update() {
@@ -408,5 +408,7 @@ object FarmingFortuneDisplay {
         event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
         event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
+
+        event.move(87, "garden.farmingFortunes.pos", "garden.farmingFortunes.position")
     }
 }

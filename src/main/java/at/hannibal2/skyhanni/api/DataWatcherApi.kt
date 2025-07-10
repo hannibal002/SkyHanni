@@ -17,11 +17,6 @@ import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.entity.item.EntityXPOrb
 
-//#if MC > 1.12
-//$$ import net.minecraft.network.datasync.DataSerializers
-//$$ import net.minecraft.network.datasync.EntityDataManager
-//#endif
-
 @SkyHanniModule
 object DataWatcherApi {
 
@@ -34,35 +29,26 @@ object DataWatcherApi {
         EntityPlayerSP::class.java,
     )
 
-    //#if MC < 1.12
     private const val DATA_VALUE_CUSTOM_NAME = 2
-    //#else
-    //$$ private val DATA_VALUE_CUSTOM_NAME = EntityDataManager.createKey(Entity::class.java, DataSerializers.STRING)
-    //#endif
-
-    //#if MC < 1.12
     private const val DATA_VALUE_HEALTH = 6
-    //#else
-    //$$ private val DATA_VALUE_HEALTH = EntityDataManager.createKey(EntityLivingBase::class.java, DataSerializers.FLOAT)
-    //#endif
 
     @HandleEvent
     fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
         for (updatedEntry in event.updatedEntries) {
-            //#if MC < 1.12
+            //#if MC < 1.21
             if (updatedEntry.dataValueId == DATA_VALUE_CUSTOM_NAME) {
                 //#else
-                //$$ if (updatedEntry.key == DATA_VALUE_CUSTOM_NAME) {
+                //$$ if (updatedEntry.data == Entity.CUSTOM_NAME) {
                 //#endif
                 EntityCustomNameUpdateEvent(event.entity, event.entity.customNameTag).post()
             }
 
-            //#if MC < 1.12
+            //#if MC < 1.21
             if (updatedEntry.dataValueId == DATA_VALUE_HEALTH) {
                 val health = (updatedEntry.`object` as? Float)?.toInt() ?: continue
                 //#else
-                //$$ if (updatedEntry.key == DATA_VALUE_HEALTH) {
-                //$$ val health = (updatedEntry.value as? Float)?.toInt() ?: continue
+                //$$ if (updatedEntry.data == LivingEntity.HEALTH) {
+                //$$ val health = (updatedEntry.get() as? Float)?.toInt() ?: continue
                 //#endif
 
                 val entity = EntityUtils.getEntityByID(event.entity.entityId) ?: continue

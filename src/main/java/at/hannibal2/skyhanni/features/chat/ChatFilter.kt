@@ -4,9 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -50,7 +49,7 @@ object ChatFilter {
         "§b✦ §r§7You earned §r§b\\d+ §r§7Mystery Dust!".toPattern(),
 
         // pet consumables
-        "§b✦ §r§7You earned §r§a\\d+ §r§7Pet Consumables?!".toPattern(),
+        "§b§b✦ §r§7You earned §a\\d+ §7Pet Consumables items!".toPattern(),
     )
 
     private val lobbyMessages = listOf(
@@ -223,9 +222,10 @@ object ChatFilter {
         "§cYou currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!".toPattern(),
     )
 
+    // TODO update patterns for 1.21
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
-        "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
+        "(?:§a)?§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
     )
     private val uselessNotificationMessages = listOf(
         "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
@@ -305,20 +305,17 @@ object ChatFilter {
         "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
     )
 
+    private val lotteryMessages = listOf(
+        "§r§bNew day! §r§eYour §r§2Lottery §r§ebuff changed!",
+        "§r§8§oYou can disable this messaging by toggling Lottery in your /hotf!"
+    )
+
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYour §9Anita's Talisman §fis giving you §6+25☘ Carrot Fortune §fduring the contest!
      */
     private val anitaFortunePattern by RepoPattern.pattern(
         "chat.jacobevent.accessory",
         "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!",
-    )
-
-    /**
-     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§6+50☘ Mining Fortune§r§f.
-     */
-    private val skymallPerkPattern by RepoPattern.pattern(
-        "chat.skymall.perk",
-        "§eNew buff§r§r§r:.*",
     )
 
     // Winter Gift
@@ -330,7 +327,7 @@ object ChatFilter {
                 northStarsPattern,
                 boostPotionPattern,
                 enchantmentBookPattern,
-                genericRewardPattern
+                genericRewardPattern,
             ).forEach { add(it) }
         }
         addAll(GiftProfitTracker.spamPatterns)
@@ -349,9 +346,9 @@ object ChatFilter {
         "§c {3}♨ §eAnd \\d+ more!".toPattern(),
     )
     private val eventPatterns = listOf(
-        "§f +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
-        "§f +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
-        "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
+        "(?:§f)? +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
+        "(?:§f)? +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
+        "(?:§f)? +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
     )
     private val factoryUpgradePatterns = listOf(
         "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
@@ -495,6 +492,7 @@ object ChatFilter {
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
         "skymall" to skymallMessages,
+        "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
     )
@@ -548,7 +546,8 @@ object ChatFilter {
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
-        generalConfig.hideSkyMall && !MiningApi.inMiningIsland() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
+        generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"
+        generalConfig.hideLottery && !IslandTypeTags.FORAGING.inAny() && message.isPresent("lottery") -> "lottery"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
         dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"

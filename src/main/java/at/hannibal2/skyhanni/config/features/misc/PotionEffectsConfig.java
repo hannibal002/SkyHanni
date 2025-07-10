@@ -49,5 +49,5 @@ public class PotionEffectsConfig {
     @Expose
     @ConfigLink(owner = PotionEffectsConfig.class, field = "nonGodPotEffectDisplay")
     // TODO rename position
-    public Position nonGodPotEffectPos = new Position(10, 10, false, true);
+    public Position nonGodPotEffectPos = new Position(10, 10);
 }

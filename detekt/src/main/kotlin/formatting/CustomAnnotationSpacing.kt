@@ -35,7 +35,7 @@ class CustomAnnotationSpacing(config: Config) : SkyHanniRule(config) {
                 is PsiComment -> nextNode.isInvalid()
                 else -> false
             }
-        }
+        } && !annotationEntry.text.contains("file:")
 
         if (hasInvalidSpacing) {
             annotationEntry.reportIssue("Annotations should occur immediately before the annotated construct.")
