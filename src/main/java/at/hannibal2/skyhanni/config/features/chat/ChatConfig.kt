@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.input.Keyboard
 
 class ChatConfig {
@@ -184,8 +185,15 @@ class ChatConfig {
     @Expose
     @ConfigOption(name = "Sky Mall Messages", desc = "Hide the Sky Mall messages outside of Mining Islands.")
     @ConfigEditorBoolean
+    @SearchTag("Skymall")
     @FeatureToggle
     var hideSkyMall: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Hide Lottery Messages", desc = "Hide the Lottery messages outside of Foraging Islands.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideLottery: Boolean = true
 
     @Expose
     @ConfigOption(

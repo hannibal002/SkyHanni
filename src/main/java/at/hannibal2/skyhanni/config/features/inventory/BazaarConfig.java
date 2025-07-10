@@ -27,6 +27,7 @@ public class BazaarConfig {
     @FeatureToggle
     public boolean bestSellMethod = false;
 
+    // TODO rename to bestSellMethodPosition
     @Expose
     @ConfigLink(owner = BazaarConfig.class, field = "bestSellMethod")
     public Position bestSellMethodPos = new Position(394, 142);
