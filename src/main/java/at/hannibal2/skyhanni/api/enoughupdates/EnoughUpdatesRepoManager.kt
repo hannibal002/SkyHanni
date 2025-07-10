@@ -10,8 +10,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 @SkyHanniModule
-object EnoughUpdatesRepoManager : AbstractRepoManager() {
-
+object EnoughUpdatesRepoManager : AbstractRepoManager(
+    eventConstructor = { NeuRepositoryReloadEvent(it) },
+) {
     override val commonName = "NotEnoughUpdates"
     override val commonShortNameCased = "NEU"
     override val configDirectory = EnoughUpdatesManager.configDirectory
@@ -21,12 +22,7 @@ object EnoughUpdatesRepoManager : AbstractRepoManager() {
     override val shouldRegisterUpdateCommand: Boolean = !PlatformUtils.isNeuLoaded()
 
     @HandleEvent
-    override fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
-
-    override fun fireReloadEvent(
-        manager: AbstractRepoManager,
-        onError: (Throwable) -> Unit,
-    ): Boolean = NeuRepositoryReloadEvent(manager).post(onError)
+    fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
     override fun reportExtraStatusInfo() = EnoughUpdatesManager.reportItemStatus()
     override fun extraReloadWork() = EnoughUpdatesManager.prepRepoReload()

@@ -8,14 +8,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.json.getJson
-import at.hannibal2.skyhanni.utils.json.writeJson
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import net.minecraft.util.IChatComponent
 import java.io.File
 import java.lang.reflect.Type
@@ -23,7 +20,9 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 @Suppress("TooManyFunctions")
-abstract class AbstractRepoManager {
+abstract class AbstractRepoManager(
+    val eventConstructor: (AbstractRepoManager) -> AbstractRepoReloadEvent,
+) {
     open fun getGson() = ConfigManager.gson
 
     /**
@@ -56,17 +55,12 @@ abstract class AbstractRepoManager {
         // e.g., 'sh-repo-main' or 'neu-repo-master'
         File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.zip")
     }
-    private val currentCommitFilePath by lazy { File(configDirectory, "currentCommit.json") }
+    private val currentCommitFile by lazy { File(configDirectory, "currentCommit.json") }
+    private val commitStorage: RepoCommitStorage by lazy { RepoCommitStorage(currentCommitFile) }
     private val githubRepoLocation: GitHubUtils.RepoLocation get() = GitHubUtils.RepoLocation(config.location)
     private val successfulConstants = mutableListOf<String>()
     private val unsuccessfulConstants = mutableListOf<String>()
-
-    fun getFailedConstants() = unsuccessfulConstants.toList()
-
-    private val commandShortName = when (commonShortName) {
-        "sh" -> ""
-        else -> commonShortName
-    }
+    private val commandShortName = commonShortName.takeIf { it != "sh" }.orEmpty()
 
     open val shouldRegisterUpdateCommand: Boolean = true
     open val shouldRegisterStatusCommand: Boolean = true
@@ -80,7 +74,6 @@ abstract class AbstractRepoManager {
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
     private var downloadFailed: Boolean = false
-    private var lastConstant: String? = null
 
     var commitTime: SimpleTimeMark? = null
         private set
@@ -88,10 +81,8 @@ abstract class AbstractRepoManager {
     var isUsingBackup: Boolean = false
         private set
 
+    fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
-
-    // Necessary for implementation, so abstract to make people do it
-    abstract fun onCommandRegistration(event: CommandRegistrationEvent)
 
     // Will be invoked by the implementation of this class
     fun registerCommands(event: CommandRegistrationEvent) {
@@ -110,16 +101,6 @@ abstract class AbstractRepoManager {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback { reloadLocalRepo() }
         }
-    }
-
-    // <editor-fold desc="Constant Reading">
-    inline fun <reified T : Any> getConstant(
-        fileName: String,
-        type: Type? = null,
-        gson: Gson = getGson(),
-    ): T {
-        setLastConstant(fileName)
-        return getRepoData("constants", fileName, type, gson)
     }
 
     inline fun <reified T : Any> getRepoData(
@@ -141,12 +122,15 @@ abstract class AbstractRepoManager {
     }.getOrElse { e ->
         logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
     }
-    // </editor-fold>
 
     // <editor-fold desc="Repo Management">
     fun updateRepo() {
         shouldManuallyReload = true
-        checkRepoLocation()
+        if (!config.location.valid) {
+            ChatUtils.userError("Invalid $commonName Repo settings detected, resetting default settings.")
+            resetRepositoryLocation()
+        }
+
         SkyHanniMod.launchIOCoroutine {
             fetchAndUnpackRepo(command = true)
             reloadRepository("$commonName Repo updated successfully.")
@@ -159,13 +143,6 @@ abstract class AbstractRepoManager {
             )
             if (informed) return@launchIOCoroutine
             ChatUtils.chat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
-        }
-    }
-
-    private fun checkRepoLocation() {
-        if (config.location.run { user.isEmpty() || repoName.isEmpty() || branch.isEmpty() }) {
-            ChatUtils.userError("Invalid $commonName Repo settings detected, resetting default settings.")
-            resetRepositoryLocation()
         }
     }
 
@@ -221,29 +198,11 @@ abstract class AbstractRepoManager {
                 destinationDirectory = repoDirectory.absolutePath,
             )
 
-            writeCurrentCommit("backup-repo", time = null)
+            commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
             logger.debug("Successfully switched to backup repo")
         } catch (e: Error) {
             logger.logErrorWithData(e, "Failed to switch to backup repo")
         }
-    }
-
-    // todo use a real data class instead of JsonObject and string 'indexing'
-    private fun writeCurrentCommit(commit: String?, time: SimpleTimeMark?) {
-        val newCurrentCommitJSON = JsonObject()
-        newCurrentCommitJSON.addProperty("sha", commit)
-        time?.let {
-            newCurrentCommitJSON.addProperty("time", it.toMillis())
-        }
-        currentCommitFilePath.writeJson(newCurrentCommitJSON)
-    }
-
-    // todo use a real data class instead of JsonObject and string 'indexing'
-    private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
-        val currentCommitJSON: JsonObject? = currentCommitFilePath.getJson()
-        val sha = currentCommitJSON?.get("sha")?.asString
-        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark()
-        return sha?.let { it to time }
     }
 
     /**
@@ -263,7 +222,7 @@ abstract class AbstractRepoManager {
     fun displayRepoStatus(joinEvent: Boolean) {
         if (joinEvent) return onJoinStatusError()
 
-        val (currentDownloadedCommit, _) = readCurrentCommit() ?: (null to null)
+        val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
             ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             return
@@ -307,7 +266,7 @@ abstract class AbstractRepoManager {
      * todo write kdoc
      */
     private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true): Boolean {
-        val (currentSha, currentCommitTime) = readCurrentCommit() ?: (null to null)
+        val (currentSha, currentCommitTime) = commitStorage.readFromFile() ?: RepoCommit()
         commitTime = currentCommitTime
 
         val (latestSha, latestCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
@@ -346,7 +305,7 @@ abstract class AbstractRepoManager {
             zipFilePath = repoZipFile.absolutePath,
             destinationDirectory = repoDirectory.absolutePath,
         )
-        writeCurrentCommit(latestSha, latestCommitTime)
+        commitStorage.writeToFile(RepoCommit(latestSha, latestCommitTime))
         commitTime = latestCommitTime
         downloadFailed = false
         isUsingBackup = false
@@ -359,13 +318,6 @@ abstract class AbstractRepoManager {
             reloadRepository(answerMessage)
         }
     }
-
-    fun setLastConstant(constant: String) {
-        lastConstant = constant
-    }
-
-    // Because abstract classes cannot have reified types, this is necessary
-    abstract fun fireReloadEvent(manager: AbstractRepoManager, onError: (Throwable) -> Unit): Boolean
 
     /**
      * Called before the repo reload event is fired - shouldn't do anything resource intensive.
@@ -382,14 +334,11 @@ abstract class AbstractRepoManager {
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
-        lastConstant = null
 
         extraReloadWork()
 
-        fireReloadEvent(this) { error ->
+        eventConstructor.invoke(this).post { error ->
             loadingError = true
-            lastConstant?.let { unsuccessfulConstants.add(it) }
-            lastConstant = null
         }
 
         SkyHanniMod.launchIOCoroutine {

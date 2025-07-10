@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
@@ -68,13 +67,6 @@ object EnoughUpdatesManager {
     val titleWordMap = TreeMap<String, MutableMap<String, MutableList<Int>>>()
 
     fun getItemInformation() = itemMap
-
-    fun downloadRepo() {
-        if (SkyHanniMod.feature.dev.neuRepo.repoAutoUpdate) {
-            EnoughUpdatesRepoManager.updateRepo()
-            reloadRepo()
-        } else reloadRepo()
-    }
 
     private var isLoading = false
 

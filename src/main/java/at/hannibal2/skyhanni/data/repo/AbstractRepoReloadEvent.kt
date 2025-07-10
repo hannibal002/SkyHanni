@@ -14,5 +14,5 @@ abstract class AbstractRepoReloadEvent(
         constant: String,
         type: Type? = null,
         gson: Gson = this.gson,
-    ): T = manager.getConstant(constant, type, gson)
+    ): T = manager.getRepoData("constants", constant, type, gson)
 }

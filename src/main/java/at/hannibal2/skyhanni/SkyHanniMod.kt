@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni
 
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -59,7 +59,7 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesRepoManager.initRepo()
         MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
@@ -143,6 +143,7 @@ object SkyHanniMod {
         logger.log(Level.INFO, message)
     }
 
+    @Suppress("DEPRECATION")
     fun launchCoroutine(function: suspend () -> Unit) {
         coroutineScope.launch {
             try {

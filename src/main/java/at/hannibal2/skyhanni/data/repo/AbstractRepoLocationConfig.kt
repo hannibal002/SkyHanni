@@ -5,6 +5,8 @@ abstract class AbstractRepoLocationConfig {
     abstract var repoName: String
     abstract var branch: String
 
+    val valid get() = user.isNotEmpty() && repoName.isNotEmpty() && branch.isNotEmpty()
+
     abstract val defaultUser: String
     abstract val defaultRepoName: String
     abstract val defaultBranch: String
