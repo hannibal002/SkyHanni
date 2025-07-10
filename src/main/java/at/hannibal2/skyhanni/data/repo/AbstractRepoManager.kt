@@ -44,6 +44,7 @@ abstract class AbstractRepoManager(
      */
     open val backupRepoResourcePath: String? = null
 
+    private val debugConfig get() = SkyHanniMod.feature.dev.debug
     abstract val config: AbstractRepoConfig<*>
     abstract val configDirectory: File
     val logger by lazy { RepoLogger("[Repo - $commonName]") }
@@ -57,10 +58,11 @@ abstract class AbstractRepoManager(
     }
     private val currentCommitFile by lazy { File(configDirectory, "currentCommit.json") }
     private val commitStorage: RepoCommitStorage by lazy { RepoCommitStorage(currentCommitFile) }
-    private val githubRepoLocation: GitHubUtils.RepoLocation get() = GitHubUtils.RepoLocation(config.location)
     private val successfulConstants = mutableListOf<String>()
     private val unsuccessfulConstants = mutableListOf<String>()
-    private val commandShortName = commonShortName.takeIf { it != "sh" }.orEmpty()
+    private val commandShortName by lazy { commonShortName.takeIf { it != "sh" }.orEmpty() }
+    private val githubRepoLocation: GitHubUtils.RepoLocation
+        get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
 
     open val shouldRegisterUpdateCommand: Boolean = true
     open val shouldRegisterStatusCommand: Boolean = true
@@ -102,6 +104,8 @@ abstract class AbstractRepoManager(
             simpleCallback { reloadLocalRepo() }
         }
     }
+
+    var reportedRepoFiles: Boolean = false
 
     inline fun <reified T : Any> getRepoData(
         directory: String,

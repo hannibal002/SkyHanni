@@ -32,32 +32,28 @@ object GitHubUtils {
             shouldError,
         )
 
-        private var _internalSha: String? = null
-        val sha: String? get() = _internalSha?.takeIf { it.isNotBlank() } ?: run {
-            SkyHanniMod.launchIOCoroutine {
-                _internalSha = getLatestCommit(!shouldError)?.sha ?: run {
-                    if (shouldError) ErrorManager.skyHanniError("Could not fetch latest commit SHA for $user/$repo/$branch")
-                    null
-                }
-            }
-            _internalSha
-        }
         val location = "$user/$repo/$branch"
         private val apiName = "GitHub - $location"
         private val commitApiUrl: String = "https://api.github.com/repos/$user/$repo/commits/$branch"
 
         suspend fun getLatestCommit(silentError: Boolean = true): CommitsApiResponse? {
-            val jsonResponse = ApiUtils.getJSONResponse(commitApiUrl, apiName, silentError) ?: return null
+            val jsonResponse = ApiUtils.getJSONResponse(commitApiUrl, apiName, silentError) ?: run {
+                SkyHanniMod.logger.error("Failed to fetch latest commits.")
+                return null
+            }
             return ConfigManager.gson.fromJson(jsonResponse, CommitsApiResponse::class.java)
         }
 
         suspend fun downloadCommitZipToFile(destinationZip: File, shaOverride: String? = null): Boolean {
-            val shaToUse = shaOverride ?: sha ?: run {
+            val shaToUse = shaOverride ?: getLatestCommit(!shouldError)?.sha ?: run {
                 if (shouldError) ErrorManager.skyHanniError("Cannot get full archive URL without a valid SHA")
                 return false
             }
             val fullArchiveUrl = "https://github.com/$user/$repo/archive/$shaToUse.zip"
             return try {
+                if (shouldError) {
+                    SkyHanniMod.logger.info("Downloading $shaToUse for $user/$repo/$branch\nUrl: $fullArchiveUrl")
+                }
                 ApiUtils.getZIPResponse(destinationZip, fullArchiveUrl, apiName, !shouldError)
                 true
             } catch (e: Exception) {

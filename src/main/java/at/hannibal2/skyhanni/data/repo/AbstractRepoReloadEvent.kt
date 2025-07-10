@@ -7,8 +7,8 @@ import java.lang.reflect.Type
 abstract class AbstractRepoReloadEvent(
     open val manager: AbstractRepoManager,
 ) : SkyHanniEvent() {
-    val repoDirectory = manager.repoDirectory
-    val gson = manager.getGson()
+    val repoDirectory by lazy { manager.repoDirectory }
+    val gson by lazy { manager.getGson() }
 
     inline fun <reified T : Any> getConstant(
         constant: String,
