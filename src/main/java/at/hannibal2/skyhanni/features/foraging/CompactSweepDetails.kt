@@ -111,7 +111,10 @@ object CompactSweepDetails {
             sweepDetails.logCountDisplay = group("logsDisplay")
             sweepDetails.logs = group("logsAmount").formatDouble()
             val fixedToughness = sweepDetails.toughness.toString().removeSuffix(".0")
-            sweepDetails.penalties.add("§6Initial Logs: ${sweepDetails.logs} ${sweepDetails.treeType} Logs §7(§6$fixedToughness toughness§7)")
+            sweepDetails.penalties.add(
+                "§6Initial Logs: ${sweepDetails.logs} " +
+                    "${sweepDetails.treeType} Logs §7(§6$fixedToughness toughness§7)",
+            )
             event.blockedReason = "SWEEP_DETAILS"
             if (isFinalCalculation(group("isItGreen"))) {
                 sendCompactedResults()
