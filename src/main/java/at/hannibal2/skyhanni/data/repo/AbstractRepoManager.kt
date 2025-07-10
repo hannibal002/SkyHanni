@@ -345,12 +345,12 @@ abstract class AbstractRepoManager(
 
         extraReloadWork()
 
-        eventConstructor.invoke(this).post { error ->
-            loadingError = true
-        }
-
         SkyHanniMod.launchIOCoroutine {
             extraReloadCoroutineWork()
+        }
+
+        eventConstructor.invoke(this).post { error ->
+            loadingError = true
         }
 
         if (answerMessage.isNotEmpty() && !loadingError) {
