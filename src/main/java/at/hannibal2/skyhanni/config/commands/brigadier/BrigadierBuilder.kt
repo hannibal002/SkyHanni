@@ -1,16 +1,21 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.ComplexCommand
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
+import at.hannibal2.skyhanni.utils.CommandArgument
+import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.StringUtils.hasWhitespace
 import at.hannibal2.skyhanni.utils.StringUtils.splitLastWhitespace
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.CommandNode
+import java.util.concurrent.CompletableFuture
 //#if MC < 1.21
 import net.minecraft.command.ICommand
 //#endif
@@ -65,6 +70,66 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
             block(allArgs.split(" ").toTypedArray())
         }
         simpleCallback { block(emptyArray()) }
+    }
+
+
+    fun <O : CommandContextAwareObject, A : CommandArgument<O>> ComplexCommand<O>.complexArgs() {
+        val root = LiteralArgumentBuilder.literal<Any>(name)
+            .executes { run(context(this), emptyList()) }
+
+
+        val suggestionProvider = SuggestionProvider<Any> { ctx, builder ->
+            val input = builder.input.substring(builder.start)
+            val tokens = input.trim().split(Regex("\\s+")).toMutableList()
+            val contextObj = context(this)
+
+            var idx = 0
+            var posCounter = 0
+            while (idx < tokens.size - 1) {
+                val tok = tokens[idx]
+                val spec = findMatchingSpec(tok, posCounter, contextObj) ?: break
+
+                if (spec.prefix.isNotEmpty() && spec.prefix == tok) {
+                    if (idx + 1 >= tokens.size - 1) break // cursor is at next arg
+                    idx += 2
+                } else {
+                    posCounter++
+                    idx++
+                }
+            }
+
+            val current = tokens.lastOrNull() ?: ""
+            val candidates = mutableListOf<String>()
+            val validSpecs = specifiers.filter { it.validity(contextObj) }
+
+            for (spec in validSpecs) {
+                if (spec.prefix.isNotEmpty() && spec.prefix.startsWith(current)) {
+                    candidates.add(spec.prefix)
+                }
+            }
+
+            val matchSpec = validSpecs.find { it.prefix == current || (it.prefix.isEmpty() && it.defaultPosition == posCounter) }
+            val suggestList = if (matchSpec != null) {
+                matchSpec.tabComplete("", contextObj)
+            } else {
+                validSpecs.filter { it.defaultPosition == posCounter }.flatMap { it.tabComplete(current, contextObj) }
+            }
+
+            candidates.forEach {
+                builder.suggest(it)
+            }
+            suggestList.forEach {
+                builder.suggest(it)
+            }
+            CompletableFuture.completedFuture(builder.build())
+        }
+
+        val argsNode = RequiredArgumentBuilder.argument<Any, String>("_input", StringArgumentType.greedyString())
+            .suggests(suggestionProvider)
+            .executes {
+                run(context(this), StringArgumentType.getString(it, "_input").split(Regex("\\s+")))
+            }
+        builder.then(root.then(argsNode))
     }
 
     /**

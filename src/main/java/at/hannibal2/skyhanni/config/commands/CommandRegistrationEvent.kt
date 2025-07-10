@@ -43,6 +43,7 @@ class CommandRegistrationEvent(
     ) {
         val command = ComplexCommandBuilder<O, CommandArgument<O>>(name).apply(block)
         command.hasUniqueName(builders)
+        // command.checkDescriptionAndCategory()
         command.addToRegister(dispatcher, builders)
     }
 }

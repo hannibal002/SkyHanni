@@ -1,4 +1,3 @@
-at.hannibal2.skyhanni.config.commands.ComplexCommand.kt
 at.hannibal2.skyhanni.config.commands.SimpleCommand.kt
 at.hannibal2.skyhanni.config.commands.brigadier.BrigadierCommand.kt
 at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer.kt

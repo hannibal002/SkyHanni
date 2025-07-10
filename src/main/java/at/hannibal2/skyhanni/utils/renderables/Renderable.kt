@@ -779,7 +779,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 isSnappingIn = false
                 ySpace = 0
-                GlStateManager.pushMatrix()
+                DrawContextUtils.pushMatrix()
                 var rowIndex = 0
                 var contentRowIndex = 0
                 while (rowIndex < content.size) {
@@ -843,21 +843,21 @@ interface Renderable {
                     rowIndex++
                     contentRowIndex++
                 }
-                GlStateManager.popMatrix()
+                DrawContextUtils.popMatrix()
             }
 
             private fun List<Renderable?>.drawRow(rowIndex: Int, x: Int, y: Int, yOff: Float, setYOffset: Boolean) {
                 val slotHeight = yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY
                 for ((index, renderable) in this.withIndex()) {
-                    GlStateManager.pushMatrix()
-                    GlStateManager.translate(xOffsets[index].toFloat(), yOff, 0F)
+                    DrawContextUtils.pushMatrix()
+                    DrawContextUtils.translate(xOffsets[index].toFloat(), yOff, 0F)
                     renderable?.renderXYAligned(
                         x + xOffsets[index],
                         y,
                         xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
                         slotHeight,
                     )
-                    GlStateManager.popMatrix()
+                    DrawContextUtils.popMatrix()
                 }
                 if (setYOffset) {
                     ySpace += slotHeight
@@ -875,10 +875,10 @@ interface Renderable {
 
                 override fun onRender(mouseX: Int, mouseY: Int) {
                     if (!isSnappingIn) {
-                        GlStateManager.translate(3f, 0f, 0f)
+                        DrawContextUtils.translate(3f, 0f, 0f)
                         content[rowIndex].drawRow(rowIndex, 0, 0, 0f, false)
-                        Gui.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.addAlpha(30).rgb)
-                        GlStateManager.translate(-3f, 0f, 0f)
+                        GuiRenderUtils.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.addAlpha(30).rgb)
+                        DrawContextUtils.translate(-3f, 0f, 0f)
                     }
                 }
 

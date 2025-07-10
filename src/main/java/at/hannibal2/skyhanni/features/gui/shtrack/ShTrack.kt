@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.CollectionApi.getMultipleMap
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.ComplexCommand
@@ -155,11 +154,11 @@ object ShTrack {
             defaultPosition = 0,
             validity = ShTrack::validIfItemState,
             tabComplete = { s, c ->
-                if (c.initializedBy.commandName != "shtrackcollection") CommandUtils.itemTabComplete(s)
+                if (c.initializedBy.name != "shtrackcollection") CommandUtils.itemTabComplete(s)
                 else CommandUtils.itemTabComplete(s, validItems = { CollectionApi.collectionValue?.get(it) != null }, suggestAtEmpty = true)
             },
         ) { a, c ->
-            val r = if (c.initializedBy.commandName != "shtrackcollection") CommandUtils.itemCheck(a, c)
+            val r = if (c.initializedBy.name != "shtrackcollection") CommandUtils.itemCheck(a, c)
             else CommandUtils.itemCheck(
                 a,
                 c,

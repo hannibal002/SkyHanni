@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.seconds
@@ -41,9 +41,9 @@ object HotmApi {
         } == true
 
     enum class PowderType(val displayName: String, val color: String, val icon: ItemStack) {
-        MITHRIL("Mithril", "§2", ItemStack(Items.dye, 1, 10)),
-        GEMSTONE("Gemstone", "§d", ItemStack(Items.dye, 1, 9)),
-        GLACITE("Glacite", "§b", ItemStack(Items.dye, 1, 6)),
+        MITHRIL("Mithril", "§2", DyeCompat.LIME.createStack()),
+        GEMSTONE("Gemstone", "§d", DyeCompat.PINK.createStack()),
+        GLACITE("Glacite", "§b", DyeCompat.CYAN.createStack()),
 
         ;
 

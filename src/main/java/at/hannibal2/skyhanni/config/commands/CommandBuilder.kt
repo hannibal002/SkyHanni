@@ -39,19 +39,19 @@ sealed class CommandBuilderBase(override val name: String) : CommandData {
 
 class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O>>(name: String) : CommandBuilderBase(name) {
     lateinit var specifiers: Collection<A>
-    //#if TODO
     lateinit var context: (ComplexCommand<O>) -> O
-    //#endif
 
     private var realDescription: String = ""
 
     //#if MC < 1.21
     override fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand {
-        return ComplexCommand(name.lowercase(), specifiers, context, aliases).also {
-            realDescription = it.constructHelp(description)
-        }
+        return toComplexCommand()
     }
     //#endif
+
+    fun toComplexCommand() = ComplexCommand(name.lowercase(), specifiers, context, aliases).also {
+        realDescription = it.constructHelp(description)
+    }
 
     override val descriptor get() = realDescription
 }

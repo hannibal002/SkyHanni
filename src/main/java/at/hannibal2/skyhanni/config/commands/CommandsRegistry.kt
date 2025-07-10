@@ -64,13 +64,29 @@ object CommandsRegistry {
         ClientCommandHandler.instance.registerCommand(command)
         addBuilder(builders)
         //#else
-        //$$ if (this !is CommandBuilder) return // complex commands are not supported in 1.21.5 right now
-        //$$ val builder = BaseBrigadierBuilder(name).apply {
-        //$$     this.description = this@addToRegister.descriptor
-        //$$     this.aliases = this@addToRegister.aliases
-        //$$     this.category = this@addToRegister.category
+        //$$ val builder: BaseBrigadierBuilder
+        //$$ when (this) {
+        //$$     is CommandBuilder -> {
+        //$$         builder = BaseBrigadierBuilder(name).apply {
+        //$$             this.description = this@addToRegister.descriptor
+        //$$             this.aliases = this@addToRegister.aliases
+        //$$             this.category = this@addToRegister.category
         //$$
-        //$$     legacyCallbackArgs(this@addToRegister.getCallback())
+        //$$             legacyCallbackArgs(this@addToRegister.getCallback())
+        //$$         }
+        //$$     }
+        //$$
+        //$$     is ComplexCommandBuilder<*, *> -> {
+        //$$         builder = BaseBrigadierBuilder(name).apply {
+        //$$             this@addToRegister.toComplexCommand().complexArgs()
+        //$$
+        //$$             this.description = this@addToRegister.descriptor // contruct Help Call missing
+        //$$             this.aliases = this@addToRegister.aliases
+        //$$             this.category = this@addToRegister.category
+        //$$         }
+        //$$     }
+        //$$
+        //$$     else -> return
         //$$ }
         //$$ builder.addToRegister(dispatcher, builders)
         //#endif
