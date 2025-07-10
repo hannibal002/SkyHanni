@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden.cropmilestones
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.TimeUnit
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -16,7 +14,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class CropMilestonesConfig {
     @Expose
     @ConfigOption(
@@ -31,7 +28,7 @@ class CropMilestonesConfig {
     @Expose
     @ConfigOption(name = "Overflow", desc = "")
     @Accordion
-    var overflow: CropMilestonesOverflowConfig = CropMilestonesOverflowConfig()
+    val overflow: CropMilestonesOverflowConfig = CropMilestonesOverflowConfig()
 
     @Expose
     @ConfigOption(
@@ -45,7 +42,7 @@ class CropMilestonesConfig {
     @Expose
     @ConfigOption(name = "Time Format", desc = "Change the highest time unit to show (1h30m vs 90min)")
     @ConfigEditorDropdown
-    var highestTimeFormat: Property<TimeFormatEntry> = Property.of(TimeFormatEntry.YEAR)
+    val highestTimeFormat: Property<TimeFormatEntry> = Property.of(TimeFormatEntry.YEAR)
 
     enum class TimeFormatEntry(
         private val displayName: String,
@@ -58,9 +55,8 @@ class CropMilestonesConfig {
         SECOND("Second", 4),
         ;
 
-        //#if MC < 1.21
+        @Transient
         val timeUnit = TimeUnit.entries.firstOrNull { it.name == this.name } ?: TimeUnit.SECOND
-        //#endif
         override fun getLegacyId(): Int = legacyId
         override fun toString(): String = displayName
     }
@@ -71,7 +67,7 @@ class CropMilestonesConfig {
         desc = "Calculate the progress and ETA till maxed milestone (46) instead of next milestone.",
     )
     @ConfigEditorBoolean
-    var bestShowMaxedNeeded: Property<Boolean> = Property.of(false)
+    val bestShowMaxedNeeded: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -80,7 +76,7 @@ class CropMilestonesConfig {
             "Hold a farming tool to show the overlay.",
     )
     @ConfigEditorDraggableList
-    var text: MutableList<MilestoneTextEntry> = mutableListOf(
+    val text: MutableList<MilestoneTextEntry> = mutableListOf(
         MilestoneTextEntry.TITLE,
         MilestoneTextEntry.MILESTONE_TIER,
         MilestoneTextEntry.NUMBER_OUT_OF_TOTAL,
@@ -120,15 +116,15 @@ class CropMilestonesConfig {
 
     @Expose
     @ConfigLink(owner = CropMilestonesConfig::class, field = "progress")
-    var progressDisplayPos: Position = Position(-400, -200)
+    val progressDisplayPos: Position = Position(-400, -200)
 
     @Expose
     @ConfigOption(name = "Best Crop", desc = "")
     @Accordion
-    var next: NextConfig = NextConfig()
+    val next: NextConfig = NextConfig()
 
     @Expose
     @ConfigOption(name = "Mushroom Pet Perk", desc = "")
     @Accordion
-    var mushroomPetPerk: MushroomPetPerkConfig = MushroomPetPerkConfig()
+    val mushroomPetPerk: MushroomPetPerkConfig = MushroomPetPerkConfig()
 }

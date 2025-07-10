@@ -20,9 +20,9 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -116,7 +116,7 @@ object HalloweenBasketWaypoints {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (LorenzUtils.inSkyBlock) {
+        if (SkyBlockUtils.inSkyBlock) {
             isActive = false
             return
         }
@@ -186,7 +186,7 @@ object HalloweenBasketWaypoints {
         config.allWaypoints = false
     }
 
-    private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
+    private fun isEnabled() = HypixelData.hypixelLive && !SkyBlockUtils.inSkyBlock
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

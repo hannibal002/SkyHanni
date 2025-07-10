@@ -12,12 +12,11 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
@@ -42,7 +41,7 @@ object CorpseTracker {
         { drawDisplay(it) },
     )
 
-    class BucketData : BucketedItemTrackerData<CorpseType>() {
+    class BucketData : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
         override fun resetItems() {
             corpsesLooted = enumMapOf()
         }
@@ -87,7 +86,7 @@ object CorpseTracker {
         for ((itemName, amount) in event.loot) {
             if (itemName.removeColor().trim() == "Glacite Powder") continue
             NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
-                tracker.addItem(event.corpseType, item, amount, message = false)
+                tracker.addItem(event.corpseType, item, amount, command = false, message = false)
             }
         }
     }
@@ -160,8 +159,8 @@ object CorpseTracker {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && (
-            IslandType.MINESHAFT.isInIsland() ||
+        SkyBlockUtils.inSkyBlock && config.enabled && (
+            IslandType.MINESHAFT.isCurrent() ||
                 (!config.onlyInMineshaft && MiningApi.inGlacialTunnels())
             )
 }

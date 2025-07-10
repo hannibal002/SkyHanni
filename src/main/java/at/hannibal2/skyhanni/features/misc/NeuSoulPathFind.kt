@@ -107,7 +107,7 @@ object NeuSoulPathFind {
         if (lastFastReminder.passedSince() > 1.hours) {
             lastFastReminder = SimpleTimeMark.now()
             ChatUtils.clickableChat(
-                "SkyHanni has a even faster fairy soul pathfinding logic. click here to enable it.",
+                "SkyHanni has an even faster Fairy Soul pathfinding logic. Click here to enable it.",
                 onClick = {
                     config.neuSoulsPathFind = false
                     config.fastFairySouls = true

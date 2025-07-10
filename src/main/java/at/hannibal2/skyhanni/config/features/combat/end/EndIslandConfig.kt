@@ -10,12 +10,12 @@ class EndIslandConfig {
     @Expose
     @ConfigOption(name = "Draconic Sacrifice Tracker", desc = "")
     @Accordion
-    var draconicSacrificeTracker: DraconicSacrificeTrackerConfig = DraconicSacrificeTrackerConfig()
+    val draconicSacrificeTracker: DraconicSacrificeTrackerConfig = DraconicSacrificeTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Dragon Features", desc = "")
     @Accordion
-    var dragon: DragonConfig = DragonConfig()
+    val dragon: DragonConfig = DragonConfig()
 
     @Expose
     @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after it died.")
@@ -26,5 +26,5 @@ class EndIslandConfig {
     @Expose
     @ConfigOption(name = "Ender Node Tracker", desc = "")
     @Accordion
-    var enderNodeTracker: EnderNodeConfig = EnderNodeConfig()
+    val enderNodeTracker: EnderNodeConfig = EnderNodeConfig()
 }

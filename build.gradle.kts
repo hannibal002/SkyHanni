@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
+import skyhannibuildsystem.PublishToModrinth
 import java.io.Serializable
 import java.nio.file.Path
 import java.util.zip.ZipFile
@@ -63,9 +64,13 @@ loom {
             mixinConfig("mixins.skyhanni.json")
         }
     }
-    if (target == ProjectTarget.MODERN) {
-        accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
+    if (target.isModern) {
+        val accessWidenerFile = file("src/main/resources/skyhanni.accesswidener")
+        if (accessWidenerFile.exists()) {
+            accessWidenerPath = accessWidenerFile
+        }
     }
+    @Suppress("UnstableApiUsage")
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -76,7 +81,7 @@ loom {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(false)
                 this.runDir(runDirectory.relativeTo(projectDir).toString())
-            } else if (target == ProjectTarget.MODERN) {
+            } else if (target.isModern) {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(true)
                 this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
@@ -113,7 +118,7 @@ val devenvMod: Configuration by configurations.creating {
     isVisible = false
 }
 
-val headlessLwjgl by configurations.creating {
+val headlessLwjgl: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
@@ -126,6 +131,8 @@ val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
 val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
     this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
+
+val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
     this.javaLauncher.set(
@@ -164,19 +171,14 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
-        exclude(module = "log4j")
-        because("Different version conflicts with Minecraft's Log4J")
-        exclude(module = "gson")
-        because("Different version conflicts with Minecraft's Log4j")
-    }
+    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)
 
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
-    val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
+    val mixinVersion = if (target == ProjectTarget.MAIN) "0.7.11-SNAPSHOT" else "0.8.2"
 
     if (!target.isFabric) {
         shadowImpl("org.spongepowered:mixin:$mixinVersion") {
@@ -185,45 +187,52 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
-    } else if (target == ProjectTarget.BRIDGE116FABRIC) {
-        modImplementation("net.fabricmc:fabric-loader:0.16.7")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
-    } else if (target == ProjectTarget.MODERN) {
-        modImplementation("net.fabricmc:fabric-loader:0.16.13")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
-
-        modLocalRuntime(libs.modmenu)
+    } else {
+        target.fabricLoaderVersion?.let { modImplementation(it) }
+        target.fabricApiVersion?.let { modImplementation(it) }
+        modImplementation(libs.fabricLanguageKotlin)
+        target.modMenuVersion?.let { modImplementation("maven.modrinth:modmenu:$it") }
     }
 
-    implementation(kotlin("stdlib-jdk8"))
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
-        exclude(group = "org.jetbrains.kotlin")
+    if (!target.isModern) {
+        implementation(kotlin("stdlib-jdk8"))
+        shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
+            exclude(group = "org.jetbrains.kotlin")
+        }
     }
 
     if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
     else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+
+    // Brigadier comes bundled with more recent versions of Minecraft
+    if (target.minecraftVersion == MinecraftVersion.MC189) {
+        shadowImpl("com.mojang:brigadier:1.0.18")
+    }
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
     // December 29, 2024, 07:30 PM EST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.6.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.6.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
 
     if (target == ProjectTarget.MAIN) {
         shadowModImpl(libs.moulconfig)
-    } else if (target == ProjectTarget.MODERN) {
-        shadowModImpl(libs.moulconfigModern)
+    } else if (target.isModern) {
+        shadowModImpl("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")
+        include("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")
     }
-
+    @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
-    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    if (!target.isModern) {
+        shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    }
     implementation(libs.hotswapagentforge)
 
     testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
@@ -234,8 +243,17 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
 
     if (target.minecraftVersion == MinecraftVersion.MC189) {
-        compileOnly(libs.hypixelmodapi)
+        compileOnly(libs.hypixelmodapi.forge)
         shadowImpl(libs.hypixelmodapitweaker)
+    } else if (target.isModern) {
+        modImplementation(libs.hypixelmodapi)
+        include(libs.hypixelmodapi.fabric)
+    }
+
+    if (target.isModern) {
+        modCompileOnly(libs.roughlyenoughitems) {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
     }
 
     // getting clock offset
@@ -250,14 +268,14 @@ afterEvaluate {
     loom.runs.named("client") {
         if (target == ProjectTarget.MAIN) {
             programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
-        } else if (target == ProjectTarget.MODERN) {
+        } else if (target.isModern) {
             programArgs("--quickPlayMultiplayer", "hypixel.net")
         }
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
         this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
     }
 }
 
@@ -290,7 +308,7 @@ tasks.processResources {
 }
 
 if (target == ProjectTarget.MAIN) {
-    tasks.create("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).apply {
+    tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
         jvmArgs(
@@ -310,20 +328,20 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
+fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
                 .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
-            kotlin.include(buildPaths)
-            java.include(buildPaths)
+            kotlin.exclude(buildPaths)
+            java.exclude(buildPaths)
         }
     }
 }
-includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
-includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
@@ -414,9 +432,10 @@ preprocess {
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
+    vars.put("TODO", 0)
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
+val sourcesJar by tasks.registering(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
     from(sourceSets.main.get().allSource)

@@ -24,7 +24,7 @@ class RiftInventoryValueConfig {
             "Long: 1,200,000"
     )
     @ConfigEditorDropdown
-    var formatType: Property<NumberFormatEntry> = Property.of(
+    val formatType: Property<NumberFormatEntry> = Property.of(
         NumberFormatEntry.SHORT
     )
 
@@ -38,5 +38,5 @@ class RiftInventoryValueConfig {
 
     @Expose
     @ConfigLink(owner = RiftInventoryValueConfig::class, field = "enabled")
-    var position: Position = Position(126, 156)
+    val position: Position = Position(126, 156)
 }

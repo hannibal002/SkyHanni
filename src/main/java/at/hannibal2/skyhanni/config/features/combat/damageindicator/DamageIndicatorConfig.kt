@@ -40,7 +40,7 @@ class DamageIndicatorConfig {
     @Expose
     @ConfigOption(name = "Select Boss", desc = "Change what bosses the damage indicator should be enabled for.")
     @ConfigEditorDraggableList
-    var bossesToShow: MutableList<BossCategory> = mutableListOf(
+    val bossesToShow: MutableList<BossCategory> = mutableListOf(
         BossCategory.NETHER_MINI_BOSSES,
         BossCategory.VANQUISHER,
         BossCategory.REVENANT_HORROR,
@@ -61,8 +61,8 @@ class DamageIndicatorConfig {
     enum class BossCategory(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
         VANQUISHER("§bVanquisher", 2),
-        ENDERSTONE_PROTECTOR("§bEndstone Protector (not tested)", 3),
-        ENDER_DRAGON("§bEnder Dragon (not finished)", 4),
+        ENDERSTONE_PROTECTOR("§bEndstone Protector", 3),
+        ENDER_DRAGON("§bEnder Dragon", 4),
         REVENANT_HORROR("§bRevenant Horror", 5),
         TARANTULA_BROODFATHER("§bTarantula Broodfather", 6),
         SVEN_PACKMASTER("§bSven Packmaster", 7),
@@ -141,10 +141,10 @@ class DamageIndicatorConfig {
     @Expose
     @ConfigOption(name = "Ender Slayer", desc = "")
     @Accordion
-    var enderSlayer: EnderSlayerConfig = EnderSlayerConfig()
+    val enderSlayer: EnderSlayerConfig = EnderSlayerConfig()
 
     @Expose
     @ConfigOption(name = "Vampire Slayer", desc = "")
     @Accordion
-    var vampireSlayer: VampireSlayerConfig = VampireSlayerConfig()
+    val vampireSlayer: VampireSlayerConfig = VampireSlayerConfig()
 }

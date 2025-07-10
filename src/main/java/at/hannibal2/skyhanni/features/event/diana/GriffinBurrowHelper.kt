@@ -5,12 +5,14 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
@@ -27,8 +29,8 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -116,12 +118,6 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
         update()
         loadTestGriffinSpots()
-    }
-
-    fun testGriffinSpots() {
-        testGriffinSpots = !testGriffinSpots
-        val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
-        ChatUtils.chat("Test Griffin Spots $state§e.")
     }
 
     private fun loadTestGriffinSpots() {
@@ -253,6 +249,17 @@ object GriffinBurrowHelper {
         // talking to Diana NPC
         if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
             resetAllData()
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onUseAbility(event: ItemClickEvent) {
+        if (!isEnabled()) return
+        val item = event.itemInHand ?: return
+        if (!item.isDianaSpade) return
+
+        additionalGuesses.removeIf {
+            it.getLocation().distanceToPlayerIgnoreY() < 10
         }
     }
 
@@ -450,8 +457,8 @@ object GriffinBurrowHelper {
 
     private fun isEnabled() = DianaApi.isDoingDiana()
 
-    private fun setTestBurrow(strings: Array<String>) {
-        if (!IslandType.HUB.isInIsland()) {
+    private fun setTestBurrow(arg: String) {
+        if (!IslandType.HUB.isCurrent()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }
@@ -469,12 +476,7 @@ object GriffinBurrowHelper {
             return
         }
 
-        if (strings.size != 1) {
-            ChatUtils.userError("/shtestburrow <type>")
-            return
-        }
-
-        val type: BurrowType = when (strings[0].lowercase()) {
+        val type: BurrowType = when (arg) {
             "reset" -> {
                 resetAllData()
                 ChatUtils.chat("Manually reset all burrow data.")
@@ -498,10 +500,21 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestburrow") {
+        event.registerBrigadier("shtestburrow") {
             description = "Sets a test burrow waypoint at your location"
             category = CommandCategory.DEVELOPER_TEST
-            callback { setTestBurrow(it) }
+            arg("type", BrigadierArguments.string()) { type ->
+                callback { setTestBurrow(getArg(type)) }
+            }
+        }
+        event.registerBrigadier("shtestgriffinspots") {
+            description = "Show potential griffin spots around you."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                testGriffinSpots = !testGriffinSpots
+                val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
+                ChatUtils.chat("Test Griffin Spots $state§e.")
+            }
         }
     }
 }

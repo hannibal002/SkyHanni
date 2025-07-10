@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
@@ -18,10 +18,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -82,7 +82,7 @@ object CFBlockOpen {
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!commandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
-        if (LorenzUtils.isBingoProfile) return
+        if (SkyBlockUtils.isBingoProfile) return
 
         tryBlock().takeIf { it != TryBlockResult.SUCCESS } ?: return
         commandSentTimer = SimpleTimeMark.now()

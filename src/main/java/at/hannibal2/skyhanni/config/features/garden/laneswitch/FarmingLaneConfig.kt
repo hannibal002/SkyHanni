@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.config.features.garden.laneswitch
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
 import at.hannibal2.skyhanni.features.garden.CropType
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -13,7 +12,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class FarmingLaneConfig {
     @ConfigOption(
         name = "Create Lanes",
@@ -25,7 +23,7 @@ class FarmingLaneConfig {
     @Expose
     @ConfigOption(name = "Lane Switch Notification", desc = "")
     @Accordion
-    var laneSwitchNotification: LaneSwitchNotificationConfig = LaneSwitchNotificationConfig()
+    val laneSwitchNotification: LaneSwitchNotificationConfig = LaneSwitchNotificationConfig()
 
     @Expose
     @ConfigOption(
@@ -37,8 +35,17 @@ class FarmingLaneConfig {
     var distanceDisplay: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Soul Sand Warning",
+        desc = "Show an informational note on distance display while on soul sand, that speed calculations are inaccurate"
+    )
+    @ConfigEditorBoolean
+    @OnlyLegacy
+    var distanceSoulSandWarning: Boolean = true
+
+    @Expose
     @ConfigLink(owner = FarmingLaneConfig::class, field = "distanceDisplay")
-    var distanceDisplayPosition: Position = Position(0, 200)
+    val distanceDisplayPosition: Position = Position(0, 200)
 
     @Expose
     @ConfigOption(name = "Corner Waypoints", desc = "Show the corner for the current lane in the world.")
@@ -46,10 +53,8 @@ class FarmingLaneConfig {
     @FeatureToggle
     var cornerWaypoints: Boolean = false
 
-    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Ignored Crops", desc = "Add the crops you wish to not setup a lane for.")
     @ConfigEditorDraggableList
-    var ignoredCrops: MutableList<CropType> = mutableListOf()
-    //#endif
+    val ignoredCrops: MutableList<CropType> = mutableListOf()
 }

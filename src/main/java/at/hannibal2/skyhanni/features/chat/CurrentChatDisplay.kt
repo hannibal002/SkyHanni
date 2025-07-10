@@ -64,15 +64,6 @@ object CurrentChatDisplay {
     )
 
     /**
-     * REGEX-TEST: §cYou cannot send guild chat with your guild chat disabled! Use /g toggle to enable it!
-     */
-    @Suppress("MaxLineLength")
-    private val guildChatPattern by patternGroup.pattern(
-        "guild",
-        "§cYou cannot send guild chat with your guild chat disabled! Use \\/g toggle to enable it!",
-    )
-
-    /**
      * REGEX-TEST: §aOpened a chat conversation with §r§b[MVP§r§5+§r§b] martimavocado§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave
      */
     @Suppress("MaxLineLength")
@@ -89,9 +80,6 @@ object CurrentChatDisplay {
         }
         if (allChatPattern.matches(message)) {
             return updateChat(ChatType.ALL)
-        }
-        if (guildChatPattern.matches(message)) {
-            return updateChat(ChatType.GUILD)
         }
         openPrivateMessagePattern.matchMatcher(message) {
             privateMessageEnd = maxPrivateMessageTime.fromNow()

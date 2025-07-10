@@ -29,9 +29,9 @@ class TimiteConfig {
 
     @Expose
     @ConfigLink(owner = TimiteConfig::class, field = "evolutionTimer")
-    var timerPosition: Position = Position(421, -220)
+    val timerPosition: Position = Position(421, -220)
 
     @Expose
     @ConfigLink(owner = TimiteConfig::class, field = "tracker")
-    var trackerPosition: Position = Position(-201, -220)
+    val trackerPosition: Position = Position(-201, -220)
 }

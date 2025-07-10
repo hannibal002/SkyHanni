@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
-//#endif
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -11,7 +9,6 @@ import java.util.Locale
 import java.util.TreeMap
 import kotlin.math.pow
 
-// todo 1.21 impl needed
 object NumberUtil {
 
     private val config get() = SkyHanniMod.feature
@@ -290,11 +287,7 @@ object NumberUtil {
 }
 
 class MinMaxNumber(val min: Double, val max: Double) {
-    //#if MC < 1.21
     override fun toString(): String = "${min.formatCoin()}§7-${max.formatCoin()}"
-    //#else
-    //$$ override fun toString(): String = "${min}§7-${max}"
-    //#endif
 
     operator fun plus(other: MinMaxNumber): MinMaxNumber = MinMaxNumber(min + other.min, max + other.max)
 }
