@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig
-import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesConfig;
+import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesConfig
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
@@ -230,7 +230,7 @@ class GardenConfig {
     @ConfigOption(
         name = "Enable Plot Borders",
         desc = "Enable the use of F3 + G hotkey to show Garden plot borders. " +
-                "Similar to how later Minecraft version render chunk borders.",
+            "Similar to how later Minecraft version render chunk borders.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -240,7 +240,7 @@ class GardenConfig {
     @ConfigOption(
         name = "Copy Milestone Data",
         desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. " +
-                "Please share this data in SkyHanni discord.",
+            "Please share this data in SkyHanni discord.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

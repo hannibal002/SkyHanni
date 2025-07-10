@@ -25,10 +25,10 @@ class OptimalAnglesConfig {
 
     @Expose
     @ConfigLink(owner = OptimalAnglesConfig::class, field = "signEnabled")
-    var signPosition: Position = Position(20, -195, false, true)
+    val signPosition: Position = Position(20, -195, false, true)
 
     @Expose
     @ConfigOption(name = "Custom Angles", desc = "Change the mousemat angles for every single crop.")
     @Accordion
-    var customAngles: CustomAnglesConfig = CustomAnglesConfig()
+    val customAngles: CustomAnglesConfig = CustomAnglesConfig()
 }
