@@ -14,5 +14,12 @@ abstract class AbstractRepoReloadEvent(
         constant: String,
         type: Type? = null,
         gson: Gson = this.gson,
-    ): T = manager.getRepoData("constants", constant, type, gson)
+    ): T {
+        // This will throw an error if the constant is not found
+        val constantData = manager.getRepoData<T>("constants", constant, type, gson)
+        // So we can safely assume it exists and is successfully loaded
+        manager.addSuccessfulConstant(constant)
+        // Then return the constant data
+        return constantData
+    }
 }

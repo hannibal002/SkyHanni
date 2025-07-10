@@ -128,19 +128,13 @@ class DebugConfig {
     @ConfigEditorBoolean
     var highlightMissingRepo: Boolean = false
 
-    //
-    //
-    //
-    //
-    //
-    // todo change this to false before release
     @Expose
     @ConfigOption(
         name = "Log Repo Errors",
         desc = "Log errors that occur while reloading/fetching any AbstractRepoManager"
     )
     @ConfigEditorBoolean
-    var logRepoErrors: Boolean = true
+    var logRepoErrors: Boolean = false
 
     @Expose
     @ConfigOption(

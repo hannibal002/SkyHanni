@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import com.google.gson.Gson
 import net.minecraft.util.IChatComponent
@@ -58,8 +58,8 @@ abstract class AbstractRepoManager(
     }
     private val currentCommitFile by lazy { File(configDirectory, "currentCommit.json") }
     private val commitStorage: RepoCommitStorage by lazy { RepoCommitStorage(currentCommitFile) }
-    private val successfulConstants = mutableListOf<String>()
-    private val unsuccessfulConstants = mutableListOf<String>()
+    private val successfulConstants = mutableSetOf<String>()
+    private val unsuccessfulConstants = mutableSetOf<String>()
     private val commandShortName by lazy { commonShortName.takeIf { it != "sh" }.orEmpty() }
     private val githubRepoLocation: GitHubUtils.RepoLocation
         get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
@@ -107,7 +107,10 @@ abstract class AbstractRepoManager(
 
     var reportedRepoFiles: Boolean = false
 
-    inline fun <reified T : Any> getRepoData(
+    fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
+
+    @PublishedApi
+    internal inline fun <reified T : Any> getRepoData(
         directory: String,
         fileName: String,
         type: Type? = null,
@@ -121,7 +124,7 @@ abstract class AbstractRepoManager(
         val jsonContent = jsonFile.getJson()
             ?: logger.throwError("Repo file '$fileName' could not be loaded as a valid JSON file.")
 
-        return if (type == null) gson.fromJson(jsonContent, T::class.java)
+        return if (type == null) gson.fromJson<T>(jsonContent)
         else gson.fromJson(jsonContent, type)
     }.getOrElse { e ->
         logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
@@ -139,7 +142,7 @@ abstract class AbstractRepoManager(
             fetchAndUnpackRepo(command = true)
             reloadRepository("$commonName Repo updated successfully.")
             if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launchIOCoroutine
-            val informed = ErrorManager.logErrorStateWithData(
+            val informed = logger.logErrorStateWithData(
                 "Error updating reading $commonName Repo",
                 "no success",
                 "usingBackupRepo" to isUsingBackup,
@@ -297,13 +300,13 @@ abstract class AbstractRepoManager(
         try {
             repoZipFile.createNewFile()
         } catch (e: Error) {
-            ErrorManager.logErrorWithData(e, "Error creating $commonShortName repo zip file")
+            logger.logErrorWithData(e, "Error creating $commonShortName repo zip file")
             return false
         }
 
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
             downloadFailed = true
-            return false
+            logger.logError("Failed to download the repo zip file from GitHub.")
         }
         RepoUtils.unzipIgnoreFirstFolder(
             zipFilePath = repoZipFile.absolutePath,
@@ -353,9 +356,9 @@ abstract class AbstractRepoManager(
             ChatUtils.chat("§a$answerMessage")
         } else if (loadingError) {
             ChatUtils.clickableChat(
-                "Error with the repo detected, try /$updateCommand to fix it!",
+                "Error with the $commonShortName Repo detected, try /$updateCommand to fix it!",
                 onClick = ::updateRepo,
-                "§eClick to update the repo!",
+                "§eClick to update the Repo!",
                 prefixColor = "§c",
             )
             if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")

@@ -6,8 +6,15 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import java.io.BufferedReader
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.io.Reader
+import java.nio.charset.StandardCharsets
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.typeOf
 
@@ -18,21 +25,25 @@ inline fun <reified T : Any> Gson.fromJson(jsonElement: JsonElement): T =
 
 inline fun <reified T : Any> Gson.fromJson(reader: Reader): T = this.fromJson(reader, typeOf<T>().javaType)
 
-fun File.getJson(): JsonObject? = runCatching {
-    this.inputStream().use {
-        ConfigManager.gson.fromJson(it.reader(), JsonObject::class.java)
-    }
+fun File.getJson(gson: Gson = ConfigManager.gson): JsonElement? = runCatching {
+    BufferedReader(
+        InputStreamReader(
+            FileInputStream(this),
+            StandardCharsets.UTF_8,
+        ),
+    ).use { gson.fromJson(it, JsonElement::class.java) }
 }.getOrNull()
 
-fun File.writeJson(json: JsonElement): Boolean = runCatching {
+fun File.writeJson(json: JsonElement, gson: Gson = ConfigManager.gson): Boolean = runCatching {
     if (!this.exists()) this.createNewFile()
-    this.outputStream().use { outputStream ->
-        ConfigManager.gson.toJson(json, outputStream.writer())
-    }
+    BufferedWriter(
+        OutputStreamWriter(
+            FileOutputStream(this),
+            StandardCharsets.UTF_8,
+        )
+    ).use { it.write(gson.toJson(json)) }
     true
-}.getOrElse { e ->
-    return false
-}
+}.getOrElse { return false }
 
 /**
  * Straight forward deep copy. This is included in gson as well, but different versions have it exposed privately instead of publicly,
