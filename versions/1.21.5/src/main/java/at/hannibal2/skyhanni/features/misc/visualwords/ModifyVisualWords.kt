@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.OrderedText
@@ -16,8 +16,8 @@ import kotlin.time.Duration.Companion.minutes
 object ModifyVisualWords {
     private val config get() = SkyHanniMod.feature.gui.modifyWords
 
-    val textCache = TimeLimitedCache<OrderedText, OrderedText>(5.minutes)
-    val stringVisitableCache = TimeLimitedCache<StringVisitable, StringVisitable>(5.minutes)
+    val textCache = TimeAndSizeLimitedCache<OrderedText, OrderedText>(262144, 5.minutes)
+    val stringVisitableCache = TimeAndSizeLimitedCache<StringVisitable, StringVisitable>(262144, 5.minutes)
 
     // Replacements the user added manually via /shwords
     var userModifiedWords = mutableListOf<VisualWordText>()
