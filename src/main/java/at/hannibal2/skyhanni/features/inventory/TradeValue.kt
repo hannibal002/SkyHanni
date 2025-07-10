@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getCoinItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -127,7 +128,7 @@ object TradeValue {
             map["Coin: $it"] = ChestItem(
                 emptyList<Int>().toMutableList(), 1, getCoinItemStack(coin), it,
                 buildList {
-                    add("Coin value $it")
+                    add("§eCoin value: §6${it.toInt().addSeparators()}")
                 },
             )
         }
