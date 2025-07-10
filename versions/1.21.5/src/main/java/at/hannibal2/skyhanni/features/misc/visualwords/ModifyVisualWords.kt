@@ -42,6 +42,13 @@ object ModifyVisualWords {
         if (!config.enabled) return orderedText
         if (!changeWords) return orderedText
 
+        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
+            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
+            update()
+        }
+
+        if (userModifiedWords.isEmpty()) return orderedText
+
         return textCache.getOrPut(orderedText) {
 
             var characters = mutableListOf<StyledCharacter>()
@@ -88,6 +95,13 @@ object ModifyVisualWords {
         if (!config.enabled) return stringVisitable
         if (!changeWords) return stringVisitable
 
+        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
+            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
+            update()
+        }
+
+        if (userModifiedWords.isEmpty()) return stringVisitable
+
         return stringVisitableCache.getOrPut(stringVisitable) {
             var characters = mutableListOf<StyledCharacter>()
             stringVisitable.visit(
@@ -125,11 +139,6 @@ object ModifyVisualWords {
     }
 
     private fun doReplacements(characters: MutableList<StyledCharacter>): MutableList<StyledCharacter> {
-
-        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
-            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
-            update()
-        }
 
         var workingCharacters = characters
 
