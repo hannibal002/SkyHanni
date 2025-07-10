@@ -37,6 +37,10 @@ value class Graph(
 
     override fun lastIndexOf(element: GraphNode) = nodes.lastIndexOf(element)
 
+    fun getTags(tag: GraphNodeTag) = nodes.filter { it.hasTag(tag) }
+    fun getTags(vararg tag: GraphNodeTag) = nodes.filter { node -> tag.all { node.hasTag(it) } }
+    fun getName(name: String) = nodes.filter { it.name == name }
+
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
             { out, value ->
@@ -151,6 +155,8 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
         tagNames.mapNotNull { GraphNodeTag.byId(it) }
     }
 
+    var enabled = true
+
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
     lateinit var neighbours: Map<GraphNode, Double>
 
@@ -170,6 +176,8 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
     }
 
     fun sameNameAndTags(other: GraphNode): Boolean = name == other.name && allowedTags == other.allowedTags
+
+    fun hasTag(tag: GraphNodeTag): Boolean = tag in tags
 
     private val allowedTags get() = tags.filter { it in NavigationHelper.allowedTags }
 }
@@ -194,6 +202,7 @@ data class DijkstraTree(
     val lastVisitedNode: GraphNode,
 )
 
+@Suppress("MapGetWithNotNullAssertionOperator")
 fun DijkstraTree.findPathToDestination(end: GraphNode): Pair<Graph, Double> {
     val distances = this
     val reversePath = buildList {

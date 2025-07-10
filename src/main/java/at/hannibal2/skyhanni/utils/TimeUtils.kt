@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
+import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -16,12 +19,17 @@ object TimeUtils {
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
-        showMilliSeconds: Boolean = this in -1.seconds..1.seconds,
+        showMilliSeconds: Boolean = this.absoluteValue < 1.seconds,
         longName: Boolean = false,
         maxUnits: Int = -1,
         showSmallerUnits: Boolean = false,
+        showNegativeAsSoon: Boolean = true,
     ): String {
-        var millis = inWholeMilliseconds
+        var millis = inWholeMilliseconds.absoluteValue
+        val prefix = if (isNegative()) {
+            if (showNegativeAsSoon) return "Soon"
+            "-"
+        } else ""
         val parts = mutableMapOf<TimeUnit, Int>()
 
         for (unit in TimeUnit.entries) {
@@ -36,7 +44,7 @@ object TimeUtils {
 
         if (absoluteValue < 1.seconds) {
             val formattedMillis = (millis / 100).toInt()
-            return "0.${formattedMillis}s"
+            return "${prefix}0.${formattedMillis}${TimeUnit.SECOND.getName(formattedMillis, longName)}"
         }
 
         var currentUnits = 0
@@ -57,7 +65,7 @@ object TimeUtils {
                 }
             }
         }
-        return result.trim()
+        return prefix + result.trim()
     }
 
     fun Duration.timerColor(default: String = "§f") = when (this) {
@@ -67,9 +75,26 @@ object TimeUtils {
         else -> default
     }
 
+    fun Iterable<Duration>.average(): Duration {
+        var sum: Duration = Duration.ZERO
+        var count = 0
+        for (element in this) {
+            sum += element
+            count++
+        }
+        return if (count == 0) Duration.ZERO else sum / count
+    }
+
     val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
-    fun getDuration(string: String) = getMillis(string.replace("m", "m ").replace("  ", " ").trim())
+    private fun String.preFixDurationString() =
+        replace(Regex("(\\d+)([yMWwdhms])(?!\\s)"), "$1$2 ") // Add a space only after common time units
+            .trim()
+
+    fun getDuration(string: String): Duration =
+        getDurationOrNull(string) ?: throw RuntimeException("Invalid format: '$string'")
+
+    fun getDurationOrNull(string: String): Duration? = getMillis(string.preFixDurationString())
 
     private fun getMillis(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
@@ -88,7 +113,7 @@ object TimeUtils {
         millis.toDuration(DurationUnit.MILLISECONDS)
     } ?: tryAlternativeFormat(string)
 
-    private fun tryAlternativeFormat(string: String): Duration {
+    private fun tryAlternativeFormat(string: String): Duration? {
         val split = string.split(":")
         return when (split.size) {
             3 -> {
@@ -106,7 +131,7 @@ object TimeUtils {
 
             1 -> split[0].toInt() * 1000
 
-            else -> throw RuntimeException("Invalid format: '$string'")
+            else -> return null
         }.milliseconds
     }
 
@@ -139,21 +164,37 @@ object TimeUtils {
         /**
          * We replace the line here, because the user might want color month names
          */
-        return tryToReplaceScoreboardLine(
+        return ScoreboardData.tryToReplaceScoreboardLine(
             if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
                 "$datePart, $timePart"
             } else {
                 "$datePart$timePart".trim()
             },
-        ) ?: ""
+        ).orEmpty()
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
+
+    fun LocalDateTime.getCountdownFormat(): String {
+        val timeNow = LocalDateTime.now()
+        val yearDiff = year - timeNow.year
+        val monthDiff = monthValue - timeNow.monthValue
+        val dayDiff = dayOfMonth - timeNow.dayOfMonth
+
+        return when {
+            yearDiff == 0 && monthDiff == 0 && dayDiff == 0 -> "HH:mm:ss"
+            (yearDiff == 0 && monthDiff == 0) || (yearDiff == 0) -> "MM-dd HH:mm"
+            else -> "yyyy-MM-dd HH:mm"
+        }
+    }
 
     val Long.ticks get() = (this * 50).milliseconds
     val Int.ticks get() = (this * 50).milliseconds
 
     val Float.minutes get() = toDouble().minutes
+
+    // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
+    fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 }
 
 private const val FACTOR_SECONDS = 1000L
@@ -162,7 +203,7 @@ private const val FACTOR_HOURS = FACTOR_MINUTES * 60
 private const val FACTOR_DAYS = FACTOR_HOURS * 24
 private const val FACTOR_YEARS = (FACTOR_DAYS * 365.25).toLong()
 
-enum class TimeUnit(val factor: Long, val shortName: String, val longName: String) {
+enum class TimeUnit(val factor: Long, private val shortName: String, private val longName: String) {
     YEAR(FACTOR_YEARS, "y", "Year"),
     DAY(FACTOR_DAYS, "d", "Day"),
     HOUR(FACTOR_HOURS, "h", "Hour"),
@@ -171,13 +212,13 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
     ;
 
     fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
-        " $longName" + if (value > 1) "s" else ""
+        " $longName" + if (value == 1) "" else "s"
     } else shortName
 
     fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
 }
 
-val Duration.inPartialSeconds: Double get() = inWholeMilliseconds.toDouble() / 1000
+val Duration.inPartialSeconds: Double get() = toDouble(DurationUnit.SECONDS)
 val Duration.inPartialMinutes: Double get() = inPartialSeconds / 60
 val Duration.inPartialHours: Double get() = inPartialSeconds / 3600
 val Duration.inPartialDays: Double get() = inPartialSeconds / 86_400

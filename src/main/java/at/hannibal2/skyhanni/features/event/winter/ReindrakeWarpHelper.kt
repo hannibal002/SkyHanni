@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.features.event.winter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ReindrakeWarpHelper {
@@ -27,8 +26,8 @@ object ReindrakeWarpHelper {
         "§c§lWOAH! (?:§r)?§cA (?:§r)?§4Reindrake (?:§r)?§cwas summoned from the depths!",
     )
 
-    @SubscribeEvent
-    fun onMessage(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (!spawnPattern.matches(event.message)) return
         ChatUtils.clickToActionOrDisable(
@@ -39,5 +38,5 @@ object ReindrakeWarpHelper {
         )
     }
 
-    fun isEnabled() = IslandType.WINTER.isInIsland() && config.reindrakeWarpHelper
+    fun isEnabled() = IslandType.WINTER.isCurrent() && config.reindrakeWarpHelper
 }

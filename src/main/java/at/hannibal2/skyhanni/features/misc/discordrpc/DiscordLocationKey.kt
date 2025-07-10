@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 object DiscordLocationKey {
 
@@ -247,9 +247,9 @@ object DiscordLocationKey {
     )
 
     private fun getAmbiguousKey(location: String): String {
-        val island = LorenzUtils.skyBlockIsland
+        val island = SkyBlockUtils.currentIsland
 
-        DungeonAPI.dungeonFloor?.lowercase()?.let {
+        DungeonApi.dungeonFloor?.lowercase()?.let {
             if (it.startsWith("m")) {
                 return "master-mode"
             }
@@ -298,16 +298,12 @@ object DiscordLocationKey {
     fun getDiscordIconKey(location: String): String {
         val keyIfNormal = location.lowercase().replace(' ', '-')
 
-        return if (normalRPC.contains(keyIfNormal)) {
-            keyIfNormal
-        } else if (specialRPC.containsKey(location)) {
-            specialRPC[location]!!
-        } else if (specialNetherRPC.contains(location)) {
-            "crimson-isle"
-        } else if (specialRiftRPC.containsKey(location)) {
-            specialRiftRPC[location]!!
-        } else {
-            getAmbiguousKey(location) // will return skyblock-logo if not found
+        return when {
+            normalRPC.contains(keyIfNormal) -> keyIfNormal
+            specialRPC.containsKey(location) -> specialRPC[location] ?: getAmbiguousKey(location)
+            specialNetherRPC.contains(location) -> "crimson-isle"
+            specialRiftRPC.containsKey(location) -> specialRiftRPC[location] ?: getAmbiguousKey(location)
+            else -> getAmbiguousKey(location) // will return skyblock-logo if not found
         }
     }
 }

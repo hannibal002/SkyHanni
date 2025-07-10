@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.ChatHoverEvent;
-import at.hannibal2.skyhanni.events.TabCompletionEvent;
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent;
+import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay;
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
@@ -38,7 +39,7 @@ public class MixinGuiChat {
         String inputFieldText = this.inputField.getText();
         String beforeCursor = inputFieldText.substring(0, this.inputField.getCursorPosition());
         TabCompletionEvent tabCompletionEvent = new TabCompletionEvent(beforeCursor, inputFieldText, Arrays.asList(originalArray));
-        tabCompletionEvent.postAndCatch();
+        tabCompletionEvent.post();
         String[] newSuggestions = tabCompletionEvent.intoSuggestionArray();
         if (newSuggestions == null)
             newSuggestions = originalArray;
@@ -53,11 +54,16 @@ public class MixinGuiChat {
         // we get the original component back
         GuiChatHook.INSTANCE.setReplacement((ChatComponentText) component);
 
-        new ChatHoverEvent((ChatComponentText) component).postAndCatch();
+        new ChatHoverEvent((ChatComponentText) component).post();
     }
 
     @ModifyArg(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiChat;handleComponentHover(Lnet/minecraft/util/IChatComponent;II)V"), index = 0)
     public IChatComponent replaceWithNewComponent(IChatComponent originalComponent) {
         return GuiChatHook.INSTANCE.getReplacementAsIChatComponent();
+    }
+
+    @Inject(method = "onGuiClosed", at = @At("HEAD"))
+    public void onGuiClosed(CallbackInfo ci) {
+        CurrentChatDisplay.onCloseChat();
     }
 }

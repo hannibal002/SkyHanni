@@ -1,15 +1,20 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 
-class DebugDataCollectEvent(private val list: MutableList<String>, private val search: String) : LorenzEvent() {
+class DebugDataCollectEvent(private val list: MutableList<String>, private val search: String) : SkyHanniEvent() {
 
     var empty = true
     private var currentTitle = ""
     private var irrelevant = false
 
     fun title(title: String) {
-        if (currentTitle != "") error("Title already set: '$currentTitle'")
+        if (currentTitle != "") ErrorManager.skyHanniError(
+            "DebugDataCollectEvent duplicate titles and no data in between",
+            "current title" to currentTitle,
+            "new title" to title,
+        )
 
         currentTitle = title
     }
@@ -37,7 +42,7 @@ class DebugDataCollectEvent(private val list: MutableList<String>, private val s
     private fun writeData(text: List<String>) {
         if (irrelevant && search.isEmpty()) return
         if (search.isNotEmpty()) {
-            if (!search.equalsIgnoreColor("all")) {
+            if (search != "all") {
                 if (!currentTitle.contains(search, ignoreCase = true)) {
                     return
                 }

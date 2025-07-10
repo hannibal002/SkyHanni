@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import com.google.gson.JsonElement
+import io.github.notenoughupdates.moulconfig.observer.Property
 import java.lang.reflect.Field
 
 // Copied from NEU
@@ -13,15 +15,13 @@ class Shimmy private constructor(
         private fun shimmy(source: Any?, fieldName: String): Any? {
             if (source == null) return null
             return try {
-                val declaredField = source.javaClass.getDeclaredField(fieldName)
-                declaredField.isAccessible = true
+                val declaredField = source.javaClass.getDeclaredField(fieldName).makeAccessible()
                 declaredField.get(source)
             } catch (e: NoSuchFieldException) {
                 null
             }
         }
 
-        @JvmStatic
         fun makeShimmy(source: Any?, path: List<String>): Shimmy? {
             if (path.isEmpty())
                 return null
@@ -32,17 +32,19 @@ class Shimmy private constructor(
             if (source == null) return null
             val lastName = path.last()
             return try {
-                val field = source.javaClass.getDeclaredField(lastName)
-                field.isAccessible = true
-                Shimmy(
-                    source,
-                    field,
-                )
+                val field = source.javaClass.getDeclaredField(lastName).makeAccessible()
+                val shimmy = Shimmy(source, field)
+
+                if (shimmy.clazz == Property::class.java) {
+                    source = shimmy(source, lastName) ?: return shimmy
+                    makeShimmy(source, listOf("value")) ?: shimmy
+                } else {
+                    shimmy
+                }
             } catch (e: NoSuchFieldException) {
                 null
             }
         }
-
     }
 
     val clazz: Class<*> = field.type

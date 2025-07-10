@@ -1,28 +1,33 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if MC < 1.21
 import net.minecraft.entity.boss.BossStatus
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+//#else
+//$$ import at.hannibal2.skyhanni.test.command.ErrorManager
+//$$ import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+//$$ import net.minecraft.client.MinecraftClient
+//#endif
 
 @SkyHanniModule
 object BossbarData {
     private var bossbar: String? = null
     private var previousServerBossbar = ""
 
-    fun getBossbar() = bossbar ?: ""
+    fun getBossbar() = bossbar.orEmpty()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         val oldBossbar = bossbar ?: return
         previousServerBossbar = oldBossbar
         bossbar = null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick() {
+        //#if MC < 1.21
         val bossbarLine = BossStatus.bossName ?: return
         if (bossbarLine.isBlank() || bossbarLine.isEmpty()) return
         if (bossbarLine == bossbar) return
@@ -30,6 +35,22 @@ object BossbarData {
         if (previousServerBossbar.isNotEmpty()) previousServerBossbar = ""
 
         bossbar = bossbarLine
-        BossbarUpdateEvent(bossbarLine).postAndCatch()
+        BossbarUpdateEvent(bossbarLine).post()
+        //#else
+        //$$ var multipleBossBars = false
+        //$$ for (bossBar in MinecraftClient.getInstance().inGameHud.bossBarHud.bossBars.values) {
+        //$$     if (multipleBossBars) {
+        //$$         ErrorManager.skyHanniError("Multiple Bossbars")
+        //$$     }
+        //$$     multipleBossBars = true
+        //$$     val bossbarLine = bossBar.name.unformattedTextCompat()
+        //$$     if (bossbarLine.isBlank() || bossbarLine.isEmpty()) continue
+        //$$     if (bossbarLine == bossbar) continue
+        //$$     if (bossbarLine == previousServerBossbar) continue
+        //$$     if (previousServerBossbar.isNotEmpty()) previousServerBossbar = ""
+        //$$     bossbar = bossbarLine
+        //$$     BossbarUpdateEvent(bossbarLine).post()
+        //$$ }
+        //#endif
     }
 }

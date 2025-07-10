@@ -1,3 +1,7 @@
 package at.hannibal2.skyhanni.events
 
-class ConfigLoadEvent : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+
+@PrimaryFunction("onConfigLoad")
+object ConfigLoadEvent : SkyHanniEvent()

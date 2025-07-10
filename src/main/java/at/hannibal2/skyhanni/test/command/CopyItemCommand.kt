@@ -1,17 +1,23 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 
+@SkyHanniModule
 object CopyItemCommand {
 
-    fun command() {
+    private fun command() {
         val itemStack = InventoryUtils.getItemInHand()
         if (itemStack == null) {
             ChatUtils.userError("No item in hand!")
@@ -20,24 +26,9 @@ object CopyItemCommand {
         copyItemToClipboard(itemStack)
     }
 
-    private fun recurseTag(compound: NBTTagCompound, text: String, list: MutableList<String>) {
-        for (s in compound.keySet) {
-            if (s == "Lore") continue
-            val tag = compound.getTag(s)
-
-            if (tag !is NBTTagCompound) {
-                list.add("$text$s: $tag")
-            } else {
-                val element = compound.getCompoundTag(s)
-                list.add("$text$s:")
-                recurseTag(element, "$text  ", list)
-            }
-        }
-    }
-
     fun copyItemToClipboard(itemStack: ItemStack) {
         val resultList = mutableListOf<String>()
-        resultList.add(itemStack.getInternalName().toString())
+        resultList.add("internal name: " + itemStack.getInternalName().asString())
         resultList.add("display name: '" + itemStack.displayName.toString() + "'")
         resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
         resultList.add("lore:")
@@ -45,14 +36,25 @@ object CopyItemCommand {
             resultList.add(" '$line'")
         }
         resultList.add("")
-        resultList.add("getTagCompound")
-        if (itemStack.hasTagCompound()) {
-            val tagCompound = itemStack.tagCompound
-            recurseTag(tagCompound, "  ", resultList)
+        val attributes = itemStack.extraAttributes.getReadableNBTDump()
+        if (attributes.isEmpty()) {
+            resultList.add("no tag compound")
+        } else {
+            resultList.add("getTagCompound")
+            resultList.addAll(attributes)
         }
 
         val string = resultList.joinToString("\n")
         OSUtils.copyToClipboard(string)
         ChatUtils.chat("Item info copied into the clipboard!")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcopyitem") {
+            description = "Copies information about the item in hand to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { command() }
+        }
     }
 }

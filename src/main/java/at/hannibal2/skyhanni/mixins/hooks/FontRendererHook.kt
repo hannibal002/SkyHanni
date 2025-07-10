@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import net.minecraft.client.renderer.GlStateManager
 
@@ -21,9 +21,9 @@ object FontRendererHook {
     private const val CHROMA_FORMAT_INDEX = 22
     private const val WHITE_FORMAT_INDEX = 15
 
-    private var CHROMA_COLOR: Int = -0x1
+    private const val CHROMA_COLOR: Int = -0x1
     private val DRAW_CHROMA = ChromaFontRenderer(CHROMA_COLOR)
-    private var CHROMA_COLOR_SHADOW: Int = -0xAAAAAB
+    private const val CHROMA_COLOR_SHADOW: Int = -0xAAAAAB
     private val DRAW_CHROMA_SHADOW = ChromaFontRenderer(CHROMA_COLOR_SHADOW)
 
     private var currentDrawState: ChromaFontRenderer? = null
@@ -103,7 +103,7 @@ object FontRendererHook {
 
     @JvmStatic
     fun toggleChromaOn() {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
 
         currentDrawState?.newChromaEnv()?.bindActualColor(RenderUtils.getAlpha())
     }
@@ -143,7 +143,7 @@ object FontRendererHook {
 
     @JvmStatic
     fun insertZColorCode(constant: String): String {
-        return if (LorenzUtils.inSkyBlock && !isChromaEnabled()) constant else "0123456789abcdefklmnorz"
+        return if (SkyBlockUtils.inSkyBlock && !isChromaEnabled()) constant else "0123456789abcdefklmnorz"
     }
 
     @JvmStatic
@@ -157,5 +157,5 @@ object FontRendererHook {
     }
 
     private fun isChromaEnabled() = config.enabled.get()
-    private fun isEnabled() = LorenzUtils.inSkyBlock && isChromaEnabled()
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && isChromaEnabled()
 }

@@ -2,36 +2,38 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.HotmData
-import at.hannibal2.skyhanni.data.HotmReward
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.data.hotx.HotmData
+import at.hannibal2.skyhanni.data.hotx.HotmReward
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.hover
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.annotations.Expose
-import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MineshaftPityDisplay {
@@ -83,7 +85,7 @@ object MineshaftPityDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
-        if (!MiningAPI.inGlacialTunnels()) return
+        if (!MiningApi.inGlacialTunnels()) return
 
         val originalOre = event.originalOre
         originalOre?.getPityBlock()?.let { it.blocksBroken++ }
@@ -98,9 +100,9 @@ object MineshaftPityDisplay {
         update()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!MiningAPI.inGlacialTunnels()) return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!MiningApi.inGlacialTunnels()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val pityCounter = calculateCounter()
             val chance = calculateChance(pityCounter)
@@ -142,15 +144,15 @@ object MineshaftPityDisplay {
 
             resetCounter()
 
-            val newComponent = Text.text(message) {
-                hover = Text.multiline(hoverText)
+            val newComponent = TextHelper.text(message) {
+                hover = TextHelper.multiline(hoverText)
             }
 
             if (config.modifyChatMessage) event.chatComponent = newComponent
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isDisplayEnabled()) return
         update()
@@ -196,7 +198,6 @@ object MineshaftPityDisplay {
             }
         }
 
-
         val neededToPityRenderable = Renderable.verticalContainer(
             listOf(
                 Renderable.string("§3Needed to pity:"),
@@ -228,18 +229,29 @@ object MineshaftPityDisplay {
             MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
-        display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
+        display = listOf(
+            Renderable.verticalContainer(
+                config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
+                spacing = 2,
+            ),
+        )
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isDisplayEnabled()) return
-        display.ifEmpty { update() }
-        if (display.isEmpty()) return
-        config.position.renderRenderables(
-            listOf(Renderable.verticalContainer(display, 2)),
-            posLabel = "Mineshaft Pity Display",
-        )
+    init {
+        RenderDisplayHelper(
+            condition = {
+                return@RenderDisplayHelper if (display.isEmpty()) {
+                    update()
+                    false
+                } else isDisplayEnabled()
+            },
+            outsideInventory = true,
+        ) {
+            config.position.renderRenderables(
+                display,
+                posLabel = "Mineshaft Pity Display",
+            )
+        }
     }
 
     private fun resetCounter() {
@@ -248,23 +260,31 @@ object MineshaftPityDisplay {
         update()
     }
 
-    fun fullResetCounter() {
-        resetCounter()
-        mineshaftTotalBlocks = 0
-        mineshaftTotalCount = 0
-        sessionMineshafts = 0
-        lastMineshaftSpawn = SimpleTimeMark.farPast()
-        update()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetmineshaftpitystats") {
+            description = "Resets the mineshaft pity display stats"
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                ChatUtils.chat("Reset the mineshaft pity display stats!")
+                resetCounter()
+                mineshaftTotalBlocks = 0
+                mineshaftTotalCount = 0
+                sessionMineshafts = 0
+                lastMineshaftSpawn = SimpleTimeMark.farPast()
+                update()
+            }
+        }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.MINESHAFT || event.oldIsland == IslandType.MINESHAFT) {
             resetCounter()
         }
     }
 
-    private fun isDisplayEnabled() = (MiningAPI.inGlacialTunnels() || MiningAPI.inDwarvenBaseCamp()) && config.enabled
+    private fun isDisplayEnabled() = (MiningApi.inGlacialTunnels() || MiningApi.inDwarvenBaseCamp()) && config.enabled
 
     enum class MineshaftPityLine(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         TITLE("§3§lMineshaft Pity Counter"),
@@ -296,14 +316,14 @@ object MineshaftPityDisplay {
             "Mithril",
             listOf(OreType.MITHRIL),
             2,
-            ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata),
+            ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
         ),
 
         GEMSTONE(
             "Gemstone",
             OreType.entries.filter { it.isGemstone() },
             4,
-            ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata),
+            ColoredBlockCompat.BLUE.createGlassStack(),
         ),
         GLACITE(
             "Glacite",
@@ -328,7 +348,7 @@ object MineshaftPityDisplay {
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata),
+            BlockCompat.createSmoothDiorite(),
         ),
         ;
 

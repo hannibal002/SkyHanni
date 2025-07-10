@@ -1,18 +1,23 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
+import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
+import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-class TextInput {
+open class TextInput {
 
     var textBox: String = ""
     private var carriage: Int? = null
@@ -33,9 +38,15 @@ class TextInput {
 
     fun finalText() = textBox.replace("&&", "§")
 
-    fun makeActive() = if (!isActive) Companion.activate(this) else Unit
+    fun makeActive() = if (!isActive) activate(this) else Unit
     fun disable() = if (isActive) Companion.disable() else Unit
-    fun handle() = Companion.handleTextInput()
+    fun handle() =
+        //#if MC < 1.21
+        handleTextInput()
+    //#else
+    //$$ handleTextInput(null)
+    //#endif
+
     fun clear() {
         textBox = ""
         carriage = null
@@ -45,6 +56,10 @@ class TextInput {
 
     private val updateEvents = mutableMapOf<Int, (TextInput) -> Unit>()
 
+    protected fun update() {
+        updateEvents.forEach { (_, it) -> it(this) }
+    }
+
     fun registerToEvent(key: Int, event: (TextInput) -> Unit) {
         updateEvents[key] = event
     }
@@ -53,18 +68,29 @@ class TextInput {
         updateEvents.remove(key)
     }
 
+    @SkyHanniModule
     companion object {
         private var activeInstance: TextInput? = null
 
+        fun isActive() = activeInstance != null
+
         fun activate(instance: TextInput) {
             activeInstance = instance
+            //#if MC < 1.21
             timeSinceKeyEvent = Keyboard.getEventNanoseconds()
+            //#endif
         }
 
         fun disable() {
             activeInstance = null
         }
 
+        @HandleEvent
+        fun onInventoryClose(event: InventoryCloseEvent) {
+            disable()
+        }
+
+        @Suppress("UnusedParameter")
         fun onMinecraftInput(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
                 cir.returnValue = false
@@ -72,12 +98,22 @@ class TextInput {
             }
         }
 
-        fun onGuiInput(ci: CallbackInfo) {
+        fun onGuiInput(
+            //#if MC < 1.21
+            ci: CallbackInfo,
+            //#else
+            //$$ ci: CallbackInfoReturnable<Boolean>
+            //#endif
+        ) {
             if (activeInstance != null) {
                 if (Keyboard.KEY_ESCAPE.isKeyHeld()) {
                     disable()
                 } else {
+                    //#if MC < 1.21
                     ci.cancel()
+                    //#else
+                    //$$ ci.setReturnValue(false)
+                    //#endif
                 }
                 return
             }
@@ -92,7 +128,7 @@ class TextInput {
             }
 
         private var textBox
-            get() = activeInstance?.textBox ?: ""
+            get() = activeInstance?.textBox.orEmpty()
             set(value) {
                 activeInstance?.textBox = value
             }
@@ -100,11 +136,22 @@ class TextInput {
         private fun updated() {
             with(activeInstance) {
                 if (this == null) return
-                this.updateEvents.forEach { (_, it) -> it(this) }
+                update()
             }
         }
 
-        private fun handleTextInput() {
+        //#if MC > 1.21
+        //$$ @HandleEvent
+        //$$ fun onChar(event: at.hannibal2.skyhanni.events.minecraft.CharEvent) {
+        //$$     handleTextInput(event.keyCode.toChar())
+        //$$ }
+        //#endif
+
+        private fun handleTextInput(
+            //#if MC > 1.21
+            //$$ char: Char?,
+            //#endif
+        ) {
             if (KeyboardManager.isCopyingKeysDown()) {
                 OSUtils.copyToClipboard(textBox)
                 return
@@ -130,31 +177,29 @@ class TextInput {
                 }
                 return
             }
-            if (Keyboard.KEY_DELETE.isKeyClicked()) { // Does not work for some reason
-                if (carriage != null) {
-                    textBox.removeRange(carriage, carriage + 1)
-                } else {
-                    textBox.dropLast(1)
-                }
-                updated()
-                return
-            }
+            //#if MC > 1.21
+            //$$ if (GLFW.GLFW_KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && GLFW.GLFW_KEY_DELETE.isKeyClicked())) {
+            //$$     textBox = onRemove()
+            //$$     updated()
+            //$$     return
+            //$$ }
+            //#endif
 
+            //#if MC < 1.21
             if (timeSinceKeyEvent == Keyboard.getEventNanoseconds()) return
             timeSinceKeyEvent = Keyboard.getEventNanoseconds()
-            val char = Keyboard.getEventCharacter()
+            val char: Char? = Keyboard.getEventCharacter()
+            //#endif
             textBox = when (char) {
                 Char(0) -> return
-                '\b' -> if (carriage != null) {
-                    if (carriage == 0) {
-                        textBox.substring(1)
-                    } else {
-                        this.carriage = carriage.minus(1)
-                        textBox.removeRange(carriage - 1, carriage)
-                    }
+                '\b' -> onRemove()
+                Char(127) -> if (SystemUtils.IS_OS_MAC) {
+                    onRemove()
                 } else {
-                    textBox.dropLast(1)
+                    textBox
                 }
+
+                null -> textBox
 
                 else -> if (carriage != null) {
                     this.carriage = carriage + 1
@@ -164,6 +209,19 @@ class TextInput {
                 }
             }
             updated()
+        }
+
+        private fun onRemove(): String = carriage?.let {
+            if (it == 0) {
+                textBox.substring(1)
+            } else {
+                this.carriage = it.minus(1)
+                textBox.removeRange(it - 1, it)
+            }
+        } ?: if (KeyboardManager.isModifierKeyDown()) {
+            textBox.removeWordsAtEnd(1)
+        } else {
+            textBox.dropLast(1)
         }
 
         private fun moveCarriageRight(carriage: Int) = carriage + 1

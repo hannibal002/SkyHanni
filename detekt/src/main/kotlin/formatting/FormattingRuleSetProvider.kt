@@ -11,7 +11,9 @@ class FormattingRuleSetProvider : RuleSetProvider {
 
     override fun instance(config: Config): RuleSet {
         return RuleSet(ruleSetId, listOf(
-            CustomCommentSpacing(config)
+            CustomAnnotationSpacing(config),
+            CustomCommentSpacing(config),
+            StorageVarOrVal(config),
         ))
     }
 }

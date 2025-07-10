@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -15,8 +16,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.util.EnumParticleTypes
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -34,11 +36,12 @@ object TrackParticlesCommand {
     private val position get() = SkyHanniMod.feature.dev.debug.trackParticlePosition
 
     private var display: List<Renderable> = emptyList()
-    private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
+    private var worldParticles = emptyMap<LorenzVec, List<ReceiveParticleEvent>>()
+    private val ignoredTypes = mutableListOf<EnumParticleTypes>()
 
     // TODO write abstract code for this and TrackSoundsCommand
-    fun command(args: Array<String>) {
-        if (!LorenzUtils.inSkyBlock) {
+    private fun command(args: Array<String>) {
+        if (!SkyBlockUtils.inSkyBlock) {
             ChatUtils.userError("This command only works in SkyBlock!")
             return
         }
@@ -52,9 +55,26 @@ object TrackParticlesCommand {
             return
         }
         if (isRecording) {
+            //#if TODO
+            args.getOrNull(0)?.let { name ->
+                val type = getParticleTypeByName(name)
+                if (type == null) {
+                    ChatUtils.userError("unknown particle type: '$name'")
+                    return
+                }
+                if (ignoredTypes.contains(type)) {
+                    ignoredTypes.remove(type)
+                    ChatUtils.chat("Removed $type from ignored types.")
+                } else {
+                    ignoredTypes.add(type)
+                    ChatUtils.chat("Add $type to ignored types.")
+                }
+                return
+            }
+            //#endif
             ChatUtils.userError(
                 "Still tracking particles, wait for the other tracking to complete before starting a new one, " +
-                    "or type §e/shtrackparticles end §cto end it prematurely"
+                    "or type §e/shtrackparticles end §cto end it prematurely",
             )
             return
         }
@@ -70,8 +90,14 @@ object TrackParticlesCommand {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    //#if TODO
+    // TODO move into utils
+    private fun getParticleTypeByName(name: String): EnumParticleTypes? =
+        EnumParticleTypes.entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
+    //#endif
+
+    @HandleEvent
+    fun onTick() {
         if (!isRecording) return
 
         val particlesToDisplay = particles.takeWhile { startTime.passedSince() - it.first < 3.seconds }
@@ -92,41 +118,53 @@ object TrackParticlesCommand {
         isRecording = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (cutOffTime.isInPast()) return
+        //#if TODO
+        if (event.type in ignoredTypes) return
+        //#endif
         event.distanceToPlayer // Need to call to initialize Lazy
         particles.addFirst(startTime.passedSince() to event)
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (cutOffTime.isInPast()) return
         position.renderRenderables(display, posLabel = "Track particles log")
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (cutOffTime.isInPast()) return
         worldParticles.forEach { (key, value) ->
             if (value.size != 1) {
                 event.drawDynamicText(key, "§e${value.size} particles", 0.8)
 
-                var offset = -0.2
+                var offset = 0.2
                 value.groupBy { it.type }.forEach { (particleType, particles) ->
-                    event.drawDynamicText(key.up(offset), "§7§l$particleType §7(§e${particles.size}§7)", 0.8)
-                    offset -= 0.2
+                    event.drawDynamicText(key.down(offset), "§7§l$particleType §7(§e${particles.size}§7)", 0.8)
+                    offset += 0.2
                 }
             } else {
                 val particle = value.first()
 
                 event.drawDynamicText(key, "§7§l${particle.type}", 0.8)
                 event.drawDynamicText(
-                    key.up(-0.2),
+                    key.down(0.2),
                     "§7C: §e${particle.count} §7S: §a${particle.speed.roundTo(2)}",
-                    scaleMultiplier = 0.8
+                    scaleMultiplier = 0.8,
                 )
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtrackparticles") {
+            description = "Tracks the particles for the specified duration (in seconds) and copies it to the clipboard"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it) }
         }
     }
 }

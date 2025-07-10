@@ -18,6 +18,7 @@ val forgeEvent = "SubscribeEvent"
 val handleEvent = "HandleEvent"
 val skyHanniModule = "SkyHanniModule"
 
+val skyhanniPath = "at.hannibal2.skyhanni"
 val patternGroup = "at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup"
 val pattern = "java.util.regex.Pattern"
 
@@ -30,10 +31,19 @@ fun isEvent(function: KtNamedFunction): Boolean {
 }
 
 fun isRepoPattern(property: KtProperty): Boolean {
-    val type = property.type()?.fqName?.asString() ?: return false
+    // TODO fix it for K2 mode instead of leaving the function (the try catch)
+    val type = try {
+        property.type()?.fqName?.asString()
+    } catch (e: Throwable) {
+        null
+    } ?: return false
     if (type == patternGroup) return true
     if (type == pattern && property.hasDelegate()) return true
     return false
+}
+
+fun isFromSkyhanni(declaration: KtNamedDeclaration): Boolean {
+    return declaration.fqName?.asString()?.startsWith(skyhanniPath) ?: false
 }
 
 class ModuleInspectionKotlin : AbstractKotlinInspection() {
@@ -42,6 +52,7 @@ class ModuleInspectionKotlin : AbstractKotlinInspection() {
         val visitor = object : KtVisitorVoid() {
 
             override fun visitClass(klass: KtClass) {
+                if (!isFromSkyhanni(klass)) return
                 val hasAnnotation = klass.annotationEntries.any { it.shortName?.asString() == skyHanniModule }
 
                 if (hasAnnotation) {
@@ -54,6 +65,7 @@ class ModuleInspectionKotlin : AbstractKotlinInspection() {
             }
 
             override fun visitObjectDeclaration(declaration: KtObjectDeclaration) {
+                if (!isFromSkyhanni(declaration)) return
                 val hasAnnotation = declaration.annotationEntries.any { it.shortName?.asString() == skyHanniModule }
                 if (hasAnnotation) return
 
