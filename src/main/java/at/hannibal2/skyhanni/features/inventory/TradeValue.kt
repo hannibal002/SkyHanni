@@ -107,7 +107,6 @@ object TradeValue {
                     coinPattern.matchMatcher(stack.getLore().last()) {
                         val number = group("number")
                         coin = number.formatDouble()
-
                     }
                 }
                 items.remove(slot)
