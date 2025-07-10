@@ -79,7 +79,6 @@ object CompactSweepDetails {
 
     private var sweepDetailsVariablesDirty = false
     private var isInsideSweepDetails = false
-    private var isFinalCalculation = false
     private var sweepDetails: SweepDetails = SweepDetails()
 
     @HandleEvent
@@ -177,7 +176,6 @@ object CompactSweepDetails {
         if (!sweepDetailsVariablesDirty) return
 
         isInsideSweepDetails = false
-        isFinalCalculation = false
 
         sweepDetails.reset()
 
