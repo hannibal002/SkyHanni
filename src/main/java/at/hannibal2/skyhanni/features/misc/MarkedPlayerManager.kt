@@ -131,7 +131,6 @@ object MarkedPlayerManager {
         config.joinLeaveMessage.playersList.onToggle {
             personOfInterest = config.joinLeaveMessage.playersList.get().split(",").map { it.trim() }
         }
-
     }
 
     @HandleEvent
@@ -177,7 +176,7 @@ object MarkedPlayerManager {
         if (playerJoined.isNotEmpty()) {
             ChatUtils.chat(
                 String.format(config.joinLeaveMessage.joinMessage.replace("&&", "§"), playerJoined.joinToString(", ")),
-                config.joinLeaveMessage.usePrefix,
+                prefix = config.joinLeaveMessage.usePrefix,
             )
             notifyList.addAll(playerJoined)
         }
@@ -185,7 +184,7 @@ object MarkedPlayerManager {
         if (playerLeft.isNotEmpty()) {
             ChatUtils.chat(
                 String.format(config.joinLeaveMessage.leftMessage.replace("&&", "§"), playerLeft.joinToString(", ")),
-                config.joinLeaveMessage.usePrefix,
+                prefix = config.joinLeaveMessage.usePrefix,
             )
             notifyList.removeAll(playerLeft)
         }
