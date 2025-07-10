@@ -134,6 +134,8 @@ object CFApi {
     var warningSound = SoundUtils.createSound("note.pling", 1f)
     val mainInventory = InventoryDetector { name -> name == "Chocolate Factory" }
 
+    private val partyModeRegex = Regex("§[a-fA-F0-9]")
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
@@ -274,9 +276,11 @@ object CFApi {
         it.maxChocolate == it.currentChocolate
     } ?: false
 
-    fun String.partyModeReplace(): String =
-        if (config.partyMode.get() && inChocolateFactory && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
-        else this
+    fun partyModeReplace(text: String): String {
+        return if (config.partyMode.get() && inChocolateFactory && chromaEnabled) {
+            text.replace(partyModeRegex, "§z")
+        } else text
+    }
 
     fun updatePosition(position: Int?, leaderboard: String) {
         position ?: return
