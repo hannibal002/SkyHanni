@@ -159,6 +159,12 @@ class FilterTypesConfig {
     @FeatureToggle
     var teleportPads: Boolean = false
 
+    @Expose
+    @ConfigOption(name = "Reward Bundles", desc = "Hide annoying reminders to claim seasonal Reward Bundles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var rewardBundles: Boolean = false
+
     // TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
