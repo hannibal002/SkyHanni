@@ -195,16 +195,13 @@ object BazaarApi {
         return NeuInternalName.fromItemName(bazaarItem.displayName)
     }
 
-    private fun updateTaxRate(items: Map<Int, ItemStack>) {
-        for ((_, item) in items) {
-            if (item.displayName.contains("Sell Instantly")) {
-                if (item.getLore().contains("Click to sell!")) {
-                    for (line in item.getLore()) {
-                        taxPattern.matchMatcher(line) {
-                            taxRate = group("tax").formatDouble()
-                        }
-                    }
-                }
+    private fun updateTaxRate(inventoryItems: Map<Int, ItemStack>) {
+        val sellInstantly = inventoryItems[11] ?: return
+
+        if (sellInstantly.displayName != "§6Sell Instantly") return
+        for (line in sellInstantly.getLore()) {
+            taxPattern.matchMatcher(line) {
+                taxRate = group("tax").formatDouble()
             }
         }
     }
