@@ -14,6 +14,12 @@ public class PartyCommandsConfig {
     @ConfigOption(name = "Trust Level", desc = "Choose who can run party chat commands.")
     public @NotNull TrustedUser defaultRequiredTrustLevel = TrustedUser.FRIENDS;
 
+    // TODO should this be customizable per-command
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(name = "Self-Trigger Commands", desc = "Allow party chat commands to trigger on your own messages.")
+    public boolean selfTriggerCommands = false;
+
     @Expose
     @ConfigEditorBoolean
     @ConfigOption(name = "Party Transfer", desc = "Automatically transfer the party to people who type §b!ptme§7.")

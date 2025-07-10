@@ -80,6 +80,6 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(92, "dev.debug.trackParticlePosition", "dev.debug.trackParticle.position")
+        event.move(94, "dev.debug.trackParticlePosition", "dev.debug.trackParticle.position")
     }
 }

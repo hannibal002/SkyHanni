@@ -76,6 +76,6 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(92, "dev.debug.trackSoundPosition", "dev.debug.trackSound.position")
+        event.move(94, "dev.debug.trackSoundPosition", "dev.debug.trackSound.position")
     }
 }
