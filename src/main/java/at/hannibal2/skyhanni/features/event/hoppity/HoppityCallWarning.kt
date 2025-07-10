@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import net.minecraft.client.renderer.GlStateManager
 import java.time.Instant
@@ -102,7 +102,7 @@ object HoppityCallWarning {
             GuiScreenUtils.displayWidth,
             GuiScreenUtils.displayHeight,
             // Apply the shifted alpha and combine it with the RGB components of flashColor.
-            shiftedRandomAlpha or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
+            shiftedRandomAlpha or (config.flashColor.toColor().rgb and 0xFFFFFF),
         )
         GlStateManager.color(1F, 1F, 1F, 1F)
     }

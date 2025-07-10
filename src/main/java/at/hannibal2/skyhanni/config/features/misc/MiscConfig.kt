@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyLegacy
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
@@ -457,6 +458,17 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var warnAboutPcTimeOffset: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var coralFishHelper: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = MiscConfig::class, field = "coralFishHelper")
+    val coralFishHelperPosition: Position = Position(174, 139)
 
     @Expose
     @ConfigOption(

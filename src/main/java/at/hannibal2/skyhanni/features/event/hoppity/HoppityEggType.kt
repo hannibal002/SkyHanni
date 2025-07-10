@@ -11,7 +11,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-// todo 1.21 impl needed
 enum class HoppityEggType(
     val mealName: String,
     val mealColor: String,

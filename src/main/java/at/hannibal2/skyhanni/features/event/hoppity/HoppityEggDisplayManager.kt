@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -102,7 +102,7 @@ object HoppityEggDisplayManager {
                 val collectedFormat = formatEggsCollected(collectedEggs)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }
-        }.map { it.partyModeReplace() }
+        }.map { CFApi.partyModeReplace(it) }
 
         if (displayList.size == 1) return emptyList()
 
