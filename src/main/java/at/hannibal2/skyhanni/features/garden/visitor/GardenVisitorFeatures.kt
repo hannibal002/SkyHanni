@@ -57,7 +57,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
-import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isSupercraftAmountSetSign
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor

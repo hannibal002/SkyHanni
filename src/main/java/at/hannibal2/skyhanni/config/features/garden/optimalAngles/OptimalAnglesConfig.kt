@@ -28,7 +28,7 @@ class OptimalAnglesConfig {
     var signPosition: Position = Position(20, -195, false, true)
 
     @Expose
-    @ConfigOption(name = "Custom Speed", desc = "Change the exact speed for every single crop.")
+    @ConfigOption(name = "Custom Angles", desc = "Change the mousemat angles for every single crop.")
     @Accordion
     var customAngles: CustomAnglesConfig = CustomAnglesConfig()
 }

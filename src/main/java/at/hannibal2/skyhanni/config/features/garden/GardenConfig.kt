@@ -49,7 +49,7 @@ class GardenConfig {
 
     @Expose
     @Category(name = "Optimal Angles", desc = "Optimal Angles Settings")
-    public OptimalAnglesConfig optimalAngles = new OptimalAnglesConfig();
+    val optimalAngles: OptimalAnglesConfig = OptimalAnglesConfig()
 
     @Expose
     @ConfigOption(name = "Farming Lane", desc = "")
@@ -152,7 +152,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Plot Price",
-        desc = "Show the price of the plot in coins when inside the Configure Plots inventory."
+        desc = "Show the price of the plot in coins when inside the Configure Plots inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -167,7 +167,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Burrowing Spores",
-        desc = "Show a notification when a Burrowing Spores spawns while farming mushrooms."
+        desc = "Show a notification when a Burrowing Spores spawns while farming mushrooms.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -176,7 +176,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "FF for Contest",
-        desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory."
+        desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -189,7 +189,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Contest Time Needed",
-        desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory."
+        desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -198,7 +198,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Custom BPS",
-        desc = "Use custom Blocks per Second value in some GUIs instead of the real one."
+        desc = "Use custom Blocks per Second value in some GUIs instead of the real one.",
     )
     @ConfigEditorBoolean
     var jacobContestCustomBps: Boolean = true
@@ -216,7 +216,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Contest Summary",
-        desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
+        desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -230,7 +230,7 @@ class GardenConfig {
     @ConfigOption(
         name = "Enable Plot Borders",
         desc = "Enable the use of F3 + G hotkey to show Garden plot borders. " +
-            "Similar to how later Minecraft version render chunk borders."
+                "Similar to how later Minecraft version render chunk borders.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -240,7 +240,7 @@ class GardenConfig {
     @ConfigOption(
         name = "Copy Milestone Data",
         desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. " +
-            "Please share this data in SkyHanni discord."
+                "Please share this data in SkyHanni discord.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
