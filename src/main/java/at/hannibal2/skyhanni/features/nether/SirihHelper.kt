@@ -28,13 +28,12 @@ object SirihHelper {
 
     private val SULPHUR_ORE = "SULPHUR_ORE".toInternalName()
 
-
     /**
-     * REGEX-TEST:  §e[NPC] §dSirih§f: §rOink.
+     * REGEX-TEST: §e[NPC] §dSirih§f: §rOink.
      */
     private val sirihLine by RepoPattern.pattern(
         "crimson.sirih.helper",
-        "§e\\[NPC] §dSirih§f: §rOink.",
+        "§e\\[NPC] §dSirih§f: §rOink\\.",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
