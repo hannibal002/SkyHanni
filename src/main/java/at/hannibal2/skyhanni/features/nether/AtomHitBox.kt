@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
@@ -38,7 +39,7 @@ object AtomHitBox {
         if (!config.enabled) return
 
         for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
-            val atom = AtomType.entries.firstOrNull { entity.wearingSkullTexture(it.texture) } ?: continue
+            val atom = AtomType.entries.firstOrNull { entity.wearingSkullTexture(it.skullTexture) } ?: continue
             if (!atom.isSelected()) continue
             atomsList[entity] = atom
         }
@@ -51,25 +52,27 @@ object AtomHitBox {
 
     enum class AtomType(
         val displayName: String,
-        val texture: String,
+        private val textureId: String,
         val color: Color,
     ) {
         EXE(
             "§aExe",
-            "ewogICJ0aW1lc3RhbXAiIDogMTY0NjA2NzI1MDA4NSwKICAicHJvZmlsZUlkIiA6ICJmNThkZWJkNTlmNTA0MjIyOGY2MDIyMjExZDRjMTQwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ1bnZlbnRpdmV0YWxlbnQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWU0NmEzOWE4ZTYxYTRkYTA3YjE3YWRlZjBlZTIyMDlmNjRkYThhZWI5YTliZDYxMTBhNGUyNGUzNWVkNzRmMyIKICAgIH0KICB9Cn0=",
+            "CRIMSON_ATOM_X",
             Color.GREEN,
         ),
         WAI(
             "§6Wai",
-            "ewogICJ0aW1lc3RhbXAiIDogMTY0NjA2NzE3MjQxNywKICAicHJvZmlsZUlkIiA6ICI0NDAzZGM1NDc1YmM0YjE1YTU0OGNmZGE2YjBlYjdkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJDaGFvc0NvbXB1dHJDbHViIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2Y4M2ZkZGY3YWE2ZmYzYzUwYWJhYzdlNmE3Nzk2ZTE1NWNjYTRjY2ZjZTQ1NzM0ZjY2ZTQxMWNiY2E5ODlhMDQiCiAgICB9CiAgfQp9",
+            "CRIMSON_ATOM_Y",
             Color.ORANGE,
         ),
         ZEE(
             "§5Zee",
-            "ewogICJ0aW1lc3RhbXAiIDogMTY0NjA2NzIyODA3MywKICAicHJvZmlsZUlkIiA6ICJhOGJhMGY1YTFmNjQ0MTgzODZkZGI3OWExZmY5ZWRlYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJDcmVlcGVyOTA3NSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS80ZThmMTlkZWYzMzA4NWRiNTY0OTA5ZmM4YzFiMmVhYmMwZWJjNTljZDg5NjY1ZjMxZTU4MGYxZmMyNDk3YjU4IgogICAgfQogIH0KfQ==",
+            "CRIMSON_ATOM_Z",
             Color.MAGENTA,
         ),
         ;
+
+        val skullTexture by lazy { SkullTextureHolder.getTexture(textureId) }
 
         override fun toString(): String = displayName
     }
