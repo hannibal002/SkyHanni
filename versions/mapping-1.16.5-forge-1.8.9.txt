@@ -188,15 +188,22 @@ net.minecraft.network.protocol.game.ClientboundAddMobPacket net.minecraft.networ
 net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.S0CPacketSpawnPlayer
 net.minecraft.network.protocol.game.ClientboundAnimatePacket net.minecraft.network.play.server.S0BPacketAnimation
 net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket net.minecraft.network.play.server.S23PacketBlockChange
+net.minecraft.network.protocol.game.ClientboundChatPacket net.minecraft.network.play.server.S02PacketChat
 net.minecraft.network.protocol.game.ClientboundContainerAckPacket net.minecraft.network.play.server.S32PacketConfirmTransaction
 net.minecraft.network.protocol.game.ClientboundContainerClosePacket net.minecraft.network.play.server.S2EPacketCloseWindow
 net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket net.minecraft.network.play.server.S2FPacketSetSlot
 net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.S19PacketEntityStatus
+net.minecraft.network.protocol.game.ClientboundKeepAlivePacket net.minecraft.network.play.server.S00PacketKeepAlive
+net.minecraft.network.protocol.game.ClientboundLevelChunkPacket net.minecraft.network.play.server.S21PacketChunkData
 net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.S28PacketEffect
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.S2APacketParticles
 net.minecraft.network.protocol.game.ClientboundLoginPacket net.minecraft.network.play.server.S01PacketJoinGame
 net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.network.play.server.S14PacketEntity
+net.minecraft.network.protocol.game.ClientboundMoveEntityPacket$Pos net.minecraft.network.play.server.S14PacketEntity$S15PacketEntityRelMove
+net.minecraft.network.protocol.game.ClientboundMoveEntityPacket$PosRot net.minecraft.network.play.server.S14PacketEntity$S17PacketEntityLookMove
+net.minecraft.network.protocol.game.ClientboundMoveEntityPacket$Rot net.minecraft.network.play.server.S14PacketEntity$S16PacketEntityLook
 net.minecraft.network.protocol.game.ClientboundOpenScreenPacket net.minecraft.network.play.server.S2DPacketOpenWindow
+net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket net.minecraft.network.play.server.S33PacketUpdateSign
 net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket net.minecraft.network.play.server.S38PacketPlayerListItem
 net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket net.minecraft.network.play.server.S13PacketDestroyEntities
 net.minecraft.network.protocol.game.ClientboundRotateHeadPacket net.minecraft.network.play.server.S19PacketEntityHeadLook
@@ -206,9 +213,12 @@ net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket net.minecraft
 net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket net.minecraft.network.play.server.S1BPacketEntityAttach
 net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecraft.network.play.server.S12PacketEntityVelocity
 net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.S04PacketEntityEquipment
+net.minecraft.network.protocol.game.ClientboundSetExperiencePacket net.minecraft.network.play.server.S1FPacketSetExperience
+net.minecraft.network.protocol.game.ClientboundSetHealthPacket net.minecraft.network.play.server.S06PacketUpdateHealth
 net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.S3BPacketScoreboardObjective
 net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket net.minecraft.network.play.server.S3EPacketTeams
 net.minecraft.network.protocol.game.ClientboundSetScorePacket net.minecraft.network.play.server.S3CPacketUpdateScore
+net.minecraft.network.protocol.game.ClientboundSetTimePacket net.minecraft.network.play.server.S03PacketTimeUpdate
 net.minecraft.network.protocol.game.ClientboundSetTitlesPacket net.minecraft.network.play.server.S45PacketTitle
 net.minecraft.network.protocol.game.ClientboundSoundPacket net.minecraft.network.play.server.S29PacketSoundEffect
 net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
@@ -217,11 +227,17 @@ net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraf
 net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.S20PacketEntityProperties
 net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.S1DPacketEntityEffect
 net.minecraft.network.protocol.game.ServerboundChatPacket net.minecraft.network.play.client.C01PacketChatMessage
+net.minecraft.network.protocol.game.ServerboundContainerAckPacket net.minecraft.network.play.client.C0FPacketConfirmTransaction
 net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraft.network.play.client.C0EPacketClickWindow
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.C02PacketUseEntity
+net.minecraft.network.protocol.game.ServerboundKeepAlivePacket net.minecraft.network.play.client.C00PacketKeepAlive
 net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.C03PacketPlayer
+net.minecraft.network.protocol.game.ServerboundMovePlayerPacket$Pos net.minecraft.network.play.client.C03PacketPlayer$C04PacketPlayerPosition
+net.minecraft.network.protocol.game.ServerboundMovePlayerPacket$PosRot net.minecraft.network.play.client.C03PacketPlayer$C06PacketPlayerPosLook
+net.minecraft.network.protocol.game.ServerboundMovePlayerPacket$Rot net.minecraft.network.play.client.C03PacketPlayer$C05PacketPlayerLook
 net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.C09PacketHeldItemChange
 net.minecraft.network.protocol.game.ServerboundPlayerActionPacket net.minecraft.network.play.client.C07PacketPlayerDigging
+net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket net.minecraft.network.play.client.C0BPacketEntityAction
 net.minecraft.network.protocol.game.ServerboundSwingPacket net.minecraft.network.play.client.C0APacketAnimation
 net.minecraft.network.protocol.game.ServerboundUseItemOnPacket net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 
@@ -282,6 +298,9 @@ net.minecraft.network.protocol.game.ServerboundPlayerActionPacket getAction() ge
 net.minecraft.network.protocol.game.ServerboundPlayerActionPacket getPos() getPosition()
 
 net.minecraft.network.protocol.game.ServerboundUseItemOnPacket hitResult.getBlockPos() getPos()
+
+net.minecraft.network.protocol.status.ClientboundPongResponsePacket net.minecraft.network.status.server.S01PacketPong
+net.minecraft.network.protocol.status.ServerboundPingRequestPacket net.minecraft.network.status.client.C01PacketPing
 
 net.minecraft.server.level.ServerPlayer net.minecraft.entity.player.EntityPlayerMP
 

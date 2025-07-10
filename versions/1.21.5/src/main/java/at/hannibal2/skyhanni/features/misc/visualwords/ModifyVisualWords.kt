@@ -45,39 +45,40 @@ object ModifyVisualWords {
         return textCache.getOrPut(orderedText) {
 
             var characters = mutableListOf<StyledCharacter>()
-            var hasCachedCharacters = false
-            var lastDiff = 1
             var replace = true
 
-            OrderedText { visitor ->
-                if (!hasCachedCharacters) {
-
-                    var lastIndex = 0
-                    orderedText.accept { index, style, codePoint ->
-                        if (codePoint == -1) {
-                            replace = false
-                            return@accept true
-                        }
-                        lastDiff = index - lastIndex
-                        lastIndex = index
-                        characters.add(StyledCharacter(codePoint, style, index == 0))
-                        true
-                    }
-
-                    if (replace) characters = doReplacements(characters)
-
-                    hasCachedCharacters = true
+            orderedText.accept { index, style, codePoint ->
+                if (codePoint == -1) {
+                    replace = false
+                    return@accept true
                 }
-
-                var index = 0
-                for (character in characters) {
-                    if (!visitor.accept(index, character.style, character.codePoint)) {
-                        return@OrderedText false
-                    }
-                    index += lastDiff
-                }
+                characters.add(StyledCharacter(codePoint, style, index == 0))
                 true
             }
+
+            if (replace) characters = doReplacements(characters)
+
+            val outputTexts = mutableListOf<OrderedText>()
+            var lastStyle: Style? = null
+            val textStringBuilder = StringBuilder()
+
+            for (character in characters) {
+                if (character.style != lastStyle) {
+                    if (textStringBuilder.isNotEmpty())
+                        outputTexts.add(OrderedText.styledForwardsVisitedString(textStringBuilder.toString(), lastStyle))
+
+                    lastStyle = character.style
+
+                    textStringBuilder.clear()
+                }
+                textStringBuilder.appendCodePoint(character.codePoint)
+            }
+
+            if (textStringBuilder.isNotEmpty()) {
+                outputTexts.add(OrderedText.styledForwardsVisitedString(textStringBuilder.toString(), lastStyle))
+            }
+
+            OrderedText.concat(outputTexts)
         }
     }
 
