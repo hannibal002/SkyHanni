@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable
+package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
@@ -58,7 +59,10 @@ object UltraRareBookAlert {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(59, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
+
+        val pathBase = "inventory.experimentationTable"
+        event.move(93, "$pathBase.ultraRareBookAlert", "$pathBase.superpairs.ultraRareBookAlert")
     }
 
-    private fun isEnabled() = config.ultraRareBookAlert && ExperimentationTableApi.inSuperpairs
+    private fun isEnabled() = config.superpairs.ultraRareBookAlert && ExperimentationTableApi.inSuperpairs
 }

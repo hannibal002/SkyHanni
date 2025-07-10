@@ -25,7 +25,6 @@ data class TitleIntention(
     val internalName: String,
 )
 
-// todo 1.21 impl needed
 open class TitleContext(
     private var titleText: String = "",
     private var subtitleText: String? = null,
