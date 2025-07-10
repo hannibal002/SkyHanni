@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
@@ -95,7 +95,7 @@ object RareDropMessages {
         IslandType.KUUDRA_ARENA,
     )
 
-    private val userLuck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck
+    private val userLuck get() = UserLuckBreakdown.getTotalUserLuck()
 
     private val config get() = SkyHanniMod.feature.chat.rareDropMessages
 
@@ -149,7 +149,7 @@ object RareDropMessages {
         if (!anyRecentMessage && config.enchantedBookMissingMessage) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
             if (SkyHanniMod.feature.misc.userluckEnabled) {
-                userLuck?.takeIf { it != 0f }?.let { luck ->
+                userLuck.takeIf { it != 0f }?.let { luck ->
                     var luckString = luck.roundTo(2).addSeparators()
                     if (luck > 0) luckString = "+$luckString"
                     message += " §a($luckString ✴ SkyHanni User Luck)"

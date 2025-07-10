@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -12,7 +15,7 @@ import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object ExperimentationXPOverlay {
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.superpairs
 
     private val patternGroup = RepoPattern.group("enchanting.experiments")
 
@@ -33,7 +36,7 @@ object ExperimentationXPOverlay {
         "§3(?<xp>[\\d.]+)k Enchanting Exp",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!isEnabled()) return
         event.stack ?: return
@@ -45,5 +48,11 @@ object ExperimentationXPOverlay {
         }
     }
 
-    private fun isEnabled() = ExperimentationTableApi.inSuperpairs && config.superpairsXPOverlay
+    private fun isEnabled() = ExperimentationTableApi.inSuperpairs && config.xpOverlay
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val pathBase = "inventory.experimentationTable"
+        event.move(93, "$pathBase.superpairsXPOverlay", "$pathBase.superpairs.xpOverlay")
+    }
 }

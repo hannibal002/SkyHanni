@@ -132,13 +132,7 @@ val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
     this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
 
-val publishToModrinth by tasks.registering(PublishToModrinth::class) {
-    this.jarDirectory.set(rootProject.layout.buildDirectory.dir("downloadedJars"))
-    this.changelog = project.findProperty("changelog") as String
-    this.versionNumber = project.findProperty("modVersion") as String
-    this.modrinthToken = project.findProperty("modrinthToken") as String
-}
-
+val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
     this.javaLauncher.set(
