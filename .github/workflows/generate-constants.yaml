@@ -26,9 +26,10 @@ jobs:
                     cache: gradle
             -   name: Setup gradle
                 uses: gradle/gradle-build-action@v2
-            -   name: Generate Repo Patterns using Gradle
-                run: |
-                    ./gradlew generateRepoPatterns --stacktrace
+            -   name: Generate Repo Patterns using Gradle w/retry
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: generateRepoPatterns --stacktrace
             -   uses: actions/upload-artifact@v4
                 name: Upload generated repo regexes
                 with:
