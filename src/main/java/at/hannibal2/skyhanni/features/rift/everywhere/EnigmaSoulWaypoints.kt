@@ -193,8 +193,7 @@ object EnigmaSoulWaypoints {
 
         for ((slot, stack) in chest.getAllItems()) {
             enigmaTitlePattern.matchMatcher(stack.displayName.removeColor()) {
-                val cleanName = group("name")
-                if (cleanName in tracked) {
+                if (group("name") in tracked) {
                     slot.highlight(LorenzColor.DARK_PURPLE)
                 }
             }
