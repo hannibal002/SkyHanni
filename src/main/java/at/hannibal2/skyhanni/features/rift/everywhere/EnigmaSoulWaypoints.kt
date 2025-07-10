@@ -63,7 +63,7 @@ object EnigmaSoulWaypoints {
      * REGEX-TEST: ✔ Enigma: Woods Flower Pot
      */
     private val enigmaTitlePattern by patternGroup.pattern(
-        "rift.everywhere.enigma-souls.title",
+        "title",
         "(?:✔ )?Enigma: (?<name>.+)",
     )
 
@@ -71,7 +71,7 @@ object EnigmaSoulWaypoints {
      * REGEX-TEST: ✖ Not completed yet!
      */
     private val notCompletedPattern by patternGroup.pattern(
-        "rift.everywhere.enigma-souls.not-completed",
+        "not-completed",
         "✖ Not completed yet!",
     )
 
@@ -79,7 +79,7 @@ object EnigmaSoulWaypoints {
      * REGEX-TEST: To Rift Guide ➜ Wyld Woods
      */
     private val guideAreaPattern by patternGroup.pattern(
-        "rift.everywhere.enigma-souls.guide-area",
+        "guide-area",
         "To Rift Guide ➜ (?<area>.+)",
     )
 
@@ -88,7 +88,7 @@ object EnigmaSoulWaypoints {
      * REGEX-TEST: You have already found that Enigma Soul!
      */
     private val foundPattern by patternGroup.pattern(
-        "rift.everywhere.enigma-souls.found",
+        "found",
         "SOUL! You unlocked an Enigma Soul!|You have already found that Enigma Soul!",
     )
 
