@@ -15,7 +15,7 @@ class PartyCommandsConfig {
     @Expose
     @ConfigEditorBoolean
     @ConfigOption(name = "Self-Trigger Commands", desc = "Allow party chat commands to trigger on your own messages.")
-    public boolean selfTriggerCommands = false;
+    var selfTriggerCommands: Boolean = false
 
     @Expose
     @ConfigEditorBoolean
