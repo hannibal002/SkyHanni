@@ -8,7 +8,10 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityMob
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 //#if MC < 1.21
 import net.minecraft.network.play.server.S0FPacketSpawnMob
@@ -26,33 +29,36 @@ object FixGhostEntities {
 
     private var recentlyRemovedEntities = ArrayDeque<Int>()
     private var recentlySpawnedEntities = ArrayDeque<Int>()
+    private val hiddenEntityIds = mutableListOf<Int>()
 
     @HandleEvent
     fun onWorldChange() {
         recentlyRemovedEntities = ArrayDeque()
         recentlySpawnedEntities = ArrayDeque()
+        hiddenEntityIds.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveCurrentShield(event: PacketReceivedEvent) {
-        if (!isEnabled()) return
+    fun onPacketReceive(event: PacketReceivedEvent) {
+        if (!config.fixGhostEntities) return
         // Disable in Kuudra for now - causes players to randomly disappear in supply phase
         // TODO: Remove once fixed
-        if (KuudraApi.inKuudra()) return
 
-        val packet = event.packet
+        // Disabled on modern versions as the detection is not fully correct leading to incorrect hiding of entities
+        // TODO fix this
+        if (KuudraApi.inKuudra || !PlatformUtils.IS_LEGACY) return
 
-        when (packet) {
+        when (val packet = event.packet) {
             is S0CPacketSpawnPlayer -> {
                 if (packet.entityID in recentlyRemovedEntities) {
-                    event.cancel()
+                    hiddenEntityIds.add(packet.entityID)
                 }
                 recentlySpawnedEntities.addLast(packet.entityID)
             }
             //#if MC < 1.21
             is S0FPacketSpawnMob -> {
                 if (packet.entityID in recentlyRemovedEntities) {
-                    event.cancel()
+                    hiddenEntityIds.add(packet.entityID)
                 }
                 recentlySpawnedEntities.addLast(packet.entityID)
             }
@@ -66,18 +72,27 @@ object FixGhostEntities {
                             recentlyRemovedEntities.removeFirst()
                         }
                     }
+                    hiddenEntityIds.remove(entityID)
                 }
             }
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
-        if (!config.hideTemporaryArmorstands) return
-        with(event.entity) {
-            if (ticksExisted < 10 && isDefaultValue() && getAllEquipment().all { it == null }) event.cancel()
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (config.hideTemporaryArmorstands && event.entity is EntityArmorStand) {
+            with(event.entity) {
+                if (ticksExisted < 10 && isDefaultValue() && getAllEquipment().all { it == null }) {
+                    event.cancel()
+                }
+            }
+        }
+        if (config.fixGhostEntities && (event.entity is EntityMob || event.entity is EntityPlayer)) {
+            with(event.entity) {
+                if (hiddenEntityIds.contains(entityId)) {
+                    event.cancel()
+                }
+            }
         }
     }
-
-    fun isEnabled() = config.fixGhostEntities
 }
