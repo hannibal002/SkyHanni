@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -179,8 +178,8 @@ object CFStrayTracker {
 
         add(
             Renderable.hoverTips(
-                "§6§lStray Tracker".partyModeReplace(),
-                tips = listOf("§a+§b$formattedExtraTime §afrom strays§7".partyModeReplace()),
+                CFApi.partyModeReplace("§6§lStray Tracker"),
+                tips = listOf(CFApi.partyModeReplace("§a+§b$formattedExtraTime §afrom strays§7")),
             ).toSearchable(),
         )
         HoppityApi.hoppityRarities.forEach { rarity ->
@@ -196,13 +195,14 @@ object CFStrayTracker {
         val extraChocFormat = rarityExtraChocMs?.format().orEmpty()
 
         val colorCode = rarity.chatColorCode
-        val lineHeader = "$colorCode${rarity.toString().lowercase().replaceFirstChar { it.uppercase() }}§7: §r$colorCode"
-        val lineFormat = "$lineHeader$caughtString".partyModeReplace()
+        val lineHeader =
+            "$colorCode${rarity.toString().lowercase().replaceFirstChar { it.uppercase() }}§7: §r$colorCode"
+        val lineFormat = CFApi.partyModeReplace("$lineHeader$caughtString")
 
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
             if (rarity == LEGENDARY) tip += extractGoldenTypesCaught(data)
-            Renderable.hoverTips(StringRenderable(lineFormat), tips = tip.partyModeReplace().split("\n"))
+            Renderable.hoverTips(StringRenderable(lineFormat), tips = CFApi.partyModeReplace(tip).split("\n"))
         } ?: StringRenderable(lineFormat)
         return renderable.toSearchable(rarity.toString())
     }

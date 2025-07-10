@@ -45,7 +45,25 @@ object ModernPatterns {
      */
     val currentTreeProgressPattern by RepoPattern.pattern(
         "foraging.tree.progress",
-        "(?<treeType>§.§l\\w+) TREE §r§b§l(?<percent>\\d+)%"
+        "(?<treeType>§.§l\\w+) TREE §r§b§l(?<percent>\\d+)%",
     )
 
+    /**
+     * REGEX-TEST: §cNope the Fish
+     * REGEX-TEST: §cCluck the Fish
+     * REGEX-TEST: §cHerring the Fish
+     */
+    val coralFishNamePattern by RepoPattern.pattern(
+        "misc.coral.fish.name",
+        "§c(?<fishName>\\w+ the Fish)",
+    )
+
+    /**
+     * REGEX-TEST: Fish Shown: 1/31
+     * REGEX-TEST: Fish Shown: 15/31
+     */
+    val coralFishFoundPattern by RepoPattern.pattern(
+        "misc.coral.fish.shown",
+        "Fish Shown: (?<found>\\d+)/(?<total>\\d+)",
+    )
 }

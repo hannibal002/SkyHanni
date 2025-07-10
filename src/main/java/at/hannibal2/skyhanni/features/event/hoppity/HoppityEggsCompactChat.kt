@@ -22,7 +22,7 @@ import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-typealias RarityType = HoppityChatConfig.CompactRarityTypes
+private typealias RarityType = HoppityChatConfig.CompactRarityTypes
 
 @SkyHanniModule
 object HoppityEggsCompactChat {
