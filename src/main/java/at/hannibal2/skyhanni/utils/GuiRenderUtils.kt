@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.utils
+
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
@@ -285,7 +286,7 @@ object GuiRenderUtils {
         y: Int,
         width: Int,
         height: Int,
-        light : Int = -0xcfcfca,
+        light: Int = -0xcfcfca,
         dark: Int = -0xefefea,
         shadow: Boolean = true,
     ) {
