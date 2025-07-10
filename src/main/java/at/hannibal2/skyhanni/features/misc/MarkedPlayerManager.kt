@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -15,8 +16,10 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 
 @SkyHanniModule
@@ -161,16 +164,15 @@ object MarkedPlayerManager {
 
         currentLobbyPlayers.clear()
 
-        loop@ for (line in event.lines) {
-            tabPlayerName.matchMatcher(line) {
-                val name = group("name")
-                if (name == LorenzUtils.getPlayerName()) continue@loop
+        tabPlayerName.matchAll(event.lines) {
+            val name = group("name")
+            if (name != PlayerUtils.getName()) {
                 currentLobbyPlayers.add(name)
             }
         }
 
-        val playerJoined = currentLobbyPlayers.filter { it in personOfInterest && it !in notifyList }
-        val playerLeft = personOfInterest.filter { it in notifyList && it !in currentLobbyPlayers }
+        val playerJoined = currentLobbyPlayers.filter { it in personOfInterest && it !in notifyList }.toSet()
+        val playerLeft = personOfInterest.filter { it in notifyList && it !in currentLobbyPlayers }.toSet()
 
         if (playerJoined.isNotEmpty()) {
             ChatUtils.chat(
