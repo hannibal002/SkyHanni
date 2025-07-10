@@ -2,11 +2,10 @@ package at.hannibal2.skyhanni.features.gifting
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -26,10 +25,10 @@ object GiftApi {
 
     private var holdingGift = false
 
-    fun isHoldingGift() = LorenzUtils.inSkyBlock && holdingGift
+    fun isHoldingGift() = SkyBlockUtils.inSkyBlock && holdingGift
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         holdingGift = false
     }
 

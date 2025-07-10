@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
 import kotlin.math.ceil
 
 object RenderableInventory {
 
-    private val inventoryTextures = ResourceLocation("skyhanni", "gui/slot.png")
+    private val inventoryTextures = createResourceLocation("skyhanni", "gui/slot.png")
     private const val TEXTURE_WIDTH = 90
     private const val TEXTURE_HEIGHT = 54
 

@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -84,7 +85,7 @@ object CroesusChestTracker {
                 val state = run.openState ?: OpenedState.UNOPENED
 
                 if (state != OpenedState.KEY_USED) {
-                    slot highlight if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
+                    slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
                 }
             }
         }
@@ -134,7 +135,7 @@ object CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null) run.floor =
-                (if (masterPattern.matches(item.name)) "M" else "F") + (
+                (if (masterPattern.matches(item.displayName)) "M" else "F") + (
                     lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
@@ -147,7 +148,7 @@ object CroesusChestTracker {
                     "Croesus Chest couldn't be read correctly.",
                     "Open state check failed for chest.",
                     "run" to run,
-                    "lore" to lore
+                    "lore" to lore,
                 ).run { null }
             }
         }
@@ -156,7 +157,7 @@ object CroesusChestTracker {
     private fun pageSetup(event: InventoryFullyOpenedEvent) {
         inCroesusInventory = true
         pageSwitchable = true
-        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.name)
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.displayName)
         if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.arrow) {
             currentPage = 0
         }
@@ -203,7 +204,7 @@ object CroesusChestTracker {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
-        if (!kismetPattern.matches(event.stack.name)) return
+        if (!kismetPattern.matches(event.stack.displayName)) return
         if (kismetUsedPattern.matches(event.stack.getLore().lastOrNull())) return
         event.stackTip = "§a$kismetAmountCache"
     }
@@ -259,10 +260,19 @@ object CroesusChestTracker {
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }
 
-    fun resetChest() = croesusChests?.let {
-        it.clear()
-        it.addAll(generateMaxChest())
-        ChatUtils.chat("Kismet State was Reset!")
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetkismet") {
+            description = "Resets the saved values of the applied kismet feathers in Croesus"
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                croesusChests?.let {
+                    it.clear()
+                    it.addAll(generateMaxChest())
+                    ChatUtils.chat("Kismet State was Reset!")
+                }
+            }
+        }
     }
 
     @JvmStatic

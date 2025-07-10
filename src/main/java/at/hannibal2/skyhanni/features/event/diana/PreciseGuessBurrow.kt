@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.GuessLogic
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
@@ -24,10 +23,12 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
+    private var newBurrow = true
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onWorldChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         bezierFitter.reset()
+        newBurrow = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
@@ -52,7 +53,8 @@ object PreciseGuessBurrow {
 
         val guessPosition = guessBurrowLocation() ?: return
 
-        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock(), precise = true).post()
+        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock(), precise = bezierFitter.count() > 5, new = newBurrow).post()
+        newBurrow = false
     }
 
     private fun guessBurrowLocation(): LorenzVec? = bezierFitter.solve()
@@ -72,6 +74,7 @@ object PreciseGuessBurrow {
         }
         bezierFitter.reset()
         lastDianaSpade = SimpleTimeMark.now()
+        newBurrow = true
     }
 
     @HandleEvent

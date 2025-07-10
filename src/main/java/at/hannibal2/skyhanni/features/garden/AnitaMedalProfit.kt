@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -18,13 +17,16 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -35,10 +37,20 @@ object AnitaMedalProfit {
 
     var inInventory = false
 
-    enum class MedalType(val displayName: String, val factorBronze: Int) {
-        GOLD("§6Gold medal", 8),
-        SILVER("§fSilver medal", 2),
-        BRONZE("§cBronze medal", 1),
+    enum class MedalType(
+        val displayName: String,
+        val simpleName: String = displayName.removeColor().split(" ")[0],
+        val factorBronze: Int,
+        val color: LorenzColor = displayName.substring(1, 2)[0].toLorenzColor() ?: LorenzColor.WHITE,
+    ) {
+        GOLD("§6Gold medal", "gold", 8),
+        SILVER("§fSilver medal", "silver", 2),
+        BRONZE("§cBronze medal", "bronze", 1),
+        ;
+
+        companion object {
+            fun bySimpleNameOrNull(name: String) = entries.firstOrNull { it.simpleName == name }
+        }
     }
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
@@ -62,9 +74,9 @@ object AnitaMedalProfit {
                 readItem(slot, item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in AnitaMedalProfit while reading item '${item.itemName}'",
+                    e, "Error in AnitaMedalProfit while reading item '${item.repoItemName}'",
                     "item" to item,
-                    "name" to item.itemName,
+                    "name" to item.repoItemName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                 )
             }
@@ -72,7 +84,7 @@ object AnitaMedalProfit {
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eProfit per Bronze Medal"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
+        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
 
@@ -138,21 +150,20 @@ object AnitaMedalProfit {
         }
     }
 
-    private fun isInvalidItemName(itemName: String): Boolean = when (itemName) {
+    private val invalidItemNames = listOf(
         " ",
         "§cClose",
         "§eUnique Gold Medals",
         "§aMedal Trades",
-        -> true
+    )
 
-        else -> false
-    }
+    private fun isInvalidItemName(itemName: String): Boolean = itemName in invalidItemNames
 
     private fun getItemName(item: ItemStack): String {
-        val name = item.name
+        val name = item.displayName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
-            item.itemName
+            item.repoItemName
         } else name
     }
 
@@ -206,7 +217,7 @@ object AnitaMedalProfit {
                     ErrorManager.logErrorStateWithData(
                         "Error in Anita Medal Contest", "Could not read item amount",
                         "rawItemName" to rawItemName,
-                        "name" to item.name,
+                        "name" to item.displayName,
                         "lore" to lore,
                     )
                     continue

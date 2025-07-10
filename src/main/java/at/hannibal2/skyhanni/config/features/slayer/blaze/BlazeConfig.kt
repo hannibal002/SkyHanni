@@ -12,7 +12,7 @@ class BlazeConfig {
     @Expose
     @ConfigOption(name = "Hellion Shields", desc = "")
     @Accordion
-    var hellion: BlazeHellionConfig = BlazeHellionConfig()
+    val hellion: BlazeHellionConfig = BlazeHellionConfig()
 
     @Expose
     @ConfigOption(
@@ -46,5 +46,5 @@ class BlazeConfig {
 
     @Expose
     @ConfigLink(owner = BlazeConfig::class, field = "firePillarDisplay")
-    var firePillarDisplayPosition: Position = Position(400, -150, 3f)
+    val firePillarDisplayPosition: Position = Position(400, -150, 3f)
 }

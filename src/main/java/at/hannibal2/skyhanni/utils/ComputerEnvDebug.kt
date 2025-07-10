@@ -11,6 +11,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+//#if MC == 1.8.9
+import net.minecraftforge.fml.client.FMLClientHandler
+import net.minecraftforge.fml.common.Loader
+//#endif
 import java.lang.management.ManagementFactory
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
@@ -26,6 +30,7 @@ object ComputerEnvDebug {
         launcher(event)
         ram(event)
         uptime(event)
+        performanceMods(event)
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -69,7 +74,7 @@ object ComputerEnvDebug {
         if (firstStack.contains("org.multimc.EntryPoint.main")) {
             return Pair("MultiMC", false)
         }
-        if (firstStack.contains("net.digitalingot.vendor.")) {
+        if (firstStack.contains("net.digitalingot.vendor.") || firstStack.contains("net.digitalingot.rustextension.")) {
             return Pair("Feather Client", true)
         }
         return Pair(null, true)
@@ -86,6 +91,9 @@ object ComputerEnvDebug {
     }
 
     private fun java(event: DebugDataCollectEvent) {
+        // outdated java 8 is only a mc 1.8.9 thing. in mc 1.21 we have modern java 21 anyway
+        if (!PlatformUtils.IS_LEGACY) return
+
         event.title("Computer Java Version")
         val version = System.getProperty("java.version")
         val pattern = "1\\.8\\.0_(?<update>.*)".toPattern()
@@ -108,7 +116,7 @@ object ComputerEnvDebug {
                 return
             }
         }
-        event.addData("Unknwon java version: '$version'")
+        event.addData("Unknown java version: '$version'")
     }
 
     private fun os(event: DebugDataCollectEvent) {
@@ -121,7 +129,7 @@ object ComputerEnvDebug {
                 add("Exact name: $exactName")
             }
         } else {
-            event.addData("Unknwon OS: '$exactName'")
+            event.addData("Unknown OS: '$exactName'")
         }
     }
 
@@ -215,6 +223,45 @@ object ComputerEnvDebug {
     }
 
     private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
+
+    private fun performanceMods(event: DebugDataCollectEvent) {
+        if (PlatformUtils.isDevEnvironment) return
+        event.title("Performance Mods")
+        //#if MC < 1.21
+        val hasOptifine = FMLClientHandler.instance().hasOptifine()
+        val hasPatcher = Loader.isModLoaded("patcher")
+        if (!hasOptifine || !hasPatcher) {
+            event.addData {
+                add("Optifine is ${if (hasOptifine) "" else "not"} installed")
+                add("Patcher is ${if (hasPatcher) "" else "not"} installed")
+                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
+                if (!hasOptifine) {
+                    add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
+                }
+                if (!hasPatcher) {
+                    add("https://modrinth.com/mod/patcher")
+                }
+            }
+        } else {
+            event.addIrrelevant {
+                add("Optifine and Patcher are installed")
+            }
+        }
+        //#else
+        //$$ val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
+        //$$ if (!hasSodium) {
+        //$$     event.addData {
+        //$$         add("Sodium is not installed")
+        //$$         add("This mod greatly improve performance")
+        //$$         add("https://modrinth.com/mod/sodium")
+        //$$     }
+        //$$ } else {
+        //$$     event.addIrrelevant {
+        //$$         add("Sodium is installed")
+        //$$     }
+        //$$ }
+        //#endif
+    }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

@@ -11,12 +11,12 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirst
 
 @SkyHanniModule
 object GardenCropMilestoneInventory {
@@ -66,13 +66,13 @@ object GardenCropMilestoneInventory {
         val maxTier = GardenCropMilestones.getMaxTier()
         val maxCounter = GardenCropMilestones.getCropsForTier(maxTier, crop)
 
-        val index = event.toolTip.indexOfFirst(
-            "§5§o§7Rewards:",
+        val index = event.toolTipRemovedPrefix().indexOfFirst(
+            "§7Rewards:",
         ) ?: return
 
         val counter = crop.getCounter().toDouble()
         val percentage = counter / maxCounter
-        val percentageFormat = LorenzUtils.formatPercentage(percentage)
+        val percentageFormat = percentage.formatPercentage()
 
         event.toolTip.add(index, " ")
         val progressBar = StringUtils.progressBar(percentage, 19)

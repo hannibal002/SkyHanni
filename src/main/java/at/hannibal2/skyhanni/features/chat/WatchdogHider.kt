@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.message
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.util.IChatComponent
 
 @SkyHanniModule
@@ -23,7 +23,7 @@ object WatchdogHider {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
+        if (!SkyBlockUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
 
         when (event.message) {
             START_LINE -> {
@@ -32,7 +32,7 @@ object WatchdogHider {
             }
 
             ANNOUNCEMENT_LINE -> {
-                ChatUtils.deleteMessage("watchdog") { it.message == START_LINE }
+                ChatUtils.deleteMessage("watchdog") { it.chatMessage == START_LINE }
                 startLineComponent = null
                 inWatchdog = true
             }

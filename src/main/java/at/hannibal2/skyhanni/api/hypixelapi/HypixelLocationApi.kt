@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.api.hypixelapi
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -50,7 +49,9 @@ object HypixelLocationApi {
     var isGuest: Boolean = false
         private set
 
-    val config get() = SkyHanniMod.feature.dev.hypixelModApi
+    // TODO reenable the setting once the hypixel mod api works fine
+//     val config get() = SkyHanniMod.feature.dev.hypixelModApi
+    val config get() = false
 
     private val logger = LorenzLogger("debug/hypixel_api")
 

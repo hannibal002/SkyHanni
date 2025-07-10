@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.other
 import com.google.gson.annotations.Expose
 
 data class MayorJson(
-    @Expose val mayor: MayorInfo,
+    @Expose val mayor: MayorInfo?,
     @Expose val current: MayorElection?,
 )
 
@@ -14,7 +14,7 @@ data class MayorInfo(
     // Ministers won't exist,
     // when the current mayor is a special mayor
     @Expose val minister: Minister?,
-    @Expose val election: MayorElection,
+    @Expose val election: MayorElection?,
 )
 
 data class MayorElection(

@@ -14,17 +14,18 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
@@ -43,7 +44,7 @@ object BingoCardDisplay {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var displayMode = 0
 
-    fun command() {
+    private fun command() {
         reload()
     }
 
@@ -52,7 +53,7 @@ object BingoCardDisplay {
     }
 
     private fun toggleCommand() {
-        if (!LorenzUtils.isBingoProfile) {
+        if (!SkyBlockUtils.isBingoProfile) {
             ChatUtils.userError("This command only works on a bingo profile!")
             return
         }
@@ -92,8 +93,8 @@ object BingoCardDisplay {
                     tips = listOf("Click to run §e/bingo"),
                     onLeftClick = {
                         HypixelCommands.bingo()
-                    }
-                )
+                    },
+                ),
             )
         } else {
             if (!config.hideCommunityGoals.get()) {
@@ -201,7 +202,7 @@ object BingoCardDisplay {
                         it.highlight = !currentlyHighlighted
                         it.displayName
                         update()
-                    }
+                    },
                 )
             } else {
                 Renderable.string(display)
@@ -218,7 +219,7 @@ object BingoCardDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (!config.enabled) return
 
         val currentlyOpen = canEditDisplay()
@@ -228,7 +229,7 @@ object BingoCardDisplay {
         }
 
         if (config.quickToggle && ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
-            val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
+            val sneaking = MinecraftCompat.localPlayer.isSneaking
             if (lastSneak != sneaking) {
                 lastSneak = sneaking
                 if (sneaking) {
@@ -254,7 +255,7 @@ object BingoCardDisplay {
     @HandleEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         update()
     }
 
@@ -272,10 +273,17 @@ object BingoCardDisplay {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shbingotoggle") {
+        event.registerBrigadier("shbingotoggle") {
             description = "Toggle the bingo card display mode"
             category = CommandCategory.USERS_ACTIVE
             callback { toggleCommand() }
+        }
+        event.registerBrigadier("shreloadbingodata") {
+            description = "Reloads the bingo card data"
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                reload()
+            }
         }
     }
 }

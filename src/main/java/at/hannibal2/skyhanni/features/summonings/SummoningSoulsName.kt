@@ -4,17 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
@@ -24,13 +23,12 @@ import kotlin.time.Duration.Companion.minutes
 object SummoningSoulsName {
 
     private val SUMMONING_SOUL_TEXTURE by lazy { SkullTextureHolder.getTexture("SUMMONING_SOUL") }
-
     private val souls = mutableMapOf<EntityArmorStand, String>()
     private val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
     private val mobsName = TimeLimitedCache<Int, String>(6.minutes)
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
         if (!isEnabled()) return
 
         // TODO use packets instead of this
@@ -41,19 +39,17 @@ object SummoningSoulsName {
         for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (entity in souls) continue
 
-            if (entity.hasSkullTexture(SUMMONING_SOUL_TEXTURE)) {
-                val soulLocation = entity.getLorenzVec()
+            if (!entity.wearingSkullTexture(SUMMONING_SOUL_TEXTURE)) continue
+            val soulLocation = entity.getLorenzVec()
 
-                val map = mutableMapOf<Int, Double>()
-                for ((mob, loc) in mobsLastLocation) {
-                    val distance = loc.distance(soulLocation)
-                    map[mob] = distance
-                }
-
-                val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
-                if (nearestMob != null) {
-                    souls[entity] = mobsName[nearestMob] ?: continue
-                }
+            val map = mutableMapOf<Int, Double>()
+            for ((mob, loc) in mobsLastLocation) {
+                val distance = loc.distance(soulLocation)
+                map[mob] = distance
+            }
+            val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
+            if (nearestMob != null) {
+                souls[entity] = mobsName[nearestMob] ?: continue
             }
         }
 
@@ -83,11 +79,11 @@ object SummoningSoulsName {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         souls.clear()
         mobsLastLocation.clear()
         mobsName.clear()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.combat.summonings.summoningSoulDisplay
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.combat.summonings.summoningSoulDisplay
 }

@@ -5,17 +5,16 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.getPrevLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.projectile.EntityArrow
 import java.util.LinkedList
 import kotlin.time.DurationUnit
@@ -32,7 +31,7 @@ object ArrowTrail {
     private val listYourArrow: MutableList<Line> = LinkedList<Line>()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         val secondsAlive = config.secondsAlive.toDouble().toDuration(DurationUnit.SECONDS)
         val time = SimpleTimeMark.now()
@@ -43,7 +42,7 @@ object ArrowTrail {
 
         for (arrow in EntityUtils.getEntities<EntityArrow>()) {
             val line = Line(arrow.getPrevLorenzVec(), arrow.getLorenzVec(), deathTime)
-            if (arrow.shootingEntity == Minecraft.getMinecraft().thePlayer) {
+            if (arrow.shootingEntity.isLocalPlayer) {
                 listYourArrow.add(line)
             } else {
                 listAllArrow.add(line)
@@ -67,7 +66,7 @@ object ArrowTrail {
         }
     }
 
-    private fun isEnabled() = config.enabled && (LorenzUtils.inSkyBlock || OutsideSBFeature.ARROW_TRAIL.isSelected())
+    private fun isEnabled() = config.enabled && (SkyBlockUtils.inSkyBlock || OutsideSBFeature.ARROW_TRAIL.isSelected())
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {

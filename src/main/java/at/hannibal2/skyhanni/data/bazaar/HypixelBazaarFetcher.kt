@@ -3,19 +3,21 @@ package at.hannibal2.skyhanni.data.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -51,7 +53,7 @@ object HypixelBazaarFetcher {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!canFetch()) return
         if (ApiUtils.isBazaarDisabled()) return
         SkyHanniMod.launchIOCoroutine {
@@ -81,8 +83,8 @@ object HypixelBazaarFetcher {
 
     private fun process(products: Map<String, BazaarProduct>) = products.mapNotNull { (key, product) ->
         val internalName = NeuItems.transHypixelNameToInternalName(key)
-        val sellOfferPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
-        val instantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantBuyPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantSellPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
 
         if (product.quickStatus.isEmpty()) {
             return@mapNotNull null
@@ -91,10 +93,10 @@ object HypixelBazaarFetcher {
         if (internalName.getItemStackOrNull() == null) {
             // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in the ingame bazaar).
             // Should only include Enchants
-            if (!isUnobtainableBazaarProduct(key) && LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
+            if (!isUnobtainableBazaarProduct(key) && SkyHanniDebugsAndTests.enabled) println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
-        internalName to BazaarData(internalName.itemName, sellOfferPrice, instantBuyPrice, product)
+        internalName to BazaarData(internalName.repoItemName, instantBuyPrice, instantSellPrice, product)
     }.toMap()
 
     private fun isUnobtainableBazaarProduct(key: String): Boolean = when (key) {
@@ -143,12 +145,19 @@ object HypixelBazaarFetcher {
         }
     }
 
-    fun fetchNow() {
-        failedAttempts = 0
-        nextFetchIsManual = true
-        nextFetchTime = SimpleTimeMark.now()
-        ChatUtils.chat("Manually updating the bazaar prices right now..")
-    }
+    private fun canFetch() = SkyBlockUtils.onHypixel && nextFetchTime.isInPast()
 
-    private fun canFetch() = LorenzUtils.onHypixel && nextFetchTime.isInPast()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdatebazaarprices") {
+            description = "Forcefully updating the bazaar prices right now."
+            category = CommandCategory.USERS_BUG_FIX
+            callback {
+                failedAttempts = 0
+                nextFetchIsManual = true
+                nextFetchTime = SimpleTimeMark.now()
+                ChatUtils.chat("Manually updating the bazaar prices right now..")
+            }
+        }
+    }
 }

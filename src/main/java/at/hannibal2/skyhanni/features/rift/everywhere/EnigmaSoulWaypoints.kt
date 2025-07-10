@@ -141,18 +141,17 @@ object EnigmaSoulWaypoints {
         if (!isEnabled() || !inInventory) return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getAllItems()) {
             for (soul in trackedSouls) {
                 if (stack.displayName.removeColor().contains(soul)) {
-                    slot highlight LorenzColor.DARK_PURPLE
+                    slot.highlight(LorenzColor.DARK_PURPLE)
                 }
             }
         }
         if (!adding) {
-            chest.inventorySlots[31] highlight LorenzColor.DARK_PURPLE
+            chest.inventorySlots[31].highlight(LorenzColor.DARK_PURPLE)
         }
     }
 

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
+import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
@@ -33,7 +34,7 @@ object PlayerChatModifier {
         }
         val clickEvent = chatComponent.chatStyle.chatClickEvent ?: return
         clickEvent.action ?: return
-        if (clickEvents.any { it.value == clickEvent.value }) return
+        if (clickEvents.any { it.value() == clickEvent.value() }) return
         clickEvents.add(clickEvent)
     }
 
@@ -43,7 +44,7 @@ object PlayerChatModifier {
         }
         val hoverEvent = chatComponent.chatStyle.chatHoverEvent ?: return
         hoverEvent.action ?: return
-        if (hoverEvents.any { it.value == hoverEvent.value }) return
+        if (hoverEvents.any { it.value() == hoverEvent.value() }) return
         hoverEvents.add(hoverEvent)
     }
 

@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrade
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.guide.GuideScrollPage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import java.text.DecimalFormat
 
 class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
@@ -32,7 +33,7 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
             FortuneUpgrades.getCropSpecific(null) // TODO
         }
 
-        FarmingItems.resetClickState()
+        FarmingItemType.resetClickState()
         update(
             content = buildList {
                 add(header())
@@ -63,15 +64,15 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
             )
         )
         add(
-            Renderable.itemStackWithTip(
+            ItemStackRenderable(
                 requiredItem.getItemStack(),
                 8.0 / 9.0,
                 verticalAlign = VerticalAlignment.CENTER
-            )
+            ).withTip()
         )
         add(
             Renderable.wrappedString(
-                requiredItem.itemName.let { if (itemQuantity == 1) it else "$it §fx$itemQuantity" }, // TODO wtf
+                requiredItem.repoItemName.let { if (itemQuantity == 1) it else "$it §fx$itemQuantity" }, // TODO wtf
                 70,
                 0.75,
                 verticalAlign = VerticalAlignment.CENTER

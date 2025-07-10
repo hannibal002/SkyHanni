@@ -34,12 +34,12 @@ class DianaConfig {
     @FeatureToggle
     var guess: Boolean = false
 
-    enum class GuessLogic(private val display: String) {
+    enum class GuessLogic(private val displayName: String) {
         SOOPY_GUESS("Soopy"),
         PRECISE_GUESS("Precise"),
         ;
 
-        override fun toString(): String = display
+        override fun toString(): String = displayName
     }
 
     @Expose
@@ -89,12 +89,12 @@ class DianaConfig {
     @Expose
     @ConfigOption(name = "Ignored Warps", desc = "")
     @Accordion
-    var ignoredWarps: IgnoredWarpsConfig = IgnoredWarpsConfig()
+    val ignoredWarps: IgnoredWarpsConfig = IgnoredWarpsConfig()
 
     @Expose
     @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
     @Accordion
-    var inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
+    val inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
 
     @Expose
     @ConfigOption(
@@ -108,16 +108,15 @@ class DianaConfig {
     @Expose
     @ConfigOption(name = "Diana Profit Tracker", desc = "")
     @Accordion
-    var dianaProfitTracker: DianaProfitTrackerConfig = DianaProfitTrackerConfig()
+    val dianaProfitTracker: DianaProfitTrackerConfig = DianaProfitTrackerConfig()
 
-    // TODO rename mythologicalMobTracker
     @Expose
     @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
-    var mythologicalMobtracker: MythologicalMobTrackerConfig = MythologicalMobTrackerConfig()
+    val mythologicalMobtracker: MythologicalMobTrackerConfig = MythologicalMobTrackerConfig()
 
     @Expose
     @ConfigOption(name = "All Burrows List", desc = "")
     @Accordion
-    var allBurrowsList: AllBurrowsListConfig = AllBurrowsListConfig()
+    val allBurrowsList: AllBurrowsListConfig = AllBurrowsListConfig()
 }

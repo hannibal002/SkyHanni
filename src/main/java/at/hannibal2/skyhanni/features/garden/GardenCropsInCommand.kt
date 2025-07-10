@@ -1,20 +1,25 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 
+@SkyHanniModule
 object GardenCropsInCommand {
 
     private val config get() = GardenApi.config.moneyPerHours
 
-    fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         if (!config.display) {
             ChatUtils.userError("shcropsin requires 'Show money per Hour' feature to be enabled to work!")
             return
@@ -44,10 +49,10 @@ object GardenCropsInCommand {
         val map = mutableMapOf<String, Long>()
         for (entry in multipliers) {
             val internalName = entry.key
-            val itemName = internalName.itemName
+            val itemName = internalName.repoItemName
             if (itemName.removeColor().lowercase().contains(searchName)) {
                 val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
-                val baseName = baseId.itemName
+                val baseName = baseId.repoItemName
                 val crop = CropType.getByName(baseName.removeColor())
 
                 val speed = crop.getSpeed()
@@ -67,5 +72,14 @@ object GardenCropsInCommand {
         }
 
         ChatUtils.chat("Crops farmed in $rawTime:\n" + map.sorted().keys.joinToString("\n"))
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcropsin") {
+            description = "Calculates with your current crop per second how many items you can collect in this amount of time"
+            category = CommandCategory.USERS_ACTIVE
+            legacyCallbackArgs { onCommand(it) }
+        }
     }
 }

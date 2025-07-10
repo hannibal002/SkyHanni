@@ -17,9 +17,15 @@ object BlockData {
             val blockState = event.packet.blockState ?: return
             ServerBlockChangeEvent(blockPos, blockState).post()
         } else if (event.packet is S22PacketMultiBlockChange) {
+            //#if MC < 1.21
             for (block in event.packet.changedBlocks) {
                 ServerBlockChangeEvent(block.pos, block.blockState).post()
             }
+            //#else
+            //$$ event.packet.visitUpdates { pos, state ->
+            //$$     ServerBlockChangeEvent(pos, state).post()
+            //$$ }
+            //#endif
         }
     }
 }

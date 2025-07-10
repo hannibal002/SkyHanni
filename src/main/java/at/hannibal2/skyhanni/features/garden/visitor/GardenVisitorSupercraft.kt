@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
@@ -26,7 +26,7 @@ object GardenVisitorSupercraft {
 
     private var hasIngredients = false
     private var lastClick = SimpleTimeMark.farPast()
-    private var lastSuperCraftMaterial = ""
+    private var lastSuperCraftMaterial = NeuInternalName.NONE
 
     private val superCraftItem by lazy {
         ItemUtils.createItemStack(
@@ -84,7 +84,7 @@ object GardenVisitorSupercraft {
         hasIngredients = true
         for ((key, value) in requiredIngredients) {
             val sackItem = key.getAmountInSacks()
-            lastSuperCraftMaterial = internalName.asString()
+            lastSuperCraftMaterial = internalName
             if (sackItem < value * (amount - amountInSacks)) {
                 hasIngredients = false
                 break

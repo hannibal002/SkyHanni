@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
-import org.lwjgl.input.Mouse
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 
 abstract class ScrollInput(
     private val scrollValue: ScrollValue,
@@ -62,10 +62,10 @@ abstract class ScrollInput(
             override fun update(isValid: Boolean) {
                 if (maxValue < minValue) return
                 if (!isValid || !isMouseEventValid()) return
-                if (dragScrollMouseButton != null && Mouse.isButtonDown(dragScrollMouseButton)) {
-                    scroll += Mouse.getEventDY() * velocity
+                if (dragScrollMouseButton != null && MouseCompat.isButtonDown(dragScrollMouseButton)) {
+                    scroll += MouseCompat.getEventDY() * velocity
                 }
-                val deltaWheel = Mouse.getEventDWheel()
+                val deltaWheel = MouseCompat.getScrollDelta()
                 scroll += -deltaWheel.coerceIn(-1, 1) * 2.5 * velocity
                 coerceInLimit()
             }
@@ -116,16 +116,16 @@ class ScrollValue {
     }
 
     fun isMouseEventValid(): Boolean {
-        val mouseEvent = Mouse.getEventNanoseconds()
+        val mouseEvent = MouseCompat.getEventNanoseconds()
         val mouseEventsValid = mouseEvent - mouseEventTime > 20L
         mouseEventTime = mouseEvent
         return mouseEventsValid
     }
 
     fun isPureScrollEvent(): Boolean {
-        val mouseX = Mouse.getEventX()
-        val mouseY = Mouse.getEventY()
-        val isScrollEvent = Mouse.getEventDWheel() != 0
+        val mouseX = MouseCompat.getEventX()
+        val mouseY = MouseCompat.getEventY()
+        val isScrollEvent = MouseCompat.getScrollDelta() != 0
         val hasMouseMoved = mouseX != lastMouseX || mouseY != lastMouseY
 
         // Update last mouse position

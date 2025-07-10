@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.neu;
 
-import at.hannibal2.skyhanni.features.misc.FairySoulPathFind;
+import at.hannibal2.skyhanni.features.misc.NeuSoulPathFind;
 import io.github.moulberry.notenoughupdates.miscfeatures.FairySouls;
 import net.minecraft.util.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 @Pseudo
 @Mixin(value = FairySouls.class, remap = false)
@@ -24,7 +25,10 @@ public class MixinFairySouls {
     private Set<Integer> foundSoulsInLocation;
 
     @Shadow
-    private List<Integer> allSoulsInCurrentLocation;
+    private List<BlockPos> allSoulsInCurrentLocation;
+
+    @Shadow
+    private TreeMap<Double, BlockPos> missingSoulsDistanceSqMap;
 
     @Shadow
     private boolean showSouls;
@@ -40,13 +44,11 @@ public class MixinFairySouls {
         if (!showSouls || !trackSouls || currentLocation == null || closestMissingSouls.isEmpty()) {
             return;
         }
-        FairySoulPathFind.render();
+        NeuSoulPathFind.render();
     }
 
     @Inject(method = "refreshMissingSoulInfo", at = @At(value = "TAIL"))
     public void refreshMissingSoulInfo_skyhanni(CallbackInfo ci) {
-        int found = foundSoulsInLocation.size();
-        int total = allSoulsInCurrentLocation.size();
-        FairySoulPathFind.updateList(closestMissingSouls, found, total);
+        NeuSoulPathFind.updateList(allSoulsInCurrentLocation, missingSoulsDistanceSqMap);
     }
 }

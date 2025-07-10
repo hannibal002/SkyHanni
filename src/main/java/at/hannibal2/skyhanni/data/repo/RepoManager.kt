@@ -1,16 +1,21 @@
 package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import com.google.gson.JsonObject
 import net.minecraft.util.IChatComponent
 import org.apache.commons.io.FileUtils
@@ -26,7 +31,7 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import kotlin.time.Duration.Companion.minutes
+import java.time.Instant
 
 @SkyHanniModule
 object RepoManager {
@@ -82,6 +87,8 @@ object RepoManager {
     private var shouldManuallyReload = false
 
     private var currentlyFetching = false
+    var commitTime: SimpleTimeMark? = null
+        private set
 
     @JvmStatic
     fun updateRepo() {
@@ -121,13 +128,17 @@ object RepoManager {
 
     private fun doTheFetching(command: Boolean) {
         try {
-            val currentDownloadedCommit = readCurrentCommit()
+            val (currentDownloadedCommit, currentDownloadedCommitTime) = readCurrentCommit() ?: (null to null)
+            commitTime = currentDownloadedCommitTime
             var latestRepoCommit: String? = null
+            var latestRepoCommitTime: SimpleTimeMark? = null
             try {
                 InputStreamReader(URL(getCommitApiUrl()).openStream())
                     .use { inReader ->
                         val commits: JsonObject = gson.fromJson(inReader, JsonObject::class.java)
                         latestRepoCommit = commits["sha"].asString
+                        val formattedDate = commits["commit"].asJsonObject["committer"].asJsonObject["date"].asString
+                        latestRepoCommitTime = Instant.parse(formattedDate).toEpochMilli().asTimeMark()
                     }
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(
@@ -141,14 +152,45 @@ object RepoManager {
 
             if (repoLocation.exists() &&
                 currentDownloadedCommit == latestRepoCommit &&
-                unsuccessfulConstants.isEmpty() &&
-                lastRepoUpdate.passedSince() < 1.minutes
+                unsuccessfulConstants.isEmpty()
             ) {
                 if (command) {
-                    ChatUtils.chat("§7The repo is already up to date!")
+                    ChatUtils.clickToClipboard(
+                        "§7The repo is already up to date!",
+                        lines = buildList {
+                            add("latest commit sha: §e$currentDownloadedCommit")
+                            latestRepoCommitTime?.let { latestTime ->
+                                add("latest commit time: §b$latestTime")
+                                add("  (§b${latestTime.passedSince().format()} ago§7)")
+                            }
+                        },
+                    )
                     shouldManuallyReload = false
                 }
                 return
+            }
+            if (command) {
+                ChatUtils.clickToClipboard(
+                    "Repo is outdated, updating..",
+                    lines = buildList {
+                        add("local commit sha: §e$latestRepoCommit")
+                        currentDownloadedCommitTime?.let { localTime ->
+                            add("local commit time: §b$localTime")
+                            add("  (§b${localTime.passedSince().format()} ago§7)")
+                        }
+                        add("")
+                        add("latest commit sha: §e$currentDownloadedCommit")
+                        latestRepoCommitTime?.let<SimpleTimeMark, Unit> { latestTime ->
+                            add("latest commit time: §b$latestTime")
+                            add("  (§b${latestTime.passedSince().format()} ago§7)")
+                            currentDownloadedCommitTime?.let<SimpleTimeMark, Unit> { localTime ->
+                                val outdatedDuration = latestTime - localTime
+                                add("")
+                                add("outdated by: §b${outdatedDuration.format()}")
+                            }
+                        }
+                    },
+                )
             }
             lastRepoUpdate = SimpleTimeMark.now()
 
@@ -165,9 +207,9 @@ object RepoManager {
             repoLocation.mkdirs()
 
             try {
-                urlConnection.getInputStream().use { `is` ->
+                urlConnection.getInputStream().use { stream ->
                     FileUtils.copyInputStreamToFile(
-                        `is`,
+                        stream,
                         itemsZip,
                     )
                 }
@@ -186,8 +228,9 @@ object RepoManager {
                 repoLocation.absolutePath,
             )
             if (currentDownloadedCommit == null || currentDownloadedCommit != latestRepoCommit) {
-                writeCurrentCommit(latestRepoCommit)
+                writeCurrentCommit(latestRepoCommit, latestRepoCommitTime)
             }
+            commitTime = latestRepoCommitTime
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e,
@@ -195,6 +238,7 @@ object RepoManager {
                 "command" to command,
             )
             repoDownloadFailed = true
+            return
         }
         repoDownloadFailed = false
         usingBackupRepo = false
@@ -202,8 +246,6 @@ object RepoManager {
 
     private fun reloadRepository(answerMessage: String = "") {
         if (!shouldManuallyReload) return
-        // TODO move away
-        ErrorManager.resetCache()
         error = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
@@ -234,18 +276,23 @@ object RepoManager {
         }
     }
 
-    private fun writeCurrentCommit(commit: String?) {
+    private fun writeCurrentCommit(commit: String?, time: SimpleTimeMark?) {
         val newCurrentCommitJSON = JsonObject()
         newCurrentCommitJSON.addProperty("sha", commit)
+        time?.let {
+            newCurrentCommitJSON.addProperty("time", it.toMillis())
+        }
         try {
             writeJson(newCurrentCommitJSON, File(configLocation, "currentCommit.json"))
         } catch (ignored: IOException) {
         }
     }
 
-    private fun readCurrentCommit(): String? {
+    private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
         val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
-        return currentCommitJSON?.get("sha")?.asString
+        val sha = currentCommitJSON?.get("sha")?.asString
+        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark()
+        return sha?.let { it to time }
     }
 
     fun displayRepoStatus(joinEvent: Boolean) {
@@ -266,16 +313,16 @@ object RepoManager {
                 for (constant in unsuccessfulConstants) {
                     text.add("   §e- §7$constant".asComponent())
                 }
-                Text.multiline(text).send()
+                TextHelper.multiline(text).send()
             }
             return
         }
-        val currentCommit = readCurrentCommit()
+        val (currentDownloadedCommit, _) = readCurrentCommit() ?: (null to null)
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentCommit", prefixColor = "§a")
+            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentCommit", prefixColor = "§c")
+        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
@@ -379,11 +426,30 @@ object RepoManager {
 
             Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING)
             RepoUtils.unzipIgnoreFirstFolder(destinationPath.toAbsolutePath().toString(), repoLocation.absolutePath)
-            writeCurrentCommit("backup-repo")
+            writeCurrentCommit("backup-repo", time = null)
 
             println("Successfully switched to backup repo")
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed to switch to backup repo")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdaterepo") {
+            description = "Download the SkyHanni repo again"
+            category = CommandCategory.USERS_BUG_FIX
+            simpleCallback { updateRepo() }
+        }
+        event.registerBrigadier("shrepostatus") {
+            description = "Shows the status of all the mods constants"
+            category = CommandCategory.USERS_BUG_FIX
+            simpleCallback { displayRepoStatus(false) }
+        }
+        event.registerBrigadier("shreloadlocalrepo") {
+            description = "Reloading the local repo data"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { reloadLocalRepo() }
         }
     }
 }
