@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.utils.collection
 
 import com.google.common.cache.Cache
 import com.google.common.cache.RemovalCause
-import kotlin.time.Duration
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
 @Suppress("unused")
 class TimeAndSizeLimitedCache<K : Any, V : Any>(
