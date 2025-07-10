@@ -10,18 +10,18 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -31,9 +31,9 @@ object HoppityNpc {
 
     private var lastReminderSent = SimpleTimeMark.farPast()
     private var hoppityYearOpened
-        get() = ChocolateFactoryApi.profileStorage?.hoppityShopYearOpened ?: -1
+        get() = CFApi.profileStorage?.hoppityShopYearOpened ?: -1
         set(value) {
-            ChocolateFactoryApi.profileStorage?.hoppityShopYearOpened = value
+            CFApi.profileStorage?.hoppityShopYearOpened = value
         }
 
     private val slotsToHighlight = mutableSetOf<Int>()
@@ -53,7 +53,7 @@ object HoppityNpc {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
-        if (LorenzUtils.isStrandedProfile) return
+        if (SkyBlockUtils.isStrandedProfile) return
 
         if (hoppityYearOpened == SkyBlockTime.now().year) return
         if (!HoppityApi.isHoppityEvent()) return
@@ -110,8 +110,8 @@ object HoppityNpc {
         }
     }
 
-    private fun isHighlightEnabled() = LorenzUtils.inSkyBlock && config.highlightHoppityShop
-    private fun isReminderEnabled() = LorenzUtils.inSkyBlock && config.hoppityShopReminder
+    private fun isHighlightEnabled() = SkyBlockUtils.inSkyBlock && config.highlightHoppityShop
+    private fun isReminderEnabled() = SkyBlockUtils.inSkyBlock && config.hoppityShopReminder
 
     private fun clear() {
         inShop = false

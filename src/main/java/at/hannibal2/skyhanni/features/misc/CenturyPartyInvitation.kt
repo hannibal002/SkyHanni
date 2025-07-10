@@ -16,11 +16,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.awt.Color
@@ -28,6 +29,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object CenturyPartyInvitation {
+
     private val config get() = SkyHanniMod.feature.misc.centuryPartyInvitation
 
     private val playerColors = mutableMapOf<Mob, LorenzColor>()
@@ -98,16 +100,9 @@ object CenturyPartyInvitation {
         if (hand.getInternalNameOrNull() != "CENTURY_PARTY_INVITATION".toInternalName()) return emptySet()
 
         val set = mutableSetOf<LorenzColor>()
-        var read = false
-        for (line in hand.getLore()) {
-            if (itemMissingLineSeparatorPattern.matches(line)) {
-                read = true
-                continue
-            }
-            if (read) {
-                readLine(line, hand)?.let {
-                    set.add(it)
-                }
+        for (line in hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) })) {
+            readLine(line, hand)?.let {
+                set.add(it)
             }
         }
 
@@ -154,7 +149,7 @@ object CenturyPartyInvitation {
     }
 
     private fun addPlayer(mob: Mob) {
-        val displayName = mob.baseEntity.displayName.formattedText
+        val displayName = mob.baseEntity.name
         val colorCode = playerRankColorPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {
@@ -227,5 +222,5 @@ object CenturyPartyInvitation {
         highlight(color) { config.playerHighlighter && inHand }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.playerHighlighter
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.playerHighlighter
 }

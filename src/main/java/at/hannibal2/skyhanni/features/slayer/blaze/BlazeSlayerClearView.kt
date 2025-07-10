@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -49,7 +49,7 @@ object BlazeSlayerClearView {
         }
     }
 
-    private fun isEnabled() = SkyHanniMod.feature.slayer.blazes.clearView && nearBlaze
+    private fun isEnabled() = SlayerApi.config.blazes.clearView && nearBlaze
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

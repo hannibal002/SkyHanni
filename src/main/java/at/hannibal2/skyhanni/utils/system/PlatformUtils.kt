@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils.system
 
+import at.hannibal2.skyhanni.utils.VersionConstants
 import net.minecraftforge.fml.common.ModContainer
 //#if MC < 1.16
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.VersionConstants
 import kotlin.time.Duration.Companion.INFINITE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -23,7 +23,12 @@ import net.minecraftforge.fml.common.Loader
  */
 object PlatformUtils {
 
-    const val MC_VERSION = VersionConstants.MC_VERSION
+    //#if MC < 1.21
+    val MC_VERSION: String = VersionConstants.MC_VERSION
+    //#else
+    //$$ val MC_VERSION: String = net.minecraft.SharedConstants.getGameVersion().name
+    //#endif
+    val IS_LEGACY: Boolean = VersionConstants.MC_VERSION == "1.8.9"
 
     val isDevEnvironment: Boolean by lazy {
         //#if MC < 1.16
@@ -54,11 +59,24 @@ object PlatformUtils {
     private fun getModFromPackage(packageName: String?): ModInstance? = modPackages[packageName]?.let {
         ModInstance(it.modId, it.name, it.version)
     }
+    //#else
+    //$$ private fun getModFromPackage(packageName: String?): ModInstance? {
+    //$$    packageName ?: return null
+    //$$    if (packageName.startsWith("at.hannibal2.skyhanni")) return ModInstance("skyhanni", "SkyHanni", VersionConstants.MOD_VERSION)
+    //$$    return null
+    //$$ }
+    //#endif
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
-    //#else
-    //$$ fun Class<*>.getModInstance(): ModInstance? = null
-    //#endif
+
+    fun isModInstalled(modId: String): Boolean {
+        //#if FORGE
+        return Loader.isModLoaded(modId)
+        //#else
+        // TODO implement this for fabric
+        //$$ return false
+        //#endif
+    }
 
     private var validNeuInstalled = false
 
@@ -96,7 +114,6 @@ object PlatformUtils {
         DelayedRun.runNextTick { NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true)) }
         //#endif
     }
-
 }
 
 data class ModInstance(val id: String, val name: String, val version: String)

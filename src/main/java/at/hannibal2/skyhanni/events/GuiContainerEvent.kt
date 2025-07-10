@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.Slot
@@ -11,31 +11,31 @@ import net.minecraft.item.ItemStack
 abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : SkyHanniEvent() {
 
     data class BackgroundDrawnEvent(
+        override val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container)
+    ) : GuiContainerEvent(gui, container), Rendering
 
     data class PreDraw(
+        override val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container), Cancellable {
-        fun drawDefaultBackground() =
-            GuiRenderUtils.drawGradientRect(0, 0, gui.width, gui.height, -1072689136, -804253680, 0.0)
-    }
+    ) : GuiContainerEvent(gui, container), Cancellable, Rendering
 
     data class PostDraw(
+        override val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container)
+    ) : GuiContainerEvent(gui, container), Rendering
 
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
         GuiContainerEvent(gui, container), Cancellable
@@ -59,12 +59,13 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     }
 
     data class ForegroundDrawnEvent(
+        override val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container)
+    ) : GuiContainerEvent(gui, container), Rendering
 
     data class SlotClickEvent(
         override val gui: GuiContainer,
@@ -79,7 +80,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         fun makePickblock() {
             if (this.clickedButton == 2 && this.clickType == ClickType.MIDDLE) return
             slot?.slotNumber?.let { slotNumber ->
-                clickInventorySlot(slotNumber, container.windowId, 2, 3)
+                InventoryUtils.clickSlot(slotNumber, container.windowId, mouseButton = 2, mode = 3)
                 cancel()
             }
         }

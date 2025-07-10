@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import net.minecraft.client.gui.FontRenderer
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.item.ItemStack
 
 fun renderItemOverlayPost(
-    fr: FontRenderer,
+    context: DrawContext,
     stack: ItemStack?,
     xPosition: Int,
     yPosition: Int,
@@ -15,7 +15,7 @@ fun renderItemOverlayPost(
 ) {
     if (!SkyHanniDebugsAndTests.globalRender) return
     GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost(
-        fr,
+        context,
         stack,
         xPosition,
         yPosition,
@@ -23,7 +23,7 @@ fun renderItemOverlayPost(
     ).post()
 }
 
-fun renderItemReturn(stack: ItemStack, x: Int, y: Int) {
+fun renderItemReturn(context: DrawContext, stack: ItemStack, x: Int, y: Int) {
     if (!SkyHanniDebugsAndTests.globalRender) return
-    RenderGuiItemOverlayEvent(stack, x, y).post()
+    RenderGuiItemOverlayEvent(context, stack, x, y).post()
 }

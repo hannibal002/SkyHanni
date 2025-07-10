@@ -2,13 +2,11 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -16,8 +14,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -25,14 +23,14 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraft.network.play.client.C02PacketUseEntity.Action
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
 
     private var visitorJson = mapOf<String?, List<GardenVisitor>>()
 
-    private val config get() = GardenApi.config.visitors
+    private val config get() = VisitorApi.config
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -56,9 +54,8 @@ object HighlightVisitorsOutsideOfGarden {
     }
 
     private fun isVisitor(entity: Entity): Boolean {
-        // todo migrate to Skyhanni IslandType
-        val mode = HypixelData.mode
-        val possibleJsons = visitorJson[mode] ?: return false
+        val island = SkyBlockUtils.currentIsland.islandData?.apiName ?: return false
+        val possibleJsons = visitorJson[island] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
             (it.position == null || it.position.distance(entity.position.toLorenzVec()) < 1) &&
@@ -81,7 +78,7 @@ object HighlightVisitorsOutsideOfGarden {
         get() = when (config.blockInteracting) {
             VisitorBlockBehaviour.DONT -> false
             VisitorBlockBehaviour.ALWAYS -> true
-            VisitorBlockBehaviour.ONLY_ON_BINGO -> LorenzUtils.isBingoProfile
+            VisitorBlockBehaviour.ONLY_ON_BINGO -> SkyBlockUtils.isBingoProfile
             null -> false
         }
 
@@ -89,21 +86,18 @@ object HighlightVisitorsOutsideOfGarden {
         EntityUtils.getEntitiesNearby<EntityLivingBase>(location, 2.0).any { isVisitor(it) }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onClickEntity(event: PacketSentEvent) {
+    fun onClickEntity(event: EntityClickEvent) {
         if (!shouldBlock) return
-        val world = MinecraftCompat.localWorldOrNull ?: return
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-        if (player.isSneaking) return
-        val packet = event.packet as? C02PacketUseEntity ?: return
-        val entity = packet.getEntityFromWorld(world) ?: return
+        if (MinecraftCompat.localPlayer.isSneaking) return
+        val entity = event.clickedEntity ?: return
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
-            event.cancel()
-            if (packet.action == C02PacketUseEntity.Action.INTERACT) {
+            if (event.action != Action.INTERACT_AT) {
                 ChatUtils.chatAndOpenConfig(
                     "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                    GardenApi.config.visitors::blockInteracting,
+                    VisitorApi.config::blockInteracting,
                 )
             }
+            event.cancel()
         }
     }
 }

@@ -8,34 +8,11 @@ import net.minecraft.inventory.Container
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
-//#endif
-
-fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
-    windowId ?: return
-    val controller = Minecraft.getMinecraft().playerController ?: return
-    val player = Minecraft.getMinecraft().thePlayer ?: return
-    //#if FORGE
-    controller.windowClick(windowId, slot, mouseButton, mode, player)
-    //#else
-    //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
-    //#endif
-}
-
-fun GuiContainer.containerSlots(): List<Slot> =
-    //#if FORGE
-    inventorySlots.inventorySlots
-//#else
-//$$ screenHandler.slots
-//#endif
-
-private fun getWindowId(): Int? =
-    //#if FORGE
-    (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
-//#else
-//$$ (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
 //#endif
 
 fun EntityPlayerSP.getItemOnCursor(): ItemStack? {
@@ -53,7 +30,7 @@ fun slotUnderCursor(): Slot? {
     //#if FORGE
     return screen.slotUnderMouse
     //#else
-    //$$ return screen.getSlotUnderMouse()
+    //$$ return screen.focusedSlot
     //#endif
 }
 
@@ -78,4 +55,64 @@ object InventoryCompat {
         //#endif
     }
 
+
+    fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
+        windowId ?: return
+        val controller = Minecraft.getMinecraft().playerController ?: return
+        val player = Minecraft.getMinecraft().thePlayer ?: return
+        //#if FORGE
+        controller.windowClick(windowId, slot, mouseButton, mode, player)
+        //#else
+        //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
+        //#endif
+    }
+
+    fun containerSlots(container: GuiContainer): List<Slot> =
+        //#if FORGE
+        container.inventorySlots.inventorySlots
+//#else
+//$$ container.screenHandler.slots
+//#endif
+
+    private fun getWindowId(): Int? =
+        //#if FORGE
+        (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
+//#else
+//$$ (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
+//#endif
+
+    fun Array<ItemStack?>?.filterNotNullOrEmpty(): List<ItemStack>? {
+        return this?.filterNotNull()?.filter { it.isNotEmpty() }
+    }
+
+    fun Array<ItemStack?>?.convertEmptyToNull(): Array<ItemStack?>? {
+        if (this == null) return null
+        if (this.isEmpty()) return this
+        val new: MutableList<ItemStack?> = mutableListOf()
+        for (stack in this) {
+            if (!stack.isNotEmpty()) new.add(null)
+            else new.add(stack)
+        }
+        return new.normalizeAsArray()
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    fun ItemStack?.isNotEmpty(): Boolean {
+        contract {
+            returns(true) implies (this@isNotEmpty != null)
+        }
+        this ?: return false
+        //#if MC > 1.21
+        //$$ return !this.isEmpty
+        //#else
+        return true
+        //#endif
+    }
+
+    fun ItemStack?.orNull(): ItemStack? {
+        //#if MC > 1.21
+        //$$ return this?.takeUnless { it.isEmpty }
+        //#endif
+        return this
+    }
 }

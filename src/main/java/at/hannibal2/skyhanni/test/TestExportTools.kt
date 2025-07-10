@@ -11,8 +11,11 @@ import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
+//#if TODO
 import at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.json.NBTTypeAdapter
+//#endif
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
@@ -28,8 +31,10 @@ object TestExportTools {
 
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
+        //#if TODO
         .registerTypeAdapter(NBTTagCompound::class.java, NBTTypeAdapter)
         .registerTypeAdapterFactory(ItemStackTypeAdapterFactory)
+        //#endif
         .create()
 
     class Key<T> internal constructor(val name: String)
@@ -55,7 +60,7 @@ object TestExportTools {
     @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
-        val stack = event.guiContainer.slotUnderMouse?.stack ?: return
+        val stack = slotUnderCursor()?.stack ?: return
         if (config.copyItemData.isKeyHeld()) {
             copyItemToClipboard(stack)
             return

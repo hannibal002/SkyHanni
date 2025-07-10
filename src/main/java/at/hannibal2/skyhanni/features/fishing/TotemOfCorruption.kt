@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -13,13 +13,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playBeepSound
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -77,7 +77,7 @@ object TotemOfCorruption {
         if (!config.hideParticles) return
 
         for (totem in totems) {
-            if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0.0f) {
+            if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0f) {
                 if (totem.location.distance(event.location) < 4.0) {
                     event.cancel()
                 }
@@ -159,14 +159,14 @@ object TotemOfCorruption {
             val timeToWarn = config.warnWhenAboutToExpire.seconds
             if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uniqueID !in warnedTotems) {
                 playBeepSound(0.5f)
-                TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!", duration = 5.seconds)
+                TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
                 warnedTotems.add(totem.uniqueID)
             }
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }
 
-    private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay.get()
-    private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.outlineType != OutlineType.NONE
+    private fun isOverlayEnabled() = SkyBlockUtils.inSkyBlock && config.showOverlay.get()
+    private fun isEffectiveAreaEnabled() = SkyBlockUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
 
 private class Totem(

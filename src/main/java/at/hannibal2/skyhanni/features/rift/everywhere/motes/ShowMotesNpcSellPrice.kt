@@ -132,7 +132,7 @@ object ShowMotesNpcSellPrice {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList<Renderable> {
+    private fun drawDisplay() = buildList {
         addString("§7Item Values:")
         val sorted = itemMap.toList().sortedByDescending { it.second.second }.toMap().toMutableMap()
 
@@ -163,10 +163,8 @@ object ShowMotesNpcSellPrice {
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
         addString("§7Total price: §b$total")
-        val name = config.inventoryValue.formatType.get().toString()
-        addString("§7Price format: §c$name")
         addRenderableButton<NumberFormatEntry>(
-            label = "Format",
+            label = "Number Format",
             current = config.inventoryValue.formatType.get(),
             onChange = {
                 config.inventoryValue.formatType.set(it)
@@ -182,7 +180,6 @@ object ShowMotesNpcSellPrice {
     }
 
     private fun isShowPriceEnabled() = RiftApi.inRift() && config.showPrice
-
     private fun isInventoryValueEnabled() = RiftApi.inRift() && config.inventoryValue.enabled
 
     @HandleEvent

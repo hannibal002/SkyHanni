@@ -9,15 +9,16 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import kotlin.time.Duration.Companion.seconds
@@ -68,11 +69,15 @@ object ReplaceRomanNumerals {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled()) return
 
-        val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
+        val lore = event.getHoverEvent().value().formattedText.split("\n").toMutableList()
         lore.replaceAll { it.tryReplace() }
 
         val chatComponentText = lore.joinToString("\n").asComponent()
+        //#if MC < 1.21
         val hoverEvent = HoverEvent(event.component.chatStyle.chatHoverEvent?.action, chatComponentText)
+        //#else
+        //$$ val hoverEvent = HoverEvent.ShowText(chatComponentText)
+        //#endif
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
@@ -112,7 +117,7 @@ object ReplaceRomanNumerals {
 
     private fun String.coloredRomanToDecimal() = removeFormatting().let { replace(it, it.romanToDecimal().toString()) }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals.get()
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals.get()
 
     init {
         RecalculatingValue

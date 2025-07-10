@@ -27,7 +27,7 @@ import net.minecraft.util.EnumParticleTypes
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
 
-    private val config get() = RiftApi.config.area.livingCave.defenseBlockConfig
+    private val config get() = RiftApi.config.area.livingCave.defenseBlock
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
 
@@ -176,5 +176,9 @@ object LivingCaveDefenseBlocks {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.livingCaveConfig", "rift.area.livingCave")
+
+        val basePath = "rift.area.livingCave"
+        event.move(82, "$basePath.defenseBlockConfig", "$basePath.defenseBlock")
+        event.move(82, "$basePath.livingCaveLivingMetalConfig", "$basePath.livingMetal")
     }
 }

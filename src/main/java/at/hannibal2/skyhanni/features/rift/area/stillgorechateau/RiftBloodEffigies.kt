@@ -182,7 +182,7 @@ object RiftBloodEffigies {
                             event.drawDynamicText(location, "§7Unknown Time ($name)", 1.5)
                             continue
                         }
-                    } else if (config.respawningSoon && effigy.respawnTime.timeUntil() < config.respwningSoonTime.minutes) {
+                    } else if (config.respawningSoon && effigy.respawnTime.timeUntil() < config.respawningSoonTime.minutes) {
                         event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
                         val time = effigy.respawnTime.timeUntil().format()
                         event.drawDynamicText(location, "§e$name respawning in §b$time", 1.5)
@@ -216,5 +216,8 @@ object RiftBloodEffigies {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
+
+        val basePath = "rift.area.stillgoreChateau.bloodEffigies"
+        event.move(82, "$basePath.respwningSoonTime", "$basePath.respawningSoonTime")
     }
 }

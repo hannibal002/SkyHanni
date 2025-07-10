@@ -12,7 +12,8 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleContext
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -52,7 +52,7 @@ object GardenCropMilestoneDisplay {
     private val overflowConfig get() = config.overflow
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone
 
-    private var countdownTitleContext: TitleManager.TitleContext? = null
+    private var countdownTitleContext: TitleContext? = null
     private var lastTitleWarnedLevel = -1
     private var needsInventory = false
 
@@ -138,7 +138,7 @@ object GardenCropMilestoneDisplay {
             progressDisplay = drawProgressDisplay(it)
         }
 
-        if (config.next.bestDisplay && config.next.bestAlwaysOn || currentCrop != null) {
+        if (config.next.bestDisplay && config.next.bestAlwaysOn.get() || currentCrop != null) {
             GardenBestCropTime.display = GardenBestCropTime.drawBestDisplay(currentCrop)
         }
     }
@@ -196,10 +196,9 @@ object GardenCropMilestoneDisplay {
                 val missing = need - have
                 val missingTime = (missing / farmingFortuneSpeed).seconds
                 val millis = missingTime.inWholeMilliseconds
-                GardenBestCropTime.timeTillNextCrop[crop] = millis
+                GardenBestCropTime.timeTillNextCrop[crop] = millis.milliseconds
                 tryWarn(missingTime, "§b${crop.cropName} $nextTier in %t", crop)
-                // TODO, change functionality to use enum rather than ordinals
-                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+                val biggestUnit = config.highestTimeFormat.get().timeUnit
                 val duration = missingTime.format(biggestUnit)
                 val speedText = "§7In §b$duration"
                 lineMap[MilestoneTextEntry.TIME] = Renderable.string(speedText)
@@ -267,7 +266,7 @@ object GardenCropMilestoneDisplay {
             duration = timeLeft,
             addType = TitleManager.TitleAddType.FORCE_FIRST,
             countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
-            onInterval = SoundUtils::playBeepSound
+            onInterval = SoundUtils::playBeepSound,
         )
     }
 
@@ -323,8 +322,7 @@ object GardenCropMilestoneDisplay {
             val blocksPerSecond = speed * (GardenApi.getCurrentlyFarmedCrop()?.multiplier ?: 1)
 
             val missingTime = (missing / blocksPerSecond).seconds
-            // TODO, change functionality to use enum rather than ordinals
-            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+            val biggestUnit = config.highestTimeFormat.get().timeUnit
             val duration = missingTime.format(biggestUnit)
             lineMap[MushroomTextEntry.TIME] = Renderable.string("§7In §b$duration")
         }

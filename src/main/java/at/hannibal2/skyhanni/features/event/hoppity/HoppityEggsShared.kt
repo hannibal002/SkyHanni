@@ -3,14 +3,14 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
@@ -22,7 +22,7 @@ object HoppityEggsShared {
      * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453
      * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453 (hidden note)
      */
-    private val sharedEggPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val sharedEggPattern by CFApi.patternGroup.pattern(
         "egg.shared",
         ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?: \\((?<note>.*)\\))?"
     )
@@ -59,5 +59,5 @@ object HoppityEggsShared {
         HypixelCommands.allChat("[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z ($note)")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && waypointsConfig.enabled && waypointsConfig.shared
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && waypointsConfig.enabled && waypointsConfig.shared
 }

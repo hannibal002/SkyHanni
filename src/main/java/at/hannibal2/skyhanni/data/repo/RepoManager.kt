@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -243,8 +246,6 @@ object RepoManager {
 
     private fun reloadRepository(answerMessage: String = "") {
         if (!shouldManuallyReload) return
-        // TODO move away
-        ErrorManager.resetCache()
         error = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
@@ -287,10 +288,10 @@ object RepoManager {
         }
     }
 
-    private fun readCurrentCommit(): Pair<String, SimpleTimeMark>? {
+    private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
         val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
         val sha = currentCommitJSON?.get("sha")?.asString
-        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark() ?: SimpleTimeMark.farPast()
+        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark()
         return sha?.let { it to time }
     }
 
@@ -316,12 +317,12 @@ object RepoManager {
             }
             return
         }
-        val currentCommit = readCurrentCommit()
+        val (currentDownloadedCommit, _) = readCurrentCommit() ?: (null to null)
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentCommit", prefixColor = "§a")
+            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentCommit", prefixColor = "§c")
+        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
@@ -430,6 +431,25 @@ object RepoManager {
             println("Successfully switched to backup repo")
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed to switch to backup repo")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdaterepo") {
+            description = "Download the SkyHanni repo again"
+            category = CommandCategory.USERS_BUG_FIX
+            simpleCallback { updateRepo() }
+        }
+        event.registerBrigadier("shrepostatus") {
+            description = "Shows the status of all the mods constants"
+            category = CommandCategory.USERS_BUG_FIX
+            simpleCallback { displayRepoStatus(false) }
+        }
+        event.registerBrigadier("shreloadlocalrepo") {
+            description = "Reloading the local repo data"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { reloadLocalRepo() }
         }
     }
 }

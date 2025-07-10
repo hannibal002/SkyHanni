@@ -10,15 +10,13 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.init.Blocks
 
 @SkyHanniModule
 object ThunderSparksHighlight {
@@ -46,8 +44,7 @@ object ThunderSparksHighlight {
             if (spark.isDead) continue
             val sparkLocation = spark.getLorenzVec()
             val block = sparkLocation.getBlockAt()
-            val seeThroughBlocks =
-                sparkLocation.distanceToPlayer() < 6 && (block == Blocks.flowing_lava || block == Blocks.lava)
+            val seeThroughBlocks = sparkLocation.distanceToPlayer() < 6 && (block in FishingApi.lavaBlocks)
             event.drawWaypointFilled(
                 sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks,
             )
@@ -63,7 +60,7 @@ object ThunderSparksHighlight {
     }
 
     private fun isEnabled() =
-        (IslandType.CRIMSON_ISLE.isInIsland() || LorenzUtils.isStrandedProfile) && config.highlight
+        (IslandType.CRIMSON_ISLE.isCurrent() || SkyBlockUtils.isStrandedProfile) && config.highlight
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

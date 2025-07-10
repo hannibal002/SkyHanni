@@ -8,5 +8,5 @@ class DevToolConfig {
     @Expose
     @ConfigOption(name = "Graph Tools", desc = "")
     @Accordion
-    var graph: GraphConfig = GraphConfig()
+    val graph: GraphConfig = GraphConfig()
 }

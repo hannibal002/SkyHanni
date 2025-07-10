@@ -6,8 +6,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.compat.getInventoryItems
+import net.minecraft.client.resources.I18n
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -16,16 +17,17 @@ import net.minecraft.entity.player.EntityPlayer
 @SkyHanniModule
 object MobUtils {
 
-    /**
-     * REGEX-TEST: Armor Stand
-     * REGEX-TEST: Armour Stand
-     */
-    private val defaultArmorStandName by RepoPattern.pattern("armorstand.default", "Armou?r Stand")
+    private val defaultArmorStandName get() =
+        //#if MC < 1.21
+        I18n.format("entity.ArmorStand.name")
+    //#else
+    //$$ I18n.translate("entity.minecraft.armor_stand")
+    //#endif
 
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
     fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? EntityArmorStand
 
-    fun getNextEntity(entity: Entity, offset: Int) = EntityUtils.getEntityByID(entity.entityId + offset)
+    fun getNextEntity(entity: Entity, offset: Int): Entity? = EntityUtils.getEntityByID(entity.entityId + offset)
 
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
@@ -37,9 +39,13 @@ object MobUtils {
         getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }
             .sortedBy { it.distanceTo(entity) }.firstOrNull()
 
-    fun EntityArmorStand.isDefaultValue() = defaultArmorStandName.matches(this.name)
+    fun EntityArmorStand.isDefaultValue() = this.name == defaultArmorStandName
 
     fun EntityArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
+
+    fun EntityArmorStand.hasEmptyInventory() = getInventoryItems().none { it.isNotEmpty() }
+
+    fun EntityArmorStand.isCompletelyDefault() = isDefaultValue() && hasEmptyInventory()
 
     class OwnerShip(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
@@ -73,11 +79,12 @@ object MobUtils {
         rayTraceForMobs(entity, partialTicks, offset)?.firstOrNull()
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
-        val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
         //#if MC < 1.21
+        val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         //#else
         //$$ val look = entity.rotationVector.toLorenzVec().normalize()
+        //$$ val pos = entity.eyePos.toLorenzVec() + offset
         //#endif
         val possibleEntities = MobData.entityToMob.filterKeys {
             it !is EntityArmorStand &&

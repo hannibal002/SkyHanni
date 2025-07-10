@@ -29,5 +29,5 @@ class AnniversaryCelebration400Config {
     @ConfigOption(name = "Team Finder Color", desc = "Change all the colors!")
     @Accordion
     @Expose
-    var colors: AnniversaryTeamFinderColorConfig = AnniversaryTeamFinderColorConfig()
+    val colors: AnniversaryTeamFinderColorConfig = AnniversaryTeamFinderColorConfig()
 }

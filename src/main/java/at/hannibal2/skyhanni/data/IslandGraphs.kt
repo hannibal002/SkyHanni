@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -7,6 +8,7 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -24,13 +26,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -38,8 +39,10 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.util.ChatComponentText
 import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -102,7 +105,13 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object IslandGraphs {
+
+    private val config get() = SkyHanniMod.feature.misc.pathfinding
+
     var currentIslandGraph: Graph? = null
+    private var lastLoadedIslandType = "nothing"
+    private var lastLoadedTime = SimpleTimeMark.farPast()
+
     var disabledNodesReason: String? = null
         private set
 
@@ -142,6 +151,8 @@ object IslandGraphs {
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
     private var inGlaciteTunnels: Boolean? = null
+    private var nextChatMessage: ChatComponentText? = null
+    private var lastMessageSent = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
@@ -157,7 +168,7 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRepoReload(event: RepositoryReloadEvent) {
-        loadIsland(LorenzUtils.skyBlockIsland)
+        loadIsland(SkyBlockUtils.currentIsland)
     }
 
     @HandleEvent
@@ -177,16 +188,17 @@ object IslandGraphs {
         reset()
     }
 
-    fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
+    private fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
 
     @HandleEvent
     fun onAreaChange(event: ScoreboardAreaChangeEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) {
+        if (!IslandType.DWARVEN_MINES.isCurrent()) {
             inGlaciteTunnels = null
             return
         }
 
-        val now = isGlaciteTunnelsArea(IslandAreas.currentAreaName)
+        // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
+        val now = isGlaciteTunnelsArea(SkyBlockUtils.scoreboardArea)
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             loadDwarvenMines()
@@ -198,7 +210,8 @@ object IslandGraphs {
     }
 
     private fun loadDwarvenMines() {
-        if (isGlaciteTunnelsArea(IslandAreas.currentAreaName)) {
+        // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
+        if (isGlaciteTunnelsArea(SkyBlockUtils.scoreboardArea)) {
             reloadFromJson("GLACITE_TUNNELS")
         } else {
             reloadFromJson("DWARVEN_MINES")
@@ -213,7 +226,44 @@ object IslandGraphs {
         }
     }
 
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Island Graphs")
+        val islandType = SkyBlockUtils.currentIsland.name
+        val important = SkyBlockUtils.inSkyBlock && lastLoadedIslandType != islandType
+        val list = buildList {
+            add("")
+            if (important) {
+                add("wrong island!")
+            } else {
+                add("island is correct!")
+            }
+            add("")
+            add("lastLoadedIslandType: $lastLoadedIslandType")
+            if (important) {
+                add("current islandType: $islandType")
+            }
+
+            add("")
+            add("lastLoadedTime: ${lastLoadedTime.passedSince()}")
+            if (important) {
+                add("last world switch: ${SkyBlockUtils.lastWorldSwitch.passedSince()}")
+            }
+
+            add("")
+            add("currentIslandGraph is null: ${currentIslandGraph == null}")
+        }
+        if (important) {
+            event.addData(list)
+        } else {
+            event.addIrrelevant(list)
+        }
+    }
+
     private fun reloadFromJson(islandName: String) {
+        lastLoadedIslandType = islandName
+        lastLoadedTime = SimpleTimeMark.now()
+
         val constant = "island_graphs/$islandName"
         val name = "constants/$constant.json"
         val jsonFile = File(RepoManager.repoLocation, name)
@@ -252,6 +302,14 @@ object IslandGraphs {
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
             update()
+        }
+        updateChat()
+        nextChatMessage?.let {
+            if (lastMessageSent.passedSince() > config.chatUpdateInterval.duration) {
+                it.send(pathFindMessageId)
+                nextChatMessage = null
+                lastMessageSent = SimpleTimeMark.now()
+            }
         }
     }
 
@@ -361,7 +419,7 @@ object IslandGraphs {
 
     private fun setFastestPath(path: Pair<Graph, Double>, setPath: Boolean = true) {
         // TODO cleanup
-        val (fastestPath, distance) = path.takeIf { it.first.isNotEmpty() } ?: return
+        val (fastestPath, _) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.nodes.toMutableList()
         if (MinecraftCompat.localPlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
@@ -369,7 +427,7 @@ object IslandGraphs {
         renderPath(setPath, nodes)
     }
 
-    fun renderPath(
+    private fun renderPath(
         setPath: Boolean = true,
         nodes: List<GraphNode>,
     ) {
@@ -510,7 +568,7 @@ object IslandGraphs {
             },
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
-        componentText.send(pathFindMessageId)
+        nextChatMessage = componentText
     }
 
     fun overrideChatMessage(message: String) {
@@ -605,6 +663,7 @@ object IslandGraphs {
             reasonForReport = "Manual reported graph location error",
             userReason = args.joinToString(" "),
             ignoreCache = true,
+            betaOnly = false,
         )
     }
 
@@ -613,12 +672,14 @@ object IslandGraphs {
         userFacingReason: String,
         additionalInternalInfo: String? = null,
         ignoreCache: Boolean = false,
+        betaOnly: Boolean = false,
     ) {
         sendReportLocation(
             location,
             reasonForReport = "Automatic graph location error: $userFacingReason",
             additionalInternalInfo = additionalInternalInfo,
             ignoreCache = ignoreCache,
+            betaOnly = betaOnly,
         )
     }
 
@@ -628,9 +689,10 @@ object IslandGraphs {
         userReason: String? = null,
         additionalInternalInfo: String? = null,
         ignoreCache: Boolean,
+        betaOnly: Boolean,
     ) {
         val graphArea = IslandAreas.currentAreaName
-        val scoreboardArea = LorenzUtils.skyBlockArea ?: "unknown"
+        val scoreboardArea = SkyBlockUtils.scoreboardArea ?: "unknown"
 
         val extraData = mutableMapOf<String, Any>()
         userReason?.let {
@@ -639,7 +701,7 @@ object IslandGraphs {
         additionalInternalInfo?.let {
             extraData["internal info"] = it
         }
-        val island = LorenzUtils.skyBlockIsland.name
+        val island = SkyBlockUtils.currentIsland.name
         extraData["island"] = island
         extraData["location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
         if (graphArea != scoreboardArea) {
@@ -660,6 +722,7 @@ object IslandGraphs {
             noStackTrace = true,
             extraData = extraData.map { it.key to it.value }.normalizeAsArray(),
             ignoreErrorCache = ignoreCache,
+            betaOnly = betaOnly,
         )
     }
 

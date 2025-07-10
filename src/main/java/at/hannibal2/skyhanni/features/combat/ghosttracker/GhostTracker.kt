@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -62,6 +62,7 @@ object GhostTracker {
 
     private val isMaxBestiary get() = currentBestiaryKills >= MAX_BESTIARY_KILLS
     private var allowedDrops = setOf<NeuInternalName>()
+    private var allowedSackDrops = setOf<NeuInternalName>()
 
     // TODO: in the future get from neu bestiary data
     private const val MAX_BESTIARY_KILLS = 100_000
@@ -180,15 +181,15 @@ object GhostTracker {
 
     @HandleEvent
     fun onSkillExp(event: SkillExpGainEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         if (event.gained > 10_000) return
         tracker.modify {
             it.combatXpGained += event.gained.toLong()
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()
@@ -211,15 +212,30 @@ object GhostTracker {
     }
 
     @HandleEvent
+    fun onSackChange(event: SackChangeEvent) {
+        if (!inArea || !ProfileStorageData.loaded) return
+
+        val allowedChanges = event.sackChanges.filter {
+            it.internalName in allowedSackDrops && it.delta > 0
+        }
+
+        tracker.modify { storage ->
+            allowedChanges.forEach { sackChange ->
+                storage.addItem(sackChange.internalName, sackChange.delta, false)
+            }
+        }
+    }
+
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+        if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
 
         tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         if (event.coins !in 200.0..2_000.0) return
         tracker.addCoins(event.coins.toInt(), false)
@@ -227,11 +243,11 @@ object GhostTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         itemDropPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val mf = group("mf").formatInt()
-            if (!isAllowedItem(internalName)) return
+            if (internalName !in allowedDrops) return
 
             tracker.addItem(internalName, 1, false)
             tracker.modify {
@@ -288,7 +304,7 @@ object GhostTracker {
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
-        if (isMaxBestiary || !isEnabled()) return
+        if (isMaxBestiary || !inArea) return
         parseBestiaryWidget(event.lines)
     }
 
@@ -298,12 +314,14 @@ object GhostTracker {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedDrops = event.getConstant<GhostDropsJson>("GhostDrops").ghostDrops
+        val ghostDropsConstant = event.getConstant<GhostDropsJson>("GhostDrops")
+        allowedDrops = ghostDropsConstant.ghostDrops
+        allowedSackDrops = ghostDropsConstant.sacksDrops
     }
 
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
-        inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isInIsland()
+        inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isCurrent()
         if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 
@@ -313,8 +331,6 @@ object GhostTracker {
             tracker.firstUpdate()
         }
     }
-
-    private fun isAllowedItem(internalName: NeuInternalName): Boolean = internalName in allowedDrops
 
     private fun getAverageMagicFind(mf: Long, kills: Long) =
         if (mf == 0L || kills == 0L) 0.0 else mf / (kills).toDouble()
@@ -354,8 +370,8 @@ object GhostTracker {
         override fun toString(): String = display
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         val storage = storage ?: return
         if (storage.migratedTotalKills) return
         tracker.modify {

@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.init.Blocks
 import kotlin.concurrent.fixedRateTimer
 
@@ -21,14 +22,14 @@ object MovementSpeedDisplay {
     private val config get() = SkyHanniMod.feature.misc
 
     private var display = ""
-    private val soulsandSpeeds = mutableListOf<Double>()
+    private val soulSandSpeeds = mutableListOf<Double>()
 
     /**
      * This speed value represents the movement speed in blocks per second.
      * This has nothing to do with the speed stat.
      */
     var speed = 0.0
-    var usingSoulsandSpeed = false
+    var usingLegacySoulSandSpeed = false
 
     init {
         // TODO use LorenzTickEvent
@@ -38,7 +39,7 @@ object MovementSpeedDisplay {
     }
 
     private fun checkSpeed() {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
 
         speed = with(MinecraftCompat.localPlayer) {
             val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
@@ -47,17 +48,20 @@ object MovementSpeedDisplay {
             // Distance from previous tick, multiplied by TPS
             oldPos.distance(newPos) * 20
         }
-        val movingOnSoulsand = LocationUtils.playerLocation().getBlockAt() == Blocks.soul_sand && speed > 0.0
-        if (movingOnSoulsand) {
-            soulsandSpeeds.add(speed)
-            if (soulsandSpeeds.size > 6) {
-                speed = soulsandSpeeds.average()
-                soulsandSpeeds.removeAt(0)
+
+        // 1.15+ has consistent soul sand speed
+        val movingOnSoulSand = PlatformUtils.IS_LEGACY && LocationUtils.playerLocation().getBlockAt() == Blocks.soul_sand && speed > 0.0
+        if (movingOnSoulSand) {
+            soulSandSpeeds.add(speed)
+            if (soulSandSpeeds.size > 6) {
+                speed = soulSandSpeeds.average()
+                soulSandSpeeds.removeAt(0)
             }
         } else {
-            soulsandSpeeds.clear()
+            soulSandSpeeds.clear()
         }
-        usingSoulsandSpeed = movingOnSoulsand && soulsandSpeeds.size == 6
+        usingLegacySoulSandSpeed = movingOnSoulSand && soulSandSpeeds.size == 6
+
         if (isEnabled()) {
             display = "Movement Speed: ${speed.roundTo(2)}"
         }
@@ -70,7 +74,7 @@ object MovementSpeedDisplay {
         config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")
     }
 
-    fun isEnabled() = LorenzUtils.onHypixel &&
-        (LorenzUtils.inSkyBlock || OutsideSBFeature.MOVEMENT_SPEED.isSelected()) &&
+    fun isEnabled() = SkyBlockUtils.onHypixel &&
+        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MOVEMENT_SPEED.isSelected()) &&
         config.playerMovementSpeed
 }

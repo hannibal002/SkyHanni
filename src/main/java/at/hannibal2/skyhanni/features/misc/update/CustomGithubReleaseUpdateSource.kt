@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.update
 
+import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.system.ModVersion
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
 import moe.nea.libautoupdate.GithubReleaseUpdateData
 import moe.nea.libautoupdate.GithubReleaseUpdateSource
@@ -30,7 +30,7 @@ class CustomGithubReleaseUpdateSource(owner: String, repository: String) : Githu
         name ?: return false
         browserDownloadUrl ?: return false
         if (!name.endsWith(".jar")) return false
-        return name.contains(PlatformUtils.MC_VERSION)
+        return name.contains(VersionConstants.MC_VERSION)
     }
 
     private fun GithubRelease.Download.createReleaseData(release: GithubRelease): GithubReleaseUpdateData {
