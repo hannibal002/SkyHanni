@@ -81,16 +81,7 @@ object CompactSweepDetails {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isInIsland() || !config.compactSweepDetails) return
-        event.blockAndReadDetails()
-    }
-
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        resetSweepDetailsVariables()
-    }
-
-    private fun SkyHanniChatEvent.blockAndReadDetails() {
-        sweepDetailsPattern.matchMatcher(message) {
+        sweepDetailsPattern.matchMatcher(event.message) {
             if (sweepPenaltyHoverHistory.isNotEmpty()) {
                 sendCompactedResults()
             }
@@ -102,23 +93,23 @@ object CompactSweepDetails {
             sweepPenaltyHoverHistory.add("§eClick to open the Tree Gifts guide!")
             sweepPenaltyHoverHistory.add("§6Initial §2Sweep§7: §2${group("sweepAmt").formatDouble()}")
             sweepDetailsChatBreakdown.add("§2Sweep: $sweepDisplay")
-            blockedReason = "SWEEP_DETAILS"
+            event.blockedReason = "SWEEP_DETAILS"
             return
         }
         if (!isInsideSweepDetails) return
-        sweepToughnessLogsPattern.matchMatcher(message) {
+        sweepToughnessLogsPattern.matchMatcher(event.message) {
             treeType = group("treeType")
             toughness = group("toughnessAmount").formatDouble()
             logCountDisplay = group("logsDisplay")
             logs = group("logsAmount").formatDouble()
             val fixedToughness = toughness.toString().removeSuffix(".0")
             sweepPenaltyHoverHistory.add("§6Initial Logs: $logs $treeType Logs §7(§6$fixedToughness toughness§7)")
-            blockedReason = "SWEEP_DETAILS"
+            event.blockedReason = "SWEEP_DETAILS"
             if (isFinalCalculation(group("isItGreen"))) {
                 sendCompactedResults()
             }
         }
-        penaltyPattern.matchMatcher(message) {
+        penaltyPattern.matchMatcher(event.message) {
             if (!addedInitialLogs) {
                 sweepDetailsChatBreakdown.add("§7, §e$logs logs")
                 addedInitialLogs = true
@@ -128,11 +119,16 @@ object CompactSweepDetails {
             sweepPenaltyHoverHistory.add("§e${group("penaltyReason")}§7: §c-${group("penaltyPercent").formatDouble()}% §7($logs logs)")
             sweepDetailsChatBreakdown.add("§7(${group("penaltyDisplay")}§7)")
             proTip = groupOrEmpty("proTip")
-            blockedReason = "SWEEP_DETAILS"
+            event.blockedReason = "SWEEP_DETAILS"
             if (isFinalCalculation(group("isItGreen"))) {
                 sendCompactedResults()
             }
         }
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        resetSweepDetailsVariables()
     }
 
     private fun sendCompactedResults() {
