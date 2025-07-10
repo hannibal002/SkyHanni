@@ -52,7 +52,6 @@ object FixGhostEntities {
             is S0CPacketSpawnPlayer -> {
                 if (packet.entityID in recentlyRemovedEntities) {
                     hiddenEntityIds.add(packet.entityID)
-                    println("entityIds size: ${hiddenEntityIds.size}")
                 }
                 recentlySpawnedEntities.addLast(packet.entityID)
             }
