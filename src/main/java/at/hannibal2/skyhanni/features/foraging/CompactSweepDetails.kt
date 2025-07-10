@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -92,7 +91,6 @@ object CompactSweepDetails {
     }
 
     private fun SkyHanniChatEvent.blockAndReadDetails() {
-        val message = message
         sweepDetailsPattern.matchMatcher(message) {
             if (sweepPenaltyHoverHistory.isNotEmpty()) {
                 sendCompactedResults()
@@ -108,34 +106,33 @@ object CompactSweepDetails {
             blockedReason = "SWEEP_DETAILS"
             return
         }
-        if (isInsideSweepDetails) {
-            sweepToughnessLogsPattern.matchMatcher(message) {
-                treeType = group("treeType")
-                toughnessDisplay = group("toughnessDisplay")
-                toughness = group("toughnessAmount").formatDouble()
-                logCountDisplay = group("logsDisplay")
-                logs = group("logsAmount").formatDouble()
-                val fixedToughness = toughness.toString().removeSuffix(".0")
-                sweepPenaltyHoverHistory.add("§6Initial Logs: $logs $treeType Logs §7(§6$fixedToughness toughness§7)")
-                blockedReason = "SWEEP_DETAILS"
-                if (isFinalCalculation(group("isItGreen"))) {
-                    sendCompactedResults()
-                }
+        if (!isInsideSweepDetails) return
+        sweepToughnessLogsPattern.matchMatcher(message) {
+            treeType = group("treeType")
+            toughnessDisplay = group("toughnessDisplay")
+            toughness = group("toughnessAmount").formatDouble()
+            logCountDisplay = group("logsDisplay")
+            logs = group("logsAmount").formatDouble()
+            val fixedToughness = toughness.toString().removeSuffix(".0")
+            sweepPenaltyHoverHistory.add("§6Initial Logs: $logs $treeType Logs §7(§6$fixedToughness toughness§7)")
+            blockedReason = "SWEEP_DETAILS"
+            if (isFinalCalculation(group("isItGreen"))) {
+                sendCompactedResults()
             }
-            penaltyPattern.matchMatcher(message) {
-                if (!addedInitialLogs) {
-                    sweepDetailsChatBreakdown.add("§7, §e$logs logs")
-                    addedInitialLogs = true
-                }
-                logs = group("logsAmount").formatDouble()
-                logCountDisplay = group("logsDisplay")
-                sweepPenaltyHoverHistory.add("§e${group("penaltyReason")}§7: §c-${group("penaltyPercent").formatDouble()}% §7($logs logs)")
-                sweepDetailsChatBreakdown.add("§7(${group("penaltyDisplay")}§7)")
-                proTip = groupOrEmpty("proTip")
-                blockedReason = "SWEEP_DETAILS"
-                if (isFinalCalculation(group("isItGreen"))) {
-                    sendCompactedResults()
-                }
+        }
+        penaltyPattern.matchMatcher(message) {
+            if (!addedInitialLogs) {
+                sweepDetailsChatBreakdown.add("§7, §e$logs logs")
+                addedInitialLogs = true
+            }
+            logs = group("logsAmount").formatDouble()
+            logCountDisplay = group("logsDisplay")
+            sweepPenaltyHoverHistory.add("§e${group("penaltyReason")}§7: §c-${group("penaltyPercent").formatDouble()}% §7($logs logs)")
+            sweepDetailsChatBreakdown.add("§7(${group("penaltyDisplay")}§7)")
+            proTip = groupOrEmpty("proTip")
+            blockedReason = "SWEEP_DETAILS"
+            if (isFinalCalculation(group("isItGreen"))) {
+                sendCompactedResults()
             }
         }
     }
@@ -198,5 +195,5 @@ object CompactSweepDetails {
         sweepDetailsVariablesDirty = false
     }
 
-    private fun isInIsland() = SkyBlockUtils.inAnyIsland(IslandType.THE_PARK, IslandType.GALATEA, IslandType.HUB)
+    private fun isInIsland() = IslandTypeTags.FORAGING.inAny()
 }
