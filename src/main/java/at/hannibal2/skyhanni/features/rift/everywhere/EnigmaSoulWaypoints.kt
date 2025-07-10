@@ -87,7 +87,6 @@ object EnigmaSoulWaypoints {
      * REGEX-TEST: SOUL! You unlocked an Enigma Soul!
      * REGEX-TEST: You have already found that Enigma Soul!
      */
-
     private val foundPattern by patternGroup.pattern(
         "rift.everywhere.enigma-souls.found",
         "SOUL! You unlocked an Enigma Soul!|You have already found that Enigma Soul!",
@@ -168,7 +167,7 @@ object EnigmaSoulWaypoints {
                             it,
                             "$name Enigma Soul",
                             config.color.toSpecialColor(),
-                            condition = { config.showPathFinder }
+                            condition = { config.showPathFinder },
                         )
                     }
                 }
