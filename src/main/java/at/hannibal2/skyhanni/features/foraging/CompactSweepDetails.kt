@@ -64,7 +64,7 @@ object CompactSweepDetails {
         "\\s+(?:§.)+(?<penaltyReason>[\\S ]+): (?<penaltyDisplay>(?:§.)+-(?<penaltyPercent>[\\d,.]+)%) Sweep (?<logsDisplay>(?:§.)?(?<isItGreen>§.)(?<logsAmount>[\\d,.]+)) Logs(?: (?<proTip>(?:§.)+[\\S ]+))?",
     )
 
-    private data class SweepDetails(
+    data class SweepDetails(
         var addedInitialLogs: Boolean = false,
         var logCountDisplay: String = "",
         var logs: Double = -1.0,
