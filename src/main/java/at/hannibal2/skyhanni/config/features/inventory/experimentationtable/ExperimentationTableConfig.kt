@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class ExperimentationTableConfig {
     @Expose
@@ -17,35 +16,20 @@ class ExperimentationTableConfig {
     @Expose
     @ConfigOption(name = "Dry-Streak Display", desc = "")
     @Accordion
+    @SearchTag("enchant enchanting")
     val dryStreak: ExperimentsDryStreakConfig = ExperimentsDryStreakConfig()
 
     @Expose
-    @ConfigOption(name = "Superpair Data", desc = "Displays useful data while doing the Superpair experiment.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var superpairDisplay: Boolean = false
+    @ConfigOption(name = "Experiment Addons", desc = "")
+    @Accordion
+    @SearchTag("enchant enchanting")
+    val addons: ExperimentsAddonsConfig = ExperimentsAddonsConfig()
 
     @Expose
-    @ConfigLink(owner = ExperimentationTableConfig::class, field = "superpairDisplay")
-    val superpairDisplayPosition: Position = Position(-372, 161)
-
-    @Expose
-    @ConfigOption(
-        name = "Superpairs Clicks Alert",
-        desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var superpairsClicksAlert: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "ULTRA-RARE Book Alert",
-        desc = "Send a chat message, title and sound when you find an ULTRA-RARE book."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var ultraRareBookAlert: Boolean = false
+    @ConfigOption(name = "Superpairs", desc = "")
+    @Accordion
+    @SearchTag("enchant enchanting")
+    val superpairs: ExperimentsSuperpairsConfig = ExperimentsSuperpairsConfig()
 
     @Expose
     @ConfigOption(
@@ -53,12 +37,7 @@ class ExperimentationTableConfig {
         desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped."
     )
     @ConfigEditorBoolean
+    @SearchTag("enchant enchanting")
     @FeatureToggle
     var guardianReminder: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Superpairs XP Overlay", desc = "Shows how much XP every pair is worth in superpairs.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var superpairsXPOverlay: Boolean = true
 }

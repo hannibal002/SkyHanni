@@ -50,7 +50,17 @@ class AttributeShardsConfig {
     var highlightDisabledAttributes: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Hunting Box Value", desc = "Displays the bazaar price of the shards in your hunting box.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var huntingBoxValue: Boolean = true
+
+    @Expose
     @ConfigLink(owner = AttributeShardsConfig::class, field = "enabled")
     val displayPosition: Position = Position(174, 139)
+
+    @Expose
+    @ConfigLink(owner = AttributeShardsConfig::class, field = "huntingBoxValue")
+    val huntingBoxValuePosition = Position(174, 139)
 
 }

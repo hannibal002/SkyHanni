@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 
+import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
