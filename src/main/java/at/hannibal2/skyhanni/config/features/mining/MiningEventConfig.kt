@@ -15,7 +15,7 @@ class MiningEventConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show information about upcoming Dwarven Mines and Crystal Hollows mining events.\n" +
-            "§eAlso enables sending data from your client. May take up to a minute to sync new events."
+                "§eAlso enables sending data from your client. May take up to a minute to sync new events.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -24,7 +24,7 @@ class MiningEventConfig {
     @Expose
     @ConfigOption(
         name = "Show Outside Mining Islands",
-        desc = "Show the event tracker even if you're outside of the Dwarven Mines or Crystal Hollows."
+        desc = "Show the event tracker even if you're outside of the Dwarven Mines or Crystal Hollows.",
     )
     @ConfigEditorBoolean
     var outsideMining: Boolean = false
@@ -48,7 +48,7 @@ class MiningEventConfig {
     @ConfigOption(
         name = "Show Passed Events",
         desc = "Show the most recently passed event at the start, greyed out.\n" +
-            "§eTakes a little while to save the last event."
+                "§eTakes a little while to save the last event.",
     )
     @ConfigEditorBoolean
     var passedEvents: Boolean = false
@@ -70,16 +70,13 @@ class MiningEventConfig {
     @ConfigOption(
         name = "Sharing Event Data",
         desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings." +
-            " Thanks for your help!"
+                " Thanks for your help!",
     )
     @ConfigEditorBoolean
     var allowDataSharing: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Goblin Raid Features",
-        desc = "",
-    )
+    @ConfigOption(name = "Goblin Raid Features", desc = "")
     @Accordion
     val goblinRaidConfig: GoblinRaidConfig = GoblinRaidConfig()
 }

@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import java.awt.Color
 
 class GoblinRaidConfig {
+
     @Expose
     @ConfigOption(
         name = "Superprotectron Highlight",
@@ -22,5 +26,5 @@ class GoblinRaidConfig {
         desc = "The color of the Superprotectron highlight.",
     )
     @ConfigEditorColour
-    var superprotectronHighlightColor: String = "0:255:255:0:88"
+    var superprotectronHighlightColor: ChromaColour = Color.YELLOW.toChromaColor(88)
 }
