@@ -152,11 +152,10 @@ object CompactSweepDetails {
         }
         if (sweepDetails.proTip.isNotEmpty()) builder.append("\n§6Pro tip: ${sweepDetails.proTip}")
         val hoverText = builder.toString()
-        val hoverComponent = hoverText.asComponent()
 
         builder.clear()
 
-        sweepDetails.sweepPenaltyHoverHistory.forEach { section ->
+        sweepDetails.sweepDetailsChatBreakdown.forEach { section ->
             builder.append(section)
             if (!section.startsWith("§2Sweep: ") || !sweepDetails.addedInitialLogs) builder.append(" ")
         }
@@ -165,7 +164,7 @@ object CompactSweepDetails {
         val chatText = builder.toString()
         val chatComponent = chatText.asComponent()
 
-        chatComponent.hover = hoverComponent
+        chatComponent.hover = hoverText.asComponent()
         chatComponent.onClick(onClick = {
             HypixelCommands.treeGifts()
         })
