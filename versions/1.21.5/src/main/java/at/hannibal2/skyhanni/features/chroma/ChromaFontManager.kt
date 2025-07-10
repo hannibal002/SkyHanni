@@ -51,7 +51,12 @@ fun forceChromaStyleIfNecessary(style: Style): Style {
 
 fun isNotActuallyEqualBecauseOfChroma(
     textColor: TextColor,
-    testObject: Any
+    testObject: Any,
 ): Boolean = testObject is TextColor &&
     (textColor.name == "chroma" || testObject.name == "chroma") &&
-    textColor.name != testObject.name
+    textColor.getTextColorName() != testObject.getTextColorName()
+
+// the get name inside of text colour does a string format and is very bad for performance
+private fun TextColor.getTextColorName(): String? {
+    return if (name != null) name else rgb.toString()
+}

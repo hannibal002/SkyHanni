@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
+import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi;
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
@@ -69,6 +69,16 @@ public abstract class MixinHandledScreen {
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         TextInput.Companion.onGuiInput(cir);
         if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
+    private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
+            cir.setReturnValue(false);
+        }
+        if (new GuiMouseInputEvent((HandledScreen<?>) (Object) this).post()) {
             cir.setReturnValue(false);
         }
     }
