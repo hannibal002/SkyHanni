@@ -349,6 +349,7 @@ abstract class AbstractRepoManager(
             extraReloadCoroutineWork()
 
             eventConstructor.invoke(this@AbstractRepoManager).post { error ->
+                logger.logErrorWithData(error, "Error while posting repo reload event")
                 loadingError = true
             }
 
