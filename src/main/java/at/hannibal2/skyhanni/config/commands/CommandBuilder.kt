@@ -1,9 +1,14 @@
 package at.hannibal2.skyhanni.config.commands
 
-class CommandBuilder(val name: String) {
-    var description: String = ""
-    var category: CommandCategory = CommandCategory.MAIN
-    var aliases: List<String> = emptyList()
+import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
+import at.hannibal2.skyhanni.utils.CommandArgument
+import at.hannibal2.skyhanni.utils.CommandContextAwareObject
+import com.mojang.brigadier.CommandDispatcher
+//#if MC < 1.21
+import net.minecraft.command.ICommand
+//#endif
+
+class CommandBuilder(name: String) : CommandBuilderBase(name) {
     private var autoComplete: ((Array<String>) -> List<String>) = { listOf() }
     private var callback: (Array<String>) -> Unit = {}
 
@@ -11,10 +16,43 @@ class CommandBuilder(val name: String) {
         this.callback = callback
     }
 
+    // Used for command registration in 1.21.5
+    @Suppress("unused")
+    fun getCallback(): (Array<String>) -> Unit = callback
+
     fun autoComplete(autoComplete: (Array<String>) -> List<String>) {
         this.autoComplete = autoComplete
     }
 
-    fun toSimpleCommand() = SimpleCommand(name.lowercase(), aliases, callback, autoComplete)
+    //#if MC < 1.21
+    override fun toCommand(dispatcher: CommandDispatcher<Any?>) = SimpleCommand(name.lowercase(), aliases, callback, autoComplete)
+    //#endif
+}
+
+sealed class CommandBuilderBase(override val name: String) : CommandData {
+    var description: String = ""
+    override var category: CommandCategory = CommandCategory.MAIN
+    override var aliases: List<String> = emptyList()
+
+    override val descriptor: String get() = description
+}
+
+class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O>>(name: String) : CommandBuilderBase(name) {
+    lateinit var specifiers: Collection<A>
+    //#if TODO
+    lateinit var context: (ComplexCommand<O>) -> O
+    //#endif
+
+    private var realDescription: String = ""
+
+    //#if MC < 1.21
+    override fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand {
+        return ComplexCommand(name.lowercase(), specifiers, context, aliases).also {
+            realDescription = it.constructHelp(description)
+        }
+    }
+    //#endif
+
+    override val descriptor get() = realDescription
 }
 

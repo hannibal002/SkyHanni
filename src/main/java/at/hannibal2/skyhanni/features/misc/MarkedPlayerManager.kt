@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.entity.EntityOtherPlayerMP
 
 @SkyHanniModule
@@ -35,7 +35,7 @@ object MarkedPlayerManager {
         val displayName = args[0]
         val name = displayName.lowercase()
 
-        if (name == LorenzUtils.getPlayerName().lowercase()) {
+        if (name == PlayerUtils.getName().lowercase()) {
             ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
             return
         }
@@ -79,7 +79,7 @@ object MarkedPlayerManager {
 
     fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.MARKED_PLAYERS.isSelected()) &&
+    private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MARKED_PLAYERS.isSelected()) &&
         config.highlightInWorld
 
     fun replaceInChat(string: String): String {
@@ -96,7 +96,7 @@ object MarkedPlayerManager {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.markOwnName.whenChanged { _, new ->
-            val name = LorenzUtils.getPlayerName()
+            val name = PlayerUtils.getName()
             if (new) {
                 if (!playerNamesToMark.contains(name)) {
                     playerNamesToMark.add(name)
@@ -116,12 +116,12 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
-        if (Minecraft.getMinecraft().thePlayer == null) return
+    fun onWorldChange() {
+        if (!MinecraftCompat.localPlayerExists) return
 
         markedPlayers.clear()
         if (config.markOwnName.get()) {
-            val name = LorenzUtils.getPlayerName()
+            val name = PlayerUtils.getName()
             if (!playerNamesToMark.contains(name)) {
                 playerNamesToMark.add(name)
             }

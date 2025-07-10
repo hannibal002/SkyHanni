@@ -21,7 +21,7 @@ class MarkedPlayerConfig {
     @Expose
     @ConfigOption(name = "Mark Own Name", desc = "Mark own player name.")
     @ConfigEditorBoolean
-    var markOwnName: Property<Boolean> = Property.of(false)
+    val markOwnName: Property<Boolean> = Property.of(false)
 
     @ConfigOption(
         name = "Marked Chat Color",
@@ -37,5 +37,5 @@ class MarkedPlayerConfig {
     )
     @Expose
     @ConfigEditorDropdown
-    var entityColor: Property<LorenzColor> = Property.of(LorenzColor.YELLOW)
+    val entityColor: Property<LorenzColor> = Property.of(LorenzColor.YELLOW)
 }

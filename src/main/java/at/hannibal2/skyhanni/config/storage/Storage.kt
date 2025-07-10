@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import java.util.*
+import java.util.UUID
 
 class Storage {
     @Expose

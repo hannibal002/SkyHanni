@@ -16,10 +16,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -27,11 +25,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
@@ -77,7 +76,7 @@ object ReforgeHelper {
     private fun isReforgeMenu(chestName: String) = reforgeMenu.matches(chestName)
     private fun isHexReforgeMenu(chestName: String) = reforgeHexMenu.matches(chestName)
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && isInReforgeMenu
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && isInReforgeMenu
 
     private var itemToReforge: ItemStack? = null
     private var inventoryContainer: Container? = null
@@ -124,7 +123,7 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.slotNumber == reforgeButton) {
-            if (event.slot.stack?.name == "§eReforge Item" || event.slot.stack?.name == "§cError!") return
+            if (event.slot.stack?.displayName == "§eReforge Item" || event.slot.stack?.displayName == "§cError!") return
             if (handleReforgeButtonClick(event)) return
         }
 
@@ -134,6 +133,7 @@ object ReforgeHelper {
     }
 
     private fun handleReforgeButtonClick(event: GuiContainerEvent.SlotClickEvent): Boolean {
+        if (reforgeToSearch == null) return false
         if (currentReforge == reforgeToSearch) {
             event.cancel()
             waitForChat.set(false)
@@ -197,7 +197,7 @@ object ReforgeHelper {
         isInReforgeMenu = true
         waitForChat.set(false)
         DelayedRun.runNextTick {
-            inventoryContainer = Minecraft.getMinecraft().thePlayer.openContainer
+            inventoryContainer = MinecraftCompat.localPlayer.openContainer
         }
     }
 
@@ -259,9 +259,10 @@ object ReforgeHelper {
             { hoveredReforge = reforge }
         }
 
-        Renderable.clickAndHover(
-            text, tips,
-            onClick = {
+        Renderable.clickable(
+            text,
+            tips = tips,
+            onLeftClick = {
                 SoundUtils.playClickSound()
                 reforgeToSearch = reforge
                 updateDisplay()
@@ -277,12 +278,12 @@ object ReforgeHelper {
         val stats: List<Renderable>
         val removedEffect: List<Renderable>
         val addEffectText: String
-        val click: List<Renderable>
+        val clickToApply: List<Renderable>
         if (currentReforge == reforge) {
             stats = currentReforge?.stats?.get(itemRarity)?.print().orEmpty()
             removedEffect = emptyList()
             addEffectText = "§aEffect:"
-            click = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
+            clickToApply = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
         } else {
             stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)).orEmpty()
             removedEffect = getReforgeEffect(
@@ -290,7 +291,7 @@ object ReforgeHelper {
                 itemRarity,
             )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
             addEffectText = "§aAdds Effect:"
-            click = if (reforgeToSearch != reforge) {
+            clickToApply = if (reforgeToSearch != reforge) {
                 listOf(renderableString(""), renderableString("§eClick to select!"))
             } else emptyList()
         }
@@ -299,7 +300,7 @@ object ReforgeHelper {
             listOf(renderableString(addEffectText)) + it
         }.orEmpty()
 
-        return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + click
+        return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + clickToApply
     }
 
     private fun getReforgeEffect(reforge: ReforgeApi.Reforge?, rarity: LorenzRarity) =
@@ -334,7 +335,6 @@ object ReforgeHelper {
 
         val alreadySelected = sortAfter == stat
         val fieldColor = if (alreadySelected) LorenzColor.GRAY else LorenzColor.DARK_GRAY
-
 
         val tips = if (alreadySelected) {
             listOf("§6Sort by", tip)
@@ -414,7 +414,7 @@ object ReforgeHelper {
         val inventory = inventoryContainer?.inventorySlots ?: return
         val slot = inventory.firstOrNull { it?.stack?.cleanName() == reforgeStone }
         if (slot != null) {
-            slot highlight color
+            slot.highlight(color)
         } else {
             inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
             inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)

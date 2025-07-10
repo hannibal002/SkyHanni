@@ -19,7 +19,12 @@ object GuildApi {
             list.clear()
             return
         }
-        if (message.startsWith("§eTotal Members: ")) {
+        if (message.startsWith("§eOffline Members: ")) {
+            inGuildMessage = false
+            list.clear()
+            return
+        }
+        if (inGuildMessage && message == "§b§m-----------------------------------------------------") {
             inGuildMessage = false
             ProfileStorageData.playerSpecific?.guildMembers?.let {
                 it.clear()

@@ -3,10 +3,14 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -15,14 +19,11 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -34,6 +35,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -93,14 +96,14 @@ object SackApi {
      * REGEX-TEST: §f❤ Rough Ruby Gemstone
      * REGEX-TEST: §f❂ Rough Opal Gemstone
      * REGEX-TEST: §f☠ Rough Onyx Gemstone
-     * REGEX-TEST: §fα Rough Aquamarine Gemstone
+     * REGEX-TEST: §f☂ Rough Aquamarine Gemstone
      * REGEX-TEST: §a☘ Flawed Citrine Gemstone
      * REGEX-TEST: §9☘ Fine Peridot Gemstone
      * REGEX-TEST: §eTopaz Gemstones
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂α] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?"
+        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂☂] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
@@ -111,7 +114,7 @@ object SackApi {
      */
     private val gemstoneFilterPattern by patternGroup.pattern(
         "gemstone.filter",
-        "(?:§.)+▶ (?<quality>.*)"
+        "(?:§.)+▶ (?<quality>.*)",
     )
     // </editor-fold>
 
@@ -131,16 +134,20 @@ object SackApi {
      * have only one render display function
      */
     //
-    val sackItem = mutableMapOf<String, SackOtherItem>()
+    val sackItem = mutableMapOf<NeuInternalName, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
     private val stackList = mutableMapOf<Int, ItemStack>()
     private const val GEMSTONE_FILTER_SLOT = 41
 
+    // TODO replace string with internal name, but also test if this works for all items as expected!
     var sackListInternalNames = emptySet<String>()
         private set
 
     var sackListNames = emptySet<String>()
+        private set
+
+    var sacks = mapOf<String, List<NeuInternalName>>()
         private set
 
     @HandleEvent
@@ -206,7 +213,7 @@ object SackApi {
             val quality: GemstoneQuality = GemstoneQuality.getByNameOrNull(
                 group("quality").takeIf { it != "Amount" }?.uppercase()
                     ?: gemstoneStackFilter?.name
-                    ?: return@matchAll
+                    ?: return@matchAll,
             ) ?: return@matchAll
 
             val (multiplier, priceUpdater) = when (quality) {
@@ -214,14 +221,17 @@ object SackApi {
                     gem.roughPrice = price
                     gem.rough = stored
                 }
+
                 GemstoneQuality.FLAWED -> Pair(80) { price: Long ->
                     gem.flawedPrice = price
                     gem.flawed = stored
                 }
+
                 GemstoneQuality.FINE -> Pair(80 * 80) { price: Long ->
                     gem.finePrice = price
                     gem.fine = stored
                 }
+
                 else -> return@matchAll
             }
 
@@ -231,7 +241,7 @@ object SackApi {
             priceUpdater(price)
             gem.price += price
             if (savingSacks) setSackItem(internalName, stored)
-            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.name] = gem
+            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.displayName] = gem
         }
     }
 
@@ -249,7 +259,7 @@ object SackApi {
                 3 -> {
                     rune.slot = key
                     rune.lvl3 = stored
-                    runeItem[value.name] = rune
+                    runeItem[value.displayName] = rune
                 }
             }
             if (savingSacks) setSackItem(value.getInternalName(), stored)
@@ -276,7 +286,7 @@ object SackApi {
                 internalName.getSackPrice(stored).coerceAtLeast(0)
             }
             item.slot = key
-            sackItem[value.name] = item
+            sackItem[internalName] = item
         }
     }
 
@@ -284,9 +294,17 @@ object SackApi {
         if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
         for (stackEntry in stackList) {
             when {
-                isGemstoneSack -> { stackEntry.processGemstoneItem(savingSacks) }
-                isRuneSack -> { stackEntry.processRuneItem(savingSacks) }
-                else -> { stackEntry.processOtherItem(savingSacks) }
+                isGemstoneSack -> {
+                    stackEntry.processGemstoneItem(savingSacks)
+                }
+
+                isRuneSack -> {
+                    stackEntry.processRuneItem(savingSacks)
+                }
+
+                else -> {
+                    stackEntry.processOtherItem(savingSacks)
+                }
             }
         }
         if (savingSacks) saveSackData()
@@ -305,12 +323,12 @@ object SackApi {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
+            sibling.hover?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
         }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
+            sibling.hover?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
         }.orEmpty()
@@ -334,7 +352,7 @@ object SackApi {
         updateSacks(sackEvent)
         sackEvent.post()
         if (chatConfig.hideSacksChange) {
-            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isInIsland())) {
+            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isCurrent())) {
                 event.blockedReason = "sacks_change"
             }
         }
@@ -346,9 +364,15 @@ object SackApi {
         val uniqueSackItems = mutableSetOf<NeuInternalName>()
 
         sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
+        sacks = sacksData.mapValues { it.value.contents }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
+    }
+
+    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
+    fun onProfileJoin() {
+        sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
     }
 
     private fun updateSacks(changes: SackChangeEvent) {
@@ -453,14 +477,22 @@ object SackApi {
 
     fun NeuInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 
-    fun testSackApi(args: Array<String>) {
-        if (args.size == 1) {
-            if (sackListInternalNames.contains(args[0].uppercase())) {
-                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].toInternalName())}")
-            } else {
-                ChatUtils.userError("That item isn't a valid sack item.")
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestsackapi") {
+            description = "Get the amount of an item in sacks according to internal feature SackAPI"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("internalName", BrigadierArguments.string()) { internalName ->
+                callback {
+                    val arg = getArg(internalName)
+                    if (sackListInternalNames.contains(arg.uppercase())) {
+                        ChatUtils.chat("Sack data for $arg: ${fetchSackItem(arg.toInternalName())}")
+                    } else {
+                        ChatUtils.userError("That item isn't a valid sack item.")
+                    }
+                }
             }
-        } else ChatUtils.userError("/shtestsackapi <internal name>")
+        }
     }
 }
 

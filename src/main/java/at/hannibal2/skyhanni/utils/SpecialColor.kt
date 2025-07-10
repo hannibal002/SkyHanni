@@ -6,13 +6,16 @@ import java.awt.Color
  * Taken from NotEnoughUpdates,
  * translated to Kotlin and modified.
  */
+@Suppress("AvoidBritishSpelling")
 object SpecialColor {
     private const val MIN_CHROMA_SECS = 1
     private const val MAX_CHROMA_SECS = 60
     private val startTime = SimpleTimeMark.now()
 
+    @Deprecated("Use ChromaColour instead")
     fun String.toSpecialColor() = Color(toSpecialColorInt(), true)
 
+    @Deprecated("Use ChromaColour instead")
     fun String.toSpecialColorInt(): Int {
         val (chroma, alpha, red, green, blue) = decompose(this)
         val (hue, sat, bri) = Color.RGBtoHSB(red, green, blue, null)

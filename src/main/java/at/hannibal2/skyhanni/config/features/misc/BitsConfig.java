@@ -44,7 +44,8 @@ public class BitsConfig {
     public boolean bitsGainChatMessage = true;
 
     @Expose
-    @ConfigOption(name = "Threshold", desc = "The amount of bits you need to have to not get a warning.")
+    @ConfigOption(name = "Message Threshhold", desc = "The amount of bits you need to get to show the message.")
     @ConfigEditorSlider(minValue = 0, maxValue = 1000, minStep = 1)
+    // TODO rename
     public int threshold = 400;
 }

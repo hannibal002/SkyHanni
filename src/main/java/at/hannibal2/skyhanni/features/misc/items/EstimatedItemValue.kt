@@ -14,27 +14,27 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Keyboard
@@ -49,6 +49,7 @@ object EstimatedItemValue {
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
+    var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
     private var currentlyShowing = false
 
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
@@ -67,6 +68,7 @@ object EstimatedItemValue {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
+        crimsonPrestigeCosts = data.crimsonPrestigeCosts
     }
 
     private fun isInNeuOverlay(): Boolean {
@@ -106,9 +108,9 @@ object EstimatedItemValue {
         if (inStorage) return
 
         // render the estimated item value over NEU PV
-        GlStateManager.translate(0f, 0f, 200f)
+        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
-        GlStateManager.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f, -200f)
 
         renderedItems++
     }
@@ -130,7 +132,7 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        if (LorenzUtils.debug) {
+        if (SkyHanniDebugsAndTests.enabled) {
             if (Keyboard.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
@@ -141,6 +143,7 @@ object EstimatedItemValue {
         }
 
         try {
+            // TODO this code needs to be changed around
             config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
@@ -161,7 +164,7 @@ object EstimatedItemValue {
     }
 
     private fun checkCurrentlyVisible(): Boolean {
-        if (!LorenzUtils.inSkyBlock) return false
+        if (!SkyBlockUtils.inSkyBlock) return false
         if (!config.enabled) return false
         if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return false
         if (System.currentTimeMillis() > lastToolTipTime + 200) return false
@@ -186,7 +189,6 @@ object EstimatedItemValue {
                 ignoreArmorDyes,
                 ignoreRunes,
                 priceSource,
-                useAttributeComposite,
             ) {
                 cache.clear()
             }
@@ -226,7 +228,7 @@ object EstimatedItemValue {
                 e, "Error in Estimated Item Value renderer",
                 "openInventoryName" to openInventoryName,
                 "item" to item,
-                "item name" to item.itemName,
+                "item name" to item.repoItemName,
                 "internal name" to item.getInternalNameOrNull(),
                 "lore" to item.getLore(),
             )
@@ -240,7 +242,7 @@ object EstimatedItemValue {
 
     private fun ItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.name
+            val name = this.displayName
             return (
                 this.item == Items.enchanted_book ||
                     name.contains("Salesperson") ||
@@ -299,10 +301,12 @@ object EstimatedItemValue {
     fun renderInNeuStorageOverlay() {
         if (!config.enabled) return
 
+        //#if MC < 1.16
         // render the estimated item value over NEU Storage
-        GlStateManager.translate(0f, 0f, 200f)
+        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
-        GlStateManager.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f, -200f)
         renderedItems++
+        //#endif
     }
 }

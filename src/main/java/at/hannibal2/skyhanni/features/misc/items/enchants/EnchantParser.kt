@@ -16,17 +16,19 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.createHoverEvent
+import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.Loader
 import java.util.TreeSet
 
 /**
@@ -73,6 +75,8 @@ object EnchantParser {
     // enchants stacked in a single column
     private var shouldBeSingleColumn = false
 
+    private val stackingEnchants: MutableList<Enchant.Stacking> = mutableListOf()
+
     // Used to determine how many enchants are used on each line
     // for this particular item, since consistency is not Hypixel's strong point
     private var maxEnchantsPerLine = 0
@@ -81,7 +85,7 @@ object EnchantParser {
 
     private val loreCache: Cache = Cache()
 
-    val isSbaLoaded by lazy { Loader.isModLoaded("skyblockaddons") }
+    val isSbaLoaded by lazy { PlatformUtils.isModInstalled("skyblockaddons") }
 
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()
@@ -98,6 +102,7 @@ object EnchantParser {
             config.colorParsing,
             config.format,
             config.perfectEnchantColor,
+            config.boldPerfectEnchant,
             config.greatEnchantColor,
             config.goodEnchantColor,
             config.poorEnchantColor,
@@ -118,7 +123,7 @@ object EnchantParser {
         currentItem = event.itemStack
 
         // The enchants we expect to find in the lore, found from the items NBT data
-        val enchants = event.itemStack.getEnchantments() ?: return
+        val enchants = event.itemStack.getHypixelEnchantments() ?: return
 
         // Check for any vanilla gray enchants at the top of the tooltip
         indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(event.toolTip, event.itemStack)
@@ -136,7 +141,7 @@ object EnchantParser {
 
         currentItem = null
 
-        val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
+        val lore = event.getHoverEvent().value().formattedText.split("\n").toMutableList()
 
         // Check for any vanilla gray enchants at the top of the tooltip
         indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(lore, null)
@@ -173,6 +178,7 @@ object EnchantParser {
             return
         }
 
+        stackingEnchants.clear()
         shouldBeSingleColumn = false
         loreLines = mutableListOf()
         orderedEnchants = TreeSet()
@@ -242,6 +248,17 @@ object EnchantParser {
 
         // Add our parsed enchants back into the lore
         loreList.addAll(startEnchant, insertEnchants)
+
+        if (config.stackingEnchantProgress) {
+            // TODO check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
+
+            stackingEnchants.forEach { stacking ->
+                currentItem?.let { item ->
+                    loreList.add(loreList.size - 1, stacking.progressString(item))
+                }
+            }
+        }
+
         // Cache parsed lore
         loreCache.updateAfter(loreList)
 
@@ -286,6 +303,10 @@ object EnchantParser {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"
+
+                if (enchant is Enchant.Stacking) {
+                    stackingEnchants.add(enchant)
+                }
 
                 // Last found enchant
                 lastEnchant = FormattedEnchant(enchant, level, stacking, isRoman)
@@ -405,8 +426,8 @@ object EnchantParser {
         val text = loreList.joinToString("\n").dropLast(2)
 
         // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
-        val chatComponentText = ChatComponentText(text)
-        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText)
+        val chatComponentText = text.asComponent()
+        val hoverEvent = createHoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText) ?: return
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
@@ -449,7 +470,7 @@ object EnchantParser {
     // We don't check if the main toggle here since we still need to go into
     // the parseEnchants method to deal with hiding vanilla enchants
     // and enchant descriptions
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = SkyBlockUtils.inSkyBlock
 
     private fun markCacheDirty() {
         loreCache.configChanged = true

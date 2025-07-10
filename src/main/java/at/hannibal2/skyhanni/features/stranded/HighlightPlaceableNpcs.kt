@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -27,11 +27,11 @@ object HighlightPlaceableNpcs {
         "location",
         "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",
     )
-    private val clickToSetPattern by RepoPattern.pattern(
+    private val clickToSetPattern by patternGroup.pattern(
         "clicktoset",
         "§7§eClick to set the location of this NPC!",
     )
-    private val clickToSpawnPattern by RepoPattern.pattern(
+    private val clickToSpawnPattern by patternGroup.pattern(
         "clicktospawn",
         "§elocation!",
     )
@@ -67,7 +67,7 @@ object HighlightPlaceableNpcs {
         if (!isEnabled() || !inInventory) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex in highlightedItems) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }
@@ -87,5 +87,5 @@ object HighlightPlaceableNpcs {
         return lore.none { locationPattern.matches(it) }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.isStrandedProfile && config.highlightPlaceableNpcs
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.isStrandedProfile && config.highlightPlaceableNpcs
 }

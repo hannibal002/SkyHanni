@@ -1,30 +1,32 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.data.ElectionApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.mayorConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 // internal
 // set 1s timer
 object ScoreboardElementMayor : ScoreboardElement() {
+    private val config get() = CustomScoreboard.displayConfig.mayor
+
     override fun getDisplay() = buildList {
         val currentMayorName = ElectionApi.currentMayor?.mayorName?.let {
             ElectionApi.mayorNameWithColorCode(it)
         } ?: return@buildList
-        val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
+        val timeTillNextMayor = if (config.showTimeTillNextMayor) {
             "§7 (§e${ElectionApi.nextMayorTimestamp.timeUntil().format(maxUnits = 2)}§7)"
         } else ""
 
         add(currentMayorName + timeTillNextMayor)
 
-        if (mayorConfig.showMayorPerks) {
+        if (config.showMayorPerks) {
             ElectionApi.currentMayor?.activePerks?.forEach { perk ->
                 add(" §7- §e${perk.perkName}")
             }
         }
 
-        if (!mayorConfig.showExtraMayor) return@buildList
+        if (!config.showExtraMayor) return@buildList
         addAll(addMinister())
         addAll(addJerryMayor())
     }
@@ -39,7 +41,7 @@ object ScoreboardElementMayor : ScoreboardElement() {
         } ?: return@buildList
         add(ministerName)
 
-        if (mayorConfig.showMayorPerks) {
+        if (config.showMayorPerks) {
             ElectionApi.currentMinister?.activePerks?.forEach { perk ->
                 add(" §7- §e${perk.perkName}")
             }
@@ -51,7 +53,7 @@ object ScoreboardElementMayor : ScoreboardElement() {
         val extraMayor = jerryExtraMayor.first ?: return@buildList
 
         val extraMayorName = ElectionApi.mayorNameWithColorCode(extraMayor.mayorName)
-        val extraTimeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
+        val extraTimeTillNextMayor = if (config.showTimeTillNextMayor) {
             " §7(§6${jerryExtraMayor.second.timeUntil().format(maxUnits = 2)}§7)"
         } else ""
 

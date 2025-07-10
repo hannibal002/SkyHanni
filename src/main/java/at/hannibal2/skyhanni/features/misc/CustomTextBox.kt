@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object CustomTextBox {
@@ -30,7 +30,7 @@ object CustomTextBox {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!config.onlyInGUI) return
+        if (!config.onlyInGui) return
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")
@@ -38,17 +38,18 @@ object CustomTextBox {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (config.onlyInGUI) return
+        if (config.onlyInGui) return
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")
     }
 
     private fun isEnabled() =
-        (LorenzUtils.inSkyBlock || OutsideSBFeature.CUSTOM_TEXT_BOX.isSelected()) && config.enabled
+        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.CUSTOM_TEXT_BOX.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.textBox", "gui.customTextBox")
+        event.move(81, "gui.customTextBox.onlyInGUI", "gui.customTextBox.onlyInGui")
     }
 }

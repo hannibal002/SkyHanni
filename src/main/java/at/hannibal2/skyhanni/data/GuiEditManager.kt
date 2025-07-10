@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -16,6 +15,8 @@ import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -70,7 +71,7 @@ object GuiEditManager {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         lastMovedGui?.let {
             GuiPositionMovedEvent(it).post()
             lastMovedGui = null
@@ -90,6 +91,7 @@ object GuiEditManager {
 
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
+        SkyHanniMod.shouldCloseScreen = false
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
             2,
@@ -106,20 +108,22 @@ object GuiEditManager {
     }
 
     @JvmStatic
-    fun renderLast() {
+    fun renderLast(context: DrawContext) {
         if (!isInGui()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
 
-        GlStateManager.translate(0f, 0f, 200f)
+        DrawContextUtils.setContext(context)
+        DrawContextUtils.translate(0f, 0f, 200f)
 
-        RenderData.renderOverlay()
+        RenderData.renderOverlay(context)
 
-        GlStateManager.pushMatrix()
-        GlStateManager.enableDepth()
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
-        GlStateManager.popMatrix()
+        DrawContextUtils.pushPop {
+            GlStateManager.enableDepth()
+            GuiRenderEvent.ChestGuiOverlayRenderEvent(context).post()
+        }
 
-        GlStateManager.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f, -200f)
+        DrawContextUtils.clearContext()
     }
 
     fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor
