@@ -26,7 +26,7 @@ object CFTooltipCompact {
         if (config.tooltipMove) {
             if (event.slot.slotNumber <= 44) {
                 lastHover = SimpleTimeMark.now()
-                tooltipToHover = event.toolTip.toList().map { it.partyModeReplace() }
+                tooltipToHover = event.toolTip.toList().map { partyModeReplace(it) }
                 event.cancel()
             } else {
                 lastHover = SimpleTimeMark.farPast()

@@ -28,7 +28,7 @@ public class MixinTextRenderLayerSet {
     @Inject(method = "getRenderLayer", at = @At("HEAD"), cancellable = true)
     private void getRenderLayer(CallbackInfoReturnable<RenderLayer> cir) {
         if (ChromaFontManagerKt.getGlyphIsChroma()) {
-            cir.setReturnValue(SkyHanniRenderLayers.INSTANCE.getChromaTextured(skyhanni$identifier));
+            cir.setReturnValue(SkyHanniRenderLayers.INSTANCE.getChromaTexturedWithIdentifier(skyhanni$identifier));
         }
     }
 
