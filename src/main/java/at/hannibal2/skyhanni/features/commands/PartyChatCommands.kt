@@ -109,6 +109,7 @@ object PartyChatCommands {
     }
 
     private fun isTrustedUser(name: String): Boolean {
+        if (name == PlayerUtils.getName()) return true
         val friend = FriendApi.getAllFriends().find { it.name == name }
         return when (config.requiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
@@ -130,7 +131,7 @@ object PartyChatCommands {
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         val name = event.cleanedAuthor
-        if (name == PlayerUtils.getName() && !command.triggerableBySelf) return
+        if (name == PlayerUtils.getName() && (!command.triggerableBySelf || !config.selfTriggerCommands)) return
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyApi.partyLeader != PlayerUtils.getName()) return
         if (isBlockedUser(name)) {

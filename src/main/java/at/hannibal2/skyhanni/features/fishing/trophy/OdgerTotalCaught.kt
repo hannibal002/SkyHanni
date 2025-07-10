@@ -24,11 +24,13 @@ object OdgerTotalCaught {
     )
 
     /**
+     * REGEX-TEST: §8Bronze §c✖
+     * REGEX-TEST: §8Bronze §a✔§7 (4)
      * REGEX-TEST: §5§o§8Bronze §a✔§7 (4)
      */
     private val bronzePattern by patternGroup.pattern(
         "bronze",
-        "^§5§o§8Bronze.*",
+        "^(?:§5§o)?§8Bronze.*",
     )
 
     private val odgerInventory = InventoryDetector { name -> name == "Trophy Fishing" }
