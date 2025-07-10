@@ -69,15 +69,15 @@ object CompactSweepDetails {
         var logCountDisplay: String = "",
         var logs: Double = -1.0,
         var proTip: String = "",
-        val chatBreakdown: MutableList<String> = mutableListOf(),
-        val hoverPenalties: MutableList<String> = mutableListOf(),
+        val breakdown: MutableList<String> = mutableListOf(),
+        val penalties: MutableList<String> = mutableListOf(),
         var sweepDisplay: String = "",
         var sweep: Double = -1.0,
         var toughness: Double = -1.0,
         var treeType: String = "",
     ) : ResettableStorageSet()
 
-    private var sweepDetailsVariablesDirty = false
+    private var sweepDetailsAreDirty = false
     private var isInsideSweepDetails = false
     private var sweepDetails: SweepDetails = SweepDetails()
 
@@ -85,22 +85,22 @@ object CompactSweepDetails {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isInIsland() || !config.compactSweepDetails) return
         sweepDetailsPattern.matchMatcher(event.message) {
-            if (sweepDetails.hoverPenalties.isNotEmpty()) {
+            if (sweepDetails.penalties.isNotEmpty()) {
                 sendCompactedResults()
             }
             // Set these to true so future messages get blocked properly regardless of Axe Throw status
             isInsideSweepDetails = true
-            sweepDetailsVariablesDirty = true
+            sweepDetailsAreDirty = true
             sweepDetails = SweepDetails()
             sweepDetails.addedInitialLogs = false
             sweepDetails.sweepDisplay = group("sweep")
-            sweepDetails.hoverPenalties.addAll(
+            sweepDetails.penalties.addAll(
                 listOf(
                     "§eClick to open the Tree Gifts guide!",
                     "§6Initial §2Sweep§7: §2${group("sweepAmt").formatDouble()}",
                 ),
             )
-            sweepDetails.chatBreakdown.add("§2Sweep: ${sweepDetails.sweepDisplay}")
+            sweepDetails.breakdown.add("§2Sweep: ${sweepDetails.sweepDisplay}")
             event.blockedReason = "SWEEP_DETAILS"
             return
         }
@@ -111,7 +111,7 @@ object CompactSweepDetails {
             sweepDetails.logCountDisplay = group("logsDisplay")
             sweepDetails.logs = group("logsAmount").formatDouble()
             val fixedToughness = sweepDetails.toughness.toString().removeSuffix(".0")
-            sweepDetails.hoverPenalties.add("§6Initial Logs: ${sweepDetails.logs} ${sweepDetails.treeType} Logs §7(§6$fixedToughness toughness§7)")
+            sweepDetails.penalties.add("§6Initial Logs: ${sweepDetails.logs} ${sweepDetails.treeType} Logs §7(§6$fixedToughness toughness§7)")
             event.blockedReason = "SWEEP_DETAILS"
             if (isFinalCalculation(group("isItGreen"))) {
                 sendCompactedResults()
@@ -119,13 +119,13 @@ object CompactSweepDetails {
         }
         penaltyPattern.matchMatcher(event.message) {
             if (!sweepDetails.addedInitialLogs) {
-                sweepDetails.chatBreakdown.add("§7, §e${sweepDetails.logs} logs")
+                sweepDetails.breakdown.add("§7, §e${sweepDetails.logs} logs")
                 sweepDetails.addedInitialLogs = true
             }
             sweepDetails.logs = group("logsAmount").formatDouble()
             sweepDetails.logCountDisplay = group("logsDisplay")
-            sweepDetails.hoverPenalties.add("§e${group("penaltyReason")}§7: §c-${group("penaltyPercent").formatDouble()}% §7(${sweepDetails.logs} logs)")
-            sweepDetails.chatBreakdown.add("§7(${group("penaltyDisplay")}§7)")
+            sweepDetails.penalties.add("§e${group("penaltyReason")}§7: §c-${group("penaltyPercent").formatDouble()}% §7(${sweepDetails.logs} logs)")
+            sweepDetails.breakdown.add("§7(${group("penaltyDisplay")}§7)")
             sweepDetails.proTip = groupOrEmpty("proTip")
             event.blockedReason = "SWEEP_DETAILS"
             if (isFinalCalculation(group("isItGreen"))) {
@@ -140,21 +140,21 @@ object CompactSweepDetails {
     }
 
     private fun sendCompactedResults() {
-        sweepDetails.hoverPenalties.add("§6Final Logs: §a${sweepDetails.logs} §6${sweepDetails.treeType} Logs")
+        sweepDetails.penalties.add("§6Final Logs: §a${sweepDetails.logs} §6${sweepDetails.treeType} Logs")
         isInsideSweepDetails = false
 
         val builder = StringBuilder()
 
-        sweepDetails.hoverPenalties.forEach { penalty ->
+        sweepDetails.penalties.forEach { penalty ->
             builder.append(penalty)
-            if (penalty != sweepDetails.hoverPenalties.last()) builder.append("\n")
+            if (penalty != sweepDetails.penalties.last()) builder.append("\n")
         }
         if (sweepDetails.proTip.isNotEmpty()) builder.append("\n§6Pro tip: ${sweepDetails.proTip}")
         val hoverText = builder.toString()
 
         builder.clear()
 
-        sweepDetails.chatBreakdown.forEach { section ->
+        sweepDetails.breakdown.forEach { section ->
             builder.append(section)
             if (!section.startsWith("§2Sweep: ") || !sweepDetails.addedInitialLogs) builder.append(" ")
         }
@@ -173,13 +173,13 @@ object CompactSweepDetails {
     }
 
     private fun resetSweepDetailsVariables() {
-        if (!sweepDetailsVariablesDirty) return
+        if (!sweepDetailsAreDirty) return
 
         isInsideSweepDetails = false
 
         sweepDetails.reset()
 
-        sweepDetailsVariablesDirty = false
+        sweepDetailsAreDirty = false
     }
 
     private fun isFinalCalculation(regexGroup: String): Boolean = regexGroup == "§a"
