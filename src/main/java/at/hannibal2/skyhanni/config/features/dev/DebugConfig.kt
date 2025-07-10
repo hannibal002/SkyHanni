@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
@@ -230,10 +230,10 @@ class DebugConfig {
     val animatedItemStackPosition: Position = Position(-300, 300)
 
     @Expose
-    @ConfigManager.NoConfigLink
+    @NoConfigLink
     val trackSoundPosition: Position = Position(0, 0)
 
     @Expose
-    @ConfigManager.NoConfigLink
+    @NoConfigLink
     val trackParticlePosition: Position = Position(0, 0)
 }
