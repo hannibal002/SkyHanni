@@ -14,20 +14,16 @@ class GuiOptionEditorBlocked(base: GuiOptionEditor) : GuiOptionEditor(base.getOp
         // Depress original option
         context.drawColoredRect(x.toFloat(), y.toFloat(), (x + width).toFloat(), (y + height).toFloat(), -0x80000000)
 
-        context.color(1f, 1f, 1f, 1f)
-        context.bindTexture(blockedTexture)
-
         val iconWidth: Float = height * 96f / 64
-        context.drawTexturedRect(x.toFloat(), y.toFloat(), iconWidth, height.toFloat())
+        context.drawTexturedRect(blockedTexture, x.toFloat(), y.toFloat(), iconWidth, height.toFloat())
 
         val fontRenderer = context.minecraft.defaultFontRenderer
         context.drawStringScaledMaxWidth(
             "This option is currently not available.",
             fontRenderer,
             (x + iconWidth).toInt(), (y + height / 2f - fontRenderer.height / 2f).toInt(),
-            true, (width - iconWidth).toInt(), -0xbbbc
+            true, (width - iconWidth).toInt(), -0xbbbc,
         )
-        context.color(1f, 1f, 1f, 1f)
     }
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
@@ -44,7 +40,7 @@ class GuiOptionEditorBlocked(base: GuiOptionEditor) : GuiOptionEditor(base.getOp
 
     companion object {
         val blockedTexture: MyResourceLocation = MyResourceLocation(
-            "skyhanni", "config_blocked.png"
+            "skyhanni", "config_blocked.png",
         )
     }
 }

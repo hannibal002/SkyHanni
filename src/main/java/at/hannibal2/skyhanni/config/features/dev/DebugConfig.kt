@@ -225,6 +225,15 @@ class DebugConfig {
     var animatedItemStack: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
+    @ConfigEditorBoolean
+    var addonsDebug: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
+    val addonsDebugPosition: Position = Position(300, 300)
+
+    @Expose
     @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
     val animatedItemStackPosition: Position = Position(-300, 300)
 

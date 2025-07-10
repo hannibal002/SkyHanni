@@ -341,7 +341,7 @@ fun createHoverEvent(action: HoverEvent.Action?, component: ChatComponentText): 
 //$$     if (action == null) return null
 //$$     when (action) {
 //$$         HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
-//$$         // i really don't think anyone is using the other 2 lol
+//$$         // I really don't think anyone is using the other 2 lol
 //$$         else -> return null
 //$$     }
 //$$ }
@@ -353,3 +353,13 @@ fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
 //#else
 //$$ this.copy().formatted(color.toChatFormatting())
 //#endif
+
+fun IChatComponent.convertToJsonString(): String {
+    //#if MC < 1.21
+    return IChatComponent.Serializer.componentToJson(this)
+    //#elseif MC < 1.21.6
+    //$$ return Text.Serializer(net.minecraft.registry.DynamicRegistryManager.EMPTY).serialize(this, null, null).toString()
+    //#else
+    //$$ return net.minecraft.text.TextCodecs.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
+    //#endif
+}
