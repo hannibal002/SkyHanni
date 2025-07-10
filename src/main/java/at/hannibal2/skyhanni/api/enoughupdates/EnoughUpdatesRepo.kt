@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.features.dev.NeuRepositoryConfig
 import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -11,11 +13,15 @@ import java.io.FileWriter
 import java.io.InputStreamReader
 import java.net.URL
 
-// The regular repo has too much extra stuff for it to be worth having more common logic
 object EnoughUpdatesRepo {
 
+    private val config get(): NeuRepositoryConfig = SkyHanniMod.feature.dev.neuRepo
+
     fun downloadRepo() {
-        download()
+        checkRepoLocation()
+        if (config.repoAutoUpdate) {
+            download()
+        }
         ChatUtils.chat("Updated NEU repo")
         EnoughUpdatesManager.reloadRepo()
     }
@@ -35,7 +41,7 @@ object EnoughUpdatesRepo {
             return
         }
 
-        val url = URL("https://github.com/NotEnoughUpdates/NotEnoughUpdates-Repo/archive/$hash.zip")
+        val url = URL("https://github.com/${config.location.user}/${config.location.name}/archive/$hash.zip")
         val urlConnection = url.openConnection()
         urlConnection.connectTimeout = 15000
         urlConnection.readTimeout = 30000
@@ -57,9 +63,52 @@ object EnoughUpdatesRepo {
         writeCurrentCommitHash(hash)
     }
 
+    private const val DEFAULT_USER = "NotEnoughUpdates"
+    private const val DEFAULT_NAME = "NotEnoughUpdates-REPO"
+    private const val DEFAULT_BRANCH = "master"
+
+    fun hasDefaultRepositoryLocation(): Boolean =
+        config.location.user == DEFAULT_USER && config.location.name == DEFAULT_NAME && config.location.branch == DEFAULT_BRANCH
+
+    fun getRepoLocation(): String {
+        return "${config.location.user}/${config.location.name}/${config.location.branch}"
+    }
+
+    private fun checkRepoLocation() {
+        if (config.run { location.user.isEmpty() || location.name.isEmpty() || location.branch.isEmpty() }) {
+            ChatUtils.chat("Invalid NEU Repo settings detected, resetting default settings.")
+            resetRepoLocation()
+        }
+    }
+
+    fun resetRepoLocation(manual: Boolean = false) {
+
+        if (hasDefaultRepositoryLocation()) {
+            ChatUtils.chat("NEU Repo location is already set to default.")
+        }
+        config.location.user = DEFAULT_USER
+        config.location.name = DEFAULT_NAME
+        config.location.branch = DEFAULT_BRANCH
+
+        if (manual) {
+            ChatUtils.clickableChat(
+                "NEU Repo location has been reset to default. " +
+                    "Click §aUpdate Repo Now §ein config or run /neuresetrepo to update!",
+                onClick = {
+                    downloadRepo()
+                },
+                "§eClick to update the NEU repo!",
+            )
+        }
+    }
+
     private fun getCommitHash(): String? {
         try {
-            InputStreamReader(URL("https://api.github.com/repos/NotEnoughUpdates/NotEnoughUpdates-Repo/commits/master").openStream())
+            InputStreamReader(
+                URL(
+                    "https://api.github.com/repos/${config.location.user}/${config.location.name}/commits/${config.location.branch}",
+                ).openStream(),
+            )
                 .use { reader ->
                     val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
                     return json["sha"].asString

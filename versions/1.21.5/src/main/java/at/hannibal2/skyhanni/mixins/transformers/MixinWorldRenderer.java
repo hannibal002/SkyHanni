@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.utils.EntityUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -37,6 +38,9 @@ public class MixinWorldRenderer {
     public void resetRealGlowing(CallbackInfoReturnable<Boolean> cir) {
         RenderLivingEntityHelper.INSTANCE.setRenderingRealGlow(false);
         RenderLivingEntityHelper.INSTANCE.check();
+        RenderEntityOutlineEvent noXrayOutlineEvent = new RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.NO_XRAY, null);
+        RenderLivingEntityHelper.INSTANCE.setCurrentGlowEvent(noXrayOutlineEvent);
+        noXrayOutlineEvent.post();
     }
 
     @Inject(method = "getEntitiesToRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
@@ -48,7 +52,11 @@ public class MixinWorldRenderer {
     public boolean shouldAlsoGlow(MinecraftClient instance, Entity entity, Operation<Boolean> original) {
         if (entity instanceof LivingEntity livingEntity) {
             int i = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity,0);
-            if (i == 0) return original.call(instance, entity);
+            if (i == 0) {
+                if (RenderLivingEntityHelper.INSTANCE.isEntityInGlowEvent(entity) == 0) {
+                    return original.call(instance, entity);
+                }
+            }
             boolean returnValue;
             if (RenderLivingEntityHelper.INSTANCE.getRenderingRealGlow()) {
                 returnValue = EntityUtils.INSTANCE.canBeSeen(entity, 150, .5);
@@ -64,7 +72,14 @@ public class MixinWorldRenderer {
     public int changeGlowColour(Entity entity, Operation<Integer> original) {
         if (entity instanceof LivingEntity livingEntity) {
             int i = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity, 0);
-            if (i == 0) return original.call(entity);
+            if (i == 0) {
+                int otherColor = RenderLivingEntityHelper.INSTANCE.isEntityInGlowEvent(entity);
+                if (otherColor != 0) {
+                    i = otherColor;
+                } else {
+                    return original.call(entity);
+                }
+            }
             return i;
         }
         return original.call(entity);
