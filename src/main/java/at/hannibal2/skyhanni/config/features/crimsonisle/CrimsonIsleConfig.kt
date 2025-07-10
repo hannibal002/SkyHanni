@@ -26,6 +26,11 @@ class CrimsonIsleConfig {
     val matriarchHelper: MatriarchHelperConfig = MatriarchHelperConfig()
 
     @Expose
+    @ConfigOption(name = "Atoms HitBox", desc = "")
+    @Accordion
+    val atomHitBox: AtomHitBoxConfig = AtomHitBoxConfig()
+
+    @Expose
     @ConfigOption(
         name = "Disable Profile Viewer in Kuudra",
         desc = "Prevent player interactions during the Kuudra boss fight to stop Profile Viewer from opening."
