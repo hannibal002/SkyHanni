@@ -1,50 +1,90 @@
 package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import java.lang.reflect.Modifier
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
+import kotlin.reflect.jvm.jvmErasure
 
-open class ResettableStorageSet {
-    private val mutableMemberProperties: List<KMutableProperty1<Any, Any?>> =
-        this::class.memberProperties.filterIsInstance<KMutableProperty1<Any, Any?>>()
-            .filter { !it.hasAnnotation<Transient>() }
-
-    open fun reset() = applyFromOther(this::class.createInstance())
-
-    open fun applyFromOther(other: ResettableStorageSet) {
-        if (this::class != other::class) return
-        mutableMemberProperties.forEach { prop ->
-            try {
-                val otherPropVal = prop.forceGet(other)
-                prop.forceSet(this, otherPropVal)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                ErrorManager.skyHanniError(
-                    "Failed to apply property ${prop.name} from ${other::class.simpleName} to ${this::class.simpleName}"
-                )
+/**
+ * Defines a storage set that can be reset to its default values.
+ *  - vars will be set to their default value
+ *  - mutable maps/collections will be cleared
+ *  Params can be "ignored" from the reset by annotating them with [Transient].
+ */
+abstract class ResettableStorageSet {
+    private val classSimpleName by lazy { this::class.simpleName ?: "UnknownClass" }
+    private val props = run {
+        val vars = this::class.memberProperties.filterIsInstance<KMutableProperty1<out ResettableStorageSet, Any?>>()
+        val (cols, maps, iters) = listOf(
+            MutableCollection::class,
+            MutableMap::class,
+            MutableIterator::class
+        ).map { type ->
+            this::class.memberProperties.filter {
+                it.returnType.jvmErasure.isSubclassOf(type)
             }
+        }
+        (vars + cols + maps + iters).filter { prop ->
+            val annotatedIgnore = prop.hasAnnotation<Transient>()
+            val modifiedIgnore = prop.javaField?.let { Modifier.isTransient(it.modifiers) } ?: false
+            !annotatedIgnore && !modifiedIgnore
         }
     }
 
-    private fun KMutableProperty1<Any, Any?>.forceGet(target: Any): Any? {
-        val wasAccessible = this.isAccessible
-        this.isAccessible = true
-        val value = this.get(target)
-        this.isAccessible = wasAccessible
-        return value
+    open fun reset() {
+        val defaults = this::class.createInstance()
+        props.forEach { prop ->
+            tryResetProp(prop, defaults)
+        }
     }
 
-    private fun KMutableProperty1<Any, Any?>.forceSet(target: Any, value: Any?) {
-        val wasAccessible = this.isAccessible
-        this.isAccessible = true
-        this.set(target, value)
-        this.isAccessible = wasAccessible
+    private fun tryResetProp(
+        prop: KProperty1<out ResettableStorageSet, *>,
+        defaults: ResettableStorageSet,
+    ) {
+        val originalAccessibility = prop.isAccessible
+        try {
+            prop.isAccessible = true
+            val current = prop.getter.call(this)
+            prop.resetFun(current, defaults)
+            prop.isAccessible = originalAccessibility
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to reset property ${prop.name} of $classSimpleName",
+                "throwable message" to e.message,
+            )
+        } finally {
+            prop.isAccessible = originalAccessibility
+        }
     }
 
-    override fun toString(): String = mutableMemberProperties.joinToString("\n") { prop ->
-        "${prop.name} = ${prop.forceGet(this) ?: ""}"
+    private fun KProperty1<out ResettableStorageSet, *>.resetFun(
+        current: Any?,
+        defaults: ResettableStorageSet,
+    ) = when {
+        this is KMutableProperty1<*, *> -> {
+            @Suppress("UNCHECKED_CAST")
+            val mutableProp = this as KMutableProperty1<Any, Any?>
+            val defaultValue = mutableProp.get(defaults)
+            mutableProp.set(this@ResettableStorageSet, defaultValue)
+        }
+        current is MutableCollection<*> -> current.clear()
+        current is MutableMap<*, *> -> current.clear()
+        current is MutableIterator<*> -> current.removeIf { true }
+        else -> ChatUtils.debug(
+            message = "ResettableStorageSet $classSimpleName tried to reset property '${this.name}' " +
+                "but it is of type ${current?.javaClass?.simpleName}, which is not handled.",
+            replaceSameMessage = true,
+        )
     }
 }
