@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard
 
 class TrackCommandConfig {
     @Expose
-    @ConfigManager.NoConfigLink
+    @NoConfigLink
     val position: Position = Position(0, 0)
 
     @Expose

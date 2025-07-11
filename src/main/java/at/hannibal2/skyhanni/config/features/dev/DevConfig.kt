@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
@@ -75,15 +75,15 @@ class DevConfig {
     val waypoint: WaypointsConfig = WaypointsConfig()
 
     @Expose
-    @ConfigManager.NoConfigLink
+    @NoConfigLink
     val debugPos: Position = Position(10, 10)
 
     @Expose
-    @ConfigManager.NoConfigLink
+    @NoConfigLink
     val debugLocationPos: Position = Position(1, 160)
 
     @Expose
-    @ConfigManager.NoConfigLink
+    @NoConfigLink
     val debugItemPos: Position = Position(90, 70)
 
     @Expose

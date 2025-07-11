@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui
 
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
@@ -175,10 +175,10 @@ class GuiConfig {
     val widenConfig: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigManager.NoConfigLink
+    @NoConfigLink
     val titlePosition: Position = Position(0, 160)
 
     @Expose
-    @ConfigManager.NoConfigLink
+    @NoConfigLink
     val titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
 }
