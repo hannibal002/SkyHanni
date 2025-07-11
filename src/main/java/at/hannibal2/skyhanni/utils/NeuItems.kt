@@ -119,6 +119,7 @@ object NeuItems {
         itemNamesWithoutColor = noColor as NavigableMap<String, NeuInternalName>
         allItemsCache = map
         stackResolutionCache.clear()
+        ChatUtils.debug("Cleared the NEUItems stack resolution cache")
     }
 
     fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery()
