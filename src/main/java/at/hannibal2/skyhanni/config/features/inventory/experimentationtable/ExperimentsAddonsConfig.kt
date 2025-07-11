@@ -11,7 +11,7 @@ class ExperimentsAddonsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Enable the helper for Chronomatron and Ultrasequencer."
+        desc = "Enable the helper for Chronomatron and Ultrasequencer.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -20,7 +20,7 @@ class ExperimentsAddonsConfig {
     @Expose
     @ConfigOption(
         name = "Next Click Helper",
-        desc = "Highlights the next slot to click in Chronomatron, and shows all items in Ultrasequencer."
+        desc = "Highlights the next slot to click in Chronomatron, and shows all items in Ultrasequencer.",
     )
     @ConfigEditorBoolean
     var highlightNextClick: Boolean = true
@@ -28,7 +28,7 @@ class ExperimentsAddonsConfig {
     @Expose
     @ConfigOption(
         name = "Prevent Misclicks",
-        desc = "Prevent clicking wrong colors in Chronomatron, and wrong slots in Ultrasequencer."
+        desc = "Prevent clicking wrong colors in Chronomatron, and wrong slots in Ultrasequencer.",
     )
     @ConfigEditorBoolean
     @SearchTag("missclick")
@@ -37,7 +37,7 @@ class ExperimentsAddonsConfig {
     @Expose
     @ConfigOption(
         name = "Max Clicks Alert",
-        desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer."
+        desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.",
     )
     @ConfigEditorBoolean
     var maxSequenceAlert: Boolean = true
