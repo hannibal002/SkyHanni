@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
@@ -181,7 +182,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
                 internalName.getItemStackOrNull()
             }
             itemStackOrNull?.let {
-                row[TextPart.ICON] = Renderable.itemStack(it)
+                row[TextPart.ICON] = ItemStackRenderable(it)
             }
 
             row[TextPart.TOTAL_PRICE] = string(" $priceFormat")

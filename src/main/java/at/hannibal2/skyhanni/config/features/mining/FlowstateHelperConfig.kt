@@ -35,6 +35,11 @@ class FlowstateHelperConfig {
     var autoHide: Int = 10
 
     @Expose
+    @ConfigOption(name = "Personal Best Message", desc = "Sends a message when you beat your flowstate record.")
+    @ConfigEditorBoolean
+    var personalBestMessage: Boolean = true
+
+    @Expose
     @ConfigLink(owner = FlowstateHelperConfig::class, field = "enabled")
     val position: Position = Position(-110, 9)
 }

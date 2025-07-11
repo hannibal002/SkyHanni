@@ -732,6 +732,9 @@ class ProfileSpecificStorage(
         var crystalNucleusTracker: CrystalNucleusTracker.Data = CrystalNucleusTracker.Data()
 
         @Expose
+        var flowstatePersonalBest = 0
+
+        @Expose
         var darkMonolithTracker: DarkMonolithFeatures.Data = DarkMonolithFeatures.Data()
     }
 

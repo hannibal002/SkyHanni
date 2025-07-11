@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.utils
+
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
@@ -280,11 +281,13 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.disableScissor()
     }
 
-    fun drawFloatingRectDark(
+    private fun drawFloatingRect(
         x: Int,
         y: Int,
         width: Int,
         height: Int,
+        light: Int = -0xcfcfca,
+        dark: Int = -0xefefea,
         shadow: Boolean = true,
     ) {
         //#if MC < 1.21
@@ -298,8 +301,6 @@ object GuiRenderUtils {
         //#endif
 
         val main = alpha or 0x202026
-        val light = -0xcfcfca
-        val dark = -0xefefea
         drawRect(x, y, x + 1, y + height, light) // Left
         drawRect(x + 1, y, x + width, y + 1, light) // Top1
         drawRect(x + width - 1, y + 1, x + width, y + height, dark) // Right
@@ -310,6 +311,43 @@ object GuiRenderUtils {
             drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow
         }
     }
+
+    fun drawFloatingRectDark(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        drawFloatingRect(
+            x,
+            y,
+            width,
+            height,
+            -0xcfcfca,
+            -0xefefea,
+            shadow = shadow,
+        )
+    }
+
+    fun drawFloatingRectLight(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        drawFloatingRect(
+            x,
+            y,
+            width,
+            height,
+            light = -0xefefea,
+            dark = -0xcfcfca,
+            shadow = shadow,
+        )
+    }
+
 
     fun ItemStack.renderOnScreen(
         x: Float,

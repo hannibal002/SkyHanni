@@ -119,6 +119,11 @@ class DungeonConfig {
     val lividFinder: LividFinderConfig = LividFinderConfig()
 
     @Expose
+    @ConfigOption(name = "Trinity", desc = "")
+    @Accordion
+    val trinityHelper: TrinityConfig = TrinityConfig()
+
+    @Expose
     @ConfigOption(name = "Terracotta Phase", desc = "")
     @Accordion
     val terracottaPhase: TerracottaPhaseConfig = TerracottaPhaseConfig()
