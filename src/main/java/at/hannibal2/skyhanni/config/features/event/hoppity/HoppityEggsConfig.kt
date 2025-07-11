@@ -88,11 +88,21 @@ class HoppityEggsConfig {
     @FeatureToggle
     var preventMissingRabbitTheFish: Boolean = true
 
+    enum class EggSoundMode(private val displayName: String) {
+        NO_MOD("No Modification"),
+        MUTE("Mute Sounds"),
+        REVERT("Revert to Eat Sound"),
+        ;
+    }
+
     @Expose
-    @ConfigOption(name = "Mute Egg Sounds", desc = "Mute the note block sounds when opening an egg.")
+    @ConfigOption(
+        name = "Modify Egg Sounds",
+        desc = "Mute or revert the note block sounds when opening an egg."
+    )
     @ConfigEditorBoolean
     @OnlyModern
     @FeatureToggle
-    @SearchTag("rolling")
-    var muteEggSounds: Boolean = false
+    @SearchTag("rolling eat")
+    var soundMode: EggSoundMode = EggSoundMode.NO_MOD
 }

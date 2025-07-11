@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -22,13 +23,15 @@ object HoppityMuteEggSounds {
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!config.muteEggSounds) return
         if (!eggInventory.isInside() || lastInInventory.passedSince() > 2.seconds)
         if (!event.isEggSound()) return
-        event.cancel()
+        when (config.soundMode) {
+            HoppityEggsConfig.EggSoundMode.NO_MOD -> return
+            HoppityEggsConfig.EggSoundMode.MUTE -> return event.cancel()
+            HoppityEggsConfig.EggSoundMode.REVERT -> return event.replaceWithOther("random.eat")
+        }
     }
 
     private fun PlaySoundEvent.isEggSound(): Boolean =
         soundName == "block.note_block.bit" && distanceToPlayer < 2.0 && volume == 1.0f
-
 }
