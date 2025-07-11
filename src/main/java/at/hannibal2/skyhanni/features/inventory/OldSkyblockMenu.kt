@@ -13,13 +13,11 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.util.Locale
 import kotlin.reflect.KFunction
 
 /**
@@ -27,8 +25,6 @@ import kotlin.reflect.KFunction
  */
 @SkyHanniModule
 object OldSkyblockMenu {
-
-    private val decimalFormat = DecimalFormat("##,##0", DecimalFormatSymbols(Locale.US))
     private val skyblockMenu = InventoryDetector { name -> name == "SkyBlock Menu" }
     private val storage get() = ProfileStorageData.profileSpecific?.maxwell
     private val enabled get() = SkyHanniMod.feature.inventory.oldSkyBlockMenu
@@ -48,7 +44,7 @@ object OldSkyblockMenu {
 
             val lore = item.getLore().toMutableList()
             lore.add(4, "")
-            val format = decimalFormat.format(magicalPower)
+            val format = magicalPower.addSeparators()
             lore.add(5, "§7Magical Power: §6$format")
 
             val newItem = item.copy()
