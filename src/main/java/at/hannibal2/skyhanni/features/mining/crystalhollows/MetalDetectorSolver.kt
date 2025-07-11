@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -22,15 +23,16 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -41,18 +43,20 @@ object MetalDetectorSolver {
      */
     private val metalDetectorDistancePattern by RepoPattern.pattern(
         "mining.crystalnucleus.metaldetector.treasure",
-        ".*§3§lTREASURE: §b(?<distance>.*)m"
+        ".*§3§lTREASURE: §b(?<distance>.*)m",
     )
 
     /**
      * REGEX-TEST: §aYou found §r§a☘ Flawed Jade Gemstone §r§8x4 §r§awith your §r§cMetal Detector§r§a!
+     * REGEX-TEST: §aYou found §r§dGemstone Powder §r§8x147 §r§awith your §r§cMetal Detector§r§a!
+     * REGEX-TEST: §aYou found §r§cScavenged Diamond Axe §r§awith your §r§cMetal Detector§r§a!
      */
     private val treasureFoundPattern by RepoPattern.pattern(
         "mining.crystalnucleus.metaldetector.treasurefound",
-        "§aYou found .*with your §r§cMetal Detector§r§a!"
+        "§aYou found .*with your §r§cMetal Detector§r§a!",
     )
 
-    private val config get() = SkyHanniMod.feature.mining.metalDetector.metalDetectorSolver
+    private val config get() = SkyHanniMod.feature.mining.metalDetector
 
     private var chestLocations: List<LorenzVec> = listOf()
     private val predictedChestLocations: MutableList<LorenzVec> = mutableListOf()
@@ -61,6 +65,7 @@ object MetalDetectorSolver {
     private var lastSearchedForBase: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastLoc: LorenzVec? = null
     private var playedPling = false
+    private var lastTreasureFound = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -102,20 +107,29 @@ object MetalDetectorSolver {
                 }
             }
 
+            if (predictedChestLocations.size == 1) {
+                ChatUtils.chat(
+                    "Found a treasure chest location",
+                    replaceSameMessage = true,
+                )
+                return
+            } else {
+                if (lastTreasureFound.passedSince() < 500.milliseconds) return
+            }
+
             if (predictedChestLocations.size == 0) {
                 ChatUtils.chat(
                     "No chests found. Try standing still with the metal detector in a different spot.",
-                    replaceSameMessage = true
+                    replaceSameMessage = true,
                 )
             } else if (predictedChestLocations.size > 1) {
                 ChatUtils.chat(
                     "${predictedChestLocations.size} possible locations found. " +
                         "Please try standing still with the metal detector in a different spot.",
-                    replaceSameMessage = true
+                    replaceSameMessage = true,
                 )
             }
         }
-
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
@@ -125,6 +139,17 @@ object MetalDetectorSolver {
 
         playedPling = false
         predictedChestLocations.clear()
+        val timeTaken = lastTreasureFound.passedSince()
+
+        if (config.showTimeTaken && !lastTreasureFound.isFarPast()) {
+            DelayedRun.runNextTick {
+                ChatUtils.chat(
+                    "§aYou found the treasure in §e${timeTaken.inWholeSeconds}§a seconds.",
+                )
+            }
+        }
+
+        lastTreasureFound = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
@@ -146,6 +171,7 @@ object MetalDetectorSolver {
         ignoreLocation = null
         lastLoc = null
         playedPling = false
+        lastTreasureFound = SimpleTimeMark.farPast()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
@@ -201,5 +227,5 @@ object MetalDetectorSolver {
         return currentPosition
     }
 
-    fun isEnabled() = config && MiningApi.inMinesOfDivan()
+    fun isEnabled() = MiningApi.inMinesOfDivan() && config.metalDetectorSolver
 }
