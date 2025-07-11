@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
@@ -61,7 +59,7 @@ data class ItemStackAnimationFrame(
 )
 
 class AnimatedItemStackRenderable(
-    private val frames: Collection<ItemStackAnimationFrame>,
+    frames: Collection<ItemStackAnimationFrame>,
     private val rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
     private val bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
     scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -70,7 +68,6 @@ class AnimatedItemStackRenderable(
     rescaleSkulls: Boolean = true,
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-    override val highlight: Boolean = false,
 ) : ItemStackRenderable(
     frames.firstOrNull()?.stackProvider ?: ErrorManager.skyHanniError(
         "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
@@ -81,7 +78,6 @@ class AnimatedItemStackRenderable(
     rescaleSkulls,
     horizontalAlign,
     verticalAlign,
-    highlight,
 ) {
     constructor(
         stackProvider: AbstractItemStackProvider,
@@ -97,7 +93,7 @@ class AnimatedItemStackRenderable(
     ) : this(
         listOf(ItemStackAnimationFrame(stackProvider, ticks = 0)),
         rotation, bounce, scale, xSpacing,
-        ySpacing, rescaleSkulls, horizontalAlign, verticalAlign, highlight,
+        ySpacing, rescaleSkulls, horizontalAlign, verticalAlign,
     )
 
     private var frameIndex = 0

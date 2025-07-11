@@ -20,7 +20,7 @@ class NeuItemStackProvider(private val internalName: NeuInternalName) : Abstract
     private var _lastNeuItemCount: Int = neuItemCount
     private var _cachedStack: ItemStack = rebuildFromNeu()
 
-    private fun rebuildFromNeu() = with (NeuItems) {
+    private fun rebuildFromNeu() = with(NeuItems) {
         _cachedStack = internalName.getItemStack()
         _lastNeuItemCount = neuItemCount
         _cachedStack

@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackBounceDefinition
@@ -18,8 +17,7 @@ import net.minecraft.util.EnumFacing
 object ItemRenderableTest {
 
     private val config get() = SkyHanniMod.feature.dev.debug
-    private val BOX_OF_SEEDS_ITEM = "BOX_OF_SEEDS".toInternalName()
-    private val boxOfSeedsProvider = NeuItemStackProvider(BOX_OF_SEEDS_ITEM)
+    private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
 
     private val itemStackRenderable by lazy {
         ItemStackRenderable(boxOfSeedsProvider, scale = 3.0)
