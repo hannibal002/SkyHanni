@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HotmConfig {
     @Expose
@@ -23,6 +24,7 @@ class HotmConfig {
     @ConfigOption(name = "Sky Mall Display", desc = "Display your current Sky Mall perk in a GUI element.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("skymall")
     var skyMallDisplay: Boolean = false
 
     @Expose
