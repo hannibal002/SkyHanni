@@ -182,6 +182,7 @@
       <w>moulconfig</w>
       <w>mouselocked</w>
       <w>mouselowered</w>
+      <w>mousemat</w>
       <w>mycelium</w>
       <w>nametag</w>
       <w>nametags</w>
@@ -271,6 +272,8 @@
       <w>soulweaver</w>
       <w>spawnable</w>
       <w>sprayonator</w>
+      <w>starborn</w>
+      <w>starlyn</w>
       <w>statspocalypse</w>
       <w>stillgore</w>
       <w>stonk</w>

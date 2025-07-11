@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
@@ -619,7 +620,7 @@ class ProfileSpecificStorage(
             var attemptsSince: Int = 0
 
             @Expose
-            var xpSince: Int = 0
+            var xpSince: Long = 0
         }
 
         @Expose
@@ -658,7 +659,7 @@ class ProfileSpecificStorage(
 
     // - foraging
     @Expose
-    var foraging: ForagingStorage = ForagingStorage()
+    val foraging: ForagingStorage = ForagingStorage()
 
     class ForagingStorage {
         @Expose
@@ -672,6 +673,10 @@ class ProfileSpecificStorage(
 
         @Expose
         var whispers: PowderStorage = PowderStorage()
+
+        // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
+        @Expose
+        var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
     }
 
     // - mining
@@ -898,6 +903,13 @@ class ProfileSpecificStorage(
     class CakeCounterData(
         @Expose var cakesEaten: Int? = -1,
         @Expose var soulsFound: Int = 0,
+    )
+
+    @Expose
+    var attributeShards: MutableMap<String, AttributeShardData> = mutableMapOf()
+
+    data class AttributeShardData(
+        @Expose var amountSyphoned: Int = 0,
     )
 
     @Expose

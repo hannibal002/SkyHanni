@@ -105,24 +105,6 @@ class ConfigManager {
         OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
-    // Some position elements don't need config links as they don't have a config option.
-    private val ignoredMissingConfigLinks = listOf(
-        // commands
-        "features.garden.GardenConfig.cropSpeedMeterPos",
-        "features.misc.MiscConfig.collectionCounterPos",
-        "features.misc.MiscConfig.carryPosition",
-        "features.misc.MiscConfig.lockedMouseDisplay",
-        "features.gui.GuiConfig.titlePosition",
-        "features.gui.GuiConfig.titleIntentionPositions",
-
-        // debug features
-        "features.dev.DebugConfig.trackSoundPosition",
-        "features.dev.DebugConfig.trackParticlePosition",
-        "features.dev.DevConfig.debugPos",
-        "features.dev.DevConfig.debugLocationPos",
-        "features.dev.DevConfig.debugItemPos",
-    )
-
     private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
         if (obj == null) return
         if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
@@ -140,7 +122,8 @@ class ConfigManager {
                 if (PlatformUtils.isDevEnvironment) {
                     var name = "${field.declaringClass.name}.${field.name}"
                     name = name.replace("at.hannibal2.skyhanni.config.", "")
-                    if (name !in ignoredMissingConfigLinks) {
+                    val hasExplanatoryAnnotation = field.getAnnotation(NoConfigLink::class.java) != null
+                    if (!hasExplanatoryAnnotation) {
                         println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
                         missingConfigLink = true
                     }
@@ -165,7 +148,7 @@ class ConfigManager {
             println("Steps to fix:")
             println("1. Search for `WEE WOO WEE WOO` in the console output.")
             println("2. Either add the Config Link.")
-            println("3. Or add the name to ignoredMissingConfigLinks.")
+            println("3. Or add the @NoConfigLink annotation to the field.")
             println("")
             PlatformUtils.shutdownMinecraft("Missing Config Link")
         }

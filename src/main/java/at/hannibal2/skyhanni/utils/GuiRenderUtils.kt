@@ -31,6 +31,7 @@ import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
 //#else
+//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 //$$ import net.minecraft.client.render.RenderLayer
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.joml.Matrix4f
@@ -54,7 +55,7 @@ object GuiRenderUtils {
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
-        drawStringCentered(str, x.toFloat(), y.toFloat(), true, 0xffffff)
+        drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
@@ -67,19 +68,19 @@ object GuiRenderUtils {
         DrawContextUtils.popMatrix()
     }
 
-    fun drawString(str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
+    fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
         DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
-    fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+    fun drawString(str: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
-    fun drawStrings(strings: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+    fun drawStrings(strings: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         drawStrings(strings.split("\n"), x, y, color, shadow)
     }
 
-    fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+    fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
             DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
@@ -268,7 +269,7 @@ object GuiRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1f, 1f, 1f, 1f)
         //#else
-        //$$ DrawContextUtils.drawContext.drawTexture(RenderLayer::getGuiTextured, texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        //$$ DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
         //#endif
     }
 
@@ -280,11 +281,13 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.disableScissor()
     }
 
-    fun drawFloatingRectDark(
+    private fun drawFloatingRect(
         x: Int,
         y: Int,
         width: Int,
         height: Int,
+        light: Int = -0xcfcfca,
+        dark: Int = -0xefefea,
         shadow: Boolean = true,
     ) {
         //#if MC < 1.21
@@ -298,8 +301,6 @@ object GuiRenderUtils {
         //#endif
 
         val main = alpha or 0x202026
-        val light = -0xcfcfca
-        val dark = -0xefefea
         drawRect(x, y, x + 1, y + height, light) // Left
         drawRect(x + 1, y, x + width, y + 1, light) // Top1
         drawRect(x + width - 1, y + 1, x + width, y + height, dark) // Right
@@ -310,6 +311,43 @@ object GuiRenderUtils {
             drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow
         }
     }
+
+    fun drawFloatingRectDark(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        drawFloatingRect(
+            x,
+            y,
+            width,
+            height,
+            -0xcfcfca,
+            -0xefefea,
+            shadow = shadow,
+        )
+    }
+
+    fun drawFloatingRectLight(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        drawFloatingRect(
+            x,
+            y,
+            width,
+            height,
+            light = -0xefefea,
+            dark = -0xcfcfca,
+            shadow = shadow,
+        )
+    }
+
 
     fun ItemStack.renderOnScreen(
         x: Float,

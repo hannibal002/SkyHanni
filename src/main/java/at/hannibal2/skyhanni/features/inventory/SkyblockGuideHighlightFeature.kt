@@ -265,6 +265,12 @@ class SkyblockGuideHighlightFeature private constructor(
                 "Daily Tasks",
                 "§c§lINCOMPLETE",
             )
+            SkyblockGuideHighlightFeature(
+                { SkyHanniMod.feature.inventory.attributeShards.highlightDisabledAttributes },
+                "attribute.disable",
+                "Attribute Menu",
+                "§7Enabled: §cNo",
+            )
         }
     }
 }

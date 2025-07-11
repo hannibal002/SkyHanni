@@ -20,7 +20,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val fr = context.minecraft.defaultFontRenderer
 
         context.pushMatrix()
-        context.translate(x.toFloat() + 10, y.toFloat(), 1F)
+        context.translate(x.toFloat() + 10, y.toFloat())
         val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
@@ -52,7 +52,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             )
         }
 
-        context.scale(2F, 2F, 1F)
+        context.scale(2F, 2F)
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
         context.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +

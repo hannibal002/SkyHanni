@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
@@ -65,7 +66,7 @@ object Year300RaffleEvent {
         }
         overlay = Renderable.horizontalContainer(
             listOf(
-                Renderable.itemStack(displayItem),
+                ItemStackRenderable(displayItem),
                 Renderable.string("§eTime Left: ${timeLeft.format()}"),
             ),
         )

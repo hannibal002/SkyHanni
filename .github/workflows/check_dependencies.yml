@@ -1,27 +1,24 @@
 name: Check PR Dependencies
 
-# TODO: Run when other pr gets merged
 on:
     pull_request_target:
-        types: [ opened, edited ]
+        types: [ opened, edited, closed ]
+
+permissions:
+    contents: read
+    pull-requests: write
 
 jobs:
     check-dependencies:
         runs-on: ubuntu-latest
         steps:
             -   name: Check out the repository
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
 
-            -   name: Set up Node.js
-                uses: actions/setup-node@v3
+            -   name: Evaluate dependency PRs
+                uses: actions/github-script@v7
                 with:
-                    node-version: '16'
-
-            -   name: Install dependencies
-                run: npm install @octokit/rest node-fetch
-
-            -   name: Run dependency check script
-                run: node .github/scripts/checkDependencies.mjs
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    GITHUB_CONTEXT: ${{ toJson(github) }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                        const check = require('./.github/scripts/check-dependencies.js');
+                        await check({ github, context, core });

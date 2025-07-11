@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 
 @SkyHanniModule
 object MiningEventDisplay {
@@ -82,16 +83,12 @@ object MiningEventDisplay {
         }
     }
 
+    private val mithrilOreItem by lazy { "MITHRIL_ORE".toInternalName().getItemStack() }
+    private val perfRubyItem by lazy { "PERFECT_RUBY_GEM".toInternalName().getItemStack() }
     private fun getIslandIcon(islandType: IslandType) = listOf(
         when (islandType) {
-            IslandType.DWARVEN_MINES -> Renderable.itemStack(
-                "MITHRIL_ORE".toInternalName().getItemStack(),
-            )
-
-            IslandType.CRYSTAL_HOLLOWS -> Renderable.itemStack(
-                "PERFECT_RUBY_GEM".toInternalName().getItemStack(),
-            )
-
+            IslandType.DWARVEN_MINES -> ItemStackRenderable(mithrilOreItem)
+            IslandType.CRYSTAL_HOLLOWS -> ItemStackRenderable(perfRubyItem)
             else -> unknownDisplay
         },
         Renderable.string("§8:"),

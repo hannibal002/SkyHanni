@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -42,7 +43,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
@@ -124,6 +125,15 @@ object GardenNextJacobContest {
         " ?(?:§.)*(?:○|(?<boosted>☘)) (?:§.)*(?<crop>.*)",
     )
 
+    /**
+     * REGEX-TEST: §e§lJacob's Contest: §r§a19m left
+     * REGEX-TEST: §e§lJacob's Contest: §r§a8m left
+     */
+    private val timeLeftPattern by patternGroup.pattern(
+        "time-left",
+        "(?:§.)+Jacob's Contest: (?:§.)+(?<timeleft>\\d+[smh]+) left"
+    )
+
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
@@ -189,9 +199,11 @@ object GardenNextJacobContest {
 
     private fun WidgetUpdateEvent.tryUpdateBoostedCrop() {
         nextContest ?: return
+        val firstLine = lines.firstOrNull() ?: return
+        if (timeLeftPattern.matches(firstLine)) return
         cropPattern.matchAll(lines) {
             if (groupOrNull("boosted") == null) return@matchAll
-            val cropType = CropType.getByName(groupOrNull("crop") ?: return@matchAll)
+            val cropType = CropType.getByNameOrNull(groupOrNull("crop") ?: return@matchAll)
             nextContest?.boostedCrop = cropType
         }
     }
@@ -334,7 +346,7 @@ object GardenNextJacobContest {
         }
 
         display = if (isFetchingContests) {
-            RenderableString("§cFetching this years jacob contests...")
+            StringRenderable("§cFetching this years jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
@@ -456,7 +468,8 @@ object GardenNextJacobContest {
         isFetchingContests = true
         SkyHanniMod.launchIOCoroutine {
             knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
-            if (knownContests.isNotEmpty()) {
+            if (haveAllContests) {
+                ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
                 fetchedFromElite = true
                 nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
                 loadedContestsYear = SkyBlockTime.now().year

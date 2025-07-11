@@ -19,7 +19,7 @@ object DragNDrop {
 
     private const val BUTTON_MAPPED = KeyboardManager.LEFT_MOUSE
 
-    private val invalidItem = ItemStackRenderable(ItemStack(Blocks.barrier), 1.0,)
+    private val invalidItem = ItemStackRenderable(ItemStack(Blocks.barrier), 1.0)
 
     @HandleEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
