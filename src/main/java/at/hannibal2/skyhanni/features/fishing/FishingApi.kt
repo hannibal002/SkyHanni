@@ -40,6 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FishingApi {
+
     enum class RodPart {
         HOOK,
         LINE,
@@ -58,6 +59,17 @@ object FishingApi {
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
         "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+    )
+
+    /**
+     * REGEX-TEST: EMBER_HELMET
+     * REGEX-TEST: EMBER_CHESTPLATE
+     * REGEX-TEST: EMBER_LEGGINGS
+     * REGEX-TEST: EMBER_BOOTS
+     */
+    private val emberArmorNames by RepoPattern.pattern(
+        "fishing.trophyfishing.emberarmor",
+        "EMBER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     val lavaBlocks = buildList { addLavas() }
@@ -90,6 +102,9 @@ object FishingApi {
     var wearingTrophyArmor = false
         private set
 
+    var wearingEmberArmor = false
+        private set
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
         if (!holdingRod) return
@@ -115,6 +130,7 @@ object FishingApi {
     fun onTick(event: SkyHanniTickEvent) {
         if (event.isMod(5)) {
             wearingTrophyArmor = isWearingTrophyArmor()
+            wearingEmberArmor = isWearingEmberArmor()
         }
 
         val bobber = bobber ?: return
@@ -155,8 +171,11 @@ object FishingApi {
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? =
-        getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")?.toInternalName()
+    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
+        val rodPartName = getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")
+        if (rodPartName.isNullOrEmpty()) return null
+        return rodPartName.toInternalName()
+    }
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
@@ -229,5 +248,10 @@ object FishingApi {
     private fun isWearingTrophyArmor(): Boolean =
         InventoryUtils.getArmor().all {
             trophyArmorNames.matches(it?.getInternalName()?.asString())
+        }
+
+    fun isWearingEmberArmor(): Boolean =
+        InventoryUtils.getArmor().all {
+            emberArmorNames.matches(it?.getInternalName()?.asString())
         }
 }

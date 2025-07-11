@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.misc.update
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
@@ -30,18 +30,16 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
 
     private val buttonPanel = HorizontalContainerRenderable(
         listOf(
-            Renderable.rectButton(
+            Renderable.darkRectButton(
                 StringRenderable("Include Betas"),
-                activeColor = ChangelogViewer.primaryColor,
                 startState = ChangelogViewer.shouldShowBeta,
                 onClick = {
                     ChangelogViewer.shouldShowBeta = it
                     ChangelogViewer.shouldMakeNewList = true
                 },
             ),
-            Renderable.rectButton(
+            Renderable.darkRectButton(
                 StringRenderable("Show Technical Details"),
-                activeColor = ChangelogViewer.primaryColor,
                 startState = ChangelogViewer.showTechnicalDetails,
                 onClick = {
                     ChangelogViewer.showTechnicalDetails = it
@@ -67,15 +65,13 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
         val height = 4 * this.height / 5
         val xTranslate = this.width / 10
         val yTranslate = this.height / 10
-        ShaderRenderUtils.drawRoundGradientRect(
-            xTranslate - 2,
-            yTranslate - 2,
-            width + 4,
-            height + 4,
-            ChangelogViewer.primary2Color.rgb,
-            ChangelogViewer.primaryColor.rgb,
-        )
-        DrawContextUtils.translate(xTranslate.toFloat(), yTranslate.toFloat(), 0f)
+
+        drawDefaultBackground(mouseX, mouseY, partialTicks)
+        DrawContextUtils.translate(xTranslate - 2.0, yTranslate - 2.0, 0.0)
+        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height)
+        DrawContextUtils.translate(-(xTranslate - 2.0), -(yTranslate - 2.0), 0.0)
+
+        DrawContextUtils.translate(xTranslate.toFloat(), yTranslate.toFloat() + 5, 0f)
         Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
             if (!ChangelogViewer.cache.containsKeys(ChangelogViewer.startVersion, ChangelogViewer.endVersion)) {
                 ChangelogViewer.shouldMakeNewList = true
@@ -107,12 +103,12 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                 }
                 scrollList
             }.renderXYAligned(0, 0, width, height)
+            DrawContextUtils.translate(0f, -5f, 0f)
             val topOfGui = -buttonPanel.height - 5
             DrawContextUtils.translate(0f, topOfGui.toFloat(), 0f)
             buttonPanel.renderXAligned(0, topOfGui, width)
-            Renderable.drawInsideRoundedRect(
+            Renderable.drawInsideDarkRect(
                 StringRenderable("§9${ChangelogViewer.startVersion} §e➜ §9${ChangelogViewer.endVersion}"),
-                ChangelogViewer.primaryColor,
                 horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
             ).renderXAligned(0, topOfGui, width)
             DrawContextUtils.translate(0f, -topOfGui.toFloat(), 0f)

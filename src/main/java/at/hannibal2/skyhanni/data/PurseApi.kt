@@ -29,10 +29,11 @@ object PurseApi {
 
     /**
      * REGEX-TEST: Piggy: §6423,085,766
+     * REGEX-TEST: §6§fPiggy: §6301,788§j§6,444
      */
     val piggyPattern by patternGroup.pattern(
         "piggy",
-        "Piggy: (?<coins>.*)",
+        "(?:§.)*Piggy: (?<coins>.*)",
     )
 
     private var inventoryCloseTime = SimpleTimeMark.farPast()
