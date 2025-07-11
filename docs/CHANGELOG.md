@@ -1,5 +1,19 @@
 # SkyHanni - Change Log
 
+## Version 5.0.0
+
+### New Features
+
+
+### Improvements
+
+
+### Fixes
+
+
+### Technical Details
+
+
 ## Version 4.0.0
 
 ### New Features
