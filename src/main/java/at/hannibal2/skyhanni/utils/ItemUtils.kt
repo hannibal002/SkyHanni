@@ -682,6 +682,10 @@ object ItemUtils {
         val bazaarOverridesTypeToken = object : TypeToken<List<BazaarOverride>>() {}.type
         val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", bazaarOverridesTypeToken)
         bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
+
+        // clear the item name cache so any potential missing items are reloaded
+        itemNameCache.clear()
+        missingRepoItems.clear()
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
