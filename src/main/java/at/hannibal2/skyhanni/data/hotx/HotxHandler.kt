@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import kotlin.reflect.KClass
 
 abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: Collection<Data>)
     where RotPerkE : Enum<*>,
