@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.hotx.ChatRepoPatternEnum
 import at.hannibal2.skyhanni.data.hotx.HotmData
-import at.hannibal2.skyhanni.data.hotx.ItemRepoPatternEnum
+import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
+import at.hannibal2.skyhanni.data.hotx.RotatingPerk
 import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -108,25 +108,50 @@ object HotmApi {
     var mineshaftMayhem: MayhemPerk? = null
 
     enum class SkymallPerk(
-        @Language("RegExp") override val chatPatternRaw: String,
-        @Language("RegExp") override val itemPatternRaw: String,
-    ) : ChatRepoPatternEnum, ItemRepoPatternEnum {
-        MINING_SPEED("Gain §r§6\\+100⸕ Mining Speed§r§f\\.", "Gain §6\\+100⸕ Mining Speed§7\\."),
-        MINING_FORTUNE("Gain §r§6\\+50☘ Mining Fortune§r§f\\.", "Gain §6\\+50☘ Mining Fortune§7\\."),
-        EXTRA_POWDER("Gain §r§a\\+15% §r§fmore Powder while mining\\.", "Gain §a\\+15% §7more Powder while mining\\."),
-        ABILITY_COOLDOWN("§r§a-20%§r§f Pickaxe Ability cooldowns\\.", "§a-20%§7 Pickaxe Ability cooldowns\\."),
-        GOBLIN_CHANCE("§r§a10x §r§fchance to find Golden and Diamond Goblins\\.", "§a10x §7chance to find Golden and"),
-        TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a5x §9Titanium §7drops\\."),
+        override val perkDescription: String,
+        @Language("RegExp") val chatFallback: String,
+        @Language("RegExp") val itemFallback: String,
+    ) : RotatingPerk {
+        MINING_SPEED(
+            perkDescription = "§6+100⸕ Mining Speed",
+            chatFallback = "Gain §r§6\\+100⸕ Mining Speed§r§f\\.",
+            itemFallback = "Gain §6\\+100⸕ Mining Speed§7\\."
+        ),
+        MINING_FORTUNE(
+            perkDescription = "§6+50☘ Mining Fortune",
+            chatFallback = "Gain §r§6\\+50☘ Mining Fortune§r§f\\.",
+            itemFallback = "Gain §6\\+50☘ Mining Fortune§7\\."
+        ),
+        EXTRA_POWDER(
+            perkDescription = "§a+15% §7more Powder",
+            chatFallback = "Gain §r§a\\+15% §r§fmore Powder while mining\\.",
+            itemFallback = "Gain §a\\+15% §7more Powder while mining\\."
+        ),
+        ABILITY_COOLDOWN(
+            perkDescription = "§a-20% §7Pickaxe Ability cooldowns",
+            chatFallback = "§r§a-20%§r§f Pickaxe Ability cooldowns\\.",
+            itemFallback = "§a-20%§7 Pickaxe Ability cooldowns\\."
+        ),
+        GOBLIN_CHANCE(
+            perkDescription = "§a10x §6Gold §7& §bDiamond §7Goblin chance",
+            chatFallback = "§r§a10x §r§fchance to find Golden and Diamond Goblins\\.",
+            itemFallback = "§a10x §7chance to find Golden and"
+        ),
+        TITANIUM(
+            perkDescription = "§a5x §9Titanium §7drops",
+            chatFallback = "Gain §r§a5x §r§9Titanium §r§fdrops",
+            itemFallback = "Gain §a5x §9Titanium §7drops\\."
+        ),
         ;
 
-        override val basePath = "mining.hotm.skymall"
-        override val chatPattern by RepoPattern.pattern("$basePath.chat.$patternId", chatPatternRaw)
-        override val itemPattern by RepoPattern.pattern("$basePath.item.$patternId", itemPatternRaw)
+        private val basePath = "mining.hotm.skymall"
+        override val chatPattern by RepoPattern.pattern("$basePath.chat.${asPatternId()}", chatFallback)
+        override val itemPattern by RepoPattern.pattern("$basePath.item.${asPatternId()}", itemFallback)
     }
 
     enum class MayhemPerk(
-        @Language("RegExp") override val chatPatternRaw: String,
-    ) : ChatRepoPatternEnum {
+        @Language("RegExp") val chatFallback: String,
+    ) {
         SCRAP_CHANCE("Your §r§9Suspicious Scrap §r§7chance was buffed by your §r§aMineshaft Mayhem §r§7perk!"),
         MINING_FORTUNE("You received a §r§a§r§6☘ Mining Fortune §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
         MINING_SPEED("You received a §r§a§r§6⸕ Mining Speed §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
@@ -134,7 +159,6 @@ object HotmApi {
         ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced §r§7from your §r§aMineshaft Mayhem §r§7perk!"),
         ;
 
-        override val basePath = "mining.hotm.mayhem"
-        override val chatPattern by RepoPattern.pattern("$basePath.chat.$patternId", chatPatternRaw)
+        val chatPattern by RepoPattern.pattern("mining.hotm.mayhem.chat.${asPatternId()}", chatFallback)
     }
 }

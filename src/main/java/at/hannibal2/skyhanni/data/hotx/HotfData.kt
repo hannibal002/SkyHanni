@@ -306,9 +306,11 @@ enum class HotfData(
     companion object : HotxHandler<HotfData, HotfReward, HotfApi.LotteryPerk>(entries) {
         override val name: String = "HotF"
         override val core: HotfData = CENTER_OF_THE_FOREST
-        override val rotatingPerkClazz = HotfApi.LotteryPerk::class
         override val rotatingPerks = HotfApi.LotteryPerk.entries
         override val rotatingPerkEntry = LOTTERY
+        override var currentRotPerk = HotfApi.lottery
+        override val applicableIslandType = IslandTypeTags.FORAGING
+
         override var tokens: Int
             get() = ProfileStorageData.profileSpecific?.foraging?.tokens ?: 0
             set(value) {
@@ -474,11 +476,6 @@ enum class HotfData(
 
         @HandleEvent(onlyOnSkyblock = true)
         override fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) = super.onInventoryFullyOpened(event)
-
-        override fun setRotatingPerk(newRotatingPerk: HotfApi.LotteryPerk?) {
-            HotfApi.lottery = newRotatingPerk
-            ChatUtils.debug("setting lottery to ${HotfApi.lottery}")
-        }
 
         @HandleEvent(onlyOnSkyblock = true)
         override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
