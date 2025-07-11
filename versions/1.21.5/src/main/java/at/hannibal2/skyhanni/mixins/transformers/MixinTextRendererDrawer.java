@@ -16,7 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TextRenderer.Drawer.class)
 public class MixinTextRendererDrawer {
 
+    //#if MC < 1.21.6
     @Inject(method = "drawGlyphs", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/font/BakedGlyph$DrawnGlyph;glyph()Lnet/minecraft/client/font/BakedGlyph;"))
+    //#else
+    //$$ @Inject(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer$GlyphDrawer;drawGlyph(Lnet/minecraft/client/font/BakedGlyph$DrawnGlyph;)V"))
+    //#endif
     private void checkIfGlyphIsChroma(CallbackInfo ci, @Local BakedGlyph.DrawnGlyph drawnGlyph) {
         ChromaFontManagerKt.checkIfGlyphIsChroma(drawnGlyph);
     }
