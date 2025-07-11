@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -185,7 +186,7 @@ object MineshaftPityDisplay {
             multipliers.forEach { multiplier ->
                 val iconsList = PityBlock.entries
                     .filter { it.multiplier == multiplier }
-                    .map { Renderable.itemStack(it.displayItem) }
+                    .map { ItemStackRenderable(it.displayItem) }
                 add(
                     Renderable.horizontalContainer(
                         listOf(

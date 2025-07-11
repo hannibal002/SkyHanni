@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
@@ -55,6 +54,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRodParts
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
@@ -67,6 +67,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -84,7 +85,7 @@ object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     var starChange = 0
-        get() = if (SkyHanniDebugsAndTests.enabled) field else 0
+        get() = if (SkyBlockUtils.debug) field else 0
 
     private val additionalCostFunctions = listOf(
         ::addReforgeStone,
@@ -124,6 +125,7 @@ object EstimatedItemValueCalculator {
         ::addAbilityScrolls,
         ::addBoosters,
         ::addDrillUpgrades,
+        ::addRodUpgrades,
         ::addGemstoneSlotUnlockCost,
         ::addGemstones,
         ::addEnchantments,
@@ -554,6 +556,17 @@ object EstimatedItemValueCalculator {
         val (totalPrice, names) = getTotalAndNames(drillUpgrades)
         if (names.isNotEmpty()) {
             list.add("§7Drill upgrades: " + totalPrice.formatCoin())
+            list += names
+        }
+        return totalPrice
+    }
+
+    private fun addRodUpgrades(stack: ItemStack, list: MutableList<String>): Double {
+        val rodUpgrades = stack.getRodParts()
+
+        val (totalPrice, names) = getTotalAndNames(rodUpgrades)
+        if (names.isNotEmpty()) {
+            list.add("§7Rod upgrades: " + totalPrice.formatCoin())
             list += names
         }
         return totalPrice
