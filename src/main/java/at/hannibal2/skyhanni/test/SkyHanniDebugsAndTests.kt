@@ -58,7 +58,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -342,8 +342,7 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(GuiKeyPressEvent::class)
     fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val focussedSlot = slotUnderCursor() ?: return
-        val stack = focussedSlot.stack ?: return
+        val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
