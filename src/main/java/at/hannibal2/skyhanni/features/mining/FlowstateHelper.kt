@@ -84,7 +84,7 @@ object FlowstateHelper {
                 val userLuckSegment = if (personalBest > 500) " §aYou Gained +${newLuck - oldLuck}✴ SkyHanni User Luck" else ""
                 ChatUtils.chat(
                     "§d§lNEW FLOWSTATE PERSONAL BEST!§f Streak: $blockBreakStreak." +
-                        " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!" + userLuckSegment
+                        " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!" + userLuckSegment,
                 )
             }
             personalBest = blockBreakStreak
@@ -220,7 +220,7 @@ object FlowstateHelper {
                 "§7Value: §a+$luck✴",
                 "",
                 "§8Gain more by getting a higher flowstate personal best",
-                "§8Maxes out at §a+10✴ §8luck"
+                "§8Maxes out at §a+10✴ §8luck",
             ),
         )
         event.addItem(stack)
@@ -271,7 +271,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Str
             PERSONAL_BEST -> {
                 if (blockBreakStreak <= personalBest) {
                     StringRenderable(
-                        "§7Personal Best: §7${getStreakColor()}$blockBreakStreak§8/§d$personalBest"
+                        "§7Personal Best: §7${getStreakColor()}$blockBreakStreak§8/§d$personalBest",
                     )
                 } else {
                     StringRenderable("§d§lNew Personal Best ${getStreakColor()}$blockBreakStreak")
