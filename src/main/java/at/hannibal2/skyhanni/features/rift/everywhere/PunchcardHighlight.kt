@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.EntityLivingBase
@@ -231,7 +232,7 @@ object PunchcardHighlight {
 
         return Renderable.horizontalContainer(
             listOf(
-                Renderable.itemStack(displayIcon),
+                ItemStackRenderable(displayIcon),
                 Renderable.string(string),
             ),
             spacing = 1,

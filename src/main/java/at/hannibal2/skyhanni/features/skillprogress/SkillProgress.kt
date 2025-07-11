@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -438,7 +439,7 @@ object SkillProgress {
             add(Renderable.string("§9[§d$level§9] "))
 
         if (config.useIcon.get()) {
-            add(Renderable.itemStack(activeSkill.item, 1.0))
+            add(ItemStackRenderable(activeSkill.item, 1.0))
         }
 
         add(

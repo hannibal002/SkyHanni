@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -185,9 +186,11 @@ class MiscConfig {
     var hideTemporaryArmorStands: Boolean = true
 
     @Expose
+    @NoConfigLink
     val collectionCounterPos: Position = Position(10, 10)
 
     @Expose
+    @NoConfigLink
     val carryPosition: Position = Position(10, 10)
 
     @Expose
