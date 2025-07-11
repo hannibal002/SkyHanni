@@ -12,9 +12,12 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.item.ItemStack
 
 object ReiCompat {
+
+    private val isReiLoaded by lazy { PlatformUtils.isModInstalled("roughlyenoughitems") }
+
     @JvmStatic
     fun searchHasFocus(): Boolean {
-        if (!PlatformUtils.isModInstalled("roughlyenoughitems")) return false
+        if (!isReiLoaded) return false
         return try {
             REIRuntime.getInstance().searchTextField?.isFocused == true
         } catch (e: Throwable) {
@@ -23,7 +26,7 @@ object ReiCompat {
     }
 
     fun getHoveredStackFromRei(): ItemStack? {
-        if (!PlatformUtils.isModInstalled("roughlyenoughitems")) return null
+        if (!isReiLoaded) return null
         try {
             REIRuntime.getInstance()
         } catch (e: Throwable) {
