@@ -84,7 +84,7 @@ object JacobContestStatsSummary {
         val oldBase = "#garden"
         val newBase = "#garden.jacobContest"
         massMigrationPairs.forEach { (oldPath, newPath) ->
-            event.move(87, "$oldBase.$oldPath", "$newBase.$newPath")
+            event.move(95, "$oldBase.$oldPath", "$newBase.$newPath")
         }
     }
 }
