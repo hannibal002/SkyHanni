@@ -45,10 +45,10 @@ object HoppityRabbitTheFishChecker {
     /**
      * REGEX-TEST: Click to open Chocolate Factory!
      */
-    private val openCfSlotLorePattern by CFApi.patternGroup.pattern(
-        "inventory.mealegg.continue",
-        "(?:§.)*Click to open Chocolate Factory!",
-    )
+        private val openCfSlotLorePattern by CFApi.patternGroup.pattern(
+            "inventory.mealegg.continue",
+            "(?:§.)*Click to open Chocolate Factory!",
+        )
     // </editor-fold>
 
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
