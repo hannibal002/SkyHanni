@@ -92,7 +92,7 @@ class CommandsConfig {
     @ConfigOption(
         name = "Prevent Early Command Execution",
         desc = "Prevent commands from executing before the server cooldown has ended and " +
-                "instead queue them to run after the cooldown is over.",
+            "instead queue them to run after the cooldown is over.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
