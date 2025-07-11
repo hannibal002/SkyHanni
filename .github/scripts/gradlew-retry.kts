@@ -23,7 +23,7 @@ val cmd = listOf("./gradlew") + gradleArgs
  */
 val retryableErrorRegex = Regex(
     // language=RegExp
-    "Could not (?:GET '?(?<url>https?:\\/\\/[^']+)(?:'\\.?)?(?: (?<error>.*))?|determine|resolve)(?: (?:all files for configuration|the dependencies of task) '(?<task>:[^']+)')?",
+    " +\\> +Could not (?:GET '?(?<url>https?:\\/\\/[^']+)(?:'\\.?)?(?: (?<error>.*))?|determine|resolve)(?: (?:all files for configuration|the dependencies of task) '(?<task>:[^']+)')?",
     RegexOption.COMMENTS
 )
 
