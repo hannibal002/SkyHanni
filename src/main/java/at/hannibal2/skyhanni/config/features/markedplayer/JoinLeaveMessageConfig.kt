@@ -17,7 +17,7 @@ class JoinLeaveMessageConfig {
     @ConfigOption(
         name = "Players List",
         desc = "The list of players you want to be notified for.\n" +
-                "§cCase sensitive, separated by commas.",
+            "§cCase sensitive, separated by commas.",
     )
     @ConfigEditorText
     val playersList: Property<String> = Property.of("hannibal2,Minikloon")
