@@ -60,8 +60,8 @@ import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
 //#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
-//$$ import net.minecraft.client.render.RenderLayer
 //#endif
 
 // todo 1.21 impl needed
@@ -784,10 +784,10 @@ interface Renderable {
                     )
                     //#else
                     //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                    //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
+                    //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
                     //$$         mouseOffsetX, mouseOffsetY, width, height)
                     //$$ } else {
-                    //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                    //$$     DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
                     //$$         mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1)
                     //$$ }
                     //#endif
@@ -820,10 +820,10 @@ interface Renderable {
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
+                        //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
                         //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
                         //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                        //$$     DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
                         //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
                         //$$ }
                         //#endif
