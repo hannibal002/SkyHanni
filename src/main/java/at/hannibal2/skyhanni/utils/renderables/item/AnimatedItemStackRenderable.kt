@@ -54,7 +54,7 @@ data class ItemStackRotationDefinition(
  * @param ticks How long this frame should last, in ticks (assuming a nominal 20/s)
  */
 data class ItemStackAnimationFrame(
-    val stackProvider: AbstractItemStackProvider,
+    val stack: ItemStack,
     val ticks: Int = 0,
 )
 
@@ -69,7 +69,7 @@ class AnimatedItemStackRenderable(
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) : ItemStackRenderable(
-    frames.firstOrNull()?.stackProvider ?: ErrorManager.skyHanniError(
+    frames.firstOrNull()?.stack ?: ErrorManager.skyHanniError(
         "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
     ),
     scale,
@@ -80,7 +80,7 @@ class AnimatedItemStackRenderable(
     verticalAlign,
 ) {
     constructor(
-        stackProvider: AbstractItemStackProvider,
+        stack: ItemStack,
         rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
         bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
         scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -89,9 +89,8 @@ class AnimatedItemStackRenderable(
         rescaleSkulls: Boolean = true,
         horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
         verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-        highlight: Boolean = false,
     ) : this(
-        listOf(ItemStackAnimationFrame(stackProvider, ticks = 0)),
+        listOf(ItemStackAnimationFrame(stack, ticks = 0)),
         rotation, bounce, scale, xSpacing,
         ySpacing, rescaleSkulls, horizontalAlign, verticalAlign,
     )
@@ -106,7 +105,7 @@ class AnimatedItemStackRenderable(
     private val bounceOffset = fullBounceHeight / 2.0
 
     override val height = baseItemHeight + fullBounceHeight
-    override val stack: ItemStack get() = frameDefs[frameIndex].stackProvider.stack
+    override val stack: ItemStack get() = frameDefs[frameIndex].stack
 
     var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(

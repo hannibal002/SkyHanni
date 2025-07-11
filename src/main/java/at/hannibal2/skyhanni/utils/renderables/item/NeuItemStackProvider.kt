@@ -7,16 +7,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import net.minecraft.item.ItemStack
+import kotlin.reflect.KProperty
 
-abstract class AbstractItemStackProvider {
-    abstract val stack: ItemStack
-}
+class NeuItemStackProvider(private val internalName: NeuInternalName) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): ItemStack = stack
 
-class StaticItemStackProvider(itemStack: ItemStack) : AbstractItemStackProvider() {
-    override val stack: ItemStack = itemStack
-}
-
-class NeuItemStackProvider(private val internalName: NeuInternalName) : AbstractItemStackProvider() {
     private var _lastNeuItemCount: Int = neuItemCount
     private var _cachedStack: ItemStack = rebuildFromNeu()
 
@@ -26,7 +21,7 @@ class NeuItemStackProvider(private val internalName: NeuInternalName) : Abstract
         _cachedStack
     }
 
-    override val stack: ItemStack get() = _cachedStack.takeIf {
+    private val stack: ItemStack get() = _cachedStack.takeIf {
         _lastNeuItemCount == neuItemCount
     } ?: rebuildFromNeu()
 

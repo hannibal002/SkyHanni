@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack
 import kotlin.time.Duration
 
 open class ItemStackRenderable(
-    private val stackProvider: AbstractItemStackProvider,
+    open val stack: ItemStack,
     val scale: Double = NeuItems.ITEM_FONT_SIZE,
     val xSpacing: Int = 2,
     ySpacing: Int = 1,
@@ -19,21 +19,6 @@ open class ItemStackRenderable(
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) : TimeDependentRenderable() {
-    open val stack: ItemStack get() = stackProvider.stack
-
-    constructor(
-        stack: ItemStack,
-        scale: Double = NeuItems.ITEM_FONT_SIZE,
-        xSpacing: Int = 2,
-        ySpacing: Int = 1,
-        rescaleSkulls: Boolean = true,
-        horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-        verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-    ) : this(
-        stackProvider = StaticItemStackProvider(stack),
-        scale, xSpacing, ySpacing, rescaleSkulls, horizontalAlign, verticalAlign,
-    )
-
     override val width = (15.5 * scale + 0.5).toInt() + xSpacing
     override val height = (15.5 * scale + 0.5).toInt() + ySpacing
 
