@@ -198,9 +198,6 @@ object MiningApi {
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
-    @Deprecated("Use IslandTypeTags.CUSTOM_MINING.inAny() instead", ReplaceWith("IslandTypeTags.CUSTOM_MINING.inAny()"))
-    fun inCustomMiningIsland() = IslandTypeTags.CUSTOM_MINING.inAny()
-
     @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
     fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
 

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
@@ -54,7 +55,7 @@ object RenderableCollectionUtils {
             // Hack to add enchant glint, like Hypixel does it
             itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
         }
-        add(Renderable.itemStack(itemStack, scale = scale))
+        add(ItemStackRenderable(itemStack, scale = scale))
     }
 
     fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {

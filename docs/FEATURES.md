@@ -47,6 +47,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hold Shift to copy with `/shwords`, Control for a single line, and Alt to format color codes.
 + Added Current Chat Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/3491)
     + Displays a GUI element that indicates what chat you are in (e.g. Party, Guild, Coop, All).
++ Notify you in chat when a marked player joins/leaves your lobby. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2653)
 
 #### Chat Filter
 
@@ -137,6 +138,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows Class Level (toggleable).
     + Added "(Dead)" text for dead teammates with customizable colors.
 + Added Color Override to Dungeon Livid Finder. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3511)
++ Added Trinity helper. - Bugzilla + Daveed (https://github.com/hannibal002/SkyHanni/pull/4063)
+    + Notifies you when it is likely that there is a Trinity room in your dungeon.
 
 </details>
 <details open><summary>
@@ -275,6 +278,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Coins per XP and XP per Bit.
 + Added Disabled Attributes Highlighter. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4193)
     + Highlight disabled attributes in /attributemenu.
++ Added Chronomatron and Ultrasequencer helpers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4081)
+    + Options to highlight next clicks and prevent misclicks.
++ Added Coral Fish Helper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4243)
+    + Shows missing fishes for the NPC, sorted by price.
++ Added option to keep clicked items visible within Superpairs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4081)
 
 </details>
 <details open><summary>
@@ -762,6 +770,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + When collecting the rewards from many farming contests at the same time at Anita.
     + Compact the Jacob Claim message, only showing full information when hovering.
 + Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
++ Optimal Angles Overlay for Squeaky Mousemat. - nikijul (https://github.com/hannibal002/SkyHanni/pull/2999)
 
 ### Garden Pests
 
@@ -1014,6 +1023,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Chests color-coded to show despawn timer.
 + Added option to mute High Heat Sound in Magma Fields. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2573)
 + Added Current Powder line on HOTM perk hover. - munkuk (https://github.com/hannibal002/SkyHanni/pull/3956)
++ Added Flowstate personal best. - nopo (https://github.com/hannibal002/SkyHanni/pull/4298)
 
 </details>
 <details open><summary>
@@ -1047,6 +1057,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Attribute Tier as Stack Size. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4203)
     + Displays Attribute Shard tier as stack size in Attribute Menu.
 + Added Invisibug Highlight. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4195)
++ Added Hunting Box Value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4251)
+    + Shows the value of the shards.
++ Added profit per Agatha Coupon in Agatha's Shop. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4250)
++ Added Compact messages for sweep details. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4259)
 
 </details>
 <details open><summary>
@@ -1247,6 +1261,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + `/gold` warps to Gold Mines, `/crimson` to Crimson Isles, etc.
 + Added party commands !ping and !tps. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4001)
     + Customizable trigger permissions for party commands.
++ Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
 
 </details>
 <details open><summary>
@@ -1274,6 +1289,18 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Tracks all loot collected during a dragon fight, records the eyes spent, and calculates overall profit.
 + Added option to prevent player interactions during the Kuudra boss fight. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
     + Added option to disable Profile Viewer on right-click.
++ Added Option to highlight runic mobs. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3467)
+
+</details>
+<details open><summary>
+
+## Crimson
+
+</summary>
+
++ Added Sirih NPC Helper. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3525)
+    + Shows a clickable message that grabs sulphur from your sacks when talking to Sirih while he is a pig.
++ Show Exes, Wais and Zees hitbox. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2665)
 
 </details>
 <details open><summary>
@@ -1653,6 +1680,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added support for Fabric 1.21.5. - nopo and CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4038)
 + Added Ex Co-op Member Hider. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3795)
     + Hides Ex Co-op Members from Collections.
++ Added SkyBlock Profile Viewer support for updating data from Pv. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
 
 </details>
 <details open><summary>

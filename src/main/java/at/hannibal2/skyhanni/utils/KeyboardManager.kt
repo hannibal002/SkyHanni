@@ -173,6 +173,7 @@ object KeyboardManager {
     fun KeyBinding.isActive(): Boolean {
         //#if MC < 1.16
         if (!Keyboard.isCreated()) return false
+        //#endif
         try {
             if (keyCode.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
@@ -183,7 +184,6 @@ object KeyboardManager {
             )
             return false
         }
-        //#endif
         return this.isKeyDown || this.isPressed
     }
 

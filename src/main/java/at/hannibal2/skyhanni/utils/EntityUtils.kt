@@ -236,6 +236,6 @@ object EntityUtils {
         //#if MC < 1.21
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
     //#else
-    //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
+    //$$ get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
 }

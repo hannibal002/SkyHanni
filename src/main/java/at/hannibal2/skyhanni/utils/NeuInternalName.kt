@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import net.minecraft.init.Items
 
@@ -95,7 +96,7 @@ class NeuInternalName private constructor(private val internalName: String) {
         }
 
     val isPet: Boolean
-        get() = this in PetUtils.petInternalNames
+        get() = this in PetUtils.petInternalNames || this.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET
 
     private val isEnchantedBook: Boolean
         get() = getItemStackOrNull()?.item == Items.enchanted_book

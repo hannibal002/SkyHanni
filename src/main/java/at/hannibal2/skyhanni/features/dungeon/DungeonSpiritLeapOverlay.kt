@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -101,7 +102,7 @@ object DungeonSpiritLeapOverlay {
 
         val backgroundColor = if (player.playerDead) deadTeammateColor else getClassColor(player.dungeonClass)
         val itemRenderable = Renderable.drawInsideRoundedRect(
-            Renderable.itemStack(playerStackInfo.stack, scale = scaleFactor * 0.9 + 2.7),
+            ItemStackRenderable(playerStackInfo.stack, scale = scaleFactor * 0.9 + 2.7),
             color = Color(255, 255, 255, 100),
             radius = 5,
         )
