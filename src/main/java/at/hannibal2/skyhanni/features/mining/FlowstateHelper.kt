@@ -84,7 +84,7 @@ object FlowstateHelper {
                 val userLuckSegment = if (personalBest > 500) " §aYou Gained +${newLuck - oldLuck}✴ SkyHanni User Luck" else ""
                 ChatUtils.chat(
                     "§d§lNEW FLOWSTATE PERSONAL BEST!§f Streak: $blockBreakStreak." +
-                    " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!" + userLuckSegment
+                        " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!" + userLuckSegment
                 )
             }
             personalBest = blockBreakStreak
