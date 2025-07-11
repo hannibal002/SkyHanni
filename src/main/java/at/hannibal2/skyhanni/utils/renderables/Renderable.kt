@@ -849,6 +849,51 @@ interface Renderable {
             }
         }
 
+        fun darkRectButton(
+            content: Renderable,
+            onClick: (Boolean) -> Unit,
+            onHover: (Boolean) -> Unit = {},
+            button: Int = KeyboardManager.LEFT_MOUSE,
+            bypassChecks: Boolean = false,
+            condition: (Boolean) -> Boolean = { true },
+            startState: Boolean = false,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            var state = startState
+
+            override val width = content.width + padding * 2
+            override val height = content.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                if (isHovered(posX, posY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
+                    if (button.isKeyClicked()) {
+                        state = !state
+                        onClick(state)
+                    }
+                    onHover(state)
+                    if (state) {
+                        GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, true)
+                    } else {
+                        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, true)
+                    }
+                } else {
+                    if (state) {
+                        GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, false)
+                    } else {
+                        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, false)
+                    }
+                }
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                content.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
         fun fixedSizeLine(
             content: Renderable,
             width: Int,
@@ -1389,6 +1434,25 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideDarkRect(
+            input: Renderable,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                GuiRenderUtils.drawFloatingRectDark(0, 0, width, height)
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)

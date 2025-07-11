@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
+import skyhannibuildsystem.PublishToModrinth
 import java.io.Serializable
 import java.nio.file.Path
 import java.util.zip.ZipFile
@@ -130,6 +131,8 @@ val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
 val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
     this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
+
+val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
     this.javaLauncher.set(

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.HideCaught
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TextPart
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TrophySorting
@@ -88,6 +89,7 @@ object TrophyFishDisplay {
                 showCheckmark,
                 onlyShowMissing,
                 showCaughtHigher,
+                requireArmor,
             ) {
                 update()
             }
@@ -262,12 +264,9 @@ object TrophyFishDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!canRender()) return
+        if (!isEnabled() || !canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
-
-        if (FishingApi.hasTreasureHook) return
-        if (config.requireHunterArmor.get() && !FishingApi.wearingTrophyArmor) return
+        if (FishingApi.hasTreasureHook || !matchesArmorRequirement()) return
 
         config.position.renderRenderables(
             display,
@@ -276,7 +275,11 @@ object TrophyFishDisplay {
         )
     }
 
-    fun canRender(): Boolean = when (config.whenToShow.get()!!) {
+    private fun matchesArmorRequirement() = if (config.requireArmor.get()) {
+        FishingApi.wearingTrophyArmor || FishingApi.wearingEmberArmor
+    } else true
+
+    private fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
         WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getMinecraft().currentScreen is GuiInventory
         WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
@@ -284,4 +287,10 @@ object TrophyFishDisplay {
     }
 
     fun isEnabled() = (IslandType.CRIMSON_ISLE.isCurrent() || SkyBlockUtils.isStrandedProfile) && config.enabled.get()
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val base = "fishing.trophyFishing.display"
+        event.move(94, "$base.requireHunterArmor", "$base.requireArmor")
+    }
 }

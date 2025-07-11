@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -416,6 +415,13 @@ object ItemUtils {
         //$$ val stack = ItemStack(item, amount)
         //$$ stack.setCustomItemName(displayName)
         //$$ stack.setLore(lore)
+        //$$ var tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent.DEFAULT.with(DataComponentTypes.DAMAGE, true)
+        //$$ tooltipDisplay = tooltipDisplay.with(DataComponentTypes.ATTRIBUTE_MODIFIERS, true)
+        //$$ tooltipDisplay = tooltipDisplay.with(DataComponentTypes.UNBREAKABLE, true)
+        //$$ if (displayName.isBlank() && lore.isEmpty()) {
+        //$$     tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent(true, tooltipDisplay.hiddenComponents)
+        //$$ }
+        //$$ stack.set(DataComponentTypes.TOOLTIP_DISPLAY, tooltipDisplay)
         //$$ return stack
         //#endif
     }
@@ -882,7 +888,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-        if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
+        if (!SkyBlockUtils.debug && !PlatformUtils.isDevEnvironment) return
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()
