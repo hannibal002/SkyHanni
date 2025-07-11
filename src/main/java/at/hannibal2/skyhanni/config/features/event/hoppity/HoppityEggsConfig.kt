@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HoppityEggsConfig {
     @Expose
@@ -92,5 +93,6 @@ class HoppityEggsConfig {
     @ConfigEditorBoolean
     @OnlyModern
     @FeatureToggle
+    @SearchTag("rolling")
     var muteEggSounds: Boolean = false
 }
