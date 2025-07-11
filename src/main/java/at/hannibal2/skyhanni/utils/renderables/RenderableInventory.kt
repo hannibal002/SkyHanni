@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.item.ItemStack
 import kotlin.math.ceil
 
@@ -89,7 +90,7 @@ object RenderableInventory {
                 val renderable = if (uv == SlotsUv.CENTER) {
                     (
                         items[index]?.let { item ->
-                            Renderable.itemStack(
+                            ItemStackRenderable(
                                 item,
                                 scale,
                                 0,
