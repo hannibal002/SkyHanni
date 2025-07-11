@@ -5,19 +5,20 @@ import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
+import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
+import at.hannibal2.skyhanni.utils.compat.RenderCompat.enableRenderPassScissorStateIfAble
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.VertexFormat
-import java.util.OptionalDouble
-import java.util.OptionalInt
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BuiltBuffer
 import net.minecraft.client.render.RenderLayer.MultiPhase
 
 class ChromaRenderLayer(
     name: String, size: Int, hasCrumbling: Boolean, translucent: Boolean, pipeline: RenderPipeline, phases: MultiPhaseParameters,
-) : MultiPhase(name, size, hasCrumbling, translucent, pipeline, phases ) {
+) : MultiPhase(name, size, hasCrumbling, translucent, pipeline, phases) {
 
     override fun draw(buffer: BuiltBuffer) {
         val renderPipeline = this.pipeline
@@ -37,13 +38,8 @@ class ChromaRenderLayer(
             }
 
             val framebuffer = phases.target.get()
-            val colorAttachment = framebuffer.colorAttachment
-            val depthAttachment = if (framebuffer.useDepthAttachment) framebuffer.depthAttachment else null
 
-            RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                colorAttachment, OptionalInt.empty(),
-                depthAttachment, OptionalDouble.empty()
-            ).use { renderPass ->
+            RenderSystem.getDevice().createRenderPass("SkyHanni Immediate Chroma Pipeline Draw", framebuffer).use { renderPass ->
                 // Set custom chroma uniforms
                 val chromaSize: Float = ChromaManager.config.chromaSize * (GuiScreenUtils.displayWidth / 100f)
                 var ticks = (ClientEvents.totalTicks) + (MinecraftClient.getInstance() as AccessorMinecraft).timer.getTickProgress(true)
@@ -66,9 +62,7 @@ class ChromaRenderLayer(
                 renderPass.setPipeline(renderPipeline)
                 renderPass.setVertexBuffer(0, gpuBuffer)
 
-                if (RenderSystem.SCISSOR_STATE.isEnabled) {
-                    renderPass.enableScissor(RenderSystem.SCISSOR_STATE)
-                }
+                renderPass.enableRenderPassScissorStateIfAble()
 
                 for (i in 0..11) {
                     val gpuTexture = RenderSystem.getShaderTexture(i)
@@ -78,7 +72,7 @@ class ChromaRenderLayer(
                 }
 
                 renderPass.setIndexBuffer(gpuBuffer2, indexType)
-                renderPass.drawIndexed(0, buffer.drawParameters.indexCount())
+                renderPass.drawIndexed(buffer.drawParameters.indexCount())
             }
         } catch (exception: Throwable) {
             try {

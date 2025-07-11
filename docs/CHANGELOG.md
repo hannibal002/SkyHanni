@@ -1,5 +1,98 @@
 # SkyHanni - Change Log
 
+## Version 5.0.0
+
+### New Features
+
+#### Foraging
+
++ Added Compact messages for sweep details. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4259)
+
+#### Mining
+
++ Added Flowstate personal best. - nopo (https://github.com/hannibal002/SkyHanni/pull/4298)
++ Added Superprotectron highlighter. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3875)
+
+#### Combat
+
++ Added Option to highlight runic mobs. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3467)
+
+#### Garden
+
++ Optimal Angles Overlay for Squeaky Mousemat. - nikijul (https://github.com/hannibal002/SkyHanni/pull/2999)
+
+#### Commands
+
++ Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
+
+#### Misc
+
++ Added SkyBlock Profile Viewer support for updating data from Pv. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
+
+#### Dungeons
+
++ Added Trinity helper. - Bugzilla + Daveed (https://github.com/hannibal002/SkyHanni/pull/4063)
+    + Notifies you when it is likely that there is a Trinity room in your dungeon.
+
+#### Chat
+
++ Notify you in chat when a marked player joins/leaves your lobby. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2653)
+
+#### Crimson
+
++ Added Sirih NPC Helper. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3525)
+    + Shows a clickable message that grabs sulphur from your sacks when talking to Sirih while he is a pig.
++ Show Exes, Wais and Zees hitbox. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2665)
+
+### Improvements
+
+#### #### Inventory
+
++ Added Coin Support to Trade Value. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3899)
++ Added Fishing rod upgrades to estimated item value calculator. - hellcat (https://github.com/hannibal002/SkyHanni/pull/3975)
+
+#### Fishing
+
++ Allowed trophy fish display to show while wearing Ember Armor. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4064)
+
+#### Misc
+
++ Improved the changelog viewer's design to be more in-line with other SkyHanni guis. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4313)
++ Made some of the keybind features work with items in REI overlays. - nopo (https://github.com/hannibal002/SkyHanni/pull/4318)
++ Reduced memory usage with a large amount of text rendering. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4316)
+
+### Fixes
+
+#### Rift
+
++ Fixed Enigma Soul tracker sometimes sending you to the wrong soul. - Luna (https://github.com/hannibal002/SkyHanni/pull/4320)
+
+#### Misc
+
++ Fixed Color month names not working on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4321)
++ Fixed Hide piggy not working on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4321)
++ Fixed Incompatibilities between Neu and SkyHanni experimentation addons helper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4322)
+
+### Technical Details
+
++ Added `NoConfigLink` annotation. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4306)
++ Added `onAnyToggled` to ConditionalUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4233)
+    + Allows you to `onToggle()` an entire config file at once.
++ Added ability to replace chat components on events with a reason. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4074)
+    + Basically the same thing as block reason.
+    + Made SkyHanniChatEvent extend SystemMessageEvent.
++ Added SkyBlockAPIEventWrappers, to fire NeuProfileDataLoadedEvent when SbPv gets opened. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
++ Begin preparations for 1.21.6/7. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4324)
+    + Currently, adds preprocessing for mixins to 1.21.7 and some of the more basic rendering changes.
+    + Shaders and some other more niche rendering doesn't work on 1.21.7 yet.
++ Changed `ChestItem` `Tips` to `List` from `MutableList`. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3899)
++ Fixed Mob.isRunic not working. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3467)
++ Made PabloHelper use RepoPattern. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3525)
++ Removed deprecated fun `Renderable.itemStack`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4262)
+    + Use `ItemStackRenderable` moving forward.
++ Renamed renderable params from posX/posY to mousePosX/mousePosY. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4215)
++ Started porting `misc` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4075)
+
 ## Version 4.0.0
 
 ### New Features

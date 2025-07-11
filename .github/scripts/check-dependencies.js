@@ -46,11 +46,19 @@ module.exports = async ({github, context, core}) => {
         });
         core.info(`Added label \"${labelName}\" to PR ${owner}/${repo}#${issue_number}`);
     } else if (!hasOpen && existing.includes(labelName)) {
-        await github.rest.issues.removeLabel({
-            ...baseParams,
-            name: labelName,
-        });
-        core.info(`Removed label \"${labelName}\" from PR ${owner}/${repo}#${issue_number}`);
+        try {
+            await github.rest.issues.removeLabel({
+                ...baseParams,
+                name: labelName,
+            });
+            core.info(`Removed label "${labelName}" from PR ${owner}/${repo}#${issue_number}`);
+        } catch (err) {
+            if (err.status === 404) {
+                core.info(`Label "${labelName}" already removed on PR ${owner}/${repo}#${issue_number}`);
+            } else {
+                throw err;
+            }
+        }
     } else {
         core.info(`No changes required for label \"${labelName}\" on PR ${owner}/${repo}#${issue_number}`);
     }

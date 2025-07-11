@@ -13,7 +13,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class MixinTextRenderer {
 
     @ModifyVariable(
+        //#if MC < 1.21.6
         method = "drawInternal(Lnet/minecraft/text/OrderedText;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
+        //#else
+        //$$ method = "draw(Lnet/minecraft/text/OrderedText;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)V",
+        //#endif
         index = 1,
         at = @At("HEAD"),
         argsOnly = true
@@ -29,7 +33,11 @@ public class MixinTextRenderer {
     }
 
     @ModifyVariable(
+        //#if MC < 1.21.6
         method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
+        //#else
+        //$$ method = "draw(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)V",
+        //#endif
         index = 1,
         at = @At("HEAD"),
         argsOnly = true
