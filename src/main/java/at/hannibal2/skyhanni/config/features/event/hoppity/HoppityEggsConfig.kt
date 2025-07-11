@@ -93,6 +93,8 @@ class HoppityEggsConfig {
         MUTE("Mute Sounds"),
         REVERT("Revert to Eat Sound"),
         ;
+
+        override fun toString() = displayName
     }
 
     @Expose
