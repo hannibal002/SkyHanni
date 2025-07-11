@@ -13,6 +13,7 @@ import kotlin.contracts.contract
 
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
+//$$ import at.hannibal2.skyhanni.compat.ReiCompat
 //#endif
 
 fun EntityPlayerSP.getItemOnCursor(): ItemStack? {
@@ -21,6 +22,18 @@ fun EntityPlayerSP.getItemOnCursor(): ItemStack? {
     //#else
     //$$ val stack = this.currentScreenHandler?.cursorStack
     //$$ if (stack?.isEmpty == true) return null
+    //$$ return stack
+    //#endif
+}
+
+fun stackUnderCursor(): ItemStack? {
+    val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return null
+    //#if FORGE
+    return screen.slotUnderMouse?.stack
+    //#else
+    //$$ var stack = screen.focusedSlot?.stack
+    //$$ if (stack != null) return stack
+    //$$ stack = ReiCompat.getHoveredStackFromRei()
     //$$ return stack
     //#endif
 }

@@ -25,7 +25,7 @@ object PlayerChatModifier {
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
-        event.applyIfPossible { cutMessage(it) }
+        event.applyIfPossible("PLAYER_CHAT") { cutMessage(it) }
     }
 
     private fun findClickableTexts(chatComponent: IChatComponent, clickEvents: MutableList<ClickEvent>) {
