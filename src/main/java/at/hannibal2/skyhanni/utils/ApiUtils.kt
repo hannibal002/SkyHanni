@@ -417,4 +417,7 @@ object ApiUtils {
     fun isMoulberryLowestBinDisabled() = disabledApis?.disabledMoulberryLowestBin == true
     fun isHypixelItemsDisabled() = disabledApis?.disableHypixelItems == true
     fun isBazaarDisabled() = disabledApis?.disabledBazaar == true
+    fun isEliteAhDisabled() = disabledApis?.disabledEliteAh == true
+    fun isEliteBzDisabled() = disabledApis?.disabledEliteBz == true
+    fun isEliteItemsDisabled() = disabledApis?.disabledEliteItems
 }

@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -19,10 +21,12 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.features.garden.contest.EliteDevApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.DialogUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -72,7 +76,7 @@ object GardenNextJacobContest {
 
     private var display: Renderable? = null
     private var simpleDisplay = emptyList<String>()
-    private var knownContests: List<EliteDevApi.EliteFarmingContest> = listOf()
+    private var knownContests: List<EliteFarmingContest> = listOf()
     private var nextContestsAvailableAt = SimpleTimeMark.farPast()
     private var lastFetchAttempted = SimpleTimeMark.farPast()
     private var lastWarningTime = SimpleTimeMark.farPast()
@@ -267,7 +271,7 @@ object GardenNextJacobContest {
                 }
             }.takeIfNotEmpty() ?: return@mapNotNull null
 
-            EliteDevApi.EliteFarmingContest(startTime, crops, boostedCrop)
+            EliteFarmingContest(startTime, crops, boostedCrop)
         }
 
         knownContests = knownContests + contestsOnPage.filter {
@@ -375,7 +379,7 @@ object GardenNextJacobContest {
         if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
         else addString("§cOpen calendar to read Jacob contest times!")
 
-    private fun MutableList<Renderable>.drawNextContest(contest: EliteDevApi.EliteFarmingContest) {
+    private fun MutableList<Renderable>.drawNextContest(contest: EliteFarmingContest) {
         val activeContest = contest.startTime.isInPast() && contest.endTime.isInFuture()
         val untilEnd = contest.endTime.timeUntil()
         val duration = when {
@@ -425,7 +429,7 @@ object GardenNextJacobContest {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
         if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
-            SkyHanniMod.coroutineScope.launch {
+            SkyHanniMod.launchIOCoroutine {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
                     message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
@@ -468,14 +472,28 @@ object GardenNextJacobContest {
         isFetchingContests = true
         SkyHanniMod.launchIOCoroutine {
             knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
-            if (haveAllContests) {
-                ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
-                fetchedFromElite = true
-                nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
-                loadedContestsYear = SkyBlockTime.now().year
-            }
+            handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
             isFetchingContests = false
+        }
+    }
+
+    private fun handleFetchedContests() {
+        if (haveAllContests) {
+            ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
+            fetchedFromElite = true
+            nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
+            loadedContestsYear = SkyBlockTime.now().year
+        } else {
+            ChatUtils.chat(
+                "This year's contests aren't available to fetch automatically yet, " +
+                    "please load them from your calendar or wait 10 minutes.",
+            )
+            ChatUtils.clickableChat(
+                "Click here to open your calendar!",
+                onClick = { HypixelCommands.calendar() },
+                "§eClick to run /calendar!",
+            )
         }
     }
 
@@ -483,7 +501,12 @@ object GardenNextJacobContest {
         if (isSendingContests || !haveAllContests || isCloseToNewYear()) return
         isSendingContests = true
         SkyHanniMod.launchIOCoroutine {
-            EliteDevApi.submitContests(knownContests)
+            if (EliteDevApi.submitContests(knownContests)) {
+                ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+            } else ErrorManager.logErrorStateWithData(
+                "Something went wrong submitting upcoming contests!",
+                "submitContestsToElite not successful",
+            )
             isSendingContests = false
         }
     }
