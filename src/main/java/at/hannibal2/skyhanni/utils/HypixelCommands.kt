@@ -211,6 +211,10 @@ object HypixelCommands {
         send("attributemenu")
     }
 
+    fun treeGifts() {
+        send("treegifts")
+    }
+
     private fun send(command: String) {
         if (command.startsWith("/")) {
             debug("Sending wrong command to server? ($command)")

@@ -10,9 +10,9 @@ import com.github.mizosoft.methanol.MutableRequest
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.net.http.HttpClient
@@ -21,28 +21,30 @@ import java.time.Duration
 
 abstract class PublishToModrinth : DefaultTask() {
 
-    @get:InputDirectory
-    abstract val jarDirectory: DirectoryProperty
+    @get:Internal
+    val jarDirectory: Provider<Directory>? = project.rootProject.layout.buildDirectory.dir("downloadedJars")
 
-    @get:Input
-    abstract var changelog: String
-
-    @get:Input
-    abstract var versionNumber: String
-
-    @get:Input
-    abstract var modrinthToken: String
+    private lateinit var changelog: String
+    private lateinit var versionNumber: String
+    private lateinit var modrinthToken: String
 
     private val userAgent: String
         get() = "SkyHanni-$versionNumber"
 
     @TaskAction
     fun publishToModrinth() {
-        val jars = jarDirectory.get().asFile.listFiles()?.filter { it.extension == "jar" }.orEmpty()
+        initVariables()
+        val jars = jarDirectory?.get()?.asFile?.listFiles()?.filter { it.extension == "jar" }.orEmpty()
 
         for (jar in jars) {
             processJar(jar)
         }
+    }
+
+    private fun initVariables() {
+        changelog = project.findProperty("changelog") as String
+        versionNumber = project.findProperty("modVersion") as String
+        modrinthToken = project.findProperty("modrinthToken") as String
     }
 
     private val jarNamePattern = "SkyHanni-(?<modVersion>[\\d.]+)-mc(?<mcVersion>[\\d.]+)\\.jar".toPattern()

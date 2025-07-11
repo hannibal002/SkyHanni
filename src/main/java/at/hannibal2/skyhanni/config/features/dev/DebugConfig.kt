@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
@@ -233,14 +234,23 @@ class DebugConfig {
     var animatedItemStack: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
+    @ConfigEditorBoolean
+    var addonsDebug: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
+    val addonsDebugPosition: Position = Position(300, 300)
+
+    @Expose
     @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
     val animatedItemStackPosition: Position = Position(-300, 300)
 
-    // Does not have a config element!
     @Expose
+    @NoConfigLink
     val trackSoundPosition: Position = Position(0, 0)
 
-    // Also does not have a config element!
     @Expose
+    @NoConfigLink
     val trackParticlePosition: Position = Position(0, 0)
 }
