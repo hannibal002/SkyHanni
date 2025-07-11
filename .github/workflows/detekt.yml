@@ -80,7 +80,7 @@ jobs:
         #        needs.detekt.result == 'failure' &&
         #        github.event.pull_request.draft == false
         #    }}
-        if: always()
+        if: ${{ always() }}
         permissions:
             pull-requests: write
         steps:
