@@ -105,7 +105,7 @@ internal object RenderableUtils {
         else -> 0
     }
 
-    fun Renderable.renderAndScale(posX: Int, posY: Int, xSpace: Int, ySpace: Int, padding: Int = 5) {
+    fun Renderable.renderAndScale(mouseOffsetX: Int, mouseOffsetY: Int, xSpace: Int, ySpace: Int, padding: Int = 5) {
         val xWithoutPadding = xSpace - padding * 2
         val yWithoutPadding = ySpace - padding * 2
 
@@ -131,8 +131,8 @@ internal object RenderableUtils {
             DrawContextUtils.translate(xOffsetRender, yOffsetRender, 0f)
             DrawContextUtils.scale(scale, scale, 1f)
             render(
-                posX + (xOffset * inverseScale).toInt(),
-                posY + (yOffset * inverseScale).toInt(),
+                mouseOffsetX + (xOffset * inverseScale).toInt(),
+                mouseOffsetY + (yOffset * inverseScale).toInt(),
             )
             DrawContextUtils.scale(inverseScale, inverseScale, 1f)
             DrawContextUtils.translate(-xOffsetRender, -yOffsetRender, 0f)
@@ -141,27 +141,27 @@ internal object RenderableUtils {
         }
     }
 
-    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
+    fun Renderable.renderXYAligned(mouseOffsetX: Int, mouseOffsetY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         val yOffset = calculateAlignmentYOffset(this, ySpace)
         DrawContextUtils.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
-        this.render(posX + xOffset, posY + yOffset)
+        this.render(mouseOffsetX + xOffset, mouseOffsetY + yOffset)
         DrawContextUtils.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
         return xOffset to yOffset
     }
 
-    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int): Int {
+    fun Renderable.renderXAligned(mouseOffsetX: Int, mouseOffsetY: Int, xSpace: Int): Int {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         DrawContextUtils.translate(xOffset.toFloat(), 0f, 0f)
-        this.render(posX + xOffset, posY)
+        this.render(mouseOffsetX + xOffset, mouseOffsetY)
         DrawContextUtils.translate(-xOffset.toFloat(), 0f, 0f)
         return xOffset
     }
 
-    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int): Int {
+    fun Renderable.renderYAligned(mouseOffsetX: Int, mouseOffsetY: Int, ySpace: Int): Int {
         val yOffset = calculateAlignmentYOffset(this, ySpace)
         DrawContextUtils.translate(0f, yOffset.toFloat(), 0f)
-        this.render(posX, posY + yOffset)
+        this.render(mouseOffsetX, mouseOffsetY + yOffset)
         DrawContextUtils.translate(0f, -yOffset.toFloat(), 0f)
         return yOffset
     }
