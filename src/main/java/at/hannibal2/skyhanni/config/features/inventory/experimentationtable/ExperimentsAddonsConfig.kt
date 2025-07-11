@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -9,11 +10,20 @@ class ExperimentsAddonsConfig {
 
     @Expose
     @ConfigOption(
+        name = "Enabled",
+        desc = "Enable the helper for Chronomatron and Ultrasequencer."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var enabled: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Next Click Helper",
         desc = "Highlights the next slot to click in Chronomatron, and shows all items in Ultrasequencer."
     )
     @ConfigEditorBoolean
-    var highlightNextClick: Boolean = false
+    var highlightNextClick: Boolean = true
 
     @Expose
     @ConfigOption(
