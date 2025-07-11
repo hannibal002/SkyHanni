@@ -915,7 +915,7 @@ object ItemUtils {
         val text = listOf(
             "§c§lMissing repo data for item: $item",
             "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
-            "§cYou can try §l/${resetCommand}§r§c and restart your game to see if that fixes the issue.",
+            "§cYou can try §l/$resetCommand§r§c and restart your game to see if that fixes the issue.",
             "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
         )
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
