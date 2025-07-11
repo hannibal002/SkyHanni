@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -71,14 +72,14 @@ object StereoHarmonyDisplay {
         val pest = vinyl.getPest()
 
         val itemStack = pest?.internalName?.getItemStack() ?: questionMarkSkull
-        if (config.showHead.get()) add(Renderable.itemStack(itemStack, 1.67))
+        if (config.showHead.get()) add(ItemStackRenderable(itemStack, 1.67))
         val list = mutableListOf<Renderable>()
         val vinylName = vinyl.displayName
         val pestName = pest?.displayName ?: "None"
         list.add(Renderable.string("§ePlaying: §a$vinylName"))
         val pestLine = mutableListOf<Renderable>()
         pestLine.add(Renderable.string("§ePest: §c$pestName "))
-        if (pest?.crop != null && config.showCrop.get()) pestLine.add(Renderable.itemStack(pest.crop.icon))
+        if (pest?.crop != null && config.showCrop.get()) pestLine.add(ItemStackRenderable(pest.crop.icon))
         list.add(Renderable.horizontalContainer(pestLine))
         add(Renderable.verticalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
