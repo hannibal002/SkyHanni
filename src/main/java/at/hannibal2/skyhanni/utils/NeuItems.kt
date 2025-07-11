@@ -40,6 +40,7 @@ object NeuItems {
 
     var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
     var itemNamesWithoutColor: NavigableMap<String, NeuInternalName> = TreeMap()
+    val stackResolutionCache: MutableMap<NeuInternalName, ItemStack?> = mutableMapOf()
 
     /** Keys are internal names as String */
     val allInternalNames: NavigableMap<String, NeuInternalName> = TreeMap()
@@ -117,6 +118,7 @@ object NeuItems {
         @Suppress("UNCHECKED_CAST")
         itemNamesWithoutColor = noColor as NavigableMap<String, NeuInternalName>
         allItemsCache = map
+        stackResolutionCache.clear()
     }
 
     fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery()
@@ -136,10 +138,11 @@ object NeuItems {
     fun transHypixelNameToInternalName(hypixelId: String): NeuInternalName =
         ItemResolutionQuery.transformHypixelBazaarToNeuItemId(hypixelId).toInternalName()
 
-    //  TODO add cache
-    fun NeuInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery()
-        .withKnownInternalName(asString())
-        .resolveToItemStack()?.copy()
+    fun NeuInternalName.getItemStackOrNull(): ItemStack? = stackResolutionCache.getOrPut(this) {
+        ItemResolutionQuery()
+            .withKnownInternalName(asString())
+            .resolveToItemStack()?.copy()
+    }
 
     fun getItemStackOrNull(internalName: String) = internalName.toInternalName().getItemStackOrNull()
 

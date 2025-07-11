@@ -357,11 +357,7 @@ class ItemResolutionQuery {
         return lore.contains("§7To Bazaar")
     }
 
-    private fun getExtraAttributes(): NBTTagCompound {
-        compound?.let {
-            return it.extraAttributes
-        } ?: return NBTTagCompound()
-    }
+    private fun getExtraAttributes(): NBTTagCompound = compound?.extraAttributes ?: NBTTagCompound()
 
     private fun resolveFromSkyblock(): String? {
         val internalName = getExtraAttributes().getString("id")

@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack
 import kotlin.time.Duration
 
 open class ItemStackRenderable(
-    item: ItemStack,
+    stackProvider: AbstractItemStackProvider,
     val scale: Double = NeuItems.ITEM_FONT_SIZE,
     val xSpacing: Int = 2,
     ySpacing: Int = 1,
@@ -21,9 +21,23 @@ open class ItemStackRenderable(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     open val highlight: Boolean = false,
 ) : TimeDependentRenderable() {
-    open val stack: ItemStack = item.copy().apply {
+    open val stack: ItemStack = stackProvider.stack.copy().apply {
         if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
     }
+
+    constructor(
+        stack: ItemStack,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
+        xSpacing: Int = 2,
+        ySpacing: Int = 1,
+        rescaleSkulls: Boolean = true,
+        horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+        verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+        highlight: Boolean = false,
+    ) : this(
+        stackProvider = StaticItemStackProvider(stack),
+        scale, xSpacing, ySpacing, rescaleSkulls, horizontalAlign, verticalAlign, highlight
+    )
 
     override val width = (15.5 * scale + 0.5).toInt() + xSpacing
     override val height = (15.5 * scale + 0.5).toInt() + ySpacing

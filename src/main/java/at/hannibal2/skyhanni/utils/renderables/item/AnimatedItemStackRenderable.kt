@@ -56,12 +56,12 @@ data class ItemStackRotationDefinition(
  * @param ticks How long this frame should last, in ticks (assuming a nominal 20/s)
  */
 data class ItemStackAnimationFrame(
-    val stack: ItemStack,
+    val stackProvider: AbstractItemStackProvider,
     val ticks: Int = 0,
 )
 
 class AnimatedItemStackRenderable(
-    frames: Collection<ItemStackAnimationFrame>,
+    private val frames: Collection<ItemStackAnimationFrame>,
     private val rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
     private val bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
     scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -72,7 +72,7 @@ class AnimatedItemStackRenderable(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     override val highlight: Boolean = false,
 ) : ItemStackRenderable(
-    frames.firstOrNull()?.stack ?: ErrorManager.skyHanniError(
+    frames.firstOrNull()?.stackProvider ?: ErrorManager.skyHanniError(
         "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
     ),
     scale,
@@ -84,7 +84,7 @@ class AnimatedItemStackRenderable(
     highlight,
 ) {
     constructor(
-        item: ItemStack,
+        stackProvider: AbstractItemStackProvider,
         rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
         bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
         scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -95,20 +95,14 @@ class AnimatedItemStackRenderable(
         verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
         highlight: Boolean = false,
     ) : this(
-        listOf(ItemStackAnimationFrame(item, 0)), rotation, bounce, scale, xSpacing,
+        listOf(ItemStackAnimationFrame(stackProvider, ticks = 0)),
+        rotation, bounce, scale, xSpacing,
         ySpacing, rescaleSkulls, horizontalAlign, verticalAlign, highlight,
     )
 
     private var frameIndex = 0
     private var ticksInFrame = 0.0
-    private val frameDefs = frames.map { (itemStack, ticks) ->
-        val newStack = itemStack.copy().apply {
-            if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
-        }
-        ItemStackAnimationFrame(newStack, ticks)
-    }.takeIfNotEmpty() ?: ErrorManager.skyHanniError(
-        "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
-    )
+    private val frameDefs = frames.toList()
 
     private val startTime = SimpleTimeMark.now()
     private val baseItemHeight = (15.5 * scale + 0.5).toInt() + ySpacing
@@ -116,7 +110,7 @@ class AnimatedItemStackRenderable(
     private val bounceOffset = fullBounceHeight / 2.0
 
     override val height = baseItemHeight + fullBounceHeight
-    override val stack: ItemStack get() = frameDefs[frameIndex].stack
+    override val stack: ItemStack get() = frameDefs[frameIndex].stackProvider.stack
 
     var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
