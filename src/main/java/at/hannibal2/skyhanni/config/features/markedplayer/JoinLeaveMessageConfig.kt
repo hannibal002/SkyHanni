@@ -14,7 +14,11 @@ class JoinLeaveMessageConfig {
     var enabled: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Players List", desc = "The list of players you want to be notified for.\n§cCase sensitive, separated by commas.")
+    @ConfigOption(
+        name = "Players List",
+        desc = "The list of players you want to be notified for.\n" +
+                "§cCase sensitive, separated by commas.",
+    )
     @ConfigEditorText
     val playersList: Property<String> = Property.of("hannibal2,Minikloon")
 
@@ -26,7 +30,8 @@ class JoinLeaveMessageConfig {
     @Expose
     @ConfigOption(
         name = "Join Message",
-        desc = "Configure the message when someone joins.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.",
+        desc = "Configure the message when someone joins.\n&& is replaced with the minecraft color code §.\n" +
+            "%s is replaced with the player name.",
     )
     @ConfigEditorText
     var joinMessage: String = "&&b%s &&ajoined your lobby."
@@ -34,7 +39,8 @@ class JoinLeaveMessageConfig {
     @Expose
     @ConfigOption(
         name = "Left Message",
-        desc = "Configure the message when someone leaves.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.",
+        desc = "Configure the message when someone leaves.\n&& is replaced with the minecraft color code §.\n" +
+            "%s is replaced with the player name.",
     )
     @ConfigEditorText
     var leftMessage: String = "&&b%s &&cleft your lobby."
