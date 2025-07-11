@@ -5,16 +5,25 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityMuteEggSounds {
 
+    private var lastInInventory: SimpleTimeMark = SimpleTimeMark.farPast()
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
-    private val eggInventory = InventoryDetector(HoppityRabbitTheFishChecker.mealEggInventoryPattern)
+    private val eggInventory = InventoryDetector(
+        pattern = HoppityRabbitTheFishChecker.mealEggInventoryPattern,
+        closeInventory = {
+            lastInInventory = SimpleTimeMark.now()
+        }
+    )
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!config.muteEggSounds || !eggInventory.isInside()) return
+        if (!config.muteEggSounds) return
+        if (!eggInventory.isInside() || lastInInventory.passedSince() > 2.seconds)
         if (!event.isEggSound()) return
         event.cancel()
     }
