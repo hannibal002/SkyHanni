@@ -24,4 +24,10 @@ class TreesConfig {
     @Accordion
     val progress = TreeProgressConfig()
 
+    @Expose
+    @ConfigOption(name = "Compact Sweep Details", desc = "Compacts messages related to Sweep Details calculations.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var compactSweepDetails = true
+
 }

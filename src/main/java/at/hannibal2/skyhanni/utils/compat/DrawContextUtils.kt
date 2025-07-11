@@ -3,10 +3,8 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
-import net.minecraft.util.Vec3
 import java.nio.FloatBuffer
 //#if MC > 1.21
-//$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
@@ -60,15 +58,19 @@ object DrawContextUtils {
     }
 
     fun translate(x: Double, y: Double, z: Double) {
+        //#if MC < 1.21.6
         drawContext.matrices.translate(x, y, z)
+        //#else
+        //$$ drawContext.matrices.translate(x.toFloat(), y.toFloat())
+        //#endif
     }
 
     fun translate(x: Float, y: Float, z: Float) {
+        //#if MC < 1.21.6
         drawContext.matrices.translate(x, y, z)
-    }
-
-    fun translate(vec: Vec3) {
-        drawContext.matrices.translate(vec)
+        //#else
+        //$$ drawContext.matrices.translate(x, y)
+        //#endif
     }
 
     fun rotate(angle: Float, x: Number, y: Number, z: Number) {
@@ -93,23 +95,35 @@ object DrawContextUtils {
     //#endif
 
     fun scale(x: Float, y: Float, z: Float) {
+        //#if MC < 1.21.6
         drawContext.matrices.scale(x, y, z)
+        //#else
+        //$$ drawContext.matrices.scale(x, y)
+        //#endif
     }
 
     @Deprecated("Use pushPop instead")
     fun pushMatrix() {
+        //#if MC < 1.21.6
         drawContext.matrices.pushMatrix()
+        //#else
+        //$$ drawContext.matrices.pushMatrix()
+        //#endif
     }
 
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
+        //#if MC < 1.21.6
         drawContext.matrices.popMatrix()
+        //#else
+        //$$ drawContext.matrices.popMatrix()
+        //#endif
     }
 
     /**
      * Push and pop the matrix stack, run the action in between.
      */
-    @Suppress("deprecation")
+    @Suppress("DEPRECATION")
     inline fun pushPop(action: () -> Unit) {
         pushMatrix()
         action()
@@ -137,6 +151,10 @@ object DrawContextUtils {
     }
 
     fun loadIdentity() {
+        //#if MC < 1.21.6
         drawContext.matrices.loadIdentity()
+        //#else
+        //$$ drawContext.matrices.identity()
+        //#endif
     }
 }
