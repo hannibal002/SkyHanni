@@ -68,11 +68,13 @@ abstract class AbstractRepoManager(
     open val shouldRegisterStatusCommand: Boolean = true
     open val shouldRegisterReloadCommand: Boolean = true
 
-    private val updateCommand by lazy { "shupdate${commandShortName}repo" }
+    val updateCommand by lazy { "shupdate${commandShortName}repo" }
     private val statusCommand by lazy { "sh${commandShortName}repostatus" }
     private val reloadCommand by lazy { "shreloadlocal${commandShortName}repo" }
 
-    private var currentlyFetching = false
+    var currentlyFetching = false
+        private set
+    private var currentlyReloading: Boolean = false
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
     private var downloadFailed: Boolean = false
@@ -215,12 +217,11 @@ abstract class AbstractRepoManager(
     /**
      * todo write kdoc
      */
-    private suspend fun tryFetchRepository(command: Boolean, silentError: Boolean = true): Boolean? {
-        if (currentlyFetching) return null
+    private suspend fun tryFetchRepository(command: Boolean, silentError: Boolean = true) {
+        if (currentlyFetching) return
         currentlyFetching = true
-        val success = fetchAndUnpackRepo(command, silentError)
+        fetchAndUnpackRepo(command, silentError)
         currentlyFetching = false
-        return success
     }
 
 
@@ -271,7 +272,11 @@ abstract class AbstractRepoManager(
     }
 
     /**
-     * todo write kdoc
+     * Determines the latest commit on the GitHub repo and compares it to the current commit.
+     * If out of date, will download the latest commit zip file and unpack it into the repo directory.
+     *
+     * @param command If true, will report the status of the repo to the user.
+     * @param silentError If true, will not log errors to the console.
      */
     private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true): Boolean {
         val (currentSha, currentCommitTime) = commitStorage.readFromFile() ?: RepoCommit()
@@ -338,6 +343,8 @@ abstract class AbstractRepoManager(
     open suspend fun extraReloadCoroutineWork() = Unit
 
     private fun reloadRepository(answerMessage: String = "") {
+        if (currentlyReloading) return
+        currentlyReloading = true
         if (!shouldManuallyReload) return
         loadingError = false
         successfulConstants.clear()
@@ -364,6 +371,7 @@ abstract class AbstractRepoManager(
                 )
                 if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
             }
+            currentlyReloading = false
         }
     }
 

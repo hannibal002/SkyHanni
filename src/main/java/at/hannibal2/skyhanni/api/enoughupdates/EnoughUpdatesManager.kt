@@ -70,6 +70,8 @@ object EnoughUpdatesManager {
 
     private var isLoading = false
 
+    fun inLoadingState() = isLoading || EnoughUpdatesRepoManager.currentlyFetching
+
     fun prepRepoReload() {
         if (isLoading) return
         isLoading = true
@@ -82,7 +84,7 @@ object EnoughUpdatesManager {
     }
 
     fun reloadItemsFromRepo() {
-        if (!isLoading) return // Sanity check to prevent double loading
+        if (!isLoading) return
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(tempItemMap)
         synchronized(itemMap) {
@@ -477,13 +479,13 @@ object EnoughUpdatesManager {
         val loadedItems = itemMap.size
         val directorySize = itemCountInRepoFolder()
 
-        ChatUtils.chat("NEU Repo Item Status:")
-        when {
-            directorySize == 0 -> ChatUtils.chat("§cNo items directory found!", prefix = false)
-            loadedItems == 0 -> ChatUtils.chat("§cNo items loaded!", prefix = false)
-            loadedItems < directorySize -> ChatUtils.chat("§eLoaded $loadedItems/$directorySize items", prefix = false)
-            loadedItems > directorySize -> ChatUtils.chat("§eLoaded Items: $loadedItems (more than directory size)", prefix = false)
-            else -> ChatUtils.chat("§aLoaded all $loadedItems items!", prefix = false)
+        val status = when {
+            directorySize == 0 -> "§cNo items directory found!"
+            loadedItems == 0 -> "§cNo items loaded!"
+            loadedItems < directorySize -> "§eLoaded $loadedItems/$directorySize items"
+            loadedItems > directorySize -> "§eLoaded Items: $loadedItems (more than directory size)"
+            else -> "§aLoaded all $loadedItems items!"
         }
+        ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
     }
 }

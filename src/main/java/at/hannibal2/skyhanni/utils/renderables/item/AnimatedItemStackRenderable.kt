@@ -46,17 +46,22 @@ data class ItemStackRotationDefinition(
 )
 
 /**
- * A data class that defines behavior for a 'frame' of an ItemStack animation.
+ * A class that defines behavior for a 'frame' of an ItemStack animation.
  *
  * A ticks parameter of 0 will make the frame last permanently.
  *
  * @param stack The ItemStack that should render during this frame.
  * @param ticks How long this frame should last, in ticks (assuming a nominal 20/s)
  */
-data class ItemStackAnimationFrame(
-    val stack: ItemStack,
-    val ticks: Int = 0,
-)
+class ItemStackAnimationFrame(
+    private val stackProvider: () -> ItemStack,
+    val ticks: Int = 0
+) {
+    constructor(itemStack: ItemStack, ticks: Int = 0) : this({ itemStack }, ticks)
+    constructor(provider: NeuItemStackProvider, ticks: Int = 0) : this(provider::stack, ticks)
+
+    val stack: ItemStack get() = stackProvider()
+}
 
 class AnimatedItemStackRenderable(
     frames: Collection<ItemStackAnimationFrame>,
@@ -79,22 +84,6 @@ class AnimatedItemStackRenderable(
     horizontalAlign,
     verticalAlign,
 ) {
-    constructor(
-        stack: ItemStack,
-        rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
-        bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
-        scale: Double = NeuItems.ITEM_FONT_SIZE,
-        xSpacing: Int = 2,
-        ySpacing: Int = 1,
-        rescaleSkulls: Boolean = true,
-        horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-        verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-    ) : this(
-        listOf(ItemStackAnimationFrame(stack, ticks = 0)),
-        rotation, bounce, scale, xSpacing,
-        ySpacing, rescaleSkulls, horizontalAlign, verticalAlign,
-    )
-
     private var frameIndex = 0
     private var ticksInFrame = 0.0
     private val frameDefs = frames.toList()
