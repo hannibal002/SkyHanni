@@ -23,6 +23,9 @@
         ],
         "rei_client": [
             "at.hannibal2.skyhanni.compat.SkyHanniReiPlugin"
+        ],
+        "skyblockapi:imc/pv-profile": [
+            "at.hannibal2.skyhanni.api.SkyBlockAPIEventWrappers::onPvLoad"
         ]
     },
     "depends": {

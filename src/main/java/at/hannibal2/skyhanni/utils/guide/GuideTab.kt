@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.item.ItemStack
 
 class GuideTab(
@@ -49,7 +50,7 @@ class GuideTab(
             override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT
             override val verticalAlign: VerticalAlignment = VerticalAlignment.TOP
 
-            val itemRender = Renderable.itemStack(
+            val itemRender = ItemStackRenderable(
                 item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER
             )
 
