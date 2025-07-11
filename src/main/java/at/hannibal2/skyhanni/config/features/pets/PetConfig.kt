@@ -76,7 +76,6 @@ class PetConfig {
     @ConfigEditorSlider(minValue = 0.7f, maxValue = 1.5f, minStep = 0.05f)
     var petItemDisplayScale: Float = 0.9f
 
-
     enum class PetItemsDisplay(
         val icon: String,
         itemDisplayName: String,
@@ -87,7 +86,6 @@ class PetConfig {
         ;
 
         private val displayName: String = "$icon §ffor $itemDisplayName"
-
-        override fun toString() = displayName
+        override fun toString() = "$icon §ffor $displayName"
     }
 }

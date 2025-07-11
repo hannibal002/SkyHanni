@@ -778,10 +778,10 @@ interface Renderable {
                     )
                     //#else
                     //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                    //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderLayer::getGuiTextured, createResourceLocation("hud/experience_bar_background"),
+                    //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
                     //$$         posX, posY, width, height)
                     //$$ } else {
-                    //$$     DrawContextUtils.drawContext.drawTexture(RenderLayer::getGuiTextured, createResourceLocation(texture.path),
+                    //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation(texture.path),
                     //$$         posX, posY, 0f, 0f, width, height, 182, 5, 256, 256, -1)
                     //$$ }
                     //#endif
@@ -797,10 +797,10 @@ interface Renderable {
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers::getChromaTextured, createResourceLocation("hud/experience_bar_progress"),
+                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
                         //$$         width, height, 0, 0, posX, posY, progress, height)
                         //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers::getChromaTextured, createResourceLocation(texture.path),
+                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
                         //$$         posX, posY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
                         //$$ }
                         //#endif
@@ -814,10 +814,10 @@ interface Renderable {
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderLayer::getGuiTextured, createResourceLocation("hud/experience_bar_progress"),
+                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
                         //$$         width, height, 0, 0, posX, posY, progress, height)
                         //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(RenderLayer::getGuiTextured, createResourceLocation(texture.path),
+                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), createResourceLocation(texture.path),
                         //$$         posX, posY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
                         //$$ }
                         //#endif
@@ -883,6 +883,51 @@ interface Renderable {
                     realColor = color
                 }
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                content.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun darkRectButton(
+            content: Renderable,
+            onClick: (Boolean) -> Unit,
+            onHover: (Boolean) -> Unit = {},
+            button: Int = KeyboardManager.LEFT_MOUSE,
+            bypassChecks: Boolean = false,
+            condition: (Boolean) -> Boolean = { true },
+            startState: Boolean = false,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            var state = startState
+
+            override val width = content.width + padding * 2
+            override val height = content.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                if (isHovered(posX, posY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
+                    if (button.isKeyClicked()) {
+                        state = !state
+                        onClick(state)
+                    }
+                    onHover(state)
+                    if (state) {
+                        GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, true)
+                    } else {
+                        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, true)
+                    }
+                } else {
+                    if (state) {
+                        GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, false)
+                    } else {
+                        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, false)
+                    }
+                }
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 content.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
@@ -1428,6 +1473,25 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideDarkRect(
+            input: Renderable,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                GuiRenderUtils.drawFloatingRectDark(0, 0, width, height)
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)

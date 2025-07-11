@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.hotx.ChatRepoPatternEnum
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.ItemRepoPatternEnum
 import at.hannibal2.skyhanni.events.mining.PowderEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -20,6 +21,7 @@ import net.minecraft.item.ItemStack
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object HotmApi {
 
     fun copyCurrentTree() = HotmData.storage?.deepCopy()
@@ -118,6 +120,8 @@ object HotmApi {
         ;
 
         override val basePath = "mining.hotm.skymall"
+        override val chatPattern by RepoPattern.pattern("$basePath.chat.$patternId", chatPatternRaw)
+        override val itemPattern by RepoPattern.pattern("$basePath.item.$patternId", itemPatternRaw)
     }
 
     enum class MayhemPerk(
@@ -131,5 +135,6 @@ object HotmApi {
         ;
 
         override val basePath = "mining.hotm.mayhem"
+        override val chatPattern by RepoPattern.pattern("$basePath.chat.$patternId", chatPatternRaw)
     }
 }
