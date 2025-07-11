@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -119,6 +121,7 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Next click highlighting">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!config.enabled) return
         if (!config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
         if (!ExperimentationTableApi.inAddon) return
@@ -154,6 +157,7 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Slot click stuff">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!config.enabled) return
         if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
         if (!config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
         event.handleChronomatronClick()
@@ -185,6 +189,7 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Next click highlighting">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onReplaceItem(event: ReplaceItemEvent) {
+        if (!config.enabled) return
         if (!ExperimentationTableApi.inAddon || !config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
         if (ExperimentationTableApi.inChronomatron) event.replaceChronomatronItem()
@@ -347,4 +352,13 @@ object ExperimentsAddonsHelper {
         )
     }
     // </editor-fold>
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val basePath = "inventory.experimentationTable.addons"
+        event.move(94, "$basePath.highlightNextClick", "$basePath.enabled")
+        event.transform(94, "$basePath.highlightNextClick") {
+            JsonPrimitive(true)
+        }
+    }
 }
