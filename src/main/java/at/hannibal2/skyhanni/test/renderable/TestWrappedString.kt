@@ -13,7 +13,7 @@ object TestWrappedString : RenderableTestSuite.TestRenderable("wrapped_string") 
 
     override fun renderable(): Renderable {
         val testString = mapOf(
-            "§r§b§lI'm §ccool §4and §7colour§dful." to 30,
+            "§r§b§lI'm §ccool §4and §7color§dful." to 30,
             "I'm am very long text without formating at all, so do not mind me here. I'm definitely fine, at do not break at all." to 70,
             "IDONotUseSpaceBecauseICanSoIWillLookAwfulWhenSplit" to 20,
             "12345§a67890§bABCDE" to 40,
@@ -40,8 +40,8 @@ object TestWrappedString : RenderableTestSuite.TestRenderable("wrapped_string") 
                         Renderable.fixedSizeLine(StringRenderable("Limited Width", horizontalAlign = HorizontalAlignment.CENTER), it.value)
                             .renderBounds(),
                     ),
-                    listOf(StringRenderable("Wrapped:"), WrappedStringRenderable(it.key,it.value).renderBounds()),
-                )
+                    listOf(StringRenderable("Wrapped:"), WrappedStringRenderable(it.key, it.value).renderBounds()),
+                ),
             )
         }
         return VerticalContainerRenderable(render)

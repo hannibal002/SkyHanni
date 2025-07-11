@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.test.renderable
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 
 @SkyHanniModule(devOnly = true)
 object TestScrollable : RenderableTestSuite.TestRenderable("scrollable") {
