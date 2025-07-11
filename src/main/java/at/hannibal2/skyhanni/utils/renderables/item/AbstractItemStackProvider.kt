@@ -12,15 +12,11 @@ abstract class AbstractItemStackProvider {
     abstract val stack: ItemStack
 }
 
-class StaticItemStackProvider(
-    private val itemStack: ItemStack,
-) : AbstractItemStackProvider() {
-    override val stack: ItemStack get() = itemStack
+class StaticItemStackProvider(itemStack: ItemStack) : AbstractItemStackProvider() {
+    override val stack: ItemStack = itemStack
 }
 
-class NeuItemStackProvider(
-    private val internalName: NeuInternalName
-) : AbstractItemStackProvider() {
+class NeuItemStackProvider(private val internalName: NeuInternalName) : AbstractItemStackProvider() {
     private var _lastNeuItemCount: Int = neuItemCount
     private var _cachedStack: ItemStack = rebuildFromNeu()
 

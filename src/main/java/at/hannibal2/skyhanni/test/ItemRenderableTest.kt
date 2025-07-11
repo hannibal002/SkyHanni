@@ -26,7 +26,7 @@ object ItemRenderableTest {
     }
     private val animatedItemStackRenderable by lazy {
         AnimatedItemStackRenderable(
-            BOX_OF_SEEDS_ITEM.getItemStack(),
+            boxOfSeedsProvider,
             rotation = ItemStackRotationDefinition(
                 axis = EnumFacing.Axis.Y,
                 rotationSpeed = 65.0
