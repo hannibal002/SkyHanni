@@ -430,7 +430,10 @@ object StringUtils {
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
-    fun SystemMessageEvent.applyIfPossible(transform: (String) -> String) {
+    fun SystemMessageEvent.applyIfPossible(
+        transformationReason: String? = null,
+        transform: (String) -> String,
+    ) {
         val original = chatComponent.formattedText
         val new = transform(original)
         if (new == original) return
@@ -441,10 +444,12 @@ object StringUtils {
 
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
-        chatComponent = new.asComponent()
-        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value()
-        if (hoverEvents.size == 1) chatComponent.hover = hoverEvents.first().value()
+        val newComponent = new.asComponent().apply {
+            if (clickEvents.size == 1) command = clickEvents.first().value()
+            if (hoverEvents.size == 1) hover = hoverEvents.first().value()
+        }
 
+        replaceComponent(newComponent, transformationReason.orEmpty())
     }
 
     private fun IChatComponent.findAllEvents(

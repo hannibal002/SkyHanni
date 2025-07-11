@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration
@@ -42,7 +43,7 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val compass = Renderable.itemStack(ItemStack(Items.compass), 0.45)
+            val compass = ItemStackRenderable(ItemStack(Items.compass), 0.45)
             val wind = Renderable.string("§9≈", scale = 0.75)
 
             override fun render(posX: Int, posY: Int) {
@@ -62,8 +63,8 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val dyeGreen = Renderable.itemStack(DyeCompat.LIME.createStack(), 0.45)
-            val dyePink = Renderable.itemStack(DyeCompat.PINK.createStack(), 0.45)
+            val dyeGreen = ItemStackRenderable(DyeCompat.LIME.createStack(), 0.45)
+            val dyePink = ItemStackRenderable(DyeCompat.PINK.createStack(), 0.45)
 
             override fun render(posX: Int, posY: Int) {
                 DrawContextUtils.translate(1f, 0f, 0f)
@@ -78,7 +79,7 @@ enum class MiningEventType(
 
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, LorenzColor.RED, true,
-        Renderable.itemStack(createPlayerHead(), 0.36), // Late init when skull texture holder is loaded
+        ItemStackRenderable(createPlayerHead(), 0.36), // Late init when skull texture holder is loaded
     ),
 
     BETTER_TOGETHER(
@@ -89,9 +90,9 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val steveHead = Renderable.itemStack(createPlayerHead(), 0.36)
+            val steveHead = ItemStackRenderable(createPlayerHead(), 0.36)
             val alexHead by lazy {
-                Renderable.itemStack(
+                ItemStackRenderable(
                     ItemUtils.createSkull(
                         "Alex",
                         "6ab43178-89fd-4905-97f6-0f67d9d76fd9",
@@ -137,9 +138,7 @@ enum class MiningEventType(
         iconInput: ItemStack,
     ) : this(
         eventName, shortName, defaultLength, color, dwarvenSpecific,
-        Renderable.itemStack(
-            iconInput, xSpacing = 0,
-        ),
+        ItemStackRenderable(iconInput, xSpacing = 0),
         iconInput,
     )
 
