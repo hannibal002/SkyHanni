@@ -66,9 +66,9 @@ object SoundUtils {
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
         //#if MC < 1.21
-        val sound: ISound = object : PositionedSound(ResourceLocation(name)) {
-            init {
-                this.volume = volume
+            val sound: ISound = object : PositionedSound(ResourceLocation(name)) {
+                init {
+                    this.volume = volume
                 repeat = false
                 repeatDelay = 0
                 attenuationType = ISound.AttenuationType.NONE
