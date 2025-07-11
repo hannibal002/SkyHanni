@@ -108,7 +108,7 @@ enum class FarmingItemType(
         override val horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-        override fun render(posX: Int, posY: Int) {
+        override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
             GuiRenderUtils.drawRect(
                 0,
                 0,
@@ -116,7 +116,7 @@ enum class FarmingItemType(
                 height,
                 if (selectedState) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt(),
             )
-            content.render(posX, posY)
+            content.render(mouseOffsetX, mouseOffsetY)
         }
     }
 

@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.Objects
@@ -48,13 +49,10 @@ object ItemPickupLog {
         ICON(
             "§e✎",
             { entry, _ ->
-                val itemIcon = entry.neuInternalName?.getItemStackOrNull()
-                if (itemIcon != null) {
-                    Renderable.itemStack(itemIcon)
-                } else {
-                    ItemNameResolver.getInternalNameOrNull(entry.name)?.let { Renderable.itemStack(it.getItemStack()) }
-                        ?: Renderable.string("§c?")
-                }
+                val entryInternalName = entry.neuInternalName ?: ItemNameResolver.getInternalNameOrNull(entry.name)
+                val itemIcon = entryInternalName?.getItemStackOrNull()
+                if (itemIcon != null) ItemStackRenderable(itemIcon)
+                else Renderable.string("§c?")
             },
         ),
         ITEM_NAME(

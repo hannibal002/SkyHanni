@@ -56,7 +56,11 @@ class TrophyFishingConfig {
     var odgerLocation: Boolean = true
 
     @Expose
+    //#if FORGE
     @ConfigOption(name = "Load from NEU PV", desc = "Load Trophy fishing data when opening NEU PV.")
+    //#else
+    //$$@ConfigOption(name = "Load from SkyBlock PV", desc = "Load Trophy fishing data when opening the SkyBlock Profile Viewer mod.")
+    //#endif
     @ConfigEditorBoolean
     @FeatureToggle
     var loadFromNeuPV: Boolean = true

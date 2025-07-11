@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
@@ -157,7 +158,7 @@ object FarmingFortuneDisplay {
         val displayCrop = GardenApi.cropInHand ?: currentCrop ?: return@buildList
 
         val list = mutableListOf<Renderable>()
-        list.add(Renderable.itemStack(displayCrop.icon))
+        list.add(ItemStackRenderable(displayCrop.icon))
 
         var recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
         val wrongTabCrop = GardenApi.cropInHand != null && GardenApi.cropInHand != currentCrop
