@@ -155,7 +155,7 @@ class AnimatedItemStackRenderable(
         ticksInFrame = 0.0
     }
 
-    override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
+    override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         currentRotation = generateNextRotation(deltaTime.inPartialSeconds)
         val currentOffsetY = bounce.calculateBounce()
         tryMoveNextFrame(deltaTime.inPartialSeconds)

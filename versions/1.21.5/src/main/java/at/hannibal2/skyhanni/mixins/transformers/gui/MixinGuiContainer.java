@@ -38,7 +38,11 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
         skyHanni$hook.closeWindowPressed(cir);
     }
 
+    //#if MC < 1.21.6
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V"))
+    //#else
+    //$$ @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V"))
+    //#endif
     private void backgroundDrawn(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyHanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
@@ -53,7 +57,11 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
         skyHanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
     }
 
+    //#if MC < 1.21.6
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V", shift = At.Shift.AFTER))
+    //#else
+    //$$ @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightFront(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
+    //#endif
     private void onForegroundDraw(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyHanni$hook.foregroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
@@ -73,7 +81,11 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
         skyHanni$hook.onMouseClick(slot, slotId, button, actionType.getIndex(), cir);
     }
 
+    //#if MC < 1.21.6
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
+    //#else
+    //$$ @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
+    //#endif
     private void renderBackgroundTexture(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ToolTipData.INSTANCE.setLastSlot(this.focusedSlot);
     }
