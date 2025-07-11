@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -50,7 +51,7 @@ object FrogMaskFeatures {
     )
 
     private val FROG_MASK = "FROG_MASK".toInternalName()
-    private val frogMaskRenderable by lazy { Renderable.itemStack(FROG_MASK.getItemStack()) }
+    private val frogMaskRenderable by lazy { ItemStackRenderable(FROG_MASK.getItemStack()) }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.THE_PARK)
     fun onRenderOverlay() {
