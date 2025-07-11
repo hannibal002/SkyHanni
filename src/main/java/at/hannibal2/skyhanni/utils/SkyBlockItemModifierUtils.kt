@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.features.fishing.FishingApi
+import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
@@ -21,7 +23,6 @@ import net.minecraft.util.ResourceLocation
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
-
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
@@ -179,6 +180,12 @@ object SkyBlockItemModifierUtils {
             }
         }
         list
+    }
+
+    fun ItemStack.getRodParts(): List<NeuInternalName> {
+        return FishingApi.RodPart.entries.mapNotNull {
+            this.getFishingRodPart(it)
+        }
     }
 
     fun ItemStack.getPowerScroll() = getAttributeString("power_ability_scroll")?.toInternalName()

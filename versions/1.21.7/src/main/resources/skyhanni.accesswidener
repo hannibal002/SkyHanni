@@ -1,0 +1,38 @@
+accessWidener v2 named
+
+accessible field net/minecraft/entity/LivingEntity equipment Lnet/minecraft/entity/EntityEquipment;
+accessible field net/minecraft/entity/EntityEquipment map Ljava/util/EnumMap;
+accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
+accessible field net/minecraft/client/gui/screen/ingame/HandledScreen focusedSlot Lnet/minecraft/screen/slot/Slot;
+accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket type Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler;
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
+accessible method net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler getType ()Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType;
+accessible method net/minecraft/client/gui/hud/ChatHud logChatMessage (Lnet/minecraft/client/gui/hud/ChatHudLine;)V
+accessible field net/minecraft/client/gui/hud/BossBarHud bossBars Ljava/util/Map;
+accessible field net/minecraft/client/render/WorldRenderer frustum Lnet/minecraft/client/render/Frustum;
+accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket entityId I
+accessible field net/minecraft/entity/player/PlayerInventory equipment Lnet/minecraft/entity/EntityEquipment;
+accessible field net/minecraft/util/hit/BlockHitResult missed Z
+accessible class net/minecraft/client/gui/hud/ChatHud$RemovalQueuedMessage
+accessible field net/minecraft/client/gui/hud/ChatHud messages Ljava/util/List;
+accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util/List;
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractAtHandler
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractHandler
+accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractHandler hand Lnet/minecraft/util/Hand;
+accessible field net/minecraft/world/World blockEntityTickers Ljava/util/List;
+accessible class net/minecraft/client/font/TextRenderer$Drawer
+accessible method net/minecraft/client/gui/hud/ChatHud refresh ()V
+accessible field net/minecraft/client/render/RenderLayer$MultiPhase phases Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
+accessible field net/minecraft/client/render/RenderLayer$MultiPhaseParameters target Lnet/minecraft/client/render/RenderPhase$Target;
+accessible method net/minecraft/client/render/RenderLayer$MultiPhase <init> (Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)V
+extendable class net/minecraft/client/render/RenderLayer$MultiPhase
+accessible class net/minecraft/client/font/TextHandler$LineWrappingCollector
+accessible class net/minecraft/client/font/TextHandler$StyledString
+accessible field net/minecraft/client/font/BakedGlyph textRenderLayers Lnet/minecraft/client/font/TextRenderLayerSet;
+accessible method net/minecraft/text/TextColor <init> (ILjava/lang/String;)V
+accessible field net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen text Lnet/minecraft/block/entity/SignText;
+accessible field net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen currentRow I
+accessible method net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen setCurrentRowMessage (Ljava/lang/String;)V
+accessible field net/minecraft/text/TextColor name Ljava/lang/String;
+accessible field net/minecraft/entity/Entity CUSTOM_NAME Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/entity/LivingEntity HEALTH Lnet/minecraft/entity/data/TrackedData;

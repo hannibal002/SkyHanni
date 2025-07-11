@@ -73,8 +73,7 @@ object PlatformUtils {
         //#if FORGE
         return Loader.isModLoaded(modId)
         //#else
-        // TODO implement this for fabric
-        //$$ return false
+        //$$ return FabricLoader.getInstance().isModLoaded(modId)
         //#endif
     }
 

@@ -34,7 +34,7 @@ class ExperimentationTableConfig {
     @Expose
     @ConfigOption(
         name = "Guardian Reminder",
-        desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped."
+        desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped.",
     )
     @ConfigEditorBoolean
     @SearchTag("enchant enchanting")
