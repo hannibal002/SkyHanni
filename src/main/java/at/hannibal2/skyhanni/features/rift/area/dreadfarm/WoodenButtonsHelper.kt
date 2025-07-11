@@ -159,7 +159,7 @@ object WoodenButtonsHelper {
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
         RiftApi.allButtonsHit = true
         hitButtons = buttonLocations.values.flatten().toMutableSet()
-        soulLocations["Buttons"]?.let {
+        soulLocations["Dreadfarm"]?.get("Buttons")?.let {
             IslandGraphs.pathFind(
                 it,
                 "Buttons Enigma Soul",
