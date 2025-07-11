@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
