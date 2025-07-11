@@ -78,14 +78,14 @@ jobs:
             group: detekt-comment-${{ github.event.pull_request.number }}
             cancel-in-progress: true
         needs: detekt
-        if: ${{ needs.detekt.outputs.sarif_exists == 'true' && needs.detekt.outputs.detekt_failed == 'true' && github.event.pull_request.draft == false }}
+        if: ${{ always() }}
         permissions:
             pull-requests: write
         steps:
             -   name: Dump condition values
                 run: |
                     echo "detekt.sarif_exists: ${{ needs.detekt.outputs.sarif_exists }}"
-                    echo "detekt.result: ${{ needs.detekt.result }}"
+                    echo "detekt.result: ${{ needs.detekt.outputs.detekt_failed  }}"
                     echo "pull_request.draft: ${{ github.event.pull_request.draft }}"
             -   name: Checkout base repo code
                 uses: actions/checkout@v4
