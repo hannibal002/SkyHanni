@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -122,11 +122,11 @@ object DicerRngDropTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<Searchable> {
+    private fun drawDisplay(data: Data) = buildList {
         val cropInHand = cropInHand ?: return@buildList
 
         val topLine = mutableListOf<Renderable>()
-        topLine.add(Renderable.itemStack(cropInHand.icon))
+        topLine.add(ItemStackRenderable(cropInHand.icon))
         topLine.add(Renderable.string("§7Dicer Tracker:"))
         add(Renderable.horizontalContainer(topLine).toSearchable())
 
