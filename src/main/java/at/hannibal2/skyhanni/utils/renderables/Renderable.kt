@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
@@ -32,7 +31,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
@@ -440,33 +438,6 @@ interface Renderable {
                     mouseOffsetX to mouseOffsetY
                 }
                 bottomLayer.render(nMouseOffsetX, nMouseOffsetY)
-            }
-        }
-
-        @Deprecated(
-            "Use ItemStackRenderable instead",
-            ReplaceWith("ItemStackRenderable(item, scale, xSpacing, ySpacing, rescaleSkulls, horizontalAlign, verticalAlign)"),
-        )
-        fun itemStack(
-            item: ItemStack,
-            scale: Double = NeuItems.ITEM_FONT_SIZE,
-            xSpacing: Int = 2,
-            ySpacing: Int = 1,
-            rescaleSkulls: Boolean = true,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-            highlight: Boolean = false,
-        ) = object : Renderable {
-            override val width = (15.5 * scale + 0.5).toInt() + xSpacing
-            override val height = (15.5 * scale + 0.5).toInt() + ySpacing
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                if (highlight) {
-                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
-                }
-                item.renderOnScreen(xSpacing / 2f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
         }
 
@@ -918,6 +889,51 @@ interface Renderable {
                     realColor = color
                 }
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                content.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun darkRectButton(
+            content: Renderable,
+            onClick: (Boolean) -> Unit,
+            onHover: (Boolean) -> Unit = {},
+            button: Int = KeyboardManager.LEFT_MOUSE,
+            bypassChecks: Boolean = false,
+            condition: (Boolean) -> Boolean = { true },
+            startState: Boolean = false,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            var state = startState
+
+            override val width = content.width + padding * 2
+            override val height = content.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                if (isHovered(mouseOffsetX, mouseOffsetY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
+                    if (button.isKeyClicked()) {
+                        state = !state
+                        onClick(state)
+                    }
+                    onHover(state)
+                    if (state) {
+                        GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, true)
+                    } else {
+                        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, true)
+                    }
+                } else {
+                    if (state) {
+                        GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, false)
+                    } else {
+                        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, false)
+                    }
+                }
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 content.render(mouseOffsetX + padding, mouseOffsetY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
@@ -1494,6 +1510,25 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideDarkRect(
+            input: Renderable,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                GuiRenderUtils.drawFloatingRectDark(0, 0, width, height)
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)

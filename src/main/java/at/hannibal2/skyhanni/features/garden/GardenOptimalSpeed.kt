@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.gui.inventory.GuiEditSign
 import kotlin.time.Duration.Companion.seconds
@@ -89,7 +90,7 @@ object GardenOptimalSpeed {
                 val color = if (lastCrop in crops) LorenzColor.GOLD else LorenzColor.WHITE
                 val renderable = Renderable.horizontalContainer(
                     listOf(
-                        Renderable.horizontalContainer(crops.map { Renderable.itemStack(it.icon) }),
+                        Renderable.horizontalContainer(crops.map { ItemStackRenderable(it.icon) }),
                         Renderable.string("${color.getChatColor()} - $speed"),
                     ),
                     spacing = 2,
@@ -101,7 +102,7 @@ object GardenOptimalSpeed {
                 val color = if (lastCrop == crop) LorenzColor.GOLD else LorenzColor.WHITE
                 val renderable = Renderable.horizontalContainer(
                     listOf(
-                        Renderable.itemStack(crop.icon),
+                        ItemStackRenderable(crop.icon),
                         Renderable.string("${color.getChatColor()}${crop.cropName} - $speed"),
                     ),
                     spacing = 2,

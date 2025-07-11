@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -17,7 +18,7 @@ object DragNDrop {
 
     private const val BUTTON_MAPPED = -100
 
-    private val invalidItem = Renderable.itemStack(ItemStack(Blocks.barrier), 1.0)
+    private val invalidItem = ItemStackRenderable(ItemStack(Blocks.barrier), 1.0)
 
     @HandleEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
@@ -82,7 +83,7 @@ object DragNDrop {
 
 fun ItemStack.toDragItem(scale: Double = 1.0) = object : DragItem<ItemStack> {
 
-    val render = Renderable.itemStack(this@toDragItem, scale, 0)
+    val render = ItemStackRenderable(this@toDragItem, scale, 0)
 
     override fun get(): ItemStack = this@toDragItem
 

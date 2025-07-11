@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
@@ -390,7 +391,7 @@ internal object RenderableUtils {
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {
-                Renderable.itemStack(it, scale = itemScale)
+                ItemStackRenderable(it, scale = itemScale)
             } ?: continue
             val left = hoverTips(
                 entry.left,

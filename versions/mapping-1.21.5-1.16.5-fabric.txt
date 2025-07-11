@@ -43,10 +43,11 @@ net.minecraft.item.ItemStack getComponents() getTag()
 net.minecraft.item.ItemStack getName() toHoverableText()
 
 net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket$InteractType net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket$InteractionType
+net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket net.minecraft.network.packet.c2s.play.PickFromInventoryC2SPacket
 
 net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket type.getType() getType()
 
-net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket
+net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket net.minecraft.network.packet.s2c.play.PlayerSpawnS2CPacket
 
 net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket entityId() getId()
 

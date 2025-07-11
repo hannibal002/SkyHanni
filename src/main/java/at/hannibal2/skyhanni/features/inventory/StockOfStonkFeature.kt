@@ -39,20 +39,22 @@ object StockOfStonkFeature {
     )
 
     /**
+     * REGEX-TEST: §7§7▶ §c§lTOP 5,000§7 - §5Stock of Stonks §8x2
      * REGEX-TEST: §5§o§7§7▶ §c§lTOP 5,000§7 - §5Stock of Stonks §8x2
      * REGEX-TEST: §5§o§7§a▶ §a§lTOP 100§7 - §5Stock of Stonks §8x25
      */
     private val topPattern by patternGroup.pattern(
         "top",
-        "§5§o§7§.▶ §.§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
+        "(?:§5§o)?§7§.▶ §.§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
     )
 
     /**
+     * REGEX-TEST: §7   Minimum Bid: §62,400,002 Coins
      * REGEX-TEST: §5§o§7   Minimum Bid: §62,400,002 Coins
      */
     private val bidPattern by patternGroup.pattern(
         "bid",
-        "§5§o§7   Minimum Bid: §6(?<amount>[\\d,]+) Coins",
+        "(?:§5§o)?§7 {3}Minimum Bid: §6(?<amount>[\\d,]+) Coins",
     )
 
     var inInventory = false
