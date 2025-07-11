@@ -9,14 +9,14 @@ import kotlin.time.Duration
 abstract class TimeDependentRenderable : Renderable {
     private var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
 
-    abstract fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration)
+    abstract fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration)
 
     @Deprecated("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
-    override fun render(posX: Int, posY: Int) {
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         val now = SimpleTimeMark.now()
         val deltaTime = now - lastRenderTime
         lastRenderTime = now
 
-        renderWithDelta(posX, posY, deltaTime)
+        renderWithDelta(mouseOffsetX, mouseOffsetY, deltaTime)
     }
 }

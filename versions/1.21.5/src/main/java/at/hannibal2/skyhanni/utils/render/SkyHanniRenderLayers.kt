@@ -94,19 +94,23 @@ object SkyHanniRenderLayers {
         false,
         false,
         SkyHanniRenderPipeline.CHROMA_STANDARD(),
-        MultiPhaseParameters.builder().build(false)
+        MultiPhaseParameters.builder().build(false),
     )
 
-    private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderLayer> = Util.memoize {
-        texture -> ChromaRenderLayer(
-        "skyhanni_text_chroma",
-        RenderLayer.CUTOUT_BUFFER_SIZE,
-        false,
-        false,
-        SkyHanniRenderPipeline.CHROMA_TEXT(),
-        MultiPhaseParameters.builder()
-            .texture(RenderPhase.Texture(texture, TriState.FALSE, false))
-            .build(false)
+    private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderLayer> = Util.memoize { texture ->
+        ChromaRenderLayer(
+            "skyhanni_text_chroma",
+            RenderLayer.CUTOUT_BUFFER_SIZE,
+            false,
+            false,
+            SkyHanniRenderPipeline.CHROMA_TEXT(),
+            MultiPhaseParameters.builder()
+                //#if MC < 1.21.6
+                .texture(RenderPhase.Texture(texture, TriState.FALSE, false))
+                //#else
+                //$$ .texture(RenderPhase.Texture(texture, false))
+                //#endif
+                .build(false),
         )
     }
 
@@ -150,7 +154,12 @@ object SkyHanniRenderLayers {
 
     fun getChromaTexturedWithIdentifier(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
 
+    //#if MC < 1.21.6
     fun getChromaStandard() = CHROMA_STANDARD
     fun getChromaTextured() = SkyHanniRenderLayers::getChromaTexturedWithIdentifier
-    fun getMinecraftGuiTextured() = RenderLayer::getGuiTextured
+    //#else
+    //$$ fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
+    //$$ fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
+    //#endif
+
 }

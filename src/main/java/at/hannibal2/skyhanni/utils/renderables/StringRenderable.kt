@@ -21,7 +21,7 @@ open class StringRenderable(
 
     val inverseScale = 1 / scale
 
-    override fun render(posX: Int, posY: Int) {
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         RenderableUtils.renderString(text, scale, color, inverseScale)
     }
 }
@@ -55,7 +55,7 @@ class WrappedStringRenderable(
 
     override val height by lazy { map.size * ((9 * scale).toInt() + 1) }
 
-    override fun render(posX: Int, posY: Int) {
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         DrawContextUtils.translate(1.0, 1.0, 0.0)
         DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
         map.entries.forEachIndexed { index, (text, size) ->
