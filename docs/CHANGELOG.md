@@ -57,7 +57,7 @@
 
 #### Misc
 
-+ Improved the change log viewer's design to be more in-line with other SkyHanni guis. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4313)
++ Improved the changelog viewer's design to be more in-line with other SkyHanni guis. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4313)
 + Made some of the keybind features work with items in REI overlays. - nopo (https://github.com/hannibal002/SkyHanni/pull/4318)
 + Reduced memory usage with a large amount of text rendering. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4316)
 
