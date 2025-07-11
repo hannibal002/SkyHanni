@@ -7,4 +7,6 @@ class MessageSendToServerEvent(
     val message: String,
     val splitMessage: List<String>,
     val originatingModContainer: ModInstance?
-) : CancellableSkyHanniEvent()
+) : CancellableSkyHanniEvent() {
+    val isCommand by lazy { message.startsWith("/") }
+}
