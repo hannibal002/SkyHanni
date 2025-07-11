@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
@@ -54,7 +55,7 @@ object QuiverDisplay {
             if (hideAmount || arrow == NONE_ARROW_TYPE) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
 
         if (config.showIcon.get()) {
-            add(Renderable.itemStack(itemStack, 1.0))
+            add(ItemStackRenderable(itemStack, 1.0))
         }
         if (!hideAmount) {
             add(Renderable.string("§b${amount.addSeparators()}x"))

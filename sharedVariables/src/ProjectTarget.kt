@@ -12,6 +12,7 @@ enum class ProjectTarget(
     val fabricApiVersion: String? = null,
     val modMenuVersion: String? = null,
     val isModern: Boolean = false,
+    val modrinthInfo: ModrinthInfo? = null,
     linkTo: String?,
 ) {
     MAIN(
@@ -20,6 +21,7 @@ enum class ProjectTarget(
         "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
         MappingStyle.SEARGE,
         forgeDep = "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
+        modrinthInfo = ModrinthInfo.FORGE_1_8_9,
         linkTo = "BRIDGE116FORGE",
     ),
     BRIDGE116FORGE(
@@ -46,6 +48,19 @@ enum class ProjectTarget(
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5",
         modMenuVersion = "14.0.0-rc.2",
         isModern = true,
+        modrinthInfo = ModrinthInfo.FABRIC_1_21_5,
+//         linkTo = "MODERN_12107",
+//     ),
+//     MODERN_12107(
+//         "1.21.7",
+//         MinecraftVersion.MC12107,
+//         yarn("1.21.7+build.6"),
+//         MappingStyle.YARN,
+//         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.16.14",
+//         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.128.2+1.21.6",
+//         modMenuVersion = "15.0.0-beta.3",
+//         isModern = true,
+//         modrinthInfo = ModrinthInfo.FABRIC_1_21_7,
         linkTo = null,
     ),
     ;
@@ -68,5 +83,9 @@ enum class ProjectTarget(
 
     companion object {
         fun activeVersions() = values().filter { MultiVersionStage.activeState.shouldCreateProject(it) }
+
+        fun findByMcVersion(mcVersion: String): ProjectTarget? {
+            return values().find { it.minecraftVersion.versionName == mcVersion }
+        }
     }
 }
