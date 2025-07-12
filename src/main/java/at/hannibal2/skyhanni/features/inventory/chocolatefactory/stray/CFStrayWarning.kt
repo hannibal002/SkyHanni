@@ -177,10 +177,10 @@ object CFStrayWarning {
         destructiveSlots = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").destructiveSlots
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!CFApi.inChocolateFactory || !warningConfig.blockClosing) return
-        if (event.slot?.slotNumber in destructiveSlots) {
+        if (event.slotId in destructiveSlots) {
             event.cancel()
             preventCloseTitle()
         }

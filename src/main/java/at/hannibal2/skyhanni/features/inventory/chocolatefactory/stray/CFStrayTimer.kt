@@ -96,7 +96,7 @@ object CFStrayTimer {
         destructiveSlots = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").destructiveSlots
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !config.blockClosing) return
         if (KeyboardManager.isShiftKeyDown()) return
