@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class MetalDetectorConfig {
-
+    @ConfigOption(name = "Credits", desc = "Most features here are from Coleweight or SoopyV2, huge thanks to them!")
     @Expose
     @ConfigOption(name = "Metal Detector Solver", desc = "Enables the solver for the metal detector.")
     @ConfigEditorBoolean
