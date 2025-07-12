@@ -15,6 +15,7 @@ data class EnforcedValueData(
     @Expose var chatPSA: List<String>? = null,
     @Expose var affectedVersion: ModVersion,
     @Expose var affectedMinecraftVersions: List<String>? = null,
+    @Expose var extraMessage: String? = null,
 )
 
 data class EnforcedValue(
