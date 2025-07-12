@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.entity.EntityPlayerSP
 
 @SkyHanniModule
@@ -34,7 +34,7 @@ object MobDebug {
 
     private fun MobData.MobSet.highlight(event: SkyHanniRenderWorldEvent, color: (Mob) -> (LorenzColor)) {
         for (mob in filter { it.isNotInvisible() }) {
-            event.drawFilledBoundingBoxNea(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
+            event.drawFilledBoundingBox(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
         }
     }
 
@@ -49,7 +49,7 @@ object MobDebug {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
-            lastRayHit = MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)
+            lastRayHit = MobUtils.rayTraceForMobs(MinecraftCompat.localPlayer, event.partialTicks)
                 ?.firstOrNull { it.canBeSeen() && (!config.showInvisible || !it.isInvisible()) }
         }
 
@@ -82,7 +82,7 @@ object MobDebug {
         }
         if (config.showRayHit) {
             lastRayHit?.let {
-                event.drawFilledBoundingBoxNea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
+                event.drawFilledBoundingBox(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
     }

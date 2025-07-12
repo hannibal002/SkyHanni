@@ -1,0 +1,67 @@
+package at.hannibal2.skyhanni.config.features.fishing.trophyfishing
+
+import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.features.crimsonisle.SulphurSkitterBoxConfig
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+
+class TrophyFishingConfig {
+    @Expose
+    @ConfigOption(name = "Trophy Fishing Chat Messages", desc = "")
+    @Accordion
+    val chatMessages: ChatMessagesConfig = ChatMessagesConfig()
+
+    @Expose
+    @ConfigOption(name = "Trophy Fishing Display", desc = "")
+    @Accordion
+    val display: TrophyFishDisplayConfig = TrophyFishDisplayConfig()
+
+    @Expose
+    @ConfigOption(name = "Geyser Fishing", desc = "")
+    @Accordion
+    val geyserOptions: GeyserFishingConfig = GeyserFishingConfig()
+
+    @ConfigOption(name = "Sulphur Skitter Box", desc = "")
+    @Accordion
+    @Expose
+    val sulphurSkitterBox: SulphurSkitterBoxConfig = SulphurSkitterBoxConfig()
+
+    @Expose
+    @ConfigOption(name = "Golden Fish Timer", desc = "")
+    @Accordion
+    val goldenFishTimer: GoldenFishTimerConfig = GoldenFishTimerConfig()
+
+    @Expose
+    @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of Trophy Fish in tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var filletTooltip: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Total Caught Tooltip", desc = "Show total Trophy Fish caught in tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var totalFishCaught: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Odger Waypoint",
+        desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand.\n" +
+            "§cOnly useful for users without Abiphone contact."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var odgerLocation: Boolean = true
+
+    @Expose
+    //#if FORGE
+    @ConfigOption(name = "Load from NEU PV", desc = "Load Trophy fishing data when opening NEU PV.")
+    //#else
+    //$$@ConfigOption(name = "Load from SkyBlock PV", desc = "Load Trophy fishing data when opening the SkyBlock Profile Viewer mod.")
+    //#endif
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var loadFromNeuPV: Boolean = true
+}

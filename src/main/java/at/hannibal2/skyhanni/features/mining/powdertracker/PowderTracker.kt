@@ -14,20 +14,18 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.mining.PowderGainEvent
+import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -157,6 +155,7 @@ object PowderTracker {
         @Expose
         var totalHardStoneCompacted = 0
 
+        // TODO remove this field and transform this into a ItemProfitTracker
         @Expose
         var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
     }
@@ -214,7 +213,7 @@ object PowderTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onPowderGain(event: PowderGainEvent) {
+    fun onPowderGain(event: PowderEvent.Gain) {
         if (lastChestPicked.passedSince() > 5.seconds) return
         tracker.modify {
             val reward = when (event.powder) {
@@ -233,7 +232,7 @@ object PowderTracker {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         if (!isEnabled()) return
         gemstoneInfo.perHour = 0.0
         gemstoneInfo.stoppedChecks = 0
@@ -461,7 +460,7 @@ object PowderTracker {
         val perMin: MutableList<Long>,
     )
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isCurrent() && config.enabled
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

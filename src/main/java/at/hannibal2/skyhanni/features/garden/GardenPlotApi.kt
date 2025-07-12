@@ -6,11 +6,10 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
-import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.features.garden.sensitivity.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -135,11 +134,11 @@ object GardenPlotApi {
             0,
             null,
             null,
-            false,
-            false,
-            false,
-            true,
-            false,
+            sprayHasNotified = false,
+            isBeingPasted = false,
+            isPestCountInaccurate = false,
+            locked = true,
+            uncleared = false,
         )
     }
 
@@ -215,12 +214,12 @@ object GardenPlotApi {
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
-    fun closestCenterPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }?.middle
+    fun getPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }
 
     fun Plot.sendTeleportTo() {
         if (isBarn()) HypixelCommands.teleportToPlot("barn")
         else HypixelCommands.teleportToPlot(name)
-        LockMouseLook.autoDisable()
+        LockMouseLook.unlockMouse()
     }
 
     init {
@@ -241,7 +240,7 @@ object GardenPlotApi {
                 val maxY = ((y - 2) * 96 + 48).toDouble()
                 val a = LorenzVec(minX, 0.0, minY)
                 val b = LorenzVec(maxX, 256.0, maxY)
-                val middle = a.interpolate(b, 0.5).copy(y = 10.0)
+                val middle = a.middle(b).copy(y = 10.0)
                 val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
                 list.add(Plot(id, slot, box, middle))
                 slot++
@@ -283,6 +282,8 @@ object GardenPlotApi {
         }
     }
 
+    private fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Configure Plots") return
@@ -290,11 +291,11 @@ object GardenPlotApi {
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
             val lore = itemStack.getLore()
-            plotNamePattern.matchMatcher(itemStack.name) {
+            plotNamePattern.matchMatcher(itemStack.displayName) {
                 val plotName = group("name")
                 plot.name = plotName
             }
-            barnNamePattern.matchMatcher(itemStack.name) {
+            barnNamePattern.matchMatcher(itemStack.displayName) {
                 plot.name = group("name")
             }
             plot.locked = false
@@ -311,8 +312,6 @@ object GardenPlotApi {
     }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
-
-    fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
     fun SkyHanniRenderWorldEvent.renderPlot(
         plot: Plot,

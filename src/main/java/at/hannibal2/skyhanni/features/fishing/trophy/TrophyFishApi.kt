@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 
 object TrophyFishApi {
@@ -9,7 +10,7 @@ object TrophyFishApi {
         val trophyFishes = TrophyFishManager.fish ?: return null
         val info = TrophyFishManager.getInfo(internalName) ?: return null
         val counts = trophyFishes[internalName].orEmpty()
-        val bestFishObtained = counts.keys.maxOrNull() ?: TrophyRarity.BRONZE
+        val bestFishObtained = counts.filter { it.value > 0 }.keys.maxOrNull() ?: TrophyRarity.BRONZE
         val rateString = if (info.rate != null) "§8[§7${info.rate}%§8]" else ""
         return """
                 |${info.displayName} $rateString
@@ -23,6 +24,14 @@ object TrophyFishApi {
                 |§7Total: ${bestFishObtained.formatCode}${counts.values.sum().addSeparators()}
         """.trimMargin()
     }
+
+    private val regex = "[- ]".toRegex()
+
+    fun getInternalName(displayName: String): String {
+        return displayName.replace("Obfuscated", "Obfuscated Fish")
+            .replace(regex, "").lowercase().removeColor()
+    }
+
 
     private fun formatCount(counts: Map<TrophyRarity, Int>, rarity: TrophyRarity): String {
         val count = counts.getOrDefault(rarity, 0)

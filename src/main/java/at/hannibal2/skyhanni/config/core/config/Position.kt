@@ -28,10 +28,7 @@ import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import java.lang.reflect.Field
-
 
 class Position @JvmOverloads constructor(
     x: Int,
@@ -60,7 +57,7 @@ class Position @JvmOverloads constructor(
 
     @Expose
     var scale: Float = scale
-        get() = if (field == 0f) DEFAULT_SCALE else field
+        get() = if (field <= 0f) DEFAULT_SCALE else field
 
     @Expose
     var centerX: Boolean = centerX
@@ -130,7 +127,7 @@ class Position @JvmOverloads constructor(
 
     fun moveX(deltaX: Int, objWidth: Int): Int {
         var newDeltaX = deltaX
-        val screenWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+        val screenWidth = GuiScreenUtils.scaledWindowWidth
         val wasPositiveX = x >= 0
         this.x += newDeltaX
 
@@ -162,7 +159,7 @@ class Position @JvmOverloads constructor(
 
     fun moveY(deltaY: Int, objHeight: Int): Int {
         var newDeltaY = deltaY
-        val screenHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+        val screenHeight = GuiScreenUtils.scaledWindowHeight
         val wasPositiveY = y >= 0
         this.y += newDeltaY
 
@@ -221,13 +218,14 @@ class Position @JvmOverloads constructor(
                 "owner" to configLink.owner,
                 "field" to configLink.field,
             )
+            ErrorManager.crashInDevEnv("Couldn't set config links") { e }
         }
     }
 
     companion object {
         const val DEFAULT_SCALE = 1f
         const val MIN_SCALE = 0.1f
-        const val MAX_SCALE = 10.0f
+        const val MAX_SCALE = 10f
 
         private class FieldNotFoundException(field: String, owner: Class<*>) :
             Exception("Config Link for field $field in class $owner not found")

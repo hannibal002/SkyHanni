@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -78,7 +77,7 @@ object TeleportPadInventoryNumber {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!inTeleportPad) return
 
-        padNumberPattern.matchMatcher(event.stack.name.lowercase()) {
+        padNumberPattern.matchMatcher(event.stack.displayName.lowercase()) {
             numbers[group("number")]?.let {
                 event.stackTip = "$it"
             }

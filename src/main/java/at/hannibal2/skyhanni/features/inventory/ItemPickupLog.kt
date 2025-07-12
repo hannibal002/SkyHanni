@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -15,8 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -26,11 +24,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import java.util.Objects
 import kotlin.math.absoluteValue
@@ -43,24 +45,27 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                Renderable.string("$prefix$formattedAmount")
+                StringRenderable("$prefix$formattedAmount")
             },
         ),
         ICON(
             "§e✎",
             { entry, _ ->
-                val itemIcon = entry.neuInternalName?.getItemStackOrNull()
-                if (itemIcon != null) {
-                    Renderable.itemStack(itemIcon)
-                } else {
-                    ItemNameResolver.getInternalNameOrNull(entry.name)?.let { Renderable.itemStack(it.getItemStack()) }
-                        ?: Renderable.string("§c?")
-                }
+                val entryInternalName = entry.neuInternalName ?: ItemNameResolver.getInternalNameOrNull(entry.name)
+                val itemIcon = entryInternalName?.getItemStackOrNull()
+                if (itemIcon != null) ItemStackRenderable(itemIcon)
+                else StringRenderable("§c?")
             },
         ),
         ITEM_NAME(
             "§d[:3] TransRights's Cake Soul",
-            { entry, _ -> Renderable.string(entry.name) },
+            { entry, _ ->
+                var name = entry.name
+                if (entry.name == "Air") {
+                    name = entry.neuInternalName?.repoItemName ?: "?"
+                }
+                StringRenderable(name)
+            },
         ),
         ;
 
@@ -98,17 +103,6 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    private val bannedItemsPattern by patternGroup.list(
-        "banneditems",
-        "SKYBLOCK_MENU",
-        "CANCEL_PARKOUR_ITEM",
-        "CANCEL_RACE_ITEM",
-        "MAXOR_ENERGY_CRYSTAL",
-        "ELLE_SUPPLIES",
-        "ELLE_FUEL_CELL",
-    )
-    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().toInternalName() }
-
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
@@ -116,7 +110,7 @@ object ItemPickupLog {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         if (!isEnabled()) return
         itemList.clear()
         itemsAddedToInventory.clear()
@@ -131,7 +125,7 @@ object ItemPickupLog {
             val itemStack = (it.internalName.getItemStack())
             val item = PickupEntry(itemStack.dynamicName(), it.delta.absoluteValue.toLong(), it.internalName)
 
-            updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
+            updateItem(itemStack.hash(), item, it.delta < 0)
         }
     }
 
@@ -139,7 +133,7 @@ object ItemPickupLog {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
-        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
+        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), event.coins < 0)
     }
 
     @HandleEvent
@@ -152,8 +146,9 @@ object ItemPickupLog {
         if (!InventoryUtils.inInventory()) {
             itemList.clear()
 
-            val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
-            val cursorItem = Minecraft.getMinecraft().thePlayer?.inventory?.itemStack
+            val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, _ -> i != 8 }
+                ?.filterNotNull().orEmpty().toMutableList()
+            val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()
@@ -189,9 +184,7 @@ object ItemPickupLog {
     }
 
     // TODO merge with ItemAddInInventoryEvent
-    private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
-        if (isBannedItem(item)) return
-
+    private fun updateItem(hash: Int, itemInfo: PickupEntry, removed: Boolean) {
         val targetInventory = if (removed) itemsRemovedFromInventory else itemsAddedToInventory
         val oppositeInventory = if (removed) itemsAddedToInventory else itemsRemovedFromInventory
 
@@ -226,24 +219,13 @@ object ItemPickupLog {
 
             if (!listToCheckAgainst.containsKey(key)) {
                 val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
+                updateItem(key, item, add)
             } else if (oldAmount > listToCheckAgainst[key]!!.second) {
                 val amount = (oldAmount - listToCheckAgainst[key]?.second!!)
                 val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
+                updateItem(key, item, add)
             }
         }
-    }
-
-    private fun isBannedItem(item: ItemStack): Boolean {
-        val internalName = item.getInternalNameOrNull() ?: return true
-        if (internalName.startsWith("MAP") == true) return true
-        if (internalName in bannedItemsConverted) return true
-
-        if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
-            return true
-        }
-        return false
     }
 
     private fun ItemStack.dynamicName(): String {
@@ -252,7 +234,7 @@ object ItemPickupLog {
             ItemCategory.PET -> true
             else -> false
         }
-        return if (compact) getInternalName().itemName else displayName
+        return if (compact) getInternalName().repoItemName else displayName
     }
 
     private fun ItemStack.hash(): Int {
@@ -286,7 +268,7 @@ object ItemPickupLog {
         if (display.isEmpty()) {
             this.display = null
         } else {
-            val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
+            val renderable = VerticalContainerRenderable(display, verticalAlign = config.alignment)
             this.display = Renderable.fixedSizeColumn(renderable, 30)
         }
     }
@@ -343,7 +325,7 @@ object ItemPickupLog {
         }
     }
 
-    private fun worldChangeCooldown(): Boolean = LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
+    private fun worldChangeCooldown(): Boolean = SkyBlockUtils.lastWorldSwitch.passedSince() > 2.seconds
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

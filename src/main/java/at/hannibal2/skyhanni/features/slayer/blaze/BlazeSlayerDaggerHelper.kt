@@ -1,27 +1,25 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.FirstDaggerEntry
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -32,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object BlazeSlayerDaggerHelper {
 
-    private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
+    private val config get() = SlayerApi.config.blazes.hellion
 
     private val attunementPattern by RepoPattern.pattern(
         "slayer.blaze.dagger.attunement",
@@ -58,7 +56,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         val dagger = getDaggerFromStack(InventoryUtils.getItemInHand())
@@ -168,7 +166,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
-        val itemName = stack?.name.orEmpty()
+        val itemName = stack?.displayName.orEmpty()
         for (dagger in Dagger.entries) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
                 return dagger
@@ -183,7 +181,7 @@ object BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
         for (shield in HellionShield.entries) {
-            if (shield.formattedName + "§r" == event.title) {
+            if (shield.formattedName in event.title) {
                 for (dagger in Dagger.entries.filter { shield in it.shields }) {
                     dagger.shields.forEach { it.active = false }
                     dagger.updated = true
@@ -197,11 +195,11 @@ object BlazeSlayerDaggerHelper {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.daggers
+        return SkyBlockUtils.inSkyBlock && config.daggers
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBlockClick(event: BlockClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (clientSideClicked) return
         if (event.clickType != ClickType.RIGHT_CLICK) return

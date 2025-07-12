@@ -5,15 +5,17 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatStyle
+import net.minecraft.util.IChatComponent
 import java.util.UUID
 
 @SkyHanniModule
@@ -70,7 +72,7 @@ object FriendApi {
 
     private val tempFriends = mutableListOf<Friend>()
 
-    private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(LorenzUtils.getRawPlayerUuid()) {
+    private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(PlayerUtils.getRawUuid()) {
         FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
     }.friends
 
@@ -138,7 +140,7 @@ object FriendApi {
 
         for (sibling in event.chatComponent.siblings) {
             val chatStyle = sibling.chatStyle ?: continue
-            val value = chatStyle.chatClickEvent?.value ?: continue
+            val value = sibling.command ?: continue
             if (!value.startsWith("/viewprofile")) continue
 
             val uuid = readFriendListPattern.matchMatcher(value) {
@@ -158,8 +160,8 @@ object FriendApi {
                     }
                 }
             }
-            val bestFriend = sibling.unformattedText.contains("§l")
-            val name = readName(chatStyle)
+            val bestFriend = sibling.unformattedText.split(" ").firstOrNull()?.contains("§l") ?: false
+            val name = readName(sibling)
             if (uuid != null && name != null) {
                 getFriends()[uuid] = Friend().also {
                     it.name = name
@@ -171,8 +173,8 @@ object FriendApi {
         saveConfig()
     }
 
-    private fun readName(chatStyle: ChatStyle): String? {
-        val hoverEventSiblings = chatStyle.chatHoverEvent?.value?.siblings ?: return null
+    private fun readName(chatComponent: IChatComponent): String? {
+        val hoverEventSiblings = chatComponent.hover?.siblings ?: return null
         for (component in hoverEventSiblings) {
             val rawName = component.unformattedText
             rawNamePattern.matchMatcher(rawName) {

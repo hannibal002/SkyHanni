@@ -5,18 +5,22 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -27,17 +31,27 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.JsonToNBT
-import net.minecraft.nbt.NBTException
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
-import net.minecraft.nbt.NBTTagString
-import net.minecraftforge.common.util.Constants
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.TreeMap
 import kotlin.math.floor
+//#if MC > 1.21
+//$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.util.Identifier
+//$$ import net.minecraft.nbt.NbtString
+//$$ import net.minecraft.text.Text
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.component.type.LoreComponent
+//$$ import at.hannibal2.skyhanni.utils.ComponentUtils
+//$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+//#else
+import net.minecraft.nbt.NBTTagString
+import net.minecraft.nbt.NBTException
+//#endif
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -65,7 +79,11 @@ object EnoughUpdatesManager {
         }
     }
 
+    private var isLoading = false
+
     fun reloadRepo() {
+        if (isLoading) return
+        isLoading = true
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
@@ -82,6 +100,7 @@ object EnoughUpdatesManager {
             }
             NeuRepositoryReloadEvent.post()
             ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
+            isLoading = false
         }
     }
 
@@ -107,9 +126,9 @@ object EnoughUpdatesManager {
     private fun parseItem(internalName: String, json: JsonObject): JsonObject? {
         if (json.get("itemid") == null) return null
         var itemId = json["itemid"].asString
-        val mcItem = Item.getByNameOrId(itemId)
+        val mcItem = itemId.getVanillaItem()
         if (mcItem != null) {
-            itemId = mcItem.registryName
+            itemId = mcItem.getIdentifierString()
         }
         json.addProperty("itemid", itemId)
 
@@ -149,15 +168,17 @@ object EnoughUpdatesManager {
     fun stackToJson(stack: ItemStack): JsonObject {
         val tag = stack.tagCompound ?: NBTTagCompound()
 
-        val lore = if (tag.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
-            tag.getCompoundTag("display").getStringList("Lore")
-        } else emptyList()
+        val lore = stack.getLore()
 
         val json = JsonObject()
-        json.addProperty("itemid", stack.item.registryName.toString())
+        json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
+        //#if MC < 1.21
         json.addProperty("nbttag", tag.toString())
         json.addProperty("damage", stack.itemDamage)
+        //#else
+        //$$ json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
+        //#endif
 
         val jsonLore = JsonArray()
         for (line in lore) {
@@ -167,7 +188,24 @@ object EnoughUpdatesManager {
         return json
     }
 
+    private val nbtListRegex = Regex("([\\[,])\\d+:")
+
+    private fun convertNbtToJson(nbtString: String): NeuNbtInfoJson? {
+        var convertedNbt = nbtString
+        convertedNbt = convertedNbt.replace(nbtListRegex, "$1")
+        try {
+            val json = ConfigManager.gson.fromJson(convertedNbt, JsonObject::class.java)
+            val fromJson = ConfigManager.gson.fromJson(json, NeuNbtInfoJson::class.java)
+            return fromJson
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Error converting nbt to json", "malformed nbt" to convertedNbt, "original nbt" to nbtString)
+        }
+
+        return null
+    }
+
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
+        //#if MC < 1.21
         json ?: return ItemStack(Items.painting)
         var usingCache = useCache && !useReplacements
         val internalName = json["internalname"].asString
@@ -178,7 +216,8 @@ object EnoughUpdatesManager {
             if (cachedStack != null) return cachedStack.copy()
         }
 
-        val stack = ItemStack(Item.getByNameOrId(json["itemid"].asString))
+        // todo modern doesnt have the "meta" number
+        val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255))
         stack.item ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
 
         json["count"]?.asInt?.let { stack.stackSize = it }
@@ -193,13 +232,13 @@ object EnoughUpdatesManager {
 
         var replacements = mapOf<String, String>()
         if (useReplacements) {
-            replacements = getPetLoreReplacements(stack.tagCompound, -1)
+            replacements = getPetLoreReplacements(stack, -1)
             json["displayname"]?.asString?.let {
                 var name = it
                 for ((key, value) in replacements) {
                     name = name.replace("{$key}", value)
                 }
-                stack.setStackDisplayName(name)
+                stack.setCustomItemName(name)
             }
         }
 
@@ -211,17 +250,73 @@ object EnoughUpdatesManager {
             stack.tagCompound = tag
         }
 
-
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
+        //#else
+        //$$ json ?: return ItemStack(Items.PAINTING)
+        //$$ var usingCache = useCache && !useReplacements
+        //$$ val internalName = json["internalname"].asString
+        //$$ if (internalName == "_") usingCache = false
+        //$$
+        //$$ if (usingCache) {
+        //$$     val cachedStack = itemStackCache[internalName]
+        //$$     if (cachedStack != null) return cachedStack.copy()
+        //$$ }
+        //$$
+        //$$ val damage = json["damage"]?.asInt ?: 0
+        //$$ val item: Item = ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
+        //$$     println(json["itemid"].asString + " " + damage + " is invalid item")
+        //$$     return ItemStack(Blocks.STONE.asItem())
+        //$$ }
+        //$$ val stack = ItemStack(item)
+        //$$ if (stack.item == Items.AIR) {
+        //$$     return ItemStack(Blocks.STONE.asItem())
+        //$$ }
+        //$$
+        //$$ json["count"]?.asInt?.let { stack.count = it }
+        //$$
+        //$$
+        //$$ if (json["nbttag"]?.isJsonObject == false) {
+        //$$     json["nbttag"]?.asString?.let { nbt ->
+        //$$         ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
+        //$$     }
+        //$$ } else {
+        //$$     val neuNbtInfoJson = ConfigManager.gson.fromJson(json["nbttag"], NeuNbtInfoJson::class.java)
+        //$$     ComponentUtils.convertToComponents(stack, neuNbtInfoJson)
+        //$$ }
+        //$$
+        //$$ var replacements = mapOf<String, String>()
+        //$$ if (useReplacements) {
+        //$$     replacements = getPetLoreReplacements(stack, -1)
+        //$$     json["displayname"]?.asString?.let {
+        //$$         var name = it
+        //$$         for ((key, value) in replacements) {
+        //$$             name = name.replace("{$key}", value)
+        //$$         }
+        //$$         stack.setCustomItemName(name)
+        //$$     }
+        //$$ }
+        //$$
+        //$$ json["lore"]?.asJsonArray?.let { lore ->
+        //$$     val loreList: MutableList<String> = mutableListOf()
+        //$$     for (nbtElement in processLore(lore, replacements)) {
+        //$$         loreList.add(nbtElement.asString().get())
+        //$$     }
+        //$$
+        //$$     stack.setLore(loreList)
+        //$$ }
+        //$$
+        //$$ if (usingCache) itemStackCache[internalName] = stack
+        //$$ return stack.copy()
+        //#endif
     }
 
-    private fun getPetLoreReplacements(tag: NBTTagCompound?, level: Int): Map<String, String> {
-        tag ?: return emptyMap()
+    private fun getPetLoreReplacements(stack: ItemStack?, level: Int): Map<String, String> {
+        stack?.tagCompound ?: return emptyMap()
         var petName: String? = null
         var tier: String? = null
 
-        val extraAttributes = tag.extraAttributes
+        val extraAttributes = stack.extraAttributes
         if (extraAttributes.hasKey("petInfo")) {
             val petInfoStr = extraAttributes.getString("petInfo")
             val petInfo = ConfigManager.gson.fromJson(petInfoStr, JsonObject::class.java)
@@ -249,7 +344,7 @@ object EnoughUpdatesManager {
             replacements["LVL"] = level.toString()
         } else {
             neuPetsJson?.customPetLeveling?.get(petName)?.let { petLeveling ->
-                val maxLevel = petLeveling.asJsonObject.get("maxLevel")?.asInt ?: 100
+                val maxLevel = petLeveling.maxLevel ?: 100
                 replacements["LVL"] = "1➡$maxLevel"
             } ?: run { replacements["LVL"] = "1➡100" }
         }
@@ -345,7 +440,11 @@ object EnoughUpdatesManager {
             for ((key, value) in replacements) {
                 loreLine.replace("{$key}", value)
             }
+            //#if MC < 1.21
             loreList.appendTag(NBTTagString(loreLine))
+            //#else
+            //$$ loreList.add(NbtString.of(loreLine))
+            //#endif
         }
         return loreList
     }
@@ -381,24 +480,24 @@ object EnoughUpdatesManager {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         if (!PlatformUtils.isNeuLoaded()) {
-            event.register("neureloadrepo") {
+            event.registerBrigadier("neureloadrepo") {
                 aliases = listOf("shreloadneurepo")
                 description = "Reloads the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
-                callback { reloadRepo() }
+                simpleCallback { reloadRepo() }
             }
-            event.register("neuresetrepo") {
+            event.registerBrigadier("neuresetrepo") {
                 aliases = listOf("shresetneurepo")
                 description = "Redownload the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
-                callback { downloadRepo() }
+                simpleCallback { downloadRepo() }
             }
         }
 
-        event.register("shneurepostatus") {
+        event.registerBrigadier("shneurepostatus") {
             description = "Get the status of the NEU repo"
             category = CommandCategory.DEVELOPER_TEST
-            callback {
+            simpleCallback {
                 val loadedItems = itemMap.size
                 val directorySize = itemCountInRepoFolder()
 

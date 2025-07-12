@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.item.ItemStack
@@ -24,9 +23,9 @@ object DianaApi {
     private fun isRitualActive() = Perk.MYTHOLOGICAL_RITUAL.isActive ||
         Perk.PERKPOCALYPSE.isActive
 
-    fun hasGriffinPet() = PetApi.isCurrentPet("Griffin")
+    fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    fun isDoingDiana() = IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInInventory()
+    fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInInventory()
 
     val ItemStack.isDianaSpade get() = getInternalName() == spade
 

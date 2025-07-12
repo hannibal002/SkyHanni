@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.data.model.TextInput;
 import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
+import at.hannibal2.skyhanni.utils.compat.DrawContext;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +20,7 @@ public class MixinGuiScreen {
 
     @Inject(method = "renderToolTip", at = @At("TAIL"))
     public void renderToolTip(ItemStack stack, int x, int y, CallbackInfo ci) {
-        GuiScreenHookKt.renderToolTip(stack);
+        GuiScreenHookKt.renderToolTip(new DrawContext(), stack);
     }
 
     @Inject(method = "renderToolTip", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getRarity()Lnet/minecraft/item/EnumRarity;", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)

@@ -7,20 +7,21 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -35,7 +36,6 @@ object PesthunterProfit {
         " ",
     )
     private var display = emptyList<Renderable>()
-    private val tradeProfits = mutableListOf<Double>()
     private var inInventory = false
 
     /**
@@ -44,7 +44,7 @@ object PesthunterProfit {
      */
     private val pestCostPattern by patternGroup.pattern(
         "garden.pests.pesthunter.cost",
-        "§2(?<pests>[\\d,]+) Pests"
+        "§2(?<pests>[\\d,]+) Pests",
     )
 
     fun isInInventory() = inInventory
@@ -52,7 +52,6 @@ object PesthunterProfit {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
-        tradeProfits.clear()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -66,8 +65,8 @@ object PesthunterProfit {
 
     private fun buildRenderables(items: Map<Int, ItemStack>) = buildList {
         val table = items.mapNotNull { (slot, stack) -> readItem(slot, stack) }
-        add(Renderable.string("§ePesthunter Shop Profit"))
-        add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
+        add(StringRenderable("§ePesthunter Shop Profit"))
+        add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
     }
 
     private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {

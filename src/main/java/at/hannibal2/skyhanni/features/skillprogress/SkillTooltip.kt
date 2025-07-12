@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 
 @SkyHanniModule
 object SkillTooltip {
@@ -44,7 +44,7 @@ object SkillTooltip {
                     val nextLevel = if (useRoman) (currentLevel + 1).toRoman() else currentLevel + 1
                     iterator.set("§7Progress to Level $nextLevel: $percent")
 
-                    event.itemStack.name = "§a${skill.displayName} $level"
+                    event.itemStack.setCustomItemName("§a${skill.displayName} $level")
                     next = true
                     continue
                 }

@@ -5,10 +5,16 @@ GrammarRules:
     AvoidBritishSpelling:
         active: true
 
+CompatRules:
+    MinecraftCompat:
+        active: true
+
 FormattingRules:
     CustomCommentSpacing:
         active: true
     CustomAnnotationSpacing:
+        active: true
+    StorageVarOrVal:
         active: true
 
 RepoRules:
@@ -23,6 +29,8 @@ RepoRules:
 
 ImportRules:
     CustomImportOrdering:
+        active: true
+    PreprocessingImportOrdering:
         active: true
 
 SkyHanniStyle:
@@ -150,6 +158,8 @@ potential-bugs:
     HasPlatformType: # false positives on config get() methods
         active: false
     StorageNeedsExpose:
+        active: true
+    NonStorageDoesntNeedExpose:
         active: true
     ImmutableTypesWithExpectedInteriorMutabilityInConfig:
         active: true

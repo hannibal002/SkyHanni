@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.json.toJsonArray
@@ -37,7 +37,7 @@ object ChatSoundResponse {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(74, "chat.soundResponse.soundResponses") { element ->
+        event.transform(95, "chat.soundResponse.soundResponses") { element ->
             if (!element.isJsonArray) return@transform element
             val array = element.asJsonArray
             mapOf(
@@ -64,7 +64,7 @@ object ChatSoundResponse {
     }
 
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
 
 private const val START_PATTERN = "(?:^|^.* )(?: |§.)*(?i)"

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -25,12 +26,16 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 object SkyHanniTypeAdapters {
-
     val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)
 
     val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
         { this.toString() },
         { java.util.UUID.fromString(this) },
+    )
+
+    val NBT_BOOLEAN: TypeAdapter<NbtBoolean> = SimpleStringTypeAdapter(
+        { this.asString() },
+        { NbtBoolean.fromString(this) },
     )
 
     val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
@@ -86,7 +91,7 @@ object SkyHanniTypeAdapters {
     val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
-    val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>()
+    val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>(IslandType.UNKNOWN)
     val RARITY = SimpleStringTypeAdapter.forEnum<LorenzRarity>()
 
     val LOCALE_DATE = object : TypeAdapter<LocalDate>() {

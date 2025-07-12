@@ -2,28 +2,30 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -35,7 +37,7 @@ import kotlin.time.toDuration
 @SkyHanniModule
 object GardenVisitorTimer {
 
-    private val config get() = GardenApi.config.visitors.timer
+    private val config get() = VisitorApi.config.timer
 
     /**
      * REGEX-TEST:  Next Visitor: §r§b11m
@@ -50,13 +52,13 @@ object GardenVisitorTimer {
     private var lastMillis = 0.seconds
     private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
     private var visitorJustArrived = false
-    private var sixthVisitorReady = false
+    private var lastSixthVisitorWarning = SimpleTimeMark.farPast()
     private var lastTimerValue = ""
     private var lastTimerUpdate = SimpleTimeMark.farPast()
     private var lastVisitors: Int = -1
 
     // TODO nea?
-//    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
+    // private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
         get() = GardenApi.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
         set(value) {
@@ -76,13 +78,12 @@ object GardenVisitorTimer {
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
         visitorJustArrived = false
-        sixthVisitorReady = false
     }
 
-    @HandleEvent
+    // TODO split up into multiple smaller functions
+    @Suppress("CyclomaticComplexMethod")
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-
         var visitorsAmount = VisitorApi.visitorsInTabList(TabListData.getTabList()).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
@@ -91,7 +92,7 @@ object GardenVisitorTimer {
         timePattern.firstMatcher(TabListData.getTabList()) {
             val timeInfo = group("info").removeColor()
             if (timeInfo == "Not Unlocked!") {
-                display = Renderable.string("§cVisitors not unlocked!")
+                display = StringRenderable("§cVisitors not unlocked!")
                 return
             }
             if (timeInfo == "Queue Full!") {
@@ -121,20 +122,15 @@ object GardenVisitorTimer {
             if (visitorJustArrived && visitorsAmount - lastVisitors == 1) {
                 updateSixthVisitorArrivalTime()
                 visitorJustArrived = false
-                sixthVisitorReady = false
             }
             millis = sixthVisitorArrivalTime.timeUntil()
 
             val nextSixthVisitorArrival = SimpleTimeMark.now() + millis + (visitorInterval * (5 - visitorsAmount))
             GardenApi.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival
-            if (isSixthVisitorEnabled() && millis.isNegative()) {
+            if (millis.isNegative()) {
                 visitorsAmount++
-                if (!sixthVisitorReady) {
-                    sixthVisitorReady = true
-                    if (isSixthVisitorWarningEnabled()) {
-                        LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
-                        SoundUtils.playBeepSound()
-                    }
+                if (config.sixthVisitorWarning) {
+                    warn6thVisitor()
                 }
             }
         }
@@ -172,17 +168,27 @@ object GardenVisitorTimer {
         }
 
         val formatDuration = millis.format()
-        val next = if (queueFull && (!isSixthVisitorEnabled() || millis.isNegative())) "§cQueue Full!" else {
+        val next = if (queueFull && (!config.sixthVisitorEnabled || millis.isNegative())) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
         display = createDisplayText("§b$visitorsAmount $visitorLabel §7($next§7)")
     }
 
-    private fun createDisplayText(text: String) = Renderable.clickAndHover(
+    private fun warn6thVisitor() {
+        // do not warn immediately on world switch
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 3.seconds) return
+
+        if (lastSixthVisitorWarning.passedSince() < 2.minutes) return
+        lastSixthVisitorWarning = SimpleTimeMark.now()
+        TitleManager.sendTitle("§a6th Visitor Ready")
+        SoundUtils.playBeepSound()
+    }
+
+    private fun createDisplayText(text: String) = Renderable.clickable(
         text,
-        listOf("§eClick to teleport to the barn!"),
-        onClick = { HypixelCommands.teleportToPlot("barn") },
+        tips = listOf("§eClick to teleport to the barn!"),
+        onLeftClick = { HypixelCommands.teleportToPlot("barn") },
     )
 
     init {
@@ -191,19 +197,18 @@ object GardenVisitorTimer {
             outsideInventory = true,
             inOwnInventory = true,
         ) {
-            config.pos.renderRenderable(display, posLabel = "Garden Visitor Timer")
+            config.position.renderRenderable(display, posLabel = "Garden Visitor Timer")
         }
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastVisitors = -1
         GardenApi.storage?.nextSixthVisitorArrival?.let {
             if (it.isFarFuture() && it.toMillis() != -9223370336633802065) {
                 sixthVisitorArrivalTime = it
             }
         }
-        sixthVisitorReady = false
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
@@ -234,8 +239,6 @@ object GardenVisitorTimer {
         }
     }
 
-    private fun isSixthVisitorEnabled() = config.sixthVisitorEnabled
-    private fun isSixthVisitorWarningEnabled() = config.sixthVisitorWarning
     private fun isEnabled() = GardenApi.inGarden() && config.enabled
 
     @HandleEvent
@@ -244,5 +247,7 @@ object GardenVisitorTimer {
         event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")
         event.move(3, "garden.visitorTimerSixthVisitorWarning", "garden.visitors.timer.sixthVisitorWarning")
         event.move(3, "garden.visitorTimerPos", "garden.visitors.timer.pos")
+
+        event.move(87, "garden.visitors.timer.pos", "garden.visitors.timer.position")
     }
 }

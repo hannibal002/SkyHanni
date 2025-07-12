@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -10,8 +11,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isLavaRod
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -25,8 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -36,9 +34,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -115,7 +118,7 @@ object GoldenFishTimer {
     private val goldenFishSkullItem by lazy {
         ItemUtils.createSkull(
             displayName = "§6Golden Fish",
-            uuid = "b7fdbe67cd004683b9fa9e3e17738254",
+            uuid = "b7fdbe67-cd00-4683-b9fa-9e3e17738254",
             value = GOLDEN_FISH_SKULL_TEXTURE,
         )
     }
@@ -157,7 +160,7 @@ object GoldenFishTimer {
             return
         }
         TrophyFishMessages.trophyFishPattern.matchMatcher(event.message) {
-            val internalName = TrophyFishMessages.getInternalName(group("displayName"))
+            val internalName = TrophyFishApi.getInternalName(group("displayName"))
             if (internalName != "goldenfish") return@matchMatcher
             timePossibleSpawn = ServerTimeMark.now() + minimumSpawnTime
             removeGoldenFish()
@@ -185,12 +188,12 @@ object GoldenFishTimer {
     }
 
     private fun updateDisplay() {
-        display = Renderable.horizontalContainer(drawDisplay())
+        display = HorizontalContainerRenderable(drawDisplay())
     }
 
     private fun drawDisplay() = buildList {
         if (config.showHead) add(
-            Renderable.itemStack(
+            ItemStackRenderable(
                 goldenFishSkullItem,
                 2.5,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -216,7 +219,7 @@ object GoldenFishTimer {
                     add("§7Can spawn since: §b${timePossibleSpawn.passedSince().formatTime()}")
                     val diff = maximumSpawnTime - minimumSpawnTime
                     val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / diff.inWholeSeconds
-                    add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}")
+                    add("§7Chance: §b${chance.coerceAtMost(1.0).formatPercentage()}")
                 }
             } else {
                 add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
@@ -225,8 +228,8 @@ object GoldenFishTimer {
         }
 
         add(
-            Renderable.verticalContainer(
-                text.map { Renderable.string(it) },
+            VerticalContainerRenderable(
+                text.map { StringRenderable(it) },
                 spacing = 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ),
@@ -254,12 +257,12 @@ object GoldenFishTimer {
     private fun rodWarning() {
         if (!config.throwRodWarning || hasWarnedRod) return
         hasWarnedRod = true
-        LorenzUtils.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
+        TitleManager.sendTitle("§cThrow your rod!")
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isActive()) return
         // This makes it only count as the rod being throw into lava if the rod goes down, up, and down again.
         // Not confirmed that this is correct, but it's the best solution found.
@@ -291,7 +294,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastChatMessage = SimpleTimeMark.farPast()
         lastFishEntity = SimpleTimeMark.farPast()
         lastGoldenFishTime = ServerTimeMark.FAR_PAST
@@ -353,7 +356,7 @@ object GoldenFishTimer {
 
     private fun isGoldenFishActive() = confirmedGoldenFishEntity != null
 
-    private fun isEnabled() = config.enabled && (IslandType.CRIMSON_ISLE.isInIsland() || LorenzUtils.isStrandedProfile)
+    private fun isEnabled() = config.enabled && (IslandType.CRIMSON_ISLE.isCurrent() || SkyBlockUtils.isStrandedProfile)
     private fun isActive() = isEnabled() && isFishing && hasLavaRodInInventory
 
 }

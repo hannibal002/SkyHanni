@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -11,7 +10,7 @@ import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.javaField
 
 object ConfigUtils {
@@ -78,17 +77,14 @@ object ConfigUtils {
         return JsonPrimitive(if (element.asBoolean) trueValue.name else falseValue.name)
     }
 
-    fun KMutableProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
+    private fun KProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
         return editor.getOptionFromField(this.javaField ?: return null)
     }
 
-    fun KMutableProperty0<*>.jumpToEditor() {
+    fun KProperty0<*>.jumpToEditor() {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
 
-        // TODO create utils function "crashIfInDevEnv"
-        if (EventHandler.isInEventHandler) {
-            throw Error("can not jump to editor $name")
-        }
+        ErrorManager.crashInDevEnv("Can not open config $name")
         ErrorManager.logErrorStateWithData(
             "Can not open the config",
             "error while trying to jump to an editor element",
@@ -98,7 +94,7 @@ object ConfigUtils {
         )
     }
 
-    private fun KMutableProperty0<*>.tryJumpToEditor(editor: MoulConfigEditor<*>): Boolean {
+    private fun KProperty0<*>.tryJumpToEditor(editor: MoulConfigEditor<*>): Boolean {
         val option = tryFindEditor(editor) ?: return false
         editor.search("")
         if (!editor.goToOption(option)) return false

@@ -7,46 +7,64 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
+//#if TODO
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
+//#endif
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.renderOnScreen
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
-import at.hannibal2.skyhanni.utils.guide.GuideGUI
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+import at.hannibal2.skyhanni.utils.guide.GuideGui
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+//#if TODO
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+//#endif
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
+//#if MC < 1.21
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+//#else
+//$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
+//#endif
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
-import java.util.Collections
 import kotlin.math.max
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
+//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
+//#endif
 
+// todo 1.21 impl needed
 @Suppress("TooManyFunctions")
 interface Renderable {
 
@@ -55,189 +73,199 @@ interface Renderable {
 
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
-    fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width) && y in (posY..posY + height)
+
+    fun isHovered(mouseOffsetX: Int, mouseOffsetY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x in (mouseOffsetX..mouseOffsetX + width) && y in (mouseOffsetY..mouseOffsetY + height)
     } ?: false
 
-    fun isBoxHovered(posX: Int, width: Int, posY: Int, height: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width) && y in (posY..posY + height)
+    fun isBoxHovered(mouseOffsetX: Int, width: Int, mouseOffsetY: Int, height: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x in (mouseOffsetX..mouseOffsetX + width) && y in (mouseOffsetY..mouseOffsetY + height)
     } ?: false
 
     /**
+     * Render the renderable. Enough said?
      * Pos x and pos y are relative to the mouse position.
      * (the GL matrix stack should already be pre transformed)
+     *
+     * @param mouseOffsetX The X offset of the mouse at this pass of rendering.
+     * @param mouseOffsetY The Y offset of the mouse at this pass of rendering.
      */
-    fun render(posX: Int, posY: Int)
+    fun render(mouseOffsetX: Int, mouseOffsetY: Int)
 
     companion object {
 
         val logger = LorenzLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
 
-        fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
+        fun <T> withMousePosition(mouseOffsetX: Int, mouseOffsetY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition
             try {
-                currentRenderPassMousePosition = Pair(posX, posY)
+                currentRenderPassMousePosition = Pair(mouseOffsetX, mouseOffsetY)
                 return block()
             } finally {
                 currentRenderPassMousePosition = last
             }
         }
 
-        fun fromAny(any: Any?, itemScale: Double = NeuItems.itemFontSize): Renderable? = when (any) {
+        fun fromAny(any: Any?, itemScale: Double = NeuItems.ITEM_FONT_SIZE): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
-            is String -> string(any)
-            is ItemStack -> itemStack(any, itemScale)
+            is String -> StringRenderable(any)
+            is ItemStack -> ItemStackRenderable(any, itemScale)
             else -> null
         }
 
-        fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable =
-            link(string(text), onClick, bypassChecks = bypassChecks)
+        fun link(text: String, bypassChecks: Boolean = false, onLeftClick: () -> Unit): Renderable =
+            link(StringRenderable(text), onLeftClick, bypassChecks = bypassChecks)
 
         fun optionalLink(
             text: String,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
-        ): Renderable = link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
+        ): Renderable = link(
+            StringRenderable(text),
+            onLeftClick,
+            bypassChecks,
+            highlightsOnHoverSlots = highlightsOnHoverSlots,
+            condition,
+        )
 
         fun link(
             renderable: Renderable,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
             underlineColor: Color = Color.WHITE,
-        ): Renderable {
-            return clickable(
-                hoverable(
-                    underlined(renderable, underlineColor), renderable, bypassChecks,
-                    condition = condition,
-                    highlightsOnHoverSlots = highlightsOnHoverSlots,
-                ),
-                onClick,
-                bypassChecks,
-                condition,
-            )
-        }
+        ): Renderable = clickable(
+            hoverable(
+                underlined(renderable, underlineColor), renderable, bypassChecks,
+                condition = condition,
+                highlightsOnHoverSlots = highlightsOnHoverSlots,
+            ),
+            onLeftClick,
+            bypassChecks,
+            condition,
+        )
 
-        fun clickAndHover(
-            text: Any,
-            tips: List<Any>,
+        fun clickable(
+            text: String,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
-            onClick: () -> Unit,
+            condition: () -> Boolean = { true },
+            tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ): Renderable {
-            return clickable(
-                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
-                onClick,
-                bypassChecks = bypassChecks,
-            )
-        }
-
-        fun multiClickAndHover(
-            text: Any,
-            tips: List<Any>,
-            bypassChecks: Boolean = false,
-            click: Map<Int, () -> Unit>,
-            onHover: () -> Unit = {},
-        ): Renderable {
-            return multiClickable(
-                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
-                click,
-                bypassChecks = bypassChecks,
-            )
-        }
+        ) = clickable(StringRenderable(text), onLeftClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
             render: Renderable,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
-        ) = leftAndRightClickable(
-            render,
-            onClick = { if (it == Direction.LEFT) onClick() },
-            bypassChecks, condition,
+            tips: List<Any>? = null,
+            onHover: () -> Unit = {},
+        ) = clickable(render, mapOf(LEFT_MOUSE to onLeftClick), bypassChecks, condition, tips, onHover)
+
+        fun clickable(
+            text: String,
+            /**
+             * This should be a direct map of key code int, to the unit that should be invoked.
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
+             */
+            onAnyClick: Map<Int, () -> Unit>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            tips: List<Any>? = null,
+            onHover: () -> Unit = {},
+        ) = clickable(StringRenderable(text), onAnyClick, bypassChecks, condition, tips, onHover)
+
+        fun clickable(
+            render: Renderable,
+            /**
+             * This should be a direct map of key code int, to the unit that should be invoked.
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
+             */
+            onAnyClick: Map<Int, () -> Unit>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            tips: List<Any>? = null,
+            onHover: () -> Unit = {},
+        ) = multiClickable(
+            tips?.let {
+                hoverTips(render, it, bypassChecks = bypassChecks, onHover = onHover)
+            } ?: onHover.takeIf { it != {} }?.let {
+                hoverable(render, render, bypassChecks = bypassChecks, onHover = onHover)
+            } ?: render,
+            onAnyClick,
+            bypassChecks,
+            condition,
         )
 
-        enum class Direction {
-            LEFT,
-            RIGHT,
-        }
-
-        fun leftAndRightClickable(
+        private fun multiClickable(
             render: Renderable,
-            onClick: (Direction) -> Unit,
+            onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
+            /**
+             * This unit is invoked on 'hover & click' if no keys within [onAnyClick] invoke their unit.
+             * This is useful for detecting things like scrolling, which do not have a direct key code to reference.
+             *
+             * See [clickableAndScrollable] for an example of how this is used.
+             */
+            nonStandardClick: () -> Unit = {},
         ) = object : Renderable {
             override val width = render.width
             override val height = render.height
             override val horizontalAlign = render.horizontalAlign
             override val verticalAlign = render.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
-                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
-                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    handleClickChecks()
                 }
-                render.render(posX, posY)
+                render.render(mouseOffsetX, mouseOffsetY)
+            }
+
+            private fun handleClickChecks() {
+                var processed = false
+                for ((key, onKeyClicked) in onAnyClick) {
+                    if (key.isKeyClicked()) {
+                        onKeyClicked()
+                        processed = true
+                    }
+                }
+                if (!processed) nonStandardClick()
             }
         }
 
         fun clickableAndScrollable(
             render: Renderable,
-            onClick: (Direction) -> Unit,
+            onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             scrollValue: ScrollValue = ScrollValue(),
-        ) = object : Renderable {
-            override val width = render.width
-            override val height = render.height
-            override val horizontalAlign = render.horizontalAlign
-            override val verticalAlign = render.verticalAlign
+        ): Renderable {
+            val pureScrollInput = ScrollInput.Companion.PureVertical(scrollValue)
 
-            private val pureScrollInput = ScrollInput.Companion.PureVertical(scrollValue)
-
-            private fun ScrollInput.Companion.PureVertical.tryUpdateScroll() {
-                pureScrollInput.update(true)
-                when (asInt()) {
-                    -1 -> onClick(Direction.RIGHT) // Scroll Up -> Right Click
-                    1 -> onClick(Direction.LEFT) // Scroll Down -> Left Click
-                    else -> return
-                }
-                dispose()
-            }
-
-            override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
-                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
-                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
-                    else pureScrollInput.tryUpdateScroll()
-                }
-                render.render(posX, posY)
-            }
-        }
-
-        fun multiClickable(
-            render: Renderable,
-            click: Map<Int, () -> Unit>,
-            bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true },
-        ) = object : Renderable {
-            override val width = render.width
-            override val height = render.height
-            override val horizontalAlign = render.horizontalAlign
-            override val verticalAlign = render.verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) for ((button, onClick) in click) {
-                    if ((button - 100).isKeyClicked()) onClick()
-                }
-                render.render(posX, posY)
-            }
+            return multiClickable(
+                render = render,
+                onAnyClick = onAnyClick,
+                bypassChecks = bypassChecks,
+                condition = condition,
+                nonStandardClick = {
+                    pureScrollInput.update(true)
+                    when (pureScrollInput.asDirection()) {
+                        ScrollInput.ScrollDirection.UP -> onAnyClick[RIGHT_MOUSE]?.invoke()
+                        ScrollInput.ScrollDirection.DOWN -> onAnyClick[LEFT_MOUSE]?.invoke()
+                        else -> {}
+                    }
+                    pureScrollInput.dispose()
+                },
+            )
         }
 
         fun hoverTips(
@@ -253,7 +281,7 @@ interface Renderable {
             onHover: () -> Unit = {},
         ): Renderable {
 
-            val render = fromAny(content) ?: string("Error")
+            val render = fromAny(content) ?: StringRenderable("Error")
             return object : Renderable {
                 override val width = render.width
                 override val height = render.height
@@ -262,15 +290,15 @@ interface Renderable {
 
                 val tipsRender = tips.mapNotNull { fromAny(it) }
 
-                override fun render(posX: Int, posY: Int) {
-                    render.render(posX, posY)
-                    val pair = Pair(posX, posY)
-                    if (isHovered(posX, posY)) {
+                override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                    render.render(mouseOffsetX, mouseOffsetY)
+                    val pair = Pair(mouseOffsetX, mouseOffsetY)
+                    if (isHovered(mouseOffsetX, mouseOffsetY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
-                            GlStateManager.pushMatrix()
-                            GlStateManager.translate(0F, 0F, 400F)
+                            DrawContextUtils.pushMatrix()
+                            DrawContextUtils.translate(0F, 0F, 400F)
 
                             RenderableTooltips.setTooltipForRender(
                                 tips = tipsRender,
@@ -279,7 +307,7 @@ interface Renderable {
                                 snapsToTopIfToLong = snapsToTopIfToLong,
                                 spacedTitle = spacedTitle,
                             )
-                            GlStateManager.popMatrix()
+                            DrawContextUtils.popMatrix()
                         }
                     } else {
                         HighlightOnHoverSlot.currentSlots.remove(pair)
@@ -289,30 +317,22 @@ interface Renderable {
         }
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val guiScreen = Minecraft.getMinecraft().currentScreen
+            val guiScreen = Minecraft.getMinecraft().currentScreen.takeIf { it != null } ?: return false
 
-            val isGuiScreen = guiScreen != null
+            // Never support grayed out inventories
+            if (RenderData.outsideInventory) return false
 
-            if (!isGuiScreen) {
-                return false
-            }
+            if (bypassChecks) return true
 
-//             never support grayed out inventories
-            if (RenderData.outsideInventory) {
-                return false
-            }
-
-            if (bypassChecks) {
-                return true
-            }
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
-                ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
+                ToolTipData.lastSlot == null
+                    || GuiData.preDrawEventCancelled
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 
-            val openGui = guiScreen?.javaClass?.name ?: "none"
+            val openGui = guiScreen.javaClass.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val neuFocus = NeuItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
@@ -321,8 +341,7 @@ interface Renderable {
             val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result =
-                isGuiScreen &&
-                    isGuiPositionEditor &&
+                isGuiPositionEditor &&
                     inMenu &&
                     isNotInSignAndOnSlot &&
                     isConfigScreen &&
@@ -336,7 +355,6 @@ interface Renderable {
                 if (!result) {
                     logger.log("")
                     logger.log("blocked link because:")
-                    if (!isGuiScreen) logger.log("isGuiScreen")
                     if (!isGuiPositionEditor) logger.log("isGuiPositionEditor")
                     if (!inMenu) logger.log("inMenu")
                     if (!isNotInSignAndOnSlot) logger.log("isNotInSignAndOnSlot")
@@ -363,37 +381,37 @@ interface Renderable {
             override val horizontalAlign = renderable.horizontalAlign
             override val verticalAlign = renderable.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, height, width, 11, color.rgb)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                GuiRenderUtils.drawRect(0, height, width, 11, color.rgb)
                 GlStateManager.color(1F, 1F, 1F, 1F)
-                renderable.render(posX, posY)
+                renderable.render(mouseOffsetX, mouseOffsetY)
             }
         }
 
         fun hoverable(
             hovered: Renderable,
-            unhovered: Renderable,
+            unHovered: Renderable,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             highlightsOnHoverSlots: List<Int> = emptyList(),
             onHover: () -> Unit = {},
         ) = object : Renderable {
-            override val width = max(hovered.width, unhovered.width)
-            override val height = max(hovered.height, unhovered.height)
-            override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
-            override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
+            override val width = max(hovered.width, unHovered.width)
+            override val height = max(hovered.height, unHovered.height)
+            override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unHovered.horizontalAlign
+            override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unHovered.verticalAlign
 
             var isHovered = false
 
-            override fun render(posX: Int, posY: Int) {
-                val pair = Pair(posX, posY)
-                isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                val pair = Pair(mouseOffsetX, mouseOffsetY)
+                isHovered = if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover()
-                    hovered.render(posX, posY)
+                    hovered.render(mouseOffsetX, mouseOffsetY)
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                     true
                 } else {
-                    unhovered.render(posX, posY)
+                    unHovered.render(mouseOffsetX, mouseOffsetY)
                     HighlightOnHoverSlot.currentSlots.remove(pair)
                     false
                 }
@@ -411,143 +429,33 @@ interface Renderable {
             override val horizontalAlign = bottomLayer.horizontalAlign
             override val verticalAlign = bottomLayer.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
-                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                val (x, y) = topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
+                val topLayerHovered = topLayer.isHovered(mouseOffsetX + x, mouseOffsetY + y)
+                val (nMouseOffsetX, nMouseOffsetY) = if (topLayerHovered && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
-                    posX to posY
+                    mouseOffsetX to mouseOffsetY
                 }
-                bottomLayer.render(posX, posY)
+                bottomLayer.render(nMouseOffsetX, nMouseOffsetY)
             }
         }
 
-        fun itemStackWithTip(
-            item: ItemStack,
-            scale: Double = NeuItems.itemFontSize,
-            xSpacing: Int = 2,
-            ySpacing: Int = 0,
-            rescaleSkulls: Boolean = true,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = hoverTips(
-            itemStack(
-                item,
-                scale,
-                xSpacing,
-                ySpacing,
-                rescaleSkulls,
-                horizontalAlign = horizontalAlign,
-                verticalAlign = verticalAlign,
-            ),
-            item.getTooltipCompat(false),
-            stack = item,
-        )
-
-        fun itemStack(
-            item: ItemStack,
-            scale: Double = NeuItems.itemFontSize,
-            xSpacing: Int = 2,
-            ySpacing: Int = 1,
-            rescaleSkulls: Boolean = true,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-        ) = object : Renderable {
-            override val width = (15.5 * scale + 0.5).toInt() + xSpacing
-            override val height = (15.5 * scale + 0.5).toInt() + ySpacing
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
-            }
-        }
-
-        fun Renderable.darken(amount: Float = 1.0f) = object : Renderable {
+        fun Renderable.darken(amount: Float = 1f) = object : Renderable {
             override val width = this@darken.width
             override val height = this@darken.height
             override val horizontalAlign = this@darken.horizontalAlign
             override val verticalAlign = this@darken.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                //#if TODO
                 DarkenShader.darknessLevel = amount
                 ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
-                this@darken.render(posX, posY)
+                //#endif
+                this@darken.render(mouseOffsetX, mouseOffsetY)
+                //#if TODO
                 ShaderManager.disableShader()
-            }
-        }
-
-        fun singeltonString(string: String): List<Renderable> {
-            return Collections.singletonList(string(string))
-        }
-
-        fun string(
-            text: String,
-            scale: Double = 1.0,
-            color: Color = Color.WHITE,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-        ) = object : Renderable {
-
-            override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1 }
-            override val height = (9 * scale).toInt() + 1
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            val inverseScale = 1 / scale
-
-            override fun render(posX: Int, posY: Int) {
-                RenderableUtils.renderString(text, scale, color, inverseScale)
-            }
-        }
-
-        fun wrappedString(
-            text: String,
-            width: Int,
-            scale: Double = 1.0,
-            color: Color = Color.WHITE,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-            internalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-        ) = object : Renderable {
-
-            val fontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
-
-            val map by lazy {
-                fontRenderer.listFormattedStringToWidth(
-                    text, (width / scale).toInt(),
-                ).associateWith { fontRenderer.getStringWidth(it) }
-            }
-
-            override val width by lazy { (rawWidth * scale).toInt() + 1 }
-
-            val rawWidth by lazy {
-                if (map.size == 1)
-                    map.entries.first().value
-                else
-                    map.maxOf { it.value }
-            }
-
-            override val height by lazy { map.size * ((9 * scale).toInt() + 1) }
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            val inverseScale = 1 / scale
-
-            override fun render(posX: Int, posY: Int) {
-                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
-                GlStateManager.translate(1.0, 1.0, 0.0)
-                GlStateManager.scale(scale, scale, 1.0)
-                map.entries.forEachIndexed { index, (text, size) ->
-                    fontRenderer.drawStringWithShadow(
-                        text,
-                        RenderableUtils.calculateAlignmentXOffset(size, rawWidth, internalAlign).toFloat(),
-                        index * 10.0f,
-                        color.rgb,
-                    )
-                }
-                GlStateManager.scale(inverseScale, inverseScale, 1.0)
-                GlStateManager.translate(-1.0, -1.0, 0.0)
+                //#endif
             }
         }
 
@@ -557,53 +465,67 @@ interface Renderable {
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
 
-            override fun render(posX: Int, posY: Int) {
-            }
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {}
         }
 
         fun searchableTable(
-            map: Map<List<Renderable?>, String?>,
+            content: Map<List<Renderable>, String>,
             textInput: TextInput,
             key: Int,
             xPadding: Int = 1,
             yPadding: Int = 0,
+            header: List<Renderable> = emptyList(),
             useEmptySpace: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            var content = map.keys.toList()
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            var list = filterListMap(content, textInput.textBox)
+            private val fullContent = if (header.isNotEmpty()) listOf(header) + content.keys else content.keys
+            val xOffsets = RenderableUtils.calculateTableX(fullContent, xPadding)
+            val yOffsets = RenderableUtils.calculateTableY(fullContent, yPadding)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override val width = xOffsets.last() - xPadding
-            override val height = yOffsets.last() - yPadding
+            override val width = xOffsets.sum()
+            override val height = yOffsets.sumAllValues().toInt()
 
             val emptySpaceX = if (useEmptySpace) 0 else xPadding
             val emptySpaceY = if (useEmptySpace) 0 else yPadding
 
             init {
                 textInput.registerToEvent(key) {
-                    // null = ignored, never filtered
-                    content = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
+                    list = filterListMap(content, textInput.textBox)
                 }
             }
 
-            override fun render(posX: Int, posY: Int) {
-                for ((rowIndex, row) in content.withIndex()) {
-                    for ((index, renderable) in row.withIndex()) {
-                        GlStateManager.pushMatrix()
-                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY + yOffsets[rowIndex],
-                            xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
-                        )
-                        GlStateManager.popMatrix()
-                    }
+            @Suppress("NOTHING_TO_INLINE")
+            inline fun renderRow(mouseOffsetX: Int, mouseOffsetY: Int, row: List<Renderable>, renderY: Int): Int {
+                var renderX = 0
+                val yShift = yOffsets[row] ?: row.firstOrNull()?.height ?: 0
+                for ((index, renderable) in row.withIndex()) {
+                    val xShift = xOffsets[index]
+                    renderable.renderXYAligned(
+                        mouseOffsetX + renderX,
+                        mouseOffsetY + renderY,
+                        xShift - emptySpaceX,
+                        yShift - emptySpaceY,
+                    )
+                    DrawContextUtils.translate(xShift.toFloat(), 0f, 0f)
+                    renderX += xShift
                 }
+                DrawContextUtils.translate(-renderX.toFloat(), yShift.toFloat(), 0f)
+                return renderY + yShift
+            }
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                var renderY = 0
+                if (header.isNotEmpty()) {
+                    renderY = renderRow(mouseOffsetX, mouseOffsetY, header, renderY)
+                }
+                for (row in list) {
+                    renderY = renderRow(mouseOffsetX, mouseOffsetY, row, renderY)
+                }
+                DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
@@ -618,8 +540,8 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -629,18 +551,18 @@ interface Renderable {
             val emptySpaceX = if (useEmptySpace) 0 else xPadding
             val emptySpaceY = if (useEmptySpace) 0 else yPadding
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 for ((rowIndex, row) in content.withIndex()) {
                     for ((index, renderable) in row.withIndex()) {
-                        GlStateManager.pushMatrix()
-                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        DrawContextUtils.pushMatrix()
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
                         renderable.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY + yOffsets[rowIndex],
+                            mouseOffsetX + xOffsets[index],
+                            mouseOffsetY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
                         )
-                        GlStateManager.popMatrix()
+                        DrawContextUtils.popMatrix()
                     }
                 }
             }
@@ -723,39 +645,34 @@ interface Renderable {
                 }
             }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 if (shouldRenderTopElseBottom && !(hideIfNoText && isTextBoxEmpty)) {
                     RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
-                    GlStateManager.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
                 }
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
                     textInput.makeActive()
                     textInput.handle()
-                    val yOff: Int
-                    if (shouldRenderTopElseBottom) {
-                        yOff = 0
-                    } else {
-                        yOff = content.height + ySpacing
-                    }
-                    if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && (-99).isKeyClicked()) {
+                    val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
+                    if (isBoxHovered(mouseOffsetX, width, mouseOffsetY + yOff, textBoxHeight) && RIGHT_MOUSE.isKeyClicked()) {
                         textInput.clear()
                     }
                 } else {
                     textInput.disable()
                 }
                 if (hideIfNoText && isTextBoxEmpty) {
-                    content.render(posX, posY)
+                    content.render(mouseOffsetX, mouseOffsetY)
                 } else if (!shouldRenderTopElseBottom) {
-                    content.render(posX, posY)
-                    GlStateManager.translate(0f, (ySpacing).toFloat(), 0f)
+                    content.render(mouseOffsetX, mouseOffsetY)
+                    DrawContextUtils.translate(0f, (ySpacing).toFloat(), 0f)
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {
                         RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     }
-                    GlStateManager.translate(0f, -(ySpacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, -(ySpacing).toFloat(), 0f)
                 } else {
-                    content.render(posX, posY + textBoxHeight + ySpacing)
-                    GlStateManager.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
+                    content.render(mouseOffsetX, mouseOffsetY + textBoxHeight + ySpacing)
+                    DrawContextUtils.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
                 }
             }
 
@@ -789,61 +706,198 @@ interface Renderable {
                 startColor
             }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 if (texture == null) {
-                    Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
+                    GuiRenderUtils.drawRect(0, 0, width, height, 0xFF43464B.toInt())
 
-                    if (useChroma) {
-                        ChromaShaderManager.begin(ChromaType.STANDARD)
-                    }
+                    //#if MC < 1.21
+                    if (useChroma) ChromaShaderManager.begin(ChromaType.STANDARD)
+                    //#endif
 
                     val factor = 0.2
                     val bgColor = if (useChroma) Color.GRAY.darker() else color
-                    Gui.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
-                    Gui.drawRect(1, 1, progress, height - 1, color.rgb)
+                    GuiRenderUtils.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
+                    //#if MC < 1.21
+                    GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
+                    //#else
+                    //$$ if (useChroma) {
+                    //$$     DrawContextUtils.drawContext.fill(SkyHanniRenderLayers.getChromaStandard(), 1, 1, progress, height - 1, color.rgb)
+                    //$$ } else {
+                    //$$     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
+                    //$$ }
+                    //#endif
 
-                    if (useChroma) {
-                        ChromaShaderManager.end()
-                    }
+                    //#if MC < 1.21
+                    if (useChroma) ChromaShaderManager.end()
+                    //#endif
                 } else {
-                    val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
-                        0, 64,
-                    ) else Pair(0, 0)
+                    val scale = 0.00390625f
 
-                    Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY, width, height,
+                    val (uMin, vMin) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK)
+                        Pair(0f, 64f * scale) else Pair(0f, 0f)
+                    val (uMax, vMax) = Pair(uMin + (width * scale), vMin + (height * scale))
+
+                    //#if MC < 1.21
+                    GuiRenderUtils.drawTexturedRect(
+                        mouseOffsetX, mouseOffsetY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
+                        alpha = 1f, filter = GL11.GL_NEAREST
                     )
+                    //#else
+                    //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                    //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
+                    //$$         mouseOffsetX, mouseOffsetY, width, height)
+                    //$$ } else {
+                    //$$     DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                    //$$         mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1)
+                    //$$ }
+                    //#endif
 
                     if (useChroma) {
-                        ChromaShaderManager.begin(ChromaType.TEXTURED)
                         GlStateManager.color(1f, 1f, 1f, 1f)
+                        //#if MC < 1.21
+                        ChromaShaderManager.begin(ChromaType.TEXTURED)
+                        GuiRenderUtils.drawTexturedRect(
+                            mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
+                            vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
+                            alpha = 1f, filter = GL11.GL_NEAREST
+                        )
+                        //#else
+                        //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
+                        //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
+                        //$$ } else {
+                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
+                        //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
+                        //$$ }
+                        //#endif
                     } else {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
+                        //#if MC < 1.21
+                        GuiRenderUtils.drawTexturedRect(
+                            mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
+                            vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
+                            alpha = 1f, filter = GL11.GL_NEAREST
+                        )
+                        //#else
+                        //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                        //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
+                        //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
+                        //$$ } else {
+                        //$$     DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                        //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
+                        //$$ }
+                        //#endif
                     }
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY + height, progress, height,
-                    )
 
-                    if (useChroma) {
-                        ChromaShaderManager.end()
-                    }
+                    //#if MC < 1.21
+                    if (useChroma) ChromaShaderManager.end()
+                    //#endif
                 }
             }
         }
 
-        // TODO use this to render current boosted crop in next jacob contest crops
         fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor().addAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
             override val horizontalAlign = this@renderBounds.horizontalAlign
             override val verticalAlign = this@renderBounds.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, color.rgb)
-                this@renderBounds.render(posX, posY)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                GuiRenderUtils.drawRect(0, 0, width, height, color.rgb)
+                this@renderBounds.render(mouseOffsetX, mouseOffsetY)
             }
 
+        }
+
+        fun rectButton(
+            content: Renderable,
+            activeColor: Color,
+            inActiveColor: Color = activeColor.darker(0.4),
+            hoveredColor: (Color) -> Color = { it.darker(0.5) },
+            onClick: (Boolean) -> Unit,
+            onHover: (Boolean) -> Unit = {},
+            button: Int = KeyboardManager.LEFT_MOUSE,
+            bypassChecks: Boolean = false,
+            condition: (Boolean) -> Boolean = { true },
+            startState: Boolean = false,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            var state = startState
+
+            val color get() = if (state) activeColor else inActiveColor
+
+            override val width = content.width + padding * 2
+            override val height = content.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                val realColor: Color
+                if (isHovered(mouseOffsetX, mouseOffsetY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
+                    if (button.isKeyClicked()) {
+                        state = !state
+                        onClick(state)
+                    }
+                    onHover(state)
+                    realColor = hoveredColor(color)
+                } else {
+                    realColor = color
+                }
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                content.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun darkRectButton(
+            content: Renderable,
+            onClick: (Boolean) -> Unit,
+            onHover: (Boolean) -> Unit = {},
+            button: Int = KeyboardManager.LEFT_MOUSE,
+            bypassChecks: Boolean = false,
+            condition: (Boolean) -> Boolean = { true },
+            startState: Boolean = false,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            var state = startState
+
+            override val width = content.width + padding * 2
+            override val height = content.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                if (isHovered(mouseOffsetX, mouseOffsetY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
+                    if (button.isKeyClicked()) {
+                        state = !state
+                        onClick(state)
+                    }
+                    onHover(state)
+                    if (state) {
+                        GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, true)
+                    } else {
+                        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, true)
+                    }
+                } else {
+                    if (state) {
+                        GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, false)
+                    } else {
+                        GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, false)
+                    }
+                }
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                content.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
         }
 
         fun fixedSizeLine(
@@ -858,8 +912,8 @@ interface Renderable {
             override val height = render.height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-            override fun render(posX: Int, posY: Int) {
-                render.renderXAligned(posX, posY, width)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                render.renderXAligned(mouseOffsetX, mouseOffsetY, width)
             }
         }
 
@@ -879,15 +933,15 @@ interface Renderable {
             val emptySpace = width - render.sumOf { it.width }
             val spacing = emptySpace / render.size
 
-            override fun render(posX: Int, posY: Int) {
-                var xOffset = posX
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                var xOffset = mouseOffsetX
                 render.forEach {
                     val x = it.width + spacing
-                    it.renderXYAligned(xOffset, posY, x, height)
+                    it.renderXYAligned(xOffset, mouseOffsetY, x, height)
                     xOffset += x
-                    GlStateManager.translate(x.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(x.toFloat(), 0f, 0f)
                 }
-                GlStateManager.translate(-(xOffset - posX).toFloat(), 0f, 0f)
+                DrawContextUtils.translate(-(xOffset - mouseOffsetX).toFloat(), 0f, 0f)
             }
         }
 
@@ -903,131 +957,19 @@ interface Renderable {
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-            override fun render(posX: Int, posY: Int) {
-                render.renderYAligned(posX, posY, height)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                render.renderYAligned(mouseOffsetX, mouseOffsetY, height)
             }
         }
 
-        fun fixedSizeBox(
-            content: Renderable,
-            height: Int,
-            width: Int,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            val render = content
-
-            override val width = width
-            override val height = height
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-            override fun render(posX: Int, posY: Int) {
-                render.renderXYAligned(posX, posY, height, width)
-            }
-        }
-
+        // todo rename to horizontal
         fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
-            return horizontalContainer(buildList { builderAction() })
+            return HorizontalContainerRenderable(buildList { builderAction() })
         }
 
-        fun horizontalContainer(
-            content: List<Renderable>,
-            spacing: Int = 0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            val renderables = content
-
-            override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
-            override val height = renderables.maxOfOrNull { it.height } ?: 0
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                var xOffset = posX
-                renderables.forEach {
-                    it.renderYAligned(xOffset, posY, height)
-                    xOffset += it.width + spacing
-                    GlStateManager.translate((it.width + spacing).toFloat(), 0f, 0f)
-                }
-                GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
-            }
-        }
-
-        fun verticalContainer(
-            content: List<Renderable>,
-            spacing: Int = 0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            val renderables = content
-
-            override val width = renderables.maxOfOrNull { it.width } ?: 0
-            override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                var yOffset = posY
-                renderables.forEach {
-                    it.renderXAligned(posX, yOffset, width)
-                    yOffset += it.height + spacing
-                    GlStateManager.translate(0f, (it.height + spacing).toFloat(), 0f)
-                }
-                GlStateManager.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
-            }
-        }
-
-        fun paddingContainer(
-            content: Renderable,
-            topSpacing: Int = 0,
-            bottomSpacing: Int = 0,
-            leftSpacing: Int = 0,
-            rightSpacing: Int = 0,
-        ) = object : Renderable {
-            override val width = content.width + leftSpacing + rightSpacing
-            override val height = content.height + topSpacing + bottomSpacing
-            override val horizontalAlign = content.horizontalAlign
-            override val verticalAlign = content.verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                GlStateManager.translate(leftSpacing.toFloat(), topSpacing.toFloat(), 0f)
-                content.render(posX + leftSpacing, posY + topSpacing)
-                GlStateManager.translate(-leftSpacing.toFloat(), -topSpacing.toFloat(), 0f)
-            }
-        }
-
-        fun verticalSearchableContainer(
-            content: Map<Renderable, String?>,
-            spacing: Int = 0,
-            textInput: TextInput,
-            key: Int,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            var renderables = filterList(content, textInput.textBox)
-
-            override val width = renderables.maxOfOrNull { it.width } ?: 0
-            override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            init {
-                textInput.registerToEvent(key) {
-                    // null = ignored, never filtered
-                    renderables = filterList(content, textInput.textBox)
-                }
-            }
-
-            override fun render(posX: Int, posY: Int) {
-                var yOffset = posY
-                renderables.forEach {
-                    it.renderXAligned(posX, yOffset, width)
-                    yOffset += it.height + spacing
-                    GlStateManager.translate(0f, (it.height + spacing).toFloat(), 0f)
-                }
-                GlStateManager.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
-            }
+        // todo add spacing as a parameter here, or remove this function (hardcoded = 2?)
+        fun vertical(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
+            return VerticalContainerRenderable(buildList { builderAction() }, spacing = 2)
         }
 
         fun scrollList(
@@ -1041,10 +983,10 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
             showScrollableTipsInList: Boolean = false,
         ) = object : Renderable {
-            private val scrollUpTip = string("§7§oMore items above (scroll)")
-            private val scrollDownTip = string("§7§oMore items below (scroll)")
+            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
+            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
 
-            override var width = list.maxOf { it.width }
+            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width)
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -1054,63 +996,27 @@ interface Renderable {
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
                 0,
-                virtualHeight - height,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
                 button,
             )
 
-            private val end get() = scroll.asInt() + height
-
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(mouseOffsetX, mouseOffsetY) && shouldAllowLink(true, bypassChecks),
                 )
 
-                var renderY = 0
-                var virtualY = 0
-                var found = false
-
-                // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
-                // there are more items above
-                if (showScrollableTipsInList && scroll.asInt() > 0) {
-                    width = maxOf(width, scrollUpTip.width)
-                    scrollUpTip.renderXAligned(posX, posY, width)
-                    GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
-                    renderY += scrollUpTip.height
-                    virtualY += scrollUpTip.height
-                }
-
-                val atScrollEnd = scroll.asInt() == virtualHeight - height
-                if (!atScrollEnd) {
-                    virtualY += scrollDownTip.height
-                    renderY += scrollDownTip.height
-                }
-
-                for (renderable in list) {
-                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
-                        renderable.renderXAligned(posX, posY + renderY, width)
-                        GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
-                        renderY += renderable.height
-                        found = true
-                    } else if (found) {
-                        found = false
-                        if (renderY + renderable.height <= height) {
-                            renderable.renderXAligned(posX, posY + renderY, width)
-                        }
-                        continue
-                    }
-                    virtualY += renderable.height
-                }
-
-                // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
-                // there are more items below
-                if (showScrollableTipsInList && virtualY > end) {
-                    width = maxOf(width, scrollDownTip.width)
-                    scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
-                    GlStateManager.translate(0f, scrollDownTip.height.toFloat(), 0f)
-                }
-
-                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+                scrollListRender(
+                    mouseOffsetX,
+                    mouseOffsetY,
+                    height,
+                    width,
+                    list,
+                    scroll,
+                    showScrollableTipsInList,
+                    scrollUpTip,
+                    scrollDownTip,
+                )
             }
         }
 
@@ -1123,14 +1029,22 @@ interface Renderable {
             textInput: TextInput,
             key: Int,
             bypassChecks: Boolean = false,
+            showScrollableTipsInList: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            private var list = filterList(content, textInput.textBox)
-            override val width = list.maxOf { it.width }
+            private var list: Set<Renderable> = filterList(content, textInput.textBox)
+
+            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
+            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
+
+            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollUpTip.width, scrollDownTip.width)
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
+
+            private val virtualHeight get() = list.sumOf { it.height }
+            private var scroll = createScroll()
 
             init {
                 textInput.registerToEvent(key) {
@@ -1140,57 +1054,288 @@ interface Renderable {
                 }
             }
 
-            // correct
-            private val virtualHeight get() = list.sumOf { it.height }
+            private fun createScroll() = ScrollInput.Companion.Vertical(
+                scrollValue,
+                0,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
+                velocity,
+                button,
+            )
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                scroll.update(
+                    isHovered(mouseOffsetX, mouseOffsetY) && shouldAllowLink(true, bypassChecks),
+                )
+
+                scrollListRender(
+                    mouseOffsetX,
+                    mouseOffsetY,
+                    height,
+                    width,
+                    list,
+                    scroll,
+                    showScrollableTipsInList,
+                    scrollUpTip,
+                    scrollDownTip,
+                )
+            }
+        }
+
+        private fun scrollListRender(
+            mouseOffsetX: Int,
+            mouseOffsetY: Int,
+            height: Int,
+            width: Int,
+            list: Collection<Renderable>,
+            scroll: ScrollInput.Companion.Vertical,
+            showScrollableTipsInList: Boolean,
+            scrollUpTip: Renderable,
+            scrollDownTip: Renderable,
+        ) {
+            val end = scroll.asInt() + height + 1
+
+            var renderY = 0
+            var virtualY = 0
+            var found = false
+
+            var negativeSpace1 = 0
+            var negativeSpace2 = 0
+
+            // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
+            // there are more items above
+            if (showScrollableTipsInList && !scroll.atMinimum()) {
+                scrollUpTip.renderXAligned(mouseOffsetX, mouseOffsetY, width)
+                DrawContextUtils.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                renderY += scrollUpTip.height
+                negativeSpace1 -= scrollUpTip.height
+            }
+
+            val atScrollEnd = scroll.atMaximum()
+            if (!atScrollEnd) {
+                negativeSpace2 -= scrollDownTip.height
+            }
+
+            val window = scroll.asInt()..(end + negativeSpace1 + negativeSpace2)
+
+            for (renderable in list) {
+                if ((virtualY..virtualY + renderable.height) in window) {
+                    renderable.renderXAligned(mouseOffsetX, mouseOffsetY + renderY, width)
+                    DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
+                    renderY += renderable.height
+                    found = true
+                } else if (found) {
+                    if (renderY + renderable.height <= height + negativeSpace2) {
+                        renderable.renderXAligned(mouseOffsetX, mouseOffsetY + renderY, width)
+                        DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
+                        renderY += renderable.height
+                    }
+                    break
+                }
+                virtualY += renderable.height
+            }
+
+            // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
+            // there are more items below
+            if (showScrollableTipsInList && !atScrollEnd) {
+                scrollDownTip.renderXAligned(mouseOffsetX, mouseOffsetY + height - scrollDownTip.height, width)
+            }
+
+            DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
+        }
+
+        fun filterList(content: Map<Renderable, String?>, textBox: String) =
+            filterListBase(content, textBox, StringRenderable("§cNo search results!"))
+
+        private fun filterListMap(content: Map<List<Renderable>, String?>, textBox: String) =
+            filterListBase(content, textBox, listOf(StringRenderable("§cNo search results!")))
+
+        private fun <T> filterListBase(content: Map<T, String?>, textBox: String, empty: T): Set<T> {
+            val map = content.filter { it.value?.contains(textBox, ignoreCase = true) != false }
+            val set = map.keys.toMutableSet()
+            if (map.filter { it.value != null }.isEmpty()) {
+                if (textBox.isNotEmpty()) {
+                    set.add(empty)
+                }
+            }
+            return set
+        }
+
+        fun searchableScrollable(
+            table: Map<List<Renderable>, String>,
+            key: Int,
+            lines: Int,
+            velocity: Double,
+            textInput: TextInput,
+            scrollValue: ScrollValue,
+            showScrollableTipsInList: Boolean = true,
+            asTable: Boolean = true,
+        ): Renderable? {
+            if (table.isEmpty()) return null
+            return if (asTable) {
+                val height = RenderableUtils.calculateTableY(table.keys, 0).maxOf { it.value }
+                searchableScrollTable(
+                    table,
+                    key = key,
+                    height = lines * height,
+                    textInput = textInput,
+                    velocity = velocity,
+                    scrollValue = scrollValue,
+                    showScrollableTipsInList = showScrollableTipsInList,
+                )
+            } else {
+                @Suppress("USELESS_CAST")
+                val content = table.mapKeys { HorizontalContainerRenderable(it.key) as Renderable }
+                val height = content.maxOf { it.key.height }
+                searchableScrollList(
+                    content,
+                    key = key,
+                    height = lines * height,
+                    textInput = textInput,
+                    velocity = velocity,
+                    scrollValue = scrollValue,
+                    showScrollableTipsInList = showScrollableTipsInList,
+                )
+            }
+        }
+
+        private fun searchableScrollTable(
+            content: Map<List<Renderable>, String?>,
+            height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
+            velocity: Double = 2.0,
+            button: Int? = null,
+            textInput: TextInput,
+            key: Int,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            header: List<Renderable> = emptyList(),
+            bypassChecks: Boolean = false,
+            showScrollableTipsInList: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
+            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
+
+            private var list = filterListMap(content, textInput.textBox).toList()
+
+            private val fullContent = if (header.isNotEmpty()) listOf(header) + content.keys else content.keys
+
+            val xOffsets = RenderableUtils.calculateTableX(fullContent, xPadding)
+            val yOffsets = RenderableUtils.calculateTableY(fullContent, yPadding)
+
+            override val width = maxOf(xOffsets.sum(), scrollUpTip.width, scrollDownTip.width)
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val virtualHeight get() = list.sumOf { yOffsets[it] ?: 0 }
+
+            private val end get() = scroll.asInt() + height + 1
 
             private var scroll = createScroll()
 
             private fun createScroll() = ScrollInput.Companion.Vertical(
                 scrollValue,
-                0,
-                virtualHeight - height,
+                yOffsets[header] ?: 0,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
                 button,
             )
 
-            private val end get() = scroll.asInt() + height
+            init {
+                textInput.registerToEvent(key) {
+                    // null = ignored, never filtered
+                    list = filterListMap(content, textInput.textBox).toList()
+                    scroll = createScroll()
+                }
+            }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(mouseOffsetX, mouseOffsetY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 var renderY = 0
-                var virtualY = 0
-                var found = false
-                for (renderable in list) {
-                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
-                        renderable.renderXAligned(posX, posY + renderY, width)
-                        GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
-                        renderY += renderable.height
-                        found = true
-                    } else if (found) {
-                        found = false
-                        if (renderY + renderable.height <= height) {
-                            renderable.renderXAligned(posX, posY + renderY, width)
-                        }
-                        continue
+                if (header.isNotEmpty()) {
+                    var offset = 0
+                    for ((index, renderable) in header.withIndex()) {
+                        renderable.renderXYAligned(
+                            mouseOffsetX + offset,
+                            mouseOffsetY,
+                            xOffsets[index],
+                            yOffsets[header] ?: 0,
+                        )
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        offset += xOffsets[index]
                     }
-                    virtualY += renderable.height
+                    DrawContextUtils.translate(-offset.toFloat(), 0f, 0f)
+                    val yShift = yOffsets[header] ?: 0
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
                 }
-                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
-            }
-        }
 
-        private fun filterList(content: Map<Renderable, String?>, textBox: String): Set<Renderable> {
-            val map = content.filter { it.value?.contains(textBox, ignoreCase = true) ?: true }
-            val set = map.keys.toMutableSet()
-            if (map.filter { it.value != null }.isEmpty()) {
-                if (textBox.isNotEmpty()) {
-                    set.add(string("§cNo search results!"))
+                val range = if (list.size == 1) {
+                    0..0
+                } else {
+                    val list = list
+                    val nStart = scroll.asInt()
+
+                    val endReduce1 = if (showScrollableTipsInList && !scroll.atMinimum()) scrollUpTip.height else 0
+                    val endReduce2 = if (showScrollableTipsInList && !scroll.atMaximum()) scrollDownTip.height else 0
+
+                    val nEnd = end - endReduce1 - endReduce2
+
+                    val sequence = list.asSequence().withIndex()
+                    val folded = sequence.runningIndexedFold(0) { past, value -> past + (yOffsets[value] ?: 0) }
+                    val pair = folded.firstTwiceOf({ it.value >= nStart }, { it.value >= nEnd || it.index == list.lastIndex })
+                    val firstElement = pair.first ?: return // Never null
+                    val lastElement = pair.second ?: return // Never null
+
+                    val spaceLeft = nEnd - nStart - if (lastElement.index == list.lastIndex && lastElement.value < nEnd) 1 else 0
+
+                    val subEnd = if ((lastElement.value - firstElement.value) < spaceLeft) 0 else 1
+
+                    val start = firstElement.index
+
+                    val end = (lastElement.takeIf { it.value >= nEnd }?.index ?: list.size).minus(subEnd)
+
+                    start until end
                 }
+
+                if (showScrollableTipsInList && !scroll.atMinimum()) {
+                    scrollUpTip.render(mouseOffsetX, mouseOffsetY)
+                    val yShift = scrollUpTip.height
+                    renderY += yShift
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
+                }
+
+                for (rowIndex in range) {
+                    val row = list[rowIndex]
+                    var offset = 0
+                    val yShift = yOffsets[row] ?: 0
+                    for ((index, renderable) in row.withIndex()) {
+                        renderable.renderXYAligned(
+                            mouseOffsetX + offset,
+                            mouseOffsetY + renderY,
+                            xOffsets[index],
+                            yShift,
+                        )
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        offset += xOffsets[index]
+                    }
+                    DrawContextUtils.translate(-offset.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
+                }
+
+                if (showScrollableTipsInList && !scroll.atMaximum()) {
+                    scrollDownTip.render(mouseOffsetX, mouseOffsetY)
+                }
+
+                DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
-            return set
         }
 
         fun scrollTable(
@@ -1207,8 +1352,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
 
             override val width = xOffsets.last() - xPadding
             override val height = height
@@ -1227,32 +1372,32 @@ interface Renderable {
                 button,
             )
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(mouseOffsetX, mouseOffsetY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 var renderY = 0
                 if (hasHeader) {
                     for ((index, renderable) in content[0].withIndex()) {
-                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY + renderY,
+                            mouseOffsetX + xOffsets[index],
+                            mouseOffsetY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[1],
                         )
-                        GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
                     val yShift = yOffsets[1] - yOffsets[0]
-                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                @Suppress("SpacingAroundCurly")
-                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(
-                    yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
-                        ?: yOffsets.size
-                    ) - 1
+                val range =
+                    yOffsets.indexOfFirst { it >= scroll.asInt() }..<(
+                        yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                            ?: yOffsets.size
+                        ) - 1
 
                 val range2 = if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
                     range.first..range.last() + 1
@@ -1262,20 +1407,20 @@ interface Renderable {
 
                 for (rowIndex in range2) {
                     for ((index, renderable) in content[rowIndex].withIndex()) {
-                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY + renderY,
+                            mouseOffsetX + xOffsets[index],
+                            mouseOffsetY + renderY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex],
                         )
-                        GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
                     val yShift = yOffsets[rowIndex + 1] - yOffsets[rowIndex]
-                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+                DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
@@ -1293,11 +1438,30 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideDarkRect(
+            input: Renderable,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                GuiRenderUtils.drawFloatingRectDark(0, 0, width, height)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1305,7 +1469,6 @@ interface Renderable {
             input: Renderable,
             padding: Int = 2,
             radius: Int = 10,
-            smoothness: Int = 2,
             topOutlineColor: Int,
             bottomOutlineColor: Int,
             borderOutlineThickness: Int,
@@ -1318,12 +1481,12 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
 
-                RenderUtils.drawRoundRectOutline(
+                ShaderRenderUtils.drawRoundRectOutline(
                     0,
                     0,
                     width,
@@ -1345,21 +1508,29 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
             radius: Int = 0,
+            smoothness: Float = 0f,
         ) = object : Renderable {
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().textureManager.bindTexture(texture)
-                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                RenderUtils.drawRoundTexturedRect(0, 0, width, height, GL11.GL_NEAREST, radius)
-                GlStateManager.color(1f, 1f, 1f, 1f)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                ShaderRenderUtils.drawRoundTexturedRect(
+                    0,
+                    0,
+                    width,
+                    height,
+                    GL11.GL_NEAREST,
+                    radius,
+                    smoothness,
+                    texture = texture,
+                    alpha = alpha / 255f,
+                )
 
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1382,41 +1553,12 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().textureManager.bindTexture(texture)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax, texture, alpha / 255f)
 
-                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
-                GlStateManager.color(1f, 1f, 1f, 1f)
-
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
-            }
-        }
-
-        fun image(
-            texture: ResourceLocation,
-            width: Int,
-            height: Int,
-            alpha: Int = 255,
-            uMin: Float = 0f,
-            uMax: Float = 1f,
-            vMin: Float = 0f,
-            vMax: Float = 1f,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            override val width = width
-            override val height = height
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().textureManager.bindTexture(texture)
-                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
-                GlStateManager.color(1f, 1f, 1f, 1f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1438,9 +1580,9 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-                RenderUtils.drawRoundRectOutline(
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                ShaderRenderUtils.drawRoundRectOutline(
                     0,
                     0,
                     width,
@@ -1452,9 +1594,9 @@ interface Renderable {
                     blur,
                 )
 
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1474,18 +1616,21 @@ interface Renderable {
             override val height = height + 2 * padding
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
-            val playerWidth = entityScale
             val playerHeight = entityScale * 2
             val playerX = width / 2 + padding
             val playerY = height / 2 + playerHeight / 2 + padding
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
                 val mouse = currentRenderPassMousePosition ?: return
-                val mouseXRelativeToPlayer = if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
-                val mouseYRelativeToPlayer = if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
-                GlStateManager.translate(0f, 0f, 100f)
+                val (mouseXRelativeToPlayer, mouseYRelativeToPlayer) = if (followMouse) {
+                    val newOffsetX = (mouseOffsetX + playerX - mouse.first).toFloat()
+                    val newOffsetY = (mouseOffsetY + playerY - mouse.second - 1.62 * entityScale).toFloat()
+                    newOffsetX to newOffsetY
+                } else eyesX to eyesY
+                DrawContextUtils.translate(0f, 0f, 100f)
+                //#if MC < 1.21
                 drawEntityOnScreen(
                     playerX,
                     playerY,
@@ -1494,7 +1639,23 @@ interface Renderable {
                     mouseYRelativeToPlayer,
                     player,
                 )
-                GlStateManager.translate(0f, 0f, -100f)
+                //#else
+                //$$ DrawContextUtils.translate(-35f, -125f, 0f)
+                //$$ drawEntity(
+                //$$     DrawContextUtils.drawContext,
+                //$$     playerX,
+                //$$     playerY,
+                //$$     playerX + width,
+                //$$     playerY + height,
+                //$$     entityScale,
+                //$$     0.0625f,
+                //$$     -mouseXRelativeToPlayer + if (followMouse) 70f else 0f,
+                //$$     -mouseYRelativeToPlayer + if (followMouse) 195f else 0f,
+                //$$     player
+                //$$ )
+                //$$ DrawContextUtils.translate(35f, 125f, 0f)
+                //#endif
+                DrawContextUtils.translate(0f, 0f, -100f)
             }
         }
     }

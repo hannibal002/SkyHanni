@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSkillLevelJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
@@ -31,11 +33,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.command.CommandBase
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -49,7 +51,7 @@ object SkillApi {
      */
     private val skillPercentPattern by patternGroup.pattern(
         "skill.percent",
-        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.]+)%\\)",
+        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.,]+)%\\)",
     )
 
     /**
@@ -92,8 +94,8 @@ object SkillApi {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
@@ -279,8 +281,10 @@ object SkillApi {
             }
 
             maxSkillTabPattern.matchMatcher(line) {
-                tablistLevel = group("level").toInt()
-                if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                if (group("type") == skillType.displayName) {
+                    tablistLevel = group("level").toInt()
+                    if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                }
             }
 
             skillTabNoPercentPattern.matchMatcher(line) {
@@ -320,15 +324,13 @@ object SkillApi {
 
     private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXP: Long, maxXP: Long, totalXP: Long, gained: String) {
         val cap = activeSkill?.maxLevel
-        val add = if (level >= 50) {
-            when (cap) {
+        val add = cap?.takeIf { level >= it }?.let {
+            when (it) {
                 50 -> XP_NEEDED_FOR_50
                 60 -> XP_NEEDED_FOR_60
                 else -> 0
             }
-        } else {
-            0
-        }
+        } ?: 0
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) =
             calculateSkillLevel(totalXP + add, cap ?: 60)
@@ -380,7 +382,8 @@ object SkillApi {
         storage?.set(skillType, skillInfo)
     }
 
-    fun onCommand(it: Array<String>) {
+    @Suppress("ReturnCount")
+    private fun onCommand(it: Array<String>) {
         if (it.isEmpty()) {
             commandHelp()
             return
@@ -474,18 +477,6 @@ object SkillApi {
         commandHelp()
     }
 
-    fun onComplete(strings: Array<String>): List<String> {
-        return when (strings.size) {
-            1 -> listOf("levelwithxp", "xpforlevel", "goal")
-            2 -> if (strings[0].lowercase() == "goal") CommandBase.getListOfStringsMatchingLastWord(
-                strings,
-                SkillType.entries.map { it.displayName },
-            ) else listOf()
-
-            else -> listOf()
-        }
-    }
-
     private fun commandHelp() {
         ChatUtils.chat(
             listOf(
@@ -524,4 +515,24 @@ object SkillApi {
         var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
         var timeActive: Long = 0L,
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shskills") {
+            description = "Skills XP/Level related command"
+            category = CommandCategory.USERS_ACTIVE
+            callback { onCommand(it) }
+            autoComplete { args ->
+                when (args.size) {
+                    1 -> listOf("levelwithxp", "xpforlevel", "goal")
+                    2 -> if (args[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
+                        args,
+                        SkillType.entries.map { it.displayName },
+                    ) else listOf()
+
+                    else -> listOf()
+                }
+            }
+        }
+    }
 }

@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -61,12 +59,13 @@ object Year400Features {
     )
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         playerColors.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        if (!config.teamFinder) return
         val new = CakeColor.entries.find { event.newItem == it.internalName }
         if (colorInHand == new) return
         colorInHand = new
@@ -106,7 +105,8 @@ object Year400Features {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
+        if (!config.teamFinder) return
         for (mob in MobData.players) {
             if (mob !in playerColors) {
                 addPlayer(mob)
@@ -126,6 +126,10 @@ object Year400Features {
         }
 
         val color = colorCode.toCharArray().first().toLorenzColor()
+
+        // Extreme Banker emblem uses the same symbol because of limited number of symbols in 1.8
+        if (color == LorenzColor.GOLD) return
+
         val cakeColor = CakeColor.entries.find { it.lorenzColor == color } ?: run {
             ErrorManager.logErrorStateWithData(
                 "Unknown slice of cake color",
@@ -154,6 +158,7 @@ object Year400Features {
 
     @HandleEvent
     fun onPunch(event: EntityClickEvent) {
+        if (!config.teamFinder) return
         val entity = event.clickedEntity
         if (colorInHand == null) return
         if (entity !is EntityOtherPlayerMP) return
@@ -166,6 +171,7 @@ object Year400Features {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
+        if (!config.teamFinder) return
         if (!fatPlayerMessagePattern.matches(event.message.removeColor())) return
         if (lastClickedPlayerTime.passedSince() >= 500.milliseconds) return
 
@@ -175,7 +181,6 @@ object Year400Features {
         lastClickedPlayerTime = SimpleTimeMark.farPast()
 
         lastPlayer.setColor(wrongColor(), colorInHand)
-        config
     }
 
     private fun wrongColor() = config.colors.wrong.get().toSpecialColor()

@@ -1,25 +1,18 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.client.renderer.GlStateManager
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,9 +23,9 @@ object GuardianReminder {
     private var lastInventoryOpen = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!config.guardianReminder) return
         if (event.inventoryName != "Experimentation Table") return
         lastInventoryOpen = SimpleTimeMark.now()
 
@@ -50,40 +43,27 @@ object GuardianReminder {
         )
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSecondPassed() {
+        if (!config.guardianReminder) return
         if (InventoryUtils.openInventoryName() != "Experimentation Table") return
         if (lastInventoryOpen.passedSince() > 2.seconds) return
         if (ExperimentationTableApi.hasGuardianPet()) return
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
-        sendTitle(gui.width, gui.height)
+        TitleManager.sendTitle(
+            titleText = "§cWrong Pet equipped!",
+            duration = 2.seconds,
+            location = TitleManager.TitleLocation.INVENTORY,
+        )
+
         if (lastErrorSound.passedSince() > 200.milliseconds) {
             lastErrorSound = SimpleTimeMark.now()
             SoundUtils.playPlingSound()
         }
     }
 
-    // TODO rename to "send title in inventory", move to utils
-    private fun sendTitle(width: Int, height: Int) {
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, -150f, 500f)
-        Renderable.drawInsideRoundedRect(
-            Renderable.string("§cWrong Pet equipped!", 1.5),
-            ColorUtils.TRANSPARENT_COLOR,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0, 125, width, height)
-
-        GlStateManager.translate(0f, 150f, -500f)
-        GlStateManager.popMatrix()
-    }
-
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(59, "inventory.helper.enchanting.guardianReminder", "inventory.experimentationTable.guardianReminder")
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.guardianReminder
 }

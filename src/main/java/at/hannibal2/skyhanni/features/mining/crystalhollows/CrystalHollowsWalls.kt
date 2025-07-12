@@ -5,14 +5,14 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.inflateBlock
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.QuadDrawer
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 
@@ -45,7 +45,7 @@ object CrystalHollowsWalls {
     private const val MIDDLE_Z = 513.0
     private const val MAX_Z = 1024.0
 
-    private val yViewOffset get() = -Minecraft.getMinecraft().thePlayer.getEyeHeight().toDouble()
+    private val yViewOffset get() = -MinecraftCompat.localPlayer.getEyeHeight().toDouble()
 
     // Yes Hypixel has misaligned the nucleus
     private val nucleusBB = AxisAlignedBB(
@@ -70,13 +70,14 @@ object CrystalHollowsWalls {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        val position = RenderUtils.getViewerPos(event.partialTicks)
+        val position = WorldRenderUtils.getViewerPos(event.partialTicks)
         when {
             position.y < HEAT_HEIGHT + yViewOffset -> drawHeat(event)
             nucleusBBOffsetY.isVecInside(position.toVec3()) -> {
                 if (!config.nucleus) return
                 drawNucleus(event)
             }
+
             position.x > MIDDLE_X -> {
                 if (position.z > MIDDLE_Z) {
                     drawPrecursor(event)
@@ -84,6 +85,7 @@ object CrystalHollowsWalls {
                     drawMithril((event))
                 }
             }
+
             else -> {
                 if (position.z > MIDDLE_Z) {
                     drawGoblin(event)
@@ -94,23 +96,23 @@ object CrystalHollowsWalls {
         }
     }
 
-    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(true, false, Area.JUNGLE.color, Area.PRECURSOR.color)
     }
 
-    private fun drawJungle(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawJungle(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(true, true, Area.GOBLIN.color, Area.MITHRIL.color)
     }
 
-    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(false, false, Area.MITHRIL.color, Area.GOBLIN.color)
     }
 
-    private fun drawMithril(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawMithril(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(false, true, Area.PRECURSOR.color, Area.JUNGLE.color)
     }
 
-    private fun drawHeat(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawHeat(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         val heatHeight = HEAT_HEIGHT.shiftNY()
         draw(
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
@@ -126,11 +128,12 @@ object CrystalHollowsWalls {
     }
 
     private fun drawNucleus(event: SkyHanniRenderWorldEvent) {
-        val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) = nucleusBBInflate.getCorners(nucleusBBInflate.minY)
+        val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) =
+            nucleusBBInflate.getCornersAtHeight(nucleusBBInflate.minY)
         val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) =
-            nucleusBBInflate.getCorners(nucleusBBInflate.maxY)
+            nucleusBBInflate.getCornersAtHeight(nucleusBBInflate.maxY)
 
-        RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+        QuadDrawer.draw3D(event) {
             draw(
                 southEastCorner,
                 southWestCorner,
@@ -188,15 +191,15 @@ object CrystalHollowsWalls {
         }
     }
 
-    private fun RenderUtils.QuadDrawer.drawArea(
-        isMinXEsleMaxX: Boolean,
+    private fun QuadDrawer.drawArea(
+        isMinXElseMaxX: Boolean,
         isMinZElseMaxZ: Boolean,
         color1: Color,
         color2: Color,
     ) {
-        val nucleusX = if (isMinXEsleMaxX) nucleusBBExpand.minX else nucleusBBExpand.maxX
-        val middleX = if (isMinXEsleMaxX) MIDDLE_X.shiftNX() else MIDDLE_X.shiftPX()
-        val x = if (isMinXEsleMaxX) MIN_X else MAX_X
+        val nucleusX = if (isMinXElseMaxX) nucleusBBExpand.minX else nucleusBBExpand.maxX
+        val middleX = if (isMinXElseMaxX) MIDDLE_X.shiftNX() else MIDDLE_X.shiftPX()
+        val x = if (isMinXElseMaxX) MIN_X else MAX_X
 
         val nucleusZ = if (isMinZElseMaxZ) nucleusBBExpand.minZ else nucleusBBExpand.maxZ
         val middleZ = if (isMinZElseMaxZ) MIDDLE_Z.shiftNZ() else MIDDLE_Z.shiftPZ()
@@ -245,23 +248,23 @@ object CrystalHollowsWalls {
         )
     }
 
-    private fun RenderUtils.QuadDrawer.drawHeatAreaForHeat(
-        isMinXEsleMaxX: Boolean,
+    private fun QuadDrawer.drawHeatAreaForHeat(
+        isMinXElseMaxX: Boolean,
         isMinZElseMaxZ: Boolean,
         color: Color,
         heatHeight: Double,
     ) = this.drawHeatArea(
         color,
         heatHeight,
-        nucleusX = if (isMinXEsleMaxX) nucleusBB.minX else nucleusBB.maxX,
+        nucleusX = if (isMinXElseMaxX) nucleusBB.minX else nucleusBB.maxX,
         middleX = MIDDLE_X,
-        x = if (isMinXEsleMaxX) MIN_X else MAX_X,
+        x = if (isMinXElseMaxX) MIN_X else MAX_X,
         nucleusZ = if (isMinZElseMaxZ) nucleusBB.minZ else nucleusBB.maxZ,
         middleZ = MIDDLE_X,
         z = if (isMinZElseMaxZ) MIN_Z else MAX_Z,
     )
 
-    private fun RenderUtils.QuadDrawer.drawHeatArea(
+    private fun QuadDrawer.drawHeatArea(
         color: Color,
         heatHeight: Double,
         nucleusX: Double,
@@ -293,5 +296,5 @@ object CrystalHollowsWalls {
         )
     }
 
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isCurrent()
 }

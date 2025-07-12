@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import net.minecraft.client.renderer.GlStateManager
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -15,9 +17,9 @@ object DragNDrop {
 
     private var isInvalidDrop = false
 
-    private const val BUTTON_MAPPED = -100
+    private const val BUTTON_MAPPED = KeyboardManager.LEFT_MOUSE
 
-    private val invalidItem = Renderable.itemStack(ItemStack(Blocks.barrier), 1.0)
+    private val invalidItem = ItemStackRenderable(ItemStack(Blocks.barrier), 1.0)
 
     @HandleEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
@@ -31,13 +33,13 @@ object DragNDrop {
             currentDrag = null
             return
         }
-        GlStateManager.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
+        DrawContextUtils.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
         if (isInvalidDrop) {
             invalidItem.render(event.mouseX, event.mouseY)
         } else {
             item.onRender(event.mouseX, event.mouseY)
         }
-        GlStateManager.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
+        DrawContextUtils.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
     }
 
     fun draggable(
@@ -47,7 +49,7 @@ object DragNDrop {
         condition: () -> Boolean = { true },
     ) = Renderable.clickable(
         display,
-        onClick = { currentDrag = item() },
+        onLeftClick = { currentDrag = item() },
         bypassChecks = bypassChecks,
         condition = condition,
     )
@@ -58,11 +60,11 @@ object DragNDrop {
         bypassChecks: Boolean = false,
         condition: () -> Boolean = { true },
     ): Renderable = object : RenderableWrapper(display) {
-        override fun render(posX: Int, posY: Int) {
-            if (isHovered(posX, posY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
+        override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+            if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
                 handelDroppable(drop)
             }
-            content.render(posX, posY)
+            content.render(mouseOffsetX, mouseOffsetY)
         }
     }
 
@@ -82,7 +84,7 @@ object DragNDrop {
 
 fun ItemStack.toDragItem(scale: Double = 1.0) = object : DragItem<ItemStack> {
 
-    val render = Renderable.itemStack(this@toDragItem, scale, 0)
+    val render = ItemStackRenderable(this@toDragItem, scale, 0)
 
     override fun get(): ItemStack = this@toDragItem
 

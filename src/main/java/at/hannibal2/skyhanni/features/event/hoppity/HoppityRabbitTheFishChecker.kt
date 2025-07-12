@@ -2,20 +2,21 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import net.minecraft.client.Minecraft
-import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityRabbitTheFishChecker {
@@ -29,7 +30,7 @@ object HoppityRabbitTheFishChecker {
      * REGEX-TEST: Chocolate Déjeuner Egg
      * REGEX-TEST: Chocolate Supper Egg
      */
-    val mealEggInventoryPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val mealEggInventoryPattern by CFApi.patternGroup.pattern(
         "inventory.mealegg.name",
         "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) Egg.*",
     )
@@ -37,7 +38,7 @@ object HoppityRabbitTheFishChecker {
     /**
      * REGEX-TEST: §cRabbit the Fish
      */
-    private val rabbitTheFishItemPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val rabbitTheFishItemPattern by CFApi.patternGroup.pattern(
         "item.rabbitthefish",
         "(?:§.)*Rabbit the Fish",
     )
@@ -45,7 +46,7 @@ object HoppityRabbitTheFishChecker {
     /**
      * REGEX-TEST: Click to open Chocolate Factory!
      */
-    private val openCfSlotLorePattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val openCfSlotLorePattern by CFApi.patternGroup.pattern(
         "inventory.mealegg.continue",
         "(?:§.)*Click to open Chocolate Factory!",
     )
@@ -68,7 +69,7 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.hasDisplayName() && it.key != 22
+            it.value.displayName.isNotEmpty() && it.key != 22
         }.entries.firstOrNull {
             rabbitTheFishItemPattern.matches(it.value.displayName)
         }?.key
@@ -88,15 +89,19 @@ object HoppityRabbitTheFishChecker {
         }
     }
 
-    private fun Int.isInventoryClosure(): Boolean =
-        this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || this == Keyboard.KEY_ESCAPE
+    @HandleEvent
+    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+        if (!isEnabled() || rabbitTheFishIndex == null) return
 
-    @JvmStatic
-    fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
-        if (!shouldContinue) SoundUtils.playErrorSound()
-        return shouldContinue
+        TitleManager.sendTitle(
+            "§cRabbit the Fish Prevented Close",
+            subtitleText = "§7Hold §eShift §7to bypass",
+            duration = 5.seconds,
+            location = TitleManager.TitleLocation.INVENTORY,
+        )
+        SoundUtils.playErrorSound()
+        event.cancel()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityApi.isHoppityEvent() && config.preventMissingRabbitTheFish
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && HoppityApi.isHoppityEvent() && config.preventMissingRabbitTheFish
 }

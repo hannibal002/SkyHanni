@@ -12,25 +12,26 @@ import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -49,6 +50,7 @@ object BazaarApi {
     private var currentSearchedItem = ""
 
     var currentlyOpenedProduct: NeuInternalName? = null
+    private var lastOpenedProduct: NeuInternalName? = null
     var orderOptionProduct: NeuInternalName? = null
 
     private val patternGroup = RepoPattern.group("inventory.bazaar")
@@ -94,7 +96,7 @@ object BazaarApi {
 
     fun NeuInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
         ErrorManager.skyHanniError(
-            "Can not find bazaar data for $itemName",
+            "Can not find bazaar data for $repoItemName",
             "internal name" to this,
         )
     }
@@ -108,10 +110,10 @@ object BazaarApi {
     }
 
     fun searchForBazaarItem(displayName: String, amount: Int? = null) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
         if (NeuItems.neuHasFocus()) return
-        if (LorenzUtils.noTradeMode) return
-        if (DungeonApi.inDungeon() || LorenzUtils.inKuudraFight) return
+        if (SkyBlockUtils.noTradeMode) return
+        if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
         HypixelCommands.bazaar(displayName.removeColor())
         amount?.let { OSUtils.copyToClipboard(it.toString()) }
         currentSearchedItem = displayName.removeColor()
@@ -123,6 +125,7 @@ object BazaarApi {
         if (inBazaarInventory) {
             val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
             currentlyOpenedProduct = openedProduct
+            lastOpenedProduct = openedProduct
             BazaarOpenedProductEvent(openedProduct, event).post()
         }
     }
@@ -130,7 +133,7 @@ object BazaarApi {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val item = event.item ?: return
-        val itemName = item.name
+        val itemName = item.displayName
         if (isBazaarOrderInventory(InventoryUtils.openInventoryName())) {
             val internalName = item.getInternalNameOrNull() ?: return
             if (itemName.contains("SELL")) {
@@ -138,11 +141,21 @@ object BazaarApi {
             } else if (itemName.contains("BUY")) {
                 // pickup items from bazaar order
                 OwnInventoryData.ignoreItem(1.seconds) { it == internalName }
+                // prepare for cancel buy order as well
+                orderOptionProduct = internalName
             }
         }
         if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
             // pickup items from own bazaar order
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
+
+        }
+
+        if (inBazaarInventory) {
+            if (item.getLore().lastOrNull()?.removeColor() == "Click to buy now!") {
+                // instant buy
+                OwnInventoryData.ignoreItem(1.seconds) { it == lastOpenedProduct }
+            }
         }
     }
 
@@ -157,6 +170,7 @@ object BazaarApi {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        if (ApiUtils.isHypixelItemsDisabled()) return
 
         if (!loadedNpcPriceData) {
             loadedNpcPriceData = true
@@ -172,8 +186,7 @@ object BazaarApi {
         if (currentSearchedItem == "") return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (chest.inventorySlots.indexOf(slot) !in 9..44) {
@@ -181,7 +194,7 @@ object BazaarApi {
             }
 
             if (stack.displayName.removeColor() == currentSearchedItem) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }
@@ -200,13 +213,13 @@ object BazaarApi {
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
-        if (items.any { it.name.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
+        if (items.any { it.displayName.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
             return true
         }
 
         // check for Buy Instantly
         event.inventoryItems[16]?.let {
-            if (it.name == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+            if (it.displayName == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
                 return true
             }
         }

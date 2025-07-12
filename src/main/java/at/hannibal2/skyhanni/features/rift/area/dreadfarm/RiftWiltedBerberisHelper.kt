@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -17,10 +16,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import java.awt.Color
@@ -51,7 +51,7 @@ object RiftWiltedBerberisHelper {
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
-        if (Minecraft.getMinecraft().thePlayer.onGround) {
+        if (MinecraftCompat.localPlayer.onGround) {
             val block = LorenzVec.getBlockBelowPlayer().getBlockAt()
             val currentY = LocationUtils.playerLocation().y
             isOnFarmland = block == Blocks.farmland && (currentY % 1 == 0.0)
@@ -131,12 +131,12 @@ object RiftWiltedBerberisHelper {
 
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
-                    event.drawFilledBoundingBoxNea(axisAlignedBB(location), Color.YELLOW, 0.7f)
+                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW, 0.7f)
                     event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
-                    event.drawFilledBoundingBoxNea(axisAlignedBB(location), Color.WHITE, 0.5f)
+                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {
-                        event.drawFilledBoundingBoxNea(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
+                        event.drawFilledBoundingBox(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
                         event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE, 3, false)
                     }
                 }
