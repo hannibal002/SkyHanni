@@ -1,4 +1,5 @@
 {
+    "_note": "If you make changes here you must also make changes to all other fabric.mod.json files in other versions.",
     "schemaVersion": 1,
     "version": "${version}",
     "id": "skyhanni",
