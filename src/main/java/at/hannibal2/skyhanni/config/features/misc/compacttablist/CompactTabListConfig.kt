@@ -13,8 +13,7 @@ class CompactTabListConfig {
     @SearchTag("tablist")
     @ConfigOption(
         name = "Enabled",
-        desc = "Compact the tab list to make it look much nicer like SBA did. Also " +
-            "doesn't break god-pot detection and shortens some other lines."
+        desc = "Compact the tab list to make it look much nicer like SBA did."
     )
     @ConfigEditorBoolean
     @FeatureToggle

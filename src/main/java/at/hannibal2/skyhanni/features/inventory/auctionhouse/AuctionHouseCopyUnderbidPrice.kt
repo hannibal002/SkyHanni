@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -72,7 +72,7 @@ object AuctionHouseCopyUnderbidPrice {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.copyUnderbidKeybind.isKeyHeld()) return
         if (!allowedInventoriesPattern.matches(InventoryUtils.openInventoryName())) return
-        val stack = slotUnderCursor()?.stack ?: return
+        val stack = stackUnderCursor() ?: return
 
         auctionPricePattern.firstMatcher(stack.getLore()) {
             val underbid = group("coins").formatLong() - 1
