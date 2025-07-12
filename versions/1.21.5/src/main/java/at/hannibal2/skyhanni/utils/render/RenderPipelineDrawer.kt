@@ -13,7 +13,11 @@ import net.minecraft.client.render.Tessellator
 import net.minecraft.client.util.math.MatrixStack
 
 object RenderPipelineDrawer {
+    //#if MC < 1.21.6
     val matrices: MatrixStack.Entry get() = DrawContextUtils.drawContext.matrices.peek()
+    //#else
+    //$$ val matrices: MatrixStack.Entry get() = MatrixStack.Entry()
+    //#endif
     fun getBuffer(
         pipeline: RenderPipeline,
     ): BufferBuilder = Tessellator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)

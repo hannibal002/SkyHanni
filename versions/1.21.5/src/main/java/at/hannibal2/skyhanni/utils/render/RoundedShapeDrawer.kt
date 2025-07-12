@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier
 
 object RoundedShapeDrawer {
 
+    //#if MC < 1.21.6
     private fun <T: RoundedShader<T>> T.performBaseUniforms(
         renderPass: RenderPass,
         withSmoothness: Boolean = true,
@@ -123,5 +124,6 @@ object RoundedShapeDrawer {
             setUniform("angle1", CircleShader.angle1)
             setUniform("angle2", CircleShader.angle2)
         }
+    //#endif
 
 }

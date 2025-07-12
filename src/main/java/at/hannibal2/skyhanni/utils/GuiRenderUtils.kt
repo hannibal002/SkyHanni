@@ -412,11 +412,13 @@ object GuiRenderUtils {
 
                 //#if MC < 1.21
                 GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
-                //#else
+                //#elseif MC < 1.21.6
                 //$$ savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
                 //#endif
             }
+            //#if MC < 1.21.6
             DrawContextUtils.multMatrix(savedMV)
+            //#endif
 
             //#if MC < 1.21
             GL11.glEnable(GL11.GL_NORMALIZE)
@@ -425,7 +427,11 @@ object GuiRenderUtils {
             //$$ RenderSystem.assertOnRenderThread()
             //#endif
 
+            //#if MC < 1.21.6
             RenderHelper.enableGUIStandardItemLighting()
+            //#else
+            //$$ MinecraftClient.getInstance().gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
+            //#endif
 
             //#if MC < 1.21
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
@@ -435,7 +441,7 @@ object GuiRenderUtils {
 
             //#if MC < 1.21
             RenderHelper.disableStandardItemLighting()
-            //#else
+            //#elseif MC < 1.21.6
             //$$ DiffuseLighting.disableGuiDepthLighting()
             //#endif
 

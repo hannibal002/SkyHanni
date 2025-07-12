@@ -41,7 +41,9 @@ object ShaderRenderUtils {
         this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
         //#if MC > 1.21
+        //#if MC < 1.21.6
         //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
+        //#endif
         //#endif
     }.also { extraApplies?.invoke(this) }
 
@@ -80,7 +82,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
             ShaderManager.disableShader()
         }
-        //#else
+        //#elseif MC < 1.21.6
         //$$ RoundedShapeDrawer.drawRoundedTexturedRect(x, y, width, height, texture)
         //#endif
     }
@@ -107,7 +109,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
             ShaderManager.disableShader()
         }
-        //#else
+        //#elseif MC < 1.21.6
         //$$ RoundedShapeDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
         //#endif
     }
@@ -158,7 +160,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawGradientRect(left, top, right, bottom, topColor, bottomColor)
             ShaderManager.disableShader()
         }
-        //#else
+        //#elseif MC < 1.21.6
         //$$ RoundedShapeDrawer.drawRoundedRectOutline(left, top, right, bottom, topColor, bottomColor)
         //#endif
     }
@@ -200,7 +202,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawGradientRect(left, top, right, bottom, topColor, bottomColor)
             ShaderManager.disableShader()
         }
-        //#else
+        //#elseif MC < 1.21.6
         //$$ RoundedShapeDrawer.drawRoundedRect(left, top, right, bottom, topColor, bottomColor)
         //#endif
     }
@@ -251,7 +253,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawRect(left, top, right, bottom, circleColor)
             ShaderManager.disableShader()
         }
-        //#else
+        //#elseif MC < 1.21.6
         //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, circleColor)
         //#endif
     }
