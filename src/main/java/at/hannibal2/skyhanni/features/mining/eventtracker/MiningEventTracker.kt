@@ -183,18 +183,7 @@ object MiningEventTracker {
     }
 
     private suspend fun sendData(json: String) {
-        val response = try {
-            ApiUtils.postJSON(miningSendStatic, json)
-        } catch (e: IOException) {
-            if (SkyHanniDebugsAndTests.enabled) {
-                ErrorManager.logErrorWithData(
-                    e, "Sending mining event data was unsuccessful",
-                    "sentData" to json,
-                )
-            }
-            return
-        }
-        if (!response.success) return
+        val response = ApiUtils.postJSON(miningSendStatic, json).takeIf { it.success } ?: return
         val data = response.data ?: return
 
         val formattedResponse = ConfigManager.gson.fromJson<MiningEventDataReceive>(data)
@@ -209,9 +198,7 @@ object MiningEventTracker {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (apiError) {
-            canRequestAt = SimpleTimeMark.now()
-        }
+        if (apiError) canRequestAt = SimpleTimeMark.now()
     }
 
     private suspend fun fetchData() {
@@ -224,13 +211,11 @@ object MiningEventTracker {
         val miningEventData = ConfigManager.gson.fromJson<MiningEventDataReceive>(receivedData)
 
         if (!miningEventData.success) {
-            if (receivedData.toString().trim() == "{}") {
-                ChatUtils.chat(
-                    "§cFailed loading Mining Event data!\n" +
-                        "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
-                    onlySendOnce = true,
-                )
-            } else ErrorManager.logErrorWithData(
+            if (receivedData.toString().trim() == "{}") ChatUtils.chat(
+                "§cFailed loading Mining Event data!\n" +
+                    "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
+                onlySendOnce = true,
+            ) else ErrorManager.logErrorWithData(
                 Exception("miningEventData.success = false"),
                 "Failed to load Mining Event data!",
                 "cause" to miningEventData.cause,
