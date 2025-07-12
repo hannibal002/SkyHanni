@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -36,6 +38,14 @@ object OldSkyblockMenu {
         if (!isEnabled()) return
 
         val sbButton = slotMap[event.slot] ?: return
+
+        if (!event.originalItem.isStainedGlassPane()) {
+            return ChatUtils.debug(
+                "Skipping adding OldSkyBlockMenu item for button ${sbButton.name} at slot ${event.slot}," +
+                " because the original item is not a stained glass pane."
+            )
+        }
+
         val showWarning = sbButton.requiresBoosterCookie && !BitsApi.hasCookieBuff()
         val item = if (showWarning) sbButton.itemWithCookieWarning else sbButton.itemWithoutCookieWarning
 
