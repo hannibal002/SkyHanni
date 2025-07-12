@@ -15,7 +15,7 @@ enum class KuudraTier(val displayName: String) {
     var doneToday: Boolean = false
 
     private var intLocation: LorenzVec? = null
-    private var intTierNumber: Int = 0
+    private var intTierNumber: Int = ordinal + 1
     private var intDisplayItem: NeuInternalName = "KUUDRA_${name}_TIER_KEY".toInternalName()
 
     val location: LorenzVec? get() = intLocation
@@ -29,10 +29,6 @@ enum class KuudraTier(val displayName: String) {
     fun getTieredDisplayName() = "Tier $intTierNumber ($displayName)"
 
     companion object {
-        init {
-            KuudraTier.entries.forEach { it.setTierNumber(it.ordinal + 1) }
-        }
-
         fun addRepoData(
             displayName: String,
             displayItem: NeuInternalName,
