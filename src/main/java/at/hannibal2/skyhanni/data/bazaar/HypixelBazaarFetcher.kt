@@ -27,6 +27,7 @@ object HypixelBazaarFetcher {
         "https://api.hypixel.net/v2/skyblock/bazaar",
         "Hypixel Bazaar"
     )
+    private val debugConfig get() = SkyHanniMod.feature.dev.debug
 
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 
