@@ -135,14 +135,10 @@ object EnoughUpdatesManager {
         if (!itemDir.exists()) return@coroutineScope
         val files = itemDir.listFiles { it.extension == "json" } ?: return@coroutineScope
 
-        files.mapNotNull { file ->
-            async(Dispatchers.IO) {
-                file.readRepoItem()
-            }
-        }.awaitAll().forEachIndexed { idx, item ->
-            if (item != null) {
-                tempItemMap[files[idx].nameWithoutExtension] = item
-            }
+        files.map { file ->
+            async { file.readRepoItem() }
+        }.awaitAll().filterNotNull().forEachIndexed { index, item ->
+            tempItemMap[files[index].nameWithoutExtension] = item
         }
     }
 
