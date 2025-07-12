@@ -16,7 +16,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -85,11 +86,11 @@ object CFStrayTimer {
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 
-    private fun getTimerRenderable(): Renderable = Renderable.verticalContainer(
+    private fun getTimerRenderable() = VerticalContainerRenderable(
         listOf(
             "§eStray Timer",
             "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"
-        ).map { Renderable.string(it) }
+        ).map(StringRenderable::from)
     )
 
     private fun isEnabled() = eventConfig.enabled && timer > Duration.ZERO
