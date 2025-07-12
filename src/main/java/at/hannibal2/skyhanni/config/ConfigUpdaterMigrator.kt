@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
@@ -71,7 +70,7 @@ object ConfigUpdaterMigrator {
             val newParentElement = new.at(np.dropLast(1), true)
             if (newParentElement !is JsonObject) {
                 logger.log(
-                    "Skipping add of $value to $path, since another element already inhabits that path"
+                    "Skipping add of $value to $path, since another element already inhabits that path",
                 )
                 return
             }
@@ -124,7 +123,6 @@ object ConfigUpdaterMigrator {
                 return
             }
             movesPerformed++
-            if (np == listOf("#player", "personalBest")) LimboTimeTracker.workaroundMigration(oldElem.asInt)
             newParentElement.add(np.last(), transform(oldElem.shDeepCopy()))
             logger.log("Moved element from $oldPath to $newPath")
         }
