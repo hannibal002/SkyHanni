@@ -457,29 +457,18 @@ object ChatFilter {
     )
 
     /**
-     ** REGEX-TEST: §eYou haven't claimed your §6Summer Rewards §eyet!
-     ** REGEX-TEST: §eYou haven't claimed your §6Winter Rewards §eyet!
-     ** REGEX-TEST: §r§eYou haven't claimed your §r§6Summer Rewards §r§eyet!
-     ** REGEX-TEST: §r§eYou haven't claimed your §r§6Winter Rewards §r§eyet!
-     */
-    /**
-     ** REGEX-TEST: §eTalk to the §bSummer Sloth §ein the §aHub§e!
-     ** REGEX-TEST: §eTalk to the §bRandom NPC §ein the §aForbidden Zone§e!
-     ** REGEX-TEST: §r§eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
-     ** REGEX-TEST: §r§eTalk to the §r§bRandom NPC §r§ein the §r§aForbidden Zone§r§e!
+     ** REGEX-TEST: §eYou haven't claimed your §r§6Summer Rewards §r§eyet!
+     ** REGEX-TEST: §eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
+     ** REGEX-TEST: §eTalk to the §r§bRandom NPC §r§ein the §r§aForbidden Zone§r§e!
      */
     private val rewardBundlePatterns by miscPatternGroup.list(
         "seasonal-bundles",
-        "(?:§.)*You have[\\S ]+ claimed your (?:§.\\S+)* Rewards (?:§.)*yet!",
-        "(?:§.)*Talk to the (?:§.[\\S ]+)* (?:§.)*in the (?:§.)*\\S+(?:[\\S ]+)?(?:§.)*!",
+        "(?:§.)*You haven't claimed your (?:§.)*\\w+ Rewards (?:§.)*yet!",
+        "(?:§.)*Talk to the (?:§.)*.+(?:§.)*in the (?:§.)*.+(?:§.)*!",
     )
 
     /**
-     ** former key: "regenerating-tree"
      ** REGEX-TEST: §cYou cannot damage a tree while it is regenerating!
-     */
-    /**
-     ** former key: "tree-toughness"
      ** REGEX-TEST: §c§oThe toughness of this tree is way too high!
      */
     private val unmineableTreePatterns by foragingPatternGroup.list(
@@ -490,11 +479,7 @@ object ChatFilter {
 
     /**
      ** REGEX-TEST: §7§oMochibear ate too much and passed out! You caught it!
-     */
-    /**
      ** REGEX-TEST: §7§oYou caught yourself an invisibug! The shard was sent to your Hunting Box!
-     */
-    /**
      ** REGEX-TEST: §7§oThe Frog is exhausted...
      */
     private val redundantShardsPatterns by huntingPatternGroup.list(
@@ -532,7 +517,7 @@ object ChatFilter {
     )
 
     private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
-        "rewards_bundles" to rewardBundlePatterns,
+        "reward_bundles" to rewardBundlePatterns,
         "redundant_hunting" to redundantShardsPatterns,
         "unmineable_tree" to unmineableTreePatterns,
     )
@@ -605,7 +590,7 @@ object ChatFilter {
         config.eventLevelUp && (message.isPresent("event")) -> "event"
 
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
-        config.rewardBundles && message.isPresent("rewards_bundles") -> "rewards_bundles"
+        config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
