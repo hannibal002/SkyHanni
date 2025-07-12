@@ -40,6 +40,7 @@ object OldSkyblockMenu {
         val sbButton = slotMap[event.slot] ?: return
 
         if (!event.originalItem.isStainedGlassPane()) {
+            sbButton.disabled = true
             return ChatUtils.debug(
                 "Skipping adding OldSkyBlockMenu item for button ${sbButton.name} at slot ${event.slot}," +
                     " because the original item is not a stained glass pane."
@@ -68,9 +69,8 @@ object OldSkyblockMenu {
         if (!isEnabled()) return
 
         val sbButton = slotMap[event.slotId] ?: return
-
-        if (event.item?.isStainedGlassPane() == true) {
-            return ChatUtils.debug("Expected a custom button at slot ${event.slotId}, but got a stained glass pane.")
+        if (sbButton.disabled) {
+            return ChatUtils.debug("Button ${sbButton.name} at slot ${event.slotId} is disabled.")
         }
 
         event.cancel()
@@ -94,6 +94,7 @@ object OldSkyblockMenu {
         private vararg val displayDescription: String,
         private val itemData: ItemData,
         val requiresBoosterCookie: Boolean = true,
+        var disabled: Boolean = false,
     ) {
         TRADES(
             HypixelCommands::trades,
