@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -107,17 +107,17 @@ object GeorgeHelper {
                     add(petInfo.renderableInfo)
                 }
             }
-            add(StringRenderable("§7Total Cost: §6$totalCost coins"))
+            add(StringRenderable("§7Total Cost: §6${totalCost.formatCoin()} coins"))
         }
     }
 
     private fun findCheapestPet(tierName: String, petName: String, tierColorCodes: String): PetInfo {
-        val internalPetName = petName.removeColor().toInternalName()
+        val colorlessPetName = petName.removeColor().uppercase().replace(" ", "_")
         val tierNumber = LorenzRarity.getByName(tierName.uppercase().replace(" ", "_"))?.id ?: 0
 
-        val (cheapestTier, cheapestPrice) = findCheapestTier(internalPetName.toString(), tierNumber)
+        val (cheapestTier, cheapestPrice) = findCheapestTier(colorlessPetName, tierNumber)
 
-        val stackRenderableInternalName = petInternalName(internalPetName.toString(), tierNumber).toInternalName()
+        val stackRenderableInternalName = petInternalName(colorlessPetName, tierNumber).toInternalName()
         val stack = ItemStackRenderable(stackRenderableInternalName.getItemStack())
 
         val rarityColorCode = LorenzRarity.getById(cheapestTier)?.chatColorCode ?: tierColorCodes
@@ -161,10 +161,6 @@ object GeorgeHelper {
                     otherRarity = true,
                 ),
             )
-        }
-        for (pair in this) {
-            ChatUtils.consoleLog("tier: ${pair.first}")
-            ChatUtils.consoleLog("price: ${pair.second}")
         }
     }.minBy { it.second }
 
