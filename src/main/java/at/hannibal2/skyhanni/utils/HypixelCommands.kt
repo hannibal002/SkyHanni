@@ -215,15 +215,25 @@ object HypixelCommands {
         send("treegifts")
     }
 
-    fun trades() = send("trades")
+    fun trades() {
+        send("trades")
+    }
 
-    fun accessories() = send("accessories")
+    fun accessories() {
+        send("accessories")
+    }
 
-    fun potionBag() = send("potionbag")
+    fun potionBag() {
+        send("potionbag")
+    }
 
-    fun quiver() = send("quiver")
+    fun quiver() {
+        send("quiver")
+    }
 
-    fun fishingBag() = send("fishingbag")
+    fun fishingBag() {
+        send("fishingbag")
+    }
 
     private fun send(command: String) {
         if (command.startsWith("/")) {
