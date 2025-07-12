@@ -108,7 +108,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Estimated Item Value",
-        desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)"
+        desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)",
     )
     @Accordion
     val estimatedItemValues: EstimatedItemValueConfig = EstimatedItemValueConfig()
@@ -177,7 +177,7 @@ class InventoryConfig {
         ItemNumberEntry.NEW_YEAR_CAKE,
         ItemNumberEntry.RANCHERS_BOOTS_SPEED,
         ItemNumberEntry.LARVA_HOOK,
-        ItemNumberEntry.VACUUM_GARDEN
+        ItemNumberEntry.VACUUM_GARDEN,
     )
 
     enum class ItemNumberEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
@@ -221,7 +221,7 @@ class InventoryConfig {
     @ConfigOption(
         name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+            "(e.g. armor, weapons, accessories). Sack items can be crafted normally.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -236,7 +236,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Anvil Combine Helper",
-        desc = "Suggest the same item in the inventory when trying to combine two items in the anvil."
+        desc = "Suggest the same item in the inventory when trying to combine two items in the anvil.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -258,7 +258,7 @@ class InventoryConfig {
     @ConfigOption(
         name = "Old SkyBlock Menu",
         desc = "Show old buttons in the SkyBlock Menu: Trade, Accessories, Potions, Quiver, Fishing and Sacks. " +
-            "§cOnly works with the booster cookie effect active."
+            "§cOnly works with the booster cookie effect active.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -267,7 +267,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Favorite Power Stone",
-        desc = "Show your favorite power stones. You can add/remove them by shift clicking a Power Stone."
+        desc = "Show your favorite power stones. You can add/remove them by shift clicking a Power Stone.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -276,7 +276,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Shift Click Equipment",
-        desc = "Change normal clicks into shift clicks in equipment inventory."
+        desc = "Change normal clicks into shift clicks in equipment inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -285,7 +285,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Shift Click NPC sell",
-        desc = "Change normal clicks to shift clicks in npc inventory for selling."
+        desc = "Change normal clicks to shift clicks in npc inventory for selling.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -294,7 +294,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Shift Click Brewing",
-        desc = "Change normal clicks to shift clicks in Brewing Stand inventory."
+        desc = "Change normal clicks to shift clicks in Brewing Stand inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -303,7 +303,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Stonk of Stonk Price",
-        desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard)."
+        desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -324,7 +324,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Essence Shop Helper",
-        desc = "Show extra information about remaining upgrades in essence shops."
+        desc = "Show extra information about remaining upgrades in essence shops.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -339,7 +339,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Active Beacon Effect",
-        desc = "Highlights the currently selected beacon effect in the beacon inventory."
+        desc = "Highlights the currently selected beacon effect in the beacon inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
