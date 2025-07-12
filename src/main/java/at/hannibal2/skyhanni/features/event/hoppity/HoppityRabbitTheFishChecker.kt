@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -89,19 +89,18 @@ object HoppityRabbitTheFishChecker {
         }
     }
 
-    @JvmStatic
-    fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !isInventoryClosure(keycode) || !isEnabled() || rabbitTheFishIndex == null
-        if (!shouldContinue) {
-            TitleManager.sendTitle(
-                "§cRabbit the Fish Prevented Close",
-                subtitleText = "§7Hold §eShift §7to bypass",
-                duration = 5.seconds,
-                location = TitleManager.TitleLocation.INVENTORY
-            )
-            SoundUtils.playErrorSound()
-        }
-        return shouldContinue
+    @HandleEvent
+    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+        if (!isEnabled() || rabbitTheFishIndex == null) return
+
+        TitleManager.sendTitle(
+            "§cRabbit the Fish Prevented Close",
+            subtitleText = "§7Hold §eShift §7to bypass",
+            duration = 5.seconds,
+            location = TitleManager.TitleLocation.INVENTORY,
+        )
+        SoundUtils.playErrorSound()
+        event.cancel()
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && HoppityApi.isHoppityEvent() && config.preventMissingRabbitTheFish

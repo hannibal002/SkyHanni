@@ -7,9 +7,6 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTimer;
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayWarning;
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
@@ -17,13 +14,11 @@ import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.sugar.Local;
-import kotlin.jvm.JvmStatic;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -75,24 +70,11 @@ public abstract class MixinHandledScreen {
         return ToolTipData.processModernTooltip(drawContext, itemStack, textTooltip);
     }
 
-    @Unique
-    @JvmStatic
-    private boolean shouldContinueWithKeypress(int keyCode) {
-        boolean shouldHoppityRabbitTheFishContinue = HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode);
-        boolean shouldCfStrayWarningContinue = CFStrayWarning.shouldContinueWithKeypress(keyCode);
-        boolean shouldCfStrayTimerContinue = CFStrayTimer.shouldContinueWithKeypress(keyCode);
-
-        boolean shiftHeld = KeyboardManager.isShiftKeyDown();
-        boolean shouldContinue = (shouldHoppityRabbitTheFishContinue && shouldCfStrayWarningContinue && shouldCfStrayTimerContinue);
-
-        return shiftHeld || shouldContinue;
-    }
-
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         TextInput.Companion.onGuiInput(cir);
-        boolean shouldContinue = shouldContinueWithKeypress(keyCode);
-        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post() || !shouldContinue) {
+        boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
+        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
             cir.setReturnValue(false);
         }
     }

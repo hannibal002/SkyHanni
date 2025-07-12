@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -191,16 +191,16 @@ object CFStrayWarning {
             "§cStray Rabbit Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",
             duration = 5.seconds,
-            location = TitleManager.TitleLocation.INVENTORY
+            location = TitleManager.TitleLocation.INVENTORY,
         )
         SoundUtils.playErrorSound()
     }
 
-    @JvmStatic
-    fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        if (!config.rabbitWarning.blockClosing) return true
-        val shouldContinue = !isInventoryClosure(keycode) || activeStraySlots.isEmpty()
-        if (!shouldContinue) preventCloseTitle()
-        return shouldContinue
+    @HandleEvent
+    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+        if (!config.rabbitWarning.blockClosing) return
+        if (activeStraySlots.isEmpty()) return
+        preventCloseTitle()
+        event.cancel()
     }
 }

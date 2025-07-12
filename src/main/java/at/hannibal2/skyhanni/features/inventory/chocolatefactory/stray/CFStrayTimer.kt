@@ -11,19 +11,19 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import java.util.*
+import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -109,8 +109,8 @@ object CFStrayTimer {
     private fun getTimerRenderable() = VerticalContainerRenderable(
         listOf(
             "§eStray Timer",
-            "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"
-        ).map(StringRenderable::from)
+            "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s",
+        ).map(StringRenderable::from),
     )
 
     private fun preventCloseTitle() {
@@ -118,17 +118,16 @@ object CFStrayTimer {
             "§cStray Timer Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",
             duration = 5.seconds,
-            location = TitleManager.TitleLocation.INVENTORY
+            location = TitleManager.TitleLocation.INVENTORY,
         )
         SoundUtils.playErrorSound()
     }
 
-    @JvmStatic
-    fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        if (!isInventoryClosure(keycode)) return true
-        if (!config.blockClosing || !isEnabled()) return true
+    @HandleEvent
+    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+        if (!config.blockClosing || !isEnabled()) return
         preventCloseTitle()
-        return false
+        event.cancel()
     }
 
     private fun isEnabled() = config.enabled && InventoryUtils.openInventoryName() == "Chocolate Factory" && timer > Duration.ZERO
