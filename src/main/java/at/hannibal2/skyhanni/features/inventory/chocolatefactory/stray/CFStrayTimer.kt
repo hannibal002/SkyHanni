@@ -100,8 +100,7 @@ object CFStrayTimer {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !config.blockClosing) return
         if (KeyboardManager.isShiftKeyDown()) return
-        val slot = event.slot ?: return
-        if (slot.slotIndex in destructiveSlots) {
+        if (event.slotId in destructiveSlots) {
             event.cancel()
             preventCloseTitle()
         }
