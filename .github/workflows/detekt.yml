@@ -22,6 +22,7 @@ jobs:
             pull-requests: write
         outputs:
             sarif_exists: ${{ steps.check_sarif.outputs.exists }}
+            detekt_failed: ${{ steps.run_detekt.outcome == 'failure' }}
         steps:
             -   name: Checkout PR code
                 uses: actions/checkout@v4
@@ -30,7 +31,9 @@ jobs:
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
             -   uses: ./.github/actions/setup-normal-workspace
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
+                id: run_detekt
                 uses: ./.github/actions/gradle-retry
+                continue-on-error: true
                 with:
                     gradle-command: detektMain --stacktrace
             -   name: Check if SARIF file exists
@@ -77,7 +80,7 @@ jobs:
         needs: detekt
         if: ${{
                 needs.detekt.outputs.sarif_exists == 'true' &&
-                needs.detekt.result == 'failure' &&
+                needs.detekt.outputs.detekt_failed == 'true' &&
                 github.event.pull_request.draft == false
             }}
         permissions:

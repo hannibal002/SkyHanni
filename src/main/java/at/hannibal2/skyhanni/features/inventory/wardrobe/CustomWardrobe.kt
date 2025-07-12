@@ -35,6 +35,8 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
@@ -99,7 +101,7 @@ object CustomWardrobe {
         renderableTopCorner = left to top
 
         if (waitingForInventoryUpdate && config.loadingText) {
-            val loadingRenderable = Renderable.string(
+            val loadingRenderable = StringRenderable(
                 "§cLoading...",
                 scale = activeScale / 100.0,
             )
@@ -343,7 +345,7 @@ object CustomWardrobe {
         currentMaxSize = maxRenderableWidth to maxRenderableHeight
 
         wardrobeWarning?.let { text ->
-            val warningRenderable = Renderable.wrappedString(
+            val warningRenderable = WrappedStringRenderable(
                 text,
                 maxRenderableWidth,
                 3.0 * (activeScale / 100.0),
@@ -402,7 +404,7 @@ object CustomWardrobe {
             Renderable.doubleLayered(
                 renderable,
                 Renderable.clickable(
-                    Renderable.string(
+                    StringRenderable(
                         "§7SkyHanni",
                         horizontalAlign = HorizontalAlignment.RIGHT,
                         verticalAlign = VerticalAlignment.BOTTOM,
@@ -663,7 +665,7 @@ object CustomWardrobe {
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
-    ) = Renderable.string(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
+    ) = StringRenderable(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
 
     @JvmStatic
     fun shouldHideNormalTooltip(): Boolean = WardrobeApi.inCustomWardrobe && !editMode

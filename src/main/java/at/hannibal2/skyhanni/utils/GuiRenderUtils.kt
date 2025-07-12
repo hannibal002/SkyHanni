@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -32,8 +33,7 @@ import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
 //#else
-//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
-//$$ import net.minecraft.client.render.RenderLayer
+//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.joml.Matrix4f
 //#endif
@@ -106,10 +106,10 @@ object GuiRenderUtils {
         return Renderable.hoverTips(
             VerticalContainerRenderable(
                 listOf(
-                    Renderable.string(label, scale = scale),
+                    StringRenderable(label, scale = scale),
                     Renderable.fixedSizeLine(
                         listOf(
-                            Renderable.string(
+                            StringRenderable(
                                 "§2${DecimalFormat("0.##").format(current)} / ${
                                     DecimalFormat(
                                         "0.##",
@@ -117,7 +117,7 @@ object GuiRenderUtils {
                                 }☘",
                                 scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
                             ),
-                            Renderable.string(
+                            StringRenderable(
                                 "§2${(percent * 100).roundTo(1)}%",
                                 scale = scale,
                                 horizontalAlign = HorizontalAlignment.RIGHT,
@@ -128,7 +128,7 @@ object GuiRenderUtils {
                     Renderable.progressBar(percent, width = width),
                 ),
             ),
-            tooltip.split('\n').map { Renderable.string(it) },
+            tooltip.split('\n').map(StringRenderable::from),
         )
     }
 
@@ -270,7 +270,7 @@ object GuiRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1f, 1f, 1f, 1f)
         //#else
-        //$$ DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        //$$ DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
         //#endif
     }
 

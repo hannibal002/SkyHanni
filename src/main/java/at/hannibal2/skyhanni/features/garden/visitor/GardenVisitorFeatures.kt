@@ -66,6 +66,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -249,7 +250,7 @@ object GardenVisitorFeatures {
         }
         if (totalPrice > 0) {
             val format = totalPrice.shortFormat()
-            this[0] = Renderable.string("§7Visitor Shopping List: §7(§6$format§7)")
+            this[0] = StringRenderable("§7Visitor Shopping List: §7(§6$format§7)")
         }
     }
 

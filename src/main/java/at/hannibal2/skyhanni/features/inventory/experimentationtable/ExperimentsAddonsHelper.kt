@@ -360,5 +360,8 @@ object ExperimentsAddonsHelper {
         event.transform(94, "$basePath.highlightNextClick") {
             JsonPrimitive(true)
         }
+        event.transform(94, "$basePath.preventMisclicks") {
+            JsonPrimitive(true)
+        }
     }
 }

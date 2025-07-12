@@ -363,7 +363,7 @@ object FarmingWeightDisplay {
         val weightFormat = (weightUntilOvertake.roundTo(2) + 0.0).addSeparators()
         val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
         return if (showRankGoal) {
-            Renderable.string(text)
+            StringRenderable(text)
         } else {
             Renderable.clickable(
                 text,

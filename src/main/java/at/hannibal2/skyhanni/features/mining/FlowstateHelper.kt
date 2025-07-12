@@ -2,18 +2,24 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.blockBreakStreak
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getSpeedBonus
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getStreakColor
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getTimerColor
+import at.hannibal2.skyhanni.features.mining.FlowstateHelper.personalBest
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.streakEndTimer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -21,12 +27,19 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import net.minecraft.init.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FlowstateHelper {
     private val config get() = SkyHanniMod.feature.mining.flowstateHelper
+    var personalBest
+        get() = ProfileStorageData.profileSpecific?.mining?.flowstatePersonalBest ?: 0
+        private set(value) {
+            ProfileStorageData.profileSpecific?.mining?.flowstatePersonalBest = value
+        }
 
     var streakEndTimer = SimpleTimeMark.farPast()
         private set
@@ -44,7 +57,7 @@ object FlowstateHelper {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockMined(event: OreMinedEvent) {
-        if (!MiningApi.inCustomMiningIsland()) return
+        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
         if (flowstateCache == null) return
 
         displayHibernating = false
@@ -56,13 +69,26 @@ object FlowstateHelper {
 
     @HandleEvent
     fun onTick() {
-        if (!MiningApi.inCustomMiningIsland()) return
+        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
 
         attemptClearDisplay()
     }
 
     private fun attemptClearDisplay() {
         if (streakEndTimer.isInFuture()) return
+        if (blockBreakStreak > personalBest) {
+            // no point telling them it's a new personal best if they never got to max speed before
+            if (personalBest > 200 && config.personalBestMessage) {
+                val newLuck = calculateFlowstateLuck(blockBreakStreak)
+                val oldLuck = calculateFlowstateLuck(personalBest)
+                val userLuckSegment = if (personalBest > 500) " §aYou Gained +${newLuck - oldLuck}✴ SkyHanni User Luck" else ""
+                ChatUtils.chat(
+                    "§d§lNEW FLOWSTATE PERSONAL BEST!§f Streak: $blockBreakStreak." +
+                        " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!" + userLuckSegment,
+                )
+            }
+            personalBest = blockBreakStreak
+        }
         blockBreakStreak = 0
         timeSinceMax = SimpleTimeMark.farPast()
         displayMaxed = false
@@ -74,7 +100,7 @@ object FlowstateHelper {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!MiningApi.inCustomMiningIsland() || !config.enabled) return
+        if (!IslandTypeTags.CUSTOM_MINING.inAny() || !config.enabled) return
         if (flowstateCache == null && !streakEndTimer.isInFuture()) return
 
         if (shouldAutoHide()) return
@@ -96,6 +122,7 @@ object FlowstateHelper {
             displayDirty = false
             FlowstateElements.STREAK.create()
             FlowstateElements.SPEED.create()
+            FlowstateElements.PERSONAL_BEST.create()
         }
         if (!displayHibernating) {
             FlowstateElements.TIMER.create()
@@ -152,14 +179,61 @@ object FlowstateHelper {
         }
         flowstateCache = enchantList.getValue("ultimate_flowstate")
     }
+
+
+    /**
+     * Best below 500 blocks gets no luck
+     * Every block between 500-1000 gets 0.005 per block (500*0.005 = 2.5)
+     * Every block between 1000-2000 gets 0.0025 per block (1000*0.0025 = 2.5)
+     * Every block between 2000-7000 gets 0.001 per block (5000*0.001 = 5)
+     * 10 Luck is the max
+     */
+    private fun calculateFlowstateLuck(best: Int): Float {
+        var extraBlocks = best - 500
+        if (0 > extraBlocks) return 0f
+        if (extraBlocks <= 500) {
+            return (0.005f * extraBlocks).roundTo(2)
+        }
+        extraBlocks -= 500
+        if (extraBlocks <= 1000) {
+            return (0.0025f * extraBlocks + 2.5f).roundTo(2)
+        }
+        extraBlocks -= 1000
+        if (extraBlocks <= 5000) {
+            return (0.001f * extraBlocks + 5f).roundTo(2)
+        }
+        // 10 is the max luck
+        return 10f
+    }
+
+    @HandleEvent
+    fun onUserLuck(event: UserLuckCalculateEvent) {
+        if (personalBest < 500) return
+        val luck = calculateFlowstateLuck(personalBest)
+        event.addLuck(luck)
+        val stack = ItemUtils.createItemStack(
+            Items.enchanted_book,
+            "§a✴ Flowstate Personal Best",
+            arrayOf(
+                "§8Enchantment",
+                "",
+                "§7Value: §a+$luck✴",
+                "",
+                "§8Gain more by getting a higher flowstate personal best",
+                "§8Maxes out at §a+10✴ §8luck",
+            ),
+        )
+        event.addItem(stack)
+    }
 }
 
-enum class FlowstateElements(val label: String, var renderable: Renderable = Renderable.string("")) {
-    TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
+enum class FlowstateElements(val label: String, var renderable: Renderable = StringRenderable("")) {
+    TITLE("§d§lFlowstate Helper", StringRenderable("§d§lFlowstate Helper")),
     TIMER("§fTime Remaining: §b9.71"),
     STREAK("§7Streak: §f123/200"),
     SPEED("§6+600⸕"),
     COMPACT("§7x40 §6+120⸕ §b(9.71)"),
+    PERSONAL_BEST("§7Personal Best: §780§8/§d750"),
     ;
 
     override fun toString() = label
@@ -171,27 +245,37 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
             TIMER -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                Renderable.string("§7Time Remaining: ${timeRemaining.formatTime()}")
+                StringRenderable("§7Time Remaining: ${timeRemaining.formatTime()}")
             }
 
             STREAK -> {
                 val textColor = getStreakColor()
                 val string = "§7Streak: $textColor$blockBreakStreak"
-                Renderable.string(string + if (blockBreakStreak < 200) "§8/200" else "")
+                StringRenderable(string + if (blockBreakStreak < 200) "§8/200" else "")
             }
 
             SPEED -> {
-                Renderable.string("§6+${getSpeedBonus()}⸕")
+                StringRenderable("§6+${getSpeedBonus()}⸕")
             }
 
             COMPACT -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                Renderable.string(
+                StringRenderable(
                     "§7x${getStreakColor()}$blockBreakStreak " +
                         "§6+${getSpeedBonus()}⸕ " +
                         timeRemaining.formatTime(),
                 )
+            }
+
+            PERSONAL_BEST -> {
+                if (blockBreakStreak <= personalBest) {
+                    StringRenderable(
+                        "§7Personal Best: §7${getStreakColor()}$blockBreakStreak§8/§d$personalBest",
+                    )
+                } else {
+                    StringRenderable("§d§lNew Personal Best ${getStreakColor()}$blockBreakStreak")
+                }
             }
 
             else -> return
