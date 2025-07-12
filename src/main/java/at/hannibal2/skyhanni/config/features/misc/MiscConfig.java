@@ -399,6 +399,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "NEU Soul Path Find", desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.")
     @ConfigEditorBoolean
+    @OnlyLegacy
     @FeatureToggle
     public boolean neuSoulsPathFind = true;
 
