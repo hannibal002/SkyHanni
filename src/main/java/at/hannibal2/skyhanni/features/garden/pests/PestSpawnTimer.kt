@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.average
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -178,7 +179,7 @@ object PestSpawnTimer {
             "§eLast pest spawned: §b$timeSinceLastPest ago"
         }
 
-        lineMap[PestTimerTextEntry.PEST_TIMER] = Renderable.string(lastPestSpawned)
+        lineMap[PestTimerTextEntry.PEST_TIMER] = StringRenderable(lastPestSpawned)
 
         val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
@@ -192,11 +193,11 @@ object PestSpawnTimer {
             "§ePest Cooldown: §b$cooldownValue"
         }
 
-        lineMap[PestTimerTextEntry.PEST_COOLDOWN] = Renderable.string(pestCooldown)
+        lineMap[PestTimerTextEntry.PEST_COOLDOWN] = StringRenderable(pestCooldown)
 
         val averageSpawn = averageSpawnTime.format()
         if (averageSpawnTime != 0.seconds) {
-            lineMap[PestTimerTextEntry.AVERAGE_PEST_SPAWN] = Renderable.string("§eAverage time to spawn: §b$averageSpawn")
+            lineMap[PestTimerTextEntry.AVERAGE_PEST_SPAWN] = StringRenderable("§eAverage time to spawn: §b$averageSpawn")
         }
 
         return formatDisplay(lineMap)

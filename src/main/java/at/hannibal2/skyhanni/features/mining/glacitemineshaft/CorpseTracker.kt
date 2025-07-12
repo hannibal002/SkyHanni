@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
@@ -125,7 +126,7 @@ object CorpseTracker {
             val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.repoItemName else "§eCorpse Keys"
             val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
             add(
-                if (applicableKeys.count() == 1) Renderable.string(keyFormat).toSearchable()
+                if (applicableKeys.count() == 1) StringRenderable(keyFormat).toSearchable()
                 else Renderable.hoverTips(
                     keyFormat,
                     keyCostStrings,

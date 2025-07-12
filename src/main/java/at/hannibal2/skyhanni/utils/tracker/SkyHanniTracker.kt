@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -91,7 +92,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
-        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
+        if (!currentlyOpen && config.hideOutsideInventory && this is SkyHanniItemTracker) {
             return
         }
         if (RenderData.outsideInventory) {
@@ -196,12 +197,18 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    fun initRenderer(position: () -> Position, inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY, condition: () -> Boolean) {
+    fun initRenderer(
+        position: () -> Position,
+        inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY,
+        onlyOnIsland: IslandType? = null,
+        condition: () -> Boolean,
+    ) {
         RenderDisplayHelper(
             inventory,
             outsideInventory = true,
             inOwnInventory = true,
             condition = condition,
+            onlyOnIsland = onlyOnIsland,
             onRender = {
                 renderDisplay(position())
             },

@@ -3,10 +3,16 @@ package at.hannibal2.skyhanni.config.features.mining.orderedwaypoints
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class OrderedWaypointsConfig {
+
+    @ConfigOption(name = "Credits", desc = "This feature is from Coleweight and SoopyV2, huge thanks to them!")
+    @ConfigEditorInfoText
+    var notice: String = ""
+
     @Expose
     @ConfigOption(name = "Enable Ordered Waypoints", desc = "Enables ordered waypoints.")
     @ConfigEditorBoolean

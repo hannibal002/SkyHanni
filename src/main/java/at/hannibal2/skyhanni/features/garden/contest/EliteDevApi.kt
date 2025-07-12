@@ -14,10 +14,10 @@ import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.minutes
 
 object EliteDevApi {
-
-    private const val API_NAME = "Elitebot Farming Contests"
-    private const val ELITEBOT_API_URL = "https://api.elitebot.dev"
-    private const val CONTEST_API_URL = "$ELITEBOT_API_URL/contests/at/now"
+    private val contestStatic = ApiUtils.StaticApiPath(
+        "https://api.elitebot.dev/contests/at/now",
+        "Elitebot Farming Contests"
+    )
     private val contestDuration = 20.minutes
 
     @KSerializable
@@ -48,8 +48,9 @@ object EliteDevApi {
         val endTime = startTime + contestDuration
     }
 
-    fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
-        val jsonContestsResponse = ApiUtils.getJSONResponse(CONTEST_API_URL, apiName = API_NAME).asJsonObject
+    suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
+        val jsonContestsResponse = ApiUtils.getJSONResponse(contestStatic)
+            ?: return null
         val contestResponse = ConfigManager.gson.fromJson<ContestsResponse>(jsonContestsResponse)
         if (contestResponse.complete) contestResponse.responseContests
         else {
@@ -71,22 +72,24 @@ object EliteDevApi {
         null
     }
 
-    fun submitContests(contests: List<EliteFarmingContest>) = try {
+    suspend fun submitContests(contests: List<EliteFarmingContest>) = try {
         val body = ConfigManager.gson.toJson(
             contests.associate { contest ->
                 contest.startTime.toMillis() / 1000 to contest.crops.map { crop -> crop.cropName }
             },
         )
-        val success = ApiUtils.postJSONIsSuccessful(CONTEST_API_URL, body, apiName = API_NAME)
-
-        if (success) {
+        val apiResponse = ApiUtils.postJSON(contestStatic, body)
+        apiResponse.message
+        if (apiResponse.success) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
-        } else {
-            ErrorManager.logErrorStateWithData(
-                "Something went wrong submitting upcoming contests!",
-                "submitContestsToElite not successful",
-            )
-        }
+        } else ErrorManager.logErrorStateWithData(
+            "Something went wrong submitting upcoming contests!",
+            "submitContestsToElite not successful",
+            extraData = listOf(
+                "apiResponse.message" to apiResponse.message,
+                "apiResponse.data" to apiResponse.data,
+            ).toTypedArray()
+        )
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
             e, "Failed to submit upcoming contests. Please report this error if it continues to occur.",

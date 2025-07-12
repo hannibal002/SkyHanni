@@ -21,21 +21,25 @@ open class ItemStackRenderable(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     open val highlight: Boolean = false,
 ) : TimeDependentRenderable() {
-    val stack: ItemStack = item.copy().apply {
+    open val stack: ItemStack = item.copy().apply {
         if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
     }
 
     override val width = (15.5 * scale + 0.5).toInt() + xSpacing
     override val height = (15.5 * scale + 0.5).toInt() + ySpacing
 
-    override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
+    override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         stack.renderOnScreen(
-            xSpacing / 2.0f,
-            0F,
+            xSpacing / 2f,
+            0f,
             scaleMultiplier = scale,
             rescaleSkulls,
         )
     }
 
-    fun withTip() = Renderable.hoverTips(stack, stack.getTooltipCompat(false), stack = stack)
+    fun withTip() = Renderable.hoverTips(
+        stack,
+        stack.getTooltipCompat(false),
+        stack = stack
+    )
 }

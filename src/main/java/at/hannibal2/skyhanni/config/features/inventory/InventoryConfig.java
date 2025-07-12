@@ -162,6 +162,11 @@ public class InventoryConfig {
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
+    @ConfigOption(name = "Attribute Shards", desc = "")
+    @Accordion
+    public AttributeShardsConfig attributeShards = new AttributeShardsConfig();
+
+    @Expose
     @ConfigOption(name = "Evolving Items", desc = "")
     @Accordion
     @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
@@ -272,6 +277,16 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean ultimateEnchantStar = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Old SkyBlock Menu",
+        desc = "Show old buttons in the SkyBlock Menu: Trade, Accessories, Potions, Quiver, Fishing and Sacks. " +
+            "§cOnly works with the booster cookie effect active."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean oldSkyBlockMenu = false;
 
     @Expose
     @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")

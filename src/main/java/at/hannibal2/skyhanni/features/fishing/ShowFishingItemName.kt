@@ -15,7 +15,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.entity.item.EntityItem
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -37,8 +38,8 @@ object ShowFishingItemName {
     fun onTick() {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
-            val itemStack = entityItem.entityItem
-            // Hypixel sometimes replaces the bait item midair with a stone
+            val itemStack = entityItem.entityItem.orNull() ?: continue
+            // On 1.8 if the itemstack is null it returns stone instead
             if (itemStack.displayName.removeColor() == "Stone") continue
             var text = ""
 

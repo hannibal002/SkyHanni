@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
+import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
@@ -73,6 +74,11 @@ class PlayerSpecificStorage {
         @Expose
         var personalBest: Int = 0
 
+        /**
+         * Do NOT use if you are trying to get the players total user luck
+         *
+         * @see UserLuckBreakdown.getTotalUserLuck
+         */
         @Expose
         var userLuck: Float = 0f
     }

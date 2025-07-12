@@ -106,6 +106,12 @@ object IslandTypeTags {
     )
 
     // Foraging
+    val FORAGING = IslandTypeTag(
+        "foraging",
+        IslandType.THE_PARK,
+        IslandType.GALATEA,
+        IslandType.HUB,
+    )
     val FORAGING_CUSTOM_TREES = IslandTypeTag(
         "foraging_custom_trees",
         IslandType.GALATEA,

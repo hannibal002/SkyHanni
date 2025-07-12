@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.line
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import kotlinx.coroutines.launch
 
 @SkyHanniModule
@@ -178,7 +179,7 @@ object CropMoneyDisplay {
                 val bazaarData = internalName.getBazaarData()
                 val price =
                     if (SkyBlockUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
-                    else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
+                    else (bazaarData.instantSellPrice + bazaarData.instantBuyPrice) / 320
                 extraMoneyPerHour.dicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
@@ -195,9 +196,9 @@ object CropMoneyDisplay {
                 ChatUtils.debug(message)
                 ready = false
                 loaded = false
-                return Renderable.string("§eStill Loading...")
+                return StringRenderable("§eStill Loading...")
             }
-            return Renderable.string("§cFarm crops to add them to this list!")
+            return StringRenderable("§cFarm crops to add them to this list!")
         }
         val cropList = createDescendingCropList(moneyPerHour)
         return Renderable.vertical {
@@ -319,8 +320,8 @@ object CropMoneyDisplay {
         val bazaarData = internalName.getBazaarData() ?: return null
 
         val npcCoins = internalName.getNpcPrice() * cropsPerHour
-        val sellOfferCoins = bazaarData.sellOfferPrice * cropsPerHour
-        val instantSellCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val sellOfferCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val instantSellCoins = bazaarData.instantSellPrice * cropsPerHour
         val bountifulCoins = if (toolHasBountiful?.get(crop) == true && config.bountiful) speedPerHour * 0.2 else 0.0
 
         return CropMoneyData(
