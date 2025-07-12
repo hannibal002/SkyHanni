@@ -12,6 +12,9 @@
 
 + Added Flowstate personal best. - nopo (https://github.com/hannibal002/SkyHanni/pull/4298)
 + Added Superprotectron highlighter. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3875)
++ Added HotM Sky Mall display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
++ Added metal detector solver, mute metal detector option, and all tools alert. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3589)
++ Added gemstone money per hour display when mining. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3586)
 
 #### Combat
 
@@ -37,6 +40,7 @@
 #### Chat
 
 + Notify you in chat when a marked player joins/leaves your lobby. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2653)
++ Added filters for reward bundles reminders, redundant shard hunting messages, and unmineable trees. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4327)
 
 #### Crimson
 
@@ -44,12 +48,24 @@
     + Shows a clickable message that grabs sulphur from your sacks when talking to Sirih while he is a pig.
 + Show Exes, Wais and Zees hitbox. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2665)
 
+#### Inventory
+
++ Added "Old SB Menu" from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4271)
+
+#### Hoppity
+
++ Added option to mute sounds while Hoppity Eggs are "rolling". - Daveed (https://github.com/hannibal002/SkyHanni/pull/4281)
+    + Sub-option available to revert to "1.8 sounds" (eating sound).
+    + Will only apply to the "new" sounds that happen in 1.20 and above.
++ Added option to prevent closing CF when stray timer or strays are active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4067)
+
 ### Improvements
 
-#### #### Inventory
+#### Inventory
 
 + Added Coin Support to Trade Value. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3899)
 + Added Fishing rod upgrades to estimated item value calculator. - hellcat (https://github.com/hannibal002/SkyHanni/pull/3975)
++ Allowed you to change the color of the highlights for the experiments addons helpers. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4338)
 
 #### Fishing
 
@@ -60,6 +76,12 @@
 + Improved the changelog viewer's design to be more in-line with other SkyHanni guis. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4313)
 + Made some of the keybind features work with items in REI overlays. - nopo (https://github.com/hannibal002/SkyHanni/pull/4318)
 + Reduced memory usage with a large amount of text rendering. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4316)
++ Added new sounds to Sound Responses. - cato (https://github.com/hannibal002/SkyHanni/pull/3363)
++ Improved Sound Responses onomatopoeia recognition. - cato (https://github.com/hannibal002/SkyHanni/pull/3363)
+
+#### Commands
+
++ Added /shresetkeybinds. - nopo (https://github.com/hannibal002/SkyHanni/pull/4340)
 
 ### Fixes
 
@@ -72,6 +94,16 @@
 + Fixed Color month names not working on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4321)
 + Fixed Hide piggy not working on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4321)
 + Fixed Incompatibilities between Neu and SkyHanni experimentation addons helper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4322)
++ Fixed changelog viewer text sometimes being in the wrong spot. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3504)
++ Fixed rare lagging issue when checking clock time. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+
+#### Chat
+
++ Fixed Hide lottery messages only hiding the buff message and not all lottery messages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4339)
+
+#### Inventory
+
++ Fixed Next Click Helper for experiments requiring Prevent Misclicks to be on to function properly. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4338)
 
 ### Technical Details
 
@@ -92,6 +124,32 @@
     + Use `ItemStackRenderable` moving forward.
 + Renamed renderable params from posX/posY to mousePosX/mousePosY. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4215)
 + Started porting `misc` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4075)
++ Added .inMinesOfDivan to MiningAPI. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3589)
++ Added `GuiOnTopRenderEvent`. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3504)
+    + A GuiRenderEvent that renders as overlay outside inventory and inside an inventory as an ChestOverlay.
++ Added debug command for fetching moulberry lbin prices. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+    + `/shfetchmoulblbins`.
++ Added debug feature to show bin prices of items. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4341)
++ Added deprecation to `SkyHanniMod.coroutineScope`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+    + Should be using `.launchCoroutine` or `launchIOCoroutine`.
++ Added KDocs to most functions in `ApiUtils`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
++ Added more Brigadier Argument Types. - Empa (https://github.com/hannibal002/SkyHanni/pull/4304)
++ Added more structure to ApiUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+    + You can define static Api routes ahead of time as vals.
+    + You can specify explicit typing for ApiResponse.
+    + Functions will need to be `suspend` marked to use ApiUtils now.
++ Added Renderable Test Suite. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3504)
+    + A way to add tests for renderables. Which can be called activated with `/shrenderable`.
++ Added the ability to give more info on why a config option is disabled when people view it. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4334)
++ Finished porting `misc` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4087)
++ Refactored `KuudraTier` to an enum class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4328)
++ Removed deprecated functions: `Renderable.string` and `Renderable.wrappedString`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4264)
+    + Use `[Wrapped]StringRenderable` moving forward.
++ Removed deprecated functions: `Renderable.verticalContainer` and `Renderable.horizontalContainer`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4264)
+    + Use `[Vertical/Horizontal]ContainerRenderable` moving forward.
++ Removed unnecessary config migrations. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4335)
++ Silenced most errors related to `ApiUtils`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+    + If you need to debug, use the "ApiUtils never silent" debug option.
 
 ## Version 4.0.0
 

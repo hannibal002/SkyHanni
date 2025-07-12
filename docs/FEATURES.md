@@ -67,6 +67,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Plays meow sound when 'meow' appears in chat.
     + Plays bark sound when 'woof' appears in chat.
 + Added option to shorten coin amounts in chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3231)
++ Added filters for reward bundles reminders, redundant shard hunting messages, and unmineable trees. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4327)
 
 </details>
 <details open><summary>
@@ -283,6 +284,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Coral Fish Helper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4243)
     + Shows missing fishes for the NPC, sorted by price.
 + Added option to keep clicked items visible within Superpairs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4081)
++ Added "Old SB Menu" from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4271)
 
 </details>
 <details open><summary>
@@ -1024,6 +1026,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to mute High Heat Sound in Magma Fields. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2573)
 + Added Current Powder line on HOTM perk hover. - munkuk (https://github.com/hannibal002/SkyHanni/pull/3956)
 + Added Flowstate personal best. - nopo (https://github.com/hannibal002/SkyHanni/pull/4298)
++ Added gemstone money per hour display when mining. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3586)
++ Added HotM Sky Mall display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
++ Added metal detector solver, mute metal detector option, and all tools alert. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3589)
 
 </details>
 <details open><summary>
@@ -1061,6 +1066,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows the value of the shards.
 + Added profit per Agatha Coupon in Agatha's Shop. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4250)
 + Added Compact messages for sweep details. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4259)
++ Added HotF Lottery display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
 
 </details>
 <details open><summary>
@@ -1190,6 +1196,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Navigate to the very right using the Event History keys.
 + Added Chocolate Factory Hot Chocolate Mixin Block. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3024)
     + Blocks opening Chocolate Factory without Hot Chocolate Mixin active.
++ Added option to mute sounds while Hoppity Eggs are "rolling". - Daveed (https://github.com/hannibal002/SkyHanni/pull/4281)
+    + Sub-option available to revert to "1.8 sounds" (eating sound).
+    + Will only apply to the "new" sounds that happen in 1.20 and above.
++ Added option to prevent closing CF when stray timer or strays are active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4067)
 
 ### The Carnival
 
