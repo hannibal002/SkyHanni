@@ -29,7 +29,9 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -419,6 +421,17 @@ object SkyHanniDebugsAndTests {
 
         event.toolTip.add("§7BZ instantSellPrice: ${instantSellPrice.addSeparators()}")
         event.toolTip.add("§7BZ instantBuyPrice: ${instantBuyPrice.addSeparators()}")
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowBinPrice(event: ToolTipEvent) {
+        if (!debugConfig.showBinPrice) return
+        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+        if (!internalName.isAuctionHouseItem()) return
+
+        val binPrice = internalName.getPrice()
+
+        event.toolTip.add("§7Bin Price: ${binPrice.addSeparators()}")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
