@@ -17,35 +17,27 @@ object RepoUtils {
         file.delete()
     }
 
-    fun unzipIgnoreFirstFolder(zipFilePath: String, destinationDirectory: String) {
-        val destDir = File(destinationDirectory).also {
-            if (!it.exists()) it.mkdirs()
-        }
-        val destPath = destDir.toPath().toRealPath()
-
+    fun unzipIgnoreFirstFolder(zipFilePath: String, fs: RepoFileSystem) {
         ZipFile(zipFilePath).use { zip ->
             zip.entries().asSequence()
                 .filter { !it.isDirectory }
                 .forEach { entry ->
-                    val relative = entry.name.substringAfter('/', "").takeIf {
-                        it.isNotBlank()
-                    } ?: return@forEach
+                    val relative = entry.name
+                        .substringAfter('/', "")
+                        .takeIf { it.isNotBlank() }
+                        ?: return@forEach
 
-                    val outPath = destPath.resolve(relative).normalize().takeIf {
-                        it.startsWith(destPath)
-                    } ?: throw RuntimeException(
-                        "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                            "please report this on the SkyHanni discord."
-                    )
-
-                    Files.createDirectories(outPath.parent)
-                    zip.getInputStream(entry).use { input ->
-                        Files.copy(
-                            input,
-                            outPath,
-                            StandardCopyOption.REPLACE_EXISTING
+                    if (fs is DiskRepoFileSystem) {
+                        // Security: ensure the file is within the root directory
+                        val outPath = fs.root.toPath().resolve(relative).normalize()
+                        if (!outPath.startsWith(fs.root.toPath())) throw RuntimeException(
+                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                                "please report this on the SkyHanni discord."
                         )
                     }
+
+                    val data = zip.getInputStream(entry).readBytes()
+                    fs.write(relative, data)
                 }
         }
     }

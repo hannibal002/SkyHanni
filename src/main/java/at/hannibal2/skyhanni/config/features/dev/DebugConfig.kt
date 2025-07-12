@@ -151,6 +151,15 @@ class DebugConfig {
     var printMissingBazaarItems: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Unzip Repo to Memory",
+        desc = "Instead of unzipping the repo directly to disk, unzip it to memory first, " +
+            "and start a background thread to write it to disk."
+    )
+    @ConfigEditorBoolean
+    var unzipRepoToMemory: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Hot Swap Detection", desc = "Show chat messages when Hot Swap starts and ends.")
     @ConfigEditorBoolean
     var hotSwapDetection: Boolean = false

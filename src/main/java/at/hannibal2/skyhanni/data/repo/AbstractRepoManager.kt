@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import com.google.gson.Gson
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.minecraft.util.IChatComponent
 import java.io.File
 import java.lang.reflect.Type
@@ -63,6 +65,7 @@ abstract class AbstractRepoManager(
     private val unsuccessfulConstants = mutableSetOf<String>()
     private val githubRepoLocation: GitHubUtils.RepoLocation
         get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
+    val fetchMutex = Mutex()
 
     open val shouldRegisterUpdateCommand: Boolean = true
     open val shouldRegisterStatusCommand: Boolean = true
@@ -72,18 +75,19 @@ abstract class AbstractRepoManager(
     abstract val statusCommand: String
     abstract val reloadCommand: String
 
-    var currentlyFetching = false
+    var repoFileSystem: RepoFileSystem = DiskRepoFileSystem(repoDirectory)
         private set
-    private var currentlyReloading: Boolean = false
-    private var shouldManuallyReload: Boolean = false
-    private var loadingError: Boolean = false
-    private var downloadFailed: Boolean = false
 
-    var commitTime: SimpleTimeMark? = null
+    var localRepoCommit: RepoCommit = RepoCommit()
         private set
 
     var isUsingBackup: Boolean = false
         private set
+
+    private var currentlyReloading: Boolean = false
+    private var shouldManuallyReload: Boolean = false
+    private var loadingError: Boolean = false
+    private var downloadFailed: Boolean = false
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
@@ -118,13 +122,16 @@ abstract class AbstractRepoManager(
         type: Type? = null,
         gson: Gson = getGson(),
     ): T = runCatching {
-        if (!repoDirectory.exists()) logger.throwError("Repo folder does not exist!")
-
-        val jsonFile = File(repoDirectory, "$directory/$fileName.json")
-        if (!jsonFile.isFile) logger.throwError("Repo file '$fileName' not found.")
-
-        val jsonContent = jsonFile.getJson()
-            ?: logger.throwError("Repo file '$fileName' could not be loaded as a valid JSON file.")
+        val path = "$directory/$fileName.json"
+        val jsonContent = when {
+            repoFileSystem.exists(path) -> repoFileSystem.readAllBytesAsJsonElement(path)
+            else -> {
+                if (!repoDirectory.exists()) logger.throwError("Repo folder does not exist!")
+                val jsonFile = File(repoDirectory, "$directory/$fileName.json")
+                if (!jsonFile.isFile) logger.throwError("Repo file '$fileName' not found.")
+                jsonFile.getJson()
+            }
+        } ?: logger.throwError("Repo file '$fileName' could not be loaded as a valid JSON file.")
 
         return if (type == null) gson.fromJson<T>(jsonContent)
         else gson.fromJson(jsonContent, type)
@@ -212,10 +219,7 @@ abstract class AbstractRepoManager(
                 ?: logger.throwError("Failed to find backup repo resource at '$backupRepoResourcePath'")
 
             Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            RepoUtils.unzipIgnoreFirstFolder(
-                zipFilePath = repoZipFile.absolutePath,
-                destinationDirectory = repoDirectory.absolutePath,
-            )
+            prepAndUnzipToRepoFileSys(repoZipFile.absolutePath)
 
             commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
             logger.debug("Successfully switched to backup repo")
@@ -225,15 +229,11 @@ abstract class AbstractRepoManager(
     }
 
     /**
-     * todo write kdoc
+     * Wrapper around [fetchAndUnpackRepo], which holds a lock to prevent multiple fetches at the same time.
      */
-    private suspend fun tryFetchRepository(command: Boolean, silentError: Boolean = true) {
-        if (currentlyFetching) return
-        currentlyFetching = true
+    private suspend fun tryFetchRepository(command: Boolean, silentError: Boolean = true) = fetchMutex.withLock {
         fetchAndUnpackRepo(command, silentError)
-        currentlyFetching = false
     }
-
 
     open fun reportExtraStatusInfo(): Unit = Unit
 
@@ -289,8 +289,8 @@ abstract class AbstractRepoManager(
      * @param silentError If true, will not log errors to the console.
      */
     private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true): Boolean {
-        val (currentSha, currentCommitTime) = commitStorage.readFromFile() ?: RepoCommit()
-        commitTime = currentCommitTime
+        localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
+        val (currentSha, currentCommitTime) = localRepoCommit
 
         val (latestSha, latestCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
             response.sha to response.commit.committer.date
@@ -324,17 +324,22 @@ abstract class AbstractRepoManager(
             downloadFailed = true
             logger.logError("Failed to download the repo zip file from GitHub.")
         }
+        prepAndUnzipToRepoFileSys(repoZipFile.absolutePath)
 
-        RepoUtils.unzipIgnoreFirstFolder(
-            zipFilePath = repoZipFile.absolutePath,
-            destinationDirectory = repoDirectory.absolutePath,
-        )
-
-        commitStorage.writeToFile(RepoCommit(latestSha, latestCommitTime))
-        commitTime = latestCommitTime
+        localRepoCommit = RepoCommit(latestSha, latestCommitTime)
+        commitStorage.writeToFile(localRepoCommit)
         downloadFailed = false
         isUsingBackup = false
         return true
+    }
+
+    fun prepAndUnzipToRepoFileSys(zipFilePath: String) {
+        val expectedType = if (debugConfig.unzipRepoToMemory) InMemoryRepoFileSystem::class.java else DiskRepoFileSystem::class.java
+        if (!expectedType.isAssignableFrom(repoFileSystem::class.java)) {
+            repoFileSystem = if (debugConfig.unzipRepoToMemory) InMemoryRepoFileSystem()
+            else DiskRepoFileSystem(repoZipFile)
+        }
+        RepoUtils.unzipIgnoreFirstFolder(zipFilePath, repoFileSystem)
     }
 
     fun reloadLocalRepo(answerMessage: String = "$commonName Repo loaded from local files successfully.") {

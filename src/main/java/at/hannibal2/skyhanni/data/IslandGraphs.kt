@@ -704,11 +704,10 @@ object IslandGraphs {
             extraData["area scoreboard"] = scoreboardArea
         }
 
-        RepoManager.commitTime?.let {
-            extraData["repo update time"] = it.toString()
-            extraData["repo update age"] = it.passedSince()
-        } ?: run {
-            extraData["repo update time"] = "none"
+        RepoManager.localRepoCommit.let { (hash, time) ->
+            extraData["repo update time"] = time?.toString() ?: "none"
+            extraData["repo update age"] = time?.passedSince() ?: "unknown"
+            extraData["repo update hash"] = hash ?: "none"
         }
 
         ErrorManager.logErrorStateWithData(

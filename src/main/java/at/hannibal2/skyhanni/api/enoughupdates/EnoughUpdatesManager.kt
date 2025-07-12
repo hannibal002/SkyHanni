@@ -74,7 +74,7 @@ object EnoughUpdatesManager {
 
     private var isLoading = false
 
-    fun inLoadingState() = isLoading || EnoughUpdatesRepoManager.currentlyFetching
+    fun inLoadingState() = isLoading || EnoughUpdatesRepoManager.fetchMutex.isLocked
 
     val logger get() = EnoughUpdatesRepoManager.logger
 
