@@ -159,7 +159,7 @@ object SkyHanniRenderLayers {
     fun getChromaTextured() = SkyHanniRenderLayers::getChromaTexturedWithIdentifier
     //#else
     //$$ fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
-    //$$ fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
+    //$$ fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
     //#endif
 
 }

@@ -123,7 +123,11 @@ enum class SkyHanniRenderPipeline(
         //#endif
     ),
     CHROMA_STANDARD(
+        //#if MC < 1.21.6
         snippet = RenderPipelines.MATRICES_SNIPPET,
+        //#else
+        //$$ snippet = RenderPipelines.TRANSFORMS_AND_PROJECTION_SNIPPET,
+        //#endif
         vFormat = VertexFormats.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "standard_chroma",
