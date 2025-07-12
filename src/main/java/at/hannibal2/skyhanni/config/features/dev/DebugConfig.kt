@@ -94,6 +94,11 @@ class DebugConfig {
     var showBZPrice: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Show Bin Price", desc = "Show Bin price in item lore.")
+    @ConfigEditorBoolean
+    var showBinPrice: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     var showItemUuid: Boolean = false
