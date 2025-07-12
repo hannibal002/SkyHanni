@@ -35,7 +35,7 @@ object OldSkyblockMenu {
                 it.disabled = !invItem.isStainedGlassPane()
             }
         },
-        closeInventory = {
+        closeInventory = { _ ->
             // Reset all buttons to enabled when the menu is closed
             SkyBlockButton.entries.forEach { it.disabled = false }
         },
