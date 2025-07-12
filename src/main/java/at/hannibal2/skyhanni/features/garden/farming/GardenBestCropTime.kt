@@ -18,6 +18,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -73,7 +75,7 @@ object GardenBestCropTime {
         }
     }
 
-    fun drawBestDisplay(currentCrop: CropType?) = Renderable.verticalContainer(
+    fun drawBestDisplay(currentCrop: CropType?) = VerticalContainerRenderable(
         buildList {
             if (timeTillNextCrop.size < CropType.entries.size) {
                 updateTimeTillNextCrop()
@@ -130,7 +132,7 @@ object GardenBestCropTime {
         val isCurrent = crop == currentCrop
         if (index > config.next.showOnlyBest.get() && (!config.next.showCurrent.get() || !isCurrent)) return null
 
-        return Renderable.horizontalContainer(
+        return HorizontalContainerRenderable(
             buildList {
                 if (!config.next.bestCompact.get()) {
                     addString("§7$index# ")

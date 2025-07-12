@@ -29,6 +29,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.Objects
@@ -42,19 +45,16 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                Renderable.string("$prefix$formattedAmount")
+                StringRenderable("$prefix$formattedAmount")
             },
         ),
         ICON(
             "§e✎",
             { entry, _ ->
-                val itemIcon = entry.neuInternalName?.getItemStackOrNull()
-                if (itemIcon != null) {
-                    Renderable.itemStack(itemIcon)
-                } else {
-                    ItemNameResolver.getInternalNameOrNull(entry.name)?.let { Renderable.itemStack(it.getItemStack()) }
-                        ?: Renderable.string("§c?")
-                }
+                val entryInternalName = entry.neuInternalName ?: ItemNameResolver.getInternalNameOrNull(entry.name)
+                val itemIcon = entryInternalName?.getItemStackOrNull()
+                if (itemIcon != null) ItemStackRenderable(itemIcon)
+                else StringRenderable("§c?")
             },
         ),
         ITEM_NAME(
@@ -64,7 +64,7 @@ object ItemPickupLog {
                 if (entry.name == "Air") {
                     name = entry.neuInternalName?.repoItemName ?: "?"
                 }
-                Renderable.string(name)
+                StringRenderable(name)
             },
         ),
         ;
@@ -268,7 +268,7 @@ object ItemPickupLog {
         if (display.isEmpty()) {
             this.display = null
         } else {
-            val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
+            val renderable = VerticalContainerRenderable(display, verticalAlign = config.alignment)
             this.display = Renderable.fixedSizeColumn(renderable, 30)
         }
     }

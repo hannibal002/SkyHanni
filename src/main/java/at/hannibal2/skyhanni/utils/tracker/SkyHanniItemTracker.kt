@@ -25,6 +25,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
@@ -170,7 +172,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
                     // TODO remove unnecessary update call, as both invokes above call the modify fun. in modify there is also a update call
                     update()
                 },
-            ) else Renderable.string(string)
+            ) else StringRenderable(string)
 
             val row = mutableMapOf<TextPart, Renderable>()
             row[TextPart.NAME] = string(" $displayName")
@@ -181,7 +183,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
                 internalName.getItemStackOrNull()
             }
             itemStackOrNull?.let {
-                row[TextPart.ICON] = Renderable.itemStack(it)
+                row[TextPart.ICON] = ItemStackRenderable(it)
             }
 
             row[TextPart.TOTAL_PRICE] = string(" $priceFormat")

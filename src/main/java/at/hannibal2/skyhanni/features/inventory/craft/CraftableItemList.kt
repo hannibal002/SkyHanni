@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrE
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -68,7 +69,7 @@ object CraftableItemList {
         } else {
             buildList<Renderable> {
                 val items = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
-                add(Renderable.string("§e§lCraftable Items §7(${items.size})"))
+                add(StringRenderable("§e§lCraftable Items §7(${items.size})"))
                 add(items.buildSearchableScrollable(height = 250, textInput, velocity = 20.0))
             }
         }

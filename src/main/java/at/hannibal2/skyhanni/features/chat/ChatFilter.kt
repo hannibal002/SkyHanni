@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
@@ -27,6 +28,13 @@ object ChatFilter {
     private val generalConfig get() = SkyHanniMod.feature.chat
     private val config get() = SkyHanniMod.feature.chat.filterType
     private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
+    private val foragingConfig get() = config.foraging
+    private val huntingConfig get() = config.hunting
+
+    private val chatFilterGroup = RepoPattern.group("chat-filter")
+    private val huntingPatternGroup = chatFilterGroup.group("hunting")
+    private val foragingPatternGroup = chatFilterGroup.group("foraging")
+    private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -448,6 +456,39 @@ object ChatFilter {
         "§4This Teleport Pad does not have a destination set!",
     )
 
+    /**
+     ** REGEX-TEST: §eYou haven't claimed your §r§6Summer Rewards §r§eyet!
+     ** REGEX-TEST: §eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
+     ** REGEX-TEST: §eTalk to the §r§bRandom NPC §r§ein the §r§aForbidden Zone§r§e!
+     */
+    private val rewardBundlePatterns by miscPatternGroup.list(
+        "seasonal-bundles",
+        "(?:§.)*You haven't claimed your (?:§.)*\\w+ Rewards (?:§.)*yet!",
+        "(?:§.)*Talk to the (?:§.)*.+(?:§.)*in the (?:§.)*.+(?:§.)*!",
+    )
+
+    /**
+     ** REGEX-TEST: §cYou cannot damage a tree while it is regenerating!
+     ** REGEX-TEST: §c§oThe toughness of this tree is way too high!
+     */
+    private val unmineableTreePatterns by foragingPatternGroup.list(
+        "unmineable-tree",
+        "(?:§.)*You cannot damage a tree while it is regenerating!",
+        "(?:§.)*The toughness of this tree is way too high!",
+    )
+
+    /**
+     ** REGEX-TEST: §7§oMochibear ate too much and passed out! You caught it!
+     ** REGEX-TEST: §7§oYou caught yourself an invisibug! The shard was sent to your Hunting Box!
+     ** REGEX-TEST: §7§oThe Frog is exhausted...
+     */
+    private val redundantShardsPatterns by huntingPatternGroup.list(
+        "redundant-comments",
+        "(?:§.)*Mochibear ate too much and passed out! You caught it!",
+        "(?:§.)*You caught yourself an invisibug! The shard was sent to your Hunting Box!",
+        "(?:§.)*The Frog is exhausted\\.\\.\\.",
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -473,6 +514,12 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
+    )
+
+    private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
+        "reward_bundles" to rewardBundlePatterns,
+        "redundant_hunting" to redundantShardsPatterns,
+        "unmineable_tree" to unmineableTreePatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -543,6 +590,7 @@ object ChatFilter {
         config.eventLevelUp && (message.isPresent("event")) -> "event"
 
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
+        config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
@@ -552,6 +600,8 @@ object ChatFilter {
         dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
+        foragingConfig.unmineable && IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && message.isPresent("unmineable_tree") -> "unmineable_tree"
+        huntingConfig.redundantComments && IslandType.GALATEA.isCurrent() && message.isPresent("redundant_hunting") -> "redundant_hunting"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
         config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
 
@@ -630,11 +680,13 @@ object ChatFilter {
      * @return True if the message is present in any of the maps
      * @see messagesMap
      * @see patternsMap
+     * @see repoPatternsMap
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
     private fun String.isPresent(key: String) = this in (messagesMap[key].orEmpty()) ||
         (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+        (repoPatternsMap[key].orEmpty()).any { it.matches(this) } ||
         (messagesContainsMap[key].orEmpty()).any { this.contains(it) } ||
         (messagesStartsWithMap[key].orEmpty()).any { this.startsWith(it) }
 

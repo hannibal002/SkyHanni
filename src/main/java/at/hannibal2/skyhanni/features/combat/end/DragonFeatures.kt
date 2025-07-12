@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.properties.Delegates
 import kotlin.time.Duration.Companion.seconds
@@ -412,7 +413,7 @@ object DragonFeatures {
         }
     }
 
-    private val widgetErrorMessage = listOf(Renderable.string("§cDragon Widget is disabled!"))
+    private val widgetErrorMessage = listOf(StringRenderable("§cDragon Widget is disabled!"))
 
     private var display = listOf<Renderable>()
 

@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
@@ -144,7 +145,7 @@ object EstimatedItemValue {
 
         try {
             // TODO this code needs to be changed around
-            config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
+            config.position.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
             // that tries to over-render the tooltip, and is not explicitly something we can solve here?
@@ -279,11 +280,7 @@ object EstimatedItemValue {
         }
         list.add("§aTotal: §6§l$numberFormat coins")
 
-        val newDisplay = mutableListOf<Renderable>()
-        for (line in list) {
-            newDisplay.add(Renderable.string(line))
-        }
-        return newDisplay
+        return list.map(StringRenderable::from)
     }
 
     @HandleEvent
@@ -296,6 +293,8 @@ object EstimatedItemValue {
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
+
+        event.move(94, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
     }
 
     fun renderInNeuStorageOverlay() {
