@@ -43,7 +43,7 @@ class WrappedStringRenderable(
 ) {
     private val fontRenderer: FontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
     val map by lazy {
-        text.splitLines((width / scale).toInt()).split("\n").associateWith { fontRenderer.getStringWidth(text) }
+        text.splitLines((width / scale).toInt()).split("\n").associateWith { fontRenderer.getStringWidth(it) }
     }
 
     override val width by lazy { (rawWidth * scale).toInt() + 1 }

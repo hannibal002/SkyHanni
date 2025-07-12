@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.storage
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.misc.reminders.Reminder
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -30,4 +31,7 @@ class Storage {
 
     @Expose
     var reminders: MutableMap<String, Reminder> = mutableMapOf()
+
+    @Expose
+    var testRenderablePositions: MutableMap<String, Position> = mutableMapOf()
 }

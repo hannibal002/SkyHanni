@@ -229,7 +229,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Red Scoreboard Numbers",
-        desc = "Hide the red scoreboard numbers on the right side of the screen."
+        desc = "Hide the red scoreboard numbers on the right side of the screen.",
     )
     @OnlyLegacy
     @ConfigEditorBoolean
@@ -245,7 +245,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Color Month Names",
-        desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard."
+        desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -272,7 +272,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Better Sign Editing",
-        desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs."
+        desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.",
     )
     @ConfigEditorBoolean
     @OnlyLegacy
@@ -292,7 +292,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Server Restart Title",
-        desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart."
+        desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -301,7 +301,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Piece Of Wizard Portal",
-        desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal."
+        desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -310,7 +310,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Account Upgrade Reminder",
-        desc = "Remind you to claim community shop account and profile upgrades when complete."
+        desc = "Remind you to claim community shop account and profile upgrades when complete.",
     )
     @ConfigEditorBoolean
     @SearchTag("Elizabeth Community Center")
@@ -326,7 +326,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Fix Patcher Lines",
-        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else."
+        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -359,8 +359,8 @@ class MiscConfig {
     @ConfigEditorBoolean
     var lockMouseLookChatMessage: Boolean = true
 
-    // Does not have a config element!
     @Expose
+    @NoConfigLink
     val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
     @Expose
@@ -386,7 +386,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Charge Bottle Notification",
-        desc = "Send a message when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged."
+        desc = "Send a message when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -395,7 +395,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Unknown Perkpocalypse Mayor Warning",
-        desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown."
+        desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -414,7 +414,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Maintain Volume During Warnings",
-        desc = "Do not change game volume levels when warning sounds are played."
+        desc = "Do not change game volume levels when warning sounds are played.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -423,7 +423,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "NEU Soul Path Find",
-        desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat."
+        desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.",
     )
     @ConfigEditorBoolean
     @OnlyLegacy
@@ -433,7 +433,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Fast Fairy Souls",
-        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. "
+        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. ",
     )
     @ConfigEditorBoolean
     var fastFairySouls: Boolean = false
@@ -441,7 +441,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "GFS Piggy Bank",
-        desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks."
+        desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -477,7 +477,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Transparent Tooltips",
-        desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!"
+        desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!",
     )
     @ConfigEditorBoolean
     var transparentTooltips: Boolean = false
@@ -486,7 +486,8 @@ class MiscConfig {
     @ConfigOption(
         name = "Hide Co-op Member Collections",
         desc = "Hides specific co-op members from collections.\n" +
-            "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) to update the list."
+            "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) " +
+            "to update the list.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
