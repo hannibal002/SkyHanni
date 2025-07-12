@@ -70,11 +70,11 @@ object ColorfulItemStats {
                 val stat = group("Stat")
 
                 "§7${stat}: ${
-                    if (colorStatMap.contains(stat)) colorStatMap[stat] else group("OldColor")
+                    colorStatMap[stat] ?: group("OldColor")
                 }${
                     group("Bonus")
                 }${
-                    if (iconStatMap.contains(stat)) iconStatMap[stat] else ""
+                    iconStatMap[stat] ?: ""
                 }"
             }
         }
