@@ -42,7 +42,7 @@ object SkyBlockXPBar {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(90, "misc.skyblockXpBar", "misc.skyblockXPBar")
+        event.move(95, "misc.skyblockXpBar", "misc.skyblockXPBar")
     }
 
     private fun isEnabled() =

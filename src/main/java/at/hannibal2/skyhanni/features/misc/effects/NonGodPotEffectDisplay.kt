@@ -178,10 +178,10 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
-        event.move(90, "misc.potionEffect.nonGodPotEffectPos", "misc.potionEffect.position")
-        event.move(90, "misc.potionEffect.nonGodPotEffectDisplay", "misc.potionEffect.displayEnabled")
-        event.move(90, "misc.potionEfect.nonGodPotEffectShowMixins", "misc.potionEffect.showMixins")
-        event.move(90, "misc.potionEffect", "misc.nonGodPotEffect")
+        event.move(95, "misc.potionEffect.nonGodPotEffectPos", "misc.potionEffect.position")
+        event.move(95, "misc.potionEffect.nonGodPotEffectDisplay", "misc.potionEffect.displayEnabled")
+        event.move(95, "misc.potionEfect.nonGodPotEffectShowMixins", "misc.potionEffect.showMixins")
+        event.move(95, "misc.potionEffect", "misc.nonGodPotEffect")
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && !DungeonApi.inDungeon() && !KuudraApi.inKuudra

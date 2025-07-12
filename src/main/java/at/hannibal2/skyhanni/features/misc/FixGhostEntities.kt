@@ -99,6 +99,6 @@ object FixGhostEntities {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(94, "misc.hideTemporaryArmorstands", "misc.hideTemporaryArmorStands")
+        event.move(95, "misc.hideTemporaryArmorstands", "misc.hideTemporaryArmorStands")
     }
 }
