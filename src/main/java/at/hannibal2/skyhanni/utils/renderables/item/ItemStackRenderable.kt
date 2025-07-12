@@ -28,7 +28,7 @@ open class ItemStackRenderable(
     override val width = (15.5 * scale + 0.5).toInt() + xSpacing
     override val height = (15.5 * scale + 0.5).toInt() + ySpacing
 
-    override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
+    override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         stack.renderOnScreen(
             xSpacing / 2f,
             0f,

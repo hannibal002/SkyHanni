@@ -31,8 +31,7 @@ import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
 //#else
-//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
-//$$ import net.minecraft.client.render.RenderLayer
+//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.joml.Matrix4f
 //#endif
@@ -269,7 +268,7 @@ object GuiRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1f, 1f, 1f, 1f)
         //#else
-        //$$ DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        //$$ DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
         //#endif
     }
 

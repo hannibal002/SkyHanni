@@ -61,7 +61,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -355,8 +355,7 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(GuiKeyPressEvent::class)
     fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val focussedSlot = slotUnderCursor() ?: return
-        val stack = focussedSlot.stack ?: return
+        val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)

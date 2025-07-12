@@ -105,17 +105,14 @@ open class TitleContext(
             val renderableWidth = targetRenderable.width
             val renderableHeight = targetRenderable.height
 
-            val posX = (guiWidth - renderableWidth) / 2
-            var posY = position.y
+            val translationX = (guiWidth - renderableWidth) / 2
             // moving the display to the bottom half of your screen is futile
-            if (posY < 0) {
-                posY = 100
-            }
-            if (posX != position.x || posY != position.y) {
-                position.set(Position(posX, posY, scale = position.scale))
+            val translationY = position.y.takeIf { it >= 0 } ?: 100
+            if (translationX != position.x || translationY != position.y) {
+                position.set(Position(translationX, translationY, scale = position.scale))
             }
 
-            DrawContextUtils.translate(posX.toFloat(), posY.toFloat(), 0f)
+            DrawContextUtils.translate(translationX.toFloat(), translationY.toFloat(), 0f)
             targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
 
             if (intentionPosition != null) {
