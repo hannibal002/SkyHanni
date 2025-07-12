@@ -36,6 +36,14 @@ class DebugConfig {
     var modMenuLog: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "ApiUtils Never Silent",
+        desc = "Forces ApiUtils' `silentError` to always be false, so that errors always debug to ErrorManager."
+    )
+    @ConfigEditorBoolean
+    var apiUtilsNeverSilent: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Show Internal Name", desc = "Show internal names in item lore.")
     @ConfigEditorBoolean
     var showInternalName: Boolean = false
