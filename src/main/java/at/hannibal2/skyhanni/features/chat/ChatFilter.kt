@@ -521,7 +521,7 @@ object ChatFilter {
         "redundant-comments",
         "(?:§.)*Mochibear ate too much and passed out! You caught it!",
         "(?:§.)*You caught yourself an invisibug! The shard was sent to your Hunting Box!",
-        "(?:§.)*The Frog is exhausted...",
+        "(?:§.)*The Frog is exhausted\\.\\.\\.",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
