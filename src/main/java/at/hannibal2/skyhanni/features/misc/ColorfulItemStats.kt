@@ -109,6 +109,8 @@ object ColorfulItemStats {
                     group("Bonus")
                 }${
                     iconStatMap[stat] ?: ""
+                }${
+                    group("OldColor")
                 }"
             }
         }
