@@ -3,10 +3,15 @@ package at.hannibal2.skyhanni.config.features.mining.nucleus
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class MetalDetectorConfig {
+
+    @ConfigOption(name = "Credits", desc = "Most features here are from Coleweight or SoopyV2, huge thanks to them!")
+    @ConfigEditorInfoText
+    var notice: String = ""
 
     @Expose
     @ConfigOption(name = "Metal Detector Solver", desc = "Enables the solver for the metal detector.")

@@ -62,7 +62,7 @@ class MiningConfig {
     val crystalNucleusTracker: CrystalNucleusTrackerConfig = CrystalNucleusTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Metal Detector", desc = "Metal Detector Settings (credit to Ninjune and Soopy)")
+    @ConfigOption(name = "Metal Detector", desc = "")
     @Accordion
     val metalDetector: MetalDetectorConfig = MetalDetectorConfig()
 
