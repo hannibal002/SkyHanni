@@ -194,7 +194,6 @@ object CFStrayWarning {
         event.sendPreventCloseTitle()
     }
 
-
     private fun SkyHanniEvent.Cancellable.sendPreventCloseTitle() {
         TitleManager.sendTitle(
             "§cStray Rabbit Prevented Close",
