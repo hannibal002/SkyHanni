@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -87,17 +85,6 @@ object ModifyVisualWords {
             }
 
             modifiedText
-        }
-    }
-
-    @HandleEvent
-    @Suppress("DEPRECATION")
-    fun onHypixelJoin(event: HypixelJoinEvent) {
-        val oldModifiedWords = SkyHanniMod.feature.storage.modifiedWords
-        if (oldModifiedWords.isNotEmpty()) {
-            SkyHanniMod.visualWordsData.modifiedWords = oldModifiedWords.toMutableList()
-            SkyHanniMod.feature.storage.modifiedWords = emptyList()
-            SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Migrate visual words")
         }
     }
 }

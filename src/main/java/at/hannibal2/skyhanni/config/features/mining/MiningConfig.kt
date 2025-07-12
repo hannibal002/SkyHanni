@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.nucleus.MetalDetectorConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig
 import com.google.gson.annotations.Expose
@@ -59,6 +60,11 @@ class MiningConfig {
     @ConfigOption(name = "Crystal Nucleus Tracker", desc = "")
     @Accordion
     val crystalNucleusTracker: CrystalNucleusTrackerConfig = CrystalNucleusTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Metal Detector", desc = "Metal Detector Settings (credit to Ninjune and Soopy)")
+    @Accordion
+    val metalDetector: MetalDetectorConfig = MetalDetectorConfig()
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
