@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -160,6 +161,10 @@ object GeorgeHelper {
                     otherRarity = true,
                 ),
             )
+        }
+        for (pair in this) {
+            ChatUtils.consoleLog("tier: ${pair.first}")
+            ChatUtils.consoleLog("price: ${pair.second}")
         }
     }.minBy { it.second }
 
