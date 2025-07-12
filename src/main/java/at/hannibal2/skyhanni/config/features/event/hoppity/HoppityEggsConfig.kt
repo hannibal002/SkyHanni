@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventS
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
@@ -89,7 +90,7 @@ class HoppityEggsConfig {
     var preventMissingRabbitTheFish: Boolean = true
 
     enum class EggSoundMode(private val displayName: String) {
-        NO_MOD("No Modification"),
+        NO_MODIFICATION("No Modification"),
         MUTE("Mute Sounds"),
         REVERT("Revert to Eat Sound"),
         ;
@@ -102,9 +103,8 @@ class HoppityEggsConfig {
         name = "Modify Egg Sounds",
         desc = "Mute or revert the note block sounds when opening an egg."
     )
-    @ConfigEditorBoolean
+    @ConfigEditorDropdown
     @OnlyModern
-    @FeatureToggle
     @SearchTag("rolling eat")
-    var soundMode: EggSoundMode = EggSoundMode.NO_MOD
+    var soundMode: EggSoundMode = EggSoundMode.NO_MODIFICATION
 }

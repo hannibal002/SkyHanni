@@ -23,10 +23,10 @@ object HoppityMuteEggSounds {
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!eggInventory.isInside() || lastInInventory.passedSince() > 2.seconds) return
+        if (!eggInventory.isInside() && lastInInventory.passedSince() > 2.seconds) return
         if (!event.isEggSound()) return
         when (config.soundMode) {
-            HoppityEggsConfig.EggSoundMode.NO_MOD -> return
+            HoppityEggsConfig.EggSoundMode.NO_MODIFICATION -> return
             HoppityEggsConfig.EggSoundMode.MUTE -> return event.cancel()
             HoppityEggsConfig.EggSoundMode.REVERT -> return event.replaceWithOther("random.eat")
         }
