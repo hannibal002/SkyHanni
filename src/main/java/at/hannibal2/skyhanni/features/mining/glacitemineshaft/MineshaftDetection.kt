@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -86,7 +87,7 @@ object MineshaftDetection {
 
         handleShaftData(type)
 
-        if (config.sendTypeToPartyChat) {
+        if (config.sendTypeToPartyChat && PartyApi.isInParty()) {
             val partyChatBuilder = StringBuilder()
 
             val formattedMessage = config.partyChatFormat
