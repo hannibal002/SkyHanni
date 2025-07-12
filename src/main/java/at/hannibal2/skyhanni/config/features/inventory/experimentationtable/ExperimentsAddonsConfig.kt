@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
@@ -24,6 +27,16 @@ class ExperimentsAddonsConfig {
     )
     @ConfigEditorBoolean
     var highlightNextClick: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Color", desc = "Color that the next slot will be highlighted in.")
+    @ConfigEditorColour
+    var nextColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
+
+    @Expose
+    @ConfigOption(name = "Second Color", desc = "Color that the second slot will be highlighted in.")
+    @ConfigEditorColour
+    var secondColor: ChromaColour = LorenzColor.YELLOW.toChromaColor(128)
 
     @Expose
     @ConfigOption(
