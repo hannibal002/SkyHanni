@@ -20,7 +20,7 @@ object ColorfulItemStats {
      */
     private val genericStat by group.pattern(
         "generic",
-        "§7(?<Stat>[a-zA-Z ]+): (?<OldColor>§[0-9a-f])(?<Bonus>[-+]?[\\d.%]+)",
+        "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.%]+)",
     )
 
     private val iconStatMap = mapOf(
@@ -35,8 +35,8 @@ object ColorfulItemStats {
 
             event.toolTip[index] = genericStat.replace(line) {
 
-                val stat = group("Stat")
-                val oldColor = group("OldColor")
+                val stat = group("stat")
+                val oldColor = group("oldColor")
 
                 buildString {
                     append("§7$stat: ")
@@ -45,7 +45,7 @@ object ColorfulItemStats {
                             stat.uppercase().replace(" ", "_")
                         )?.icon?.take(2) ?: oldColor
                     )
-                    append(group("Bonus"))
+                    append(group("bonus"))
                     append(iconStatMap[stat].orEmpty())
                     append(oldColor)
                 }
