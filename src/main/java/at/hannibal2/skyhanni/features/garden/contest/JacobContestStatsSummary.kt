@@ -81,10 +81,10 @@ object JacobContestStatsSummary {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        val oldBase = "#garden"
-        val newBase = "#garden.jacobContest"
+        val oldBase = "garden"
+        val newBase = "garden.jacobContest"
         massMigrationPairs.forEach { (oldPath, newPath) ->
-            event.move(95, "$oldBase.$oldPath", "$newBase.$newPath")
+            event.move(96, "$oldBase.$oldPath", "$newBase.$newPath")
         }
     }
 }
