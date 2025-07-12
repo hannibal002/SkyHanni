@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -32,7 +31,7 @@ object JacobContestTimeNeeded {
     private var display = emptyList<Renderable>()
     private var currentBracket = ContestBracket.GOLD
 
-    @HandleEvent(priority = HandleEvent.LOW, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (FarmingContestApi.inInventory) {
             update()
@@ -195,7 +194,7 @@ object JacobContestTimeNeeded {
         config.customBPS.value
     } else getLatestBlocksPerSecond()
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (!FarmingContestApi.inInventory) return
