@@ -246,7 +246,7 @@ object UpdateKeybinds {
                 for (keybind in keybinds) {
                     resetKeybind(keybind)
                 }
-                ChatUtils.chat("§cSuccessfully reset all SkyHanni Keybinds")
+                ChatUtils.chat("§aSuccessfully reset all SkyHanni Keybinds")
             }
         }
     }
