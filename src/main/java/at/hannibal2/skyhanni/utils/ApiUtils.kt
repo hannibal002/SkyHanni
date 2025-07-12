@@ -337,16 +337,15 @@ object ApiUtils {
      * @param file The [File] where the content will be written.
      * @return The number of bytes written to the file, or null if the entity is null or has no content.
      */
-    private fun HttpEntity?.readEntityToFile(
-        file: File,
-    ): Long? = this?.takeIf { it.contentLength > 0 }?.runCatching {
-        content.use { input ->
-            file.outputStream().use { output ->
-                input.copyTo(output)
+    private fun HttpEntity?.readEntityToFile(file: File): Long? =
+        this?.runCatching {
+            content.use { input ->
+                file.outputStream().use { output ->
+                    input.copyTo(output)
+                }
             }
-        }
-        file.length()
-    }?.getOrNull()
+            file.length()
+        }?.getOrNull()
 
     /**
      * Reads the content of the HttpEntity and parses it as a JsonElement.
