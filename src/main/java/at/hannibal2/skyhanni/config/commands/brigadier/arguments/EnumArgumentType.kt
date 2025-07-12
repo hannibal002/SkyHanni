@@ -46,10 +46,17 @@ class EnumArgumentType<E : Enum<E>> private constructor(
         fun <E : Enum<E>> create(clazz: Class<E>, toString: (E) -> String): EnumArgumentType<E> {
             return EnumArgumentType(clazz, toString)
         }
+
+        /**
+         * To use enum name arguments do `EnumArgumentType.name<Enum>()`
+         */
         inline fun <reified E : Enum<E>> name(): EnumArgumentType<E> {
             return create(E::class.java) { it.name }
         }
 
+        /**
+         * To use enum lowercase name arguments do `EnumArgumentType.lowercase<Enum>()`
+         */
         inline fun <reified E : Enum<E>> lowercase(): EnumArgumentType<E> {
             return create(E::class.java) { it.name.lowercase() }
         }
