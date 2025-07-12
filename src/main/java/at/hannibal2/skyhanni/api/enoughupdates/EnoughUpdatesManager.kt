@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -50,9 +49,8 @@ import kotlin.math.floor
 //#else
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
-import kotlin.text.Charsets.UTF_8
-
 //#endif
+import kotlin.text.Charsets.UTF_8
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -492,15 +490,6 @@ object EnoughUpdatesManager {
     private fun itemCountInRepoFolder(): Int {
         val itemsFolder = File(repoDirectory, "items")
         return itemsFolder.listFiles()?.size ?: 0
-    }
-
-    @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
-        if (itemMap.isEmpty() && itemCountInRepoFolder() > 0) {
-            if (EnoughUpdatesRepoManager.currentlyFetching) return
-            reloadRepo()
-            println("No loaded items in NEU repo, attempting to reload the repo.")
-        }
     }
 
     @HandleEvent
