@@ -123,7 +123,7 @@ object GeorgeHelper {
         val rarityColorCode = LorenzRarity.getById(cheapestTier)?.chatColorCode ?: tierColorCodes
         val formattedPet = "${rarityColorCode}${LorenzRarity.getById(cheapestTier)?.formattedName} $petName"
 
-        val clickableRenderable = if (cheapestPrice > -1.0) {
+        val clickableRenderable = if (cheapestPrice > 0) {
             Renderable.clickable(
                 text = " §7- $formattedPet: §6${cheapestPrice.addSeparators()} coins",
                 tips = listOf(
