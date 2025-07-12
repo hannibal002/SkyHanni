@@ -36,16 +36,17 @@ object ColorfulItemStats {
             event.toolTip[index] = genericStat.replace(line) {
 
                 val stat = group("Stat")
+                val oldColor = group("OldColor")
 
                 buildString {
                     append("§7$stat: ")
                     append(
                         SkyblockStat.getValueOrNull(
                             stat.uppercase().replace(" ", "_")
-                        )?.icon?.take(2) ?: group("OldColor"))
+                        )?.icon?.take(2) ?: oldColor)
                     append(group("Bonus"))
                     append(iconStatMap[stat].orEmpty())
-                    append(group("OldColor"))
+                    append(oldColor)
                 }
             }
         }
