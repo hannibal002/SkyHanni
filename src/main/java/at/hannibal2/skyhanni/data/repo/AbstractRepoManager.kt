@@ -182,7 +182,12 @@ abstract class AbstractRepoManager(
                     switchToBackupRepo()
                 }
             }
+            val startReloadTime = SimpleTimeMark.now()
+            logger.preDebug("Starting repo reload at $startReloadTime")
             reloadRepository()
+            val elapsedReloadFormat = (SimpleTimeMark.now() - startReloadTime).format()
+            logger.preDebug("Repo reload finished at ${SimpleTimeMark.now()}.\nElapsed reload time: $elapsedReloadFormat")
+
             val timeAfter = SimpleTimeMark.now()
             val elapsedFormat = (timeAfter - timeNow).format()
             logger.preDebug("initRepo finished at $timeAfter.\nElapsed time: $elapsedFormat")
@@ -286,8 +291,6 @@ abstract class AbstractRepoManager(
     private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true): Boolean {
         val (currentSha, currentCommitTime) = commitStorage.readFromFile() ?: RepoCommit()
         commitTime = currentCommitTime
-        val timeNow = SimpleTimeMark.now()
-        logger.preDebug("Starting fetch and unpack at $timeNow")
 
         val (latestSha, latestCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
             response.sha to response.commit.committer.date
@@ -317,35 +320,20 @@ abstract class AbstractRepoManager(
             return false
         }
 
-        val downloadTimeBefore = SimpleTimeMark.now()
-        logger.preDebug("Download starting at $downloadTimeBefore")
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
             downloadFailed = true
             logger.logError("Failed to download the repo zip file from GitHub.")
         }
-        val downloadTimeAfter = SimpleTimeMark.now()
-        val elapsedDownloadFormat = (downloadTimeAfter - downloadTimeBefore).format()
-        logger.preDebug("Download finished at $downloadTimeAfter.\nElapsed download time: $elapsedDownloadFormat")
 
-        val unzipTimeBefore = SimpleTimeMark.now()
-        logger.preDebug("Unzipping starting at $unzipTimeBefore")
         RepoUtils.unzipIgnoreFirstFolder(
             zipFilePath = repoZipFile.absolutePath,
             destinationDirectory = repoDirectory.absolutePath,
         )
-        val unzipTimeAfter = SimpleTimeMark.now()
-        val elapsedUnzipFormat = (unzipTimeAfter - unzipTimeBefore).format()
-        logger.preDebug("Unzipping finished at $unzipTimeAfter.\nElapsed unzip time: $elapsedUnzipFormat")
 
         commitStorage.writeToFile(RepoCommit(latestSha, latestCommitTime))
         commitTime = latestCommitTime
         downloadFailed = false
         isUsingBackup = false
-
-        val timeAfter = SimpleTimeMark.now()
-        val elapsedFormat = (timeAfter - timeNow).format()
-        logger.preDebug("Finished fetch and unpack at $timeAfter.\nElapsed time: $elapsedFormat")
-
         return true
     }
 
@@ -364,24 +352,23 @@ abstract class AbstractRepoManager(
     private suspend fun reloadRepository(answerMessage: String = "") {
         if (currentlyReloading) return
         val timeNow = SimpleTimeMark.now()
-        logger.preDebug("Starting repo reload at $timeNow")
+        logger.preDebug("Starting reloadRepository() at $timeNow")
         currentlyReloading = true
         if (!shouldManuallyReload) return
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
 
+        val beforeCoroutineWork = SimpleTimeMark.now()
+        logger.preDebug("Running extra coroutine work before posting repo reload event at $beforeCoroutineWork")
         extraReloadCoroutineWork()
+        val elapsedCoroutineFormat = (SimpleTimeMark.now() - beforeCoroutineWork).format()
+        logger.preDebug("Finished extra coroutine work at ${SimpleTimeMark.now()}.\nElapsed coroutine time: $elapsedCoroutineFormat")
 
-        val eventTimeNow = SimpleTimeMark.now()
-        logger.preDebug("Posting repo reload event at $eventTimeNow")
         eventConstructor.invoke(this@AbstractRepoManager).post { error ->
             logger.logErrorWithData(error, "Error while posting repo reload event")
             loadingError = true
         }
-        val eventTimeAfter = SimpleTimeMark.now()
-        val elapsedEventFormat = (eventTimeAfter - eventTimeNow).format()
-        logger.preDebug("Finished posting repo reload event at $eventTimeAfter.\nElapsed event time: $elapsedEventFormat")
 
         if (answerMessage.isNotEmpty() && !loadingError) {
             ChatUtils.chat("§a$answerMessage")
@@ -396,7 +383,7 @@ abstract class AbstractRepoManager(
         }
         val timeAfter = SimpleTimeMark.now()
         val elapsedFormat = (timeAfter - timeNow).format()
-        logger.preDebug("Finished repo reload at $timeAfter.\nElapsed time: $elapsedFormat")
+        logger.preDebug("Finished reloadRepository() at $timeAfter.\nElapsed time: $elapsedFormat")
         currentlyReloading = false
     }
 

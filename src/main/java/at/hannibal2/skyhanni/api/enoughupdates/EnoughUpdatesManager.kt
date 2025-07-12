@@ -23,6 +23,10 @@ import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -33,7 +37,6 @@ import net.minecraft.nbt.NBTTagList
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import java.util.TreeMap
 import kotlin.math.floor
 //#if MC > 1.21
@@ -48,6 +51,8 @@ import kotlin.math.floor
 //#else
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
+import kotlin.text.Charsets.UTF_8
+
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
@@ -76,7 +81,7 @@ object EnoughUpdatesManager {
 
     val logger get() = EnoughUpdatesRepoManager.logger
 
-    fun reloadItemsFromRepo() {
+    suspend fun reloadItemsFromRepo() {
         if (isLoading) {
             logger.preDebug("Already loading NEU repo, skipping reload")
             return
@@ -97,15 +102,8 @@ object EnoughUpdatesManager {
         val prepElapsedFormat = (prepFinishedTime - timeNow).format()
         logger.preDebug("Preparation finished at $prepFinishedTime\nElapsed time: $prepElapsedFormat")
 
-
-        val startTimeMapLoad = SimpleTimeMark.now()
-        logger.preDebug("Loading item map at $startTimeMapLoad")
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(tempItemMap)
-        val mapLoadFinishedTime = SimpleTimeMark.now()
-        val mapLoadElapsedFormat = (mapLoadFinishedTime - startTimeMapLoad).format()
-        logger.preDebug("Item map loaded at $mapLoadFinishedTime\nElapsed time: $mapLoadElapsedFormat")
-
 
         val transferItemMapStart = SimpleTimeMark.now()
         logger.preDebug("Transferring item map at $transferItemMapStart")
@@ -132,21 +130,33 @@ object EnoughUpdatesManager {
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
-    private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
+    private suspend fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
         val itemDir = File(repoDirectory, "items")
-        if (!itemDir.exists()) return
-        for (file in itemDir.listFiles() ?: return) {
-            if (file.extension != "json") continue
-            try {
-                InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8).use { reader ->
-                    val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
-                    tempItemMap[file.nameWithoutExtension] = parseItem(file.nameWithoutExtension, json) ?: continue
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Error while loading neu repo")
+        if (!itemDir.exists()) return@coroutineScope
+        val files = itemDir.listFiles { it.extension == "json" } ?: return@coroutineScope
+
+        files.mapNotNull { file ->
+            async(Dispatchers.IO) {
+                file.readRepoItem()
+            }
+        }.awaitAll().forEachIndexed { idx, item ->
+            if (item != null) {
+                tempItemMap[files[idx].nameWithoutExtension] = item
             }
         }
-        return
+    }
+
+    private fun File.readRepoItem(): JsonObject? = runCatching {
+        FileInputStream(this).use { fis ->
+            InputStreamReader(fis, UTF_8).use { reader ->
+                ConfigManager.gson.fromJson(reader, JsonObject::class.java)?.let { json ->
+                    parseItem(this.nameWithoutExtension, json)
+                }
+            }
+        }
+    }.getOrElse {
+        logger.debug("Error reading item file: ${this.name}")
+        null
     }
 
     private fun parseItem(internalName: String, json: JsonObject): JsonObject? {
