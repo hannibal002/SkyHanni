@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.mining
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -10,9 +11,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class GemstoneMoneyPerHourConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable gemstone money per hour display. use /shresetgemstone to manually reset it.")
+    @ConfigOption(name = "Enabled", desc = "Enable gemstone money per hour display. Use §e/shresetgemstone §7to manually reset it.")
     @ConfigEditorBoolean
-    var enabled: Boolean = true
+    @FeatureToggle
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Force NPC", desc = "Force the NPC price of gemstones to be used.")
@@ -43,12 +45,12 @@ class GemstoneMoneyPerHourConfig {
     @ConfigOption(
         name = "Pause Time",
         desc = "Whether the timer should pause instead of resetting.\n" +
-            "Note: It will still reset when you enter a non-mining island."
+            "§eNote: It will still reset when you enter a non-mining island."
     )
     @ConfigEditorBoolean
-    var pauseEnabled: Boolean = false
+    var shouldPause: Boolean = true
 
     @Expose
     @ConfigLink(owner = GemstoneMoneyPerHourConfig::class, field = "enabled")
-    val position: Position = Position(189, 52, false, true)
+    val position: Position = Position(189, 52)
 }

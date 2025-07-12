@@ -14,10 +14,11 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -27,6 +28,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -41,7 +45,7 @@ object GemstoneMoneyPerHour {
      */
     private val pristineMessagePattern by RepoPattern.pattern(
         "mining.pristine",
-        "§d§lPRISTINE! §r§fYou found §r§a. Flawed (?<gemstone>\\w+) Gemstone §r§8x(?<amount>\\d+)§r§f!"
+        "§d§lPRISTINE! §r§fYou found §r§a. Flawed (?<gemstone>\\w+) Gemstone §r§8x(?<amount>\\d+)§r§f!",
     )
 
     /**
@@ -49,7 +53,7 @@ object GemstoneMoneyPerHour {
      */
     private val roughGemstoneNamePattern by RepoPattern.pattern(
         "mining.roughgemstone",
-        "rough (?<gemstone>\\w+) gem"
+        "rough (?<gemstone>\\w+) gem",
     )
 
     private val config get() = SkyHanniMod.feature.mining.gemstoneMoneyPerHour
@@ -123,30 +127,64 @@ object GemstoneMoneyPerHour {
         display = createDisplay()
     }
 
-    private fun createDisplay() = buildList {
+    private fun createDisplay() = buildList<Renderable> {
         if (start.isFarPast()) return@buildList
         if (lastGemstone.isEmpty()) return@buildList
         val moneyPerHour = coins / maxOf(uptime.inPartialSeconds, 1.0) * 3600
         val internalName = convertToInternalName(lastGemstone)
-        val gemstoneName = internalName.itemNameWithoutColor
+        val gemstoneName = internalName.repoItemName.removeSuffix(" Gemstone")
         val gemstonePrice = getPrice(internalName).toInt()
         val pausedText = if (paused) " §c(PAUSED)"
         else ""
 
-        add(Renderable.string("§d§lGemstone Money per Hour"))
-        add(Renderable.string("§a($gemstoneName @ §b${gemstonePrice.shortFormat()})"))
-        add(Renderable.string("§aCoins/hr: §b${moneyPerHour.toInt().shortFormat()}"))
-        add(Renderable.string("§aCoins made: §b${coins.shortFormat()}"))
-        add(Renderable.string("§aUptime: §b${uptime.format()}$pausedText"))
+        add(StringRenderable("§d§lGemstone Money per Hour"))
+        add(StringRenderable("§aSelling $gemstoneName §afor §6${gemstonePrice.shortFormat()} §aeach"))
+        add(StringRenderable("§aCoins/hr: §6${moneyPerHour.toInt().shortFormat()}"))
+        add(StringRenderable("§aCoins made: §6${coins.shortFormat()}"))
+        add(StringRenderable("§aUptime: §b${uptime.format()}$pausedText"))
+        addButtons()
+    }
+
+    private fun MutableList<Renderable>.addButtons() {
+        if (!InventoryUtils.inAnyInventory()) return
+        addRenderableButton<GemstoneMoneyPerHourConfig.GemstoneType>(
+            label = "Gemstone Type",
+            current = config.gemstoneType,
+            getName = { it.displayName },
+            onChange = {
+                config.gemstoneType = it
+                updateDisplay()
+            },
+        )
+
+        addRenderableButton(
+            label = "Use NPC Price",
+            config = config::forceNPC,
+            enabled = "Use NPC Price",
+            disabled = "Use bazaar Price",
+            onChange = {
+                updateDisplay()
+            },
+        )
+
+        addRenderableButton(
+            label = "Pause Tracker when not mining",
+            config = config::shouldPause,
+            enabled = "Pause when not mining",
+            disabled = "Reset when not mining",
+            onChange = {
+                updateDisplay()
+            },
+        )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOnTopRenderEvent) {
         if (!isEnabled()) return
         display.ifEmpty { updateDisplay() }
         if (display.isNotEmpty()) {
             config.position.renderRenderables(
-                listOf(Renderable.verticalContainer(display, 2)),
+                listOf(VerticalContainerRenderable(display, 2)),
                 posLabel = "Gemstone Money per Hour Display",
             )
         }
@@ -156,7 +194,7 @@ object GemstoneMoneyPerHour {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled() || lastMined.isFarPast()) display = listOf()
         else if (lastMined.passedSince() > config.timeoutTime.toInt().seconds) {
-            if (config.pauseEnabled) paused = true
+            if (config.shouldPause) paused = true
             else reset()
         } else uptime += 1.seconds
         display = createDisplay()
@@ -179,17 +217,15 @@ object GemstoneMoneyPerHour {
         display = listOf()
     }
 
-    private fun command() {
-        reset()
-        ChatUtils.chat("Reset gemstone money per hour display!")
-    }
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetgemstone") {
             description = "Resets the gemstone money per hour display."
-            category = CommandCategory.USERS_ACTIVE
-            callback { command() }
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                reset()
+                ChatUtils.chat("Reset gemstone money per hour display!")
+            }
         }
     }
 
