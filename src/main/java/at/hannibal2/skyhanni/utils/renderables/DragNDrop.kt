@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
@@ -16,7 +17,7 @@ object DragNDrop {
 
     private var isInvalidDrop = false
 
-    private const val BUTTON_MAPPED = -100
+    private const val BUTTON_MAPPED = KeyboardManager.LEFT_MOUSE
 
     private val invalidItem = ItemStackRenderable(ItemStack(Blocks.barrier), 1.0)
 
@@ -59,11 +60,11 @@ object DragNDrop {
         bypassChecks: Boolean = false,
         condition: () -> Boolean = { true },
     ): Renderable = object : RenderableWrapper(display) {
-        override fun render(posX: Int, posY: Int) {
-            if (isHovered(posX, posY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
+        override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+            if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
                 handelDroppable(drop)
             }
-            content.render(posX, posY)
+            content.render(mouseOffsetX, mouseOffsetY)
         }
     }
 

@@ -1,19 +1,14 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.skyhanni.test.renderable
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.CircularRenderable
 import at.hannibal2.skyhanni.utils.renderables.OrbitSystemRenderable
 import java.awt.Color
 
-@SkyHanniModule
-object OrbitalTest {
+@SkyHanniModule(devOnly = true)
+object TestOrbital : RenderableTestSuite.TestRenderable("orbital") {
 
-    private val config get() = SkyHanniMod.feature.dev.debug
     private val orbitalRenderable by lazy {
         OrbitSystemRenderable(
             mainBody = CircularRenderable(
@@ -30,9 +25,5 @@ object OrbitalTest {
         )
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.orbital) return
-        config.orbitalPosition.renderRenderable(orbitalRenderable, posLabel = "Orbital Test")
-    }
+    override fun renderable() = orbitalRenderable
 }

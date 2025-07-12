@@ -21,12 +21,6 @@ object DefaultConfigFeatures {
         if (didNotifyOnce) return
         didNotifyOnce = true
 
-        val oldToggles = SkyHanniMod.feature.storage.knownFeatureToggles
-        if (oldToggles.isNotEmpty()) {
-            SkyHanniMod.knownFeaturesData.knownFeatures = oldToggles
-            SkyHanniMod.feature.storage.knownFeatureToggles = emptyMap()
-        }
-
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val updated = SkyHanniMod.VERSION !in knownToggles
         val processor = FeatureToggleProcessor()

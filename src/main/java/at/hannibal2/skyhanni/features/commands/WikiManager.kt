@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import net.minecraft.item.ItemStack
 import java.net.URLEncoder
 
@@ -62,7 +62,7 @@ object WikiManager {
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
         if (NeuItems.neuHasFocus()) return
-        val stack = slotUnderCursor()?.stack ?: return
+        val stack = stackUnderCursor() ?: return
 
         if (!config.wikiKeybind.isKeyHeld()) return
         wikiTheItem(stack, config.menuOpenWiki)
