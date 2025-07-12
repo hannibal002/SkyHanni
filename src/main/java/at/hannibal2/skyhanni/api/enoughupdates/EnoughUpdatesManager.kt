@@ -78,12 +78,12 @@ object EnoughUpdatesManager {
 
     fun reloadItemsFromRepo() {
         if (isLoading) {
-            logger.debug("Already loading NEU repo, skipping reload")
+            logger.preDebug("Already loading NEU repo, skipping reload")
             return
         }
 
         val timeNow = SimpleTimeMark.now()
-        logger.debug("Starting reloadItemsFromRepo at $timeNow")
+        logger.preDebug("Starting reloadItemsFromRepo at $timeNow")
 
         isLoading = true
         itemStackCache.clear()
@@ -95,20 +95,20 @@ object EnoughUpdatesManager {
 
         val prepFinishedTime = SimpleTimeMark.now()
         val prepElapsedFormat = (prepFinishedTime - timeNow).format()
-        logger.debug("Preparation finished at $prepFinishedTime\nElapsed time: $prepElapsedFormat")
+        logger.preDebug("Preparation finished at $prepFinishedTime\nElapsed time: $prepElapsedFormat")
 
 
         val startTimeMapLoad = SimpleTimeMark.now()
-        logger.debug("Loading item map at $startTimeMapLoad")
+        logger.preDebug("Loading item map at $startTimeMapLoad")
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(tempItemMap)
         val mapLoadFinishedTime = SimpleTimeMark.now()
         val mapLoadElapsedFormat = (mapLoadFinishedTime - startTimeMapLoad).format()
-        logger.debug("Item map loaded at $mapLoadFinishedTime\nElapsed time: $mapLoadElapsedFormat")
+        logger.preDebug("Item map loaded at $mapLoadFinishedTime\nElapsed time: $mapLoadElapsedFormat")
 
 
         val transferItemMapStart = SimpleTimeMark.now()
-        logger.debug("Transferring item map at $transferItemMapStart")
+        logger.preDebug("Transferring item map at $transferItemMapStart")
 
         synchronized(itemMap) {
             itemMap.clear()
@@ -116,7 +116,7 @@ object EnoughUpdatesManager {
         }
         val transferItemMapFinishedTime = SimpleTimeMark.now()
         val transferItemMapElapsedFormat = (transferItemMapFinishedTime - transferItemMapStart).format()
-        logger.debug("Item map transferred at $transferItemMapFinishedTime\nElapsed time: $transferItemMapElapsedFormat")
+        logger.preDebug("Item map transferred at $transferItemMapFinishedTime\nElapsed time: $transferItemMapElapsedFormat")
 
         isLoading = false
     }
