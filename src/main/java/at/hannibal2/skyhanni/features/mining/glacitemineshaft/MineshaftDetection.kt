@@ -68,21 +68,22 @@ object MineshaftDetection {
         if (type == config.mineshaftToTrack) {
             TitleManager.sendTitle(config.mineshaftToTrack.displayName)
 
-            ChatUtils.chat(
-                "It took " +
-                    LorenzColor.RED.getChatColor() +
-                    timeSinceThis.passedSince().format() +
-                    LorenzColor.YELLOW.getChatColor() +
-                    " and " +
-                    LorenzColor.RED.getChatColor() +
-                    sinceThis +
-                    LorenzColor.YELLOW.getChatColor() +
-                    if (sinceThis == 1) " mineshaft " else " mineshafts " +
-                        "entered to get a " +
-                    config.mineshaftToTrack.displayName +
-                    LorenzColor.YELLOW.getChatColor() +
-                    " mineshaft."
-            )
+            val builder = StringBuilder()
+            builder.append("It took ")
+                .append(LorenzColor.RED.getChatColor())
+                .append(timeSinceThis.passedSince().format())
+                .append(LorenzColor.YELLOW.getChatColor())
+                .append(" and ")
+                .append(LorenzColor.RED.getChatColor())
+                .append(sinceThis)
+                .append(LorenzColor.YELLOW.getChatColor())
+                .append(if (sinceThis == 1) " mineshaft " else " mineshafts ")
+                .append("entered to get a ")
+                .append(config.mineshaftToTrack.displayName)
+                .append(LorenzColor.YELLOW.getChatColor())
+                .append(" mineshaft.")
+
+            ChatUtils.chat(builder.toString())
         }
 
         handleShaftData(type)
