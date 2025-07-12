@@ -72,7 +72,7 @@ object EnoughUpdatesManager {
 
     fun inLoadingState() = isLoading || EnoughUpdatesRepoManager.currentlyFetching
 
-    fun prepRepoReload() {
+    fun reloadItemsFromRepo() {
         if (isLoading) return
         isLoading = true
         itemStackCache.clear()
@@ -81,10 +81,7 @@ object EnoughUpdatesManager {
         titleWordMap.clear()
         recipes.clear()
         recipesMap.clear()
-    }
 
-    fun reloadItemsFromRepo() {
-        if (!isLoading) return
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(tempItemMap)
         synchronized(itemMap) {
@@ -95,7 +92,11 @@ object EnoughUpdatesManager {
     }
 
     fun reloadRepo() {
-        if (isLoading) return
+        if (isLoading) {
+            System.out.println("reloadRepo called, but already loading NEU repo, skipping reload")
+            return
+        }
+        System.out.println("reloadRepo called")
         EnoughUpdatesRepoManager.reloadLocalRepo()
     }
 
@@ -461,6 +462,7 @@ object EnoughUpdatesManager {
     @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         if (itemMap.isEmpty() && itemCountInRepoFolder() > 0) {
+            if (EnoughUpdatesRepoManager.currentlyFetching) return
             reloadRepo()
             println("No loaded items in NEU repo, attempting to reload the repo.")
         }

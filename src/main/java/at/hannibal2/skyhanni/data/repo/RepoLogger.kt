@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 
 class RepoLogger(private val loggingPrefix: String) {
     fun debug(message: String) = SkyHanniMod.logger.debug("$loggingPrefix $message")
+    fun preDebug(message: String) = System.out.println("$loggingPrefix $message")
     fun warn(message: String) = SkyHanniMod.logger.warn("$loggingPrefix $message")
 
     fun logError(error: String): Nothing = ErrorManager.skyHanniError("$loggingPrefix $error")

@@ -339,14 +339,14 @@ object ApiUtils {
      */
     private fun HttpEntity?.readEntityToFile(
         file: File,
-    ): Long? = when {
-        this == null || this.contentLength == 0L -> null
-        else -> runCatching {
+    ): Long? = this?.takeIf { it.contentLength > 0 }?.runCatching {
+        content.use { input ->
             file.outputStream().use { output ->
-                this.content.copyTo(output)
+                input.copyTo(output)
             }
-        }.getOrNull()
-    }
+        }
+        file.length()
+    }?.getOrNull()
 
     /**
      * Reads the content of the HttpEntity and parses it as a JsonElement.

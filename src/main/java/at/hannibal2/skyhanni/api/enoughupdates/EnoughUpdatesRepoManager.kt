@@ -18,6 +18,10 @@ object EnoughUpdatesRepoManager : AbstractRepoManager(
     override val configDirectory = EnoughUpdatesManager.configDirectory
     override val config get(): NeuRepositoryConfig = SkyHanniMod.feature.dev.neuRepo
 
+    override val reloadCommand: String = "neureloadrepo"
+    override val statusCommand: String = "neurepostatus"
+    override val updateCommand: String = "neuupdaterepo"
+
     override val shouldRegisterReloadCommand: Boolean = !PlatformUtils.isNeuLoaded()
     override val shouldRegisterUpdateCommand: Boolean = !PlatformUtils.isNeuLoaded()
 
@@ -25,6 +29,5 @@ object EnoughUpdatesRepoManager : AbstractRepoManager(
     fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
     override fun reportExtraStatusInfo() = EnoughUpdatesManager.reportItemStatus()
-    override fun extraReloadWork() = EnoughUpdatesManager.prepRepoReload()
     override suspend fun extraReloadCoroutineWork() = EnoughUpdatesManager.reloadItemsFromRepo()
 }

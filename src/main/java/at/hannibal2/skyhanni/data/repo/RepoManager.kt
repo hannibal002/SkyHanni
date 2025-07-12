@@ -16,6 +16,10 @@ object RepoManager : AbstractRepoManager(
     override val configDirectory = ConfigManager.configDirectory
     override val config get() = SkyHanniMod.feature.dev.repo
 
+    override val reloadCommand: String = "shreloadlocalrepo"
+    override val statusCommand: String = "shrepostatus"
+    override val updateCommand: String = "shupdaterepo"
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 }

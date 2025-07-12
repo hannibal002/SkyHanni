@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -60,7 +61,6 @@ abstract class AbstractRepoManager(
     private val commitStorage: RepoCommitStorage by lazy { RepoCommitStorage(currentCommitFile) }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
-    private val commandShortName by lazy { commonShortName.takeIf { it != "sh" }.orEmpty() }
     private val githubRepoLocation: GitHubUtils.RepoLocation
         get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
 
@@ -68,9 +68,9 @@ abstract class AbstractRepoManager(
     open val shouldRegisterStatusCommand: Boolean = true
     open val shouldRegisterReloadCommand: Boolean = true
 
-    val updateCommand by lazy { "shupdate${commandShortName}repo" }
-    private val statusCommand by lazy { "sh${commandShortName}repostatus" }
-    private val reloadCommand by lazy { "shreloadlocal${commandShortName}repo" }
+    abstract val updateCommand: String
+    abstract val statusCommand: String
+    abstract val reloadCommand: String
 
     var currentlyFetching = false
         private set
@@ -172,6 +172,8 @@ abstract class AbstractRepoManager(
     }
 
     fun initRepo() {
+        val timeNow = SimpleTimeMark.now()
+        logger.preDebug("initRepo starting at $timeNow")
         shouldManuallyReload = true
         SkyHanniMod.launchIOCoroutine {
             if (config.repoAutoUpdate) {
@@ -181,6 +183,9 @@ abstract class AbstractRepoManager(
                 }
             }
             reloadRepository()
+            val timeAfter = SimpleTimeMark.now()
+            val elapsedFormat = (timeAfter - timeNow).format()
+            logger.preDebug("initRepo finished at $timeAfter.\nElapsed time: $elapsedFormat")
         }
     }
 
@@ -281,6 +286,8 @@ abstract class AbstractRepoManager(
     private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true): Boolean {
         val (currentSha, currentCommitTime) = commitStorage.readFromFile() ?: RepoCommit()
         commitTime = currentCommitTime
+        val timeNow = SimpleTimeMark.now()
+        logger.preDebug("Starting fetch and unpack at $timeNow")
 
         val (latestSha, latestCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
             response.sha to response.commit.committer.date
@@ -310,18 +317,35 @@ abstract class AbstractRepoManager(
             return false
         }
 
+        val downloadTimeBefore = SimpleTimeMark.now()
+        logger.preDebug("Download starting at $downloadTimeBefore")
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
             downloadFailed = true
             logger.logError("Failed to download the repo zip file from GitHub.")
         }
+        val downloadTimeAfter = SimpleTimeMark.now()
+        val elapsedDownloadFormat = (downloadTimeAfter - downloadTimeBefore).format()
+        logger.preDebug("Download finished at $downloadTimeAfter.\nElapsed download time: $elapsedDownloadFormat")
+
+        val unzipTimeBefore = SimpleTimeMark.now()
+        logger.preDebug("Unzipping starting at $unzipTimeBefore")
         RepoUtils.unzipIgnoreFirstFolder(
             zipFilePath = repoZipFile.absolutePath,
             destinationDirectory = repoDirectory.absolutePath,
         )
+        val unzipTimeAfter = SimpleTimeMark.now()
+        val elapsedUnzipFormat = (unzipTimeAfter - unzipTimeBefore).format()
+        logger.preDebug("Unzipping finished at $unzipTimeAfter.\nElapsed unzip time: $elapsedUnzipFormat")
+
         commitStorage.writeToFile(RepoCommit(latestSha, latestCommitTime))
         commitTime = latestCommitTime
         downloadFailed = false
         isUsingBackup = false
+
+        val timeAfter = SimpleTimeMark.now()
+        val elapsedFormat = (timeAfter - timeNow).format()
+        logger.preDebug("Finished fetch and unpack at $timeAfter.\nElapsed time: $elapsedFormat")
+
         return true
     }
 
@@ -333,46 +357,47 @@ abstract class AbstractRepoManager(
     }
 
     /**
-     * Called before the repo reload event is fired - shouldn't do anything resource intensive.
-     */
-    open fun extraReloadWork() = Unit
-
-    /**
      * Called before the repo reload event is fired, but inside the IO coroutine.
      */
     open suspend fun extraReloadCoroutineWork() = Unit
 
-    private fun reloadRepository(answerMessage: String = "") {
+    private suspend fun reloadRepository(answerMessage: String = "") {
         if (currentlyReloading) return
+        val timeNow = SimpleTimeMark.now()
+        logger.preDebug("Starting repo reload at $timeNow")
         currentlyReloading = true
         if (!shouldManuallyReload) return
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
 
-        extraReloadWork()
+        extraReloadCoroutineWork()
 
-        SkyHanniMod.launchIOCoroutine {
-            extraReloadCoroutineWork()
-
-            eventConstructor.invoke(this@AbstractRepoManager).post { error ->
-                logger.logErrorWithData(error, "Error while posting repo reload event")
-                loadingError = true
-            }
-
-            if (answerMessage.isNotEmpty() && !loadingError) {
-                ChatUtils.chat("§a$answerMessage")
-            } else if (loadingError) {
-                ChatUtils.clickableChat(
-                    "Error with the $commonShortName Repo detected, try /$updateCommand to fix it!",
-                    onClick = ::updateRepo,
-                    "§eClick to update the Repo!",
-                    prefixColor = "§c",
-                )
-                if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
-            }
-            currentlyReloading = false
+        val eventTimeNow = SimpleTimeMark.now()
+        logger.preDebug("Posting repo reload event at $eventTimeNow")
+        eventConstructor.invoke(this@AbstractRepoManager).post { error ->
+            logger.logErrorWithData(error, "Error while posting repo reload event")
+            loadingError = true
         }
+        val eventTimeAfter = SimpleTimeMark.now()
+        val elapsedEventFormat = (eventTimeAfter - eventTimeNow).format()
+        logger.preDebug("Finished posting repo reload event at $eventTimeAfter.\nElapsed event time: $elapsedEventFormat")
+
+        if (answerMessage.isNotEmpty() && !loadingError) {
+            ChatUtils.chat("§a$answerMessage")
+        } else if (loadingError) {
+            ChatUtils.clickableChat(
+                "Error with the $commonShortName Repo detected, try /$updateCommand to fix it!",
+                onClick = ::updateRepo,
+                "§eClick to update the Repo!",
+                prefixColor = "§c",
+            )
+            if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
+        }
+        val timeAfter = SimpleTimeMark.now()
+        val elapsedFormat = (timeAfter - timeNow).format()
+        logger.preDebug("Finished repo reload at $timeAfter.\nElapsed time: $elapsedFormat")
+        currentlyReloading = false
     }
 
 }

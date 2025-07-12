@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Files
-import java.util.zip.ZipInputStream
+import java.nio.file.StandardCopyOption
+import java.util.zip.ZipFile
 
 object RepoUtils {
 
@@ -19,55 +17,36 @@ object RepoUtils {
         file.delete()
     }
 
-    /**
-     * Modified from https://www.journaldev.com/960/java-unzip-file-example
-     */
     fun unzipIgnoreFirstFolder(zipFilePath: String, destinationDirectory: String) {
-        val dir = File(destinationDirectory)
-        // create output directory if it doesn't exist
-        if (!dir.exists()) dir.mkdirs()
-        val fis: FileInputStream
-        // buffer for read and write data to file
-        val buffer = ByteArray(1024)
-        try {
-            fis = FileInputStream(zipFilePath)
-            val zis = ZipInputStream(fis)
-            var ze = zis.nextEntry
-            while (ze != null) {
-                if (!ze.isDirectory) {
-                    var fileName = ze.name
-                    fileName = fileName.substring(fileName.split("/").toTypedArray()[0].length + 1)
-                    val newFile = File(destinationDirectory + File.separator + fileName)
-                    // create directories for sub directories in zip
-                    File(newFile.parent).mkdirs()
-                    if (!isInTree(dir, newFile)) {
-                        throw RuntimeException(
-                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                                "please report this on the SkyHanni discord."
+        val destDir = File(destinationDirectory).also {
+            if (!it.exists()) it.mkdirs()
+        }
+        val destPath = destDir.toPath().toRealPath()
+
+        ZipFile(zipFilePath).use { zip ->
+            zip.entries().asSequence()
+                .filter { !it.isDirectory }
+                .forEach { entry ->
+                    val relative = entry.name.substringAfter('/', "").takeIf {
+                        it.isNotBlank()
+                    } ?: return@forEach
+
+                    val outPath = destPath.resolve(relative).normalize().takeIf {
+                        it.startsWith(destPath)
+                    } ?: throw RuntimeException(
+                        "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                            "please report this on the SkyHanni discord."
+                    )
+
+                    Files.createDirectories(outPath.parent)
+                    zip.getInputStream(entry).use { input ->
+                        Files.copy(
+                            input,
+                            outPath,
+                            StandardCopyOption.REPLACE_EXISTING
                         )
                     }
-                    val fos = FileOutputStream(newFile)
-                    var len: Int
-                    while (zis.read(buffer).also { len = it } > 0) {
-                        fos.write(buffer, 0, len)
-                    }
-                    fos.close()
                 }
-                // close this ZipEntry
-                zis.closeEntry()
-                ze = zis.nextEntry
-            }
-            // close last ZipEntry
-            zis.closeEntry()
-            zis.close()
-            fis.close()
-        } catch (e: IOException) {
-            ErrorManager.logErrorWithData(
-                e,
-                "unzipIgnoreFirstFolder failed",
-                "zipFilePath" to zipFilePath,
-                "destinationDirectory" to destinationDirectory,
-            )
         }
     }
 
