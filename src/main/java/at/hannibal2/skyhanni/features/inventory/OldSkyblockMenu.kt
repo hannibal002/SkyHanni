@@ -42,7 +42,7 @@ object OldSkyblockMenu {
         if (!event.originalItem.isStainedGlassPane()) {
             return ChatUtils.debug(
                 "Skipping adding OldSkyBlockMenu item for button ${sbButton.name} at slot ${event.slot}," +
-                " because the original item is not a stained glass pane."
+                    " because the original item is not a stained glass pane."
             )
         }
 
