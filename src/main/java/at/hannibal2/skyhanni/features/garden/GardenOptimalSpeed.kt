@@ -26,6 +26,8 @@ import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -88,10 +90,10 @@ object GardenOptimalSpeed {
         display = if (config.compactRancherGui) {
             crops.groupBy({ it.second }, { it.first }).map { (speed, crops) ->
                 val color = if (lastCrop in crops) LorenzColor.GOLD else LorenzColor.WHITE
-                val renderable = Renderable.horizontalContainer(
+                val renderable = HorizontalContainerRenderable(
                     listOf(
-                        Renderable.horizontalContainer(crops.map { ItemStackRenderable(it.icon) }),
-                        Renderable.string("${color.getChatColor()} - $speed"),
+                        HorizontalContainerRenderable(crops.map { ItemStackRenderable(it.icon) }),
+                        StringRenderable("${color.getChatColor()} - $speed"),
                     ),
                     spacing = 2,
                 )
@@ -100,10 +102,10 @@ object GardenOptimalSpeed {
         } else {
             crops.map { (crop, speed) ->
                 val color = if (lastCrop == crop) LorenzColor.GOLD else LorenzColor.WHITE
-                val renderable = Renderable.horizontalContainer(
+                val renderable = HorizontalContainerRenderable(
                     listOf(
                         ItemStackRenderable(crop.icon),
-                        Renderable.string("${color.getChatColor()}${crop.cropName} - $speed"),
+                        StringRenderable("${color.getChatColor()}${crop.cropName} - $speed"),
                     ),
                     spacing = 2,
                 )

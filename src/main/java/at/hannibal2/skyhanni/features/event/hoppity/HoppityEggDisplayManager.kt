@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import org.lwjgl.opengl.GL11
@@ -106,7 +108,7 @@ object HoppityEggDisplayManager {
 
         if (displayList.size == 1) return emptyList()
 
-        val container = Renderable.verticalContainer(displayList.map(Renderable::string))
+        val container = VerticalContainerRenderable(displayList.map(StringRenderable::from))
         return listOf(
             if (unclaimedEggsConfig.warpClickEnabled) Renderable.clickable(
                 container,
