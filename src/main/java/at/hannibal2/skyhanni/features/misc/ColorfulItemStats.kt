@@ -13,6 +13,10 @@ object ColorfulItemStats {
 
     private val group = RepoPattern.group("misc.itemstats")
 
+    /**
+     * REGEX-TEST: §7Crit Chance: §c+30%
+     * REGEX-TEST: §7Magic Find: §a+54.52
+     */
     private val genericStat by group.pattern(
         "generic",
         "§7(?<Stat>[a-zA-Z ]+): (?<OldColor>§[0-9a-f])(?<Bonus>[-+]?[\\d.%]+)",
@@ -103,12 +107,12 @@ object ColorfulItemStats {
             event.toolTip[index] = genericStat.replace(line) {
                 val stat = group("Stat")
 
-                "§7${stat}: ${
+                "§7$stat: ${
                     colorStatMap[stat] ?: group("OldColor")
                 }${
                     group("Bonus")
                 }${
-                    iconStatMap[stat] ?: ""
+                    iconStatMap[stat].orEmpty()
                 }${
                     group("OldColor")
                 }"
