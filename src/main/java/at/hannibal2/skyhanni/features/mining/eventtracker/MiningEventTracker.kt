@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,7 +23,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import java.io.IOException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -183,18 +181,7 @@ object MiningEventTracker {
     }
 
     private suspend fun sendData(json: String) {
-        val response = try {
-            ApiUtils.postJSON(miningSendStatic, json)
-        } catch (e: IOException) {
-            if (SkyHanniDebugsAndTests.enabled) {
-                ErrorManager.logErrorWithData(
-                    e, "Sending mining event data was unsuccessful",
-                    "sentData" to json,
-                )
-            }
-            return
-        }
-        if (!response.success) return
+        val response = ApiUtils.postJSON(miningSendStatic, json).takeIf { it.success } ?: return
         val data = response.data ?: return
 
         val formattedResponse = ConfigManager.gson.fromJson<MiningEventDataReceive>(data)
@@ -209,9 +196,7 @@ object MiningEventTracker {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (apiError) {
-            canRequestAt = SimpleTimeMark.now()
-        }
+        if (apiError) canRequestAt = SimpleTimeMark.now()
     }
 
     private suspend fun fetchData() {
@@ -224,13 +209,11 @@ object MiningEventTracker {
         val miningEventData = ConfigManager.gson.fromJson<MiningEventDataReceive>(receivedData)
 
         if (!miningEventData.success) {
-            if (receivedData.toString().trim() == "{}") {
-                ChatUtils.chat(
-                    "§cFailed loading Mining Event data!\n" +
-                        "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
-                    onlySendOnce = true,
-                )
-            } else ErrorManager.logErrorWithData(
+            if (receivedData.toString().trim() == "{}") ChatUtils.chat(
+                "§cFailed loading Mining Event data!\n" +
+                    "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
+                onlySendOnce = true,
+            ) else ErrorManager.logErrorWithData(
                 Exception("miningEventData.success = false"),
                 "Failed to load Mining Event data!",
                 "cause" to miningEventData.cause,

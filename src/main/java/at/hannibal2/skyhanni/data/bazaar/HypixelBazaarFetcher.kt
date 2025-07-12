@@ -22,12 +22,12 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-// https://api.hypixel.net/#tag/SkyBlock/paths/~1v2~1skyblock~1bazaar/get
 @SkyHanniModule
 object HypixelBazaarFetcher {
-    private const val URL = "https://api.hypixel.net/v2/skyblock/bazaar"
-    private const val API_NAME = "Hypixel Bazaar"
-    private val bzStatic = ApiUtils.StaticApiPath(URL, API_NAME)
+    private val bzStatic = ApiUtils.StaticApiPath(
+        "https://api.hypixel.net/v2/skyblock/bazaar",
+        "Hypixel Bazaar"
+    )
 
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 

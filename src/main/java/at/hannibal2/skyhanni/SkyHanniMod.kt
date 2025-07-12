@@ -144,6 +144,7 @@ object SkyHanniMod {
     }
 
     fun launchCoroutine(function: suspend () -> Unit) {
+        @Suppress("DEPRECATION")
         coroutineScope.launch {
             try {
                 function()

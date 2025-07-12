@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson
 import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -20,31 +19,26 @@ class HypixelItemApi {
         fun getNpcPrice(internalName: NeuInternalName) = npcPrices[internalName]
     }
 
+    private val hypixelItemStatic = ApiUtils.StaticApiPath(
+        "https://api.hypixel.net/v2/resources/skyblock/items",
+        "Hypixel SkyBlock Items"
+    )
+
     private suspend fun loadNpcPrices(): MutableMap<NeuInternalName, Double> {
         val list = mutableMapOf<NeuInternalName, Double>()
-        val apiResponse = ApiUtils.getJSONResponse(
-            "https://api.hypixel.net/v2/resources/skyblock/items",
-            apiName = "Hypixel SkyBlock Items",
-        ) ?: return list
-        try {
-            val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
+        val apiResponse = ApiUtils.getJSONResponse(hypixelItemStatic) ?: return list
+        val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
 
-            val motesPrice = mutableMapOf<NeuInternalName, Double>()
-            val allStats = mutableMapOf<NeuInternalName, Map<String, Int>>()
-            for (item in itemsData.items) {
-                val neuItemId = NeuItems.transHypixelNameToInternalName(item.id ?: continue)
-                item.npcPrice?.let { list[neuItemId] = it }
-                item.motesPrice?.let { motesPrice[neuItemId] = it }
-                item.stats?.let { stats -> allStats[neuItemId] = stats }
-            }
-            ItemUtils.updateBaseStats(allStats)
-            RiftApi.motesPrice = motesPrice
-        } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(
-                e, "Error getting npc sell prices",
-                "hypixelApiResponse" to apiResponse,
-            )
+        val motesPrice = mutableMapOf<NeuInternalName, Double>()
+        val allStats = mutableMapOf<NeuInternalName, Map<String, Int>>()
+        for (item in itemsData.items) {
+            val neuItemId = NeuItems.transHypixelNameToInternalName(item.id ?: continue)
+            item.npcPrice?.let { list[neuItemId] = it }
+            item.motesPrice?.let { motesPrice[neuItemId] = it }
+            item.stats?.let { stats -> allStats[neuItemId] = stats }
         }
+        ItemUtils.updateBaseStats(allStats)
+        RiftApi.motesPrice = motesPrice
         return list
     }
 

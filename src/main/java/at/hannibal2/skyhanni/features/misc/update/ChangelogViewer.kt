@@ -64,27 +64,23 @@ object ChangelogViewer {
     }
 
     private suspend fun getChangelog() {
-        try {
-            val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
-            val data = mutableListOf<ChangelogJson>()
-            var pageNumber = 1
-            while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
-                val pagedUrl = "$url$pageNumber"
-                val jsonObject = ApiUtils.getJSONResponse(pagedUrl, apiName = "github")
-                    ?: return
-                val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
-                data.addAll(page)
-                pageNumber++
-            }
-            val neededData = data.filter {
-                val sub = ModVersion.fromString(it.tagName)
-                sub.isInBetween(startVersion, endVersion)
-            }
-            neededData.forEach { entry ->
-                cache[ModVersion.fromString(entry.tagName)] = formatData(formatString(getBasic(entry.body)))
-            }
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Changelog Loading Failed")
+        val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
+        val data = mutableListOf<ChangelogJson>()
+        var pageNumber = 1
+        while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
+            val pagedUrl = "$url$pageNumber"
+            val jsonObject = ApiUtils.getJSONResponse(pagedUrl, apiName = "github")
+                ?: ErrorManager.skyHanniError("Changelog Loading Failed")
+            val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
+            data.addAll(page)
+            pageNumber++
+        }
+        val neededData = data.filter {
+            val sub = ModVersion.fromString(it.tagName)
+            sub.isInBetween(startVersion, endVersion)
+        }
+        neededData.forEach { entry ->
+            cache[ModVersion.fromString(entry.tagName)] = formatData(formatString(getBasic(entry.body)))
         }
     }
 
