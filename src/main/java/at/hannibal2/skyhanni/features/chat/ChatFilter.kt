@@ -489,15 +489,12 @@ object ChatFilter {
     )
 
     /**
-     ** key: "redundant-mochibear"
      ** REGEX-TEST: §7§oMochibear ate too much and passed out! You caught it!
      */
     /**
-     ** key: "redundant-invisibug"
      ** REGEX-TEST: §7§oYou caught yourself an invisibug! The shard was sent to your Hunting Box!
      */
     /**
-     ** key: "redundant-mossybit"
      ** REGEX-TEST: §7§oThe Frog is exhausted...
      */
     private val redundantShardsPatterns by huntingPatternGroup.list(
