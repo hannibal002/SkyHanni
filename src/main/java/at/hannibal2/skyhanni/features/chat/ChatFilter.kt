@@ -314,8 +314,8 @@ object ChatFilter {
     )
 
     private val lotteryMessages = listOf(
-        "§r§bNew day! §r§eYour §r§2Lottery §r§ebuff changed!",
-        "§r§8§oYou can disable this messaging by toggling Lottery in your /hotf!"
+        "§bNew day! §r§eYour §r§2Lottery §r§ebuff changed!",
+        "§8§oYou can disable this messaging by toggling Lottery in your /hotf!",
     )
 
     /**
