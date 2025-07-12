@@ -13,8 +13,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
@@ -72,8 +74,17 @@ object EnoughUpdatesManager {
 
     fun inLoadingState() = isLoading || EnoughUpdatesRepoManager.currentlyFetching
 
+    val logger get() = EnoughUpdatesRepoManager.logger
+
     fun reloadItemsFromRepo() {
-        if (isLoading) return
+        if (isLoading) {
+            logger.debug("Already loading NEU repo, skipping reload")
+            return
+        }
+
+        val timeNow = SimpleTimeMark.now()
+        logger.debug("Starting reloadItemsFromRepo at $timeNow")
+
         isLoading = true
         itemStackCache.clear()
         displayNameCache.clear()
@@ -82,12 +93,31 @@ object EnoughUpdatesManager {
         recipes.clear()
         recipesMap.clear()
 
+        val prepFinishedTime = SimpleTimeMark.now()
+        val prepElapsedFormat = (prepFinishedTime - timeNow).format()
+        logger.debug("Preparation finished at $prepFinishedTime\nElapsed time: $prepElapsedFormat")
+
+
+        val startTimeMapLoad = SimpleTimeMark.now()
+        logger.debug("Loading item map at $startTimeMapLoad")
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(tempItemMap)
+        val mapLoadFinishedTime = SimpleTimeMark.now()
+        val mapLoadElapsedFormat = (mapLoadFinishedTime - startTimeMapLoad).format()
+        logger.debug("Item map loaded at $mapLoadFinishedTime\nElapsed time: $mapLoadElapsedFormat")
+
+
+        val transferItemMapStart = SimpleTimeMark.now()
+        logger.debug("Transferring item map at $transferItemMapStart")
+
         synchronized(itemMap) {
             itemMap.clear()
             itemMap.putAll(tempItemMap)
         }
+        val transferItemMapFinishedTime = SimpleTimeMark.now()
+        val transferItemMapElapsedFormat = (transferItemMapFinishedTime - transferItemMapStart).format()
+        logger.debug("Item map transferred at $transferItemMapFinishedTime\nElapsed time: $transferItemMapElapsedFormat")
+
         isLoading = false
     }
 
