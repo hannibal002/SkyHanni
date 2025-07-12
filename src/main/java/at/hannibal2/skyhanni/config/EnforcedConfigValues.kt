@@ -19,19 +19,19 @@ import kotlin.time.Duration.Companion.INFINITE
 @SkyHanniModule
 object EnforcedConfigValues {
 
-    private var enforcedConfigValues: List<EnforcedValueData> = listOf()
+    private var enforcedConfigValuesData: List<EnforcedValueData> = listOf()
     private var hasSentPSAsOnce = false
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val constant = event.getConstant<EnforcedConfigValuesJson>("misc/EnforcedConfigValues").enforcedConfigValues
-        val oldEnforcedValues = enforcedConfigValues
-        enforcedConfigValues = constant.filter {
+        val oldEnforcedValues = enforcedConfigValuesData
+        enforcedConfigValuesData = constant.filter {
             SkyHanniMod.modVersion <= it.affectedVersion
         }.filter {
             it.affectedMinecraftVersions?.contains(PlatformUtils.MC_VERSION) ?: true
         }
-        if (oldEnforcedValues == enforcedConfigValues) return
+        if (oldEnforcedValues == enforcedConfigValuesData) return
         hasSentPSAsOnce = false
         // we have to recreate the whole config when a value changes
         // so that the option is blocked off inside the config
@@ -52,13 +52,13 @@ object EnforcedConfigValues {
     }
 
     private fun sendPSAs() {
-        val notifications = enforcedConfigValues.mapNotNull { it.notificationPSA }
+        val notifications = enforcedConfigValuesData.mapNotNull { it.notificationPSA }
         for (notification in notifications) {
             if (notification.isNotEmpty()) {
                 NotificationManager.queueNotification(SkyHanniNotification(notification, INFINITE, true))
             }
         }
-        val chat = enforcedConfigValues.flatMap { it.chatPSA.orEmpty() }
+        val chat = enforcedConfigValuesData.flatMap { it.chatPSA.orEmpty() }
         if (chat.isNotEmpty()) {
             var shouldPrefix = true
             for (line in chat) {
@@ -69,7 +69,7 @@ object EnforcedConfigValues {
     }
 
     private fun enforceOntoConfig(config: Any) {
-        for (enforcedValue in enforcedConfigValues.flatMap { it.enforcedValues }) {
+        for (enforcedValue in enforcedConfigValuesData.flatMap { it.enforcedValues }) {
             val shimmy = Shimmy.makeShimmy(config, enforcedValue.path.split("."))
             if (shimmy == null) {
                 try {
@@ -86,10 +86,10 @@ object EnforcedConfigValues {
     }
 
     fun isBlockedFromEditing(optionPath: String): String? {
-        val firstEnforcedValue = enforcedConfigValues.firstOrNull { enforcedValueData ->
+        val firstEnforcedValue = enforcedConfigValuesData.firstOrNull { enforcedValueData ->
             enforcedValueData.enforcedValues.any { it.path == optionPath }
         } ?: return null
-        return firstEnforcedValue.extraMessage ?: ""
+        return firstEnforcedValue.extraMessage.orEmpty()
     }
 
 }

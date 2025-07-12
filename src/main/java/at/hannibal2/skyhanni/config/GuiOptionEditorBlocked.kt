@@ -32,7 +32,6 @@ class GuiOptionEditorBlocked(private val base: GuiOptionEditor, private val extr
             (x + iconWidth).toInt(), (y + (oneThird * 2) - fontRenderer.height / 2f).toInt(),
             true, (width - iconWidth).toInt(), -0xbbbc,
         )
-
     }
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
