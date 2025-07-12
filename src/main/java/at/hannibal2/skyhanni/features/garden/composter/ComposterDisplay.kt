@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHoriz
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -98,7 +99,7 @@ object ComposterDisplay {
                 addItemStack(bucket)
                 addString("§b$format")
             }
-        } else Renderable.string("§cOpen Composter Upgrades!")
+        } else StringRenderable("§cOpen Composter Upgrades!")
     }
 
     private fun readData(tabList: List<String>) {

@@ -16,6 +16,9 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -73,21 +76,17 @@ object DungeonSpiritLeapOverlay {
 
     private fun createSpiritLeapOverlay(leapRenderItems: List<Renderable>): Renderable {
         val layout = leapRenderItems.take(4).chunked(2)
-        return if (layout.isNotEmpty()) {
-            Renderable.table(
-                layout,
-                xPadding = 18,
-                yPadding = 18,
-                horizontalAlign = HorizontalAlignment.CENTER,
-                verticalAlign = VerticalAlignment.CENTER,
-            )
-        } else {
-            Renderable.wrappedString(
-                width = (containerWidth * 0.8).toInt(),
-                text = "No targets available for leap.",
-                scale = scaleFactor * 3,
-            )
-        }
+        return if (layout.isNotEmpty()) Renderable.table(
+            layout,
+            xPadding = 18,
+            yPadding = 18,
+            horizontalAlign = HorizontalAlignment.CENTER,
+            verticalAlign = VerticalAlignment.CENTER,
+        ) else WrappedStringRenderable(
+            width = (containerWidth * 0.8).toInt(),
+            text = "No targets available for leap.",
+            scale = scaleFactor * 3,
+        )
     }
 
     private fun createLeapItem(playerStackInfo: PlayerStackInfo): Renderable? {
@@ -107,15 +106,15 @@ object DungeonSpiritLeapOverlay {
             radius = 5,
         )
 
-        val playerInfoRenderable = Renderable.verticalContainer(
+        val playerInfoRenderable = VerticalContainerRenderable(
             listOf(
-                Renderable.wrappedString(
+                WrappedStringRenderable(
                     player.username,
                     width = (containerWidth * 0.25).toInt(),
                     scale = scaleFactor + 1.5,
                 ),
                 Renderable.placeholder(0, (containerHeight * 0.03).toInt()),
-                Renderable.wrappedString(
+                WrappedStringRenderable(
                     classInfo,
                     width = (containerWidth * 0.25).toInt(),
                     scale = (scaleFactor * 0.9) + 1.1,
@@ -125,7 +124,7 @@ object DungeonSpiritLeapOverlay {
             verticalAlign = VerticalAlignment.CENTER,
         )
 
-        val buttonLayout = Renderable.horizontalContainer(
+        val buttonLayout = HorizontalContainerRenderable(
             listOf(
                 Renderable.placeholder((containerWidth * 0.01).toInt(), 0),
                 itemRenderable,

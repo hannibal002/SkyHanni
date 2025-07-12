@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -86,10 +87,9 @@ object PersonalCompactorOverlay {
             RenderableInventory.fakeInventory(itemList, MAX_ITEMS_PER_ROW, 1.0)
         }
 
-        val title = Renderable.string(name)
-        val status = Renderable.string(
-            "§7Status: " + if (enabled) "§aEnabled" else "§cDisabled",
-        )
+        val title = StringRenderable(name)
+        val statusFormat = "§7Status: " + if (enabled) "§aEnabled" else "§cDisabled"
+        val status = StringRenderable(statusFormat)
 
         RenderableTooltips.setTooltipForRender(listOf(title, status, fakeInventory), spacedTitle = true)
         event.cancel()
