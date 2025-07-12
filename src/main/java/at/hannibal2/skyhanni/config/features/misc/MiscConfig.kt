@@ -486,7 +486,8 @@ class MiscConfig {
     @ConfigOption(
         name = "Hide Co-op Member Collections",
         desc = "Hides specific co-op members from collections.\n" +
-                "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) to update the list.",
+            "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) " +
+            "to update the list.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
