@@ -46,11 +46,11 @@ enum class MiningEventType(
             val compass = ItemStackRenderable(ItemStack(Items.compass), 0.45)
             val wind = Renderable.string("§9≈", scale = 0.75)
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 1f, -2f)
-                compass.render(posX, posY)
+                compass.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(-1f, -2f, 2f)
-                wind.render(posX, posY)
+                wind.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(0f, 1f, 0f)
             }
         },
@@ -66,11 +66,11 @@ enum class MiningEventType(
             val dyeGreen = ItemStackRenderable(DyeCompat.LIME.createStack(), 0.45)
             val dyePink = ItemStackRenderable(DyeCompat.PINK.createStack(), 0.45)
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 0f, 0f)
-                dyePink.render(posX + 1, posY - 1)
+                dyePink.render(mouseOffsetX + 1, mouseOffsetY - 1)
                 DrawContextUtils.translate(-2f, 1.5f, 0f)
-                dyeGreen.render(posX, posY)
+                dyeGreen.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(1f, -1.5f, 0f)
             }
 
@@ -102,11 +102,11 @@ enum class MiningEventType(
                 )
             }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(-1f, 0f, 0f)
-                alexHead.render(posX, posY)
+                alexHead.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(+4f, +3f, 0f)
-                steveHead.render(posX, posY)
+                steveHead.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(-3f, -3f, 0f)
             }
 
