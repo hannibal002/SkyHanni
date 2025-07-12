@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -164,7 +166,7 @@ object UpdateKeybinds {
                 logger.log("$keybind new $newValue")
             } else {
                 shouldNotify = true
-                SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$keybind"))
+                resetKeybind(keybind)
                 logger.log("Couldn't find a mapping for $keybind value: $currentValue")
                 DelayedRun.runDelayed(3.seconds) {
                     ChatUtils.chat("Could not convert keybind for $keybind, please set it manually in /sh")
@@ -226,6 +228,25 @@ object UpdateKeybinds {
                 DelayedRun.runDelayed(3.seconds) {
                     ChatUtils.chat("Keybind $keybind was invalid and it has been reset, please set it manually in /sh")
                 }
+            }
+        }
+    }
+
+    private fun resetKeybind(key: String) {
+        SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$key"))
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetkeybinds") {
+            category = CommandCategory.USERS_RESET
+            description = "Resets all of your skyhanni keybinds"
+            aliases = listOf("shkeybindreset")
+            simpleCallback {
+                for (keybind in keybinds) {
+                    resetKeybind(keybind)
+                }
+                ChatUtils.chat("§aSuccessfully reset all SkyHanni Keybinds")
             }
         }
     }

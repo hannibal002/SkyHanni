@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.api
 
-import at.hannibal2.skyhanni.data.hotx.ChatRepoPatternEnum
-import at.hannibal2.skyhanni.data.hotx.ItemRepoPatternEnum
+import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
+import at.hannibal2.skyhanni.data.hotx.RotatingPerk
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
@@ -12,26 +12,30 @@ object HotfApi {
     var lottery: LotteryPerk? = null
 
     enum class LotteryPerk(
-        @Language("RegExp") override val chatPatternRaw: String,
-        @Language("RegExp") override val itemPatternRaw: String,
-    ) : ChatRepoPatternEnum, ItemRepoPatternEnum {
+        override val perkDescription: String,
+        @Language("RegExp") val chatFallback: String,
+        @Language("RegExp") val itemFallback: String,
+    ) : RotatingPerk {
         SWEEP(
-            chatPatternRaw = "Gain §r§a\\+5% §r§2∮ Sweep§r§f\\.",
-            itemPatternRaw = "Gain §a\\+5% §2∮ Sweep§7\\."
+            perkDescription = "§a+5% §r§2∮ Sweep",
+            chatFallback = "Gain §r§a\\+5% §r§2∮ Sweep§r§f\\.",
+            itemFallback = "Gain §a\\+5% §2∮ Sweep§7\\."
         ),
         MANGROVE_FORTUNE(
-            chatPatternRaw = "Gain §r§a\\+50 §r§6☘ Mangrove Fortune§r§f\\.",
-            itemPatternRaw = "Gain §a\\+50 §6☘ Mangrove Fortune§7\\."
+            perkDescription = "§a+50 §r§6☘ Mangrove Fortune",
+            chatFallback = "Gain §r§a\\+50 §r§6☘ Mangrove Fortune§r§f\\.",
+            itemFallback = "Gain §a\\+50 §6☘ Mangrove Fortune§7\\."
         ),
         FIG_FORTUNE(
-            chatPatternRaw = "Gain §r§a\\+50 §r§6☘ Fig Fortune§r§f\\.",
-            itemPatternRaw = "Gain §a\\+50 §6☘ Fig Fortune§7\\."
+            perkDescription = "§a+50 §r§6☘ Fig Fortune",
+            chatFallback = "Gain §r§a\\+50 §r§6☘ Fig Fortune§r§f\\.",
+            itemFallback = "Gain §a\\+50 §6☘ Fig Fortune§7\\."
         ),
         ;
 
-        override val basePath = "foraging.hotf.lottery"
-        override val chatPattern by RepoPattern.pattern("$basePath.chat.$patternId", chatPatternRaw)
-        override val itemPattern by RepoPattern.pattern("$basePath.item.$patternId", itemPatternRaw)
+        private val basePath = "foraging.hotf.lottery"
+        override val chatPattern by RepoPattern.pattern("$basePath.chat.${asPatternId()}", chatFallback)
+        override val itemPattern by RepoPattern.pattern("$basePath.item.${asPatternId()}", itemFallback)
     }
 
 }

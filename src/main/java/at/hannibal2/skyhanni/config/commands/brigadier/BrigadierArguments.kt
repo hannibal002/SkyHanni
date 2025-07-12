@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.SimpleStringArgumentType
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.DoubleArgumentType
 import com.mojang.brigadier.arguments.FloatArgumentType
@@ -26,4 +27,8 @@ object BrigadierArguments {
     fun string(): StringArgumentType = StringArgumentType.string()
     fun greedyString(): StringArgumentType = StringArgumentType.greedyString()
     fun word(): StringArgumentType = StringArgumentType.word()
+
+    fun <T : Any> simpleMap(map: Map<String, T>): SimpleStringArgumentType<T> {
+        return SimpleStringArgumentType(map)
+    }
 }

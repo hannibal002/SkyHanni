@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -91,7 +92,7 @@ object GardenVisitorTimer {
         timePattern.firstMatcher(TabListData.getTabList()) {
             val timeInfo = group("info").removeColor()
             if (timeInfo == "Not Unlocked!") {
-                display = Renderable.string("§cVisitors not unlocked!")
+                display = StringRenderable("§cVisitors not unlocked!")
                 return
             }
             if (timeInfo == "Queue Full!") {

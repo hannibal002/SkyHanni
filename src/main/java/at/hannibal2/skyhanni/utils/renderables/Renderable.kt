@@ -459,46 +459,6 @@ interface Renderable {
             }
         }
 
-        @Deprecated(
-            "Use StringRenderable instead",
-            ReplaceWith("StringRenderable(text, scale, color, horizontalAlign, verticalAlign)"),
-        )
-        fun string(
-            text: String,
-            scale: Double = 1.0,
-            color: Color = Color.WHITE,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-        ) = StringRenderable(
-            text,
-            scale,
-            color,
-            horizontalAlign,
-            verticalAlign,
-        )
-
-        @Deprecated(
-            "use WrappedStringRenderable instead",
-            ReplaceWith("WrappedStringRenderable(text, width, scale, color, horizontalAlign, verticalAlign)"),
-        )
-        fun wrappedString(
-            text: String,
-            width: Int,
-            scale: Double = 1.0,
-            color: Color = Color.WHITE,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-            internalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-        ) = WrappedStringRenderable(
-            text,
-            width,
-            scale,
-            color,
-            horizontalAlign,
-            verticalAlign,
-            internalAlign,
-        )
-
         fun placeholder(width: Int, height: Int = 10) = object : Renderable {
             override val width = width
             override val height = height
@@ -1002,45 +962,15 @@ interface Renderable {
             }
         }
 
+        // todo rename to horizontal
         fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
             return HorizontalContainerRenderable(buildList { builderAction() })
         }
 
+        // todo add spacing as a parameter here, or remove this function (hardcoded = 2?)
         fun vertical(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
             return VerticalContainerRenderable(buildList { builderAction() }, spacing = 2)
         }
-
-        @Deprecated(
-            "Use HorizontalContainerRenderable instead",
-            ReplaceWith("HorizontalContainerRenderable(content, spacing, horizontalAlign, verticalAlign)"),
-        )
-        fun horizontalContainer(
-            content: List<Renderable>,
-            spacing: Int = 0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ): Renderable = HorizontalContainerRenderable(
-            content,
-            spacing,
-            horizontalAlign,
-            verticalAlign,
-        )
-
-        @Deprecated(
-            "Use VerticalContainerRenderable instead",
-            ReplaceWith("VerticalContainerRenderable(content, spacing, horizontalAlign, verticalAlign)"),
-        )
-        fun verticalContainer(
-            content: List<Renderable>,
-            spacing: Int = 0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ): Renderable = VerticalContainerRenderable(
-            content,
-            spacing,
-            horizontalAlign,
-            verticalAlign,
-        )
 
         fun scrollList(
             list: List<Renderable>,

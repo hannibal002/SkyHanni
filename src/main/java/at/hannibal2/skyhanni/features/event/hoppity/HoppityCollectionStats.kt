@@ -55,6 +55,8 @@ import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
@@ -539,7 +541,7 @@ object HoppityCollectionStats {
 
         newList.add(
             Renderable.hoverTips(
-                Renderable.wrappedString(
+                WrappedStringRenderable(
                     "§dHotspot Rabbits§7: §a$foundHotspotCount§7/§a$totalHotspotCount",
                     width = 200,
                 ),
@@ -585,7 +587,7 @@ object HoppityCollectionStats {
 
         newList.add(
             Renderable.hoverTips(
-                Renderable.wrappedString(
+                WrappedStringRenderable(
                     "§6Resident Rabbits§7: §a$foundResidentRabbitsCount§7/§a$totalResidentRabbitsCount",
                     width = 200,
                 ),
@@ -608,9 +610,9 @@ object HoppityCollectionStats {
         newList.add(
             Renderable.hoverTips(
                 if (missingLocationRabbits.isEmpty()) {
-                    Renderable.wrappedString("§aFound enough eggs in all locations", width = 200)
+                    WrappedStringRenderable("§aFound enough eggs in all locations", width = 200)
                 } else {
-                    Renderable.wrappedString(
+                    WrappedStringRenderable(
                         "§cMissing Locations§7:§c " + missingLocationRabbits.joinToString("§7, §c") {
                             it.locationName
                         },
@@ -626,7 +628,7 @@ object HoppityCollectionStats {
         logRabbits(event)
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
+        newList.add(StringRenderable("§eHoppity Rabbit Collection§f:"))
         newList.add(RenderableUtils.fillTable(getRabbitStatsFormat(), padding = 5))
 
         addLocationRequirementRabbitsToHud(newList)
@@ -639,7 +641,7 @@ object HoppityCollectionStats {
         if (loggedRabbitCount < foundRabbitCount) {
             newList.addString("")
             newList.add(
-                Renderable.wrappedString(
+                WrappedStringRenderable(
                     "§cPlease Scroll through \n" + "§call pages!",
                     width = 200,
                 ),

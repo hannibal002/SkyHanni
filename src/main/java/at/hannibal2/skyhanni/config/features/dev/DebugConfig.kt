@@ -36,6 +36,14 @@ class DebugConfig {
     var modMenuLog: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "ApiUtils Never Silent",
+        desc = "Forces ApiUtils' `silentError` to always be false, so that errors always debug to ErrorManager."
+    )
+    @ConfigEditorBoolean
+    var apiUtilsNeverSilent: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Show Internal Name", desc = "Show internal names in item lore.")
     @ConfigEditorBoolean
     var showInternalName: Boolean = false
@@ -84,6 +92,11 @@ class DebugConfig {
     @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
     @ConfigEditorBoolean
     var showBZPrice: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Show Bin Price", desc = "Show Bin price in item lore.")
+    @ConfigEditorBoolean
+    var showBinPrice: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
