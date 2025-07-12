@@ -194,38 +194,6 @@ class DebugConfig {
     val forceGreatSpook: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
-    @ConfigEditorBoolean
-    var dvdLogo: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "dvdLogo")
-    val dvdLogoPosition: Position = Position(100, 100)
-
-    @Expose
-    @ConfigOption(name = "Orbital", desc = "Enable the test Orbital System renderable.")
-    @ConfigEditorBoolean
-    var orbital: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "orbital")
-    val orbitalPosition: Position = Position(200, 200)
-
-    @Expose
-    @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
-    @ConfigEditorBoolean
-    var itemStack: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "itemStack")
-    val itemStackPosition: Position = Position(-200, 300)
-
-    @Expose
-    @ConfigOption(name = "Animated Item Stack", desc = "Enable the test Animated Item Stack Renderable")
-    @ConfigEditorBoolean
-    var animatedItemStack: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
     @ConfigEditorBoolean
     var addonsDebug: Boolean = false
@@ -233,10 +201,6 @@ class DebugConfig {
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
     val addonsDebugPosition: Position = Position(300, 300)
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
-    val animatedItemStackPosition: Position = Position(-300, 300)
 
     @Expose
     @NoConfigLink

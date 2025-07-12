@@ -256,6 +256,16 @@ class InventoryConfig {
 
     @Expose
     @ConfigOption(
+        name = "Old SkyBlock Menu",
+        desc = "Show old buttons in the SkyBlock Menu: Trade, Accessories, Potions, Quiver, Fishing and Sacks. " +
+            "§cOnly works with the booster cookie effect active."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var oldSkyBlockMenu: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Favorite Power Stone",
         desc = "Show your favorite power stones. You can add/remove them by shift clicking a Power Stone."
     )
