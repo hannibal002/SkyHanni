@@ -48,6 +48,7 @@ import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import java.awt.Color
@@ -193,7 +194,7 @@ object BlockStrengthGuide {
             return Renderable.hoverTips(
                 HorizontalContainerRenderable(
                     listOf(
-                        Renderable.itemStack(icon),
+                        ItemStackRenderable(icon),
                         progressBar,
                         StringRenderable("$ticks"),
                     ),

@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
@@ -58,7 +59,7 @@ object PestFinder {
     }
 
     private fun drawDisplay() = buildList {
-        add(Renderable.string("§6Total pests: §e${PestApi.scoreboardPests}§6/§e8"))
+        add(StringRenderable("§6Total pests: §e${PestApi.scoreboardPests}§6/§e8"))
 
         for (plot in PestApi.getInfestedPlots()) {
             val pests = plot.pests
@@ -85,7 +86,7 @@ object PestFinder {
 
         if (PestApi.getInfestedPlots().isEmpty() && PestApi.scoreboardPests != 0) {
             remindInChat()
-            add(Renderable.string("§e${PestApi.scoreboardPests} §6Bugged pests!"))
+            add(StringRenderable("§e${PestApi.scoreboardPests} §6Bugged pests!"))
             add(
                 Renderable.clickable(
                     "§cTry opening your plots menu",

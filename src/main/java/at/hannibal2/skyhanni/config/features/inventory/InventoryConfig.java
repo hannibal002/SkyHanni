@@ -279,6 +279,16 @@ public class InventoryConfig {
     public boolean ultimateEnchantStar = false;
 
     @Expose
+    @ConfigOption(
+        name = "Old SkyBlock Menu",
+        desc = "Show old buttons in the SkyBlock Menu: Trade, Accessories, Potions, Quiver, Fishing and Sacks. " +
+            "§cOnly works with the booster cookie effect active."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean oldSkyBlockMenu = false;
+
+    @Expose
     @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean

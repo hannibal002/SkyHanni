@@ -25,7 +25,7 @@ class CommandsConfig {
     @ConfigOption(
         name = "Party Commands",
         desc = "Shortens party commands and allows tab-completing for them. " +
-            "§eCommands: /pt, /pp, /pko, /pk, /pd §7(SkyBlock command §e/pt §7to check your play time will still work)"
+            "§eCommands: /pt, /pp, /pko, /pk, /pd §7(SkyBlock command §e/pt §7to check your play time will still work)",
     )
     @Expose
     @ConfigEditorBoolean
@@ -43,7 +43,7 @@ class CommandsConfig {
 
     @ConfigOption(
         name = "Party Kick Reason",
-        desc = "Send a reason when kicking people using §e/pk lrg89 Dupe Archer §7or §e/party kick nea89o Low Cata Level§7."
+        desc = "Send a reason when kicking people using §e/pk lrg89 Dupe Archer §7or §e/party kick nea89o Low Cata Level§7.",
     )
     @Expose
     @ConfigEditorBoolean
@@ -52,7 +52,7 @@ class CommandsConfig {
 
     @ConfigOption(
         name = "Shorten §e/warp",
-        desc = "Allows warping without the need for the §ewarp §7prefix.\n(§e/warp wizard §7-> §e/wizard§7)"
+        desc = "Allows warping without the need for the §ewarp §7prefix.\n(§e/warp wizard §7-> §e/wizard§7)",
     )
     @Expose
     @ConfigEditorBoolean
@@ -68,7 +68,7 @@ class CommandsConfig {
     @Expose
     @ConfigOption(
         name = "Lower Case §e/viewrecipe",
-        desc = "Add support for lower case item IDs to the Hypixel command §e/viewrecipe§7."
+        desc = "Add support for lower case item IDs to the Hypixel command §e/viewrecipe§7.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -77,7 +77,7 @@ class CommandsConfig {
     @Expose
     @ConfigOption(
         name = "Fix Transfer Cooldown",
-        desc = "Waits for the transfer cooldown to complete if you try to warp."
+        desc = "Waits for the transfer cooldown to complete if you try to warp.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -87,4 +87,14 @@ class CommandsConfig {
     @ConfigOption(name = "Transfer Cooldown Message", desc = "Sends a message in chat when the transfer cooldown ends.")
     @ConfigEditorBoolean
     var transferCooldownMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Prevent Early Command Execution",
+        desc = "Prevent commands from executing before the server cooldown has ended and " +
+            "instead queue them to run after the cooldown is over.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var preventEarlyExecution: Boolean = false
 }

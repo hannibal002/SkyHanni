@@ -38,6 +38,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -184,12 +188,12 @@ object GoldenFishTimer {
     }
 
     private fun updateDisplay() {
-        display = Renderable.horizontalContainer(drawDisplay())
+        display = HorizontalContainerRenderable(drawDisplay())
     }
 
     private fun drawDisplay() = buildList {
         if (config.showHead) add(
-            Renderable.itemStack(
+            ItemStackRenderable(
                 goldenFishSkullItem,
                 2.5,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -224,8 +228,8 @@ object GoldenFishTimer {
         }
 
         add(
-            Renderable.verticalContainer(
-                text.map { Renderable.string(it) },
+            VerticalContainerRenderable(
+                text.map { StringRenderable(it) },
                 spacing = 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ),

@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.utils
+
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
@@ -11,6 +12,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -30,8 +33,7 @@ import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
 //#else
-//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
-//$$ import net.minecraft.client.render.RenderLayer
+//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.joml.Matrix4f
 //#endif
@@ -102,12 +104,12 @@ object GuiRenderUtils {
         val percent = current.fractionOf(maxValue)
         val scale = textScale.toDouble()
         return Renderable.hoverTips(
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 listOf(
-                    Renderable.string(label, scale = scale),
+                    StringRenderable(label, scale = scale),
                     Renderable.fixedSizeLine(
                         listOf(
-                            Renderable.string(
+                            StringRenderable(
                                 "§2${DecimalFormat("0.##").format(current)} / ${
                                     DecimalFormat(
                                         "0.##",
@@ -115,7 +117,7 @@ object GuiRenderUtils {
                                 }☘",
                                 scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
                             ),
-                            Renderable.string(
+                            StringRenderable(
                                 "§2${(percent * 100).roundTo(1)}%",
                                 scale = scale,
                                 horizontalAlign = HorizontalAlignment.RIGHT,
@@ -126,7 +128,7 @@ object GuiRenderUtils {
                     Renderable.progressBar(percent, width = width),
                 ),
             ),
-            tooltip.split('\n').map { Renderable.string(it) },
+            tooltip.split('\n').map(StringRenderable::from),
         )
     }
 
@@ -268,7 +270,7 @@ object GuiRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1f, 1f, 1f, 1f)
         //#else
-        //$$ DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        //$$ DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
         //#endif
     }
 
@@ -280,11 +282,13 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.disableScissor()
     }
 
-    fun drawFloatingRectDark(
+    private fun drawFloatingRect(
         x: Int,
         y: Int,
         width: Int,
         height: Int,
+        light: Int = -0xcfcfca,
+        dark: Int = -0xefefea,
         shadow: Boolean = true,
     ) {
         //#if MC < 1.21
@@ -298,8 +302,6 @@ object GuiRenderUtils {
         //#endif
 
         val main = alpha or 0x202026
-        val light = -0xcfcfca
-        val dark = -0xefefea
         drawRect(x, y, x + 1, y + height, light) // Left
         drawRect(x + 1, y, x + width, y + 1, light) // Top1
         drawRect(x + width - 1, y + 1, x + width, y + height, dark) // Right
@@ -310,6 +312,43 @@ object GuiRenderUtils {
             drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow
         }
     }
+
+    fun drawFloatingRectDark(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        drawFloatingRect(
+            x,
+            y,
+            width,
+            height,
+            -0xcfcfca,
+            -0xefefea,
+            shadow = shadow,
+        )
+    }
+
+    fun drawFloatingRectLight(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        drawFloatingRect(
+            x,
+            y,
+            width,
+            height,
+            light = -0xefefea,
+            dark = -0xcfcfca,
+            shadow = shadow,
+        )
+    }
+
 
     fun ItemStack.renderOnScreen(
         x: Float,
