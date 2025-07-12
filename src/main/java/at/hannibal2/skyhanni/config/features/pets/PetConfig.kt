@@ -35,6 +35,11 @@ class PetConfig {
     val nametag: PetNametagConfig = PetNametagConfig()
 
     @Expose
+    @ConfigOption(name = "Taming 60 Helper", desc = "")
+    @Accordion
+    val tamingSixty: TamingSixtyConfig = TamingSixtyConfig()
+
+    @Expose
     @ConfigOption(name = "Highlight Current Pet", desc = "")
     @Accordion
     val highlightInMenu: MenuHighlightConfig = MenuHighlightConfig()

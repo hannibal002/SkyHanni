@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -10,7 +9,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -30,7 +28,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object GeorgeHelper {
 
-    // private val config get() = SkyHanniMod.feature.misc.pets
     /**
      * internal name: NONE
      * display name: '§d+1 Taming Level Cap'
@@ -55,6 +52,7 @@ object GeorgeHelper {
      *
      * no tag compound
      */
+    private val config get() = SkyHanniMod.feature.misc.pets.tamingSixty
     private val useFandomWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useFandom
     private const val SPAWN_EGG_SLOT = 41
 
@@ -107,7 +105,7 @@ object GeorgeHelper {
                     add(petInfo.renderableInfo)
                 }
             }
-            add(StringRenderable("§7Total Cost: §6${totalCost.formatCoin()} coins"))
+            add(StringRenderable("§7Total Cost: §6${totalCost.addSeparators()} coins"))
         }
     }
 
@@ -124,12 +122,16 @@ object GeorgeHelper {
         val formattedPet = "${rarityColorCode}${LorenzRarity.getById(cheapestTier)?.formattedName} $petName"
 
         val clickableRenderable = if (cheapestPrice > 0) {
+            val tips = mutableListOf(
+                "§eClick to find a $formattedPet §eon the AH!",
+                "§7(Make sure to check the rarity filter.)",
+            )
+            if (cheapestTier < tierNumber) tips.add(
+                "§7(Does not include costs to upgrade via Kat.)",
+            )
             Renderable.clickable(
                 text = " §7- $formattedPet: §6${cheapestPrice.addSeparators()} coins",
-                tips = listOf(
-                    "§eClick to find a $formattedPet §eon the AH!",
-                    "§7(Make sure to check the rarity filter.)",
-                ),
+                tips = tips,
                 onLeftClick = { HypixelCommands.auctionSearch("] $petName") },
             )
         } else {
@@ -154,7 +156,7 @@ object GeorgeHelper {
 
     private fun findCheapestTier(pet: String, originalTier: Int) = buildList<Pair<Int, Double>> {
         this.add(originalTier to petInternalName(pet, originalTier).getPetPrice())
-        if (true) { // TODO: replace with config setting!
+        if (config.otherTiers) {
             this.add(originalTier - 1 to petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true))
             if (originalTier != 5) this.add(
                 originalTier + 1 to petInternalName(pet, originalTier + 1).getPetPrice(
@@ -171,9 +173,9 @@ object GeorgeHelper {
 
     @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.HUB)
     fun onRenderOverlay() {
-        // if (!config.enabled) return
+        if (!config.enabled) return
         if (display.isEmpty()) return
-        Position(100, 90, centerX = false).renderRenderables(display, posLabel = "Taming 60 Helper")
+        config.displayPos.renderRenderables(display, posLabel = "Taming 60 Helper")
     }
 
     @HandleEvent
