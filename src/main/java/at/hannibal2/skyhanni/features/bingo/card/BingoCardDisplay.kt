@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -86,7 +87,7 @@ object BingoCardDisplay {
         val newList = mutableListOf<Renderable>()
 
         if (BingoApi.bingoGoals.isEmpty()) {
-            newList.add(Renderable.string("§6Bingo Goals:"))
+            newList.add(StringRenderable("§6Bingo Goals:"))
             newList.add(
                 Renderable.clickable(
                     "§cOpen the §e/bingo §ccard.",
@@ -106,7 +107,7 @@ object BingoCardDisplay {
     }
 
     private fun MutableList<Renderable>.addCommunityGoals() {
-        add(Renderable.string("§6Community Goals:"))
+        add(StringRenderable("§6Community Goals:"))
         val goals = BingoApi.communityGoals.toMutableList()
         var hiddenGoals = 0
         for (goal in goals.toList()) {
@@ -124,7 +125,7 @@ object BingoCardDisplay {
 
         if (hiddenGoals > 0) {
             val name = StringUtils.pluralize(hiddenGoals, "goal")
-            add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
+            add(StringRenderable("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
         addString(" ")
     }
@@ -136,7 +137,7 @@ object BingoCardDisplay {
     private fun MutableList<Renderable>.addPersonalGoals() {
         val todo = BingoApi.personalGoals.filter { !it.done }.toMutableList()
         val done = MAX_PERSONAL_GOALS - todo.size
-        add(Renderable.string("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)"))
+        add(StringRenderable("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)"))
 
         var hiddenGoals = 0
         var nextTip = 14.days
@@ -157,17 +158,17 @@ object BingoCardDisplay {
 
         if (hiddenGoals > 0) {
             val name = StringUtils.pluralize(hiddenGoals, "goal")
-            add(Renderable.string("§7+ $hiddenGoals more §cunknown §7$name."))
+            add(StringRenderable("§7+ $hiddenGoals more §cunknown §7$name."))
         }
         hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 14.days
         if (hasHiddenPersonalGoals) {
             val nextTipTime = BingoApi.lastBingoCardOpenTime + nextTip
             if (nextTipTime.isInPast()) {
-                add(Renderable.string("§eThe next hint got unlocked already!"))
-                add(Renderable.string("§eOpen the bingo card to update!"))
+                add(StringRenderable("§eThe next hint got unlocked already!"))
+                add(StringRenderable("§eOpen the bingo card to update!"))
             } else {
                 val until = nextTipTime.timeUntil()
-                add(Renderable.string("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}"))
+                add(StringRenderable("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}"))
             }
         }
     }
@@ -205,12 +206,12 @@ object BingoCardDisplay {
                     },
                 )
             } else {
-                Renderable.string(display)
+                StringRenderable(display)
             }
         }
         if (filter) {
             val missing = goals.size - finalGoal.size
-            add(Renderable.string("  §8+ $missing not highlighted goals."))
+            add(StringRenderable("  §8+ $missing not highlighted goals."))
         }
     }
 
