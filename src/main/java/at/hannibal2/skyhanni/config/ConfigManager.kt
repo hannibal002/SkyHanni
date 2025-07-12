@@ -294,8 +294,9 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
             UpdateKeybinds.keybinds.add(extraPath)
         }
         //#endif
-        if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
-            return GuiOptionEditorBlocked(default)
+
+        EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
+            return GuiOptionEditorBlocked(default, extraMessage)
         }
 
         if (PlatformUtils.IS_LEGACY) {

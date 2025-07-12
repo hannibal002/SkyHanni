@@ -124,7 +124,7 @@ class TrackerConfig {
     companion object {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            event.move(90, "misc.tracker.hideItemTrackersOutsideInventory", "misc.tracker.hideOutsideInventory")
+            event.move(95, "misc.tracker.hideItemTrackersOutsideInventory", "misc.tracker.hideOutsideInventory")
         }
     }
 }
