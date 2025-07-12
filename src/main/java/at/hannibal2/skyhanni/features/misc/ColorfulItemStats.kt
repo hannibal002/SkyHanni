@@ -43,7 +43,8 @@ object ColorfulItemStats {
                     append(
                         SkyblockStat.getValueOrNull(
                             stat.uppercase().replace(" ", "_")
-                        )?.icon?.take(2) ?: oldColor)
+                        )?.icon?.take(2) ?: oldColor
+                    )
                     append(group("Bonus"))
                     append(iconStatMap[stat].orEmpty())
                     append(oldColor)
