@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -22,11 +23,14 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.inventory.ContainerChest
@@ -36,8 +40,8 @@ object EnigmaSoulWaypoints {
 
     private val config get() = RiftApi.config.enigmaSoulWaypoints
     private var inInventory = false
-    var soulLocations = mapOf<String, LorenzVec>()
-    private val trackedSouls = mutableListOf<String>()
+    var soulLocations = mapOf<String, Map<String, LorenzVec>>()
+    private val trackedSouls = mutableMapOf<String, MutableList<String>>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true
 
@@ -51,6 +55,42 @@ object EnigmaSoulWaypoints {
             "§7missing souls on this page",
         )
     }
+
+    private val patternGroup = RepoPattern.group("rift.everywhere.enigma-souls")
+
+    /**
+     * REGEX-TEST: Enigma: Tough Bark
+     * REGEX-TEST: ✔ Enigma: Woods Flower Pot
+     */
+    private val enigmaTitlePattern by patternGroup.pattern(
+        "title",
+        "(?:✔ )?Enigma: (?<name>.+)",
+    )
+
+    /**
+     * REGEX-TEST: ✖ Not completed yet!
+     */
+    private val notCompletedPattern by patternGroup.pattern(
+        "not-completed",
+        "✖ Not completed yet!",
+    )
+
+    /**
+     * REGEX-TEST: To Rift Guide ➜ Wyld Woods
+     */
+    private val guideAreaPattern by patternGroup.pattern(
+        "guide-area",
+        "To Rift Guide ➜ (?<area>.+)",
+    )
+
+    /**
+     * REGEX-TEST: SOUL! You unlocked an Enigma Soul!
+     * REGEX-TEST: You have already found that Enigma Soul!
+     */
+    private val foundPattern by patternGroup.pattern(
+        "found",
+        "SOUL! You unlocked an Enigma Soul!|You have already found that Enigma Soul!",
+    )
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
@@ -69,9 +109,12 @@ object EnigmaSoulWaypoints {
         inInventory = true
 
         for (stack in event.inventoryItems.values) {
-            val split = stack.displayName.split("Enigma: ")
-            if (split.size == 2 && stack.getLore().last() == "§8✖ Not completed yet!") {
-                inventoryUnfound.add(split.last())
+            stack.getLore().lastOrNull()?.let {
+                if (notCompletedPattern.matches(it.removeColor())) {
+                    enigmaTitlePattern.matchMatcher(stack.displayName.removeColor()) {
+                        inventoryUnfound.add(group("name"))
+                    }
+                }
             }
         }
     }
@@ -87,50 +130,51 @@ object EnigmaSoulWaypoints {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory || !isEnabled()) return
 
+        val area = getSelectedArea() ?: return
+
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
             event.makePickblock()
             if (inventoryUnfound.contains("Buttons")) {
                 RiftApi.trackingButtons = !RiftApi.trackingButtons
             }
             if (adding) {
-                trackedSouls.addAll(inventoryUnfound)
+                trackedSouls.getOrPut(area) { mutableListOf() }.addAll(inventoryUnfound)
                 adding = false
             } else {
-                trackedSouls.removeAll(inventoryUnfound)
+                trackedSouls[area]?.removeAll(inventoryUnfound)
                 adding = true
             }
         }
 
         if (event.slot?.stack == null) return
 
-        val split = event.slot.stack.displayName.split("Enigma: ")
-        if (split.size != 2) return
-
+        val name = enigmaTitlePattern.matchMatcher(event.slot.stack.displayName.removeColor()) {
+            group("name")
+        } ?: return
         event.makePickblock()
-        val name = split.last()
-        if (!soulLocations.contains(name)) return
+        if (soulLocations[area]?.contains(name) != true) return
 
         if (name == "Buttons") {
             RiftApi.trackingButtons = !RiftApi.trackingButtons
         }
 
-        if (!trackedSouls.contains(name)) {
+        if (trackedSouls[area]?.contains(name) != true) {
             ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
             if (config.showPathFinder) {
-                soulLocations[name]?.let {
+                soulLocations[area]?.get(name)?.let {
                     if (!(name == "Buttons" && WoodenButtonsHelper.showButtons())) {
                         IslandGraphs.pathFind(
                             it,
                             "$name Enigma Soul",
                             config.color.toSpecialColor(),
-                            condition = { config.showPathFinder }
+                            condition = { config.showPathFinder },
                         )
                     }
                 }
             }
-            trackedSouls.add(name)
+            trackedSouls.getOrPut(area) { mutableListOf() }.add(name)
         } else {
-            trackedSouls.remove(name)
+            trackedSouls[area]?.remove(name)
             ChatUtils.chat("§5No longer tracking the $name Enigma Soul!", prefixColor = "§5")
             IslandGraphs.stop()
         }
@@ -143,9 +187,12 @@ object EnigmaSoulWaypoints {
         if (event.gui !is GuiChest) return
         val chest = event.container as ContainerChest
 
+        val area = getSelectedArea() ?: return
+        val tracked = trackedSouls[area] ?: return
+
         for ((slot, stack) in chest.getAllItems()) {
-            for (soul in trackedSouls) {
-                if (stack.displayName.removeColor().contains(soul)) {
+            enigmaTitlePattern.matchMatcher(stack.displayName.removeColor()) {
+                if (group("name") in tracked) {
                     slot.highlight(LorenzColor.DARK_PURPLE)
                 }
             }
@@ -158,10 +205,12 @@ object EnigmaSoulWaypoints {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        for (soul in trackedSouls) {
-            soulLocations[soul]?.let {
-                event.drawWaypointFilled(it, config.color.toSpecialColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.up(), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
+        for ((area, souls) in trackedSouls) {
+            for (name in souls) {
+                soulLocations[area]?.get(name)?.let { position ->
+                    event.drawWaypointFilled(position, config.color.toSpecialColor(), seeThroughBlocks = true, beacon = true)
+                    event.drawDynamicText(position.up(), "§5${name.removeSuffix(" Soul")} Soul", 1.5)
+                }
             }
         }
     }
@@ -171,9 +220,11 @@ object EnigmaSoulWaypoints {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
         val areas = data.areas
         soulLocations = buildMap {
-            for ((_, locations) in areas) {
-                for (location in locations) {
-                    this[location.name] = location.position
+            for ((area, souls) in areas) {
+                this[area] = buildMap {
+                    for (soul in souls) {
+                        this[soul.name] = soul.position
+                    }
                 }
             }
         }
@@ -182,24 +233,33 @@ object EnigmaSoulWaypoints {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        val message = event.message.removeColor().trim()
-        if (message == "You have already found that Enigma Soul!" || message == "SOUL! You unlocked an Enigma Soul!") {
+        if (foundPattern.matches(event.message.removeColor().trim())) {
             hideClosestSoul()
+        }
+    }
+
+    private fun getSelectedArea(): String? = InventoryUtils.getSlotAtIndex(40)?.stack?.getLore()?.firstOrNull()?.let {
+        guideAreaPattern.matchMatcher(it.removeColor()) {
+            group("area")
         }
     }
 
     private fun hideClosestSoul() {
         var closestSoul = ""
+        var closestArea = ""
         var closestDistance = 8.0
 
-        for ((soul, location) in soulLocations) {
-            if (location.distanceToPlayer() < closestDistance) {
-                closestSoul = soul
-                closestDistance = location.distanceToPlayer()
+        for ((area, souls) in soulLocations) {
+            for ((name, position) in souls) {
+                if (position.distanceToPlayer() < closestDistance) {
+                    closestSoul = name
+                    closestArea = area
+                    closestDistance = position.distanceToPlayer()
+                }
             }
         }
-        if (closestSoul in trackedSouls) {
-            trackedSouls.remove(closestSoul)
+        if (trackedSouls[closestArea]?.contains(closestSoul) == true) {
+            trackedSouls[closestArea]?.remove(closestSoul)
             ChatUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
             if (closestSoul == "Buttons") {
                 RiftApi.trackingButtons = false

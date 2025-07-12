@@ -61,7 +61,4 @@ jobs:
                 run: ./gradlew :sharedVariables:build
 
             -   name: Publish to Modrinth
-                run: ./gradlew publishToModrinth \
-                    -Pchangelog="${{ steps.get_changelog.outputs.changelog }}" \
-                    -PmodVersion="${UPDATE_VERSION}" \
-                    -PmodrinthToken="${MODRINTH_TOKEN}"
+                run: ./gradlew publishToModrinth -Pchangelog="${{ steps.get_changelog.outputs.changelog }}" -PmodVersion="${UPDATE_VERSION}" -PmodrinthToken="${MODRINTH_TOKEN}"

@@ -70,7 +70,7 @@ class DVDLogoRenderable(
         y = position.y + (trajectory.y * movementSpeed * deltaTime),
     )
 
-    override fun renderWithDelta(posX: Int, posY: Int, deltaTime: Duration) {
+    override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         val (offsetX, offsetY, _) = RenderUtils.absoluteTranslation
 
         val absoluteX = position.x + offsetX
@@ -95,7 +95,7 @@ class DVDLogoRenderable(
         val (x, y) = position.x.roundToInt() to position.y.roundToInt()
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(x.toFloat(), y.toFloat(), 0f)
-            renderable.render(posX + x, posY + y)
+            renderable.render(mouseOffsetX + x, mouseOffsetY + y)
         }
     }
 }
