@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
 @SkyHanniModule
-object CoralFIshHelper {
+object CoralFishHelper {
 
     private val config get() = SkyHanniMod.feature.misc
 
