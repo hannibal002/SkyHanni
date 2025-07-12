@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+//#if FORGE
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -11,7 +13,9 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.value
+import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.FontRenderer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
@@ -23,8 +27,8 @@ import java.util.NavigableMap
 import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
-//#if FORGE
-import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
+import kotlin.reflect.KMutableProperty0
+
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor
@@ -198,6 +202,165 @@ object StringUtils {
         width,
     ).joinToString("\n") { it.removePrefix("§r") }
 
+    //#if FORGE
+    fun splitLinesWithLength(text: String, width: Int, font: FontRenderer): Pair<List<Pair<String, Int>>, Int> {
+        // TODO account for none standard § encodings
+        val output = mutableListOf<Pair<String, Int>>()
+        var trueWidth = 0
+
+        class FontChanges(
+            var textColor: Char = 'f',
+            var randomStyle: Boolean = false,
+            var boldStyle: Boolean = false,
+            var italicStyle: Boolean = false,
+            var underlineStyle: Boolean = false,
+            var strikethroughStyle: Boolean = false,
+            /**
+             * Here for double ``§r`` removal
+             */
+            var mutated: Boolean = false,
+        ) {
+            fun copy() = FontChanges(
+                textColor,
+                randomStyle,
+                boldStyle,
+                italicStyle,
+                underlineStyle,
+                strikethroughStyle,
+            )
+
+            fun reset() {
+                textColor = 'f'
+                randomStyle = false
+                boldStyle = false
+                italicStyle = false
+                underlineStyle = false
+                strikethroughStyle = false
+                mutated = false
+            }
+        }
+
+        val current = FontChanges()
+        var lastSplit = current
+        var whereIsSplitChar = -1
+        var lineWidth = 0
+        var splitWidth = 0
+        var i = 0
+        val builder = StringBuilder()
+
+        fun <T> setAttribute(add: Char, attribute: KMutableProperty0<T>, set: T) {
+            attribute.set(set)
+            current.mutated = true
+            builder.append('§').append(add)
+        }
+
+        fun split() {
+            // Dumm split when there is no way to split none contextually (eg: A single Word is longer than width)
+            if (whereIsSplitChar == -1) {
+                splitWidth = lineWidth
+                whereIsSplitChar = builder.length
+            }
+
+            // Split the builder into the old part and the new part
+            val extra = builder.substring(whereIsSplitChar)
+            builder.deleteEnd(whereIsSplitChar)
+            builder.selfTrimEnd()
+
+            // Remove redundant trailing §
+            while (builder.length >= 2 && builder[builder.length - 2] == '§') {
+                builder.delete(builder.length - 2, builder.length)
+            }
+            builder.selfTrimEnd()
+
+            output.add(builder.toString() to splitWidth)
+            if (trueWidth < splitWidth) {
+                trueWidth = splitWidth
+            }
+
+            builder.clear()
+            if (lastSplit.randomStyle) {
+                builder.append('§').append('k')
+            }
+            if (lastSplit.boldStyle) {
+                builder.append('§').append('l')
+            }
+            if (lastSplit.italicStyle) {
+                builder.append('§').append('o')
+            }
+            if (lastSplit.underlineStyle) {
+                builder.append('§').append('n')
+            }
+            if (lastSplit.strikethroughStyle) {
+                builder.append('§').append('m')
+            }
+            if (lastSplit.textColor != 'f') {
+                builder.append('§').append(lastSplit.textColor)
+            }
+
+            val whiteSpaceInFront = extra.indexOfFirst { !it.isWhitespace() }.transformIf({ this == -1 }, { 0 })
+            builder.append(extra.substring(whiteSpaceInFront))
+            lineWidth -= whiteSpaceInFront * font.getCharWidth(' ')
+
+            whereIsSplitChar = -1
+            lastSplit = current
+            lineWidth -= splitWidth
+            splitWidth = 0
+        }
+
+        while (i < text.length) {
+            val c = text[i]
+            when (c) {
+                '§' -> when (val format = text[++i]) {
+                    'r' -> if (current.mutated) {
+                        builder.append('§').append('r')
+                        current.reset()
+                    }
+
+                    'k' -> setAttribute('k', current::randomStyle, true)
+                    'l' -> setAttribute('l', current::boldStyle, true)
+                    'o' -> setAttribute('o', current::italicStyle, true)
+                    'n' -> setAttribute('n', current::underlineStyle, true)
+                    'm' -> setAttribute('m', current::strikethroughStyle, true)
+                    else -> setAttribute(format, current::textColor, format)
+                }
+
+                '\n' -> split()
+                ' ' -> {
+                    // TODO wide space galloping
+                    val w = font.getCharWidth(c)
+                    whereIsSplitChar = builder.length
+                    if (lineWidth + w > width) {
+                        lastSplit = current
+                        split()
+                    } else {
+                        lastSplit = current.copy()
+                        splitWidth = lineWidth
+                        lineWidth += w
+                        builder.append(c)
+                    }
+                }
+
+                else -> {
+                    val w = font.getCharWidth(c) + if (current.boldStyle) 1 else 0
+                    if (lineWidth + w > width) {
+                        split()
+                    }
+                    lineWidth += w
+                    builder.append(c)
+                }
+            }
+            i++
+        }
+
+        return output to trueWidth
+    }
+    //#else
+    //$$ fun splitLinesWithLength(text: String, width: Int, font: TextRenderer): Pair<List<Pair<String, Int>>, Int>{
+    //$$     val list = text.splitLines(width).split("\n").map{ it to font.getWidth(it) }
+    //$$     return list to list.maxOf { it.second }
+    //$$ }
+    //#endif
+
     //#if MC > 1.21
     //$$ private fun splitText(text: String, width: Int): List<String> {
     //$$     val lines = ChatMessages.breakRenderedChatMessageLines(Text.literal(text), width, MinecraftClient.getInstance().textRenderer)
@@ -235,6 +398,68 @@ object StringUtils {
     //$$     return strings
     //$$ }
     //#endif
+
+    /**
+     * Removes the characters in a substring of this builder.
+     * The substring begins at the specified [startIndex] and extends
+     * to the end of the builder.
+     * If [startIndex] is equal to [length], no changes are made.
+     *
+     * @param      startIndex  The beginning index, inclusive.
+     * @throws     StringIndexOutOfBoundsException  if [startIndex]
+     *             is negative, greater than [length]
+     */
+    fun StringBuilder.deleteEnd(startIndex: Int) {
+        this.delete(startIndex, length)
+    }
+
+    /**
+     * Removes the characters in a substring of this builder.
+     * The substring start at the beginning and extends to
+     * the character at index {[endIndex] - 1} or to the
+     * end if no such character exits.
+     * If [endIndex] is equal to 0, no changes are made.
+     *
+     * @param      endIndex    The ending index, exclusive.
+     * @throws     StringIndexOutOfBoundsException  if [endIndex]
+     *             is negative.
+     */
+    fun StringBuilder.deleteStart(endIndex: Int) {
+        this.delete(0, endIndex)
+    }
+
+    /**
+     * Modifies this builder having leading and trailing whitespace removed.
+     */
+    fun StringBuilder.selfTrim() {
+        selfTrimEnd()
+        selfTrimStart()
+    }
+
+    /**
+     * Modifies this builder having leading whitespace removed.
+     */
+    fun StringBuilder.selfTrimStart() {
+        var i: Int = 0
+        while (i <= length) {
+            if (!this[i].isWhitespace()) break
+            i++
+        }
+        deleteStart(i)
+    }
+
+    /**
+     * Modifies this builder having trailing whitespace removed.
+     */
+    fun StringBuilder.selfTrimEnd() {
+        var i: Int = length - 1
+        while (i >= 0) {
+            if (!this[i].isWhitespace()) break
+            i--
+        }
+        deleteEnd(i + 1)
+    }
+
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).

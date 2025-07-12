@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
+import at.hannibal2.skyhanni.utils.StringUtils.splitLinesWithLength
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -46,15 +47,15 @@ class WrappedStringRenderable(
     verticalAlign,
 ) {
     private val fontRenderer: FontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
-    val map by lazy {
-        text.splitLines((width / scale).toInt()).split("\n").associateWith { fontRenderer.getStringWidth(it) }
+    val map : List<Pair<String,Int>> by lazy {
+        splitLinesWithLength(text,(width / scale).toInt(),fontRenderer).first
     }
 
     override val width by lazy { (rawWidth * scale).toInt() + 1 }
 
     private val rawWidth by lazy {
-        if (map.size == 1) map.entries.first().value
-        else map.maxOf { it.value }
+        if (map.size == 1) map.first().second
+        else map.maxOf { it.second }
     }
 
     override val height by lazy { map.size * ((9 * scale).toInt() + 1) }
@@ -62,7 +63,7 @@ class WrappedStringRenderable(
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         DrawContextUtils.translate(1.0, 1.0, 0.0)
         DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
-        map.entries.forEachIndexed { index, (text, size) ->
+        map.forEachIndexed { index, (text, size) ->
             GuiRenderUtils.drawString(
                 text,
                 RenderableUtils.calculateAlignmentXOffset(size, rawWidth, internalAlign).toFloat(),
