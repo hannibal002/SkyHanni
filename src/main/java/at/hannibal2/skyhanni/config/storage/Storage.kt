@@ -11,12 +11,6 @@ class Storage {
     var hasPlayedBefore: Boolean = false
 
     @Expose
-    var savedMouselockedSensitivity: Float = .5f
-
-    @Expose
-    var savedMouseloweredSensitivity: Float = .5f
-
-    @Expose
     var visualWordsImported: Boolean = false
 
     @Expose
@@ -30,10 +24,6 @@ class Storage {
 
     @Expose
     var players: MutableMap<UUID, PlayerSpecificStorage> = mutableMapOf()
-
-    // TODO this should get moved into player specific
-    @Expose
-    var currentFameRank: String = "New player"
 
     @Expose
     var blacklistedUsers: MutableList<String> = mutableListOf()
