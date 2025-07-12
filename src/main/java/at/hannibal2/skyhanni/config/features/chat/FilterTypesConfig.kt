@@ -22,13 +22,13 @@ class FilterTypesConfig {
     @ConfigOption(name = "Foraging", desc = "")
     @OnlyModern
     @Accordion
-    val foraging: ForagingConfig = ForagingConfig()
+    val foraging: ForagingFilterConfig = ForagingFilterConfig()
 
     @Expose
     @ConfigOption(name = "Hunting", desc = "")
     @OnlyModern
     @Accordion
-    val hunting: HuntingConfig = HuntingConfig()
+    val hunting: HuntingFilterConfig = HuntingFilterConfig()
 
     @Expose
     @ConfigOption(name = "Stash Messages", desc = "")

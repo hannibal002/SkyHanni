@@ -467,7 +467,6 @@ object ChatFilter {
      ** REGEX-TEST: §eTalk to the §bRandom NPC §ein the §aForbidden Zone§e!
      ** REGEX-TEST: §r§eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
      ** REGEX-TEST: §r§eTalk to the §r§bRandom NPC §r§ein the §r§aForbidden Zone§r§e!
-     ** REGEX-TEST: §r§eTalk to the §r§bRandom NPC §r§ein the §r§aForbidden Zone§r§e!
      */
     private val rewardBundlePatterns by miscPatternGroup.list(
         "seasonal-bundles",
@@ -477,23 +476,7 @@ object ChatFilter {
 
     /**
      ** former key: "regenerating-tree"
-     ** sponsored by paranoia
      ** REGEX-TEST: §cYou cannot damage a tree while it is regenerating!
-     ** REGEX-TEST: §cYou cannot cut a tree while it is regenerating!
-     ** REGEX-TEST: §cYou cannot damage this tree while it is regenerating!
-     ** REGEX-TEST: §cYou cannot cut this tree while it is regenerating!
-     ** REGEX-TEST: §r§cYou cannot damage a tree while it is regenerating!
-     ** REGEX-TEST: §r§cYou cannot cut a tree while it is regenerating!
-     ** REGEX-TEST: §r§cYou cannot damage this tree while it is regenerating!
-     ** REGEX-TEST: §r§cYou cannot cut this tree while it is regenerating!
-     ** REGEX-TEST: §cYou can't damage a tree while it is regenerating!
-     ** REGEX-TEST: §cYou can't cut a tree while it is regenerating!
-     ** REGEX-TEST: §cYou can't damage this tree while it is regenerating!
-     ** REGEX-TEST: §cYou can't cut this tree while it is regenerating!
-     ** REGEX-TEST: §r§cYou can't damage a tree while it is regenerating!
-     ** REGEX-TEST: §r§cYou can't cut a tree while it is regenerating!
-     ** REGEX-TEST: §r§cYou can't damage this tree while it is regenerating!
-     ** REGEX-TEST: §r§cYou can't cut this tree while it is regenerating!
      */
     /**
      ** former key: "tree-toughness"
@@ -501,7 +484,7 @@ object ChatFilter {
      */
     private val unmineableTreePatterns by foragingPatternGroup.list(
         "unmineable-tree",
-        "(?:§.)*You can\\S+t [\\S ]+ tree while it[\\S ]+s regenerat\\S+!",
+        "(?:§.)*You cannot damage a tree while it is regenerating!",
         "(?:§.)*The toughness of this tree is way too high!",
     )
 
