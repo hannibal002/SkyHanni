@@ -262,6 +262,6 @@ object PartyChatCommands {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(90, "misc.partyCommands.defaultRequiredTrustLevel", "misc.partyCommands.requiredTrustLevel")
+        event.move(95, "misc.partyCommands.defaultRequiredTrustLevel", "misc.partyCommands.requiredTrustLevel")
     }
 }

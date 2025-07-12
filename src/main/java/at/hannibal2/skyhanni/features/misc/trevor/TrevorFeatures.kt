@@ -359,12 +359,12 @@ object TrevorFeatures {
         event.transform(11, "$base.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, TrackerEntry::class.java)
         }
-        event.move(90, "$base.trapperSolver", "$base.solver")
-        event.move(90, "$base.trapperMobDiedMessage", "$base.mobDiedMessage")
-        event.move(90, "$base.keyBindWarpTrapper", "$base.keyBind")
-        event.move(90, "$base.trapperTalkCooldown", "$base.cooldown")
-        event.move(90, "$base.trapperReadyTitle", "$base.readyTitle")
-        event.move(90, "$base.trapperCooldownGui", "$base.cooldownGui")
-        event.move(90, "$base.trapperCooldownGuiPosition", "$base.cooldownGuiPosition")
+        event.move(95, "$base.trapperSolver", "$base.solver")
+        event.move(95, "$base.trapperMobDiedMessage", "$base.mobDiedMessage")
+        event.move(95, "$base.keyBindWarpTrapper", "$base.keyBind")
+        event.move(95, "$base.trapperTalkCooldown", "$base.cooldown")
+        event.move(95, "$base.trapperReadyTitle", "$base.readyTitle")
+        event.move(95, "$base.trapperCooldownGui", "$base.cooldownGui")
+        event.move(95, "$base.trapperCooldownGuiPosition", "$base.cooldownGuiPosition")
     }
 }
