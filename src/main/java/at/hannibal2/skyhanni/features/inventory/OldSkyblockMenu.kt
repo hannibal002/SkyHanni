@@ -68,6 +68,11 @@ object OldSkyblockMenu {
         if (!isEnabled()) return
 
         val sbButton = slotMap[event.slotId] ?: return
+
+        if (event.item?.isStainedGlassPane() == true) {
+            return ChatUtils.debug("Expected a custom button at slot ${event.slotId}, but got a stained glass pane.")
+        }
+
         event.cancel()
 
         val canClick = !sbButton.requiresBoosterCookie || BitsApi.hasCookieBuff()
