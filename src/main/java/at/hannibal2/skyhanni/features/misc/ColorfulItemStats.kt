@@ -105,17 +105,15 @@ object ColorfulItemStats {
         for ((index, line) in event.toolTip.withIndex()) {
 
             event.toolTip[index] = genericStat.replace(line) {
-                val stat = group("Stat")
 
-                "§7$stat: ${
+                val stat = group("Stat")
+                buildString {
+                    "§7$stat: "
                     colorStatMap[stat] ?: group("OldColor")
-                }${
                     group("Bonus")
-                }${
                     iconStatMap[stat].orEmpty()
-                }${
                     group("OldColor")
-                }"
+                }
             }
         }
     }
