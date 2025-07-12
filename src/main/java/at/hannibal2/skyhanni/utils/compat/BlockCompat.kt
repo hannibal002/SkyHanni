@@ -22,6 +22,8 @@ object BlockCompat {
         //$$ return ItemStack(Blocks.POLISHED_DIORITE)
         //#endif
     }
+
+    fun getAllLeaves(): List<Block> = buildList { addLeaves() }
 }
 
 fun MutableList<Block>.addLeaves() {
