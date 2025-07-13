@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import kotlinx.coroutines.launch
 import java.util.Locale
 import java.util.ServiceLoader
 
@@ -121,12 +120,12 @@ object OrderedWaypoints {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shorderedload") {
-            description = "Loads the ordered waypoints from your clipboard or config."
+            description = "Loads ordered waypoints from your clipboard or config."
             category = CommandCategory.USERS_ACTIVE
             arg("name", BrigadierArguments.string()) { name ->
                 callback { load(getArg(name)) }
             }
-            callback { load("") }
+            simpleCallback { load("") }
             aliases = generateAliases(listOf("load", "import"))
         }
 
@@ -218,13 +217,20 @@ object OrderedWaypoints {
     }
 
     private fun load(name: String) {
-        SkyHanniMod.coroutineScope.launch {
-            val res = if (name.isEmpty()) {
+        SkyHanniMod.launchIOCoroutine {
+            val res = if (name == "") {
                 loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
             } else {
                 ProfileStorageData.playerSpecific?.routes?.get(name) ?: run {
-                    ChatUtils.chat("Route $name doesn't exist.")
-                    return@launch
+                    val savedRoutes = ProfileStorageData.playerSpecific?.routes?.keys?.toList()
+                    if (savedRoutes != null) {
+                        ChatUtils.userError(
+                            "Route $name doesn't exist.\n" +
+                                "§cSaved Routes: ${savedRoutes.joinToString(", ")}\n" +
+                                "§cIf you would like to import a route from your clipboard, leave the route name blank."
+                        )
+                    }
+                    return@launchIOCoroutine
                 }
             }
 
@@ -234,11 +240,11 @@ object OrderedWaypoints {
                 renderWaypoints.clear()
                 ChatUtils.chat("Loaded ordered waypoints!")
             } ?: run {
-                ChatUtils.chat(
+                ChatUtils.userError(
                     "There was an error parsing waypoints. " +
                         "Please make sure they are Coleweight formatted waypoints."
                 )
-                return@launch
+                return@launchIOCoroutine
             }
 
             orderedWaypointsList.sortedBy { item -> item.number }
@@ -255,7 +261,7 @@ object OrderedWaypoints {
 
     private fun skip(amount: Int) {
         if (orderedWaypointsList.isEmpty()) {
-            return ChatUtils.chat("There are no waypoints to skip.")
+            return ChatUtils.userError("There are no waypoints to skip.")
         }
 
         incrementIndex(amount)
@@ -272,13 +278,13 @@ object OrderedWaypoints {
             currentOrderedWaypointIndex = newOrderedWaypointIndex
             ChatUtils.chat("Skipped to ${currentOrderedWaypointIndex + 1}.")
         } else {
-            ChatUtils.chat("$number is not between 1 and ${orderedWaypointsList.size}.")
+            ChatUtils.userError("$number is not between 1 and ${orderedWaypointsList.size}.")
         }
     }
 
     private fun unskip(amount: Int) {
         if (orderedWaypointsList.isEmpty()) {
-            return ChatUtils.chat("There are no waypoints to unskip.")
+            return ChatUtils.userError("There are no waypoints to unskip.")
         }
 
         incrementIndex(-amount)
@@ -288,11 +294,11 @@ object OrderedWaypoints {
 
     private fun delete(number: Int) {
         if (orderedWaypointsList.isEmpty()) {
-            return ChatUtils.chat("There are no waypoints to delete.")
+            return ChatUtils.userError("There are no waypoints to delete.")
         }
 
         if (number < 1 || number > orderedWaypointsList.size) {
-            return ChatUtils.chat("Invalid number. Must be between 1 and ${orderedWaypointsList.size}.")
+            return ChatUtils.userError("$number is not between 1 and ${orderedWaypointsList.size}.")
         }
 
         for (i in number - 1 until orderedWaypointsList.size) {
@@ -309,7 +315,7 @@ object OrderedWaypoints {
         val pos = LocationUtils.playerLocation().add(0, -1, 0).roundLocationToBlock()
 
         if (number < 1 || number > orderedWaypointsList.size + 1) {
-            return ChatUtils.chat("Please enter a number between 1 and ${orderedWaypointsList.size + 1}.")
+            return ChatUtils.userError("$number is not between 1 and ${orderedWaypointsList.size + 1}.")
         }
 
         val newWaypoint = SkyhanniWaypoint(pos, number = number, options = mutableMapOf("name" to number.toString()))
@@ -326,7 +332,7 @@ object OrderedWaypoints {
     }
 
     private fun export(format: String) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             val route = if (format.isEmpty()) exportWaypoints(orderedWaypointsList, "coleweight")
             else exportWaypoints(orderedWaypointsList, format.lowercase(Locale.getDefault()))
 
@@ -334,14 +340,14 @@ object OrderedWaypoints {
                 ClipboardUtils.copyToClipboard(it)
                 ChatUtils.chat("Route was copied to clipboard.")
             } ?: run {
-                ChatUtils.chat("Invalid waypoint format specified.")
+                ChatUtils.userError("Invalid waypoint format specified.")
             }
         }
     }
 
     private fun save(name: String) {
         ProfileStorageData.playerSpecific?.routes?.put(name, orderedWaypointsList.deepCopy()) ?: run {
-            return ChatUtils.chat("An error occurred while saving.")
+            return ChatUtils.userError("An error occurred while saving.")
         }
         ChatUtils.chat("Route saved as $name. Do /shorderedload $name to import it.")
     }
