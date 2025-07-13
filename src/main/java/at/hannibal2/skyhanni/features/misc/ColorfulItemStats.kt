@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object ColorfulItemStats {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.colorfulItemTooltips
 
     private val group = RepoPattern.group("misc.itemstats")
 
@@ -25,7 +25,7 @@ object ColorfulItemStats {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ItemHoverEvent) {
-        if (!config.colorfulItemTooltips) return
+        if (!config.enabled) return
 
         for ((index, line) in event.toolTip.withIndex()) {
             event.toolTip[index] = genericStat.replace(line) {
@@ -37,6 +37,9 @@ object ColorfulItemStats {
                     stat.uppercase().replace(" ", "_")
                 )
 
+                val bonusGroup = group("bonus")
+                val bonus = if (config.replacePercentages && config.statIcons) bonusGroup.removeSuffix("%") else bonusGroup
+
                 buildString {
                     append("§7$stat: ")
                     append(
@@ -45,8 +48,10 @@ object ColorfulItemStats {
                         )?.icon?.take(2) ?: oldColor
                     )
                     append(skyblockStat?.icon?.take(2) ?: oldColor)
-                    append(group("bonus"))
-                    append(skyblockStat?.icon?.lastOrNull())
+                    append(bonus)
+                    if (config.statIcons) {
+                        skyblockStat?.icon?.lastOrNull()?.let { append(it) }
+                    }
                     append(oldColor)
                 }
             }

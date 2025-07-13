@@ -155,6 +155,11 @@ class MiscConfig {
     val frogMaskFeatures: FrogMaskFeaturesConfig = FrogMaskFeaturesConfig()
 
     @Expose
+    @ConfigOption(name = "Colorful Item Tooltips", desc = "")
+    @Accordion
+    val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     var resetSearchGuiOnClose: Boolean = true
@@ -492,15 +497,6 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideExCoopMembers: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Color Item Stat Numbers",
-        desc = "Changes the color of the numbers in item lore to the color they are in the SkyBlock stats menu.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var colorfulItemTooltips: Boolean = false
 
     @Expose
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
