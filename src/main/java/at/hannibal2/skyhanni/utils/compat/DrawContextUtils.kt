@@ -77,7 +77,7 @@ object DrawContextUtils {
         val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
         //#if MC < 1.21
         GlStateManager.rotate(angle, xf, yf, zf)
-        //#else
+        //#elseif MC < 1.21.6
         //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
         //#endif
     }
@@ -85,13 +85,15 @@ object DrawContextUtils {
     fun multMatrix(buffer: FloatBuffer) {
         //#if MC < 1.21
         GlStateManager.multMatrix(buffer)
-        //#else
+        //#elseif MC < 1.21.6
         //$$ multMatrix(Matrix4f(buffer))
         //#endif
     }
 
     //#if MC > 1.21
+    //#if MC < 1.21.6
     //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    //#endif
     //#endif
 
     fun scale(x: Float, y: Float, z: Float) {

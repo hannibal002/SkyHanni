@@ -146,6 +146,7 @@ class ItemResolutionQuery {
             "Turbo-Cacti" -> "Turbo-Cactus"
             "Prismatic" -> "Pristine"
             "Dragon Tracer" -> "Aiming"
+            "Drain" -> "Syphon"
             else -> this
         }
 

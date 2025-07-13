@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.mining.FlowstateHelper.personalBest
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.streakEndTimer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -26,8 +27,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.Text
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.TextRenderable
 import net.minecraft.init.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -154,15 +158,15 @@ object FlowstateHelper {
         attemptClearDisplay()
     }
 
-    fun getTimerColor(timeRemaining: Duration): String {
-        if (!config.colorfulTimer) return "§b"
+    fun getTimerColor(timeRemaining: Duration): Text {
+        if (!config.colorfulTimer) return Text.of("§b")
         return when (timeRemaining) {
-            in 0.seconds..2.seconds -> "§c"
-            in 2.seconds..4.seconds -> "§#§e§c§7§b§3§6§/"
-            in 4.seconds..6.seconds -> "§e"
-            in 6.seconds..8.seconds -> "§a"
-            in 8.seconds..10.seconds -> "§2"
-            else -> "§6"
+            in 0.seconds..2.seconds -> Text.of("§c")
+            in 2.seconds..4.seconds -> ExtendedChatColor("#ec7b36", false).asText()
+            in 4.seconds..6.seconds -> Text.of("§e")
+            in 6.seconds..8.seconds -> Text.of("§a")
+            in 8.seconds..10.seconds -> Text.of("§2")
+            else -> Text.of("§6")
         }
     }
 
@@ -245,7 +249,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Str
             TIMER -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                StringRenderable("§7Time Remaining: ${timeRemaining.formatTime()}")
+                TextRenderable(Text.of("§7Time Remaining: ").append(timeRemaining.formatTime()))
             }
 
             STREAK -> {
@@ -261,10 +265,12 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Str
             COMPACT -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                StringRenderable(
-                    "§7x${getStreakColor()}$blockBreakStreak " +
-                        "§6+${getSpeedBonus()}⸕ " +
+                TextRenderable(
+                    Text.of(
+                        "§7x${getStreakColor()}$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ ",
+                    ).append(
                         timeRemaining.formatTime(),
+                    ),
                 )
             }
 
@@ -285,8 +291,8 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Str
     companion object {
         private val config get() = SkyHanniMod.feature.mining.flowstateHelper
 
-        private fun Duration.formatTime(): String {
-            return getTimerColor(this) + format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true)
+        private fun Duration.formatTime(): Text {
+            return getTimerColor(this).append(format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true))
         }
 
         @JvmField
