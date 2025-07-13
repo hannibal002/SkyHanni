@@ -388,7 +388,7 @@ object ItemUtils {
         return stack
         //#else
         //$$ val stack = ItemStack(Items.PLAYER_HEAD)
-        //$$ val profile = GameProfile(UUID.fromString(uuid), uuid)
+        //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         //$$ profile.properties.put("textures", Property("textures", value))
         //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
         //$$ stack.setCustomItemName(displayName)
