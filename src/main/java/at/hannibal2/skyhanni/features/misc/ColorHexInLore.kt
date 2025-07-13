@@ -57,7 +57,7 @@ object ColorHexInLore {
 
     private fun String.replaceColor(hexCode: String) = replace(hexCode, addColor(hexCode))
 
-    private fun addColor(hexFirst: String): String = ExtendedChatColor(ColorUtils.getColorFromHex(hexFirst), false).toString() + hexFirst
+    private fun addColor(hexFirst: String): String = ExtendedChatColor(hexFirst, false).toString() + hexFirst
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.hexAsColorInLore
 }

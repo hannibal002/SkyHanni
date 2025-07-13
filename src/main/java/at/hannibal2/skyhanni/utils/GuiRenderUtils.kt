@@ -36,6 +36,7 @@ import java.nio.FloatBuffer
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.joml.Matrix4f
+//$$ import net.minecraft.text.Text
 //#endif
 
 // todo 1.21 impl needed
@@ -47,17 +48,31 @@ object GuiRenderUtils {
 
     private val fr: FontRenderer get() = Minecraft.getMinecraft().fontRendererObj
 
-    private fun drawStringCentered(str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
-        str ?: return
+    private fun drawStringCentered(str: String, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
         DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
-    fun drawStringCentered(str: String?, x: Int, y: Int) {
+    //#if MC > 1.21
+    //$$ private fun drawStringCentered(str: Text, x: Float, y: Float, shadow: Boolean, color: Int) {
+    //$$     val strLen = fr.getWidth(str)
+    //$$     val x2 = x - strLen / 2f
+    //$$     val y2 = y - fr.fontHeight / 2f
+    //$$     DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+    //$$ }
+    //#endif
+
+    fun drawStringCentered(str: String, x: Int, y: Int) {
         drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
+
+    //#if MC > 1.21
+    //$$ fun drawStringCentered(str: Text, x: Int, y: Int) {
+    //$$     drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
+    //$$ }
+    //#endif
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
         DrawContextUtils.pushMatrix()
@@ -77,6 +92,16 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
+    //#if MC > 1.21
+    //$$ fun drawString(str: Text, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
+    //$$     DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
+    //$$ }
+    //$$
+    //$$ fun drawString(str: Text, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+    //$$     DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
+    //$$ }
+    //#endif
+
     fun drawStrings(strings: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         drawStrings(strings.split("\n"), x, y, color, shadow)
     }
@@ -88,6 +113,16 @@ object GuiRenderUtils {
             newY += 9
         }
     }
+
+    //#if MC > 1.21
+    //$$ fun drawTexts(strings: List<Text>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+    //$$     var newY = y
+    //$$     for (string in strings) {
+    //$$         DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
+    //$$         newY += 9
+    //$$     }
+    //$$ }
+    //#endif
 
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
         left <= x && x < left + width && top <= y && y < top + height
