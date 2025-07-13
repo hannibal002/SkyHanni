@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -981,13 +979,7 @@ object DamageIndicatorManager {
         event.move(2, "damageIndicator", "combat.damageIndicator")
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
-        event.transform(11, "combat.damageIndicator.bossesToShow") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, BossCategory::class.java)
-        }
 
-        event.transform(15, "combat.damageIndicator.bossName") { element ->
-            ConfigUtils.migrateIntToEnum(element, NameVisibility::class.java)
-        }
         event.transform(23, "combat.damageIndicator.bossesToShow") { element ->
             val result = JsonArray()
             for (bossType in element as JsonArray) {

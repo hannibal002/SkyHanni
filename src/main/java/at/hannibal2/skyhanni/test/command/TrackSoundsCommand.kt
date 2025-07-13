@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -78,7 +79,7 @@ object TrackSoundsCommand {
         val soundsToDisplay = sounds.takeWhile { startTime.passedSince() - it.first < 3.seconds }
 
         display = soundsToDisplay.take(10).reversed().map {
-            Renderable.string("§3" + it.second.soundName + " §8p:" + it.second.pitch + " §7v:" + it.second.volume)
+            StringRenderable("§3" + it.second.soundName + " §8p:" + it.second.pitch + " §7v:" + it.second.volume)
         }
         worldSounds = soundsToDisplay.map { it.second }.groupBy { it.location }
 

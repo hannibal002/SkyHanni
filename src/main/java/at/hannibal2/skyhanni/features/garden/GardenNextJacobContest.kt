@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.features.garden.contest.EliteDevApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.DialogUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -62,7 +61,7 @@ object GardenNextJacobContest {
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
     private const val MAX_CONTESTS_PER_YEAR = 124
     private val profileStorage get() = SkyHanniMod.feature.storage
-    private val config get() = GardenApi.config.nextJacobContests
+    private val config get() = GardenApi.config.jacobContest.nextContest
     private val patternGroup = RepoPattern.group("garden.nextcontest")
     private val calendarDetector by lazy { InventoryDetector(monthPattern) }
     private val haveAllContests get() = knownContests.size == MAX_CONTESTS_PER_YEAR
@@ -500,9 +499,6 @@ object GardenNextJacobContest {
         event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
         event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
 
-        event.transform(15, "garden.nextJacobContests.shareAutomatically") { element ->
-            ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
-        }
         event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
         event.move(33, "garden.jacobContextTimesPos", "garden.jacobContestTimesPosition")
         event.move(33, "garden.jacobContextTimes", "garden.jacobContestTimes")

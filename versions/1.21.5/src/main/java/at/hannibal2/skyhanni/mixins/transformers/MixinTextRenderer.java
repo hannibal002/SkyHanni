@@ -13,32 +13,18 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class MixinTextRenderer {
 
     @ModifyVariable(
+        //#if MC < 1.21.6
         method = "drawInternal(Lnet/minecraft/text/OrderedText;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
+        //#else
+        //$$ method = "draw(Lnet/minecraft/text/OrderedText;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)V",
+        //#endif
         index = 1,
         at = @At("HEAD"),
         argsOnly = true
     )
     private OrderedText modifyOrderedText(OrderedText value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.orderedTextToLegacyString(value)
-        );
-
-        if (replaced == null) return value;
-        return OrderedTextUtils.legacyTextToOrderedText(
-            replaced
-        );
-    }
-
-    @ModifyVariable(
-        method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
-        index = 1,
-        at = @At("HEAD"),
-        argsOnly = true
-    )
-    private String modifyString(String value) {
-
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
             value
         );
 
@@ -47,22 +33,39 @@ public class MixinTextRenderer {
     }
 
     @ModifyVariable(
+        //#if MC < 1.21.6
+        method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
+        //#else
+        //$$ method = "draw(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)V",
+        //#endif
+        index = 1,
+        at = @At("HEAD"),
+        argsOnly = true
+    )
+    private String modifyString(String value) {
+
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+            OrderedTextUtils.legacyTextToOrderedText(value)
+        );
+
+        if (replaced == null) return value;
+        return OrderedTextUtils.orderedTextToLegacyString(replaced);
+    }
+
+    @ModifyVariable(
         method = "getWidth(Lnet/minecraft/text/OrderedText;)I",
         index = 1,
         at = @At("HEAD"),
         argsOnly = true
     )
-
     private OrderedText modifyWidth(OrderedText value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.orderedTextToLegacyString(value)
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+            value
         );
 
         if (replaced == null) return value;
-        return OrderedTextUtils.legacyTextToOrderedText(
-            replaced
-        );
+        return replaced;
     }
 
     @ModifyVariable(
@@ -73,12 +76,12 @@ public class MixinTextRenderer {
     )
     private String modifyWidth(String value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            value
+        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+            OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
         if (replaced == null) return value;
-        return replaced;
+        return OrderedTextUtils.orderedTextToLegacyString(replaced);
     }
 
     @ModifyVariable(
@@ -89,13 +92,11 @@ public class MixinTextRenderer {
     )
     private StringVisitable modifyWidth(StringVisitable value) {
 
-        String replaced = ModifyVisualWords.INSTANCE.modifyText(
-            OrderedTextUtils.stringVisitableToLegacyString(value)
+        StringVisitable replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(
+            value
         );
 
         if (replaced == null) return value;
-        return OrderedTextUtils.legacyStringToStringVisitable(
-            replaced
-        );
+        return replaced;
     }
 }

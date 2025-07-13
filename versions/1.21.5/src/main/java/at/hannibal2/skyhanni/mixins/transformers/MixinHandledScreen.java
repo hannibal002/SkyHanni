@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi;
+import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.DelayedRun;
+import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
@@ -49,7 +51,11 @@ public abstract class MixinHandledScreen {
         if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
     }
 
+    //#if MC < 1.21.6
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(Lnet/minecraft/client/gui/DrawContext;IIF)V", shift = At.Shift.AFTER))
+    //#else
+    //$$ @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(Lnet/minecraft/client/gui/DrawContext;IIF)V", shift = At.Shift.AFTER))
+    //#endif
     private void renderBackgroundTexture(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (MinecraftCompat.INSTANCE.getLocalWorldExists() && MinecraftCompat.INSTANCE.getLocalPlayerExists()) {
             new DrawBackgroundEvent(context).post();
@@ -58,7 +64,7 @@ public abstract class MixinHandledScreen {
 
     @ModifyArg(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), index = 1)
     private List<Text> renderBackground(List<Text> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) DrawContext drawContext) {
-        if (WardrobeApi.INSTANCE.getInCustomWardrobe()) {
+        if (CustomWardrobe.shouldHideNormalTooltip()) {
             return new ArrayList<>();
         }
         return ToolTipData.processModernTooltip(drawContext, itemStack, textTooltip);
@@ -67,7 +73,18 @@ public abstract class MixinHandledScreen {
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         TextInput.Companion.onGuiInput(cir);
+        boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
+        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
+    private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
+            cir.setReturnValue(false);
+        }
+        if (new GuiMouseInputEvent((HandledScreen<?>) (Object) this).post()) {
             cir.setReturnValue(false);
         }
     }

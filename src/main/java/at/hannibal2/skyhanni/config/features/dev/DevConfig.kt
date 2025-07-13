@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
@@ -15,10 +16,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
 class DevConfig {
+
     @Expose
     @ConfigOption(name = "Repository", desc = "")
     @Accordion
     val repo: RepositoryConfig = RepositoryConfig()
+
+    @Expose
+    @ConfigOption(name = "Neu Repository", desc = "")
+    @Accordion
+    val neuRepo: NeuRepositoryConfig = NeuRepositoryConfig()
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")
@@ -67,16 +74,16 @@ class DevConfig {
     @Expose
     val waypoint: WaypointsConfig = WaypointsConfig()
 
-    // Does not have a config element!
     @Expose
+    @NoConfigLink
     val debugPos: Position = Position(10, 10)
 
-    // Does not have a config element!
     @Expose
+    @NoConfigLink
     val debugLocationPos: Position = Position(1, 160)
 
-    // Does not have a config element!
     @Expose
+    @NoConfigLink
     val debugItemPos: Position = Position(90, 70)
 
     @Expose

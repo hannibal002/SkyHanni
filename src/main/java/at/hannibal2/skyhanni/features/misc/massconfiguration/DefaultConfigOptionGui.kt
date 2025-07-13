@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import kotlin.math.max
 import kotlin.math.min
 
@@ -186,7 +186,7 @@ class DefaultConfigOptionGui(
         DrawContextUtils.popMatrix()
         GuiRenderUtils.disableScissor()
         hoveringTextToDraw?.let { tooltip ->
-            RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
+            RenderableTooltips.setTooltipForRender(tooltip.map(StringRenderable::from))
         }
     }
 

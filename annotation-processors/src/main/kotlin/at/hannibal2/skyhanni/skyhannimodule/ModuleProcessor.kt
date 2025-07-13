@@ -186,7 +186,8 @@ class ModuleProcessor(
             it.write("    // Do not use this mc version as its reflective of the compile time version\n")
             it.write("    // And might not be correct at run time\n")
             it.write("    // We use it for the auto updater only\n")
-            it.write("    const val MC_VERSION = \"$mcVersion\"\n")
+            it.write("    var MC_VERSION = \"$mcVersion\"\n")
+            it.write("        private set\n")
             it.write("    const val CONFIG_VERSION = ${configVersion?.let { File(it) }?.readText()?.filter{it.isDigit()}?.toInt() ?: 0}\n")
             it.write("}\n")
         }
