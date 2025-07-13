@@ -16,12 +16,12 @@ class LaneSwitchSoundSettings {
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the notification sound.")
-    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
-    var pitch: Float = 1.0f
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2f, minStep = 0.1f)
+    var pitch: Float = 1f
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    var testSound: Runnable = Runnable(FarmingLaneFeatures::playUserSound)
+    val testSound: Runnable = Runnable(FarmingLaneFeatures::playUserSound)
 
     @Expose
     @ConfigOption(
@@ -33,5 +33,5 @@ class LaneSwitchSoundSettings {
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
-    var listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val listOfSounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 }

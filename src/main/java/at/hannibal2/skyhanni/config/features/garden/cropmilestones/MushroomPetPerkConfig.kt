@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.cropmilestones
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -9,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// TODO moulconfig runnable support
+// TODO Write ConditionalUtils.onToggle()-s for these values in their feature classes
 class MushroomPetPerkConfig {
     @Expose
     @ConfigOption(
@@ -23,32 +22,31 @@ class MushroomPetPerkConfig {
     @Expose
     @ConfigOption(
         name = "Mushroom Text",
-        desc = "Drag text to change the appearance of the overlay.\n" + "Hold a farming tool to show the overlay.",
+        desc = "Drag text to change the appearance of the overlay.\n" +
+            "Hold a farming tool to show the overlay.",
     )
     @ConfigEditorDraggableList
-    var text: MutableList<MushroomTextEntry> = mutableListOf(
+    val text: MutableList<MushroomTextEntry> = mutableListOf(
         MushroomTextEntry.TITLE,
         MushroomTextEntry.MUSHROOM_TIER,
         MushroomTextEntry.NUMBER_OUT_OF_TOTAL,
         MushroomTextEntry.TIME,
     )
 
-    enum class MushroomTextEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        TITLE("§6Mooshroom Cow Perk", 0),
-        MUSHROOM_TIER("§7Mushroom Milestone 8", 1), // TODO Change MUSHROOM_TIER to MUSHROOM_MILESTONE
-        NUMBER_OUT_OF_TOTAL("§e6,700§8/§e15,000", 2),
-        TIME("§7In §b12m 34s", 3),
-        PERCENTAGE("§7Percentage: §e12.34%", 4),
+    // TODO Change MUSHROOM_TIER to MUSHROOM_MILESTONE
+    enum class MushroomTextEntry(private val displayName: String) {
+        TITLE("§6Mooshroom Cow Perk"),
+        MUSHROOM_TIER("§7Mushroom Milestone 8"),
+        NUMBER_OUT_OF_TOTAL("§e6,700§8/§e15,000"),
+        TIME("§7In §b12m 34s"),
+        PERCENTAGE("§7Percentage: §e12.34%"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
+    // Todo rename to position
     @Expose
     @ConfigLink(owner = MushroomPetPerkConfig::class, field = "enabled")
-    var pos: Position = Position(-112, -143, false, true)
+    val pos: Position = Position(-112, -143)
 }

@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
+import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -31,9 +35,12 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.seconds
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FishingApi {
+
     enum class RodPart {
         HOOK,
         LINE,
@@ -54,10 +61,25 @@ object FishingApi {
         "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
+    /**
+     * REGEX-TEST: EMBER_HELMET
+     * REGEX-TEST: EMBER_CHESTPLATE
+     * REGEX-TEST: EMBER_LEGGINGS
+     * REGEX-TEST: EMBER_BOOTS
+     */
+    private val emberArmorNames by RepoPattern.pattern(
+        "fishing.trophyfishing.emberarmor",
+        "EMBER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+    )
+
     val lavaBlocks = buildList { addLavas() }
     private val waterBlocks = buildList { addWaters() }
 
     var lastCastTime = SimpleTimeMark.farPast()
+        private set
+    var lastReelTime = SimpleTimeMark.farPast()
+        private set
+    var lastCatchSound = SimpleTimeMark.farPast()
         private set
     var holdingRod = false
         private set
@@ -78,6 +100,9 @@ object FishingApi {
         private set
 
     var wearingTrophyArmor = false
+        private set
+
+    var wearingEmberArmor = false
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -105,23 +130,38 @@ object FishingApi {
     fun onTick(event: SkyHanniTickEvent) {
         if (event.isMod(5)) {
             wearingTrophyArmor = isWearingTrophyArmor()
+            wearingEmberArmor = isWearingEmberArmor()
         }
 
         val bobber = bobber ?: return
         if (bobber.isDead) {
+            if (lastReelTime.passedSince() < 0.5.seconds && lastCatchSound.passedSince() < 0.5.seconds) FishingCatchEvent.post()
             resetBobber()
-        } else {
-            if (!bobberHasTouchedLiquid) {
-                val isWater = when {
-                    bobber.isInLava && holdingLavaRod -> false
-                    bobber.isInWater && holdingWaterRod -> true
-                    else -> return
-                }
-
-                bobberHasTouchedLiquid = true
-                FishingBobberInLiquidEvent(bobber, isWater).post()
-            }
+            return
         }
+
+        if (bobberHasTouchedLiquid) return
+        val isWater = when {
+            bobber.isInLava && holdingLavaRod -> false
+            bobber.isInWater && holdingWaterRod -> true
+            else -> return
+        }
+
+        bobberHasTouchedLiquid = true
+        FishingBobberInLiquidEvent(bobber, isWater).post()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (!holdingRod) return
+        if (event.soundName == "random.orb" && event.volume == .5F) lastCatchSound = SimpleTimeMark.now()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onClick(event: WorldClickEvent) {
+        if (event.clickType != ClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
+        if (lastReelTime.passedSince() < .3.seconds) return
+        lastReelTime = SimpleTimeMark.now()
     }
 
     fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
@@ -131,8 +171,11 @@ object FishingApi {
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? =
-        getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")?.toInternalName()
+    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
+        val rodPartName = getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")
+        if (rodPartName.isNullOrEmpty()) return null
+        return rodPartName.toInternalName()
+    }
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
@@ -172,31 +215,43 @@ object FishingApi {
         (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonApi.inDungeon()
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
+        if (countIsZero(entity)) return 0
+
+        return when (entity.name) {
+            "Sea Emperor", "Rider of the Deep" -> 2
+
+            else -> 1
+        }
+    }
+
+    private val frostyNpcLocation = LorenzVec(-1.5, 76.0, 92.5)
+
+    private fun countIsZero(entity: EntityArmorStand): Boolean {
         val name = entity.name
         // a dragon, will always be fought
-        if (name == "Reindrake") return 0
+        if (name == "Reindrake") return true
 
         // a npc shop
-        if (name == "§5Frosty the Snow Blaster") return 0
+        if (name == "§5Frosty the Snow Blaster") return true
 
         if (name == "Frosty") {
-            val npcLocation = LorenzVec(-1.5, 76.0, 92.5)
-            if (entity.getLorenzVec().distance(npcLocation) < 1) {
-                return 0
+            if (entity.getLorenzVec().distance(frostyNpcLocation) < 1) {
+                return true
             }
         }
 
         val isSummonedSoul = name.contains("'")
         val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
-        if (!hasFishingMobName || isSummonedSoul) return 0
+        return !hasFishingMobName || isSummonedSoul
+    }
 
-        if (name == "Sea Emperor" || name == "Rider of the Deep") {
-            return 2
+    private fun isWearingTrophyArmor(): Boolean =
+        InventoryUtils.getArmor().all {
+            trophyArmorNames.matches(it?.getInternalName()?.asString())
         }
-        return 1
-    }
 
-    private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
-        trophyArmorNames.matches(it?.getInternalName()?.asString())
-    }
+    fun isWearingEmberArmor(): Boolean =
+        InventoryUtils.getArmor().all {
+            emberArmorNames.matches(it?.getInternalName()?.asString())
+        }
 }

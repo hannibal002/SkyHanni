@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
-    private val config get() = GardenApi.config.personalBests
+    private val config get() = GardenApi.config.jacobContest.personalBests
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
     private var personalBestIncrements = mapOf<CropType, Int>()
 

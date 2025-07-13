@@ -20,14 +20,12 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -36,12 +34,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.line
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import kotlinx.coroutines.launch
 
 @SkyHanniModule
@@ -148,7 +148,7 @@ object CropMoneyDisplay {
             if (GardenApi.mushroomCowPet && it != CropType.MUSHROOM && config.mooshroom) {
                 val redMushroom = "ENCHANTED_RED_MUSHROOM".toInternalName()
                 val brownMushroom = "ENCHANTED_BROWN_MUSHROOM".toInternalName()
-                val (redPrice, brownPrice) = if (LorenzUtils.noTradeMode) {
+                val (redPrice, brownPrice) = if (SkyBlockUtils.noTradeMode) {
                     val redPrice = (redMushroom.getNpcPriceOrNull() ?: 160.0) / 160
                     val brownPrice = (brownMushroom.getNpcPriceOrNull() ?: 160.0) / 160
                     redPrice to brownPrice
@@ -177,8 +177,8 @@ object CropMoneyDisplay {
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
-                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
-                    else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
+                    if (SkyBlockUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
+                    else (bazaarData.instantSellPrice + bazaarData.instantBuyPrice) / 320
                 extraMoneyPerHour.dicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
@@ -195,9 +195,9 @@ object CropMoneyDisplay {
                 ChatUtils.debug(message)
                 ready = false
                 loaded = false
-                return Renderable.string("§eStill Loading...")
+                return StringRenderable("§eStill Loading...")
             }
-            return Renderable.string("§cFarm crops to add them to this list!")
+            return StringRenderable("§cFarm crops to add them to this list!")
         }
         val cropList = createDescendingCropList(moneyPerHour)
         return Renderable.vertical {
@@ -282,7 +282,7 @@ object CropMoneyDisplay {
         val moneyPerHours = mutableMapOf<NeuInternalName, CropMoneyData>()
 
         val onlyNpcPrice =
-            (!config.useCustomFormat && LorenzUtils.noTradeMode) ||
+            (!config.useCustomFormat && SkyBlockUtils.noTradeMode) ||
                 (config.useCustomFormat && config.customFormat.singleOrNull() == CustomFormatEntry.NPC_PRICE)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
@@ -319,8 +319,8 @@ object CropMoneyDisplay {
         val bazaarData = internalName.getBazaarData() ?: return null
 
         val npcCoins = internalName.getNpcPrice() * cropsPerHour
-        val sellOfferCoins = bazaarData.sellOfferPrice * cropsPerHour
-        val instantSellCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val sellOfferCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val instantSellCoins = bazaarData.instantSellPrice * cropsPerHour
         val bountifulCoins = if (toolHasBountiful?.get(crop) == true && config.bountiful) speedPerHour * 0.2 else 0.0
 
         return CropMoneyData(
@@ -340,7 +340,7 @@ object CropMoneyDisplay {
     private fun currentFormats() =
         if (config.useCustomFormat) {
             config.customFormat
-        } else if (LorenzUtils.noTradeMode) {
+        } else if (SkyBlockUtils.noTradeMode) {
             listOf(CustomFormatEntry.NPC_PRICE)
         } else {
             listOf(CustomFormatEntry.SELL_OFFER)
@@ -396,9 +396,6 @@ object CropMoneyDisplay {
         event.move(3, "garden.moneyPerHourDicer", "garden.moneyPerHours.dicer")
         event.move(3, "garden.moneyPerHourHideTitle", "garden.moneyPerHours.hideTitle")
         event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHours.pos")
-        event.transform(11, "garden.moneyPerHours.customFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, CustomFormatEntry::class.java)
-        }
     }
 
     private fun CropMoneyData.toPrices(): List<Double> {

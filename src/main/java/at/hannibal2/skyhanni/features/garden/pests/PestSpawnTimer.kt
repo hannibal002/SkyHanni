@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager.sendTitle
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.average
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -81,7 +82,7 @@ object PestSpawnTimer {
             val tablistCooldownEnd = SimpleTimeMark.now() + (minutes?.minutes ?: 0.seconds) + (seconds?.seconds ?: 0.seconds)
 
             if (shouldSetCooldown(tablistCooldownEnd, seconds)) {
-                // hypixel sometimes rounds down times, we'll assume times are rounded down if seconds are null and add a minute
+                // hypixel sometimes rounds time down, we'll assume times are rounded down if seconds are null and add a minute
                 pestCooldownEndTime = if (seconds == null) {
                     tablistCooldownEnd + 1.minutes
                 } else {
@@ -178,7 +179,7 @@ object PestSpawnTimer {
             "§eLast pest spawned: §b$timeSinceLastPest ago"
         }
 
-        lineMap[PestTimerTextEntry.PEST_TIMER] = Renderable.string(lastPestSpawned)
+        lineMap[PestTimerTextEntry.PEST_TIMER] = StringRenderable(lastPestSpawned)
 
         val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
@@ -192,11 +193,11 @@ object PestSpawnTimer {
             "§ePest Cooldown: §b$cooldownValue"
         }
 
-        lineMap[PestTimerTextEntry.PEST_COOLDOWN] = Renderable.string(pestCooldown)
+        lineMap[PestTimerTextEntry.PEST_COOLDOWN] = StringRenderable(pestCooldown)
 
         val averageSpawn = averageSpawnTime.format()
         if (averageSpawnTime != 0.seconds) {
-            lineMap[PestTimerTextEntry.AVERAGE_PEST_SPAWN] = Renderable.string("§eAverage time to spawn: §b$averageSpawn")
+            lineMap[PestTimerTextEntry.AVERAGE_PEST_SPAWN] = StringRenderable("§eAverage time to spawn: §b$averageSpawn")
         }
 
         return formatDisplay(lineMap)
@@ -211,6 +212,7 @@ object PestSpawnTimer {
     }
 
     private fun shouldRender(): Boolean = when {
+        !isEnabled() -> false
         config.onlyWithFarmingTool && config.onlyWithVacuum -> hasFarmingToolInHand() || hasVacuumInHand()
         config.onlyWithFarmingTool -> hasFarmingToolInHand()
         config.onlyWithVacuum -> hasVacuumInHand()
@@ -219,14 +221,14 @@ object PestSpawnTimer {
     }
 
     private fun cooldownExpired() {
-        sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
+        TitleManager.sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown has expired!")
         SoundUtils.playPlingSound()
         hasWarned = true
     }
 
     private fun cooldownReminder() {
-        sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
+        TitleManager.sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown expires in ${pestCooldownEndTime.timeUntil().format()}")
         SoundUtils.playPlingSound()
         hasWarned = true

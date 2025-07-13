@@ -23,15 +23,6 @@ class HoppityWaypointsConfig {
     var shared: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Show Waypoints Immediately",
-        desc = "Show an estimated waypoint immediately after clicking.\n" +
-            "§cThis might cause issues with other particle sources."
-    )
-    @ConfigEditorBoolean
-    var showImmediately: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Color", desc = "Color of the waypoint.")
     @ConfigEditorColour
     var color: String = "0:53:46:224:73"
@@ -83,10 +74,17 @@ class HoppityWaypointsConfig {
     var showNearbyDuplicates: Boolean = false
 
     @Expose
+    //#if FORGE
     @ConfigOption(
         name = "Load from NEU PV",
         desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer."
     )
+    //#else
+    //$$@ConfigOption(
+    //$$    name = "Load from SkyBlock PV",
+    //$$    desc = "Load Hoppity Egg Location data from API when opening the SkyBlock Profile Viewer mod."
+    //$$)
+    //#endif
     @ConfigEditorBoolean
     @FeatureToggle
     var loadFromNeuPv: Boolean = true

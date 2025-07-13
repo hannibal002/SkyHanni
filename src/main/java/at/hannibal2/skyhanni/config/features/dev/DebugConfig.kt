@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.config.features.dev
 
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
@@ -32,6 +34,14 @@ class DebugConfig {
     )
     @ConfigEditorBoolean
     var modMenuLog: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "ApiUtils Never Silent",
+        desc = "Forces ApiUtils' `silentError` to always be false, so that errors always debug to ErrorManager."
+    )
+    @ConfigEditorBoolean
+    var apiUtilsNeverSilent: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show Internal Name", desc = "Show internal names in item lore.")
@@ -82,6 +92,11 @@ class DebugConfig {
     @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
     @ConfigEditorBoolean
     var showBZPrice: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Show Bin Price", desc = "Show Bin price in item lore.")
+    @ConfigEditorBoolean
+    var showBinPrice: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
@@ -164,12 +179,12 @@ class DebugConfig {
     @Expose
     @ConfigOption(name = "Powder Messages", desc = "Shows debug messages every time Hotm Powder changes.")
     @ConfigEditorBoolean
-    val powderMessages: Boolean = false
+    var powderMessages: Boolean = false
 
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
-    var assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
+    val assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
 
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
@@ -189,18 +204,22 @@ class DebugConfig {
     @Expose
     @ConfigOption(name = "Always Great Spook", desc = "Assumes the Great Spook is always active.")
     @ConfigEditorBoolean
-    var forceGreatSpook: Property<Boolean> = Property.of(false)
+    val forceGreatSpook: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
+    @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
     @ConfigEditorBoolean
-    var dvdLogo: Boolean = false
+    var addonsDebug: Boolean = false
 
-    // Does not have a config element!
     @Expose
-    var trackSoundPosition: Position = Position(0, 0)
+    @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
+    val addonsDebugPosition: Position = Position(300, 300)
 
-    // Also does not have a config element!
     @Expose
-    var trackParticlePosition: Position = Position(0, 0)
+    @NoConfigLink
+    val trackSoundPosition: Position = Position(0, 0)
+
+    @Expose
+    @NoConfigLink
+    val trackParticlePosition: Position = Position(0, 0)
 }

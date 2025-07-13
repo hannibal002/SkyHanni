@@ -21,7 +21,7 @@ class FlowstateHelperConfig {
     @Expose
     @ConfigOption(name = "Appearance", desc = "Drag text to change the appearance.")
     @ConfigEditorDraggableList
-    var appearance: MutableList<FlowstateElements> = FlowstateElements.defaultOption.toMutableList()
+    val appearance: MutableList<FlowstateElements> = FlowstateElements.defaultOption.toMutableList()
 
     @Expose
     @ConfigOption(name = "Dynamic Color", desc = "Makes the timer's color dynamic.")
@@ -35,6 +35,11 @@ class FlowstateHelperConfig {
     var autoHide: Int = 10
 
     @Expose
+    @ConfigOption(name = "Personal Best Message", desc = "Sends a message when you beat your flowstate record.")
+    @ConfigEditorBoolean
+    var personalBestMessage: Boolean = true
+
+    @Expose
     @ConfigLink(owner = FlowstateHelperConfig::class, field = "enabled")
-    var position: Position = Position(-110, 9)
+    val position: Position = Position(-110, 9)
 }

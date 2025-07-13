@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -27,7 +26,7 @@ object CFTooltipCompact {
         if (config.tooltipMove) {
             if (event.slot.slotNumber <= 44) {
                 lastHover = SimpleTimeMark.now()
-                tooltipToHover = event.toolTip.toList().map { it.partyModeReplace() }
+                tooltipToHover = event.toolTip.toList().map { partyModeReplace(it) }
                 event.cancel()
             } else {
                 lastHover = SimpleTimeMark.farPast()

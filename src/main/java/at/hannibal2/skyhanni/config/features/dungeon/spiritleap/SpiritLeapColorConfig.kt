@@ -6,8 +6,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SpiritLeapColorConfig {
-    val defaultColor: String = "0:200:0:0:0"
-    private val deadColor: String = "0:200:120:0:0"
+
+    companion object {
+        @Transient const val DEFAULT_COLOR: String = "0:200:0:0:0"
+        private const val DEAD_COLOR: String = "0:200:120:0:0"
+    }
 
     @Expose
     @ConfigOption(
@@ -23,7 +26,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Archer class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var archerClassColor: String = defaultColor
+    var archerClassColor: String = DEFAULT_COLOR
 
     @Expose
     @ConfigOption(
@@ -31,7 +34,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Mage class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var mageClassColor: String = defaultColor
+    var mageClassColor: String = DEFAULT_COLOR
 
     @Expose
     @ConfigOption(
@@ -39,7 +42,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Berserk class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var berserkClassColor: String = defaultColor
+    var berserkClassColor: String = DEFAULT_COLOR
 
     @Expose
     @ConfigOption(
@@ -47,7 +50,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Tank class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var tankClassColor: String = defaultColor
+    var tankClassColor: String = DEFAULT_COLOR
 
     @Expose
     @ConfigOption(
@@ -55,16 +58,16 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Healer class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var healerClassColor: String = defaultColor
+    var healerClassColor: String = DEFAULT_COLOR
 
     @ConfigOption(name = "Reset Colors", desc = "Restores the class highlighter colors to their default settings.")
     @ConfigEditorButton(buttonText = "Reset")
-    var resetColors: Runnable = Runnable {
-        deadTeammateColor = deadColor
-        archerClassColor = defaultColor
-        mageClassColor = defaultColor
-        berserkClassColor = defaultColor
-        tankClassColor = defaultColor
-        healerClassColor = defaultColor
+    val resetColors: Runnable = Runnable {
+        deadTeammateColor = DEAD_COLOR
+        archerClassColor = DEFAULT_COLOR
+        mageClassColor = DEFAULT_COLOR
+        berserkClassColor = DEFAULT_COLOR
+        tankClassColor = DEFAULT_COLOR
+        healerClassColor = DEFAULT_COLOR
     }
 }

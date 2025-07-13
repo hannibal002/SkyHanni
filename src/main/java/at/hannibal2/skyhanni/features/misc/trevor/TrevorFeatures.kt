@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.misc.trevor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.title.TitleContext
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -18,13 +18,11 @@ import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -90,10 +88,6 @@ object TrevorFeatures {
         "mob.died",
         "§aReturn to the Trapper soon to get a new animal to hunt!",
     )
-    private val startDialoguePattern by patternGroup.pattern(
-        "start.dialogue",
-        "\\[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task\\.",
-    )
     private val outOfTimePattern by patternGroup.pattern(
         "outoftime",
         "You ran out of time and the animal disappeared!",
@@ -116,35 +110,33 @@ object TrevorFeatures {
     private var timeLastWarped = SimpleTimeMark.farPast()
     private var lastChatPrompt = ""
     private var lastChatPromptTime = SimpleTimeMark.farPast()
-    private var teleportBlock = SimpleTimeMark.farPast()
 
     var questActive = false
     var inBetweenQuests = false
     var inTrapperDen = false
+    var lastTitle: TitleContext? = null
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!onFarmingIsland()) return
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    fun onSecondPassed() {
         updateTrapper()
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
-        if (config.trapperSolver && questActive) {
+        if (config.solver && questActive) {
             TrevorSolver.findMob()
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!onFarmingIsland()) return
-
         val formattedMessage = event.message.removeColor()
 
         mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()
-            if (config.trapperMobDiedMessage) {
-                TitleManager.sendTitle("§2Mob Died ")
+            if (config.mobDiedMessage) {
+                lastTitle?.stop()
+                lastTitle = TitleManager.sendTitle("§2Mob Died")
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
@@ -181,9 +173,6 @@ object TrevorFeatures {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y
         }
 
-        startDialoguePattern.matchMatcher(formattedMessage) {
-            teleportBlock = SimpleTimeMark.now()
-        }
         outOfTimePattern.matchMatcher(formattedMessage) {
             resetTrapper()
         }
@@ -200,16 +189,15 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.trapperCooldownGui) return
-        if (!onFarmingIsland()) return
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    fun onRenderOverlay() {
+        if (!config.cooldownGui) return
 
         val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
         else if (timeUntilNextReady == 1) "1 second left"
         else "$timeUntilNextReady seconds left"
 
-        config.trapperCooldownPos.renderString(
+        config.cooldownGuiPosition.renderString(
             "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
             posLabel = "Trapper Cooldown GUI",
         )
@@ -224,8 +212,11 @@ object TrevorFeatures {
 
         if (timeUntilNextReady <= 0 && trapperReady) {
             if (timeUntilNextReady == 0) {
-                TitleManager.sendTitle("§2Trapper Ready")
-                SoundUtils.playBeepSound()
+                if (config.readyTitle) {
+                    lastTitle?.stop()
+                    lastTitle = TitleManager.sendTitle("§2Trapper Ready")
+                    SoundUtils.playBeepSound()
+                }
             }
             currentStatus = TrapperStatus.READY
             currentLabel = "§2Ready"
@@ -266,17 +257,16 @@ object TrevorFeatures {
         questActive = active
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!onFarmingIsland()) return
         var entityTrapper = EntityUtils.getEntityByID(TRAPPER_ID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
-        if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
+        if (entityTrapper is EntityLivingBase && config.cooldown) {
             // Solve for the fact that Moby also has the same ID as the Trapper
             val entityMob = MobData.entityToMob[entityTrapper] ?: return
             if (entityMob.name == "Moby") return
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
-                config.trapperTalkCooldown
+                config.cooldown
             }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
@@ -285,7 +275,7 @@ object TrevorFeatures {
             }
         }
 
-        if (config.trapperSolver) {
+        if (config.solver) {
             var location = TrevorSolver.mobLocation.coordinates
             if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return
             if (TrevorSolver.averageHeight != 0.0) {
@@ -294,22 +284,21 @@ object TrevorFeatures {
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
                 val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
                 location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), true, true)
+                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), displayName, 1.5)
             } else {
-                event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
+                event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
             }
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onKeyPress(event: KeyPressEvent) {
-        if (!onFarmingIsland()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
 
-        if (event.keyCode != config.keyBindWarpTrapper) return
+        if (event.keyCode != config.keyBind) return
 
         if (config.acceptQuest) {
             val timeSince = lastChatPromptTime.passedSince()
@@ -322,7 +311,7 @@ object TrevorFeatures {
             }
         }
 
-        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds && teleportBlock.passedSince() > 5.seconds) {
+        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds) {
             HypixelCommands.warp("trapper")
             timeLastWarped = SimpleTimeMark.now()
         }
@@ -330,12 +319,8 @@ object TrevorFeatures {
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
-        if (!inTrapperDen) return
-        if (!config.trapperTalkCooldown) return
-        val entity = event.entity
-        if (entity.name == "§e§lCLICK") {
-            event.cancel()
-        }
+        if (!inTrapperDen || !config.cooldown) return
+        if (event.entity.name == "§e§lCLICK") event.cancel()
     }
 
     private fun resetTrapper() {
@@ -353,7 +338,7 @@ object TrevorFeatures {
 
     @HandleEvent
     fun onTick() {
-        inTrapperDen = areaTrappersDenPattern.matches(IslandAreas.currentAreaName)
+        inTrapperDen = areaTrappersDenPattern.matches(IslandAreas.currentArea)
     }
 
     enum class TrapperStatus(baseColor: LorenzColor) {
@@ -366,12 +351,15 @@ object TrevorFeatures {
         val colorCode = baseColor.getChatColor()
     }
 
-    fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
-
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "misc.trevorTheTrapper.textFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, TrackerEntry::class.java)
-        }
+        val base = "misc.trevorTheTrapper"
+        event.move(95, "$base.trapperSolver", "$base.solver")
+        event.move(95, "$base.trapperMobDiedMessage", "$base.mobDiedMessage")
+        event.move(95, "$base.keyBindWarpTrapper", "$base.keyBind")
+        event.move(95, "$base.trapperTalkCooldown", "$base.cooldown")
+        event.move(95, "$base.trapperReadyTitle", "$base.readyTitle")
+        event.move(95, "$base.trapperCooldownGui", "$base.cooldownGui")
+        event.move(95, "$base.trapperCooldownGuiPosition", "$base.cooldownGuiPosition")
     }
 }

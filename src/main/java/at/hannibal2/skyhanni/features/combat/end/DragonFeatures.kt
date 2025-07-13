@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
@@ -14,19 +14,20 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.properties.Delegates
 import kotlin.time.Duration.Companion.seconds
@@ -405,14 +406,14 @@ object DragonFeatures {
                 if (i == 1) {
                     currentTopDamage = group("damage").formatDouble()
                 }
-                if (group("name") == LorenzUtils.getPlayerName()) {
+                if (group("name") == PlayerUtils.getName()) {
                     currentPlace = if (i > 3) null else i
                 }
             }
         }
     }
 
-    private val widgetErrorMessage = listOf(Renderable.string("§cDragon Widget is disabled!"))
+    private val widgetErrorMessage = listOf(StringRenderable("§cDragon Widget is disabled!"))
 
     private var display = listOf<Renderable>()
 
@@ -446,7 +447,7 @@ object DragonFeatures {
     }
 
     @HandleEvent
-    fun configFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(78, "combat.dragon", "combat.endIsland.dragon")
         event.move(78, "combat.endstoneProtectorChat", "combat.endIsland.endstoneProtectorChat")
     }

@@ -17,14 +17,13 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JU
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -34,6 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -84,7 +84,7 @@ object CrystalNucleusTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         balObtainedPattern.matchMatcher(event.message) {
-            if (!group("player").equals(LorenzUtils.getPlayerName(), ignoreCase = true)) return@matchMatcher
+            if (!group("player").equals(PlayerUtils.getName(), ignoreCase = true)) return@matchMatcher
 
             val item = when (group("raritycolor")) {
                 "6" -> LEGENDARY_BAL_ITEM
@@ -127,7 +127,7 @@ object CrystalNucleusTracker {
         val runsCompleted = data.runsCompleted
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
-            val jungleKeyCost: Double = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
+            val jungleKeyCost: Double = SkyHanniTracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
             profit -= jungleKeyCost
             val jungleKeyCostFormat = jungleKeyCost.shortFormat()
             add(
@@ -141,7 +141,7 @@ object CrystalNucleusTracker {
             )
 
             val usesApparatus = CrystalNucleusApi.usesApparatus()
-            val partsCost = CrystalNucleusApi.getPrecursorRunPrice()
+            val partsCost = CrystalNucleusApi.getPrecursorRunPrice { SkyHanniTracker.getPricePer(it) }
             val totalSapphireCost: Double = partsCost * runsCompleted
             val rawConfigString = config.professorUsage.get().toString()
             val usageString = if (usesApparatus) StringUtils.pluralize(
@@ -206,6 +206,6 @@ object CrystalNucleusTracker {
         }
     }
 
-    private fun isAreaEnabled() = config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus"
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && isAreaEnabled()
+    private fun isAreaEnabled() = config.showOutsideNucleus || SkyBlockUtils.graphArea == "Crystal Nucleus"
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isCurrent() && isAreaEnabled()
 }
