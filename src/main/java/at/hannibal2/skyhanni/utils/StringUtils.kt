@@ -25,6 +25,8 @@ import java.util.UUID
 import java.util.regex.Matcher
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
+import java.util.regex.Pattern
+
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor
@@ -586,5 +588,13 @@ object StringUtils {
 
     private fun isFormatSpecial(formatChar: Char): Boolean {
         return formatChar in 'k'..'o' || formatChar in 'K'..'O' || formatChar in "rR"
+    }
+
+    fun String.removePrefix(prefixPattern: Pattern): String {
+        val matcher = prefixPattern.matcher(this)
+        // Only remove the prefix if it matches at the start of the string
+        return if (matcher.find() && matcher.start() == 0) {
+            this.substring(matcher.end())
+        } else this
     }
 }
