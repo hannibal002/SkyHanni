@@ -23,10 +23,9 @@ import java.util.NavigableMap
 import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
-import java.util.regex.Pattern
-
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor

@@ -263,7 +263,7 @@ object IslandGraphs {
         lastLoadedTime = SimpleTimeMark.now()
 
         try {
-            val graph = RepoManager.getRepoData<Graph>("island_graphs", islandName, gson = Graph.gson)
+            val graph = RepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
             IslandAreas.display = null
             setNewGraph(graph)
         } catch (e: Error) {
