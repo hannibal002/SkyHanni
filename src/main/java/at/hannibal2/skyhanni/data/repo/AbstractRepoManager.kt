@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -187,8 +185,6 @@ abstract class AbstractRepoManager(
     }
 
     fun initRepo() {
-        val timeNow = SimpleTimeMark.now()
-        logger.preDebug("initRepo starting at $timeNow")
         shouldManuallyReload = true
         SkyHanniMod.launchIOCoroutine {
             if (config.repoAutoUpdate) {
@@ -197,15 +193,7 @@ abstract class AbstractRepoManager(
                     switchToBackupRepo()
                 }
             }
-            val startReloadTime = SimpleTimeMark.now()
-            logger.preDebug("Starting repo reload at $startReloadTime")
             reloadRepository()
-            val elapsedReloadFormat = (SimpleTimeMark.now() - startReloadTime).format()
-            logger.preDebug("Repo reload finished at ${SimpleTimeMark.now()}.\nElapsed reload time: $elapsedReloadFormat")
-
-            val timeAfter = SimpleTimeMark.now()
-            val elapsedFormat = (timeAfter - timeNow).format()
-            logger.preDebug("initRepo finished at $timeAfter.\nElapsed time: $elapsedFormat")
         }
     }
 
@@ -361,18 +349,11 @@ abstract class AbstractRepoManager(
     open suspend fun extraReloadCoroutineWork() = Unit
 
     private suspend fun reloadRepository(answerMessage: String = "") = repoMutex.withLock {
-        val timeNow = SimpleTimeMark.now()
-        logger.preDebug("Starting reloadRepository() at $timeNow")
         if (!shouldManuallyReload) return
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
-
-        val beforeCoroutineWork = SimpleTimeMark.now()
-        logger.preDebug("Running extra coroutine work before posting repo reload event at $beforeCoroutineWork")
         extraReloadCoroutineWork()
-        val elapsedCoroutineFormat = (SimpleTimeMark.now() - beforeCoroutineWork).format()
-        logger.preDebug("Finished extra coroutine work at ${SimpleTimeMark.now()}.\nElapsed coroutine time: $elapsedCoroutineFormat")
 
         eventConstructor.invoke(this@AbstractRepoManager).post { error ->
             logger.logErrorWithData(error, "Error while posting repo reload event")
@@ -393,8 +374,5 @@ abstract class AbstractRepoManager(
             )
             if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
         }
-        val timeAfter = SimpleTimeMark.now()
-        val elapsedFormat = (timeAfter - timeNow).format()
-        logger.preDebug("Finished reloadRepository() at $timeAfter.\nElapsed time: $elapsedFormat")
     }
 }

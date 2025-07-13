@@ -12,10 +12,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
@@ -61,7 +59,6 @@ object EnoughUpdatesManager {
     private val itemMap = TreeMap<String, JsonObject>()
     private val itemStackCache = mutableMapOf<String, ItemStack>()
     private val displayNameCache = mutableMapOf<String, String>()
-    private val recipes = mutableSetOf<PrimitiveRecipe>()
     private val recipesMap = mutableMapOf<NeuInternalName, MutableSet<PrimitiveRecipe>>()
 
     private var neuPetsJson: NeuPetsJson? = null
@@ -73,47 +70,23 @@ object EnoughUpdatesManager {
 
     fun inLoadingState() = loadingMutex.isLocked || EnoughUpdatesRepoManager.repoMutex.isLocked
 
-    val logger get() = EnoughUpdatesRepoManager.logger
-
     /**
      * Called by the Neu Repo Manager when the NEU repo is reloaded.
      */
     suspend fun reloadItemsFromRepo() = loadingMutex.withLock {
-        val timeNow = SimpleTimeMark.now()
-        logger.preDebug("Starting reloadItemsFromRepo at $timeNow")
-
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
         titleWordMap.clear()
-        recipes.clear()
         recipesMap.clear()
-
-        val prepFinishedTime = SimpleTimeMark.now()
-        val prepElapsedFormat = (prepFinishedTime - timeNow).format()
-        logger.preDebug("Preparation finished at $prepFinishedTime\nElapsed time: $prepElapsedFormat")
 
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(tempItemMap)
-
-        val transferItemMapStart = SimpleTimeMark.now()
-        logger.preDebug("Transferring item map at $transferItemMapStart")
 
         synchronized(itemMap) {
             itemMap.clear()
             itemMap.putAll(tempItemMap)
         }
-        val transferItemMapFinishedTime = SimpleTimeMark.now()
-        val transferItemMapElapsedFormat = (transferItemMapFinishedTime - transferItemMapStart).format()
-        logger.preDebug("Item map transferred at $transferItemMapFinishedTime\nElapsed time: $transferItemMapElapsedFormat")
-    }
-
-    fun reloadRepo() {
-        if (loadingMutex.isLocked) {
-            return logger.preDebug("reloadRepo called, but already loading NEU repo, skipping reload")
-        }
-        logger.preDebug("reloadRepo called")
-        EnoughUpdatesRepoManager.reloadLocalRepo()
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
@@ -163,7 +136,6 @@ object EnoughUpdatesManager {
     }
 
     fun registerRecipe(recipe: PrimitiveRecipe) {
-        recipes.add(recipe)
         for (internalName in recipe.outputs) {
             val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
             recipeSet.add(recipe)
