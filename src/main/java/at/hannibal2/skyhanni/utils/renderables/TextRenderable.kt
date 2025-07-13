@@ -22,11 +22,10 @@ open class TextRenderable(
         verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     ) : this(Text.of(text), scale, color, horizontalAlign, verticalAlign)
 
-
     override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(fixStupid(text)) * scale).toInt() + 1 }
     override val height = (9 * scale).toInt() + 1
 
-    val inverseScale = 1 / scale
+    private val inverseScale = 1 / scale
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         RenderableUtils.renderString(fixStupid(text), scale, color, inverseScale)
