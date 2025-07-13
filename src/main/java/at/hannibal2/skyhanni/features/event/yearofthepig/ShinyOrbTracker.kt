@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -19,8 +18,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -46,8 +45,8 @@ object ShinyOrbTracker {
     // Todo: Only display when Year of the Pig is active (how do we detect that?)
     init {
         tracker.initRenderer(
-            { config.position }
-        ) { config.enabled && IslandType.HUB.isInIsland() && passesHoldingItem() }
+            { config.position },
+        ) { config.enabled && IslandType.HUB.isCurrent() && passesHoldingItem() }
     }
 
     class ShinyOrbData : ItemTrackerData() {
@@ -106,6 +105,7 @@ object ShinyOrbTracker {
                 val (internalName, amount) = event.loot.first to event.loot.second
                 tracker.addItem(internalName, amount, command = false)
             }
+
             event.coins != null -> tracker.addCoins(event.coins, command = false)
             event.skillXp != null -> tracker.modify { tracker ->
                 val (skill, amount) = event.skillXp.first to event.skillXp.second
@@ -121,7 +121,7 @@ object ShinyOrbTracker {
 
         val orbPrice = SHINY_ORB_ITEM.getPrice()
         profit -= data.orbsUsed * orbPrice
-        add(Renderable.string("§7${data.orbsUsed}x §6Shiny Orb§7: §c-${orbPrice.shortFormat()} coins").toSearchable())
+        add(StringRenderable("§7${data.orbsUsed}x §6Shiny Orb§7: §c-${orbPrice.shortFormat()} coins").toSearchable())
 
         // Skill XP gains
         addSkillXpInfo(data.skillXpGained)

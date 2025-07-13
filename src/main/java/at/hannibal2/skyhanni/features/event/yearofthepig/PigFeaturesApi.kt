@@ -18,11 +18,11 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -37,15 +37,17 @@ object PigFeaturesApi {
     class ShinyOrbDataSet(
         var pigEntityId: Int? = null,
         var shinyOrbEntityId: Int? = null,
-        private var shinyOrbLocationCache: LorenzVec? = null
+        private var shinyOrbLocationCache: LorenzVec? = null,
     ) : ResettableStorageSet() {
-        private val shinyOrbEntity get() = shinyOrbEntityId?.let {
-            EntityUtils.getEntityByID(it) as EntityArmorStand?
-        }
-        val shinyOrbLocation get() = shinyOrbLocationCache ?: shinyOrbEntity?.getLorenzVec()?.let {
-            shinyOrbLocationCache = it
-            it
-        }
+        private val shinyOrbEntity
+            get() = shinyOrbEntityId?.let {
+                EntityUtils.getEntityByID(it) as EntityArmorStand?
+            }
+        val shinyOrbLocation
+            get() = shinyOrbLocationCache ?: shinyOrbEntity?.getLorenzVec()?.let {
+                shinyOrbLocationCache = it
+                it
+            }
 
         override fun reset() {
             shinyOrbLocationCache = null
@@ -61,22 +63,22 @@ object PigFeaturesApi {
     // <editor-fold desc="Patterns">
     private val orbUsedChatPattern by patternGroup.pattern(
         "chat.orb.used",
-        "§dOink! §r§eBring the pig back to the §r§6Shiny Orb§r§e!"
+        "§dOink! §r§eBring the pig back to the §r§6Shiny Orb§r§e!",
     )
 
     private val orbChargedChatPattern by patternGroup.pattern(
         "chat.orb.charged",
-        "§6§lSHINY! §r§eThe orb is charged! Click on it for loot!"
+        "§6§lSHINY! §r§eThe orb is charged! Click on it for loot!",
     )
 
     private val orbExpiredChatPattern by patternGroup.pattern(
         "chat.orb.expired",
-        "§cYour Shiny Orb and associated pig expired and disappeared\\."
+        "§cYour Shiny Orb and associated pig expired and disappeared\\.",
     )
 
     private val chargedOrbTagPattern by patternGroup.pattern(
         "entity.tag.charged.name",
-        "§e§lCLICK"
+        "§e§lCLICK",
     )
 
     /**
@@ -84,7 +86,7 @@ object PigFeaturesApi {
      */
     private val orbTagPattern by patternGroup.pattern(
         "entity.tag.normal.name",
-        "(?:(?:§.)+\\[.*] )?(?<player>[^§]+)(?:§.)+"
+        "(?:(?:§.)+\\[.*] )?(?<player>[^§]+)(?:§.)+",
     )
 
     /**
@@ -99,7 +101,7 @@ object PigFeaturesApi {
      */
     private val orbLootedChatPattern by patternGroup.pattern(
         "chat.orb.looted",
-        "§6§lSHINY! §r§eYou extracted (?:§.)+(?<reward>.*) §r§efrom the piglet's orb!"
+        "§6§lSHINY! §r§eYou extracted (?:§.)+(?<reward>.*) §r§efrom the piglet's orb!",
     )
 
     /**
@@ -107,7 +109,7 @@ object PigFeaturesApi {
      */
     private val coinsRewardPattern by patternGroup.pattern(
         "orb.reward.coins",
-        "\\+(?<amount>[\\d,]+) Coins"
+        "\\+(?<amount>[\\d,]+) Coins",
     )
 
     /**
@@ -116,7 +118,7 @@ object PigFeaturesApi {
      */
     private val skillXpRewardPattern by patternGroup.pattern(
         "orb.reward.skillxp",
-        "\\+(?<amount>[\\d,]+) (?<skill>.*) XP"
+        "\\+(?<amount>[\\d,]+) (?<skill>.*) XP",
     )
     // </editor-fold>
 
@@ -151,12 +153,12 @@ object PigFeaturesApi {
     }
 
     private fun tryFindPlayerOrb(
-        location: LorenzVec
+        location: LorenzVec,
     ): EntityArmorStand? = writableDataSet.shinyOrbEntityId?.let {
         EntityUtils.getEntityByID(it) as EntityArmorStand?
     } ?: armorStands.firstOrNull {
         it.distanceTo(location) <= 3.0 && armorStands.any { labelArmorStand ->
-            val tagMatchesIgn = orbTagPattern.matchGroup(labelArmorStand.name, "player") == LorenzUtils.getPlayerName()
+            val tagMatchesIgn = orbTagPattern.matchGroup(labelArmorStand.name, "player") == PlayerUtils.getName()
             val tagCharged = chargedOrbTagPattern.matches(labelArmorStand.name)
             val tagMatches = tagMatchesIgn || tagCharged
 
