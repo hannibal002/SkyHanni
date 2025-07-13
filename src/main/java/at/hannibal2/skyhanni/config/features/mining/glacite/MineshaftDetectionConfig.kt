@@ -43,5 +43,5 @@ class MineshaftDetectionConfig {
             "Other mineshafts will still be tracked."
     )
     @ConfigEditorDropdown
-    var mineshaftToTrack: MineshaftDetection.MineshaftTypes = MineshaftDetection.MineshaftTypes.FAIR
+    var mineshaftToTrack: MineshaftDetection.MineshaftTypes = MineshaftDetection.MineshaftTypes.FAIR1
 }

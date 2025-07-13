@@ -53,7 +53,7 @@ object MineshaftDetection {
             .firstOrNull { line -> MineshaftTypes.entries.any { line.contains(it.name) } }
             ?.removeColor() ?: return
 
-        val areaName = matchingLine.split(" ").last().dropLast(1)
+        val areaName = matchingLine.split(" ").last()
 
         ChatUtils.debug("In area: $areaName")
 
@@ -124,22 +124,29 @@ object MineshaftDetection {
     }
 
     enum class MineshaftTypes(val color: LorenzColor, val rawName: String) {
-        TOPA(LorenzColor.YELLOW, "Topaz"),
-        SAPP(LorenzColor.BLUE, "Sapphire"),
-        AMET(LorenzColor.DARK_PURPLE, "Amethyst"),
-        AMBE(LorenzColor.GOLD, "Amber"),
-        JADE(LorenzColor.GREEN, "Jade"),
-        TITA(LorenzColor.GRAY, "Titanium"),
-        UMBE(LorenzColor.GOLD, "Umber"),
-        TUNG(LorenzColor.DARK_GRAY, "Tungsten"),
-        FAIR(LorenzColor.WHITE, "Vanguard"),
-        RUBY(LorenzColor.RED, "Ruby"),
-        ONYX(LorenzColor.BLACK, "Onyx"),
-        AQUA(LorenzColor.DARK_BLUE, "Aquamarine"),
-        CITR(LorenzColor.YELLOW, "Citrine"),
-        PERI(LorenzColor.DARK_GREEN, "Peridot"),
-        JASP(LorenzColor.LIGHT_PURPLE, "Jasper"),
-        OPAL(LorenzColor.WHITE, "Opal"),
+        TOPA1(LorenzColor.YELLOW, "Topaz"),
+        SAPP1(LorenzColor.BLUE, "Sapphire"),
+        AMET1(LorenzColor.DARK_PURPLE, "Amethyst"),
+        AMBE1(LorenzColor.GOLD, "Amber"),
+        JADE1(LorenzColor.GREEN, "Jade"),
+        TITA1(LorenzColor.GRAY, "Titanium"),
+        UMBE1(LorenzColor.GOLD, "Umber"),
+        TUNG1(LorenzColor.DARK_GRAY, "Tungsten"),
+        FAIR1(LorenzColor.WHITE, "Vanguard"),
+        RUBY1(LorenzColor.RED, "Ruby"),
+        RUBY2(LorenzColor.RED, "Ruby Crystal"),
+        ONYX1(LorenzColor.BLACK, "Onyx"),
+        ONYX2(LorenzColor.BLACK, "Onyx Crystal"),
+        AQUA1(LorenzColor.DARK_BLUE, "Aquamarine"),
+        AQUA2(LorenzColor.DARK_BLUE, "Aquamarine Crystal"),
+        CITR1(LorenzColor.YELLOW, "Citrine"),
+        CITR2(LorenzColor.YELLOW, "Citrine Crystal"),
+        PERI1(LorenzColor.DARK_GREEN, "Peridot"),
+        PERI2(LorenzColor.DARK_GREEN, "Peridot Crystal"),
+        JASP1(LorenzColor.LIGHT_PURPLE, "Jasper"),
+        JASP2(LorenzColor.LIGHT_PURPLE, "Jasper Crystal"),
+        OPAL1(LorenzColor.WHITE, "Opal"),
+        OPAL2(LorenzColor.WHITE, "Opal Crystal")
         ;
 
         val displayName: String = color.getChatColor() + rawName
