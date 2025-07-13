@@ -58,11 +58,6 @@ object PigFeaturesApi {
     }
 
     // <editor-fold desc="Patterns">
-    private val orbUsedChatPattern by patternGroup.pattern(
-        "chat.orb.used",
-        "§dOink! §r§eBring the pig back to the §r§6Shiny Orb§r§e!",
-    )
-
     private val orbChargedChatPattern by patternGroup.pattern(
         "chat.orb.charged",
         "§6§lSHINY! §r§eThe orb is charged! Click on it for loot!",
@@ -137,9 +132,6 @@ object PigFeaturesApi {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isYearOfThePig()) return
         val message = event.message
-        orbUsedChatPattern.matchMatcher(message) {
-            ShinyOrbUsedEvent().post()
-        }
 
         orbChargedChatPattern.matchMatcher(message) {
             val orbEntity = tryFindOrb(LocationUtils.playerLocation())
@@ -201,9 +193,9 @@ object PigFeaturesApi {
     }
 
     private fun EntityPig.handlePigClick() {
-        if (dataSetList.any { it.pigEntityId == this.entityId }) return
         val pigStartingLocation = this.getLorenzVec()
         DelayedRun.runDelayed(1.seconds) {
+            if (dataSetList.any { it.pigEntityId == this.entityId }) return@runDelayed
             val orbEntity = tryFindOrb(pigStartingLocation)
             orbEntity ?: return@runDelayed
             data.add(
@@ -214,6 +206,7 @@ object PigFeaturesApi {
                     spawnTime = SimpleTimeMark.now(),
                 ),
             )
+            ShinyOrbUsedEvent().post()
         }
     }
 }
