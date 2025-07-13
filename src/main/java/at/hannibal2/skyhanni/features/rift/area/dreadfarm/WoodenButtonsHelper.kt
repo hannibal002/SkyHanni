@@ -108,7 +108,12 @@ object WoodenButtonsHelper {
         if (!checkButtons()) return
 
         val location = event.position
-        if (location.getBlockAt() == Blocks.wooden_button && !hitButtons.contains(location)) {
+        //#if MC < 1.16
+        val oakButtonBlock = Blocks.wooden_button
+        //#else
+        //$$ val oakButtonBlock = Blocks.OAK_BUTTON
+        //#endif
+        if (location.getBlockAt() == oakButtonBlock && !hitButtons.contains(location)) {
             lastHitButton = event.position
         }
     }
@@ -154,7 +159,7 @@ object WoodenButtonsHelper {
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
         RiftApi.allButtonsHit = true
         hitButtons = buttonLocations.values.flatten().toMutableSet()
-        soulLocations["Buttons"]?.let {
+        soulLocations["Dreadfarm"]?.get("Buttons")?.let {
             IslandGraphs.pathFind(
                 it,
                 "Buttons Enigma Soul",

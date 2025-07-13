@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 
+// todo 1.21 impl needed
 class RabbitFoundEvent(
     val eggType: HoppityEggType,
     val duplicate: Boolean,

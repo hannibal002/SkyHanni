@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -35,23 +34,25 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -293,7 +294,7 @@ object TunnelsMaps {
 
         return buildList {
             if (goal == campfire && active != campfire.name) {
-                add(Renderable.string("§6Override for ${campfire.name}"))
+                add(StringRenderable("§6Override for ${campfire.name}"))
                 add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
             } else {
                 add(
@@ -322,7 +323,7 @@ object TunnelsMaps {
 
     private fun generateLocationsDisplay() = buildList {
         val campfireName = campfire.name ?: return@buildList
-        add(Renderable.string("§6Locations:"))
+        add(StringRenderable("§6Locations:"))
         add(
             Renderable.clickable(
                 campfireName,
@@ -339,13 +340,13 @@ object TunnelsMaps {
         if (!config.excludeFairy.get()) {
             add(
                 Renderable.hoverable(
-                    Renderable.horizontalContainer(
-                        listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                    HorizontalContainerRenderable(
+                        listOf(StringRenderable("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))
+                            Renderable.clickable(StringRenderable("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
-                    Renderable.string("§dFairy Souls"),
+                    StringRenderable("§dFairy Souls"),
                 ),
             )
         }
@@ -357,11 +358,14 @@ object TunnelsMaps {
     }
 
     private fun Map<String, List<GraphNode>>.toRenderables() = map {
-        Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
+        Renderable.clickable(
+            StringRenderable(it.key),
+            onLeftClick = guiSetActive(it.key)
+        )
     }
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickable(
-        Renderable.string(
+        StringRenderable(
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),
@@ -529,5 +533,5 @@ object TunnelsMaps {
 
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && IslandAreas.currentAreaName in areas
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isCurrent() && config.enable && SkyBlockUtils.graphArea in areas
 }

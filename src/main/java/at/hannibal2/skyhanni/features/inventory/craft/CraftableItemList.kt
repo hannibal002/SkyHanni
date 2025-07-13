@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.isVanillaItem
@@ -22,6 +21,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStack
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrE
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -68,7 +69,7 @@ object CraftableItemList {
         } else {
             buildList<Renderable> {
                 val items = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
-                add(Renderable.string("§e§lCraftable Items §7(${items.size})"))
+                add(StringRenderable("§e§lCraftable Items §7(${items.size})"))
                 add(items.buildSearchableScrollable(height = 250, textInput, velocity = 20.0))
             }
         }
@@ -177,5 +178,5 @@ object CraftableItemList {
         config.position.renderRenderables(display, posLabel = "Craftable Item List")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

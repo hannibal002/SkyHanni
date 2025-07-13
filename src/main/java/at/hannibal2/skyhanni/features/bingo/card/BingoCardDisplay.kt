@@ -18,15 +18,16 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -44,7 +45,7 @@ object BingoCardDisplay {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var displayMode = 0
 
-    fun command() {
+    private fun command() {
         reload()
     }
 
@@ -53,7 +54,7 @@ object BingoCardDisplay {
     }
 
     private fun toggleCommand() {
-        if (!LorenzUtils.isBingoProfile) {
+        if (!SkyBlockUtils.isBingoProfile) {
             ChatUtils.userError("This command only works on a bingo profile!")
             return
         }
@@ -86,7 +87,7 @@ object BingoCardDisplay {
         val newList = mutableListOf<Renderable>()
 
         if (BingoApi.bingoGoals.isEmpty()) {
-            newList.add(Renderable.string("§6Bingo Goals:"))
+            newList.add(StringRenderable("§6Bingo Goals:"))
             newList.add(
                 Renderable.clickable(
                     "§cOpen the §e/bingo §ccard.",
@@ -106,7 +107,7 @@ object BingoCardDisplay {
     }
 
     private fun MutableList<Renderable>.addCommunityGoals() {
-        add(Renderable.string("§6Community Goals:"))
+        add(StringRenderable("§6Community Goals:"))
         val goals = BingoApi.communityGoals.toMutableList()
         var hiddenGoals = 0
         for (goal in goals.toList()) {
@@ -124,7 +125,7 @@ object BingoCardDisplay {
 
         if (hiddenGoals > 0) {
             val name = StringUtils.pluralize(hiddenGoals, "goal")
-            add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
+            add(StringRenderable("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
         addString(" ")
     }
@@ -136,7 +137,7 @@ object BingoCardDisplay {
     private fun MutableList<Renderable>.addPersonalGoals() {
         val todo = BingoApi.personalGoals.filter { !it.done }.toMutableList()
         val done = MAX_PERSONAL_GOALS - todo.size
-        add(Renderable.string("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)"))
+        add(StringRenderable("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)"))
 
         var hiddenGoals = 0
         var nextTip = 14.days
@@ -157,17 +158,17 @@ object BingoCardDisplay {
 
         if (hiddenGoals > 0) {
             val name = StringUtils.pluralize(hiddenGoals, "goal")
-            add(Renderable.string("§7+ $hiddenGoals more §cunknown §7$name."))
+            add(StringRenderable("§7+ $hiddenGoals more §cunknown §7$name."))
         }
         hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 14.days
         if (hasHiddenPersonalGoals) {
             val nextTipTime = BingoApi.lastBingoCardOpenTime + nextTip
             if (nextTipTime.isInPast()) {
-                add(Renderable.string("§eThe next hint got unlocked already!"))
-                add(Renderable.string("§eOpen the bingo card to update!"))
+                add(StringRenderable("§eThe next hint got unlocked already!"))
+                add(StringRenderable("§eOpen the bingo card to update!"))
             } else {
                 val until = nextTipTime.timeUntil()
-                add(Renderable.string("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}"))
+                add(StringRenderable("§eThe next hint will unlock in §b${until.format(maxUnits = 2)}"))
             }
         }
     }
@@ -205,12 +206,12 @@ object BingoCardDisplay {
                     },
                 )
             } else {
-                Renderable.string(display)
+                StringRenderable(display)
             }
         }
         if (filter) {
             val missing = goals.size - finalGoal.size
-            add(Renderable.string("  §8+ $missing not highlighted goals."))
+            add(StringRenderable("  §8+ $missing not highlighted goals."))
         }
     }
 
@@ -219,7 +220,7 @@ object BingoCardDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (!config.enabled) return
 
         val currentlyOpen = canEditDisplay()
@@ -255,7 +256,7 @@ object BingoCardDisplay {
     @HandleEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         update()
     }
 
@@ -273,10 +274,17 @@ object BingoCardDisplay {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shbingotoggle") {
+        event.registerBrigadier("shbingotoggle") {
             description = "Toggle the bingo card display mode"
             category = CommandCategory.USERS_ACTIVE
             callback { toggleCommand() }
+        }
+        event.registerBrigadier("shreloadbingodata") {
+            description = "Reloads the bingo card data"
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                reload()
+            }
         }
     }
 }

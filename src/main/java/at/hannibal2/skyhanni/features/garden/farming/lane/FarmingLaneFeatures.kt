@@ -2,7 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming.lane
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleContext
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
@@ -36,7 +37,7 @@ object FarmingLaneFeatures {
     private var currentDistance = 0.0
 
     private var display = listOf<String>()
-    private var titleContext: TitleManager.TitleContext? = null
+    private var titleContext: TitleContext? = null
     private var timeRemaining: Duration? = null
     private var lastSpeed = 0.0
     private var lastTimeFarming = SimpleTimeMark.farPast()
@@ -84,7 +85,7 @@ object FarmingLaneFeatures {
                     " §7(${movementState.label}§7)"
                 } else ""
                 add("§7Time remaining: $color$format$suffix")
-                if (MovementSpeedDisplay.usingSoulsandSpeed && config.distanceSoulSandWarning) {
+                if (MovementSpeedDisplay.usingLegacySoulSandSpeed && config.distanceSoulSandWarning) {
                     add("§7Using inaccurate soul sand speed!")
                 }
             }
@@ -187,7 +188,7 @@ object FarmingLaneFeatures {
             return MovementState.TOO_SLOW
         }
         // only calculate the time if the speed has not changed
-        if (!MovementSpeedDisplay.usingSoulsandSpeed) {
+        if (!MovementSpeedDisplay.usingLegacySoulSandSpeed) {
             if (sameSpeedCounter < 6) {
                 return MovementState.CALCULATING
             }

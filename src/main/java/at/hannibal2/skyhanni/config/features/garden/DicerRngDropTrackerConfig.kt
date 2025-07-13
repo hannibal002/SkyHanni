@@ -19,7 +19,7 @@ class DicerRngDropTrackerConfig {
     @ConfigOption(name = "Compact Format", desc = "Compact the Dicer RNG Drop Tracker Display.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var compact: Property<Boolean> = Property.of(false)
+    val compact: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
@@ -29,5 +29,5 @@ class DicerRngDropTrackerConfig {
 
     @Expose
     @ConfigLink(owner = DicerRngDropTrackerConfig::class, field = "enabled")
-    var position: Position = Position(16, -232)
+    val position: Position = Position(16, -232)
 }

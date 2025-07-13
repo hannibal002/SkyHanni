@@ -2,16 +2,13 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
@@ -32,16 +29,14 @@ class FarmingFortuneConfig {
     @ConfigEditorBoolean
     var hideMissingFortuneWarnings: Boolean = false
 
-    //#if TODO
     @ConfigOption(
         name = "Farming Fortune Guide",
         desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff"
     )
     @ConfigEditorButton(buttonText = "Open")
-    var open: Runnable = Runnable(FFGuideGui::onCommand)
-    //#endif
+    val open: Runnable = Runnable(FFGuideGui::onCommand)
 
     @Expose
     @ConfigLink(owner = FarmingFortuneConfig::class, field = "display")
-    var position: Position = Position(5, -180)
+    val position: Position = Position(5, -180)
 }

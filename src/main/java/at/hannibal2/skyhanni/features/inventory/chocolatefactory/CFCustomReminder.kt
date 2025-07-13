@@ -8,19 +8,18 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
@@ -187,7 +186,7 @@ object CFCustomReminder {
             return "§aGoal Reached! §eBuy §f$targetName"
         }
         val format = duration.format(maxUnits = 2)
-        return "§f$targetName §ein §b$format".partyModeReplace()
+        return CFApi.partyModeReplace("§f$targetName §ein §b$format")
     }
 
     private fun warn() {
@@ -215,5 +214,5 @@ object CFCustomReminder {
         display = emptyList()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && configReminder.enabled
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && configReminder.enabled
 }

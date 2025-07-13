@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -33,6 +36,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,7 +59,7 @@ object PestFinder {
     }
 
     private fun drawDisplay() = buildList {
-        add(Renderable.string("§6Total pests: §e${PestApi.scoreboardPests}§6/§e8"))
+        add(StringRenderable("§6Total pests: §e${PestApi.scoreboardPests}§6/§e8"))
 
         for (plot in PestApi.getInfestedPlots()) {
             val pests = plot.pests
@@ -82,7 +86,7 @@ object PestFinder {
 
         if (PestApi.getInfestedPlots().isEmpty() && PestApi.scoreboardPests != 0) {
             remindInChat()
-            add(Renderable.string("§e${PestApi.scoreboardPests} §6Bugged pests!"))
+            add(StringRenderable("§e${PestApi.scoreboardPests} §6Bugged pests!"))
             add(
                 Renderable.clickable(
                     "§cTry opening your plots menu",
@@ -209,7 +213,14 @@ object PestFinder {
         teleportNearestInfestedPlot()
     }
 
-    fun teleportNearestInfestedPlot() {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (config.muteVacuum && event.soundName == "mob.wither.shoot") {
+            event.cancel()
+        }
+    }
+
+    private fun teleportNearestInfestedPlot() {
         // need to check again for the command
         if (!GardenApi.inGarden()) {
             ChatUtils.userError("This command only works while on the Garden!")
@@ -228,6 +239,15 @@ object PestFinder {
         }
 
         plot.sendTeleportTo()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtpinfested") {
+            description = "Teleports you to the nearest infested plot"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { teleportNearestInfestedPlot() }
+        }
     }
 
     fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)

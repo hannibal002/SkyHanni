@@ -11,7 +11,12 @@ enum class TrevorMob(val mobName: String, val renderDistance: Double) {
     CHICKEN("Chicken", 33.0),
     ;
 
-    private val i18n = "entity.$mobName.name"
+    private val i18n =
+        //#if MC < 1.21
+        "entity.$mobName.name"
+    //#else
+    //$$ "entity.minecraft.${mobName.lowercase()}"
+    //#endif
 
     val entityName get() = I18n.format(i18n)
 }

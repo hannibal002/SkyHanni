@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils.chat
 
+import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -9,7 +12,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
+import java.awt.Color
 //#if MC < 1.21
+import at.hannibal2.skyhanni.utils.compat.Text
 import net.minecraft.util.ChatComponentText
 //#endif
 //#if MC > 1.16
@@ -182,5 +187,15 @@ object TextHelper {
 
         text.add(createDivider(dividerColor))
         multiline(text).send(chatLineId)
+    }
+
+    fun createGradientText(start: Color, end: Color, string: String): Text {
+        val length = string.length.toDouble()
+        var text = Text.of("")
+        for ((index, char) in string.withIndex()) {
+            val color = ColorUtils.blendRGB(start, end, index / length).rgb
+            text = text.append(ExtendedChatColor(color).asText().append(char.toString()))
+        }
+        return text
     }
 }

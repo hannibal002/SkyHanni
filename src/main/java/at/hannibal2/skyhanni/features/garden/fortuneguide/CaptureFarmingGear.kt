@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -25,8 +27,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -37,9 +41,9 @@ import kotlin.time.Duration.Companion.days
 @SkyHanniModule
 object CaptureFarmingGear {
     private val outdatedItems get() = GardenApi.storage?.fortune?.outdatedItems
-
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: SKILL LEVEL UP Farming 1 ➜ 2
      */
@@ -116,6 +120,7 @@ object CaptureFarmingGear {
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)",
     )
+    // </editor-fold>
 
     private val farmingSets = arrayListOf(
         "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
@@ -129,7 +134,7 @@ object CaptureFarmingGear {
         }
     }
 
-    // TODO upadte armor on equpment/wardeobe update as well
+    // TODO update armor on equipment/wardrobe update as well
     fun captureFarmingGear() {
         for (armor in InventoryUtils.getArmor()) {
             if (armor == null) continue
@@ -167,15 +172,6 @@ object CaptureFarmingGear {
         }
     }
 
-    fun handelCarrolyn(input: Array<String>) {
-        val string = input.joinToString("_").uppercase()
-        val crop = CropType.entries.firstOrNull { it.name == string }
-            ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string").run { return }
-        val carrolyn = CarrolynTable.getByCrop(crop)
-            ?: ChatUtils.userError("Invalid Argument, crop is not valid").run { return }
-        carrolyn.setVisibleActive(!carrolyn.get())
-    }
-
     private fun getUniqueVisitorsForTier(tier: Int): Int {
         return when {
             tier == 0 -> 0
@@ -195,11 +191,9 @@ object CaptureFarmingGear {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
+        if (event.tryReadPets()) return
+
         val items = event.inventoryItems
-        if (PetApi.isPetMenu(event.inventoryName)) {
-            pets(items, outdatedItems)
-            return
-        }
         when (event.inventoryName) {
             "Your Equipment and Stats" -> equipmentAndStats(items, outdatedItems)
             "Your Skills" -> skills(items, storage)
@@ -209,6 +203,12 @@ object CaptureFarmingGear {
             "Visitor Milestones" -> visitorMilestones(items)
             "Bestiary", "Bestiary ➜ Garden" -> bestiary(items, storage)
         }
+    }
+
+    private fun InventoryFullyOpenedEvent.tryReadPets(): Boolean {
+        if (!PetStorageApi.mainPetMenuNamePattern.matches(inventoryName)) return false
+        pets(inventoryItems, outdatedItems ?: return false)
+        return true
     }
 
     private fun bestiary(
@@ -309,6 +309,7 @@ object CaptureFarmingGear {
         }
     }
 
+    // TODO: Completely get rid of this and use PetStorageApi instead.
     private fun pets(
         items: Map<Int, ItemStack>,
         outdatedItems: MutableMap<FarmingItemType, Boolean>,
@@ -325,6 +326,7 @@ object CaptureFarmingGear {
 
         for ((_, item) in items) {
             if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
+            item.getPetInfo()?.takeIf { it.uniqueId != null } ?: continue
             val (name, rarity) = item.getInternalName().asString().split(";")
             if (name == "ELEPHANT" && rarity.toInt() > highestElephantRarity) {
                 FarmingItemType.ELEPHANT.setItem(item)
@@ -435,17 +437,38 @@ object CaptureFarmingGear {
         }
     }
 
-    fun onResetGearCommand() {
-        val storage = GardenApi.storage?.fortune ?: return
-        ChatUtils.chat("Resets farming items")
-        storage.farmingItems.clear()
-        storage.outdatedItems.clear()
-    }
-
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(48, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")
         event.move(48, "#profile.garden.fortune.pumpkinFortune", "#profile.garden.fortune.carrolyn.PUMPKIN")
         event.move(48, "#profile.garden.fortune.cocoaBeansFortune", "#profile.garden.fortune.carrolyn.COCOA_BEANS")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcarrolyn") {
+            description = "Toggles if the specified crops effect is active from carrolyn"
+            category = CommandCategory.USERS_BUG_FIX
+            legacyCallbackArgs { args ->
+                val string = args.joinToString("_").uppercase()
+                val crop = CropType.entries.firstOrNull { it.name == string }
+                    ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string")
+                        .run<Unit, Nothing> { return@legacyCallbackArgs }
+                val carrolyn = CarrolynTable.getByCrop(crop)
+                    ?: ChatUtils.userError("Invalid Argument, crop is not valid")
+                        .run<Unit, Nothing> { return@legacyCallbackArgs }
+                carrolyn.setVisibleActive(!carrolyn.get())
+            }
+        }
+        event.registerBrigadier("shresetfarmingitems") {
+            description = "Resets farming items saved for the Farming Fortune Guide"
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                val storage = GardenApi.storage?.fortune ?: return@simpleCallback
+                ChatUtils.chat("Resets farming items")
+                storage.farmingItems.clear()
+                storage.outdatedItems.clear()
+            }
+        }
     }
 }

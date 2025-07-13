@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -14,22 +13,27 @@ class VisitorConfig {
     @Expose
     @ConfigOption(name = "Visitor Timer", desc = "")
     @Accordion
-    var timer: TimerConfig = TimerConfig()
+    val timer: TimerConfig = TimerConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Shopping List", desc = "")
     @Accordion
-    var shoppingList: ShoppingListConfig = ShoppingListConfig()
+    val shoppingList: ShoppingListConfig = ShoppingListConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Inventory", desc = "")
     @Accordion
-    var inventory: VisitorInventoryConfig = VisitorInventoryConfig()
+    val inventory: VisitorInventoryConfig = VisitorInventoryConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Reward Warning", desc = "")
     @Accordion
-    var rewardWarning: RewardWarningConfig = RewardWarningConfig()
+    val rewardWarning: RewardWarningConfig = RewardWarningConfig()
+
+    @Expose
+    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
+    @Accordion
+    val dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
 
     @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
@@ -57,17 +61,13 @@ class VisitorConfig {
     @ConfigEditorDropdown
     var highlightStatus: HighlightMode = HighlightMode.BOTH
 
-    enum class HighlightMode(
-        private val displayName: String,
-        private val legacyId: Int = -1
-    ) : HasLegacyId {
-        COLOR("Color Only", 0),
-        NAME("Name Only", 1),
-        BOTH("Both", 2),
-        DISABLED("Disabled", 3),
+    enum class HighlightMode(private val displayName: String) {
+        COLOR("Color Only"),
+        NAME("Name Only"),
+        BOTH("Both"),
+        DISABLED("Disabled"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -88,11 +88,6 @@ class VisitorConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideChat: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
-    @Accordion
-    var dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
 
     @Expose
     @ConfigOption(
