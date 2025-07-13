@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
@@ -14,19 +13,22 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import java.util.Locale
 import java.util.ServiceLoader
+import java.util.concurrent.CompletableFuture
 
 @SkyHanniModule
 object OrderedWaypoints {
@@ -44,14 +46,12 @@ object OrderedWaypoints {
         for (i in renderWaypoints.indices) {
             val wpColor = if (!config.showAll) {
                 when (i) {
-                    0 -> config.previousWaypointColor.toSpecialColor()
-                    1 -> config.currentWaypointColor.toSpecialColor()
-                    2 -> config.nextWaypointColor.toSpecialColor()
-                    else -> LorenzColor.RED.toColor()
+                    0 -> config.previousWaypointColor.toColor()
+                    1 -> config.currentWaypointColor.toColor()
+                    2 -> config.nextWaypointColor.toColor()
+                    else -> config.setupModeColor.toColor()
                 }
-            } else {
-                orderedWaypointsList[renderWaypoints[i]].color
-            }
+            } else config.showAllWaypointColor.toColor()
 
             if (orderedWaypointsList.size <= renderWaypoints[i]) {
                 ChatUtils.debug("${renderWaypoints[i]} $i")
@@ -62,7 +62,7 @@ object OrderedWaypoints {
             event.drawEdges(
                 orderedWaypointsList[renderWaypoints[i]].location,
                 wpColor,
-                1,
+                config.blockOutlineThickness.toInt(),
                 false
             )
 
@@ -70,7 +70,7 @@ object OrderedWaypoints {
                 // Waypoint name (number)
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
-                    "${LorenzColor.YELLOW.getChatColor()}${orderedWaypointsList[renderWaypoints[i]].number}",
+                    "§e${orderedWaypointsList[renderWaypoints[i]].number}",
                     seeThroughBlocks = true
                 )
             }
@@ -79,16 +79,14 @@ object OrderedWaypoints {
                 // Distance
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.0, 0.5),
-                    "${
-                        LorenzColor.YELLOW.getChatColor() + orderedWaypointsList[renderWaypoints[i]].location.distanceToPlayer().roundTo(1).addSeparators()
-                    } m",
+                    "§e${orderedWaypointsList[renderWaypoints[i]].location.distanceToPlayer().roundTo(1).addSeparators()} m",
                     seeThroughBlocks = true
                 )
             }
         }
 
         val traceWP = orderedWaypointsList[renderWaypoints.getOrNull(2) ?: return decideWaypoints()]
-        val lineColor = config.traceLineColor.toSpecialColor()
+        val lineColor = config.traceLineColor.toColor()
         if (!config.setupMode && config.traceLine && !config.showAll) {
             event.drawLineToEye(
                 traceWP.location.add(0.5, 0.25, 0.5),
@@ -122,7 +120,9 @@ object OrderedWaypoints {
         event.registerBrigadier("shorderedload") {
             description = "Loads ordered waypoints from your clipboard or config."
             category = CommandCategory.USERS_ACTIVE
-            arg("name", BrigadierArguments.string()) { name ->
+            arg(
+                "name", BrigadierArguments.string(), ::genRouteSuggestions
+            ) { name ->
                 callback { load(getArg(name)) }
             }
             simpleCallback { load("") }
@@ -185,7 +185,7 @@ object OrderedWaypoints {
         event.registerBrigadier("shorderedexport") {
             description = "Exports the loaded ordered waypoints to clipboard."
             category = CommandCategory.USERS_ACTIVE
-            arg("format", BrigadierArguments.string()) { format ->
+            arg("format", BrigadierArguments.string(), ::getFormatSuggestions) { format ->
                 callback { export(getArg(format)) }
             }
             simpleCallback { export("coleweight") }
@@ -200,7 +200,43 @@ object OrderedWaypoints {
             }
             aliases = generateAliases(listOf("save"))
         }
+
+        event.registerBrigadier("shorderederase") {
+            description = "Erases the route with the specified name."
+            category = CommandCategory.USERS_ACTIVE
+            arg("name", BrigadierArguments.string(), ::genRouteSuggestions) { name ->
+                callback { erase(getArg(name)) }
+            }
+            aliases = generateAliases(listOf("erase"))
+        }
     }
+
+    private fun genRouteSuggestions(
+        context: CommandContext<Any?>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions> {
+        val routes = config.routes.keys
+        for (route in routes) {
+            if (route.startsWith(builder.remainingLowerCase)) {
+                builder.suggest(route)
+            }
+        }
+        return builder.buildFuture()
+    }
+
+    private fun getFormatSuggestions(
+        context: CommandContext<Any?>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions> {
+        val formats = ServiceLoader.load(WaypointFormat::class.java).map { it.name }
+        for (format in formats) {
+            if (format.startsWith(builder.remainingLowerCase)) {
+                builder.suggest(format)
+            }
+        }
+        return builder.buildFuture()
+    }
+
 
     // Assumes that commands[0] has already been registered as `/shordered$commands[0]`
     private fun generateAliases(commands: List<String>): List<String> {
@@ -221,15 +257,12 @@ object OrderedWaypoints {
             val res = if (name == "") {
                 loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
             } else {
-                ProfileStorageData.playerSpecific?.routes?.get(name) ?: run {
-                    val savedRoutes = ProfileStorageData.playerSpecific?.routes?.keys?.toList()
-                    if (savedRoutes != null) {
-                        ChatUtils.userError(
-                            "Route $name doesn't exist.\n" +
-                                "§cSaved Routes: ${savedRoutes.joinToString(", ")}\n" +
-                                "§cIf you would like to import a route from your clipboard, leave the route name blank."
-                        )
-                    }
+                config.routes[name] ?: run {
+                    ChatUtils.userError(
+                        "Route $name doesn't exist.\n" +
+                            "§cSaved Routes: ${config.routes.keys.toList().joinToString(", ")}\n" +
+                            "§cIf you would like to import a route from your clipboard, leave the route name blank."
+                    )
                     return@launchIOCoroutine
                 }
             }
@@ -346,10 +379,16 @@ object OrderedWaypoints {
     }
 
     private fun save(name: String) {
-        ProfileStorageData.playerSpecific?.routes?.put(name, orderedWaypointsList.deepCopy()) ?: run {
-            return ChatUtils.userError("An error occurred while saving.")
-        }
+        config.routes[name] = orderedWaypointsList.deepCopy()
         ChatUtils.chat("Route saved as $name. Do /shorderedload $name to import it.")
+    }
+
+    private fun erase(name: String) {
+        config.routes.remove(name) ?: run {
+            ChatUtils.userError("Route $name doesn't exist.")
+            return
+        }
+        ChatUtils.chat("Route $name successfully deleted.")
     }
 
     private fun decideWaypoints() {

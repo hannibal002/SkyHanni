@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.config.features.mining.orderedwaypoints
 
+import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
+import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
@@ -16,22 +20,28 @@ class OrderedWaypointsConfig {
     @Expose
     @ConfigOption(name = "Enable Ordered Waypoints", desc = "Enables ordered waypoints.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Current Color", desc = "Color of the current ordered waypoint.")
     @ConfigEditorColour
-    var currentWaypointColor: String = "0:153:85:255:85"
+    var currentWaypointColor: ChromaColour = ChromaColour.fromRGB(85, 255, 85, 0, 153)
 
     @Expose
     @ConfigOption(name = "Previous Color", desc = "Color of the previous ordered waypoint.")
     @ConfigEditorColour
-    var previousWaypointColor: String = "0:153:85:85:255"
+    var previousWaypointColor: ChromaColour = ChromaColour.fromRGB(85, 85, 255, 0, 153)
 
     @Expose
     @ConfigOption(name = "Next Color", desc = "Color of the next ordered waypoint.")
     @ConfigEditorColour
-    var nextWaypointColor: String = "0:153:255:255:88"
+    var nextWaypointColor: ChromaColour = ChromaColour.fromRGB(255, 255, 85, 0, 153)
+
+    @Expose
+    @ConfigOption(name = "Block Outline Thickness", desc = "Thickness of the block outline.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+    var blockOutlineThickness: Float = 1f
 
     @Expose
     @ConfigOption(name = "Waypoint Range", desc = "How close you have to be for it to go to the next waypoint.")
@@ -46,7 +56,7 @@ class OrderedWaypointsConfig {
     @Expose
     @ConfigOption(name = "Trace Line Color", desc = "Color of the trace line.")
     @ConfigEditorColour
-    var traceLineColor: String = "0:255:85:255:85"
+    var traceLineColor: ChromaColour = ChromaColour.fromRGB(85, 255, 85, 0, 255)
 
     @Expose
     @ConfigOption(name = "Trace Line Thickness", desc = "Thickness of the trace line.")
@@ -64,6 +74,11 @@ class OrderedWaypointsConfig {
     var setupMode: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Setup Mode Waypoint Color", desc = "Color used for additional waypoints displayed by setup mode.")
+    @ConfigEditorColour
+    var setupModeColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 0, 102)
+
+    @Expose
     @ConfigOption(name = "Setup Mode Range", desc = "How close you need to be for nearby waypoints to show in setup mode.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 100f, minStep = 1f)
     var setupModeRange: Float = 16f
@@ -77,4 +92,12 @@ class OrderedWaypointsConfig {
     @ConfigOption(name = "Show All Waypoints", desc = "Whether all waypoints should be displayed. May cause lag.")
     @ConfigEditorBoolean
     var showAll: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "All Waypoint Color", desc = "Color used for waypoints when using show all mode.")
+    @ConfigEditorColour
+    var showAllWaypointColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, 102)
+
+    @Expose
+    var routes: MutableMap<String, Waypoints<SkyhanniWaypoint>> = mutableMapOf()
 }

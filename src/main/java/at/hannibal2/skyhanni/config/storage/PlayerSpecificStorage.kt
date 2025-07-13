@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.config.storage
 
-import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
-import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
@@ -82,7 +80,4 @@ class PlayerSpecificStorage {
         @Expose
         var userLuck: Float = 0f
     }
-
-    @Expose
-    var routes: MutableMap<String, Waypoints<SkyhanniWaypoint>> = mutableMapOf()
 }

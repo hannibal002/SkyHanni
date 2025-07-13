@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.auto.service.AutoService
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
-import java.awt.Color
 
 @AutoService(WaypointFormat::class)
 class ColeweightWaypointFormat : WaypointFormat {
@@ -38,7 +37,6 @@ class ColeweightWaypointFormat : WaypointFormat {
                     .map {
                         SkyhanniWaypoint(
                             LorenzVec(it.x, it.y, it.z),
-                            Color(it.r.toFloat(), it.g.toFloat(), it.b.toFloat(), 0.4f),
                             @Suppress("UnsafeCallOnNullableType")
                             it.options["name"]!!.toInt(),
                             it.options,
@@ -64,9 +62,9 @@ class ColeweightWaypointFormat : WaypointFormat {
                         it.location.x.toInt(),
                         it.location.y.toInt(),
                         it.location.z.toInt(),
-                        it.color.red.toDouble() / 255,
-                        it.color.green.toDouble() / 255,
-                        it.color.blue.toDouble() / 255,
+                        0.0,
+                        1.0,
+                        0.0,
                         it.options,
                     )
                 }.toMutableList(),
