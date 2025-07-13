@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig.StrayTypeEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -180,13 +182,19 @@ object CFStrayWarning {
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!CFApi.inChocolateFactory || !warningConfig.blockClosing) return
-        if (event.slotId in destructiveSlots) {
-            event.cancel()
-            preventCloseTitle()
-        }
+        if (activeStraySlots.isEmpty() || KeyboardManager.isShiftKeyDown()) return
+        if (event.slotId !in destructiveSlots) return
+        event.sendPreventCloseTitle()
     }
 
-    private fun preventCloseTitle() {
+    @HandleEvent
+    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+        if (!config.rabbitWarning.blockClosing) return
+        if (activeStraySlots.isEmpty()) return
+        event.sendPreventCloseTitle()
+    }
+
+    private fun SkyHanniEvent.Cancellable.sendPreventCloseTitle() {
         TitleManager.sendTitle(
             "§cStray Rabbit Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",
@@ -194,13 +202,6 @@ object CFStrayWarning {
             location = TitleManager.TitleLocation.INVENTORY,
         )
         SoundUtils.playErrorSound()
-    }
-
-    @HandleEvent
-    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
-        if (!config.rabbitWarning.blockClosing) return
-        if (activeStraySlots.isEmpty()) return
-        preventCloseTitle()
-        event.cancel()
+        cancel()
     }
 }
