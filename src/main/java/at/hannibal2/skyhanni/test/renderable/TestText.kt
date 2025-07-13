@@ -9,15 +9,11 @@ import java.awt.Color
 @SkyHanniModule(devOnly = true)
 object TestText : RenderableTestSuite.TestRenderable("text") {
 
-    private val textRenderable by lazy {
-        TextRenderable(
-            TextHelper.createGradientText(
-                Color.CYAN,
-                LorenzColor.LIGHT_PURPLE.toColor(),
-                "Really cool gradient that goes from aqua to pink",
-            ),
-        )
-    }
-
-    override fun renderable() = textRenderable
+    override fun renderable() = TextRenderable(
+        TextHelper.createGradientText(
+            Color.CYAN,
+            LorenzColor.LIGHT_PURPLE.toColor(),
+            "Really cool gradient that goes from aqua to pink",
+        ),
+    )
 }
