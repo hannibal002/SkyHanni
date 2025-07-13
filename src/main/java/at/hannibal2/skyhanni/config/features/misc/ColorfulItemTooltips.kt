@@ -31,6 +31,6 @@ class ColorfulItemTooltips {
             "§eRequires add stat icons to be enabled.",
     )
     @ConfigEditorBoolean
-    var replacePercentages: Boolean = true
+    var replacePercentages: Boolean = false
 
 }
