@@ -65,6 +65,8 @@ object MineshaftDetection {
         val sinceThis = getSinceMineshaftType(type)
         val timeSinceThis = getTimeSinceMineshaftType(type)
 
+        ChatUtils.chat("You entered a ${type.displayName} mineshaft!")
+
         if (type == config.mineshaftToTrack) {
             TitleManager.sendTitle(config.mineshaftToTrack.displayName)
 
