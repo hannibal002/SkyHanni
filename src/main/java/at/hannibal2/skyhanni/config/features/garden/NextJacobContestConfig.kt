@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
@@ -69,16 +68,12 @@ class NextJacobContestConfig {
     @ConfigEditorDropdown
     var shareAutomatically: ShareContestsEntry = ShareContestsEntry.ASK
 
-    enum class ShareContestsEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        ASK("Ask When Needed", 0),
-        AUTO("Share Automatically", 1),
-        DISABLED("Disabled", 2),
+    enum class ShareContestsEntry(private val displayName: String) {
+        ASK("Ask When Needed"),
+        AUTO("Share Automatically"),
+        DISABLED("Disabled"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

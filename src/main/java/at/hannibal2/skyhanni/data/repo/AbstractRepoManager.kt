@@ -343,8 +343,8 @@ abstract class AbstractRepoManager(
         return true
     }
 
-    fun prepCleanRepoFileSystem() {
-        repoFileSystem = RepoFileSystem.createAndClean(repoDirectory, debugConfig.unzipRepoToMemory)
+    private fun prepCleanRepoFileSystem() {
+        repoFileSystem = RepoFileSystem.createAndClean(repoDirectory, config.unzipToMemory)
     }
 
     fun reloadLocalRepo(answerMessage: String = "$commonName Repo loaded from local files successfully.") {

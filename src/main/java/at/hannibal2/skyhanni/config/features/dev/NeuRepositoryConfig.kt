@@ -55,4 +55,14 @@ class NeuRepositoryConfig : AbstractRepoConfig<NeuRepositoryConfig.NeuRepository
         @Transient override val defaultRepoName = "NotEnoughUpdates-REPO"
         @Transient override val defaultBranch = "master"
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Unzip Repo to Memory",
+        desc = "Instead of unzipping the repo directly to disk, unzip it to memory first, " +
+            "and start a background thread to write it to disk.",
+    )
+    @ConfigEditorBoolean
+    override var unzipToMemory: Boolean = true
+
 }
