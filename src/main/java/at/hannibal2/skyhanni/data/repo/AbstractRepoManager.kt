@@ -13,7 +13,9 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
+import at.hannibal2.skyhanni.utils.system.LazyVar
 import com.google.gson.Gson
+import com.google.gson.JsonElement
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.minecraft.util.IChatComponent
@@ -50,22 +52,26 @@ abstract class AbstractRepoManager(
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
     abstract val config: AbstractRepoConfig<*>
     abstract val configDirectory: File
+
     val logger by lazy { RepoLogger("[Repo - $commonName]") }
     val repoDirectory by lazy {
         // ~/.minecraft/config/[...]/repo
         File(configDirectory, "repo")
     }
     private val repoZipFile by lazy {
+        // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].zip
         // e.g., 'sh-repo-main' or 'neu-repo-master'
         File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.zip")
     }
-    private val currentCommitFile by lazy { File(configDirectory, "currentCommit.json") }
-    private val commitStorage: RepoCommitStorage by lazy { RepoCommitStorage(currentCommitFile) }
+    private val commitStorage: RepoCommitStorage by lazy {
+        // ~/.minecraft/config/[...]/currentCommit.json
+        RepoCommitStorage(File(configDirectory, "currentCommit.json"))
+    }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
     private val githubRepoLocation: GitHubUtils.RepoLocation
         get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
-    val fetchMutex = Mutex()
+    val repoMutex = Mutex()
 
     open val shouldRegisterUpdateCommand: Boolean = true
     open val shouldRegisterStatusCommand: Boolean = true
@@ -75,7 +81,7 @@ abstract class AbstractRepoManager(
     abstract val statusCommand: String
     abstract val reloadCommand: String
 
-    var repoFileSystem: RepoFileSystem = DiskRepoFileSystem(repoDirectory)
+    var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory) }
         private set
 
     var localRepoCommit: RepoCommit = RepoCommit()
@@ -84,11 +90,9 @@ abstract class AbstractRepoManager(
     var isUsingBackup: Boolean = false
         private set
 
-    private var currentlyReloading: Boolean = false
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
     private var downloadFailed: Boolean = false
-    private var canDisposeMemoryFS = false
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
@@ -112,9 +116,20 @@ abstract class AbstractRepoManager(
         }
     }
 
-    var reportedRepoFiles: Boolean = false
-
     fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
+
+    @PublishedApi
+    internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
+
+    @PublishedApi
+    internal fun readJsonElement(path: String): JsonElement? {
+        if (repoFileSystem.exists(path)) {
+            return repoFileSystem.readAllBytesAsJsonElement(path)
+        }
+        val onDisk = repoDirectory.resolve(path)
+        if (!onDisk.isFile) logger.throwError("Repo file not found: $path")
+        return onDisk.getJson()
+    }
 
     @PublishedApi
     internal inline fun <reified T : Any> getRepoData(
@@ -123,19 +138,11 @@ abstract class AbstractRepoManager(
         type: Type? = null,
         gson: Gson = getGson(),
     ): T = runCatching {
-        val path = "$directory/$fileName.json"
-        val jsonContent = when {
-            repoFileSystem.exists(path) -> repoFileSystem.readAllBytesAsJsonElement(path)
-            else -> {
-                if (!repoDirectory.exists()) logger.throwError("Repo folder does not exist!")
-                val jsonFile = File(repoDirectory, "$directory/$fileName.json")
-                if (!jsonFile.isFile) logger.throwError("Repo file '$fileName' not found.")
-                jsonFile.getJson()
-            }
-        } ?: logger.throwError("Repo file '$fileName' could not be loaded as a valid JSON file.")
-
-        return if (type == null) gson.fromJson<T>(jsonContent)
-        else gson.fromJson(jsonContent, type)
+        val path = resolvePath(directory, fileName)
+        val json = readJsonElement(path)
+            ?: logger.throwError("Repo file '$fileName' not found.")
+        if (type == null) gson.fromJson<T>(json)
+        else gson.fromJson(json, type)
     }.getOrElse { e ->
         logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
     }
@@ -234,7 +241,7 @@ abstract class AbstractRepoManager(
     /**
      * Wrapper around [fetchAndUnpackRepo], which holds a lock to prevent multiple fetches at the same time.
      */
-    private suspend fun tryFetchRepository(command: Boolean, silentError: Boolean = true) = fetchMutex.withLock {
+    private suspend fun tryFetchRepository(command: Boolean, silentError: Boolean = true) = repoMutex.withLock {
         fetchAndUnpackRepo(command, silentError)
     }
 
@@ -337,14 +344,7 @@ abstract class AbstractRepoManager(
     }
 
     fun prepCleanRepoFileSystem() {
-        (repoFileSystem as? MemoryRepoFileSystem)?.dispose()
-        val expectedType = if (debugConfig.unzipRepoToMemory) MemoryRepoFileSystem::class.java else DiskRepoFileSystem::class.java
-        repoFileSystem = when {
-            expectedType.isAssignableFrom(repoFileSystem::class.java) -> repoFileSystem
-            debugConfig.unzipRepoToMemory -> MemoryRepoFileSystem(repoDirectory) { canDisposeMemoryFS = true }
-            else -> DiskRepoFileSystem(repoDirectory)
-        }
-        repoFileSystem.deleteAll()
+        repoFileSystem = RepoFileSystem.createAndClean(repoDirectory, debugConfig.unzipRepoToMemory)
     }
 
     fun reloadLocalRepo(answerMessage: String = "$commonName Repo loaded from local files successfully.") {
@@ -359,11 +359,9 @@ abstract class AbstractRepoManager(
      */
     open suspend fun extraReloadCoroutineWork() = Unit
 
-    private suspend fun reloadRepository(answerMessage: String = "") {
-        if (currentlyReloading) return
+    private suspend fun reloadRepository(answerMessage: String = "") = repoMutex.withLock {
         val timeNow = SimpleTimeMark.now()
         logger.preDebug("Starting reloadRepository() at $timeNow")
-        currentlyReloading = true
         if (!shouldManuallyReload) return
         loadingError = false
         successfulConstants.clear()
@@ -379,11 +377,9 @@ abstract class AbstractRepoManager(
             logger.logErrorWithData(error, "Error while posting repo reload event")
             loadingError = true
         }
-        if (canDisposeMemoryFS) {
-            (repoFileSystem as? MemoryRepoFileSystem)?.dispose()
-            repoFileSystem = DiskRepoFileSystem(repoDirectory)
-            canDisposeMemoryFS = false
-        }
+        // Only check if we can dispose after the event has been posted, as we may see speed increases using
+        // the MemoryRepoFileSystem for the event, and writing to disk after the event.
+        repoFileSystem = repoFileSystem.transitionAfterReload()
 
         if (answerMessage.isNotEmpty() && !loadingError) {
             ChatUtils.chat("§a$answerMessage")
@@ -399,7 +395,5 @@ abstract class AbstractRepoManager(
         val timeAfter = SimpleTimeMark.now()
         val elapsedFormat = (timeAfter - timeNow).format()
         logger.preDebug("Finished reloadRepository() at $timeAfter.\nElapsed time: $elapsedFormat")
-        currentlyReloading = false
     }
-
 }

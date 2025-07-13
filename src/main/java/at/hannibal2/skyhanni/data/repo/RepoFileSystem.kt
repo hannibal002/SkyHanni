@@ -20,6 +20,7 @@ sealed interface RepoFileSystem {
     fun readAllBytes(path: String): ByteArray
     fun write(path: String, data: ByteArray)
     fun list(path: String): List<String>
+    fun transitionAfterReload(): RepoFileSystem = this
 
     /**
      * Deletes everything under [path].
@@ -56,6 +57,14 @@ sealed interface RepoFileSystem {
             write(relative, data)
         }
     }
+
+    companion object {
+        fun createAndClean(root: File, useMemory: Boolean): RepoFileSystem {
+            val fs = if (useMemory) MemoryRepoFileSystem(root) else DiskRepoFileSystem(root)
+            fs.deleteAll()
+            return fs
+        }
+    }
 }
 
 class DiskRepoFileSystem(val root: File) : RepoFileSystem {
@@ -74,10 +83,7 @@ class DiskRepoFileSystem(val root: File) : RepoFileSystem {
     }?.mapNotNull { it.name }?.toList().orEmpty()
 }
 
-class MemoryRepoFileSystem(
-    private val diskRoot: File,
-    private val onFlushed: () -> Unit,
-) : RepoFileSystem, DisposableHandle {
+class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, DisposableHandle {
     private val storage = ConcurrentHashMap<String, ByteArray>()
     private var flushScheduled = false
 
@@ -86,12 +92,10 @@ class MemoryRepoFileSystem(
     override fun write(path: String, data: ByteArray) {
         storage[path] = data
     }
-
     override fun deleteRecursively(path: String) {
         if (path.isEmpty()) storage.clear()
         else storage.keys.removeIf { it == path || it.startsWith("$path/") }
     }
-
     override fun list(path: String) = storage.keys.filter {
         it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
     }.map { it.removePrefix("$path/") }
@@ -102,12 +106,16 @@ class MemoryRepoFileSystem(
             flushScheduled = true
             SkyHanniMod.launchIOCoroutine {
                 saveToDisk(diskRoot)
-                onFlushed()
             }
         }
     }
 
     override fun dispose() = storage.clear()
+
+    override fun transitionAfterReload(): RepoFileSystem {
+        dispose()
+        return DiskRepoFileSystem(diskRoot)
+    }
 
     private fun saveToDisk(root: File) {
         val base = root.toPath()

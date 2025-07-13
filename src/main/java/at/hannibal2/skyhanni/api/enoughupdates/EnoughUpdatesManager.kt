@@ -71,7 +71,7 @@ object EnoughUpdatesManager {
 
     fun getItemInformation() = itemMap
 
-    fun inLoadingState() = loadingMutex.isLocked || EnoughUpdatesRepoManager.fetchMutex.isLocked
+    fun inLoadingState() = loadingMutex.isLocked || EnoughUpdatesRepoManager.repoMutex.isLocked
 
     val logger get() = EnoughUpdatesRepoManager.logger
 
