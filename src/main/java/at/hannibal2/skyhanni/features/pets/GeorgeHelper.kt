@@ -28,30 +28,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object GeorgeHelper {
 
-    /**
-     * internal name: NONE
-     * display name: '§d+1 Taming Level Cap'
-     * minecraft id: 'minecraft:spawn_egg'
-     * lore:
-     *  '§7§7Raise your Taming Skill level cap by'
-     *  '§7one, up to §f+10§7.'
-     *  ''
-     *  '§7Your cap: §dTaming LV'
-     *  ''
-     *  '§7Pets left to donate:'
-     *  '  §dMythic Enderman'
-     *  '  §6Legendary Black Cat'
-     *  '  §5Epic Rift Ferret'
-     *  '  §5Epic Jellyfish'
-     *  '  §9Rare Frost Wisp'
-     *  ''
-     *  '§8+§b10 SkyBlock XP'
-     *  ''
-     *  '§7§7Donate any of the pets above to'
-     *  '§7increase your cap by one.'
-     *
-     * no tag compound
-     */
     private val config get() = SkyHanniMod.feature.misc.pets.tamingSixty
     private val useFandomWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useFandom
     private const val SPAWN_EGG_SLOT = 41
