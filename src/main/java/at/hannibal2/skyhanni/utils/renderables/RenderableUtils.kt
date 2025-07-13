@@ -379,7 +379,7 @@ internal object RenderableUtils {
     }
 
     fun MutableList<Renderable>.addCenteredString(string: String) =
-        this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
+        this.add(StringRenderable(string, horizontalAlign = HorizontalAlignment.CENTER))
 
     fun fillTable(
         data: List<DisplayTableEntry>,
@@ -398,7 +398,7 @@ internal object RenderableUtils {
                 tips = entry.hover,
                 highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
             )
-            val right = Renderable.string(entry.right)
+            val right = StringRenderable(entry.right)
             outerList.add(listOf(item, left, right))
         }
         return Renderable.table(outerList, xPadding = 5, yPadding = padding)

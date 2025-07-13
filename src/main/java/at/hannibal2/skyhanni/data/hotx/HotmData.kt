@@ -425,9 +425,10 @@ enum class HotmData(
     companion object : HotxHandler<HotmData, HotmReward, SkymallPerk>(entries) {
 
         override val name: String = "HotM"
-        override val rotatingPerkClazz = SkymallPerk::class
         override val rotatingPerks = SkymallPerk.entries
         override val rotatingPerkEntry: HotmData = SKY_MALL
+        override var currentRotPerk = HotmApi.skymall
+        override val applicableIslandType = IslandTypeTags.MINING
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
@@ -635,11 +636,6 @@ enum class HotmData(
                     type.setAmount(amount, postEvent = true)
                 }
             }
-        }
-
-        override fun setRotatingPerk(newRotatingPerk: SkymallPerk?) {
-            HotmApi.skymall = newRotatingPerk
-            ChatUtils.debug("setting skymall to ${HotmApi.skymall}")
         }
 
         @HandleEvent(onlyOnSkyblock = true)
