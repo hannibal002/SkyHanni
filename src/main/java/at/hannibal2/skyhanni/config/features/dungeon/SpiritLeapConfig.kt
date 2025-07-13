@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SpiritLeapConfig {
     companion object {
-        const val DEFAULT_COLOR: String = "0:200:0:0:0"
+        @Transient const val DEFAULT_COLOR: String = "0:200:0:0:0"
         private const val DEAD_COLOR: String = "0:200:120:0:0"
     }
 
@@ -78,7 +78,7 @@ class SpiritLeapConfig {
 
     @ConfigOption(name = "Reset Colors", desc = "Restores the class highlighter colors to their default settings.")
     @ConfigEditorButton(buttonText = "Reset")
-    var resetColors: Runnable = Runnable {
+    val resetColors: Runnable = Runnable {
         deadTeammateColor = DEAD_COLOR
         archerClassColor = DEFAULT_COLOR
         mageClassColor = DEFAULT_COLOR

@@ -323,6 +323,30 @@ enum class TabWidget(
         // language=RegExp
         "§e§lEvent Trackers:",
     ),
+    AGATHA_CONTEST(
+        // language=RegExp
+        "(?:§.)*Agatha's Contest:.*",
+    ),
+    MOONGLADE_BEACON(
+        // language=RegExp
+        "(?:§.)*Moonglade Beacon: §r§b(?<stacks>\\d+) Stacks?",
+    ),
+    SALTS(
+        // language=RegExp
+        "(?:§.)*Salts:",
+    ),
+    FOREST_WHISPERS(
+        // language=RegExp
+        "(?:§.)*Forest Whispers: (?:§.)*(?<amount>.*)",
+    ),
+    SHARD_TRAPS(
+        // language=RegExp
+        "(?:§.)*Shard Traps"
+    ),
+    STARBORN_TEMPLE(
+        // language=RegExp
+        "§9§lStarborn Temple:",
+    ),
     ;
 
     /** The pattern for the first line of the widget*/

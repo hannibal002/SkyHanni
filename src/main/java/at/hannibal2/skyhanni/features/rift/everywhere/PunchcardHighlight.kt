@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -21,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -30,6 +31,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.EntityLivingBase
@@ -76,7 +80,7 @@ object PunchcardHighlight {
 
     private val PUNCHCARD_ARTIFACT = "PUNCHCARD_ARTIFACT".toInternalName()
     private val displayIcon by lazy { PUNCHCARD_ARTIFACT.getItemStack() }
-    private var display: Renderable = Renderable.string("hello")
+    private var display: Renderable = StringRenderable("hello")
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
@@ -148,14 +152,14 @@ object PunchcardHighlight {
             255 -> 1
             else -> 255 - color.alpha
         }
-        RenderLivingEntityHelper.setEntityColor(entity, color.addAlpha(alpha)) { IslandType.THE_RIFT.isInIsland() }
+        RenderLivingEntityHelper.setEntityColor(entity, color.addAlpha(alpha)) { IslandType.THE_RIFT.isCurrent() }
     }
 
     private fun removePlayerColor(entity: EntityLivingBase) {
         RenderLivingEntityHelper.removeEntityColor(entity)
     }
 
-    fun onResetCommand() {
+    private fun onResetCommand() {
         playerList.clear()
         playerQueue.clear()
         if (config.reverse.get()) {
@@ -228,10 +232,10 @@ object PunchcardHighlight {
         string += "§d" + if (!config.reverseGUI.get()) playerList.size
         else 20 - playerList.size
 
-        return Renderable.horizontalContainer(
+        return HorizontalContainerRenderable(
             listOf(
-                Renderable.itemStack(displayIcon),
-                Renderable.string(string),
+                ItemStackRenderable(displayIcon),
+                StringRenderable(string),
             ),
             spacing = 1,
         )
@@ -245,6 +249,15 @@ object PunchcardHighlight {
         val reverse = config.reverse.get()
         for (player in MobData.players.filter { (reverse && it.name in playerList) || (!reverse && it.name !in playerList) }) {
             colorPlayer(player.baseEntity)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetpunchcard") {
+            description = "Resets the Rift Punchcard Artifact player list."
+            category = CommandCategory.USERS_RESET
+            simpleCallback { onResetCommand() }
         }
     }
 }

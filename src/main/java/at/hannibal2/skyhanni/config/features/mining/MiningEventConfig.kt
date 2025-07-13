@@ -2,22 +2,20 @@ package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
-//#endif
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class MiningEventConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
         desc = "Show information about upcoming Dwarven Mines and Crystal Hollows mining events.\n" +
-            "§eAlso enables sending data from your client. May take up to a minute to sync new events."
+            "§eAlso enables sending data from your client. May take up to a minute to sync new events.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -26,7 +24,7 @@ class MiningEventConfig {
     @Expose
     @ConfigOption(
         name = "Show Outside Mining Islands",
-        desc = "Show the event tracker even if you're outside of the Dwarven Mines or Crystal Hollows."
+        desc = "Show the event tracker even if you're outside of the Dwarven Mines or Crystal Hollows.",
     )
     @ConfigEditorBoolean
     var outsideMining: Boolean = false
@@ -36,12 +34,10 @@ class MiningEventConfig {
     @ConfigEditorDropdown
     var showType: ShowType = ShowType.ALL
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Compressed Format", desc = "Compress the event names so that they are shorter.")
     @ConfigEditorDropdown
     var compressedFormat: CompressFormat = CompressFormat.DEFAULT
-    //#endif
 
     @Expose
     @ConfigOption(name = "Compressed Island", desc = "Show the islands only as an icon.")
@@ -52,7 +48,7 @@ class MiningEventConfig {
     @ConfigOption(
         name = "Show Passed Events",
         desc = "Show the most recently passed event at the start, greyed out.\n" +
-            "§eTakes a little while to save the last event."
+            "§eTakes a little while to save the last event.",
     )
     @ConfigEditorBoolean
     var passedEvents: Boolean = false
@@ -68,13 +64,19 @@ class MiningEventConfig {
 
     @Expose
     @ConfigLink(owner = MiningEventConfig::class, field = "enabled")
-    var position: Position = Position(200, 60)
+    val position: Position = Position(200, 60)
 
     @Expose
     @ConfigOption(
         name = "Sharing Event Data",
-        desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings. Thanks for your help!"
+        desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings." +
+            " Thanks for your help!",
     )
     @ConfigEditorBoolean
     var allowDataSharing: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Goblin Raid Features", desc = "")
+    @Accordion
+    val goblinRaidConfig: GoblinRaidConfig = GoblinRaidConfig()
 }

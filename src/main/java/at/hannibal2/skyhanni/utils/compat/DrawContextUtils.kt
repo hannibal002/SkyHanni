@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.Vec3
+import net.minecraft.item.ItemStack
+import java.nio.FloatBuffer
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
+//$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
 //#endif
 
@@ -26,8 +28,15 @@ object DrawContextUtils {
     val drawContext: DrawContext
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
-            ErrorManager.skyHanniError("drawContext is null")
+            //#if MC < 1.21
+            ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
+            DrawContext()
+            //#else
+            //$$ ErrorManager.skyHanniError("drawContext is null")
+            //#endif
         }
+
+    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.drawItem(item, x, y)
 
     fun setContext(context: DrawContext) {
         renderDepth++
@@ -49,43 +58,74 @@ object DrawContextUtils {
     }
 
     fun translate(x: Double, y: Double, z: Double) {
+        //#if MC < 1.21.6
         drawContext.matrices.translate(x, y, z)
+        //#else
+        //$$ drawContext.matrices.translate(x.toFloat(), y.toFloat())
+        //#endif
     }
 
     fun translate(x: Float, y: Float, z: Float) {
+        //#if MC < 1.21.6
         drawContext.matrices.translate(x, y, z)
+        //#else
+        //$$ drawContext.matrices.translate(x, y)
+        //#endif
     }
 
-    fun translate(vec: Vec3) {
-        drawContext.matrices.translate(vec)
+    fun rotate(angle: Float, x: Number, y: Number, z: Number) {
+        val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
+        //#if MC < 1.21
+        GlStateManager.rotate(angle, xf, yf, zf)
+        //#elseif MC < 1.21.6
+        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
+        //#endif
     }
+
+    fun multMatrix(buffer: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.multMatrix(buffer)
+        //#elseif MC < 1.21.6
+        //$$ multMatrix(Matrix4f(buffer))
+        //#endif
+    }
+
+    //#if MC > 1.21
+    //#if MC < 1.21.6
+    //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    //#endif
+    //#endif
 
     fun scale(x: Float, y: Float, z: Float) {
+        //#if MC < 1.21.6
         drawContext.matrices.scale(x, y, z)
+        //#else
+        //$$ drawContext.matrices.scale(x, y)
+        //#endif
     }
 
     @Deprecated("Use pushPop instead")
     fun pushMatrix() {
+        //#if MC < 1.21.6
         drawContext.matrices.pushMatrix()
+        //#else
+        //$$ drawContext.matrices.pushMatrix()
+        //#endif
     }
 
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
+        //#if MC < 1.21.6
         drawContext.matrices.popMatrix()
-    }
-
-    fun rotate(angle: Float, x: Float, y: Float, z: Float) {
-        //#if MC < 1.21
-        GlStateManager.rotate(angle, x, y, z)
         //#else
-        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
+        //$$ drawContext.matrices.popMatrix()
         //#endif
     }
 
     /**
      * Push and pop the matrix stack, run the action in between.
      */
-    @Suppress("deprecation")
+    @Suppress("DEPRECATION")
     inline fun pushPop(action: () -> Unit) {
         pushMatrix()
         action()
@@ -110,5 +150,13 @@ object DrawContextUtils {
         scale(x.toFloat(), y.toFloat(), z.toFloat())
         action()
         scale(1 / x.toFloat(), 1 / y.toFloat(), 1 / z.toFloat())
+    }
+
+    fun loadIdentity() {
+        //#if MC < 1.21.6
+        drawContext.matrices.loadIdentity()
+        //#else
+        //$$ drawContext.matrices.identity()
+        //#endif
     }
 }

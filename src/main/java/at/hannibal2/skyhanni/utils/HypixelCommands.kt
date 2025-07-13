@@ -1,15 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-//#if TODO
 import at.hannibal2.skyhanni.api.GetFromSackApi
-//#endif
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
-//#if TODO
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-//#endif
 
-// todo 1.21 impl needed
+@Suppress("TooManyFunctions")
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -35,11 +30,9 @@ object HypixelCommands {
         send("skills")
     }
 
-    //#if TODO
     fun viewRecipe(itemId: NeuInternalName, page: Int = 1) {
         send("viewrecipe ${itemId.skyblockCommandId} $page")
     }
-    //#endif
 
     fun recipe(itemName: String) {
         send("recipe $itemName")
@@ -78,11 +71,11 @@ object HypixelCommands {
         send("sethome")
     }
 
-    //#if TODO
-    fun getFromSacks(itemName: String, amount: Int) {
-        GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
+    // Do not remove this deprecation tag, as we want to catch all wrong uses of /gfs in the future forever.
+    @Deprecated("do not send /gfs commands manually to hypixel", ReplaceWith("GetFromSackApi.getFromSack(internalName, amount)"))
+    fun getFromSacks(internalName: NeuInternalName, amount: Int) {
+        GetFromSackApi.getFromSack(internalName, amount)
     }
-    //#endif
 
     fun widget() {
         send("widget")
@@ -160,8 +153,11 @@ object HypixelCommands {
         send("party promote $player")
     }
 
-    fun partyChat(message: String) {
-        send("pc $message")
+    fun partyChat(message: String, prefix: Boolean = false) {
+        when (prefix) {
+            false -> send("pc $message")
+            true -> send("pc [SkyHanni] $message")
+        }
     }
 
     fun partyInvite(player: String) {
@@ -209,6 +205,34 @@ object HypixelCommands {
 
     fun locraw() {
         send("locraw")
+    }
+
+    fun attributeMenu() {
+        send("attributemenu")
+    }
+
+    fun treeGifts() {
+        send("treegifts")
+    }
+
+    fun trades() {
+        send("trades")
+    }
+
+    fun accessories() {
+        send("accessories")
+    }
+
+    fun potionBag() {
+        send("potionbag")
+    }
+
+    fun quiver() {
+        send("quiver")
+    }
+
+    fun fishingBag() {
+        send("fishingbag")
     }
 
     private fun send(command: String) {

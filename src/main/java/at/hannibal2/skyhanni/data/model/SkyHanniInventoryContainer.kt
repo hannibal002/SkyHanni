@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -18,7 +18,7 @@ class SkyHanniInventoryContainer(
     fun toRenderable(scale: Double = 1.0): Renderable =
         VerticalContainerRenderable(
             listOf(
-                RenderableString(displayName, scale),
+                StringRenderable(displayName, scale),
                 RenderableInventory.fakeInventory(
                     items,
                     rowSize,

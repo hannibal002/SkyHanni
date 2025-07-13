@@ -3,16 +3,16 @@ package at.hannibal2.skyhanni.data.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-//#if TODO
-import at.hannibal2.skyhanni.utils.LorenzUtils
-//#endif
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -22,11 +22,13 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
-// https://api.hypixel.net/#tag/SkyBlock/paths/~1v2~1skyblock~1bazaar/get
 @SkyHanniModule
 object HypixelBazaarFetcher {
-    private const val URL = "https://api.hypixel.net/v2/skyblock/bazaar"
+    private val bzStatic = ApiUtils.StaticApiPath(
+        "https://api.hypixel.net/v2/skyblock/bazaar",
+        "Hypixel Bazaar"
+    )
+
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 
     var latestProductInformation = mapOf<NeuInternalName, BazaarData>()
@@ -62,12 +64,13 @@ object HypixelBazaarFetcher {
         }
     }
 
-    private fun fetchAndProcessBazaarData() {
+    private suspend fun fetchAndProcessBazaarData() {
         nextFetchTime = SimpleTimeMark.now() + 2.minutes
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
         try {
-            val jsonResponse = ApiUtils.getJSONResponse(URL, apiName = "Hypixel Bazaar").asJsonObject
+            val jsonResponse = ApiUtils.getJSONResponse(bzStatic)
+                ?: return onError(fetchType, Exception("Failed to fetch bazaar data from Hypixel API"))
             val response = ConfigManager.gson.fromJson<BazaarApiResponseJson>(jsonResponse)
             if (response.success) {
                 latestProductInformation = process(response.products)
@@ -84,8 +87,8 @@ object HypixelBazaarFetcher {
 
     private fun process(products: Map<String, BazaarProduct>) = products.mapNotNull { (key, product) ->
         val internalName = NeuItems.transHypixelNameToInternalName(key)
-        val sellOfferPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
-        val instantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantBuyPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantSellPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
 
         if (product.quickStatus.isEmpty()) {
             return@mapNotNull null
@@ -94,12 +97,10 @@ object HypixelBazaarFetcher {
         if (internalName.getItemStackOrNull() == null) {
             // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in the ingame bazaar).
             // Should only include Enchants
-            //#if TODO
-            if (!isUnobtainableBazaarProduct(key) && LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
-            //#endif
+            if (!isUnobtainableBazaarProduct(key) && SkyHanniDebugsAndTests.enabled) println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
-        internalName to BazaarData(internalName.repoItemName, sellOfferPrice, instantBuyPrice, product)
+        internalName to BazaarData(internalName.repoItemName, instantBuyPrice, instantSellPrice, product)
     }.toMap()
 
     private fun isUnobtainableBazaarProduct(key: String): Boolean = when (key) {
@@ -148,12 +149,19 @@ object HypixelBazaarFetcher {
         }
     }
 
-    fun fetchNow() {
-        failedAttempts = 0
-        nextFetchIsManual = true
-        nextFetchTime = SimpleTimeMark.now()
-        ChatUtils.chat("Manually updating the bazaar prices right now..")
-    }
-
     private fun canFetch() = SkyBlockUtils.onHypixel && nextFetchTime.isInPast()
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdatebazaarprices") {
+            description = "Forcefully updating the bazaar prices right now."
+            category = CommandCategory.USERS_BUG_FIX
+            callback {
+                failedAttempts = 0
+                nextFetchIsManual = true
+                nextFetchTime = SimpleTimeMark.now()
+                ChatUtils.chat("Manually updating the bazaar prices right now..")
+            }
+        }
+    }
 }

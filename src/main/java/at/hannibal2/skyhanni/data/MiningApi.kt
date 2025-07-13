@@ -38,6 +38,7 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object MiningApi {
 
@@ -49,6 +50,11 @@ object MiningApi {
      */
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
+
+    /**
+     * REGEX-TEST: Mines of Divan
+     */
+    private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
 
     /**
      * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
@@ -158,9 +164,16 @@ object MiningApi {
 
     val blockStrengths = mutableMapOf<OreBlock, Int>()
 
-    private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
+    private val allowedSoundNames = setOf(
+        "dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb",
+        //#if MC > 1.21
+        //$$ "block.metal.place",
+        //#endif
+    )
 
     var heat: Int = 0
+        private set
+    var heatDisplay: String? = null
         private set
     var lastHeatUpdate = SimpleTimeMark.farPast()
         private set
@@ -186,12 +199,11 @@ object MiningApi {
 
     fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isCurrent()
 
+    fun inMinesOfDivan() = inCrystalHollows() && minesOfDivanPattern.matches(HypixelData.skyBlockArea)
+
     fun inMineshaft() = IslandType.MINESHAFT.isCurrent()
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
-
-    @Deprecated("Use IslandTypeTags.CUSTOM_MINING.inAny() instead", ReplaceWith("IslandTypeTags.CUSTOM_MINING.inAny()"))
-    fun inCustomMiningIsland() = IslandTypeTags.CUSTOM_MINING.inAny()
 
     @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
     fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
@@ -219,13 +231,22 @@ object MiningApi {
         }
 
         if (IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
+            var found = false
             heatPattern.firstMatcher(event.new) {
+                found = true
                 val newHeat = group("heat")
+                heatDisplay = group("scoreboard").takeIf { it.isNotEmpty() }
                 if (newHeat == "IMMUNE") {
                     updateHeat(0)
                 } else if (newHeat.toInt() != heat) {
                     updateHeat(newHeat.toInt())
                 }
+            }
+            if (!found) {
+                if (heat != 0) {
+                    updateHeat(0)
+                }
+                heatDisplay = null
             }
         }
     }
@@ -388,8 +409,8 @@ object MiningApi {
         }
     }
 
-    @HandleEvent
-    fun onAreaChange(event: ScoreboardAreaChangeEvent) {
+    @HandleEvent(ScoreboardAreaChangeEvent::class)
+    fun onAreaChange() {
         if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
         updateLocation()
     }

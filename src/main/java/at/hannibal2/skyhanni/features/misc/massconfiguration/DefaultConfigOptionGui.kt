@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.misc.massconfiguration
 
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import kotlin.math.max
 import kotlin.math.min
 
@@ -16,7 +17,7 @@ class DefaultConfigOptionGui(
     new: String,
 ) : SkyhanniBaseScreen() {
 
-    val title = if (old == "null") {
+    private val guiTitle = if (old == "null") {
         if (new == "null")
             "§5SkyHanni Default Options"
         else
@@ -57,7 +58,7 @@ class DefaultConfigOptionGui(
         DrawContextUtils.translate(width / 2F, (height - ySize) / 2F, 0F)
         DrawContextUtils.scale(2f, 2f, 1f)
         GuiRenderUtils.drawStringCenteredScaledMaxWidth(
-            title,
+            guiTitle,
             0F,
             mc.fontRendererObj.FONT_HEIGHT.toFloat(),
             false,
@@ -150,7 +151,7 @@ class DefaultConfigOptionGui(
             GuiRenderUtils.drawRect(xSize - padding * 2 - 1, 0, xSize - padding * 2, cardHeight, 0xFF808080.toInt())
 
             GuiRenderUtils.drawString("§e${cat.name} ${suggestionState.label}", 4, 4)
-            mc.fontRendererObj.drawSplitString("§7${cat.description}", 4, 14, xSize - padding * 2 - 8, -1)
+            GuiRenderUtils.drawStrings("§7${cat.description}".splitLines(xSize - padding * 2 - 8), 4, 14, -1)
 
             if (isMouseInScrollArea && y in 0..cardHeight) {
                 hoveringTextToDraw = listOf(
@@ -185,7 +186,7 @@ class DefaultConfigOptionGui(
         DrawContextUtils.popMatrix()
         GuiRenderUtils.disableScissor()
         hoveringTextToDraw?.let { tooltip ->
-            RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
+            RenderableTooltips.setTooltipForRender(tooltip.map(StringRenderable::from))
         }
     }
 

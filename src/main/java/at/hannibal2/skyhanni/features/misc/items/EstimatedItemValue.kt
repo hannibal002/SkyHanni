@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -23,13 +24,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
@@ -131,7 +133,7 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        if (LorenzUtils.debug) {
+        if (SkyHanniDebugsAndTests.enabled) {
             if (Keyboard.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
@@ -143,7 +145,7 @@ object EstimatedItemValue {
 
         try {
             // TODO this code needs to be changed around
-            config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
+            config.position.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
             // that tries to over-render the tooltip, and is not explicitly something we can solve here?
@@ -163,7 +165,7 @@ object EstimatedItemValue {
     }
 
     private fun checkCurrentlyVisible(): Boolean {
-        if (!LorenzUtils.inSkyBlock) return false
+        if (!SkyBlockUtils.inSkyBlock) return false
         if (!config.enabled) return false
         if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return false
         if (System.currentTimeMillis() > lastToolTipTime + 200) return false
@@ -188,7 +190,6 @@ object EstimatedItemValue {
                 ignoreArmorDyes,
                 ignoreRunes,
                 priceSource,
-                useAttributeComposite,
             ) {
                 cache.clear()
             }
@@ -279,11 +280,7 @@ object EstimatedItemValue {
         }
         list.add("§aTotal: §6§l$numberFormat coins")
 
-        val newDisplay = mutableListOf<Renderable>()
-        for (line in list) {
-            newDisplay.add(Renderable.string(line))
-        }
-        return newDisplay
+        return list.map(StringRenderable::from)
     }
 
     @HandleEvent
@@ -296,6 +293,8 @@ object EstimatedItemValue {
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
+
+        event.move(94, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
     }
 
     fun renderInNeuStorageOverlay() {

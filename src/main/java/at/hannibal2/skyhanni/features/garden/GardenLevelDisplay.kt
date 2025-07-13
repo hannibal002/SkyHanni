@@ -44,6 +44,10 @@ object GardenLevelDisplay {
         }
 
     private val patternGroup = RepoPattern.group("garden.level")
+
+    /**
+     * REGEX-TEST: §2§l§m                §f§l§m    §r §e7,891§6/§e10k
+     */
     private val expToNextLevelPattern by patternGroup.pattern(
         "inventory.nextxp",
         ".* §e(?<nextLevelExp>.*)§6/.*",
@@ -60,14 +64,27 @@ object GardenLevelDisplay {
         "inventory.overflow",
         ".*§r §6(?<overflow>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Progress to Level 15: §e78.9%
+     */
     private val gardenLevelPattern by patternGroup.pattern(
         "inventory.levelprogress",
         "§7Progress to Level (?<currentLevel>[^:]*).*",
     )
+
+    /**
+     * REGEX-TEST: §7§8Max level reached!
+     * REGEX-TEST: §5§o§7§8Max level reached!
+     */
     private val gardenMaxLevelPattern by patternGroup.pattern(
         "inventory.max",
-        "§5§o§7§8Max level reached!",
+        "(?:§5§o)?§7§8Max level reached!",
     )
+
+    /**
+     * REGEX-TEST:     §r§8+§r§215 §r§7Garden Experience
+     */
     private val visitorRewardPattern by patternGroup.pattern(
         "chat.increase",
         " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience",

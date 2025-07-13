@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkyBlockXPApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 @SkyHanniModule
@@ -22,7 +22,7 @@ object SkyBlockXPBar {
     @HandleEvent
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (!isEnabled()) return
-        if (event.type != RenderLayer.EXPERIENCE) return
+        if (event.type != RenderLayer.EXPERIENCE_BAR) return
         val (level, xp) = SkyBlockXPApi.levelXPPair ?: return
 
         with(MinecraftCompat.localPlayer) {
@@ -33,12 +33,18 @@ object SkyBlockXPBar {
 
     @HandleEvent
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
-        if (event.type != RenderLayer.EXPERIENCE) return
+        if (event.type != RenderLayer.EXPERIENCE_BAR) return
         with(cache ?: return) {
             MinecraftCompat.localPlayer.setXPStats(currentXP, maxXP, level)
             cache = null
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS) && config.skyblockXpBar
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(95, "misc.skyblockXpBar", "misc.skyblockXPBar")
+    }
+
+    private fun isEnabled() =
+        SkyBlockUtils.inSkyBlock && !SkyBlockUtils.inAnyIsland(setOf(IslandType.THE_RIFT, IslandType.CATACOMBS)) && config.skyblockXPBar
 }

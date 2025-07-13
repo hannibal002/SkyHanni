@@ -12,7 +12,7 @@ class CarnivalConfig {
     @Expose
     @ConfigOption(name = "Zombie Shootout", desc = "")
     @Accordion
-    var zombieShootout: ZombieShootoutConfig = ZombieShootoutConfig()
+    val zombieShootout: ZombieShootoutConfig = ZombieShootoutConfig()
 
     @Expose
     @ConfigOption(
@@ -31,7 +31,7 @@ class CarnivalConfig {
 
     @Expose
     @ConfigLink(owner = CarnivalConfig::class, field = "showGoals")
-    var goalsPosition: Position = Position(20, 20)
+    val goalsPosition: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
