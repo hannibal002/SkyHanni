@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.events.yearofthepig
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 
 class ShinyOrbLootedEvent(

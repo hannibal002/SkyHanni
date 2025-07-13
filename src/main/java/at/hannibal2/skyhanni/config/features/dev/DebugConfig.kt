@@ -30,7 +30,7 @@ class DebugConfig {
     @ConfigOption(
         name = "Mod Menu Log",
         desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +
-                "Useful for adding more mods to quick mod menu switch.",
+            "Useful for adding more mods to quick mod menu switch.",
     )
     @ConfigEditorBoolean
     var modMenuLog: Boolean = false
