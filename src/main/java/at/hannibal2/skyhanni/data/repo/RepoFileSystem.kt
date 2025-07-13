@@ -22,7 +22,7 @@ sealed interface RepoFileSystem {
     fun readAllBytes(path: String): ByteArray
     fun write(path: String, data: ByteArray)
     fun list(path: String): List<String>
-    fun transitionAfterReload(): RepoFileSystem = this
+    suspend fun transitionAfterReload(): RepoFileSystem = this
 
     /**
      * Deletes everything under [path].
@@ -104,16 +104,15 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
 
     override fun unzipIgnoreFirstFolder(zipFilePath: String) {
         super.unzipIgnoreFirstFolder(zipFilePath)
-        if (flushJob == null) {
-            flushJob = SkyHanniMod.launchIOCoroutine {
-                saveToDisk(diskRoot)
-            }
+        if (flushJob != null) return
+        flushJob = SkyHanniMod.launchIOCoroutine {
+            saveToDisk(diskRoot)
         }
     }
 
     override fun dispose() = storage.clear()
 
-    override fun transitionAfterReload(): RepoFileSystem {
+    override suspend fun transitionAfterReload(): RepoFileSystem {
         runBlocking { flushJob?.join() }
         dispose()
         return DiskRepoFileSystem(diskRoot)

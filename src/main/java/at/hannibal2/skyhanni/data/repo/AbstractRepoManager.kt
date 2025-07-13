@@ -321,6 +321,8 @@ abstract class AbstractRepoManager(
         // This is outside the scope of the 'local' file system - we need the zip to for sure be a file
         repoDirectory.deleteRecursively()
         repoDirectory.mkdirs()
+        prepCleanRepoFileSystem()
+
         try {
             repoZipFile.createNewFile()
         } catch (e: Error) {
@@ -333,7 +335,6 @@ abstract class AbstractRepoManager(
         }
 
         // Actually unpack the repo zip file into our local 'file system'
-        prepCleanRepoFileSystem()
         repoFileSystem.unzipIgnoreFirstFolder(repoZipFile.absolutePath)
 
         localRepoCommit = RepoCommit(latestSha, latestCommitTime)
