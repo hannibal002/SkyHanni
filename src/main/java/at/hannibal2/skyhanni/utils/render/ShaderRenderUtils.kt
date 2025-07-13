@@ -15,6 +15,7 @@ import java.awt.Color
 import kotlin.math.max
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
+//$$ import org.joml.Matrix3x2f
 //$$ import org.joml.Matrix4f
 //#endif
 
@@ -44,6 +45,12 @@ object ShaderRenderUtils {
         //#if MC < 1.21.6
         //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
         //#endif
+        //#endif
+        //#if MC > 1.21.6
+        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.matrices)
+        //$$ this.modelViewMatrix = Matrix4f()
+        //$$     .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
+        //$$     .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
         //#endif
     }.also { extraApplies?.invoke(this) }
 
@@ -82,7 +89,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
             ShaderManager.disableShader()
         }
-        //#elseif MC < 1.21.6
+        //#else
         //$$ RoundedShapeDrawer.drawRoundedTexturedRect(x, y, width, height, texture)
         //#endif
     }
@@ -109,7 +116,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
             ShaderManager.disableShader()
         }
-        //#elseif MC < 1.21.6
+        //#else
         //$$ RoundedShapeDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
         //#endif
     }
@@ -160,7 +167,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawGradientRect(left, top, right, bottom, topColor, bottomColor)
             ShaderManager.disableShader()
         }
-        //#elseif MC < 1.21.6
+        //#else
         //$$ RoundedShapeDrawer.drawRoundedRectOutline(left, top, right, bottom, topColor, bottomColor)
         //#endif
     }
@@ -202,7 +209,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawGradientRect(left, top, right, bottom, topColor, bottomColor)
             ShaderManager.disableShader()
         }
-        //#elseif MC < 1.21.6
+        //#else
         //$$ RoundedShapeDrawer.drawRoundedRect(left, top, right, bottom, topColor, bottomColor)
         //#endif
     }
@@ -253,7 +260,7 @@ object ShaderRenderUtils {
             GuiRenderUtils.drawRect(left, top, right, bottom, circleColor)
             ShaderManager.disableShader()
         }
-        //#elseif MC < 1.21.6
+        //#else
         //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, circleColor)
         //#endif
     }
