@@ -21,7 +21,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Command Logging",
-        desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)"
+        desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)",
     )
     @ConfigEditorBoolean
     var commandLogs: Boolean = false
@@ -30,7 +30,7 @@ class DebugConfig {
     @ConfigOption(
         name = "Mod Menu Log",
         desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +
-            "Useful for adding more mods to quick mod menu switch."
+            "Useful for adding more mods to quick mod menu switch.",
     )
     @ConfigEditorBoolean
     var modMenuLog: Boolean = false
@@ -38,7 +38,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "ApiUtils Never Silent",
-        desc = "Forces ApiUtils' `silentError` to always be false, so that errors always debug to ErrorManager."
+        desc = "Forces ApiUtils' `silentError` to always be false, so that errors always debug to ErrorManager.",
     )
     @ConfigEditorBoolean
     var apiUtilsNeverSilent: Boolean = false
@@ -116,7 +116,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Copy RNG Meter",
-        desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard."
+        desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard.",
     )
     @ConfigEditorBoolean
     var copyRngMeter: Boolean = false
@@ -129,7 +129,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Missing Repo Items",
-        desc = "Highlights each item in the current inventory that is not in your current NEU repo."
+        desc = "Highlights each item in the current inventory that is not in your current NEU repo.",
     )
     @ConfigEditorBoolean
     var highlightMissingRepo: Boolean = false
@@ -137,7 +137,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Log Repo Errors",
-        desc = "Log errors that occur while reloading/fetching any AbstractRepoManager"
+        desc = "Log errors that occur while reloading/fetching any AbstractRepoManager",
     )
     @ConfigEditorBoolean
     var logRepoErrors: Boolean = false
@@ -145,24 +145,10 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Print Missing Bazaar Items",
-        desc = "Print unknown Bazaar items to the console."
+        desc = "Print unknown Bazaar items to the console.",
     )
     @ConfigEditorBoolean
     var printMissingBazaarItems: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Unzip Repo to Memory",
-        desc = "Instead of unzipping the repo directly to disk, unzip it to memory first, " +
-            "and start a background thread to write it to disk."
-    )
-    @ConfigEditorBoolean
-    var unzipRepoToMemory: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Hot Swap Detection", desc = "Show chat messages when Hot Swap starts and ends.")
-    @ConfigEditorBoolean
-    var hotSwapDetection: Boolean = false
 
     @Expose
     @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always outdated.")
@@ -172,7 +158,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "SkyHanni Event Counter",
-        desc = "Count once per second how many skyhanni events gets triggered, show the total amount in console output."
+        desc = "Count once per second how many skyhanni events gets triggered, show the total amount in console output.",
     )
     @ConfigEditorBoolean
     var eventCounter: Boolean = false
@@ -180,7 +166,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Bypass Advanced Tab List",
-        desc = "The Advanced Player Tab list is disabled while pressing this hotkey."
+        desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var bypassAdvancedPlayerTabList: Int = Keyboard.KEY_NONE
