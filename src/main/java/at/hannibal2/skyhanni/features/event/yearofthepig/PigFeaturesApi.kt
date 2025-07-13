@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -21,10 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -66,19 +64,6 @@ object PigFeaturesApi {
     private val orbExpiredChatPattern by patternGroup.pattern(
         "chat.orb.expired",
         "§cYour Shiny Orb and associated pig expired and disappeared\\.",
-    )
-
-    private val chargedOrbTagPattern by patternGroup.pattern(
-        "entity.tag.charged.name",
-        "§e§lCLICK",
-    )
-
-    /**
-     * REGEX-TEST: §6[MVP§3++§6] oBlazin§f§r
-     */
-    private val orbTagPattern by patternGroup.pattern(
-        "entity.tag.normal.name",
-        "(?:(?:§.)+\\[.*] )?(?<player>[^§]+)(?:§.)+",
     )
 
     /**
@@ -156,9 +141,7 @@ object PigFeaturesApi {
         val nearbyStands = EntityUtils.getEntitiesNearby<EntityArmorStand>(location, 5.0).toList()
         val sortedStands = nearbyStands.sortedBy { it.distanceTo(location) }
         return sortedStands.firstOrNull { stand ->
-            val tagMatchesIgn = orbTagPattern.matchGroup(stand.name, "player") == PlayerUtils.getName()
-            val tagCharged = chargedOrbTagPattern.matches(stand.name)
-            tagMatchesIgn || tagCharged
+            stand.wearingSkullTexture("ewogICJ0aW1lc3RhbXAiIDogMTYxODYwNjA5MDE0OSwKICAicHJvZmlsZUlkIiA6ICJhYTZhNDA5NjU4YTk0MDIwYmU3OGQwN2JkMzVlNTg5MyIsCiAgInByb2ZpbGVOYW1lIiA6ICJiejE0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzgyY2RlMDY4ZTk5YTRmOThjMzFmODdiNGNjMDZiZTE0YjIyOWFjYTRmNzI4MWE0MTZjN2UyZjU1MzIyM2RiNzQiCiAgICB9CiAgfQp9")
         }
     }
 
@@ -202,7 +185,7 @@ object PigFeaturesApi {
                 ShinyOrbData(
                     pigEntityId = this.entityId,
                     shinyOrbEntityId = orbEntity.entityId,
-                    shinyOrbLocation = orbEntity.getLorenzVec(),
+                    shinyOrbLocation = orbEntity.getLorenzVec() + LorenzVec(0, 2, 0),
                     spawnTime = SimpleTimeMark.now(),
                 ),
             )
