@@ -128,8 +128,8 @@ object SkyHanniMod {
         CoroutineName("SkyHanni") + SupervisorJob(globalJob),
     )
 
-    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit) {
-        launchCoroutine {
+    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job {
+        return launchCoroutine {
             withContext(Dispatchers.IO) {
                 block()
             }
@@ -144,9 +144,9 @@ object SkyHanniMod {
     }
 
     @Suppress("DEPRECATION")
-    fun launchCoroutine(function: suspend () -> Unit) {
+    fun launchCoroutine(function: suspend () -> Unit): Job {
         @Suppress("DEPRECATION")
-        coroutineScope.launch {
+        return coroutineScope.launch {
             try {
                 function()
             } catch (e: Exception) {

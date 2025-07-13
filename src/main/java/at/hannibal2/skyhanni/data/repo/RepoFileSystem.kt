@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import kotlinx.coroutines.DisposableHandle
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
@@ -85,7 +87,7 @@ class DiskRepoFileSystem(val root: File) : RepoFileSystem {
 
 class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, DisposableHandle {
     private val storage = ConcurrentHashMap<String, ByteArray>()
-    private var flushScheduled = false
+    private var flushJob: Job? = null
 
     override fun exists(path: String) = storage.containsKey(path)
     override fun readAllBytes(path: String) = storage[path] ?: throw FileNotFoundException(path)
@@ -102,9 +104,8 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
 
     override fun unzipIgnoreFirstFolder(zipFilePath: String) {
         super.unzipIgnoreFirstFolder(zipFilePath)
-        if (!flushScheduled) {
-            flushScheduled = true
-            SkyHanniMod.launchIOCoroutine {
+        if (flushJob == null) {
+            flushJob = SkyHanniMod.launchIOCoroutine {
                 saveToDisk(diskRoot)
             }
         }
@@ -113,6 +114,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
     override fun dispose() = storage.clear()
 
     override fun transitionAfterReload(): RepoFileSystem {
+        runBlocking { flushJob?.join() }
         dispose()
         return DiskRepoFileSystem(diskRoot)
     }
