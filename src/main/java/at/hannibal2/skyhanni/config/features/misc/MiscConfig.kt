@@ -495,12 +495,12 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(
-        name = "Puts color in item tooltips",
-        desc = "Changes the color of the numbers in item lore to the color they are in the SkyBlock stats menu",
+        name = "Color Item Stat Numbers",
+        desc = "Changes the color of the numbers in item lore to the color they are in the SkyBlock stats menu.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var colorfulItemTooltips: Boolean = true
+    var colorfulItemTooltips: Boolean = false
 
     @Expose
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")

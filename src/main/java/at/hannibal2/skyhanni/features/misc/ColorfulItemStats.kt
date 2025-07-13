@@ -23,20 +23,19 @@ object ColorfulItemStats {
         "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.%]+)",
     )
 
-    private val iconStatMap = mapOf(
-        "Magic Find" to "✯",
-    )
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ItemHoverEvent) {
         if (!config.colorfulItemTooltips) return
 
         for ((index, line) in event.toolTip.withIndex()) {
-
             event.toolTip[index] = genericStat.replace(line) {
 
                 val stat = group("stat")
                 val oldColor = group("oldColor")
+
+                val skyblockStat = SkyblockStat.getValueOrNull(
+                    stat.uppercase().replace(" ", "_")
+                )
 
                 buildString {
                     append("§7$stat: ")
@@ -45,8 +44,9 @@ object ColorfulItemStats {
                             stat.uppercase().replace(" ", "_")
                         )?.icon?.take(2) ?: oldColor
                     )
+                    append(skyblockStat?.icon?.take(2) ?: oldColor)
                     append(group("bonus"))
-                    append(iconStatMap[stat].orEmpty())
+                    append(skyblockStat?.icon?.lastOrNull())
                     append(oldColor)
                 }
             }
