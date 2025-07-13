@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
-//#if FORGE
+
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.value
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.FontRenderer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
@@ -28,7 +26,8 @@ import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
 import kotlin.reflect.KMutableProperty0
-
+//#if FORGE
+import net.minecraft.client.gui.FontRenderer
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor
