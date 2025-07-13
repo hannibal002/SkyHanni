@@ -250,12 +250,12 @@ object OrderedWaypoints {
         renderWaypoints.clear()
         currentOrderedWaypointIndex = 0
         lastCloser = 0
-        ChatUtils.chat("Unloaded ordered waypoints!")
+        ChatUtils.chat("Unloaded ordered waypoints.")
     }
 
     private fun skip(amount: Int) {
         if (orderedWaypointsList.isEmpty()) {
-            return ChatUtils.chat("There are no waypoints to skip!")
+            return ChatUtils.chat("There are no waypoints to skip.")
         }
 
         incrementIndex(amount)
@@ -264,7 +264,7 @@ object OrderedWaypoints {
 
     private fun skipto(number: Int) {
         if (orderedWaypointsList.isEmpty()) {
-            return ChatUtils.chat("There are no waypoints to skip to!")
+            return ChatUtils.chat("There are no waypoints to skip to.")
         }
 
         val newOrderedWaypointIndex = number - 1
@@ -278,7 +278,7 @@ object OrderedWaypoints {
 
     private fun unskip(amount: Int) {
         if (orderedWaypointsList.isEmpty()) {
-            return ChatUtils.chat("There are no waypoints to unskip!")
+            return ChatUtils.chat("There are no waypoints to unskip.")
         }
 
         incrementIndex(-amount)
@@ -288,11 +288,11 @@ object OrderedWaypoints {
 
     private fun delete(number: Int) {
         if (orderedWaypointsList.isEmpty()) {
-            return ChatUtils.chat("There are no waypoints to delete!")
+            return ChatUtils.chat("There are no waypoints to delete.")
         }
 
         if (number < 1 || number > orderedWaypointsList.size) {
-            return ChatUtils.chat("Invalid number! Must be between 1 and ${orderedWaypointsList.size}.")
+            return ChatUtils.chat("Invalid number. Must be between 1 and ${orderedWaypointsList.size}.")
         }
 
         for (i in number - 1 until orderedWaypointsList.size) {
@@ -309,7 +309,7 @@ object OrderedWaypoints {
         val pos = LocationUtils.playerLocation().add(0, -1, 0).roundLocationToBlock()
 
         if (number < 1 || number > orderedWaypointsList.size + 1) {
-            return ChatUtils.chat("Please enter a number between 1 and ${orderedWaypointsList.size + 1})")
+            return ChatUtils.chat("Please enter a number between 1 and ${orderedWaypointsList.size + 1}.")
         }
 
         val newWaypoint = SkyhanniWaypoint(pos, number = number, options = mutableMapOf("name" to number.toString()))
@@ -332,7 +332,7 @@ object OrderedWaypoints {
 
             route?.let {
                 ClipboardUtils.copyToClipboard(it)
-                ChatUtils.chat("Route was copied to clipboard!")
+                ChatUtils.chat("Route was copied to clipboard.")
             } ?: run {
                 ChatUtils.chat("Invalid waypoint format specified.")
             }
