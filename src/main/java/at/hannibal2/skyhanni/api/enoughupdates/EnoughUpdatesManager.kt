@@ -16,15 +16,16 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -33,8 +34,6 @@ import net.minecraft.nbt.JsonToNBT
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
 import java.util.TreeMap
 import kotlin.math.floor
 //#if MC > 1.21
@@ -50,7 +49,6 @@ import kotlin.math.floor
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
 //#endif
-import kotlin.text.Charsets.UTF_8
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -59,6 +57,7 @@ object EnoughUpdatesManager {
     val configDirectory = File("config/notenoughupdates")
     val repoDirectory = File(configDirectory, "repo")
 
+    private val loadingMutex = Mutex()
     private val itemMap = TreeMap<String, JsonObject>()
     private val itemStackCache = mutableMapOf<String, ItemStack>()
     private val displayNameCache = mutableMapOf<String, String>()
@@ -72,22 +71,17 @@ object EnoughUpdatesManager {
 
     fun getItemInformation() = itemMap
 
-    private var isLoading = false
-
-    fun inLoadingState() = isLoading || EnoughUpdatesRepoManager.fetchMutex.isLocked
+    fun inLoadingState() = loadingMutex.isLocked || EnoughUpdatesRepoManager.fetchMutex.isLocked
 
     val logger get() = EnoughUpdatesRepoManager.logger
 
-    suspend fun reloadItemsFromRepo() {
-        if (isLoading) {
-            logger.preDebug("Already loading NEU repo, skipping reload")
-            return
-        }
-
+    /**
+     * Called by the Neu Repo Manager when the NEU repo is reloaded.
+     */
+    suspend fun reloadItemsFromRepo() = loadingMutex.withLock {
         val timeNow = SimpleTimeMark.now()
         logger.preDebug("Starting reloadItemsFromRepo at $timeNow")
 
-        isLoading = true
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
@@ -112,44 +106,30 @@ object EnoughUpdatesManager {
         val transferItemMapFinishedTime = SimpleTimeMark.now()
         val transferItemMapElapsedFormat = (transferItemMapFinishedTime - transferItemMapStart).format()
         logger.preDebug("Item map transferred at $transferItemMapFinishedTime\nElapsed time: $transferItemMapElapsedFormat")
-
-        isLoading = false
     }
 
     fun reloadRepo() {
-        if (isLoading) {
-            System.out.println("reloadRepo called, but already loading NEU repo, skipping reload")
-            return
+        if (loadingMutex.isLocked) {
+            return logger.preDebug("reloadRepo called, but already loading NEU repo, skipping reload")
         }
-        System.out.println("reloadRepo called")
+        logger.preDebug("reloadRepo called")
         EnoughUpdatesRepoManager.reloadLocalRepo()
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private suspend fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
-        val itemDir = File(repoDirectory, "items")
-        if (!itemDir.exists()) return@coroutineScope
-        val files = itemDir.listFiles { it.extension == "json" } ?: return@coroutineScope
-
-        files.map { file ->
-            async { file.readRepoItem() }
-        }.awaitAll().filterNotNull().forEachIndexed { index, item ->
-            tempItemMap[files[index].nameWithoutExtension] = item
+        val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
+        fileSystem.list("items").mapNotNullAsync { name ->
+            val internalName = name.removeSuffix(".json")
+            val parsed = parseItem(
+                internalName = internalName,
+                json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
+            ) ?: return@mapNotNullAsync null
+            internalName to parsed
+        }.forEach { (internalName, item) ->
+            tempItemMap[internalName] = item
         }
-    }
-
-    private fun File.readRepoItem(): JsonObject? = runCatching {
-        FileInputStream(this).use { fis ->
-            InputStreamReader(fis, UTF_8).use { reader ->
-                ConfigManager.gson.fromJson(reader, JsonObject::class.java)?.let { json ->
-                    parseItem(this.nameWithoutExtension, json)
-                }
-            }
-        }
-    }.getOrElse {
-        logger.debug("Error reading item file: ${this.name}")
-        null
     }
 
     private fun parseItem(internalName: String, json: JsonObject): JsonObject? {

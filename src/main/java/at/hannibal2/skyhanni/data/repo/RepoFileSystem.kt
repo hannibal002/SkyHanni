@@ -1,23 +1,60 @@
 package at.hannibal2.skyhanni.data.repo
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import kotlinx.coroutines.DisposableHandle
 import java.io.File
 import java.io.FileNotFoundException
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
+import java.util.zip.ZipFile
+import kotlin.sequences.forEach
 
 sealed interface RepoFileSystem {
     fun exists(path: String): Boolean
     fun readAllBytes(path: String): ByteArray
     fun write(path: String, data: ByteArray)
-    fun saveToDisk(root: File)
+    fun list(path: String): List<String>
+
+    /**
+     * Deletes everything under [path].
+     * If [path] is empty, deletes all entries.
+     */
+    fun deleteRecursively(path: String)
+    fun deleteAll() = deleteRecursively("")
 
     fun readAllBytesAsJsonElement(path: String, gson: Gson = ConfigManager.gson): JsonElement {
         val bytes = readAllBytes(path)
         val jsonText = String(bytes, Charsets.UTF_8)
         return gson.fromJson<JsonElement>(jsonText)
+    }
+
+    fun unzipIgnoreFirstFolder(
+        zipFilePath: String,
+    ) = ZipFile(zipFilePath).use { zip ->
+        zip.entries().asSequence().filter { !it.isDirectory }.forEach { entry ->
+            val relative = entry.name
+                .substringAfter('/', "")
+                .takeIf { it.isNotBlank() }
+                ?: return@forEach
+
+            if (this is DiskRepoFileSystem) {
+                // Security: ensure the file is within the root directory
+                val outPath = root.toPath().resolve(relative).normalize()
+                if (!outPath.startsWith(root.toPath())) throw RuntimeException(
+                    "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                        "please report this on the SkyHanni discord."
+                )
+            }
+
+            val data = zip.getInputStream(entry).readBytes()
+            write(relative, data)
+        }
     }
 }
 
@@ -29,21 +66,61 @@ class DiskRepoFileSystem(val root: File) : RepoFileSystem {
         f.parentFile.mkdirs()
         f.writeBytes(data)
     }
-    override fun saveToDisk(root: File) {
-        // No-op, already on disk
+    override fun deleteRecursively(path: String) {
+        File(root, path).deleteRecursively()
     }
+    override fun list(path: String) = root.resolve(path).listFiles {
+        it.extension == "json"
+    }?.mapNotNull { it.name }?.toList().orEmpty()
 }
 
-class InMemoryRepoFileSystem : RepoFileSystem {
+class MemoryRepoFileSystem(
+    private val diskRoot: File,
+    private val onFlushed: () -> Unit,
+) : RepoFileSystem, DisposableHandle {
     private val storage = ConcurrentHashMap<String, ByteArray>()
+    private var flushScheduled = false
+
     override fun exists(path: String) = storage.containsKey(path)
     override fun readAllBytes(path: String) = storage[path] ?: throw FileNotFoundException(path)
     override fun write(path: String, data: ByteArray) {
         storage[path] = data
     }
-    override fun saveToDisk(root: File) = storage.forEach { (path, bytes) ->
-        val f = File(root, path)
-        f.parentFile.mkdirs()
-        f.writeBytes(bytes)
+
+    override fun deleteRecursively(path: String) {
+        if (path.isEmpty()) storage.clear()
+        else storage.keys.removeIf { it == path || it.startsWith("$path/") }
+    }
+
+    override fun list(path: String) = storage.keys.filter {
+        it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
+    }.map { it.removePrefix("$path/") }
+
+    override fun unzipIgnoreFirstFolder(zipFilePath: String) {
+        super.unzipIgnoreFirstFolder(zipFilePath)
+        if (!flushScheduled) {
+            flushScheduled = true
+            SkyHanniMod.launchIOCoroutine {
+                saveToDisk(diskRoot)
+                onFlushed()
+            }
+        }
+    }
+
+    override fun dispose() = storage.clear()
+
+    private fun saveToDisk(root: File) {
+        val base = root.toPath()
+        base.createDirectoriesFor(storage.keys)
+        storage.entries.parallelStream().forEach { (relativePath, bytes) ->
+            val out = base.resolve(relativePath)
+            Files.write(out, bytes)
+        }
+    }
+
+    private fun Path.createDirectoriesFor(relativePaths: Set<String>) = relativePaths.mapNotNull { p ->
+        Paths.get(p).parent
+    }.toSet().forEach { dir ->
+        Files.createDirectories(this.resolve(dir))
     }
 }

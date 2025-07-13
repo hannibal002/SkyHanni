@@ -88,6 +88,7 @@ abstract class AbstractRepoManager(
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
     private var downloadFailed: Boolean = false
+    private var canDisposeMemoryFS = false
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
@@ -212,6 +213,7 @@ abstract class AbstractRepoManager(
         logger.debug("Attempting to switch to backup repo")
 
         try {
+            repoDirectory.deleteRecursively()
             repoDirectory.mkdirs()
             repoZipFile.createNewFile()
 
@@ -219,7 +221,8 @@ abstract class AbstractRepoManager(
                 ?: logger.throwError("Failed to find backup repo resource at '$backupRepoResourcePath'")
 
             Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            prepAndUnzipToRepoFileSys(repoZipFile.absolutePath)
+            prepCleanRepoFileSystem()
+            repoFileSystem.unzipIgnoreFirstFolder(repoZipFile.absolutePath)
 
             commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
             logger.debug("Successfully switched to backup repo")
@@ -294,10 +297,7 @@ abstract class AbstractRepoManager(
 
         val (latestSha, latestCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
             response.sha to response.commit.committer.date
-        } ?: run {
-            downloadFailed = true
-            null to null
-        }
+        } ?: ((null to null).also { downloadFailed = true })
 
         val diffCheck = RepoComparison(currentSha, currentCommitTime, latestSha, latestCommitTime)
 
@@ -311,7 +311,8 @@ abstract class AbstractRepoManager(
 
         if (command) diffCheck.reportRepoOutdated()
 
-        RepoUtils.recursiveDelete(repoDirectory)
+        // This is outside the scope of the 'local' file system - we need the zip to for sure be a file
+        repoDirectory.deleteRecursively()
         repoDirectory.mkdirs()
         try {
             repoZipFile.createNewFile()
@@ -319,12 +320,14 @@ abstract class AbstractRepoManager(
             logger.logErrorWithData(e, "Error creating $commonShortName repo zip file")
             return false
         }
-
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
             downloadFailed = true
             logger.logError("Failed to download the repo zip file from GitHub.")
         }
-        prepAndUnzipToRepoFileSys(repoZipFile.absolutePath)
+
+        // Actually unpack the repo zip file into our local 'file system'
+        prepCleanRepoFileSystem()
+        repoFileSystem.unzipIgnoreFirstFolder(repoZipFile.absolutePath)
 
         localRepoCommit = RepoCommit(latestSha, latestCommitTime)
         commitStorage.writeToFile(localRepoCommit)
@@ -333,13 +336,15 @@ abstract class AbstractRepoManager(
         return true
     }
 
-    fun prepAndUnzipToRepoFileSys(zipFilePath: String) {
-        val expectedType = if (debugConfig.unzipRepoToMemory) InMemoryRepoFileSystem::class.java else DiskRepoFileSystem::class.java
-        if (!expectedType.isAssignableFrom(repoFileSystem::class.java)) {
-            repoFileSystem = if (debugConfig.unzipRepoToMemory) InMemoryRepoFileSystem()
-            else DiskRepoFileSystem(repoZipFile)
+    fun prepCleanRepoFileSystem() {
+        (repoFileSystem as? MemoryRepoFileSystem)?.dispose()
+        val expectedType = if (debugConfig.unzipRepoToMemory) MemoryRepoFileSystem::class.java else DiskRepoFileSystem::class.java
+        repoFileSystem = when {
+            expectedType.isAssignableFrom(repoFileSystem::class.java) -> repoFileSystem
+            debugConfig.unzipRepoToMemory -> MemoryRepoFileSystem(repoDirectory) { canDisposeMemoryFS = true }
+            else -> DiskRepoFileSystem(repoDirectory)
         }
-        RepoUtils.unzipIgnoreFirstFolder(zipFilePath, repoFileSystem)
+        repoFileSystem.deleteAll()
     }
 
     fun reloadLocalRepo(answerMessage: String = "$commonName Repo loaded from local files successfully.") {
@@ -373,6 +378,11 @@ abstract class AbstractRepoManager(
         eventConstructor.invoke(this@AbstractRepoManager).post { error ->
             logger.logErrorWithData(error, "Error while posting repo reload event")
             loadingError = true
+        }
+        if (canDisposeMemoryFS) {
+            (repoFileSystem as? MemoryRepoFileSystem)?.dispose()
+            repoFileSystem = DiskRepoFileSystem(repoDirectory)
+            canDisposeMemoryFS = false
         }
 
         if (answerMessage.isNotEmpty() && !loadingError) {
