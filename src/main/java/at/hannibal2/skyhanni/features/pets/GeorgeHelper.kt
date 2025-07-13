@@ -32,9 +32,8 @@ object GeorgeHelper {
     private val useFandomWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useFandom
     private const val SPAWN_EGG_SLOT = 41
 
-    private val patternGroup = RepoPattern.group("george.tamingcap")
+    private val patternGroup = RepoPattern.group("tamingcap")
 
-    //
     /**
      * REGEX-TEST:   §dMythic Enderman
      * REGEX-TEST:   §6Legendary Black Cat
@@ -43,21 +42,13 @@ object GeorgeHelper {
      * REGEX-TEST:   §9Rare Frost Wisp
      */
     private val neededPetPattern by patternGroup.pattern(
-        "needed.pet.loreline",
+        "needed-pet.loreline",
         "(?i) *(?<fullThing>(?<tierColorCodes>§.)*(?<tier>(?:un)?common|rare|epic|legendary|mythic) (?<pet>[\\S ]+))",
-    )
-
-    /**
-     * REGEX-TEST: Offer Pets
-     */
-    private val offerPetsChestPattern by patternGroup.pattern(
-        "offerpets.chestname",
-        "Offer Pets",
     )
 
     init {
         InventoryDetector(
-            pattern = offerPetsChestPattern,
+            pattern = "Offer Pets".toPattern(),
             openInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
         )
     }
@@ -100,7 +91,7 @@ object GeorgeHelper {
         val clickableRenderable = if (cheapestPrice > 0) {
             val tips = mutableListOf(
                 "§eClick to find a $formattedPet §eon the AH!",
-                "§7(Make sure to check the rarity filter.)",
+                "§7(Make sure to adjust the rarity filter.)",
             )
             if (cheapestTier < tierNumber) tips.add(
                 "§7(Does not include costs to upgrade via Kat.)",
@@ -142,7 +133,7 @@ object GeorgeHelper {
         }
     }.minBy { it.second }
 
-    data class PetInfo(
+    private data class PetInfo(
         var petPrice: Double,
         var renderableInfo: HorizontalContainerRenderable,
     )
@@ -151,7 +142,7 @@ object GeorgeHelper {
     fun onRenderOverlay() {
         if (!config.enabled) return
         if (display.isEmpty()) return
-        config.displayPos.renderRenderables(display, posLabel = "Taming 60 Helper")
+        config.position.renderRenderables(display, posLabel = "Taming 60 Helper")
     }
 
     @HandleEvent

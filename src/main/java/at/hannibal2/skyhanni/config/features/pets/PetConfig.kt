@@ -37,7 +37,7 @@ class PetConfig {
 
     @Expose
     @ConfigOption(name = "Taming 60 Helper", desc = "")
-    @SearchTag("George Heatran")
+    @SearchTag("George")
     @Accordion
     val tamingSixty: TamingSixtyConfig = TamingSixtyConfig()
 

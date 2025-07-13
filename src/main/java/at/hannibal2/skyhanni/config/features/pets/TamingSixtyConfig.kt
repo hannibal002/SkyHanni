@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.pets
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,8 +13,9 @@ class TamingSixtyConfig {
         name = "Enabled",
         desc = "Shows a helper for the cheapest prices to buy pets to raise your Taming level cap.",
     )
+    @FeatureToggle
     @ConfigEditorBoolean
-    var enabled: Boolean = false
+    var enabled: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -25,5 +27,5 @@ class TamingSixtyConfig {
 
     @Expose
     @ConfigLink(owner = TamingSixtyConfig::class, field = "display")
-    val displayPos: Position = Position(125, 250)
+    val position: Position = Position(125, 250)
 }
