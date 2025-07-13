@@ -104,7 +104,7 @@ object CollectionUtils {
      */
     inline fun <K, V : Number, R> Map<K, V>.subtract(
         other: Map<K, V>,
-        transform: (Double) -> R
+        transform: (Double) -> R,
     ): Map<K, R> = (keys + other.keys).associateWith { k ->
         val diff = (this[k]?.toDouble() ?: 0.0) - (other[k]?.toDouble() ?: 0.0)
         transform(diff)
@@ -325,7 +325,7 @@ object CollectionUtils {
         return EnumMap<K, V>(K::class.java)
     }
 
-    fun <T> Collection<List<T>>.transpose() : List<List<T?>>{
+    fun <T> Collection<List<T>>.transpose(): List<List<T?>> {
         if (this.isEmpty()) return emptyList()
 
         val colCount: Int = this.maxOf { it.size }

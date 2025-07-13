@@ -202,6 +202,7 @@ object StringUtils {
     ).joinToString("\n") { it.removePrefix("§r") }
 
     //#if FORGE
+    @Suppress("CyclomaticComplexMethod")
     fun splitLinesWithLength(text: String, width: Int, font: FontRenderer): Pair<List<Pair<String, Int>>, Int> {
         val output = mutableListOf<Pair<String, Int>>()
         var trueWidth = 0
@@ -238,11 +239,11 @@ object StringUtils {
                 mutated = false
             }
 
-            fun setColor(color : String,builder : StringBuilder){
+            fun setColor(color: String, builder: StringBuilder) {
                 textColor = color
                 builder.append('§').append(color)
                 // Since Color do clear all formatting
-                if(mutated) {
+                if (mutated) {
                     randomStyle = false
                     boldStyle = false
                     italicStyle = false
@@ -355,7 +356,7 @@ object StringUtils {
                         var g = i // Making a lookahead for the end of the ExtendedChatColor
                         while (g < text.length) {
                             if (text[g - 1] == '§' && text[g] == '/') {
-                                current.setColor(text.substring(i, g + 1),builder)
+                                current.setColor(text.substring(i, g + 1), builder)
                                 i = g
                                 break
                             }
@@ -364,8 +365,8 @@ object StringUtils {
                         // Invalid §# are not handled really as it is broke anyway
                     }
 
-                    else ->{
-                        current.setColor(format.toString(),builder)
+                    else -> {
+                        current.setColor(format.toString(), builder)
                     }
                 }
 
@@ -465,9 +466,9 @@ object StringUtils {
      * to the end of the builder.
      * If [startIndex] is equal to [length], no changes are made.
      *
-     * @param      startIndex  The beginning index, inclusive.
-     * @throws     StringIndexOutOfBoundsException  if [startIndex]
-     *             is negative, greater than [length]
+     * @param startIndex The beginning index, inclusive.
+     * @throws StringIndexOutOfBoundsException if [startIndex]
+     * is negative, greater than [length]
      */
     fun StringBuilder.deleteEnd(startIndex: Int) {
         this.delete(startIndex, length)
@@ -480,9 +481,9 @@ object StringUtils {
      * end if no such character exits.
      * If [endIndex] is equal to 0, no changes are made.
      *
-     * @param      endIndex    The ending index, exclusive.
-     * @throws     StringIndexOutOfBoundsException  if [endIndex]
-     *             is negative.
+     * @param endIndex The ending index, exclusive.
+     * @throws StringIndexOutOfBoundsException if [endIndex]
+     * is negative.
      */
     fun StringBuilder.deleteStart(endIndex: Int) {
         this.delete(0, endIndex)
