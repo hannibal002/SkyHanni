@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -137,11 +138,13 @@ object PigFeaturesApi {
         }
     }
 
+    private val ORB_SKULL by lazy { SkullTextureHolder.getTexture("SHINY_PIG_ORB") }
+
     private fun tryFindOrb(location: LorenzVec): EntityArmorStand? {
         val nearbyStands = EntityUtils.getEntitiesNearby<EntityArmorStand>(location, 5.0).toList()
         val sortedStands = nearbyStands.sortedBy { it.distanceTo(location) }
         return sortedStands.firstOrNull { stand ->
-            stand.wearingSkullTexture("ewogICJ0aW1lc3RhbXAiIDogMTYxODYwNjA5MDE0OSwKICAicHJvZmlsZUlkIiA6ICJhYTZhNDA5NjU4YTk0MDIwYmU3OGQwN2JkMzVlNTg5MyIsCiAgInByb2ZpbGVOYW1lIiA6ICJiejE0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzgyY2RlMDY4ZTk5YTRmOThjMzFmODdiNGNjMDZiZTE0YjIyOWFjYTRmNzI4MWE0MTZjN2UyZjU1MzIyM2RiNzQiCiAgICB9CiAgfQp9")
+            stand.wearingSkullTexture(ORB_SKULL)
         }
     }
 
