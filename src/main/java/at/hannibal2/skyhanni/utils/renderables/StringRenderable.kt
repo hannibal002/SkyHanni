@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import java.awt.Color
+import kotlin.math.ceil
 
 open class StringRenderable(
     val text: String,
@@ -47,8 +48,8 @@ class WrappedStringRenderable(
     verticalAlign,
 ) {
     private val fontRenderer: FontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
-    val map : List<Pair<String,Int>> by lazy {
-        splitLinesWithLength(text,(width / scale).toInt(),fontRenderer).first
+    val map: List<Pair<String, Int>> by lazy {
+        splitLinesWithLength(text, ceil(width / scale).toInt() - 1, fontRenderer).first
     }
 
     override val width by lazy { (rawWidth * scale).toInt() + 1 }

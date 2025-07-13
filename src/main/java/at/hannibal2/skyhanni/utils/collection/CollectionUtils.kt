@@ -325,6 +325,16 @@ object CollectionUtils {
         return EnumMap<K, V>(K::class.java)
     }
 
+    fun <T> Collection<List<T>>.transpose() : List<List<T?>>{
+        if (this.isEmpty()) return emptyList()
+
+        val colCount: Int = this.maxOf { it.size }
+
+        return (0 until colCount).map { colIndex ->
+            this.map { row -> row.getOrNull(colIndex) }
+        }
+    }
+
     /** Splits the input into equal sized lists. If the list can't get divided clean by [subs] then the last entry gets reduced. e.g. 13/4 = [4,4,4,1]*/
     fun <T> Collection<T>.split(subs: Int = 2): List<List<T>> {
         if (this.isEmpty()) return listOf(emptyList())

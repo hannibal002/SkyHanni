@@ -204,12 +204,11 @@ object StringUtils {
 
     //#if FORGE
     fun splitLinesWithLength(text: String, width: Int, font: FontRenderer): Pair<List<Pair<String, Int>>, Int> {
-        // TODO account for none standard § encodings
         val output = mutableListOf<Pair<String, Int>>()
         var trueWidth = 0
 
         class FontChanges(
-            var textColor: Char = 'f',
+            var textColor: String = "f",
             var randomStyle: Boolean = false,
             var boldStyle: Boolean = false,
             var italicStyle: Boolean = false,
@@ -227,16 +226,31 @@ object StringUtils {
                 italicStyle,
                 underlineStyle,
                 strikethroughStyle,
+                mutated,
             )
 
             fun reset() {
-                textColor = 'f'
+                textColor = "f"
                 randomStyle = false
                 boldStyle = false
                 italicStyle = false
                 underlineStyle = false
                 strikethroughStyle = false
                 mutated = false
+            }
+
+            fun setColor(color : String,builder : StringBuilder){
+                textColor = color
+                builder.append('§').append(color)
+                // Since Color do clear all formatting
+                if(mutated) {
+                    randomStyle = false
+                    boldStyle = false
+                    italicStyle = false
+                    underlineStyle = false
+                    strikethroughStyle = false
+                }
+                mutated = true
             }
         }
 
@@ -248,10 +262,34 @@ object StringUtils {
         var i = 0
         val builder = StringBuilder()
 
-        fun <T> setAttribute(add: Char, attribute: KMutableProperty0<T>, set: T) {
-            attribute.set(set)
+        fun setAttribute(add: Char, attribute: KMutableProperty0<Boolean>) {
+            attribute.set(true)
             current.mutated = true
             builder.append('§').append(add)
+        }
+
+        fun trimBuilderEnd() {
+            val pre = builder.length
+            builder.selfTrimEnd()
+            val diff = pre - builder.length
+            val length = diff * font.getCharWidth(' ')
+            lineWidth -= length
+            splitWidth -= length
+        }
+
+        fun cleanUpBuilderAndAddToOutput() {
+            trimBuilderEnd()
+
+            // Remove redundant trailing §
+            while (builder.length >= 2 && builder[builder.length - 2] == '§') {
+                builder.delete(builder.length - 2, builder.length)
+            }
+            trimBuilderEnd()
+
+            output.add(builder.toString() to splitWidth)
+            if (trueWidth < splitWidth) {
+                trueWidth = splitWidth
+            }
         }
 
         fun split() {
@@ -259,25 +297,19 @@ object StringUtils {
             if (whereIsSplitChar == -1) {
                 splitWidth = lineWidth
                 whereIsSplitChar = builder.length
+                lastSplit = current
             }
 
             // Split the builder into the old part and the new part
             val extra = builder.substring(whereIsSplitChar)
             builder.deleteEnd(whereIsSplitChar)
-            builder.selfTrimEnd()
 
-            // Remove redundant trailing §
-            while (builder.length >= 2 && builder[builder.length - 2] == '§') {
-                builder.delete(builder.length - 2, builder.length)
-            }
-            builder.selfTrimEnd()
-
-            output.add(builder.toString() to splitWidth)
-            if (trueWidth < splitWidth) {
-                trueWidth = splitWidth
-            }
-
+            cleanUpBuilderAndAddToOutput()
             builder.clear()
+
+            if (lastSplit.textColor != "f") {
+                builder.append('§').append(lastSplit.textColor)
+            }
             if (lastSplit.randomStyle) {
                 builder.append('§').append('k')
             }
@@ -293,13 +325,8 @@ object StringUtils {
             if (lastSplit.strikethroughStyle) {
                 builder.append('§').append('m')
             }
-            if (lastSplit.textColor != 'f') {
-                builder.append('§').append(lastSplit.textColor)
-            }
 
-            val whiteSpaceInFront = extra.indexOfFirst { !it.isWhitespace() }.transformIf({ this == -1 }, { 0 })
-            builder.append(extra.substring(whiteSpaceInFront))
-            lineWidth -= whiteSpaceInFront * font.getCharWidth(' ')
+            builder.append(extra)
 
             whereIsSplitChar = -1
             lastSplit = current
@@ -307,6 +334,10 @@ object StringUtils {
             splitWidth = 0
         }
 
+        fun instanceSplit() {
+            whereIsSplitChar = -1
+            split()
+        }
         while (i < text.length) {
             val c = text[i]
             when (c) {
@@ -316,28 +347,54 @@ object StringUtils {
                         current.reset()
                     }
 
-                    'k' -> setAttribute('k', current::randomStyle, true)
-                    'l' -> setAttribute('l', current::boldStyle, true)
-                    'o' -> setAttribute('o', current::italicStyle, true)
-                    'n' -> setAttribute('n', current::underlineStyle, true)
-                    'm' -> setAttribute('m', current::strikethroughStyle, true)
-                    else -> setAttribute(format, current::textColor, format)
+                    'k' -> setAttribute('k', current::randomStyle)
+                    'l' -> setAttribute('l', current::boldStyle)
+                    'o' -> setAttribute('o', current::italicStyle)
+                    'n' -> setAttribute('n', current::underlineStyle)
+                    'm' -> setAttribute('m', current::strikethroughStyle)
+                    '#' -> {
+                        var g = i // Making a lookahead for the end of the ExtendedChatColor
+                        while (g < text.length) {
+                            if (text[g - 1] == '§' && text[g] == '/') {
+                                current.setColor(text.substring(i, g + 1),builder)
+                                i = g
+                                break
+                            }
+                            g++
+                        }
+                        // Invalid §# are not handled really as it is broke anyway
+                    }
+
+                    else ->{
+                        current.setColor(format.toString(),builder)
+                    }
                 }
 
-                '\n' -> split()
+                '\n' -> instanceSplit()
                 ' ' -> {
-                    // TODO wide space galloping
-                    val w = font.getCharWidth(c)
-                    whereIsSplitChar = builder.length
-                    if (lineWidth + w > width) {
-                        lastSplit = current
-                        split()
-                    } else {
-                        lastSplit = current.copy()
-                        splitWidth = lineWidth
-                        lineWidth += w
-                        builder.append(c)
+                    var g = i + 1 // Making a lookahead for the end of the whitespace
+                    while (g < text.length && text[g] == ' ') {
+                        g++
                     }
+                    // Ignore the whitespace and just split on \n
+                    if (g < text.length && text[g] == '\n') {
+                        instanceSplit()
+                        g++
+                    } else {
+                        val w = font.getCharWidth(c) * (g - i)
+                        if (lineWidth + w > width) {
+                            instanceSplit()
+                        } else {
+                            whereIsSplitChar = builder.length + (g - i)
+                            lastSplit = current.copy()
+                            lineWidth += w
+                            splitWidth = lineWidth
+                            repeat(g - i) {
+                                builder.append(c)
+                            }
+                        }
+                    }
+                    i = g - 1 // -1 since there follows a ++ below
                 }
 
                 else -> {
@@ -351,6 +408,10 @@ object StringUtils {
             }
             i++
         }
+
+        // Handle the remaining stuff
+        splitWidth = lineWidth
+        cleanUpBuilderAndAddToOutput()
 
         return output to trueWidth
     }
