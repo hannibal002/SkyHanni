@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbUsedEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -42,11 +41,10 @@ object ShinyOrbTracker {
         it.getInternalNameOrNull() in setOf(SHINY_ORB_ITEM, SHINY_ROD_ITEM)
     } == true
 
-    // Todo: Only display when Year of the Pig is active (how do we detect that?)
     init {
         tracker.initRenderer(
             { config.position },
-        ) { config.enabled && IslandType.HUB.isCurrent() && passesHoldingItem() }
+        ) { config.enabled && IslandType.HUB.isCurrent() && passesHoldingItem() && PigFeaturesApi.isYearOfThePig() }
     }
 
     class ShinyOrbData : ItemTrackerData() {
@@ -76,7 +74,6 @@ object ShinyOrbTracker {
                 "§7You got §6$coinsFormat coins §7that way.",
             )
         }
-
 
         @Expose
         var orbsUsed = 0L
@@ -119,9 +116,10 @@ object ShinyOrbTracker {
         addSearchString("§6§lShiny Orb Profit Tracker")
         var profit = tracker.drawItems(data, { true }, this)
 
-        val orbPrice = SHINY_ORB_ITEM.getPrice()
-        profit -= data.orbsUsed * orbPrice
-        add(StringRenderable("§7${data.orbsUsed}x §6Shiny Orb§7: §c-${orbPrice.shortFormat()} coins").toSearchable())
+        val orbPrice = 5000.0
+        val totalOrbPrice = data.orbsUsed * orbPrice
+        profit -= totalOrbPrice
+        add(StringRenderable("§7${data.orbsUsed}x §6Shiny Orb§7: §c-${totalOrbPrice.shortFormat()} coins").toSearchable())
 
         // Skill XP gains
         addSkillXpInfo(data.skillXpGained)

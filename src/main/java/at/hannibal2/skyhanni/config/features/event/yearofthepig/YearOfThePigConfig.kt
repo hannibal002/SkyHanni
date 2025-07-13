@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.yearofthepig
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -15,7 +16,7 @@ class YearOfThePigConfig {
     @Expose
     @ConfigOption(name = "Lines to Draw", desc = "Which helper lines to draw.")
     @ConfigEditorDraggableList
-    var linesToDraw: MutableList<ShinyOrbLineType> = mutableListOf(
+    val linesToDraw: MutableList<ShinyOrbLineType> = mutableListOf(
         ShinyOrbLineType.TO_PIG,
         ShinyOrbLineType.TO_ORB,
     )

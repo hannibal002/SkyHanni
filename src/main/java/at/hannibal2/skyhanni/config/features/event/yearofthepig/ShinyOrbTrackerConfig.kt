@@ -22,5 +22,5 @@ class ShinyOrbTrackerConfig {
 
     @Expose
     @ConfigLink(owner = ShinyOrbTrackerConfig::class, field = "enabled")
-    var position: Position = Position(100, 100)
+    val position: Position = Position(100, 100)
 }

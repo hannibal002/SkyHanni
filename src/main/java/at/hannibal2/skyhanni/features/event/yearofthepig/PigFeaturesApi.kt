@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.features.event.yearofthepig
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
@@ -26,6 +25,8 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -34,31 +35,27 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PigFeaturesApi {
-    class ShinyOrbDataSet(
-        var pigEntityId: Int? = null,
-        var shinyOrbEntityId: Int? = null,
-        private var shinyOrbLocationCache: LorenzVec? = null,
-    ) : ResettableStorageSet() {
-        private val shinyOrbEntity
-            get() = shinyOrbEntityId?.let {
-                EntityUtils.getEntityByID(it) as EntityArmorStand?
-            }
-        val shinyOrbLocation
-            get() = shinyOrbLocationCache ?: shinyOrbEntity?.getLorenzVec()?.let {
-                shinyOrbLocationCache = it
-                it
-            }
 
-        override fun reset() {
-            shinyOrbLocationCache = null
-            super.reset()
-        }
-    }
+    class ShinyOrbData(
+        val pigEntityId: Int,
+        val shinyOrbEntityId: Int,
+        val shinyOrbLocation: LorenzVec,
+        val spawnTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+    )
 
     private val patternGroup = RepoPattern.group("event.year-of-the-pig")
-    private val armorStands get() = EntityUtils.getEntities<EntityArmorStand>()
-    private val writableDataSet: ShinyOrbDataSet = ShinyOrbDataSet()
-    val dataSet get() = writableDataSet
+
+    private val data: MutableList<ShinyOrbData> = mutableListOf()
+    val dataSetList get() = data
+
+    private fun tryToRemoveOrb() {
+        DelayedRun.runDelayed(1.seconds) {
+            dataSetList.removeIf { dataSet ->
+                val pigId = dataSet.pigEntityId
+                EntityUtils.getEntityByID(pigId) == null && dataSet.spawnTime.passedSince() > 2.seconds
+            }
+        }
+    }
 
     // <editor-fold desc="Patterns">
     private val orbUsedChatPattern by patternGroup.pattern(
@@ -105,6 +102,7 @@ object PigFeaturesApi {
     )
 
     /**
+     * REGEX-TEST: +3,000 Coins
      * REGEX-TEST: +9,721 Coins
      */
     private val coinsRewardPattern by patternGroup.pattern(
@@ -122,90 +120,100 @@ object PigFeaturesApi {
     )
     // </editor-fold>
 
-    @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
-        writableDataSet.reset()
+    private const val YEAR_OF_THE_PIG_OFFSET = 11
+
+    fun isYearOfThePig(): Boolean {
+        val sbYear = SkyBlockTime.now().year
+        val yearOffset = sbYear % 12
+        return yearOffset == YEAR_OF_THE_PIG_OFFSET || SkyHanniMod.feature.dev.debug.alwaysYearOfThePig
     }
 
     @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        data.clear()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent) {
-        val playerVec = LocationUtils.playerLocation()
+        if (!isYearOfThePig()) return
         val message = event.message
         orbUsedChatPattern.matchMatcher(message) {
-            ShinyOrbUsedEvent(writableDataSet).post()
+            ShinyOrbUsedEvent().post()
         }
 
         orbChargedChatPattern.matchMatcher(message) {
-            val orbEntity = tryFindPlayerOrb(playerVec)
-            ShinyOrbChargedEvent(writableDataSet.shinyOrbLocation, orbEntity?.entityId).post()
+            val orbEntity = tryFindOrb(LocationUtils.playerLocation())
+            ShinyOrbChargedEvent(orbEntity?.entityId).post()
         }
 
         orbLootedChatPattern.matchMatcher(message) {
             handleLootedOrb(group("reward"))
-            writableDataSet.reset()
+            tryToRemoveOrb()
         }
 
         orbExpiredChatPattern.matchMatcher(message) {
-            val pigId = writableDataSet.pigEntityId ?: return@matchMatcher
+            val oldestData = dataSetList.maxByOrNull { it.spawnTime.passedSince() } ?: return@matchMatcher
+
+            val pigId = oldestData.pigEntityId
             val pigEntity = EntityUtils.getEntityByID(pigId)
-            if (pigEntity == null) writableDataSet.reset()
+            if (pigEntity == null) data.removeIf { it.pigEntityId == pigId }
         }
     }
 
-    private fun tryFindPlayerOrb(
-        location: LorenzVec,
-    ): EntityArmorStand? = writableDataSet.shinyOrbEntityId?.let {
-        EntityUtils.getEntityByID(it) as EntityArmorStand?
-    } ?: armorStands.firstOrNull {
-        it.distanceTo(location) <= 3.0 && armorStands.any { labelArmorStand ->
-            val tagMatchesIgn = orbTagPattern.matchGroup(labelArmorStand.name, "player") == PlayerUtils.getName()
-            val tagCharged = chargedOrbTagPattern.matches(labelArmorStand.name)
-            val tagMatches = tagMatchesIgn || tagCharged
-
-            tagMatches && labelArmorStand.distanceTo(location) <= 3.0 && labelArmorStand.entityId != it.entityId
+    private fun tryFindOrb(location: LorenzVec): EntityArmorStand? {
+        val nearbyStands = EntityUtils.getEntitiesNearby<EntityArmorStand>(location, 5.0).toList()
+        val sortedStands = nearbyStands.sortedBy { it.distanceTo(location) }
+        return sortedStands.firstOrNull { stand ->
+            val tagMatchesIgn = orbTagPattern.matchGroup(stand.name, "player") == PlayerUtils.getName()
+            val tagCharged = chargedOrbTagPattern.matches(stand.name)
+            tagMatchesIgn || tagCharged
         }
     }
 
     private fun handleLootedOrb(reward: String) {
-        val shinyOrbLocation = writableDataSet.shinyOrbLocation ?: return
-
         coinsRewardPattern.matchMatcher(reward) {
             val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
-            ShinyOrbLootedEvent(shinyOrbLocation, coins = amount).post()
-            return writableDataSet.reset()
+            ShinyOrbLootedEvent(coins = amount).post()
+            return tryToRemoveOrb()
         }
 
         skillXpRewardPattern.matchMatcher(reward) {
             val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
             val skill = SkillType.getByNameOrNull(group("skill")) ?: return@matchMatcher
-            ShinyOrbLootedEvent(shinyOrbLocation, skillXp = skill to amount.toLong()).post()
-            return writableDataSet.reset()
+            ShinyOrbLootedEvent(skillXp = skill to amount.toLong()).post()
+            return tryToRemoveOrb()
         }
 
         val (lootName, lootAmount) = ItemUtils.readItemAmount(reward) ?: return
         val lootInternalName = NeuInternalName.fromItemNameOrNull(lootName) ?: run {
             ErrorManager.skyHanniError("Could not find internal name for §c\"$lootName§c\"")
         }
-        ShinyOrbLootedEvent(shinyOrbLocation, loot = lootInternalName to lootAmount).post()
-        writableDataSet.reset()
+        ShinyOrbLootedEvent(loot = lootInternalName to lootAmount).post()
+        tryToRemoveOrb()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onEntityClick(event: EntityClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (!isYearOfThePig()) return
         val entity = event.clickedEntity ?: return
 
         if (entity is EntityPig && entity.mob?.name == "SHINY PIG") entity.handlePigClick()
     }
 
     private fun EntityPig.handlePigClick() {
+        if (dataSetList.any { it.pigEntityId == this.entityId }) return
         val pigStartingLocation = this.getLorenzVec()
         DelayedRun.runDelayed(1.seconds) {
-            if (writableDataSet.pigEntityId == this.entityId) return@runDelayed
-            val orbEntity = tryFindPlayerOrb(pigStartingLocation) ?: return@runDelayed
-            writableDataSet.reset()
-            writableDataSet.shinyOrbEntityId = orbEntity.entityId
-            writableDataSet.pigEntityId = this.entityId
+            val orbEntity = tryFindOrb(pigStartingLocation)
+            orbEntity ?: return@runDelayed
+            data.add(
+                ShinyOrbData(
+                    pigEntityId = this.entityId,
+                    shinyOrbEntityId = orbEntity.entityId,
+                    shinyOrbLocation = orbEntity.getLorenzVec(),
+                    spawnTime = SimpleTimeMark.now(),
+                ),
+            )
         }
     }
 }

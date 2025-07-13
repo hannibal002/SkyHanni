@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 
 class ShinyOrbLootedEvent(
-    val location: LorenzVec,
     val loot: Pair<NeuInternalName, Int>? = null,
     val coins: Int? = null,
     val skillXp: Pair<SkillType, Long>? = null,

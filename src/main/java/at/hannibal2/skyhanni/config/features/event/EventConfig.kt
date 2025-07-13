@@ -72,7 +72,7 @@ class EventConfig {
     @ConfigOption(name = "Year of the Pig", desc = "Features for Year of the Pig.")
     @Accordion
     @Expose
-    var yearOfThePig: YearOfThePigConfig = YearOfThePigConfig()
+    val yearOfThePig: YearOfThePigConfig = YearOfThePigConfig()
 
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose

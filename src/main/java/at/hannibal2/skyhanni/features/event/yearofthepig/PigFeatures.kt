@@ -6,62 +6,58 @@ import at.hannibal2.skyhanni.config.features.event.yearofthepig.YearOfThePigConf
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import java.awt.Color
 
 @SkyHanniModule
 object PigFeatures {
 
     private val config get() = SkyHanniMod.feature.event.yearOfThePig
-    private val dataSet get() = PigFeaturesApi.dataSet
+    private val dataSetList get() = PigFeaturesApi.dataSetList
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.linesToDraw.any()) return
 
-        event.tryRenderLineToPig(dataSet)
-        event.tryRenderLinePigToOrb(dataSet)
+        dataSetList.forEach { dataSet ->
+            event.tryRenderLineToPig(dataSet)
+            event.tryRenderLinePigToOrb(dataSet)
+        }
     }
 
-    private fun SkyHanniRenderWorldEvent.tryRenderLineToPig(dataSet: PigFeaturesApi.ShinyOrbDataSet) {
-        val pigEntity = dataSet.pigEntityId?.let { EntityUtils.getEntityByID(it) } ?: return
+    private fun SkyHanniRenderWorldEvent.tryRenderLineToPig(dataSet: PigFeaturesApi.ShinyOrbData) {
+        val pigEntity = EntityUtils.getEntityByID(dataSet.pigEntityId) ?: return
 
-        val nearPig = pigEntity.distanceToPlayer() < 5
-        val lineToPigEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_PIG) && !nearPig
+        val lineToPigEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_PIG)
         if (!lineToPigEnabled) return
 
-        val pigEntityLocation = exactLocation(pigEntity)
+        val pigEntityLocation = WorldRenderUtils.exactLocation(pigEntity, partialTicks)
         drawLineToEye(
             pigEntityLocation.up(0.54),
             Color.PINK,
             3,
-            true
+            true,
         )
     }
 
-    private fun SkyHanniRenderWorldEvent.tryRenderLinePigToOrb(
-        dataSet: PigFeaturesApi.ShinyOrbDataSet
-    ) {
-        val pigEntity = dataSet.pigEntityId?.let { EntityUtils.getEntityByID(it) } ?: return
-        val nearPig = pigEntity.distanceToPlayer() < 10
+    private fun SkyHanniRenderWorldEvent.tryRenderLinePigToOrb(dataSet: PigFeaturesApi.ShinyOrbData) {
+        val pigEntity = EntityUtils.getEntityByID(dataSet.pigEntityId) ?: return
 
-        val lineToOrbEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_ORB) && nearPig
+        val lineToOrbEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_ORB)
         if (!lineToOrbEnabled) return
 
-        val orbEntityLocation = dataSet.shinyOrbLocation ?: return
-        val pigEntityLocation = exactLocation(pigEntity)
+        val orbEntityLocation = dataSet.shinyOrbLocation
+        val pigEntityLocation = WorldRenderUtils.exactLocation(pigEntity, partialTicks)
 
         draw3DLine(
             pigEntityLocation.up(0.54),
             orbEntityLocation.down(0.5),
             Color.YELLOW,
             3,
-            true
+            true,
         )
         return
     }
-
 }
