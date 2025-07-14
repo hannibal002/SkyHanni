@@ -4,40 +4,18 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.misc.PatcherFixes
-import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCylinderInWorld
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawHitbox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawLineToEye
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawPyramid
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereInWorld
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereWireframeInWorld
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
-import net.minecraft.util.AxisAlignedBB
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
@@ -103,6 +81,7 @@ object RenderUtils {
             Triple(xTranslate, yTranslate, zTranslate)
         }
 
+    // todo move to GuiRenderUtils?
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
     }
@@ -274,31 +253,7 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    @Deprecated("Use WorldRenderUtils' drawDynamicText instead")
-    fun SkyHanniRenderWorldEvent.drawDynamicText(
-        location: LorenzVec,
-        text: String,
-        scaleMultiplier: Double,
-        yOff: Float = 0f,
-        hideTooCloseAt: Double = 4.5,
-        smallestDistanceVew: Double = 5.0,
-        ignoreBlocks: Boolean = true,
-        ignoreY: Boolean = false,
-        maxDistance: Int? = null,
-    ) {
-        _drawDynamicText(location, text, scaleMultiplier, yOff, hideTooCloseAt, smallestDistanceVew, ignoreBlocks, ignoreY, maxDistance)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawHitbox instead")
-    fun SkyHanniRenderWorldEvent.drawHitbox(
-        boundingBox: AxisAlignedBB,
-        color: Color,
-        lineWidth: Int = 3,
-        depth: Boolean = true,
-    ) {
-        _drawHitbox(boundingBox, color, lineWidth, depth)
-    }
-
+    @Deprecated("Use ChromaColour instead")
     fun chromaColor(
         timeTillRepeat: Duration,
         offset: Float = 0f,
@@ -315,6 +270,7 @@ object RenderUtils {
         )
     }
 
+    // todo move to GuiRenderUtils?
     fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(
         xPos: Int,
         yPos: Int,
@@ -324,6 +280,7 @@ object RenderUtils {
         drawSlotText0(xPos, yPos, text, scale)
     }
 
+    // todo move to GuiRenderUtils?
     fun GuiContainerEvent.ForegroundDrawnEvent.drawSlotText(
         xPos: Int,
         yPos: Int,
