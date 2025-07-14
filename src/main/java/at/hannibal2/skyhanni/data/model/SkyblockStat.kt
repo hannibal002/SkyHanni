@@ -65,7 +65,7 @@ enum class SkyblockStat(
     ),
     VITALITY("§4♨", " *Vitality: §r§4♨$VALUE_PATTERN", " *§4♨ Vitality §f$VALUE_PATTERN"),
     MENDING("§a☄", " *Mending: §r§a☄$VALUE_PATTERN", " *§a☄ Mending §f$VALUE_PATTERN"),
-    TRUE_DEFENSE("§7❂", " *True Defense: §r§f❂$VALUE_PATTERN", " *§f❂ True Defense §f$VALUE_PATTERN"),
+    TRUE_DEFENSE("§f❂", " *True Defense: §r§f❂$VALUE_PATTERN", " *§f❂ True Defense §f$VALUE_PATTERN"),
     SWING_RANGE("§eⓈ", " *Swing Range: §r§eⓈ$VALUE_PATTERN", " *§eⓈ Swing Range §f$VALUE_PATTERN"),
 
     // TODO add the way sba did get it (be careful with 500+ Speed)

@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HoppityStrayTimerConfig {
     @Expose
@@ -18,6 +19,16 @@ class HoppityStrayTimerConfig {
     @Expose
     @ConfigLink(owner = HoppityStrayTimerConfig::class, field = "enabled")
     val strayTimerPosition: Position = Position(200, 200)
+
+    @Expose
+    @ConfigOption(
+        name = "Block Closing",
+        desc = "Block closing the Chocolate Factory while the timer is active.\n" +
+            "§eHold §cShift §eto bypass"
+    )
+    @SearchTag("prevent close")
+    @ConfigEditorBoolean
+    var blockClosing: Boolean = false
 
     @Expose
     @ConfigOption(

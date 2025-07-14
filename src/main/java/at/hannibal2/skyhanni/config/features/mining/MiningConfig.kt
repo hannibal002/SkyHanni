@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.nucleus.MetalDetectorConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig
 import com.google.gson.annotations.Expose
@@ -61,6 +62,11 @@ class MiningConfig {
     val crystalNucleusTracker: CrystalNucleusTrackerConfig = CrystalNucleusTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Metal Detector", desc = "")
+    @Accordion
+    val metalDetector: MetalDetectorConfig = MetalDetectorConfig()
+
+    @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
     @Accordion
     val coldOverlay: ColdOverlayConfig = ColdOverlayConfig()
@@ -106,6 +112,11 @@ class MiningConfig {
     @ConfigOption(name = "Flowstate Helper", desc = "")
     @Accordion
     val flowstateHelper: FlowstateHelperConfig = FlowstateHelperConfig()
+
+    @Expose
+    @ConfigOption(name = "Gemstone Money per Hour Display", desc = "")
+    @Accordion
+    val gemstoneMoneyPerHour: GemstoneMoneyPerHourConfig = GemstoneMoneyPerHourConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")

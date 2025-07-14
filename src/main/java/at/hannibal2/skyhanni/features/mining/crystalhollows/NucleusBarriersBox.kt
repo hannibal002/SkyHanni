@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.util.AxisAlignedBB
 

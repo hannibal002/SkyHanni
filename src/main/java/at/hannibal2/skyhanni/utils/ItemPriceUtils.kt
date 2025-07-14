@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
@@ -18,6 +20,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -72,15 +76,10 @@ object ItemPriceUtils {
 
     fun NeuInternalName.isAuctionHouseItem(): Boolean = getLowestBinOrNull() != null
 
-    private fun NeuInternalName.getLowestBinOrNull(): Double? {
-        val result = if (PlatformUtils.isNeuLoaded()) {
-            getNeuLowestBin(this)
-        } else {
-            getShLowestBin(this)
-        }
-        if (result == -1L) return null
-        return result.toDouble()
-    }
+    private fun NeuInternalName.getLowestBinOrNull(): Double? = when {
+        PlatformUtils.isNeuLoaded() -> getNeuLowestBin(this)
+        else -> getShLowestBin(this)
+    }.takeIf { it != -1L }?.toDouble()
 
     private fun getNeuLowestBin(internalName: NeuInternalName) =
         NotEnoughUpdates.INSTANCE.manager.auctionManager.getLowestBin(internalName.asString())
@@ -147,15 +146,8 @@ object ItemPriceUtils {
     }
 
     private var lastLowestBinRefresh = SimpleTimeMark.farPast()
-    private var lowestBins = JsonObject()
-
-    private fun getShLowestBin(internalName: NeuInternalName): Long {
-        if (lowestBins.has(internalName.asString())) {
-            return lowestBins[internalName.asString()].asLong
-        }
-
-        return -1L
-    }
+    private var lowestBins: Map<NeuInternalName, Long> = mutableMapOf()
+    private fun getShLowestBin(internalName: NeuInternalName): Long = lowestBins[internalName] ?: -1L
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -165,17 +157,16 @@ object ItemPriceUtils {
         lastLowestBinRefresh = SimpleTimeMark.now()
 
         SkyHanniMod.launchIOCoroutine {
-            refreshLowestBins()
+            val jsonResponse = ApiUtils.getTypedJSONResponse<JsonObject>(lbinStatic) ?: return@launchIOCoroutine
+            lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(jsonResponse)
         }
     }
 
-    private fun refreshLowestBins() {
-        lowestBins = ApiUtils.getJSONResponse(
-            "https://moulberry.codes/lowestbin.json.gz",
-            apiName = "NEU Lowest Bin",
-            gunzip = true,
-        )
-    }
+    private val lbinStatic = ApiUtils.StaticApiPath(
+        "https://moulberry.codes/lowestbin.json.gz",
+        "NEU Lowest Bin",
+        tryForceGzip = true
+    )
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {
         val price = pricePer * amount.toDouble()
@@ -205,6 +196,23 @@ object ItemPriceUtils {
             }
             simpleCallback {
                 debugItemPrice(null)
+            }
+        }
+        event.registerBrigadier("shfetchmoulblbins") {
+            description = "Test fetching Moulberry's lowest bin data."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                SkyHanniMod.launchIOCoroutine {
+                    val timeNow = SimpleTimeMark.now()
+                    val fetchedLowestBins = ApiUtils.getJSONResponse(lbinStatic)
+                        ?: ErrorManager.skyHanniError("Failed to fetch Moulberry's lowest bin data!")
+                    lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(fetchedLowestBins)
+                    val formatString = buildString {
+                        appendLine("§aFetched Moulberry's lowest bin data in §b${timeNow.passedSince().format()}§a!")
+                        appendLine("    §7Total Items: §6${lowestBins.size}")
+                    }
+                    ChatUtils.chat(formatString, prefixColor = "§a")
+                }
             }
         }
     }

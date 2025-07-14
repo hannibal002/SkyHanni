@@ -163,7 +163,7 @@ object PetStorageApi {
 
     private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName): NeuItemJson? {
         val skin = groupOrNull("skin") ?: groupOrNull("altskin") ?: return null
-        return PetUtils.getPetSkinOrNull(petInternalName, skin)
+        return PetUtils.findPetSkinOrNull(petInternalName, skin)
     }
 
     private fun Matcher.getRarityOrNull() = LorenzRarity.getByColorCode(group("rarity")[0])
@@ -184,9 +184,7 @@ object PetStorageApi {
             val level = group("level").toInt()
             val rarity = getRarityOrNull() ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                val trimmed = line.trim().removeResets()
-                PetUtils.petItemResolution[trimmed]
-                    ?: NeuInternalName.fromItemNameOrNull(trimmed)?.takeIf { !it.isPet }
+                PetUtils.resolvePetItemOrNull(line.trim().removeResets())
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{
@@ -235,7 +233,7 @@ object PetStorageApi {
             }?.split("\n") ?: return
 
             val petHeldItem = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo) {
-                PetUtils.petItemResolution[group("item").removeResets()]
+                PetUtils.resolvePetItemOrNull(group("item").removeResets())
             }
 
             val resolvedPet = resolvePetDataOrNull(
@@ -306,6 +304,7 @@ object PetStorageApi {
                 heldItemInternalName = petInfo.heldItem,
                 exp = petInfo.exp,
                 uuid = petInfo.uniqueId,
+                skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
             )
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
@@ -331,6 +330,7 @@ object PetStorageApi {
             heldItemInternalName = petInfo.heldItem,
             exp = petInfo.exp,
             uuid = petInfo.uniqueId,
+            skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
         )
 
         petStorage.pets.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {

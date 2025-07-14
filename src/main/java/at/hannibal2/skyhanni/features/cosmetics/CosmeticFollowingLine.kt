@@ -10,13 +10,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds

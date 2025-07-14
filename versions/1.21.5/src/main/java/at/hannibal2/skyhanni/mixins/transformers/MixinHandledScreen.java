@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.inventory.BetterContainers;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.DelayedRun;
+import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
@@ -75,7 +76,8 @@ public abstract class MixinHandledScreen {
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         TextInput.Companion.onGuiInput(cir);
-        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
+        boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
+        if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
             cir.setReturnValue(false);
         }
     }

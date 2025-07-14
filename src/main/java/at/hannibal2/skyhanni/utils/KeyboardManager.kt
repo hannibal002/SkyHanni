@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
@@ -60,6 +61,22 @@ object KeyboardManager {
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
     fun isRightMouseClicked() = RIGHT_MOUSE.isKeyClicked()
+
+    @JvmStatic
+    fun checkIsInventoryClosure(keycode: Int): Boolean {
+        // Holding shift bypasses closure checks
+        if (isShiftKeyDown()) return false
+
+        val isClose =
+            //#if MC < 1.21
+            keycode == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || keycode == Keyboard.KEY_ESCAPE
+        //#else
+        //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
+        //#endif
+
+        if (!isClose) return false
+        return AttemptedInventoryCloseEvent().post()
+    }
 
     /**
      * TODO make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,
