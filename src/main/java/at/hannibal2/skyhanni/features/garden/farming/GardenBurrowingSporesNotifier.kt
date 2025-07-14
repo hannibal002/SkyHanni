@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemBlink
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -23,6 +25,7 @@ object GardenBurrowingSporesNotifier {
         "drop",
         "§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores\\.",
     )
+    private val BURROWING_SPORES = "BURROWING_SPORES".toInternalName()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
@@ -33,6 +36,6 @@ object GardenBurrowingSporesNotifier {
         if (!sporeDropMessage.matches(event.message)) return
 
         if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!")
-        if (blinkEnabled) ItemBlink.setBlink(NeuItems.getItemStackOrNull("BURROWING_SPORES"), 5_000)
+        if (blinkEnabled) ItemBlink.setBlink(BURROWING_SPORES.getItemStackOrNull(), 5_000)
     }
 }
