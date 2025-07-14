@@ -167,8 +167,8 @@ object FlareDisplay {
                 val location = flare.location.add(-0.5, 0.0, -0.5)
                 val name = flare.type.displayName
                 val time = "§b${getRemainingTime(flare).format()}"
-                event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
-                event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
+                event.drawDynamicText(location, name, 1.5, seeThroughBlocks = false)
+                event.drawDynamicText(location, time, 1.5, yOff = 10f, seeThroughBlocks = false)
             }
         }
 

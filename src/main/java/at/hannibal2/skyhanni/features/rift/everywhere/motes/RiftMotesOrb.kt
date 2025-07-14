@@ -97,7 +97,7 @@ object RiftMotesOrb {
             val sizeOffset = (5 - config.size) * -0.1
             val color = if (orb.pickedUp) LorenzColor.GRAY else LorenzColor.LIGHT_PURPLE
             val text = color.getChatColor() + "Motes Orb"
-            event.drawDynamicText(location, text, 1.5 + sizeOffset, ignoreBlocks = false)
+            event.drawDynamicText(location, text, 1.5 + sizeOffset, seeThroughBlocks = false)
             event.drawWaypointFilled(location, color.toColor(), extraSize = sizeOffset)
         }
     }

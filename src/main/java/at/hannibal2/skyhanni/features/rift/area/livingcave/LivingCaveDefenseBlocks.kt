@@ -156,7 +156,7 @@ object LivingCaveDefenseBlocks {
         }
         for (block in staticBlocks) {
             val location = block.location
-            event.drawDynamicText(location, "§bBreak!", 1.5, ignoreBlocks = false)
+            event.drawDynamicText(location, "§bBreak!", 1.5, seeThroughBlocks = false)
             event.drawWaypointFilled(location, color)
 
             event.draw3DLine(

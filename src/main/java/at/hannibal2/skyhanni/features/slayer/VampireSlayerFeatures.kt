@@ -294,7 +294,7 @@ object VampireSlayerFeatures {
                     stand.position.toLorenzVec().add(0.5, 2.5, 0.5),
                     text,
                     1.5,
-                    ignoreBlocks = false,
+                    seeThroughBlocks = false,
                 )
                 for ((ichor, boss) in standList) {
                     if (!(configBloodIchor.showLines && isIchor) && !(configKillerSpring.showLines && isSpring)) continue

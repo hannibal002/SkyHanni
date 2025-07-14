@@ -117,7 +117,7 @@ object EndermanSlayerFeatures {
                     skull.getLorenzVec().add(-0.5, 1.5, -0.5),
                     "§6Nukekubi Skull",
                     1.6,
-                    ignoreBlocks = false,
+                    seeThroughBlocks = false,
                     maxDistance = 20,
                 )
             }

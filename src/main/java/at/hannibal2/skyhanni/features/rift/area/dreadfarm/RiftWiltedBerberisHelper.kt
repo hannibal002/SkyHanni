@@ -132,7 +132,7 @@ object RiftWiltedBerberisHelper {
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
                     event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW, 0.7f)
-                    event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+                    event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, seeThroughBlocks = false)
                 } else {
                     event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {
