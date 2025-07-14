@@ -21,7 +21,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Command Logging",
-        desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)"
+        desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)",
     )
     @ConfigEditorBoolean
     var commandLogs: Boolean = false
@@ -30,10 +30,18 @@ class DebugConfig {
     @ConfigOption(
         name = "Mod Menu Log",
         desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +
-            "Useful for adding more mods to quick mod menu switch."
+            "Useful for adding more mods to quick mod menu switch.",
     )
     @ConfigEditorBoolean
     var modMenuLog: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "ApiUtils Never Silent",
+        desc = "Forces ApiUtils' `silentError` to always be false, so that errors always debug to ErrorManager.",
+    )
+    @ConfigEditorBoolean
+    var apiUtilsNeverSilent: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show Internal Name", desc = "Show internal names in item lore.")
@@ -86,6 +94,11 @@ class DebugConfig {
     var showBZPrice: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Show Bin Price", desc = "Show Bin price in item lore.")
+    @ConfigEditorBoolean
+    var showBinPrice: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     var showItemUuid: Boolean = false
@@ -103,7 +116,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Copy RNG Meter",
-        desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard."
+        desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard.",
     )
     @ConfigEditorBoolean
     var copyRngMeter: Boolean = false
@@ -116,7 +129,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Missing Repo Items",
-        desc = "Highlights each item in the current inventory that is not in your current NEU repo."
+        desc = "Highlights each item in the current inventory that is not in your current NEU repo.",
     )
     @ConfigEditorBoolean
     var highlightMissingRepo: Boolean = false
@@ -134,7 +147,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "SkyHanni Event Counter",
-        desc = "Count once per second how many skyhanni events gets triggered, show the total amount in console output."
+        desc = "Count once per second how many skyhanni events gets triggered, show the total amount in console output.",
     )
     @ConfigEditorBoolean
     var eventCounter: Boolean = false
@@ -142,7 +155,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Bypass Advanced Tab List",
-        desc = "The Advanced Player Tab list is disabled while pressing this hotkey."
+        desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var bypassAdvancedPlayerTabList: Int = Keyboard.KEY_NONE
@@ -174,6 +187,11 @@ class DebugConfig {
     val assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
 
     @Expose
+    @ConfigOption(name = "Always Year of Pig", desc = "Assumes the Year of the Pig is always active, even if it is not.")
+    @ConfigEditorBoolean
+    var alwaysYearOfThePig: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
     @ConfigEditorBoolean
     var alwaysFunnyTime: Boolean = false
@@ -194,38 +212,6 @@ class DebugConfig {
     val forceGreatSpook: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
-    @ConfigEditorBoolean
-    var dvdLogo: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "dvdLogo")
-    val dvdLogoPosition: Position = Position(100, 100)
-
-    @Expose
-    @ConfigOption(name = "Orbital", desc = "Enable the test Orbital System renderable.")
-    @ConfigEditorBoolean
-    var orbital: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "orbital")
-    val orbitalPosition: Position = Position(200, 200)
-
-    @Expose
-    @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
-    @ConfigEditorBoolean
-    var itemStack: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "itemStack")
-    val itemStackPosition: Position = Position(-200, 300)
-
-    @Expose
-    @ConfigOption(name = "Animated Item Stack", desc = "Enable the test Animated Item Stack Renderable")
-    @ConfigEditorBoolean
-    var animatedItemStack: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
     @ConfigEditorBoolean
     var addonsDebug: Boolean = false
@@ -233,10 +219,6 @@ class DebugConfig {
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
     val addonsDebugPosition: Position = Position(300, 300)
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
-    val animatedItemStackPosition: Position = Position(-300, 300)
 
     @Expose
     @NoConfigLink

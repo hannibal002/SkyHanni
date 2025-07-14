@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -62,17 +61,13 @@ class VisitorConfig {
     @ConfigEditorDropdown
     var highlightStatus: HighlightMode = HighlightMode.BOTH
 
-    enum class HighlightMode(
-        private val displayName: String,
-        private val legacyId: Int = -1
-    ) : HasLegacyId {
-        COLOR("Color Only", 0),
-        NAME("Name Only", 1),
-        BOTH("Both", 2),
-        DISABLED("Disabled", 3),
+    enum class HighlightMode(private val displayName: String) {
+        COLOR("Color Only"),
+        NAME("Name Only"),
+        BOTH("Both"),
+        DISABLED("Disabled"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 //#if FORGE
@@ -137,7 +138,7 @@ object QuickModMenuSwitch {
             }
             val nameSuffix = if (opening) " §7(opening...)" else ""
             val renderable = Renderable.link(
-                Renderable.string(nameFormat + mod.name),
+                StringRenderable(nameFormat + mod.name),
                 bypassChecks = true,
                 onLeftClick = { open(mod) },
                 condition = { System.currentTimeMillis() > lastGuiOpen + 250 },

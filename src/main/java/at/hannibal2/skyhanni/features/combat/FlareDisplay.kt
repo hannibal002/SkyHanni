@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
@@ -102,10 +103,10 @@ object FlareDisplay {
             if (newDisplay == null) {
                 newDisplay = buildList {
                     val displayTime = if (remainingTime.isNegative()) "§eSoon" else "§b${remainingTime.format()}"
-                    add(Renderable.string("$name: $displayTime"))
+                    add(StringRenderable("$name: $displayTime"))
                     if (config.showManaBuff) {
                         type.manaBuff?.let {
-                            add(Renderable.string(" §b$it §7mana regen"))
+                            add(StringRenderable(" §b$it §7mana regen"))
                         }
                     }
                 }

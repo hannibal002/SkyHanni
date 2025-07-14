@@ -15,6 +15,7 @@ import java.awt.Color
 import kotlin.math.max
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
+//$$ import org.joml.Matrix3x2f
 //$$ import org.joml.Matrix4f
 //#endif
 
@@ -41,7 +42,15 @@ object ShaderRenderUtils {
         this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
         //#if MC > 1.21
+        //#if MC < 1.21.6
         //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
+        //#endif
+        //#endif
+        //#if MC > 1.21.6
+        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.matrices)
+        //$$ this.modelViewMatrix = Matrix4f()
+        //$$     .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
+        //$$     .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
         //#endif
     }.also { extraApplies?.invoke(this) }
 

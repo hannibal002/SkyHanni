@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -58,26 +57,14 @@ public class ChestValueConfig {
     @ConfigEditorDropdown
     public SortingTypeEntry sortingType = SortingTypeEntry.DESCENDING;
 
-    public enum SortingTypeEntry implements HasLegacyId {
-        DESCENDING("Descending", 0),
-        ASCENDING("Ascending", 1),
+    public enum SortingTypeEntry {
+        DESCENDING("Descending"),
+        ASCENDING("Ascending"),
         ;
         private final String displayName;
-        private final int legacyId;
 
-        SortingTypeEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         SortingTypeEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override
@@ -91,26 +78,14 @@ public class ChestValueConfig {
     @ConfigEditorDropdown
     public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
 
-    public enum NumberFormatEntry implements HasLegacyId {
-        SHORT("Short", 0),
-        LONG("Long", 1);
+    public enum NumberFormatEntry{
+        SHORT("Short"),
+        LONG("Long");
 
         private final String displayName;
-        private final int legacyId;
 
-        NumberFormatEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         NumberFormatEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override

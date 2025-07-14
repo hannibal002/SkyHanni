@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -135,8 +136,13 @@ object ExperimentsAddonsHelper {
     }.sortedBy {
         hypixelUltrasequencerData.indexOf(it.slotNumber)
     }.forEachIndexed { slotIndex, slot ->
-        val alphaValue = (255 / (1 + slotIndex))
-        val slotColor = LorenzColor.GREEN.addOpacity(alphaValue)
+        if (slotIndex == 1) config.nextColor
+        val slotColor = if (slotIndex == 0) {
+            config.nextColor.getEffectiveColour()
+        } else {
+            val alphaValue = (255 / (slotIndex))
+            config.secondColor.getEffectiveColour().addAlpha(alphaValue)
+        }
         slot.highlight(slotColor)
     }
 
@@ -147,8 +153,7 @@ object ExperimentsAddonsHelper {
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
             val color = slot.stack.getLorenzColorOrNull() ?: return@forEach
             if (color !in listOf(nextColor, nextNextColor)) return@forEach
-            val alphaValue = if (color == nextColor) 255 else 128
-            val slotColor = LorenzColor.GREEN.addOpacity(alphaValue)
+            val slotColor = if (color == nextColor) config.nextColor else config.secondColor
             slot.highlight(slotColor)
         }
     }
@@ -159,7 +164,7 @@ object ExperimentsAddonsHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.enabled) return
         if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
-        if (!config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
+        if (currentAddonPhase != HelperPhase.REPLICATE) return
         event.handleChronomatronClick()
         event.handleUltrasequencerClick()
     }
@@ -169,7 +174,10 @@ object ExperimentsAddonsHelper {
         if (userChronomatronProgress.size == hypixelChronomatronData.size) return
         val clickedColor = item?.getLorenzColorOrNull()?.takeIf {
             it == hypixelChronomatronData[userChronomatronProgress.size]
-        } ?: return cancel()
+        } ?: run {
+            if (config.preventMisclicks) cancel()
+            return
+        }
         userChronomatronProgress.add(clickedColor)
         makePickblock()
     }
@@ -180,7 +188,10 @@ object ExperimentsAddonsHelper {
         val clickedSlot = slot.slotNumber.takeIf {
             val expectedSlot = hypixelUltrasequencerData[userUltrasequencerProgress.size]
             it == expectedSlot
-        } ?: return cancel()
+        } ?: run {
+            if (config.preventMisclicks) cancel()
+            return
+        }
         userUltrasequencerProgress.add(clickedSlot)
         makePickblock()
     }

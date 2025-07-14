@@ -262,8 +262,6 @@ object ItemUtils {
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
-    fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
-
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = MinecraftCompat.localPlayer
@@ -359,6 +357,10 @@ object ItemUtils {
         //#endif
     }
 
+    @Suppress("SpreadOperator")
+    fun createSkull(displayName: String, uuid: String, value: String, loreColl: Collection<String>) =
+        createSkull(displayName, uuid, value, *loreColl.toTypedArray())
+
     // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
         //#if MC < 1.21
@@ -384,7 +386,7 @@ object ItemUtils {
         return stack
         //#else
         //$$ val stack = ItemStack(Items.PLAYER_HEAD)
-        //$$ val profile = GameProfile(UUID.fromString(uuid), uuid)
+        //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         //$$ profile.properties.put("textures", Property("textures", value))
         //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
         //$$ stack.setCustomItemName(displayName)

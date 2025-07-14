@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMini
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -165,10 +164,6 @@ object CrimsonIsleReputationHelper {
         event.move(2, "misc.reputationHelperHotkey", "crimsonIsle.reputationHelper.hotkey")
         event.move(2, "misc.crimsonIsleReputationHelperPos", "crimsonIsle.reputationHelper.position")
         event.move(2, "misc.crimsonIsleReputationShowLocation", "crimsonIsle.reputationHelper.showLocation")
-
-        event.transform(15, "crimsonIsle.reputationHelper.showLocation") { element ->
-            ConfigUtils.migrateIntToEnum(element, ShowLocationEntry::class.java)
-        }
     }
 
     fun update() {
