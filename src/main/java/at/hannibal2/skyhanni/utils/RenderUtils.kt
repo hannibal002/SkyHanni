@@ -274,39 +274,6 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    @Deprecated("Use WorldRenderUtils' drawCylinderInWorld instead")
-    fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
-        color: Color,
-        location: LorenzVec,
-        radius: Float,
-        height: Float,
-    ) {
-        _drawCylinderInWorld(color, location.x, location.y, location.z, radius, height)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawPyramid instead")
-    fun SkyHanniRenderWorldEvent.drawPyramid(
-        topPoint: LorenzVec,
-        baseCenterPoint: LorenzVec,
-        baseEdgePoint: LorenzVec,
-        color: Color,
-        depth: Boolean = true,
-    ) {
-        _drawPyramid(topPoint, baseCenterPoint, baseEdgePoint, color, depth)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawCylinderInWorld instead")
-    fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
-        color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-        height: Float,
-    ) {
-        _drawCylinderInWorld(color, x, y, z, radius, height)
-    }
-
     @Deprecated("Use WorldRenderUtils' drawSphereInWorld instead")
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
