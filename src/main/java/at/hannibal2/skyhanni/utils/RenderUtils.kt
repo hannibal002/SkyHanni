@@ -289,49 +289,6 @@ object RenderUtils {
         _drawDynamicText(location, text, scaleMultiplier, yOff, hideTooCloseAt, smallestDistanceVew, ignoreBlocks, ignoreY, maxDistance)
     }
 
-    @Deprecated("Use WorldRenderUtils' draw3DPathWithWaypoint instead")
-    fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
-        path: Graph,
-        colorLine: Color,
-        lineWidth: Int,
-        depth: Boolean,
-        startAtEye: Boolean = true,
-        textSize: Double = 1.0,
-        waypointColor: Color =
-            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
-        bezierPoint: Double = 1.0,
-        showNodeNames: Boolean = false,
-        markLastBlock: Boolean = true,
-    ) {
-        _draw3DPathWithWaypoint(
-            path,
-            colorLine,
-            lineWidth,
-            depth,
-            startAtEye,
-            textSize,
-            waypointColor,
-            bezierPoint,
-            showNodeNames,
-            markLastBlock,
-        )
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawFilledBoundingBox instead")
-    fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
-        aabb: AxisAlignedBB,
-        c: Color,
-        alphaMultiplier: Float = 1f,
-        /**
-         * If set to `true`, renders the box relative to the camera instead of relative to the world.
-         * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
-         */
-        renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
-    ) {
-        _drawFilledBoundingBox(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers)
-    }
-
     @Deprecated("Use WorldRenderUtils' outlineTopFace instead")
     fun SkyHanniRenderWorldEvent.outlineTopFace(
         boundingBox: AxisAlignedBB,
