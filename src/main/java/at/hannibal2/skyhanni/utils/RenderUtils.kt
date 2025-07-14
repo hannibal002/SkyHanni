@@ -274,50 +274,6 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    @Deprecated("Use WorldRenderUtils' drawSphereInWorld instead")
-    fun SkyHanniRenderWorldEvent.drawSphereInWorld(
-        color: Color,
-        location: LorenzVec,
-        radius: Float,
-        segments: Int = 32,
-    ) {
-        _drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawSphereInWorld instead")
-    fun SkyHanniRenderWorldEvent.drawSphereInWorld(
-        color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-        segments: Int = 32,
-    ) {
-        _drawSphereInWorld(color, x, y, z, radius, segments)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawSphereWireframeInWorld instead")
-    fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
-        color: Color,
-        location: LorenzVec,
-        radius: Float,
-        segments: Int = 32,
-    ) {
-        _drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius, segments)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawSphereWireframeInWorld instead")
-    fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
-        color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-        segments: Int = 32,
-    ) {
-        _drawSphereWireframeInWorld(color, x, y, z, radius, segments)
-    }
-
     @Deprecated("Use WorldRenderUtils' drawDynamicText instead")
     fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
@@ -331,41 +287,6 @@ object RenderUtils {
         maxDistance: Int? = null,
     ) {
         _drawDynamicText(location, text, scaleMultiplier, yOff, hideTooCloseAt, smallestDistanceVew, ignoreBlocks, ignoreY, maxDistance)
-    }
-
-    @Deprecated("Use WorldRenderUtils' exactLocation instead")
-    fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
-
-    @Deprecated("Use WorldRenderUtils' exactLocation instead")
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
-        // TODO cache once per frame
-        val player = MinecraftCompat.localPlayer
-        val eyeHeight = player.getEyeHeight().toDouble()
-        PatcherFixes.onPlayerEyeLine()
-        return exactLocation(player).add(y = eyeHeight)
-    }
-
-    @Deprecated("Use WorldRenderUtils' exactBoundingBox instead")
-    fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
-        if (entity.isDead) return entity.entityBoundingBox
-        val offset = exactLocation(entity) - entity.getLorenzVec()
-        return entity.entityBoundingBox.offset(offset.x, offset.y, offset.z)
-    }
-
-    @Deprecated("Use WorldRenderUtils' exactPlayerEyeLocation instead")
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
-        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
-        return exactLocation(player) + add
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawLineToEye instead")
-    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        _drawLineToEye(location, color, lineWidth, depth)
-    }
-
-    @Deprecated("Use WorldRenderUtils' exactLocation instead")
-    fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
-        return WorldRenderUtils.exactLocation(entity, partialTicks)
     }
 
     @Deprecated("Use WorldRenderUtils' draw3DPathWithWaypoint instead")
