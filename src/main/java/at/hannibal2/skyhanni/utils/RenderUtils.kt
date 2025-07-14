@@ -176,16 +176,6 @@ object RenderUtils {
         GlStateManager.enableLighting()
     }
 
-    @Deprecated("Use WorldRenderUtils' drawString instead")
-    fun SkyHanniRenderWorldEvent.drawString(
-        location: LorenzVec,
-        text: String,
-        seeThroughBlocks: Boolean = false,
-        color: Color? = null,
-    ) {
-        _drawString(location, text, seeThroughBlocks, color)
-    }
-
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
