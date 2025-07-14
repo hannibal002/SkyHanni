@@ -216,15 +216,12 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         logger.debug("Attempting to switch to backup repo")
 
         try {
-            repoDirectory.deleteRecursively()
-            repoDirectory.mkdirs()
-            repoZipFile.createNewFile()
+            val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath)
+                ?: logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
 
-            val inputStream = RepoManager::class.java.classLoader.getResourceAsStream(backupRepoResourcePath)
-                ?: logger.throwError("Failed to find backup repo resource at '$backupRepoResourcePath'")
+            prepCleanRepoFileSystem()
 
             Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            prepCleanRepoFileSystem()
             repoFileSystem.unzipIgnoreFirstFolder(repoZipFile.absolutePath)
 
             commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
@@ -294,7 +291,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * @param command If true, will report the status of the repo to the user.
      * @param silentError If true, will not log errors to the console.
      */
-    private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true): Boolean {
+    private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true) {
         localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
         val (currentSha, currentCommitTime) = localRepoCommit
 
@@ -309,22 +306,12 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 diffCheck.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
-            return true
+            return
         }
 
         if (command) diffCheck.reportRepoOutdated()
-
-        // This is outside the scope of the 'local' file system - we need the zip to for sure be a file
-        repoDirectory.deleteRecursively()
-        repoDirectory.mkdirs()
         prepCleanRepoFileSystem()
 
-        try {
-            repoZipFile.createNewFile()
-        } catch (e: Error) {
-            logger.logErrorWithData(e, "Error creating $commonShortName repo zip file")
-            return false
-        }
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
             downloadFailed = true
             logger.logError("Failed to download the repo zip file from GitHub.")
@@ -337,11 +324,15 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         commitStorage.writeToFile(localRepoCommit)
         downloadFailed = false
         isUsingBackup = false
-        return true
+        return
     }
 
     private fun prepCleanRepoFileSystem() {
+        repoDirectory.deleteRecursively()
         repoFileSystem = RepoFileSystem.createAndClean(repoDirectory, config.unzipToMemory)
+        repoDirectory.mkdirs()
+        repoZipFile.mkdirs()
+        repoZipFile.createNewFile()
     }
 
     fun reloadLocalRepo(answerMessage: String = "$commonName Repo loaded from local files successfully.") {
