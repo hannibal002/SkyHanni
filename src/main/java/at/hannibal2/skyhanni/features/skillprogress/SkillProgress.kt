@@ -22,22 +22,24 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.Quad
+import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -48,8 +50,8 @@ object SkillProgress {
     val config get() = SkyHanniMod.feature.skillProgress
     private val barConfig get() = config.skillProgressBarConfig
     private val allSkillConfig get() = config.allSkillDisplayConfig
+    private val customGoalConfig get() = config.customGoalConfig
     val etaConfig get() = config.skillETADisplayConfig
-    val customGoalConfig get() = config.customGoalConfig
 
     private var skillExpPercentage = 0.0
     private var display = emptyList<Renderable>()
@@ -100,14 +102,16 @@ object SkillProgress {
     private fun renderDisplay() {
         when (val textAlignment = config.textAlignmentProperty.get()) {
             SkillProgressConfig.TextAlignment.NONE -> {
-                config.displayPosition.renderStringsAndItems(listOf(display), posLabel = "Skill Progress")
+                val content = HorizontalContainerRenderable(display)
+                config.displayPosition.renderRenderable(content, posLabel = "Skill Progress")
             }
 
             SkillProgressConfig.TextAlignment.CENTERED,
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
-                val content = horizontalContainer(display, horizontalAlign = textAlignment.alignment)
+                val horizontalAlignment = textAlignment.alignment ?: RenderUtils.HorizontalAlignment.LEFT
+                val content = HorizontalContainerRenderable(display, horizontalAlign = horizontalAlignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
                 config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
@@ -280,16 +284,16 @@ object SkillProgress {
 
             val (level, currentXP, currentXPMax, totalXP) =
                 if (useCustomGoalLevel)
-                    Quad(skillInfo.overflowLevel, have, need, xp)
+                    SkillLevel(skillInfo.overflowLevel, have, need, xp)
                 else if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
-                    Quad(
+                    SkillLevel(
                         skillInfo.overflowLevel,
                         skillInfo.overflowCurrentXp,
                         skillInfo.overflowCurrentXpMax,
                         skillInfo.overflowTotalXp,
                     )
                 else
-                    Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
+                    SkillLevel(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
             this[skill] = if (level == -1) {
                 Renderable.clickable(
@@ -354,22 +358,22 @@ object SkillProgress {
             }
         }
 
-        add(Renderable.string("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel"))
+        add(StringRenderable("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel"))
 
         if (useCustomGoalLevel)
-            add(Renderable.string("§7Needed XP: §e${remaining.addSeparators()}"))
+            add(StringRenderable("§7Needed XP: §e${remaining.addSeparators()}"))
 
         var xpInterp = xpInfo.xpGainHour
 
         if (have > need) {
-            add(Renderable.string("§7In §cIncrease level cap!"))
+            add(StringRenderable("§7In §cIncrease level cap!"))
         } else if (xpInfo.xpGainHour < 1000) {
-            add(Renderable.string("§7In §cN/A"))
+            add(StringRenderable("§7In §cN/A"))
         } else {
             val duration = ((remaining) * 1000 * 60 * 60 / xpInterp.toLong()).milliseconds
             val format = duration.format(TimeUnit.DAY)
             add(
-                Renderable.string(
+                StringRenderable(
                     "§7In §b$format " +
                         if (xpInfo.isActive) "" else "§c(PAUSED)",
                 ),
@@ -377,11 +381,11 @@ object SkillProgress {
         }
 
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
-            add(Renderable.string("§7XP/h: §cN/A"))
+            add(StringRenderable("§7XP/h: §cN/A"))
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
             add(
-                Renderable.string(
+                StringRenderable(
                     "§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
                         if (xpInfo.isActive) "" else "§c(PAUSED)",
                 ),
@@ -427,21 +431,21 @@ object SkillProgress {
 
         val (level, currentXP, currentXPMax, _) =
             if (useCustomGoalLevel && customGoalConfig.enableInDisplay)
-                Quad(currentLevel, xp + add, need, xpTotalCurrent)
+                SkillLevel(currentLevel, xp + add, need, xpTotalCurrent)
             else if (config.overflowConfig.enableInDisplay.get())
-                Quad(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
+                SkillLevel(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
             else
-                Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
+                SkillLevel(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
 
         if (config.showLevel.get())
-            add(Renderable.string("§9[§d$level§9] "))
+            add(StringRenderable("§9[§d$level§9] "))
 
         if (config.useIcon.get()) {
-            add(Renderable.itemStack(activeSkill.item, 1.0))
+            add(ItemStackRenderable(activeSkill.item, 1.0))
         }
 
         add(
-            Renderable.string(
+            StringRenderable(
                 buildString {
                     append("§b+${skill.lastGain} ")
 
@@ -540,5 +544,5 @@ object SkillProgress {
         xpInfo.isActive = true
     }
 
-    private fun isDisplayEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isDisplayEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get()
 }

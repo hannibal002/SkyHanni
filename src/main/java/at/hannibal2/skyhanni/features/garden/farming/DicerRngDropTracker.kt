@@ -7,20 +7,21 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -32,7 +33,7 @@ import java.util.regex.Pattern
 object DicerRngDropTracker {
 
     private val itemDrops = mutableListOf<ItemDrop>()
-    private val config get() = GardenApi.config.dicerCounters
+    private val config get() = GardenApi.config.dicerRngDropTracker
     private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker }) {
         drawDisplay(it)
     }
@@ -104,8 +105,6 @@ object DicerRngDropTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.hideChat && !config.display) return
-
         val message = event.message
         for (drop in itemDrops) {
             drop.pattern.matchMatcher(message) {
@@ -125,13 +124,13 @@ object DicerRngDropTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<Searchable> {
+    private fun drawDisplay(data: Data) = buildList {
         val cropInHand = cropInHand ?: return@buildList
 
         val topLine = mutableListOf<Renderable>()
-        topLine.add(Renderable.itemStack(cropInHand.icon))
-        topLine.add(Renderable.string("§7Dicer Tracker:"))
-        add(Renderable.horizontalContainer(topLine).toSearchable())
+        topLine.add(ItemStackRenderable(cropInHand.icon))
+        topLine.add(StringRenderable("§7Dicer Tracker:"))
+        add(HorizontalContainerRenderable(topLine).toSearchable())
 
         val items = data.drops[cropInHand] ?: return@buildList
         if (config.compact.get()) {
@@ -157,7 +156,7 @@ object DicerRngDropTracker {
         val crop = event.crop
         cropInHand = if (crop == CropType.MELON || crop == CropType.PUMPKIN) crop else null
         if (cropInHand != null) {
-            toolName = event.toolItem!!.name
+            toolName = event.toolItem!!.displayName
         }
         tracker.update()
     }
@@ -170,7 +169,7 @@ object DicerRngDropTracker {
     }
 
     init {
-        tracker.initRenderer({ config.pos }) { shouldShowDisplay() }
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -182,7 +181,7 @@ object DicerRngDropTracker {
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Pattern)
 
-    fun isEnabled() = GardenApi.inGarden() && config.display
+    private fun isEnabled() = GardenApi.inGarden() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -203,6 +202,10 @@ object DicerRngDropTracker {
 
             ConfigManager.gson.toJsonTree(items)
         }
+
+        event.move(87, "garden.dicerCounters.pos", "garden.dicerCounters.position")
+        event.move(87, "garden.dicerCounters.display", "garden.dicerCounters.enabled")
+        event.move(88, "garden.dicerCounters", "garden.dicerRngDropTracker")
     }
 
     @HandleEvent

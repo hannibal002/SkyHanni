@@ -9,11 +9,11 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -73,9 +73,13 @@ object TiaRelayHelper {
         for (sound in sounds.toMutableMap()) {
             if (sound.value.name != name) {
                 ChatUtils.userError("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
-                ChatUtils.clickableChat("Click here to run /togglemusic", onClick = {
-                    HypixelCommands.toggleMusic()
-                }, "§eClick to run /togglemusic!")
+                ChatUtils.clickableChat(
+                    "Click here to run /togglemusic",
+                    onClick = {
+                        HypixelCommands.toggleMusic()
+                    },
+                    "§eClick to run /togglemusic!",
+                )
                 sounds.clear()
                 return
             }

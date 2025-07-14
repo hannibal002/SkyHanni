@@ -11,13 +11,15 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 
 @SkyHanniModule
 object MiningEventDisplay {
@@ -44,8 +46,8 @@ object MiningEventDisplay {
     private fun updateEvents() = buildList {
         if (MiningEventTracker.apiError) {
             val count = MiningEventTracker.apiErrorCount
-            add(Renderable.string("§cMining Event API Error! ($count)"))
-            add(Renderable.string("§cSwap servers to try again!"))
+            add(StringRenderable("§cMining Event API Error! ($count)"))
+            add(StringRenderable("§cSwap servers to try again!"))
         }
 
         val sortedIslandEventData = islandEventData.entries
@@ -62,7 +64,7 @@ object MiningEventDisplay {
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
                 MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
-                MiningEventConfig.ShowType.CURRENT -> islandType.isInIsland()
+                MiningEventConfig.ShowType.CURRENT -> islandType.isCurrent()
                 else -> true
             }
 
@@ -75,31 +77,27 @@ object MiningEventDisplay {
             if (!shouldShow) continue
             val upcomingEvents = formatUpcomingEvents(eventDetails.islandEvents, eventDetails.lastEvent)
             val islandName = if (config.islandAsIcon) {
-                Renderable.horizontalContainer(getIslandIcon(islandType))
+                HorizontalContainerRenderable(getIslandIcon(islandType))
             } else {
-                Renderable.string("§a${islandType.displayName}§8:")
+                StringRenderable("§a${islandType.displayName}§8:")
             }
-            add(Renderable.horizontalContainer(listOf(islandName) + upcomingEvents, 3))
+            add(HorizontalContainerRenderable(listOf(islandName) + upcomingEvents, 3))
         }
     }
 
+    private val mithrilOreItem by lazy { "MITHRIL_ORE".toInternalName().getItemStack() }
+    private val perfRubyItem by lazy { "PERFECT_RUBY_GEM".toInternalName().getItemStack() }
     private fun getIslandIcon(islandType: IslandType) = listOf(
         when (islandType) {
-            IslandType.DWARVEN_MINES -> Renderable.itemStack(
-                "MITHRIL_ORE".toInternalName().getItemStack(),
-            )
-
-            IslandType.CRYSTAL_HOLLOWS -> Renderable.itemStack(
-                "PERFECT_RUBY_GEM".toInternalName().getItemStack(),
-            )
-
+            IslandType.DWARVEN_MINES -> ItemStackRenderable(mithrilOreItem)
+            IslandType.CRYSTAL_HOLLOWS -> ItemStackRenderable(perfRubyItem)
             else -> unknownDisplay
         },
-        Renderable.string("§8:"),
+        StringRenderable("§8:"),
     )
 
-    private val unknownDisplay = Renderable.string("§7???")
-    private val transitionDisplay = Renderable.string("§8->")
+    private val unknownDisplay = StringRenderable("§7???")
+    private val transitionDisplay = StringRenderable("§8->")
 
     private fun formatUpcomingEvents(events: List<RunningEventType>, lastEvent: MiningEventType?): Array<Renderable> {
         val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
@@ -133,7 +131,7 @@ object MiningEventDisplay {
     }
 
     private fun shouldDisplay(): Boolean {
-        val isOnValidMiningLocation = LorenzUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
+        val isOnValidMiningLocation = SkyBlockUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
 
         return (isOnValidMiningLocation || OutsideSBFeature.MINING_EVENT_DISPLAY.isSelected()) && config.enabled
     }

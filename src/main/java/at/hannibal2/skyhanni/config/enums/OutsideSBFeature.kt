@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.enums
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 enum class OutsideSBFeature(private val displayName: String) {
     MODIFY_VISUAL_WORDS("Modify Visual Words"),
@@ -20,10 +20,11 @@ enum class OutsideSBFeature(private val displayName: String) {
     HIGHLIGHT_PARTY_MEMBERS("Highlight Party Members"),
     MOVEMENT_SPEED("Movement Speed"),
     CUSTOM_SCOREBOARD("Custom Scoreboard (only on Hypixel)"),
+    MAYOR_OVERLAY("Mayor Overlay"),
     MINING_EVENT_DISPLAY("Mining Event Display"),
     ;
 
     override fun toString() = displayName
 
-    fun isSelected() = Minecraft.getMinecraft().thePlayer != null && SkyHanniMod.feature.misc.showOutsideSB.get().contains(this)
+    fun isSelected() = MinecraftCompat.localPlayerExists && SkyHanniMod.feature.misc.showOutsideSB.get().contains(this)
 }

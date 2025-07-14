@@ -9,20 +9,20 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 
 @SkyHanniModule
 object CraftMaterialCollector {
@@ -41,13 +41,13 @@ object CraftMaterialCollector {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
-        val correctItem = items[23]?.name == "§aCrafting Table"
-        val correctSuperCraftItem = items[32]?.name == "§aSupercraft"
+        val correctItem = items[23]?.displayName == "§aCrafting Table"
+        val correctSuperCraftItem = items[32]?.displayName == "§aSupercraft"
 
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
 
-        val recipeName = items[25]?.itemName ?: return
+        val recipeName = items[25]?.repoItemName ?: return
         showRecipe(calculateMaterialsNeeded(event.inventoryItemsPrimitive), recipeName)
     }
 
@@ -58,16 +58,16 @@ object CraftMaterialCollector {
         val neededMaterials = mutableListOf<PrimitiveItemStack>()
         display = buildList {
             val totalPrice = calculateTotalPrice(recipeMaterials, 1)
-            add(Renderable.string("§7Craft $recipeName §7(§6${totalPrice.shortFormat()}§7)"))
+            add(StringRenderable("§7Craft $recipeName §7(§6${totalPrice.shortFormat()}§7)"))
             for (item in recipeMaterials) {
                 val material = item.internalName
                 val amount = item.amount
-                var text = "§8${amount.addSeparators()}x " + material.itemName
+                var text = "§8${amount.addSeparators()}x " + material.repoItemName
                 if (material.isBazaarItem() || material.isAuctionHouseItem()) {
                     neededMaterials.add(item)
                     text += " §6${(material.getPrice() * amount).shortFormat()}"
                 }
-                add(Renderable.string(text))
+                add(StringRenderable(text))
             }
             if (neededMaterials.isNotEmpty()) {
                 add(
@@ -102,10 +102,10 @@ object CraftMaterialCollector {
 
     private fun updateDisplay() {
         display = buildList {
-            add(Renderable.string("§7Buy items:"))
+            add(StringRenderable("§7Buy items:"))
             for ((material, amount) in neededMaterials) {
                 val priceMultiplier = amount * multiplier
-                val itemName = material.itemName
+                val itemName = material.repoItemName
                 val text = "§8${priceMultiplier.addSeparators()}x " + itemName + " §6${
                     (material.getPrice() * priceMultiplier).shortFormat(false)
                 }"
@@ -171,6 +171,6 @@ object CraftMaterialCollector {
         config.craftMaterialsFromBazaarPosition.renderRenderables(display, posLabel = "Craft Material Collector")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.craftMaterialsFromBazaar
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.craftMaterialsFromBazaar
 
 }

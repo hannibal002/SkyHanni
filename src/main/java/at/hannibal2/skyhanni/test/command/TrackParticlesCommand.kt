@@ -7,18 +7,19 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import net.minecraft.util.EnumParticleTypes
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -36,11 +37,12 @@ object TrackParticlesCommand {
     private val position get() = SkyHanniMod.feature.dev.debug.trackParticlePosition
 
     private var display: List<Renderable> = emptyList()
-    private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
+    private var worldParticles = emptyMap<LorenzVec, List<ReceiveParticleEvent>>()
+    private val ignoredTypes = mutableListOf<EnumParticleTypes>()
 
     // TODO write abstract code for this and TrackSoundsCommand
     private fun command(args: Array<String>) {
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             ChatUtils.userError("This command only works in SkyBlock!")
             return
         }
@@ -54,9 +56,26 @@ object TrackParticlesCommand {
             return
         }
         if (isRecording) {
+            //#if TODO
+            args.getOrNull(0)?.let { name ->
+                val type = getParticleTypeByName(name)
+                if (type == null) {
+                    ChatUtils.userError("unknown particle type: '$name'")
+                    return
+                }
+                if (ignoredTypes.contains(type)) {
+                    ignoredTypes.remove(type)
+                    ChatUtils.chat("Removed $type from ignored types.")
+                } else {
+                    ignoredTypes.add(type)
+                    ChatUtils.chat("Add $type to ignored types.")
+                }
+                return
+            }
+            //#endif
             ChatUtils.userError(
                 "Still tracking particles, wait for the other tracking to complete before starting a new one, " +
-                    "or type §e/shtrackparticles end §cto end it prematurely"
+                    "or type §e/shtrackparticles end §cto end it prematurely",
             )
             return
         }
@@ -72,15 +91,21 @@ object TrackParticlesCommand {
         }
     }
 
+    //#if TODO
+    // TODO move into utils
+    private fun getParticleTypeByName(name: String): EnumParticleTypes? =
+        EnumParticleTypes.entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
+    //#endif
+
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isRecording) return
 
         val particlesToDisplay = particles.takeWhile { startTime.passedSince() - it.first < 3.seconds }
 
         display = particlesToDisplay
             .take(10).reversed().map {
-                Renderable.string("§3" + it.second.type + " §8c:" + it.second.count + " §7s:" + it.second.speed)
+                StringRenderable("§3" + it.second.type + " §8c:" + it.second.count + " §7s:" + it.second.speed)
             }
         worldParticles = particlesToDisplay.map { it.second }.groupBy { it.location }
 
@@ -97,12 +122,15 @@ object TrackParticlesCommand {
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (cutOffTime.isInPast()) return
+        //#if TODO
+        if (event.type in ignoredTypes) return
+        //#endif
         event.distanceToPlayer // Need to call to initialize Lazy
         particles.addFirst(startTime.passedSince() to event)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (cutOffTime.isInPast()) return
         position.renderRenderables(display, posLabel = "Track particles log")
     }

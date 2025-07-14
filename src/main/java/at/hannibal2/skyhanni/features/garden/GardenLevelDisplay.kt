@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -30,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -44,6 +44,10 @@ object GardenLevelDisplay {
         }
 
     private val patternGroup = RepoPattern.group("garden.level")
+
+    /**
+     * REGEX-TEST: §2§l§m                §f§l§m    §r §e7,891§6/§e10k
+     */
     private val expToNextLevelPattern by patternGroup.pattern(
         "inventory.nextxp",
         ".* §e(?<nextLevelExp>.*)§6/.*",
@@ -60,14 +64,27 @@ object GardenLevelDisplay {
         "inventory.overflow",
         ".*§r §6(?<overflow>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Progress to Level 15: §e78.9%
+     */
     private val gardenLevelPattern by patternGroup.pattern(
         "inventory.levelprogress",
         "§7Progress to Level (?<currentLevel>[^:]*).*",
     )
+
+    /**
+     * REGEX-TEST: §7§8Max level reached!
+     * REGEX-TEST: §5§o§7§8Max level reached!
+     */
     private val gardenMaxLevelPattern by patternGroup.pattern(
         "inventory.max",
-        "§5§o§7§8Max level reached!",
+        "(?:§5§o)?§7§8Max level reached!",
     )
+
+    /**
+     * REGEX-TEST:     §r§8+§r§215 §r§7Garden Experience
+     */
     private val visitorRewardPattern by patternGroup.pattern(
         "chat.increase",
         " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience",
@@ -117,7 +134,7 @@ object GardenLevelDisplay {
             "SkyBlock Menu" -> event.inventoryItems[10] ?: return
             else -> return
         }
-        gardenItemNamePattern.matchMatcher(item.name.removeColor()) {
+        gardenItemNamePattern.matchMatcher(item.displayName.removeColor()) {
             val level = groupOrNull("currentLevel")
             if (level != null) useRomanNumerals = level.isRoman()
         } ?: return
@@ -162,7 +179,7 @@ object GardenLevelDisplay {
 
         val iterator = event.toolTip.listIterator()
         if (slotIndex == 4 && currentLevel > 15) {
-            event.itemStack.name = "§aGarden Level ${currentLevel.toRomanIfNecessary()}"
+            event.itemStack.setCustomItemName("§aGarden Level ${currentLevel.toRomanIfNecessary()}")
         }
         var next = false
         for (line in iterator) {

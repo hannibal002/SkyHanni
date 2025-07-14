@@ -12,8 +12,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
@@ -59,6 +57,7 @@ object PestApi {
         }
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
+    var lastPestSpawnTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     // TODO move into repo
@@ -75,7 +74,7 @@ object PestApi {
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
-    private val patternGroup = RepoPattern.group("garden.pestsapi")
+    val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
         " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",
@@ -184,7 +183,6 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestSpawn(event: PestSpawnEvent) {
-        PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plotNames = event.plotNames
         for (plotName in plotNames) {
             val plot = GardenPlotApi.getPlotByName(plotName)
@@ -265,7 +263,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
             checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
             firstScoreboardCheck = true
@@ -274,7 +272,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastPestKillTime = SimpleTimeMark.farPast()
         lastTimeVacuumHold = SimpleTimeMark.farPast()
         gardenJoinTime = SimpleTimeMark.now()

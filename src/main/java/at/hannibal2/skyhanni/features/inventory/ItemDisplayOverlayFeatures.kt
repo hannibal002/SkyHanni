@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
@@ -12,6 +14,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EVOLVING_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.MASTER_SKULL_TIER
@@ -22,16 +25,13 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.TIME_POCKET_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -39,7 +39,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -47,8 +46,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
@@ -73,6 +75,7 @@ object ItemDisplayOverlayFeatures {
         "masterskull.id",
         "MASTER_SKULL_TIER_(?<tier>\\d)",
     )
+
     /**
      * REGEX-TEST: §7Vacuum Bag: §21 Pest
      * REGEX-TEST: §7Vacuum Bag: §2444 Pests
@@ -157,13 +160,17 @@ object ItemDisplayOverlayFeatures {
             return "§b$year"
         }
 
-        if (PET_LEVEL.isSelected()) {
-            if (item.getItemCategoryOrNull() == ItemCategory.PET) {
-                val level = item.getPetLevel()
-                if (level != ItemUtils.maxPetLevel(itemName)) {
-                    return level.toString()
-                }
-            }
+        if (PET_LEVEL.isSelected() && item.getItemCategoryOrNull() == ItemCategory.PET) {
+            item.getPetInfo()?.takeIf {
+                // 0.0 Would probably work, but rounding errors can occur
+                // due to hypixel's imprecision in storage.
+                it.exp > 10.0 || PetStorageApi.mainPetMenuNamePattern.matches(
+                    InventoryUtils.openInventoryName()
+                )
+            } ?: return null
+            val level = item.getPetLevel()
+            val maxLevel = item.getMaxPetLevel()
+            if (level != maxLevel) return level.toString()
         }
 
         if (MINION_TIER.isSelected() && itemName.contains(" Minion ") &&
@@ -211,7 +218,7 @@ object ItemDisplayOverlayFeatures {
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionApi.isCollectionTier0(lore)) return "0"
-                val name = item.name
+                val name = item.displayName
                 if (name.startsWith("§e")) {
                     val text = name.split(" ").last()
                     return "" + text.romanToDecimalIfNecessary()
@@ -221,7 +228,7 @@ object ItemDisplayOverlayFeatures {
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && internalName == "RANCHERS_BOOTS".toInternalName()) {
             item.getRanchersSpeed()?.let {
-                val isUsingBlackCat = PetApi.isCurrentPet("Black Cat")
+                val isUsingBlackCat = CurrentPetApi.isCurrentPet("Black Cat")
                 val helmet = InventoryUtils.getHelmet()?.getInternalName()
                 val hand = InventoryUtils.getItemInHand()?.getInternalName()
                 val racingHelmet = "RACING_HELMET".toInternalName()
@@ -245,7 +252,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            dungeonPotionPattern.matchMatcher(item.name.removeColor()) {
+            dungeonPotionPattern.matchMatcher(item.displayName.removeColor()) {
                 return when (val level = group("level").romanToDecimal()) {
                     in 1..2 -> "§f$level"
                     in 3..4 -> "§a$level"
@@ -271,7 +278,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (TIME_POCKET_ITEMS.isSelected()) {
+        if (EVOLVING_ITEMS.isSelected()) {
             item.getSecondsHeld()?.let { seconds ->
                 return "§a${(seconds / 3600)}"
             }
@@ -339,14 +346,14 @@ object ItemDisplayOverlayFeatures {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "inventory.itemNumberAsStackSize") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
-        }
         event.transform(29, "inventory.itemNumberAsStackSize") { element ->
             fixRemovedConfigElement(element)
         }
         event.transform(70, "inventory.itemNumberAsStackSize") { element ->
             migrateTimePocketItems(element)
+        }
+        event.transform(86, "inventory.itemNumberAsStackSize") { element ->
+            fixRenamedConfigElement(element, "TIME_POCKET_ITEMS", "EVOLVING_ITEMS")
         }
     }
 
@@ -355,6 +362,19 @@ object ItemDisplayOverlayFeatures {
         val newList = JsonArray()
         for (element in data.asJsonArray) {
             if (element.asString == "REMOVED") continue
+            newList.add(element)
+        }
+        return newList
+    }
+
+    private fun fixRenamedConfigElement(data: JsonElement, oldName: String, newName: String): JsonElement {
+        if (!data.isJsonArray) return data
+        val newList = JsonArray()
+        for (element in data.asJsonArray) {
+            if (element.asString == oldName) {
+                newList.add(JsonPrimitive(newName))
+                continue
+            }
             newList.add(element)
         }
         return newList

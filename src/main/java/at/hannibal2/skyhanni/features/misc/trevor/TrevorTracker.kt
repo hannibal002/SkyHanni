@@ -3,16 +3,17 @@ package at.hannibal2.skyhanni.features.misc.trevor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Matcher
 
@@ -41,7 +42,7 @@ object TrevorTracker {
         "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.",
     )
 
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
 
     private val peltsPerSecond = mutableListOf<Int>()
     private var peltsPerHour = 0
@@ -75,24 +76,17 @@ object TrevorTracker {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         peltsPerSecond.clear()
         peltsPerHour = 0
         stoppedChecks = 0
     }
 
-    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
-        for (index in config.textFormat) {
-            // TODO, change functionality to use enum rather than ordinals
-            newList.add(map[index.ordinal])
-        }
-        return newList
-    }
+    // TODO change functionality to use enum rather than ordinals
+    private fun formatDisplay(map: List<Renderable>) = config.textFormat.map { map[it.ordinal] }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!TrevorFeatures.onFarmingIsland()) return
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
 
         selfKillMobPattern.matchMatcher(event.message) {
@@ -125,30 +119,29 @@ object TrevorTracker {
         display = formatDisplay(drawTrapperDisplay(storage))
     }
 
-    private fun drawTrapperDisplay(storage: ProfileSpecificStorage.TrapperData) = buildList<List<Any>> {
-        addAsSingletonList("§b§lTrevor Data Tracker")
-        addAsSingletonList("§b${storage.questsDone.addSeparators()} §9Quests Started")
-        addAsSingletonList("§b${storage.peltsGained.addSeparators()} §5Total Pelts Gained")
-        addAsSingletonList("§b${peltsPerHour.addSeparators()} §5Pelts Per Hour")
-        addAsSingletonList("")
-        addAsSingletonList("§b${storage.killedAnimals.addSeparators()} §cKilled Animals")
-        addAsSingletonList("§b${storage.selfKillingAnimals.addSeparators()} §cSelf Killing Animals")
-        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.TRACKABLE] ?: 0).addSeparators()} §fTrackable Animals")
-        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.UNTRACKABLE] ?: 0).addSeparators()} §aUntrackable Animals")
-        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.UNDETECTED] ?: 0).addSeparators()} §9Undetected Animals")
-        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.ENDANGERED] ?: 0).addSeparators()} §5Endangered Animals")
-        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.ELUSIVE] ?: 0).addSeparators()} §6Elusive Animals")
+    private fun drawTrapperDisplay(storage: ProfileSpecificStorage.TrapperData) = buildList {
+        addString("§b§lTrevor Data Tracker")
+        addString("§b${storage.questsDone.addSeparators()} §9Quests Started")
+        addString("§b${storage.peltsGained.addSeparators()} §5Total Pelts Gained")
+        addString("§b${peltsPerHour.addSeparators()} §5Pelts Per Hour")
+        addString("")
+        addString("§b${storage.killedAnimals.addSeparators()} §cKilled Animals")
+        addString("§b${storage.selfKillingAnimals.addSeparators()} §cSelf Killing Animals")
+        addString("§b${(storage.animalRarities[TrapperMobRarity.TRACKABLE] ?: 0).addSeparators()} §fTrackable Animals")
+        addString("§b${(storage.animalRarities[TrapperMobRarity.UNTRACKABLE] ?: 0).addSeparators()} §aUntrackable Animals")
+        addString("§b${(storage.animalRarities[TrapperMobRarity.UNDETECTED] ?: 0).addSeparators()} §9Undetected Animals")
+        addString("§b${(storage.animalRarities[TrapperMobRarity.ENDANGERED] ?: 0).addSeparators()} §5Endangered Animals")
+        addString("§b${(storage.animalRarities[TrapperMobRarity.ELUSIVE] ?: 0).addSeparators()} §6Elusive Animals")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderStringsAndItems(display, posLabel = "Trevor Tracker")
+        config.position.renderRenderables(display, posLabel = "Trevor Tracker")
     }
 
     private fun shouldDisplay(): Boolean {
         if (!config.dataTracker) return false
-        if (!TrevorFeatures.onFarmingIsland()) return false
         if (TrevorFeatures.inTrapperDen) return true
         return when (config.displayType) {
             true -> (TrevorFeatures.inBetweenQuests || TrevorFeatures.questActive)

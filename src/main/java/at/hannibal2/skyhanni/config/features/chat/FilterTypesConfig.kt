@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -10,17 +11,29 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "")
     @Accordion
-    var powderMining: PowderMiningConfig = PowderMiningConfig()
+    val powderMining: PowderMiningConfig = PowderMiningConfig()
 
     @Expose
     @ConfigOption(name = "Crystal Nucleus", desc = "")
     @Accordion
-    var crystalNucleus: CrystalNucleusConfig = CrystalNucleusConfig()
+    val crystalNucleus: CrystalNucleusConfig = CrystalNucleusConfig()
+
+    @Expose
+    @ConfigOption(name = "Foraging", desc = "")
+    @OnlyModern
+    @Accordion
+    val foraging: ForagingFilterConfig = ForagingFilterConfig()
+
+    @Expose
+    @ConfigOption(name = "Hunting", desc = "")
+    @OnlyModern
+    @Accordion
+    val hunting: HuntingFilterConfig = HuntingFilterConfig()
 
     @Expose
     @ConfigOption(name = "Stash Messages", desc = "")
     @Accordion
-    var stashMessages: StashConfig = StashConfig()
+    val stashMessages: StashConfig = StashConfig()
 
     @Expose
     @ConfigOption(
@@ -96,6 +109,12 @@ class FilterTypesConfig {
     var fireSale: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Reward Bundles", desc = "Hide the reminders to claim seasonal reward bundles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var rewardBundles: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Event Level Up", desc = "Hide event level up messages.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -131,6 +150,12 @@ class FilterTypesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var gardenNoPest: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Legacy Items Warning", desc = "Hide the legacy items in sacks/storage warning.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var legacyItemsWarning: Boolean = false
 
     @Expose
     @ConfigOption(name = "Block Alpha Achievements", desc = "Hide achievement messages while on the Alpha network.")

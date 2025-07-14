@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 @SkyHanniModule
 object ChromaManager {
 
-    val config get() = SkyHanniMod.feature.gui.chroma
+    val config get(): ChromaConfig = SkyHanniMod.feature.gui.chroma
 
     @JvmStatic
     fun resetChromaSettings() {

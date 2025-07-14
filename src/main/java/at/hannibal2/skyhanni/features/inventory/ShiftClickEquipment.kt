@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeShiftClick
+import at.hannibal2.skyhanni.utils.InventoryUtils.makeShiftClick
 import net.minecraft.client.gui.inventory.GuiChest
 
 @SkyHanniModule

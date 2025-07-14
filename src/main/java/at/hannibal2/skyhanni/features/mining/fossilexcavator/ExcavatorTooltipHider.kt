@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -33,7 +32,7 @@ object ExcavatorTooltipHider {
         }
 
         if (config.hideDirt) {
-            val isDirt = dirtPattern.matches(event.itemStack.name)
+            val isDirt = dirtPattern.matches(event.itemStack.displayName)
             if (isDirt) {
                 event.cancel()
             }

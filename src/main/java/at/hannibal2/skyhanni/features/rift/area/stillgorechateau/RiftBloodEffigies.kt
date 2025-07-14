@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -19,12 +18,12 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.minutes
@@ -85,7 +84,7 @@ object RiftBloodEffigies {
         locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) }?.let { locations.indexOf(it) }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         effigies.values.forEach { it.reset() }
     }
 
@@ -148,15 +147,15 @@ object RiftBloodEffigies {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 15.0)) {
+        eLoop@for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 15.0)) {
             effigiesTimerPattern.matchMatcher(entity.name) {
-                val index = getIndex(entity) ?: continue
+                val index = getIndex(entity) ?: continue@eLoop
                 val time = TimeUtils.getDuration(group("time"))
                 effigies[index]?.let {
                     it.state = EffigyState.BROKEN
                     it.respawnTime = SimpleTimeMark.now() + time
                 }
-                continue
+                continue@eLoop
             }
 
             if (effigiesBreakPattern.matches(entity.name)) {
@@ -183,7 +182,7 @@ object RiftBloodEffigies {
                             event.drawDynamicText(location, "§7Unknown Time ($name)", 1.5)
                             continue
                         }
-                    } else if (config.respawningSoon && effigy.respawnTime.timeUntil() < config.respwningSoonTime.minutes) {
+                    } else if (config.respawningSoon && effigy.respawnTime.timeUntil() < config.respawningSoonTime.minutes) {
                         event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
                         val time = effigy.respawnTime.timeUntil().format()
                         event.drawDynamicText(location, "§e$name respawning in §b$time", 1.5)
@@ -217,5 +216,8 @@ object RiftBloodEffigies {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
+
+        val basePath = "rift.area.stillgoreChateau.bloodEffigies"
+        event.move(82, "$basePath.respwningSoonTime", "$basePath.respawningSoonTime")
     }
 }

@@ -1,22 +1,27 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenCropTimeCommand {
 
     private val config get() = GardenApi.config.moneyPerHours
 
-    fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         if (!config.display) {
             ChatUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
@@ -40,10 +45,10 @@ object GardenCropTimeCommand {
         val map = mutableMapOf<String, Long>()
         for (entry in multipliers) {
             val internalName = entry.key
-            val itemName = internalName.itemName
+            val itemName = internalName.repoItemName
             if (itemName.removeColor().lowercase().contains(searchName)) {
                 val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
-                val baseName = baseId.itemName
+                val baseName = baseId.repoItemName
                 val crop = CropType.getByName(baseName.removeColor())
 
                 val fullAmount = baseAmount.toLong() * amount
@@ -70,5 +75,15 @@ object GardenCropTimeCommand {
         }
 
         ChatUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcroptime") {
+            description =
+                "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
+            category = CommandCategory.USERS_ACTIVE
+            legacyCallbackArgs { onCommand(it) }
+        }
     }
 }

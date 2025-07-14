@@ -3,29 +3,36 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
-open class SkyHanniItemTracker<Data : ItemTrackerData>(
+open class
+SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
@@ -40,10 +47,12 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
     private var scrollValue = ScrollValue()
 
     open fun addCoins(amount: Int, command: Boolean) {
-        addItem(SKYBLOCK_COIN, amount, command)
+        modify {
+            it.addItem(SKYBLOCK_COIN, amount, command)
+        }
     }
 
-    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
         modify {
             it.addItem(internalName, amount, command)
         }
@@ -52,17 +61,32 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (isHidden != null) sharedData.modify { it.items[internalName]?.hidden = isHidden }
         }
 
-        if (command) {
-            TrackerManager.commandEditTrackerSuccess = true
-            val displayName = internalName.itemName
-            if (amount > 0) {
-                ChatUtils.chat("Manually added to $name: §r$displayName §7(${amount}x§7)")
-            } else {
-                ChatUtils.chat("Manually removed from $name: §r$displayName §7(${-amount}x§7)")
-            }
-            return
+        if (command) logCommandAdd(internalName, amount)
+        handlePossibleRareDrop(internalName, amount, message)
+    }
+
+    open fun ItemAddEvent.addItemFromEvent() {
+        val command = source == ItemAddManager.Source.COMMAND
+        modify { data ->
+            data.addItem(internalName, amount, command)
+            logCompletedAddEvent()
         }
-        handlePossibleRareDrop(internalName, amount)
+    }
+
+    fun logCommandAdd(internalName: NeuInternalName, amount: Int) {
+        val displayName = internalName.repoItemName
+        val message = if (amount > 0) {
+            "Manually added to $name: §r$displayName §7(${amount}x§7)"
+        } else {
+            "Manually removed from $name: §r$displayName §7(${-amount}x§7)"
+        }
+        ChatUtils.chat(message)
+    }
+
+    fun ItemAddEvent.logCompletedAddEvent() {
+        if (source != ItemAddManager.Source.COMMAND) return
+        TrackerManager.commandEditTrackerSuccess = true
+        logCommandAdd(internalName, amount)
     }
 
     private fun NeuInternalName.getCleanName(
@@ -70,7 +94,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
     ): String {
         val item = items[this] ?: error("Item not found for $this")
-        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.itemName
+        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemNameCompact
     }
 
     open fun drawItems(
@@ -92,7 +116,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         },
         itemHider: (NeuInternalName, Boolean) -> Unit = { item, currentlyHidden ->
             modify {
-                it.items[item]?.hidden = !currentlyHidden
+                it.toggleItemHide(item, currentlyHidden)
             }
         },
         getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String> = { internalName, item ->
@@ -147,9 +171,10 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
                 onLeftClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
+                    // TODO remove unnecessary update call, as both invokes above call the modify fun. in modify there is also a update call
                     update()
                 },
-            ) else Renderable.string(string)
+            ) else StringRenderable(string)
 
             val row = mutableMapOf<TextPart, Renderable>()
             row[TextPart.NAME] = string(" $displayName")
@@ -160,7 +185,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
                 internalName.getItemStackOrNull()
             }
             itemStackOrNull?.let {
-                row[TextPart.ICON] = Renderable.itemStack(it)
+                row[TextPart.ICON] = ItemStackRenderable(it)
             }
 
             row[TextPart.TOTAL_PRICE] = string(" $priceFormat")
@@ -194,7 +219,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         newDrop: Boolean,
         internalName: NeuInternalName,
     ) = buildList {
-        add(internalName.itemName)
+        add(internalName.repoItemName)
         add("")
         addAll(loreFormat)
         add("")
@@ -210,7 +235,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         add("§7to edit the number.")
         add("§7Use negative numbers to remove items.")
 
-        if (LorenzUtils.debug) {
+        if (SkyHanniDebugsAndTests.enabled) {
             add("")
             add("§7$internalName")
         }
@@ -226,7 +251,8 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
         } else emptyList()
 
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
+        val coinFormat = "coin".pluralize(profit.toInt())
+        val text = "§eTotal Profit: $profitPrefix$profitFormat $coinFormat"
         return Renderable.hoverTips(text, tips).toSearchable()
     }
 }

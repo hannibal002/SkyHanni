@@ -2,13 +2,16 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
 import kotlin.math.ceil
 
 object RenderableInventory {
 
-    private val inventoryTextures = ResourceLocation("skyhanni", "gui/slot.png")
+    private val inventoryTextures = createResourceLocation("skyhanni", "gui/slot.png")
     private const val TEXTURE_WIDTH = 90
     private const val TEXTURE_HEIGHT = 54
 
@@ -89,7 +92,7 @@ object RenderableInventory {
                 val renderable = if (uv == SlotsUv.CENTER) {
                     (
                         items[index]?.let { item ->
-                            Renderable.itemStack(
+                            ItemStackRenderable(
                                 item,
                                 scale,
                                 0,
@@ -116,8 +119,8 @@ object RenderableInventory {
             }
         }
 
-        return Renderable.verticalContainer(
-            finalList.map { Renderable.horizontalContainer(it, 0) },
+        return VerticalContainerRenderable(
+            finalList.map { HorizontalContainerRenderable(it, 0) },
             0,
             horizontalAlign = horizontalAlign,
             verticalAlign = verticalAlign,

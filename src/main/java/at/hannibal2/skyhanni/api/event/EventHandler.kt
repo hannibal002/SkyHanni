@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.test.command.ErrorManager.maybeSkipError
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
@@ -12,8 +13,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     private val canReceiveCancelled: Boolean,
 ) {
 
-    var invokeCount: Long = 0L
-        private set
+    val invokeLog = SkyHanniEvents.EventInvokeLog()
 
     constructor(event: Class<T>, listeners: List<EventListeners.Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
@@ -22,7 +22,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     )
 
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
-        invokeCount++
+        invokeLog.invokeCount++
         if (this.listeners.isEmpty()) return false
 
         if (SkyHanniEvents.isDisabledHandler(name)) return false
@@ -33,7 +33,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             if (!listener.shouldInvoke(event)) continue
             try {
                 listener.invoker.accept(event)
-            } catch (throwable: Throwable) {
+            } catch (originalThrowable: Throwable) {
+                val throwable = originalThrowable.maybeSkipError()
                 errors++
                 if (errors <= 3) {
                     val errorName = throwable::class.simpleName ?: "error"
@@ -49,7 +50,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         if (errors > 3) {
             val hiddenErrors = errors - 3
             ChatUtils.chat(
-                Text.text(
+                TextHelper.text(
                     "§c[SkyHanni/${SkyHanniMod.VERSION}] $hiddenErrors more errors in $name are hidden!",
                 ),
             )

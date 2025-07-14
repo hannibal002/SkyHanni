@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CircularList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -26,7 +25,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CircularList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -93,7 +94,7 @@ object TheGreatSpook {
         } else {
             "§5§lPrimal Fear Ready!"
         }
-        displayMobCooldown = Renderable.string(mobCooldownString)
+        displayMobCooldown = StringRenderable(mobCooldownString)
 
         if (config.primalFearNotification && mobCooldown.isInPast()) {
             SoundUtils.playPlingSound()
@@ -110,7 +111,7 @@ object TheGreatSpook {
         } else {
             "§5§lThe Great Spook has ended!"
         }
-        displayGreatSpookEnd = Renderable.string(timeLeftString)
+        displayGreatSpookEnd = StringRenderable(timeLeftString)
     }
 
     @HandleEvent
@@ -189,7 +190,7 @@ object TheGreatSpook {
             action = {
                 HypixelCommands.allChat(solution)
             },
-            oneTimeClick = true
+            oneTimeClick = true,
         )
     }
 

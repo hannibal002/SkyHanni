@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
 
@@ -99,8 +99,7 @@ object BingoCardTips {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
         for ((slot, _) in chest.getAllItems()) {
             val goal = BingoApi.bingoGoals[slot.slotNumber] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
@@ -109,11 +108,11 @@ object BingoCardTips {
                 val difficulty = Difficulty.valueOf(it.difficulty.uppercase())
                 difficulty.color
             } ?: LorenzColor.GRAY
-            slot highlight color.addOpacity(120)
+            slot.highlight(color.addOpacity(120))
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.bingoSplashGuide
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.bingoSplashGuide
 
     enum class Difficulty(rawName: String, val color: LorenzColor) {
         EASY("Easy", LorenzColor.GREEN),

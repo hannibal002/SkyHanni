@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
@@ -153,8 +153,8 @@ object ReforgeApi {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val reforgeStoneData = event.readConstant<Map<String, NeuReforgeJson>>("reforgestones", reforgeGson).values
-        val reforgeData = event.readConstant<Map<String, NeuReforgeJson>>("reforges", reforgeGson).values
+        val reforgeStoneData = event.getConstant<Map<String, NeuReforgeJson>>("reforgestones", gson = reforgeGson).values
+        val reforgeData = event.getConstant<Map<String, NeuReforgeJson>>("reforges", gson = reforgeGson).values
         reforgeList = (reforgeStoneData + reforgeData).map(::mapReforge)
     }
 
@@ -200,7 +200,7 @@ object ReforgeApi {
         val type = it.itemType
         return Reforge(
             name = it.reforgeName,
-            type = LorenzUtils.enumValueOf<ReforgeType>(type.first),
+            type = EnumUtils.enumValueOf<ReforgeType>(type.first),
             stats = it.reforgeStats.orEmpty(),
             reforgeStone = it.internalName,
             specialItems = type.second.takeIf { it.isNotEmpty() },

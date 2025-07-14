@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import kotlin.time.Duration.Companion.seconds
@@ -17,12 +18,12 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object BlazeSlayerFirePitsWarning {
 
-    private val config get() = SkyHanniMod.feature.slayer.blazes
+    private val config get() = SlayerApi.config.blazes
 
     private var lastFirePitsWarning = SimpleTimeMark.farPast()
 
     private fun fireFirePits() {
-        LorenzUtils.sendTitle("§cFire Pits!", 2.seconds)
+        TitleManager.sendTitle("§cFire Pits!", duration = 2.seconds)
         lastFirePitsWarning = SimpleTimeMark.now()
     }
 
@@ -60,7 +61,7 @@ object BlazeSlayerFirePitsWarning {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.firePitsWarning && DamageIndicatorManager.isBossSpawned(
+        SkyBlockUtils.inSkyBlock && config.firePitsWarning && DamageIndicatorManager.isBossSpawned(
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,
             BossType.SLAYER_BLAZE_QUAZII_3,

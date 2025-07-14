@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -22,7 +22,7 @@ object ModifyVisualWords {
     // Replacements the user added manually via /shwords
     var userModifiedWords = mutableListOf<VisualWord>()
 
-    // Replacements the mod added automatically for some features, april jokes, etc
+    // Replacements the mod added automatically for some features, april jokes, etc.
     private val modModifiedWords = mutableListOf<VisualWord>()
     private var finalWordsList = listOf<VisualWord>()
     private var debug = false
@@ -31,6 +31,7 @@ object ModifyVisualWords {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords
+        (Minecraft.getMinecraft().ingameGUI.chatGUI as Any as AccessorMixinGuiNewChat).refreshChat_skyhanni()
     }
 
     @HandleEvent
@@ -49,13 +50,15 @@ object ModifyVisualWords {
         }
     }
 
+    var changeWords = true
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
-        if (!LorenzUtils.onHypixel) return originalText
+        if (!SkyBlockUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
-        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
+        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
+        if (!changeWords) return originalText
 
-        if (userModifiedWords.isEmpty()) {
+        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)
             update()
         }
@@ -82,17 +85,6 @@ object ModifyVisualWords {
             }
 
             modifiedText
-        }
-    }
-
-    @HandleEvent
-    @Suppress("DEPRECATION")
-    fun onHypixelJoin(event: HypixelJoinEvent) {
-        val oldModifiedWords = SkyHanniMod.feature.storage.modifiedWords
-        if (oldModifiedWords.isNotEmpty()) {
-            SkyHanniMod.visualWordsData.modifiedWords = oldModifiedWords
-            SkyHanniMod.feature.storage.modifiedWords = emptyList()
-            SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Migrate visual words")
         }
     }
 }

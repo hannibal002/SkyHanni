@@ -2,13 +2,15 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkyBlockXPApi
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 @SkyHanniModule
 object SkyBlockXPBar {
@@ -17,26 +19,32 @@ object SkyBlockXPBar {
 
     private class OriginalValues(val currentXP: Float, val maxXP: Int, val level: Int)
 
-    @SubscribeEvent
-    fun onRenderExperienceBar(event: RenderGameOverlayEvent.Pre) {
+    @HandleEvent
+    fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (!isEnabled()) return
-        if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
+        if (event.type != RenderLayer.EXPERIENCE_BAR) return
         val (level, xp) = SkyBlockXPApi.levelXPPair ?: return
 
-        with(Minecraft.getMinecraft().thePlayer) {
+        with(MinecraftCompat.localPlayer) {
             cache = OriginalValues(experience, experienceTotal, experienceLevel)
             setXPStats(xp / 100f, 100, level)
         }
     }
 
-    @SubscribeEvent
-    fun onRenderExperienceBarPost(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
+    @HandleEvent
+    fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
+        if (event.type != RenderLayer.EXPERIENCE_BAR) return
         with(cache ?: return) {
-            Minecraft.getMinecraft().thePlayer.setXPStats(currentXP, maxXP, level)
+            MinecraftCompat.localPlayer.setXPStats(currentXP, maxXP, level)
             cache = null
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS) && config.skyblockXPBar
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(95, "misc.skyblockXpBar", "misc.skyblockXPBar")
+    }
+
+    private fun isEnabled() =
+        SkyBlockUtils.inSkyBlock && !SkyBlockUtils.inAnyIsland(setOf(IslandType.THE_RIFT, IslandType.CATACOMBS)) && config.skyblockXPBar
 }

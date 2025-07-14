@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -24,11 +24,12 @@ object AnitaExtraFarmingFortune {
     private val config get() = GardenApi.config.anitaShop
 
     /**
+     * REGEX-TEST: §aJacob's Ticket §8x450
      * REGEX-TEST: §5§o§aJacob's Ticket §8x450
      */
     private val realAmountPattern by RepoPattern.pattern(
         "garden.inventory.anita.extrafortune.realamount",
-        "§5§o§aJacob's Ticket §8x(?<realAmount>.*)",
+        "(?:§5§o)?§aJacob's Ticket §8x(?<realAmount>.*)",
     )
 
     private var levelPrice = mapOf<Int, AnitaUpgradePrice>()
@@ -62,7 +63,7 @@ object AnitaExtraFarmingFortune {
         }
         jacobTickets = (contributionFactor * jacobTickets).toInt()
 
-        val index = event.toolTip.indexOfFirst("§5§o§eClick to trade!")?.let { it - 1 } ?: return
+        val index = event.toolTipRemovedPrefix().indexOfFirst("§eClick to trade!")?.let { it - 1 } ?: return
 
         // TODO: maybe only show the price when playing classic
 //        if (!LorenzUtils.noTradeMode) {

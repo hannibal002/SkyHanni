@@ -1,136 +1,163 @@
 package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
+import at.hannibal2.skyhanni.config.OnlyLegacy
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
-import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig
+import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
+import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
+import org.lwjgl.input.Keyboard
 
 class MiscConfig {
-
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
-    var pets: PetConfig = PetConfig()
+    val pets: PetConfig = PetConfig()
 
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
-    var commands: CommandsConfig = CommandsConfig()
+    val commands: CommandsConfig = CommandsConfig()
 
     @Expose
     @Category(name = "Party Commands", desc = "Enable or disable party commands.")
-    var partyCommands: PartyCommandsConfig = PartyCommandsConfig()
+    val partyCommands: PartyCommandsConfig = PartyCommandsConfig()
 
     @Expose
     @Category(name = "Minions", desc = "The minions on your private island.")
-    var minions: MinionsConfig = MinionsConfig()
+    val minions: MinionsConfig = MinionsConfig()
 
     @Expose
-    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
-    var stranded: StrandedConfig = StrandedConfig()
+    @Category(name = "Stranded", desc = "Features designed for the Stranded game mode.")
+    val stranded: StrandedConfig = StrandedConfig()
 
     @Expose
     @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
-    var areaNavigation: AreaNavigationConfig = AreaNavigationConfig()
+    val areaNavigation: AreaNavigationConfig = AreaNavigationConfig()
 
-    // TODO maybe we can migrate this already
     @Expose
+    @Category(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
+    val pathfinding: PathfindConfig = PathfindConfig()
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
-    var hideArmor2: HideArmorConfig = HideArmorConfig()
+    @Expose
+    val hideArmor: HideArmorConfig = HideArmorConfig()
 
-    // TODO rename nonGodPotEffect
     @Expose
     @ConfigOption(name = "Non-God Pot Effects", desc = "")
     @Accordion
-    var potionEffect: PotionEffectsConfig = PotionEffectsConfig()
+    val nonGodPotEffect: NonGodPotEffectsConfig = NonGodPotEffectsConfig()
 
+    @JvmField
     @Expose
     @ConfigOption(name = "Particle Hider", desc = "")
     @Accordion
-    var particleHiders: ParticleHiderConfig = ParticleHiderConfig()
+    val particleHiders: ParticleHiderConfig = ParticleHiderConfig()
 
-    @Expose
     @ConfigOption(name = "Trevor The Trapper", desc = "")
     @Accordion
-    var trevorTheTrapper: TrevorTheTrapperConfig = TrevorTheTrapperConfig()
-
     @Expose
+    val trevorTheTrapper: TrevorTheTrapperConfig = TrevorTheTrapperConfig()
+
     @ConfigOption(name = "Teleport Pads On Private Island", desc = "")
     @Accordion
-    var teleportPad: TeleportPadConfig = TeleportPadConfig()
-
     @Expose
+    val teleportPad: TeleportPadConfig = TeleportPadConfig()
+
     @ConfigOption(name = "Quick Mod Menu Switch", desc = "")
     @Accordion
-    var quickModMenuSwitch: QuickModMenuSwitchConfig = QuickModMenuSwitchConfig()
+    @Expose
+    val quickModMenuSwitch: QuickModMenuSwitchConfig = QuickModMenuSwitchConfig()
 
     @Expose
     @ConfigOption(name = "Glowing Dropped Items", desc = "")
     @Accordion
-    var glowingDroppedItems: GlowingDroppedItemsConfig = GlowingDroppedItemsConfig()
+    val glowingDroppedItems: GlowingDroppedItemsConfig = GlowingDroppedItemsConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Party Members", desc = "")
     @Accordion
-    var highlightPartyMembers: HighlightPartyMembersConfig = HighlightPartyMembersConfig()
+    val highlightPartyMembers: HighlightPartyMembersConfig = HighlightPartyMembersConfig()
 
     @Expose
     @ConfigOption(name = "Kick Duration", desc = "")
     @Accordion
-    var kickDuration: KickDurationConfig = KickDurationConfig()
+    val kickDuration: KickDurationConfig = KickDurationConfig()
 
     @Expose
     @ConfigOption(name = "Tracker", desc = "Tracker Config")
     @Accordion
-    var tracker: TrackerConfig = TrackerConfig()
+    val tracker: TrackerConfig = TrackerConfig()
 
     @Expose
     @ConfigOption(name = "Pet Candy Display", desc = "")
     @Accordion
-    var petCandy: PetCandyDisplayConfig = PetCandyDisplayConfig()
+    val petCandy: PetCandyDisplayConfig = PetCandyDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Bits Features", desc = "")
     @Accordion
-    var bits: BitsConfig = BitsConfig()
+    val bits: BitsConfig = BitsConfig()
 
     @Expose
     @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
     @Accordion
-    var patcherCoordsWaypoint: PatcherCoordsWaypointConfig = PatcherCoordsWaypointConfig()
+    val patcherCoordsWaypoint: PatcherCoordsWaypointConfig = PatcherCoordsWaypointConfig()
 
     @Expose
     @ConfigOption(name = "Reminders", desc = "")
     @Accordion
-    var reminders: RemindersConfig = RemindersConfig()
+    val reminders: RemindersConfig = RemindersConfig()
 
     @Expose
     @ConfigOption(name = "Last Servers", desc = "")
     @Accordion
-    var lastServers: LastServersConfig = LastServersConfig()
+    val lastServers: LastServersConfig = LastServersConfig()
 
     @Expose
     @ConfigOption(name = "Enchanted Clock", desc = "")
     @Accordion
-    var enchantedClock: EnchantedClockConfig = EnchantedClockConfig()
+    val enchantedClock: EnchantedClockConfig = EnchantedClockConfig()
 
-    @Expose
     @ConfigOption(name = "Century Party Invitation", desc = "Features for the Century Party Invitation")
     @Accordion
-    var centuryPartyInvitation: CenturyPartyInvitationConfig = CenturyPartyInvitationConfig()
+    @Expose
+    val centuryPartyInvitation: CenturyPartyInvitationConfig = CenturyPartyInvitationConfig()
+
+    @ConfigOption(name = "Fruit Bowl", desc = "Features for Fruit Bowl")
+    @Accordion
+    @Expose
+    val fruitBowl: FruitBowlConfig = FruitBowlConfig()
+
+    @Expose
+    @ConfigOption(name = "Cake Counter Features", desc = "")
+    @Accordion
+    val cakeCounter: CakeCounterConfig = CakeCounterConfig()
+
+    @Expose
+    @ConfigOption(name = "Frog Mask Features", desc = "")
+    @Accordion
+    val frogMaskFeatures: FrogMaskFeaturesConfig = FrogMaskFeaturesConfig()
+
+    @Expose
+    @ConfigOption(name = "Colorful Item Tooltips", desc = "")
+    @Accordion
+    val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
 
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
@@ -140,7 +167,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
-    var showOutsideSB: Property<MutableList<OutsideSBFeature>> = Property.of(mutableListOf())
+    val showOutsideSB: Property<MutableList<OutsideSBFeature>> = Property.of(mutableListOf())
 
     @Expose
     @ConfigOption(name = "Auto Join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
@@ -164,10 +191,12 @@ class MiscConfig {
     var hideTemporaryArmorStands: Boolean = true
 
     @Expose
-    var collectionCounterPos: Position = Position(10, 10, false, true)
+    @NoConfigLink
+    val collectionCounterPos: Position = Position(10, 10)
 
     @Expose
-    var carryPosition: Position = Position(10, 10, false, true)
+    @NoConfigLink
+    val carryPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
@@ -183,7 +212,9 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "SkyBlock XP Bar",
-        desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nExcept in Catacombs & Rift.\nBest used with the option below.",
+        desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\n" +
+            "Except in Catacombs & Rift.\n" +
+            "Best used with the option below.",
     )
     @SearchTag("skyblockxp skyblocklevel level lvl")
     @ConfigEditorBoolean
@@ -193,18 +224,19 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "XP in Inventory",
-        desc = "Show your current XP in inventory lore that would use your XP.\nE.g. when hovering over the anvil combine button.",
+        desc = "Show your current XP in inventory lore that would use your XP.\n" +
+            "E.g. when hovering over the anvil combine button.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var xpInInventory: Boolean = true
 
-    // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(
         name = "Red Scoreboard Numbers",
         desc = "Hide the red scoreboard numbers on the right side of the screen.",
     )
+    @OnlyLegacy
     @ConfigEditorBoolean
     @FeatureToggle
     var hideScoreboardNumbers: Boolean = false
@@ -248,6 +280,7 @@ class MiscConfig {
         desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.",
     )
     @ConfigEditorBoolean
+    @OnlyLegacy
     @FeatureToggle
     var betterSignEditing: Boolean = true
 
@@ -259,29 +292,7 @@ class MiscConfig {
 
     @Expose
     @ConfigLink(owner = MiscConfig::class, field = "playerMovementSpeed")
-    var playerMovementSpeedPos: Position = Position(394, 124, false, true)
-
-    @Expose
-    @ConfigOption(
-        name = "Frog Mask Display",
-        desc = "Displays information about the active §2Frog Mask§7 region. §eRequires a Frog Mask in inventory.",
-    )
-    @ConfigEditorDropdown
-    var frogMaskDisplay: FrogMaskCondition = FrogMaskCondition.DISABLED
-
-    enum class FrogMaskCondition(private val displayName: String) {
-        DISABLED("Off"),
-        ALWAYS("Always"),
-        PARK("In The Park"),
-        WORN("While Worn"),
-        WORN_IN_PARK("While Worn in The Park");
-
-        override fun toString() = displayName
-    }
-
-    @Expose
-    @ConfigLink(owner = MiscConfig::class, field = "frogMaskDisplay")
-    var frogMaskDisplayPosition: Position = Position(25, 25, false, true)
+    val playerMovementSpeedPos: Position = Position(394, 124)
 
     @Expose
     @ConfigOption(
@@ -334,7 +345,7 @@ class MiscConfig {
 
     @Expose
     @ConfigLink(owner = MiscConfig::class, field = "showTimeInLimbo")
-    var showTimeInLimboPosition: Position = Position(400, 200, 1.3f)
+    val showTimeInLimboPosition: Position = Position(400, 200, 1.3f)
 
     @Expose
     @ConfigOption(name = "Limbo Playtime Detailed", desc = "Show your total time in limbo in the detailed /playtime.")
@@ -353,18 +364,19 @@ class MiscConfig {
     @ConfigEditorBoolean
     var lockMouseLookChatMessage: Boolean = true
 
-    // Does not have a config element!
     @Expose
-    var lockedMouseDisplay: Position = Position(400, 200, 0.8f)
+    @NoConfigLink
+    val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
-    var inventoryLoadPos: Position = Position(394, 124, false, true)
+    val inventoryLoadPos: Position = Position(394, 124)
 
     @Expose
     @ConfigOption(
         name = "Fix Ghost Entities",
-        desc = "Remove ghost entities caused by a Hypixel bug.\n" + "This includes Diana, Dungeon and Crimson Isle mobs and nametags.",
+        desc = "Remove ghost entities caused by a Hypixel bug.\n" +
+            "This includes Diana, Dungeon and Crimson Isle mobs and nametags.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -374,13 +386,16 @@ class MiscConfig {
     @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var replaceRomanNumerals: Property<Boolean> = Property.of(false)
+    val replaceRomanNumerals: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigOption(
+        name = "Charge Bottle Notification",
+        desc = "Send a message when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
-    var thunderBottleNotification: Boolean = true
+    var chargeBottleNotification: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -391,15 +406,15 @@ class MiscConfig {
     @FeatureToggle
     var unknownPerkpocalypseMayorWarning: Boolean = true
 
-    @Expose
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion
-    var hideFarEntities: HideFarEntitiesConfig = HideFarEntitiesConfig()
+    @Expose
+    val hideFarEntities: HideFarEntitiesConfig = HideFarEntitiesConfig()
 
     @Expose
     @ConfigOption(name = "Last Storage", desc = "")
     @Accordion
-    var lastStorage: LastStorageConfig = LastStorageConfig()
+    val lastStorage: LastStorageConfig = LastStorageConfig()
 
     @Expose
     @ConfigOption(
@@ -413,11 +428,20 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "NEU Soul Path Find",
-        desc = "When showing §e/neusouls on§7, show a pathfind to the Fairy Souls missing and a percentage of souls done in chat.",
+        desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.",
     )
     @ConfigEditorBoolean
+    @OnlyLegacy
     @FeatureToggle
     var neuSoulsPathFind: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Fast Fairy Souls",
+        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. ",
+    )
+    @ConfigEditorBoolean
+    var fastFairySouls: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -432,7 +456,7 @@ class MiscConfig {
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var userluckEnabled: Boolean = true
+    var userLuck: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -443,4 +467,39 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var warnAboutPcTimeOffset: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var coralFishHelper: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = MiscConfig::class, field = "coralFishHelper")
+    val coralFishHelperPosition: Position = Position(174, 139)
+
+    @Expose
+    @ConfigOption(
+        name = "Transparent Tooltips",
+        desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!",
+    )
+    @ConfigEditorBoolean
+    var transparentTooltips: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Hide Co-op Member Collections",
+        desc = "Hides specific co-op members from collections.\n" +
+            "§eOpen the Historic Members menu (automatic) or use /shedithiddencoopmembers (manual) " +
+            "to update the list.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideExCoopMembers: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    var abiphoneAcceptKey: Int = Keyboard.KEY_NONE
 }
