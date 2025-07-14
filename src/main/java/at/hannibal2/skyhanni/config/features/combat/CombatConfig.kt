@@ -76,6 +76,7 @@ class CombatConfig {
     @Expose
     @ConfigOption(name = "Instance Chest Profit", desc = "Display chest profit for kuudra and dungeons.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var showInstanceChestProfit: Boolean = false
 
     @Expose

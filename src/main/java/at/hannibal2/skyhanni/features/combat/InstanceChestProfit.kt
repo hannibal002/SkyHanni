@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -15,7 +16,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -110,12 +113,15 @@ object InstanceChestProfit {
             }
             essencePattern.matchMatcher(it.value.displayName) {
                 val name = group("name")
-                val count = group("count").toInt()
+                val rawCount = group("count").toInt()
+                val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
+                else rawCount.toDouble()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull() ?: 0.0)
                 itemsWithCost.addOrPut(it.value.displayName, price)
             }
         }
 
+        // Slot 31 has the purchase cost information
         items[31]?.getLore()?.forEach {
             coinsPattern.matchMatcher(it) {
                 val amount = group("amount").replace(",", "").toInt()
@@ -148,7 +154,7 @@ object InstanceChestProfit {
                 else "§a"
 
                 if (!displayedCost && it.value < 0) {
-                    val cost = itemsWithCost.values.filter { it < 0 }.sum()
+                    val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
                     add(listOf(StringRenderable("")))
                     add(listOf(StringRenderable("§c§lTotal Cost"), StringRenderable("§c${cost.formatCoin()}")))
                     displayedCost = true
@@ -164,14 +170,22 @@ object InstanceChestProfit {
             else "§a"
 
             add(listOf(StringRenderable("")))
-            add(
-                listOf(
-                    StringRenderable("$color§lProfit"), StringRenderable("$color ${total.formatCoin()}"),
-                )
-            )
+            add(listOf(StringRenderable("$color§lProfit"), StringRenderable("$color ${total.formatCoin()}")))
         }
 
         display = Renderable.table(newDisplay, yPadding = 1)
+    }
+
+    private fun getKuudraEssenceBonus(): Double {
+        return ProfileStorageData.petProfiles?.pets?.filter { PetUtils.getPetProperName(it.fauxInternalName) == "KUUDRA" }
+            ?.maxByOrNull { it.rarity.id }
+            ?.let {
+                when (it.rarity) {
+                    LorenzRarity.RARE -> 0.15 / 100 * it.level
+                    LorenzRarity.EPIC, LorenzRarity.LEGENDARY -> 0.2 / 100 * it.level
+                    else -> 0.0
+                }
+            } ?: 0.0
     }
 
     @HandleEvent(GuiRenderEvent::class)
