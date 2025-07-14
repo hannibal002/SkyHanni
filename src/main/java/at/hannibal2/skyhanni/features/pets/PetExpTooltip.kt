@@ -6,15 +6,17 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -54,7 +56,8 @@ object PetExpTooltip {
                 index
             }
 
-            val (maxLevel, maxXP) = getMaxValues(name, petExperience)
+            val internalName = itemStack.getInternalNameOrNull() ?: return
+            val (maxLevel, maxXP) = getMaxValues(name, petExperience, internalName)
 
             val percentage = petExperience / maxXP
             val percentageFormat = percentage.formatPercentage()
@@ -110,8 +113,8 @@ object PetExpTooltip {
         objectNeuTooltipTweaks.javaClass.getDeclaredField("petExtendExp").makeAccessible()
     }
 
-    private fun getMaxValues(petName: String, petExperience: Double): Pair<Int, Int> {
-        val isLevel200Pet = ItemUtils.maxPetLevel(petName) == 200
+    private fun getMaxValues(petName: String, petExperience: Double, internalName: NeuInternalName): Pair<Int, Int> {
+        val isLevel200Pet = PetUtils.getMaxLevel(internalName) == 200
         val useLevel200PetLevelling = isLevel200Pet && (!config.showDragonEgg || petExperience >= LEVEL_100_LEGENDARY)
 
         val maxLevel = if (useLevel200PetLevelling) 200 else 100

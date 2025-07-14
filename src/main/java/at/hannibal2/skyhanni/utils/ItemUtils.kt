@@ -262,8 +262,6 @@ object ItemUtils {
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
-    fun maxPetLevel(name: String) = if (level200PetNames.any { it.contains(name) }) 200 else 100
-
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = MinecraftCompat.localPlayer
@@ -665,7 +663,6 @@ object ItemUtils {
     }
 
     private var compactNameReplace = mapOf<String, String>()
-    private var level200PetNames = setOf<String>()
     var bazaarOverrides = mapOf<String, String>()
         private set
 
@@ -681,7 +678,6 @@ object ItemUtils {
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
         val repoData = event.getConstant<ItemsJson>("Items")
         compactNameReplace = repoData.compactNames!!
-        level200PetNames = repoData.level200PetNames
     }
 
     @HandleEvent
