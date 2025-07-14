@@ -1,37 +1,30 @@
-package at.hannibal2.skyhanni.config.features.inventory;
+package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class AttributeOverlayConfig {
-
+class AttributeOverlayConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show the attribute name and level on the item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    var enabled: Boolean = false
 
     // TODO: add way of making config options with data classes from repo
     @Expose
     @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown.")
     @ConfigEditorDraggableList
-    public List<AttributeApi.AttributeType> attributesList = new ArrayList<>(AttributeApi.AttributeType.getEntries());
+    val attributesList: MutableList<AttributeApi.AttributeType> = AttributeApi.AttributeType.entries.toMutableList()
 
     @Expose
-    @ConfigOption(
-        name = "Min Level",
-        desc = "Minimum level to show the attributes of."
-    )
-    @ConfigEditorSlider(minValue = 1, maxValue = 10, minStep = 1)
-    public int minimumLevel = 1;
+    @ConfigOption(name = "Min Level", desc = "Minimum level to show the attributes of.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+    var minimumLevel: Int = 1
 
     @Expose
     @ConfigOption(
@@ -41,7 +34,7 @@ public class AttributeOverlayConfig {
             "§c want to suggest changes, please do so in the discord."
     )
     @ConfigEditorBoolean
-    public boolean highlightGoodRolls = true;
+    var highlightGoodRolls: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -50,7 +43,7 @@ public class AttributeOverlayConfig {
             "combinations for that item."
     )
     @ConfigEditorBoolean
-    public boolean highlightGoodAttributes = false;
+    var highlightGoodAttributes: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -58,7 +51,7 @@ public class AttributeOverlayConfig {
         desc = "Makes it so that Good Rolls are always shown no matter the attribute level."
     )
     @ConfigEditorBoolean
-    public boolean goodRollsOverrideLevel = true;
+    var goodRollsOverrideLevel: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -66,10 +59,10 @@ public class AttributeOverlayConfig {
         desc = "Highlights attributes in good rolls even if they aren't in the attributes list."
     )
     @ConfigEditorBoolean
-    public boolean ignoreList = false;
+    var ignoreList: Boolean = false
 
     @Expose
     @ConfigOption(name = "Hide non Good Rolls", desc = "Hides attributes that are not considered good rolls.")
     @ConfigEditorBoolean
-    public boolean hideNonGoodRolls = false;
+    var hideNonGoodRolls: Boolean = false
 }

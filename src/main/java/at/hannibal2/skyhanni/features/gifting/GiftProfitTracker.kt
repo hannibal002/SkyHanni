@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -351,21 +352,7 @@ object GiftProfitTracker {
         }
 
         // Skill XP gains
-        data.skillXpGained.sumAllValues().takeIf { it > 0 }?.let { sumXpGained ->
-            val applicableSkills = data.skillXpGained.filter { it.value > 0 }
-            val skillHoverTips = applicableSkills.map { (skill, xp) ->
-                "§7${xp.addSeparators()} §3${skill.displayName} XP"
-            }.toMutableList()
-            if (applicableSkills.size > 1) {
-                skillHoverTips.add("§7You gained §e${sumXpGained.addSeparators()} §7total skill XP.")
-            }
-            add(
-                Renderable.hoverTips(
-                    "§7${sumXpGained.shortFormat()} §3Skill XP",
-                    skillHoverTips,
-                ).toSearchable("Skill XP"),
-            )
-        }
+        addSkillXpInfo(data.skillXpGained)
 
         // Breakdown of rewards by rarity
         val totalRewards = data.rarityRewardTypesGained.sumAllValues().toLong()

@@ -169,7 +169,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Evolving Items", desc = "")
     @Accordion
     @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
-    public evolvingItemsConfig evolvingItems = new evolvingItemsConfig();
+    public EvolvingItemsConfig evolvingItems = new EvolvingItemsConfig();
 
     @Expose
     @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")

@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
@@ -48,17 +46,22 @@ data class ItemStackRotationDefinition(
 )
 
 /**
- * A data class that defines behavior for a 'frame' of an ItemStack animation.
+ * A class that defines behavior for a 'frame' of an ItemStack animation.
  *
  * A ticks parameter of 0 will make the frame last permanently.
  *
  * @param stack The ItemStack that should render during this frame.
  * @param ticks How long this frame should last, in ticks (assuming a nominal 20/s)
  */
-data class ItemStackAnimationFrame(
-    val stack: ItemStack,
-    val ticks: Int = 0,
-)
+class ItemStackAnimationFrame(
+    private val stackProvider: () -> ItemStack,
+    val ticks: Int = 0
+) {
+    constructor(itemStack: ItemStack, ticks: Int = 0) : this({ itemStack }, ticks)
+    constructor(provider: NeuItemStackProvider, ticks: Int = 0) : this(provider::stack, ticks)
+
+    val stack: ItemStack get() = stackProvider()
+}
 
 class AnimatedItemStackRenderable(
     frames: Collection<ItemStackAnimationFrame>,
@@ -70,7 +73,6 @@ class AnimatedItemStackRenderable(
     rescaleSkulls: Boolean = true,
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-    override val highlight: Boolean = false,
 ) : ItemStackRenderable(
     frames.firstOrNull()?.stack ?: ErrorManager.skyHanniError(
         "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
@@ -81,34 +83,10 @@ class AnimatedItemStackRenderable(
     rescaleSkulls,
     horizontalAlign,
     verticalAlign,
-    highlight,
 ) {
-    constructor(
-        item: ItemStack,
-        rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
-        bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
-        scale: Double = NeuItems.ITEM_FONT_SIZE,
-        xSpacing: Int = 2,
-        ySpacing: Int = 1,
-        rescaleSkulls: Boolean = true,
-        horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-        verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-        highlight: Boolean = false,
-    ) : this(
-        listOf(ItemStackAnimationFrame(item, 0)), rotation, bounce, scale, xSpacing,
-        ySpacing, rescaleSkulls, horizontalAlign, verticalAlign, highlight,
-    )
-
     private var frameIndex = 0
     private var ticksInFrame = 0.0
-    private val frameDefs = frames.map { (itemStack, ticks) ->
-        val newStack = itemStack.copy().apply {
-            if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
-        }
-        ItemStackAnimationFrame(newStack, ticks)
-    }.takeIfNotEmpty() ?: ErrorManager.skyHanniError(
-        "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
-    )
+    private val frameDefs = frames.toList()
 
     private val startTime = SimpleTimeMark.now()
     private val baseItemHeight = (15.5 * scale + 0.5).toInt() + ySpacing
