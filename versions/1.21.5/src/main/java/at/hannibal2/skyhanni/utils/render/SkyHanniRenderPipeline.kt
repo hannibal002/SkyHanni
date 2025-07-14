@@ -96,10 +96,16 @@ enum class SkyHanniRenderPipeline(
         vFormat = VertexFormats.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect_outline",
+        //#if MC < 1.21.6
         uniforms = getCommonRoundedUniforms(withSmoothness = false) + mapOf(
             "borderThickness" to UniformType.FLOAT,
             "borderBlur" to UniformType.FLOAT,
         ),
+        //#else
+        //$$ uniforms = getCommonRoundedUniforms() + mapOf(
+        //$$     "SkyHanniRoundedOutlineUniforms" to UniformType.UNIFORM_BUFFER
+        //$$ ),
+        //#endif
         depthWrite = false,
     ),
     CIRCLE(
@@ -107,10 +113,16 @@ enum class SkyHanniRenderPipeline(
         vFormat = VertexFormats.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle",
+        //#if MC < 1.21.6
         uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
             "angle1" to UniformType.FLOAT,
             "angle2" to UniformType.FLOAT,
         ),
+        //#else
+        //$$ uniforms = getCommonRoundedUniforms() + mapOf(
+        //$$     "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
+        //$$ ),
+        //#endif
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_SNIPPET,
@@ -152,22 +164,32 @@ private object SkyHanniRenderPipelineUtils {
     fun getCommonRoundedUniforms(
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,
-    ): Map<String, UniformType> = mapOf(
-        "scaleFactor" to UniformType.FLOAT,
-        "radius" to UniformType.FLOAT,
-        "smoothness" to UniformType.FLOAT,
-        "halfSize" to UniformType.VEC2,
-        "centerPos" to UniformType.VEC2,
-        "modelViewMatrix" to UniformType.MATRIX4X4,
-    ).filter {
-        (withSmoothness || it.key != "smoothness") &&
-            (withHalfSize || it.key != "halfSize")
+    ): Map<String, UniformType> {
+        //#if MC < 1.21.6
+         return mapOf(
+            "scaleFactor" to UniformType.FLOAT,
+            "radius" to UniformType.FLOAT,
+            "smoothness" to UniformType.FLOAT,
+            "halfSize" to UniformType.VEC2,
+            "centerPos" to UniformType.VEC2,
+            "modelViewMatrix" to UniformType.MATRIX4X4,
+        ).filter {
+            (withSmoothness || it.key != "smoothness") &&
+                (withHalfSize || it.key != "halfSize")
+        }
+        //#else
+        //$$ return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
+        //#endif
     }
 
     val commonChromaUniforms = mapOf(
+        //#if MC < 1.21.6
         "chromaSize" to UniformType.FLOAT,
         "timeOffset" to UniformType.FLOAT,
         "saturation" to UniformType.FLOAT,
         "forwardDirection" to UniformType.INT,
+        //#else
+        //$$ "SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER,
+        //#endif
     )
 }

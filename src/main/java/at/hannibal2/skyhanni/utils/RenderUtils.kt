@@ -92,7 +92,7 @@ object RenderUtils {
             val yTranslate = read[13].toInt()
             val zTranslate = read[14].toInt()
             matrixBuffer.flip()
-            //#else
+            //#elseif MC < 1.21.6
             //$$ RenderSystem.assertOnRenderThread()
             //$$ val posMatrix = DrawContextUtils.drawContext.matrices.peek().positionMatrix
             //$$ val tmp = org.joml.Vector3f()
@@ -100,6 +100,10 @@ object RenderUtils {
             //$$ val xTranslate = tmp.x.toInt()
             //$$ val yTranslate = tmp.y.toInt()
             //$$ val zTranslate = tmp.z.toInt()
+            //#else
+            //$$ val xTranslate = 0
+            //$$ val yTranslate = 0
+            //$$ val zTranslate = 0
             //#endif
             Triple(xTranslate, yTranslate, zTranslate)
         }

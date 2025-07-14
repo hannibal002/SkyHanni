@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -67,12 +66,11 @@ class ChestValueConfig {
     @ConfigEditorDropdown
     var sortingType: SortingTypeEntry = SortingTypeEntry.DESCENDING
 
-    enum class SortingTypeEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        DESCENDING("Descending", 0),
-        ASCENDING("Ascending", 1),
+    enum class SortingTypeEntry(private val displayName: String) {
+        DESCENDING("Descending"),
+        ASCENDING("Ascending"),
         ;
 
-        override fun getLegacyId(): Int = legacyId
         override fun toString() = displayName
     }
 
@@ -81,12 +79,11 @@ class ChestValueConfig {
     @ConfigEditorDropdown
     var formatType: NumberFormatEntry = NumberFormatEntry.SHORT
 
-    enum class NumberFormatEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        SHORT("Short", 0),
-        LONG("Long", 1),
+    enum class NumberFormatEntry(private val displayName: String) {
+        SHORT("Short"),
+        LONG("Long"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

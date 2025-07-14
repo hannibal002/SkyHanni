@@ -30,13 +30,14 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.string as renderableString
 
 @SkyHanniModule
 object ReforgeHelper {
@@ -218,8 +219,8 @@ object ReforgeHelper {
         display = generateDisplay()
     }
 
-    private fun generateDisplay() = buildList<Renderable> {
-        this.add(renderableString("§6Reforge Overlay"))
+    private fun generateDisplay() = buildList {
+        this.add(StringRenderable("§6Reforge Overlay"))
 
         val item = itemToReforge ?: run {
             reforgeToSearch = null
@@ -283,29 +284,35 @@ object ReforgeHelper {
             stats = currentReforge?.stats?.get(itemRarity)?.print().orEmpty()
             removedEffect = emptyList()
             addEffectText = "§aEffect:"
-            clickToApply = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
+            clickToApply = listOf(
+                StringRenderable(""),
+                StringRenderable("§3Reforge is currently applied!")
+            )
         } else {
             stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)).orEmpty()
             removedEffect = getReforgeEffect(
                 currentReforge,
                 itemRarity,
-            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
+            )?.let { listOf(StringRenderable("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
             addEffectText = "§aAdds Effect:"
             clickToApply = if (reforgeToSearch != reforge) {
-                listOf(renderableString(""), renderableString("§eClick to select!"))
+                listOf(
+                    StringRenderable(""),
+                    StringRenderable("§eClick to select!")
+                )
             } else emptyList()
         }
 
         val addedEffect = getReforgeEffect(reforge, itemRarity)?.let {
-            listOf(renderableString(addEffectText)) + it
+            listOf(StringRenderable(addEffectText)) + it
         }.orEmpty()
 
-        return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + clickToApply
+        return listOf(StringRenderable("§6Reforge Stats")) + stats + removedEffect + addedEffect + clickToApply
     }
 
     private fun getReforgeEffect(reforge: ReforgeApi.Reforge?, rarity: LorenzRarity) =
         reforge?.extraProperty?.get(rarity)?.let {
-            Renderable.wrappedString(
+            WrappedStringRenderable(
                 it,
                 190,
                 color = LorenzColor.GRAY.toColor(),
@@ -345,7 +352,7 @@ object ReforgeHelper {
             Renderable.drawInsideRoundedRect(
                 Renderable.hoverTips(
                     Renderable.fixedSizeLine(
-                        renderableString(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
+                        StringRenderable(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                         SkyblockStat.fontSizeOfLargestIcon,
                     ),
                     tips,
@@ -428,9 +435,13 @@ object ReforgeHelper {
                 val key = it.key
                 val value = this[key] ?: 0.0
                 buildList {
-                    add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
-                    diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
-                    add(renderableString(key.iconWithName))
+                    val valueFormat = "§9${value.toStringWithPlus().removeSuffix(".0")}"
+                    add(StringRenderable(valueFormat))
+                    diff?.get(key)?.let { diffKey ->
+                        val diffFormat = (if (diffKey < 0) "§c" else "§a") + diffKey.toStringWithPlus().removeSuffix(".0")
+                        add(StringRenderable(diffFormat))
+                    }
+                    add(StringRenderable(key.iconWithName))
                 }
             }
             )

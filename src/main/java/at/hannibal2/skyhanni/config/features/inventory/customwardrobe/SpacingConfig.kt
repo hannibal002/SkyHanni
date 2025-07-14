@@ -1,25 +1,17 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class SpacingConfig {
-    companion object {
-        private val config get() = SkyHanniMod.feature.inventory.customWardrobe
-        @JvmStatic
-        fun resetSpacing() {
-            // Instead of manually resetting each spacing prop, just reset the entire config object
-            config.spacing = SpacingConfig()
-        }
-    }
+class SpacingConfig : ResettableStorageSet() {
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe spacing settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    val resetSpacing: Runnable = Runnable(SpacingConfig::resetSpacing)
+    val resetSpacing: Runnable = Runnable(::reset)
 
     @Expose
     @ConfigOption(name = "Global Scale", desc = "Control the scale of the entirety of the wardrobe.")
