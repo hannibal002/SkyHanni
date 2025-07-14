@@ -73,9 +73,14 @@ object UtilsPatterns {
         "item.name.potion",
         ".*Potion",
     )
+
+    /**
+     * REGEX-TEST: 8x Enchanted Pork
+     * REGEX-TEST:   §810x §r§bGlacite Jewel
+     */
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",
-        "(?: +§8(?:\\+§.)?(?<amount>[\\d.,]+[km]?)x? )?(?<name>.*)",
+        "(?:(?: +§8)?(?:\\+§.)?(?<amount>[\\d.,]+[km]?)x? )?(?<name>.*)",
     )
     val readAmountAfterPattern by patternGroup.pattern(
         "item.amount.behind",

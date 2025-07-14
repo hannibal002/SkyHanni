@@ -79,7 +79,6 @@ object EliteDevApi {
             },
         )
         val apiResponse = ApiUtils.postJSON(contestStatic, body)
-        apiResponse.message
         if (apiResponse.success) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else ErrorManager.logErrorStateWithData(

@@ -144,8 +144,8 @@ tasks.runClient {
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = project.findProperty("prTitle") as String
-    this.prBody = project.findProperty("prBody") as String
+    this.prTitle = project.findProperty("prTitle") as? String ?: ""
+    this.prBody = project.findProperty("prBody") as? String ?: ""
 }
 
 // Disabled because it breaks mixins with the minecraft dev plugin

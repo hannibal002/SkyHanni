@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.kdoc.psi.api.KDoc
 import org.jetbrains.kotlin.psi.*
 
 // depends-on-plugin org.jetbrains.kotlin
+// depends-on-plugin liveplugin
 
 registerIntention(RenameKotlinFunctionToUseCamelCaseIntention())
 if (!isIdeStartup) show("Reloaded Regex intentions")
@@ -22,6 +23,7 @@ val logger =
 
 val regexTestPrefix = "REGEX-TEST: "
 val regexTestFailPrefix = "REGEX-FAIL: "
+val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
 
 class RegexInfo(
     val regex: KtValueArgument,
@@ -50,11 +52,16 @@ class RegexInfo(
             }
     }
 
-    fun getExamples(): List<String> {
+    fun getExamples(): List<String> = buildList {
         val examples = commentText?.filter { it.startsWith(regexTestPrefix) || it.startsWith(regexTestFailPrefix) }
-            ?.map { it.substring(regexTestPrefix.length) }
-        if (examples == null) return listOf()
-        return examples
+            ?.map { it.substring(regexTestPrefix.length) }.orEmpty()
+        addAll(examples)
+        val wrappedExamples = commentText?.filter { it.startsWith("WRAPPED-REGEX-TEST:") }
+            ?.mapNotNull {
+                val matcher = wrappedRegexTestPattern.matcher(it)
+                if (matcher.matches()) matcher.group("test") else null
+            }.orEmpty()
+        addAll(wrappedExamples)
     }
 }
 

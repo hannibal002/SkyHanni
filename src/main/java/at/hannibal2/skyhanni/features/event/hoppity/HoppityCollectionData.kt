@@ -44,7 +44,7 @@ object HoppityCollectionData {
         rarityBonuses.clear()
         specialBonuses.clear()
 
-        val data = event.readConstant<NeuHoppityJson>("hoppity").hoppity
+        val data = event.getConstant<NeuHoppityJson>("hoppity").hoppity
         for ((rarityString, rarityData) in data.rarities.entries) {
             val rarity = RabbitCollectionRarity.valueOf(rarityString.uppercase())
 
