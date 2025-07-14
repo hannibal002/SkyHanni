@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.subMapOfStringsStartingWith
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -35,8 +36,9 @@ object StorageApi {
 
     /**
      * REGEX-TEST: Rift Storage (1/2)
+     * REGEX-TEST: Rift Storage
      */
-    private val riftStoragePattern by RepoPattern.pattern("storage.rift", "Rift Storage \\((?<page>\\d+)/\\d+\\)")
+    private val riftStoragePattern by RepoPattern.pattern("storage.rift", "Rift Storage(?: \\((?<page>\\d+)/\\d+\\))?")
 
     val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
     val enderchest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
@@ -49,17 +51,17 @@ object StorageApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         enderchestPattern.matchMatcher(event.inventoryName) {
-            val page = group("page").toInt()
+            val page = groupOrNull("page")?.toInt()
             handleRead("Ender Chest $page", event.inventoryItemsWithNull.values)
             return
         }
         backpackPattern.matchMatcher(event.inventoryName) {
-            val page = group("page").toInt()
+            val page = groupOrNull("page")?.toInt()
             handleRead("Backpack $page", event.inventoryItemsWithNull.values)
             return
         }
         riftStoragePattern.matchMatcher(event.inventoryName) {
-            val page = group("page").toInt()
+            val page = groupOrNull("page")?.toInt()
             handleRead("Rift Storage $page", event.inventoryItemsWithNull.values)
             return
         }
