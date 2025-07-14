@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isVanillaItem
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
+import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
@@ -113,7 +113,7 @@ object NeuItems {
                 else println("wrong name: '$cleanName'")
             }
 
-            val newCleanName = cleanName.removeNonAscii().trim()
+            val newCleanName = cleanName.removeNonAsciiNonColorCode().trim()
 
             tempAllItemCache[newCleanName] = internalName
             tempNoColor[newCleanName.removeColor()] = internalName
