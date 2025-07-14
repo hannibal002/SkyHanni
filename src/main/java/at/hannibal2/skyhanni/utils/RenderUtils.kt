@@ -289,27 +289,6 @@ object RenderUtils {
         _drawDynamicText(location, text, scaleMultiplier, yOff, hideTooCloseAt, smallestDistanceVew, ignoreBlocks, ignoreY, maxDistance)
     }
 
-    @Deprecated("Use WorldRenderUtils' outlineTopFace instead")
-    fun SkyHanniRenderWorldEvent.outlineTopFace(
-        boundingBox: AxisAlignedBB,
-        lineWidth: Int,
-        color: Color,
-        depth: Boolean,
-    ) {
-        _outlineTopFace(boundingBox, lineWidth, color, depth)
-    }
-
-    @Deprecated("Use WorldRenderUtils' draw3DLine instead")
-    fun SkyHanniRenderWorldEvent.draw3DLine(
-        p1: LorenzVec,
-        p2: LorenzVec,
-        color: Color,
-        lineWidth: Int,
-        depth: Boolean,
-    ) {
-        _draw3DLine(p1, p2, color, lineWidth, depth)
-    }
-
     @Deprecated("Use WorldRenderUtils' drawHitbox instead")
     fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
