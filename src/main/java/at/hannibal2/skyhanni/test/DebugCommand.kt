@@ -199,7 +199,7 @@ object DebugCommand {
                 add(" neu repo location: default")
             }
 
-            add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
+            add(" loaded neu items: ${NeuItems.allNeuRepoInternalNames().size}")
         }
 
         val isRelevant = RepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings

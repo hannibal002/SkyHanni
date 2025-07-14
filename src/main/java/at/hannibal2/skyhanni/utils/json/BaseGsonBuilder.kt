@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeComponent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -38,6 +41,16 @@ object BaseGsonBuilder {
         .registerTypeAdapter(
             SkyHanniTracker.DefaultDisplayMode::class.java,
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),
+        )
+        .registerTypeAdapter(NeuRecipeComponent::class.java, SkyHanniTypeAdapters.NEU_RECIPE_COMPONENT.nullSafe())
+        .registerTypeAdapter(NeuRecipeType::class.java, SkyHanniTypeAdapters.NEU_RECIPE_TYPE.nullSafe())
+        .registerTypeAdapter(
+            NeuAbstractRecipe::class.java,
+            NeuAbstractRecipe.Companion.AbstractNeuRecipeSerializer()
+        )
+        .registerTypeAdapter(
+            NeuAbstractRecipe::class.java,
+            NeuAbstractRecipe.Companion.AbstractNeuRecipeDeserializer()
         )
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
