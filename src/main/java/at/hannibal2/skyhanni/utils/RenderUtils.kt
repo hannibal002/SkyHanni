@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawFilledBoundingBox
@@ -175,28 +174,6 @@ object RenderUtils {
         DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawColor instead")
-    fun SkyHanniRenderWorldEvent.drawColor(
-        location: LorenzVec,
-        color: LorenzColor,
-        beacon: Boolean = false,
-        alpha: Float = -1f,
-        seeThroughBlocks: Boolean = true,
-    ) {
-        _drawColor(location, color.toColor(), beacon, alpha, seeThroughBlocks)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawColor instead")
-    fun SkyHanniRenderWorldEvent.drawColor(
-        location: LorenzVec,
-        color: Color,
-        beacon: Boolean = false,
-        alpha: Float = -1f,
-        seeThroughBlocks: Boolean = true,
-    ) {
-        _drawColor(location, color, beacon, alpha, seeThroughBlocks)
     }
 
     @Deprecated("Use WorldRenderUtils' expandBlock instead")
