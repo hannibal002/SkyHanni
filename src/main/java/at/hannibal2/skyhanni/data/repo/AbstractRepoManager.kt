@@ -18,15 +18,23 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.minecraft.util.IChatComponent
 import java.io.File
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 @Suppress("TooManyFunctions")
-abstract class AbstractRepoManager(
-    val eventConstructor: (AbstractRepoManager) -> AbstractRepoReloadEvent,
-) {
+abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     open fun getGson() = ConfigManager.gson
+
+    @Suppress("UNCHECKED_CAST")
+    private val eventClass: Class<E> by lazy {
+        (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
+    }
+
+    private val eventCtor by lazy {
+        eventClass.getConstructor(AbstractRepoManager::class.java)
+    }
 
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
@@ -355,7 +363,7 @@ abstract class AbstractRepoManager(
         unsuccessfulConstants.clear()
         extraReloadCoroutineWork()
 
-        eventConstructor.invoke(this@AbstractRepoManager).post { error ->
+        eventCtor.newInstance(this).post { error ->
             logger.logErrorWithData(error, "Error while posting repo reload event")
             loadingError = true
         }

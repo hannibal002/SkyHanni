@@ -8,9 +8,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
-object RepoManager : AbstractRepoManager(
-    eventConstructor = { RepositoryReloadEvent(it) },
-) {
+object RepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val commonName = "SkyHanni"
     override val commonShortNameCased = "SH"
     override val configDirectory = ConfigManager.configDirectory

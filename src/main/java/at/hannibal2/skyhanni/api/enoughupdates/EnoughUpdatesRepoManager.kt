@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 @SkyHanniModule
-object EnoughUpdatesRepoManager : AbstractRepoManager(
-    eventConstructor = { NeuRepositoryReloadEvent(it) },
-) {
+object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>() {
     override val commonName = "NotEnoughUpdates"
     override val commonShortNameCased = "NEU"
     override val configDirectory = EnoughUpdatesManager.configDirectory
