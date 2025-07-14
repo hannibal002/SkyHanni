@@ -196,10 +196,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         shouldManuallyReload = true
         SkyHanniMod.launchIOCoroutine {
             if (config.repoAutoUpdate) {
-                tryFetchRepository(command = false)
-                if (downloadFailed) {
-                    switchToBackupRepo()
-                }
+                fetchAndUnpackRepo(command = false)
+                if (downloadFailed) switchToBackupRepo()
             }
             reloadRepository()
         }
@@ -229,13 +227,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         } catch (e: Error) {
             logger.logErrorWithData(e, "Failed to switch to backup repo")
         }
-    }
-
-    /**
-     * Wrapper around [fetchAndUnpackRepo], which holds a lock to prevent multiple fetches at the same time.
-     */
-    private suspend fun tryFetchRepository(command: Boolean, silentError: Boolean = true) = repoMutex.withLock {
-        fetchAndUnpackRepo(command, silentError)
     }
 
     open fun reportExtraStatusInfo(): Unit = Unit
@@ -291,7 +282,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * @param command If true, will report the status of the repo to the user.
      * @param silentError If true, will not log errors to the console.
      */
-    private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true) {
+    private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true) = repoMutex.withLock {
         localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
         val (currentSha, currentCommitTime) = localRepoCommit
 
@@ -324,7 +315,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         commitStorage.writeToFile(localRepoCommit)
         downloadFailed = false
         isUsingBackup = false
-        return
     }
 
     private fun prepCleanRepoFileSystem() {
