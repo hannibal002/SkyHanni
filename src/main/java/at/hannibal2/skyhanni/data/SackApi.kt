@@ -360,7 +360,7 @@ object SackApi {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
+        val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NeuInternalName>()
 
         sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }

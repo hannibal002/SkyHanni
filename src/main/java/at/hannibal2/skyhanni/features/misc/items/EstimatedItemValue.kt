@@ -61,7 +61,7 @@ object EstimatedItemValue {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
-            event.readConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+            event.getConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
     @HandleEvent

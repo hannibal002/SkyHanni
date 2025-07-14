@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -165,9 +164,5 @@ object GardenBestCropTime {
         event.move(3, "garden.cropMilestoneShowCurrent", "garden.cropMilestones.next.showCurrent")
         event.move(3, "garden.cropMilestoneBestCompact", "garden.cropMilestones.next.bestCompact")
         event.move(3, "garden.cropMilestoneBestHideTitle", "garden.cropMilestones.next.bestHideTitle")
-
-        event.transform(17, "garden.cropMilestones.next.bestType") { element ->
-            ConfigUtils.migrateIntToEnum(element, BestTypeEntry::class.java)
-        }
     }
 }

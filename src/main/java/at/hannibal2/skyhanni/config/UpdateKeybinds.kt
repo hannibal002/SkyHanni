@@ -145,7 +145,7 @@ object UpdateKeybinds {
         return map
     }
 
-    var keybinds: MutableList<String> = mutableListOf()
+    var keybinds: MutableSet<String> = mutableSetOf()
 
     private val logger = LorenzLogger("keybind_upgrader")
 

@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
@@ -48,6 +47,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -521,6 +521,9 @@ object GardenVisitorFeatures {
         }
     }
 
+    val LEGENDARY_JERRY = "JERRY;4".toInternalName()
+    val SPACE_HELM = "DCTR_SPACE_HELM".toInternalName()
+
     @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         val visitor = event.visitor
@@ -542,11 +545,11 @@ object GardenVisitorFeatures {
 
         if (name.removeColor().contains("Jerry")) {
             logger.log("Jerry!")
-            ItemBlink.setBlink(NeuItems.getItemStackOrNull("JERRY;4"), 5_000)
+            ItemBlink.setBlink(LEGENDARY_JERRY.getItemStackOrNull(), 5_000)
         }
         if (name.removeColor().contains("Spaceman")) {
             logger.log("Spaceman!")
-            ItemBlink.setBlink(NeuItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
+            ItemBlink.setBlink(SPACE_HELM.getItemStackOrNull(), 5_000)
         }
     }
 
@@ -758,9 +761,7 @@ object GardenVisitorFeatures {
         event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
         event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
-        event.transform(11, "garden.visitors.rewardWarning.drops") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, VisitorReward::class.java)
-        }
+
         event.transform(12, "garden.visitors.rewardWarning.drops") { element ->
             val drops = JsonArray()
             for (jsonElement in element.asJsonArray) {
@@ -782,10 +783,6 @@ object GardenVisitorFeatures {
             }
             drops.add(JsonPrimitive(VisitorReward.COPPER_DYE.name))
             drops
-        }
-
-        event.transform(15, "garden.visitors.highlightStatus") { element ->
-            ConfigUtils.migrateIntToEnum(element, HighlightMode::class.java)
         }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
