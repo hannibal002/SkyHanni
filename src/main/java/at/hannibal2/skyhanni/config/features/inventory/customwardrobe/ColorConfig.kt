@@ -1,26 +1,17 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ColorConfig {
-
-    companion object {
-        private val config get() = SkyHanniMod.feature.inventory.customWardrobe
-        @JvmStatic
-        fun resetColor() {
-            // Instead of manually resetting each color, just reset the entire config object
-            config.color = ColorConfig()
-        }
-    }
+class ColorConfig() : ResettableStorageSet() {
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    val resetColor: Runnable = Runnable(ColorConfig::resetColor)
+    val resetColor: Runnable = Runnable(::reset)
 
     @Expose
     @ConfigOption(name = "Background", desc = "Color of the GUI background.")
