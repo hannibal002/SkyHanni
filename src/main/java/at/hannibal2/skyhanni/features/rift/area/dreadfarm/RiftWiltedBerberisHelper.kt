@@ -30,9 +30,12 @@ import kotlin.time.Duration.Companion.milliseconds
 object RiftWiltedBerberisHelper {
 
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
+
+    private val berberisSounds = setOf("mob.horse.donkey.death", "mob.horse.donkey.hit")
+    private val list = mutableSetOf<WiltedBerberis>()
+
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
-    private val list = mutableSetOf<WiltedBerberis>()
 
     data class WiltedBerberis(var currentParticles: LorenzVec) {
         var previous: LorenzVec? = null
@@ -109,7 +112,7 @@ object RiftWiltedBerberisHelper {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isMuteOthersSoundsEnabled()) return
 
-        if (event.soundName in setOf("mob.horse.donkey.death", "mob.horse.donkey.hit")) {
+        if (event.soundName in berberisSounds) {
             event.cancel()
         }
     }
