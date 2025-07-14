@@ -19,13 +19,13 @@ class GoldenFishTimerConfig {
     @Expose
     @ConfigOption(name = "Display Mode", desc = "Type of display to show for the Golden Fish.")
     @ConfigEditorDropdown
-    var displayDesign: DesignFormat = DesignFormat.ICON
+    var displayDesign: DesignFormat = DesignFormat.DETAILED_WITH_ICON
 
     enum class DesignFormat(private val displayName: String) {
         OFF("Off"),
         COMPACT("Compact"),
         DETAILED("Detailed"),
-        ICON("Detailed + Icon"),
+        DETAILED_WITH_ICON("Detailed + Icon"),
         ;
 
         override fun toString() = displayName
