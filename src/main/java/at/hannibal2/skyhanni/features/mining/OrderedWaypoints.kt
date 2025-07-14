@@ -2,12 +2,16 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.FriendApi.saveConfig
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -38,6 +42,19 @@ object OrderedWaypoints {
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
+
+
+    @HandleEvent(HypixelJoinEvent::class)
+    fun onHypixelJoin() {
+        if (SkyHanniMod.orderedWaypointsRoutesData.routes == null) {
+            SkyHanniMod.orderedWaypointsRoutesData.routes = mutableMapOf()
+            saveConfig()
+        }
+    }
+
+    fun saveConfig() {
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.ROUTES, "Save file")
+    }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -211,12 +228,13 @@ object OrderedWaypoints {
         }
     }
 
+    @Suppress("UnusedParameter")
     private fun genRouteSuggestions(
         context: CommandContext<Any?>,
         builder: SuggestionsBuilder
     ): CompletableFuture<Suggestions> {
-        val routes = config.routes.keys
-        for (route in routes) {
+        val routes = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys
+        for (route in routes.orEmpty()) {
             if (route.startsWith(builder.remainingLowerCase)) {
                 builder.suggest(route)
             }
@@ -224,6 +242,7 @@ object OrderedWaypoints {
         return builder.buildFuture()
     }
 
+    @Suppress("UnusedParameter")
     private fun getFormatSuggestions(
         context: CommandContext<Any?>,
         builder: SuggestionsBuilder
@@ -257,10 +276,11 @@ object OrderedWaypoints {
             val res = if (name == "") {
                 loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
             } else {
-                config.routes[name] ?: run {
+                val routes = ProfileStorageData.orderedWaypointsRoutes?.routes
+                routes?.get(name) ?: run {
                     ChatUtils.userError(
                         "Route $name doesn't exist.\n" +
-                            "§cSaved Routes: ${config.routes.keys.toList().joinToString(", ")}\n" +
+                            "§cSaved Routes: ${routes?.keys?.toList()?.joinToString(", ")}\n" +
                             "§cIf you would like to import a route from your clipboard, leave the route name blank."
                     )
                     return@launchIOCoroutine
@@ -379,15 +399,17 @@ object OrderedWaypoints {
     }
 
     private fun save(name: String) {
-        config.routes[name] = orderedWaypointsList.deepCopy()
+        ProfileStorageData.orderedWaypointsRoutes?.routes?.set(name, orderedWaypointsList.deepCopy())
+        saveConfig()
         ChatUtils.chat("Route saved as $name. Do /shorderedload $name to import it.")
     }
 
     private fun erase(name: String) {
-        config.routes.remove(name) ?: run {
+        ProfileStorageData.orderedWaypointsRoutes?.routes?.remove(name) ?: run {
             ChatUtils.userError("Route $name doesn't exist.")
             return
         }
+        saveConfig()
         ChatUtils.chat("Route $name successfully deleted.")
     }
 

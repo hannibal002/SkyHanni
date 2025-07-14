@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -266,6 +267,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
     PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
+    ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

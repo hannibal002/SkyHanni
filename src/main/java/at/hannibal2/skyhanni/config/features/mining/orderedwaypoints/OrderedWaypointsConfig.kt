@@ -97,7 +97,4 @@ class OrderedWaypointsConfig {
     @ConfigOption(name = "All Waypoint Color", desc = "Color used for waypoints when using show all mode.")
     @ConfigEditorColour
     var showAllWaypointColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, 102)
-
-    @Expose
-    var routes: MutableMap<String, Waypoints<SkyhanniWaypoint>> = mutableMapOf()
 }
