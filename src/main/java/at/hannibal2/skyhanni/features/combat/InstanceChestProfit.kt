@@ -121,7 +121,7 @@ object InstanceChestProfit {
             }
         }
 
-        // Slot 31 has the purchase cost information
+        // Slot 31 has the cost information for the chest
         items[31]?.getLore()?.forEach {
             coinsPattern.matchMatcher(it) {
                 val amount = group("amount").replace(",", "").toInt()
