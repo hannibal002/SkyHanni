@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.client.Minecraft
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -34,15 +33,8 @@ object GraphNodeEditor {
     private var lastUpdate = SimpleTimeMark.farPast()
     private val tagsToShow: MutableList<GraphNodeTag> = GraphNodeTag.entries.toMutableList()
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
     fun onRenderOverlay() {
-        if (Minecraft.getMinecraft().currentScreen == null) {
-            doRender()
-        }
-    }
-
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onBackgroundDraw() {
         doRender()
     }
 
@@ -167,13 +159,13 @@ object GraphNodeEditor {
 
     private fun checkIsland(tag: GraphNodeTag): Boolean {
         val islandMatches = tag.onlyIsland?.let {
-            it == LorenzUtils.skyBlockIsland
+            it == SkyBlockUtils.currentIsland
         } ?: tag.onlyIslands.takeIfNotEmpty()?.let {
-            LorenzUtils.skyBlockIsland in it
+            SkyBlockUtils.currentIsland in it
         } ?: true
 
         val skyblockMatches = tag.onlySkyblock?.let {
-            it == LorenzUtils.inSkyBlock
+            it == SkyBlockUtils.inSkyBlock
         } ?: true
 
         return islandMatches && skyblockMatches

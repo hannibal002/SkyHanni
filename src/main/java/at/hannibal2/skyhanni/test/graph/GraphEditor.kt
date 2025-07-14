@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -31,14 +31,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawPyramid
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
@@ -287,7 +287,7 @@ object GraphEditor {
             node.position,
             nodeName,
             0.8,
-            ignoreBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
+            seeThroughBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
@@ -296,12 +296,12 @@ object GraphEditor {
 
         val tags = node.tags
         if (tags.isEmpty()) return
-        val tagText = tags.map { it.displayName }.joinToString(" §f+ ")
+        val tagText = tags.joinToString(" §f+ ") { it.displayName }
         this.drawDynamicText(
             node.position,
             tagText,
             0.8,
-            ignoreBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
+            seeThroughBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = 0f,

@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class BroodmotherConfig {
     @Expose
@@ -31,7 +30,7 @@ class BroodmotherConfig {
     @Expose
     @ConfigOption(name = "Alert Settings", desc = "")
     @Accordion
-    var spawnAlert: BroodmotherSpawnAlertConfig = BroodmotherSpawnAlertConfig()
+    val spawnAlert: BroodmotherSpawnAlertConfig = BroodmotherSpawnAlertConfig()
 
     @Expose
     @ConfigOption(name = "Imminent Warning", desc = "Warns you when the Broodmother is 1 minute away from spawning.")
@@ -46,7 +45,7 @@ class BroodmotherConfig {
             "§cThe 'Alive!' and 'Imminent' stages are overridden by the \"Spawn Alert\" and \"Imminent Warning\" features."
     )
     @ConfigEditorDraggableList
-    var stages: MutableList<StageEntry> = mutableListOf(
+    val stages: MutableList<StageEntry> = mutableListOf(
         StageEntry.SLAIN,
         StageEntry.ALIVE
     )
@@ -71,5 +70,5 @@ class BroodmotherConfig {
 
     @Expose
     @ConfigLink(owner = BroodmotherConfig::class, field = "countdown")
-    var countdownPosition: Position = Position(10, 10)
+    val countdownPosition: Position = Position(10, 10)
 }

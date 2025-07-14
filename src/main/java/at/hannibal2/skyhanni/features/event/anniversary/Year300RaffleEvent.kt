@@ -4,15 +4,19 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
@@ -22,8 +26,10 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("SKyHanniModuleInspection", "unused")
 object Year300RaffleEvent {
 
+    val ORANGE_CAKE = "EPOCH_CAKE_ORANGE".toInternalName()
+
     private val config get() = SkyHanniMod.feature.event.century
-    private val displayItem by lazy { NeuItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
+    private val displayItem by lazy { ORANGE_CAKE.getItemStackOrNull() ?: ItemStack(Items.clock) }
 
     private var lastTimerReceived = SimpleTimeMark.farPast()
     private var lastTimeAlerted = SimpleTimeMark.farPast()
@@ -37,7 +43,7 @@ object Year300RaffleEvent {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enableActiveTimer && SkyBlockTime(301).toTimeMark().isInPast()
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enableActiveTimer && SkyBlockTime(301).toTimeMark().isInPast()
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -63,10 +69,10 @@ object Year300RaffleEvent {
             SoundUtils.centuryActiveTimerAlert.playSound()
             lastTimeAlerted = SimpleTimeMark.now()
         }
-        overlay = Renderable.horizontalContainer(
+        overlay = HorizontalContainerRenderable(
             listOf(
-                Renderable.itemStack(displayItem),
-                Renderable.string("§eTime Left: ${timeLeft.format()}"),
+                ItemStackRenderable(displayItem),
+                StringRenderable("§eTime Left: ${timeLeft.format()}"),
             ),
         )
     }

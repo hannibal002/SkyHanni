@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.HotmData
-import at.hannibal2.skyhanni.data.HotmReward
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.hotx.HotmData
+import at.hannibal2.skyhanni.data.hotx.HotmReward
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -15,6 +17,7 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Comp
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -24,12 +27,16 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import com.google.gson.annotations.Expose
-import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -182,12 +189,12 @@ object MineshaftPityDisplay {
             multipliers.forEach { multiplier ->
                 val iconsList = PityBlock.entries
                     .filter { it.multiplier == multiplier }
-                    .map { Renderable.itemStack(it.displayItem) }
+                    .map { ItemStackRenderable(it.displayItem) }
                 add(
-                    Renderable.horizontalContainer(
+                    HorizontalContainerRenderable(
                         listOf(
-                            Renderable.horizontalContainer(iconsList),
-                            Renderable.string("§b${pityCounter / multiplier}"),
+                            HorizontalContainerRenderable(iconsList),
+                            StringRenderable("§b${pityCounter / multiplier}"),
                         ),
                         2,
                     ),
@@ -195,42 +202,42 @@ object MineshaftPityDisplay {
             }
         }
 
-        val neededToPityRenderable = Renderable.verticalContainer(
+        val neededToPityRenderable = VerticalContainerRenderable(
             listOf(
-                Renderable.string("§3Needed to pity:"),
-                Renderable.horizontalContainer(
+                StringRenderable("§3Needed to pity:"),
+                HorizontalContainerRenderable(
                     listOf(
                         Renderable.placeholder(10, 0),
-                        Renderable.verticalContainer(blocksToPityList),
+                        VerticalContainerRenderable(blocksToPityList),
                     ),
                 ),
             ),
         )
 
         val map = mapOf(
-            MineshaftPityLine.TITLE to Renderable.string("§9§lMineshaft Pity Counter"),
-            MineshaftPityLine.COUNTER to Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
-            MineshaftPityLine.CHANCE to Renderable.string(
+            MineshaftPityLine.TITLE to StringRenderable("§9§lMineshaft Pity Counter"),
+            MineshaftPityLine.COUNTER to StringRenderable("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
+            MineshaftPityLine.CHANCE to StringRenderable(
                 "§3Chance: §e1§6/§e${
                     chance.roundTo(1).addSeparators()
                 } §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
             ),
             MineshaftPityLine.NEEDED_TO_PITY to neededToPityRenderable,
             MineshaftPityLine.TIME_SINCE_MINESHAFT to
-                Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
+                StringRenderable("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
             MineshaftPityLine.AVERAGE_BLOCKS_MINESHAFT to
-                Renderable.string(
+                StringRenderable(
                     "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
                 ),
-            MineshaftPityLine.MINESHAFTS_TOTAL to Renderable.string("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
-            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_TOTAL to StringRenderable("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_SESSION to StringRenderable("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
         display = listOf(
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
-                spacing = 2
-            )
+                spacing = 2,
+            ),
         )
     }
 
@@ -257,13 +264,21 @@ object MineshaftPityDisplay {
         update()
     }
 
-    fun fullResetCounter() {
-        resetCounter()
-        mineshaftTotalBlocks = 0
-        mineshaftTotalCount = 0
-        sessionMineshafts = 0
-        lastMineshaftSpawn = SimpleTimeMark.farPast()
-        update()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetmineshaftpitystats") {
+            description = "Resets the mineshaft pity display stats"
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                ChatUtils.chat("Reset the mineshaft pity display stats!")
+                resetCounter()
+                mineshaftTotalBlocks = 0
+                mineshaftTotalCount = 0
+                sessionMineshafts = 0
+                lastMineshaftSpawn = SimpleTimeMark.farPast()
+                update()
+            }
+        }
     }
 
     @HandleEvent
@@ -305,14 +320,14 @@ object MineshaftPityDisplay {
             "Mithril",
             listOf(OreType.MITHRIL),
             2,
-            ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata),
+            ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
         ),
 
         GEMSTONE(
             "Gemstone",
             OreType.entries.filter { it.isGemstone() },
             4,
-            ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata),
+            ColoredBlockCompat.BLUE.createGlassStack(),
         ),
         GLACITE(
             "Glacite",
@@ -337,7 +352,7 @@ object MineshaftPityDisplay {
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata),
+            BlockCompat.createSmoothDiorite(),
         ),
         ;
 

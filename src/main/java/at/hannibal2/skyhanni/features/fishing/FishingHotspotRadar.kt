@@ -14,15 +14,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
@@ -60,7 +60,12 @@ object FishingHotspotRadar {
 
         bezierFitter.addPoint(currLoc)
 
-        hotspotLocation = bezierFitter.solve() ?: return
+        val guess = bezierFitter.solve() ?: return
+        if (!SkyBlockUtils.currentIsland.isInBounds(guess)) {
+            hotspotLocation = null
+            return
+        }
+        hotspotLocation = guess
         isUnknown = false
         lastUpdate = SimpleTimeMark.now()
         hotspotLocation?.let {
@@ -151,5 +156,5 @@ object FishingHotspotRadar {
         bezierFitter.reset()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.guessHotspotRadar
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.guessHotspotRadar
 }

@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
@@ -25,14 +25,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -40,10 +37,12 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.util.ChatComponentText
 import java.awt.Color
-import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -104,7 +103,11 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object IslandGraphs {
+
+    private val config get() = SkyHanniMod.feature.misc.pathfinding
+
     var currentIslandGraph: Graph? = null
+        private set
     private var lastLoadedIslandType = "nothing"
     private var lastLoadedTime = SimpleTimeMark.farPast()
 
@@ -147,6 +150,8 @@ object IslandGraphs {
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
     private var inGlaciteTunnels: Boolean? = null
+    private var nextChatMessage: ChatComponentText? = null
+    private var lastMessageSent = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
@@ -162,7 +167,7 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRepoReload(event: RepositoryReloadEvent) {
-        loadIsland(LorenzUtils.skyBlockIsland)
+        loadIsland(SkyBlockUtils.currentIsland)
     }
 
     @HandleEvent
@@ -186,14 +191,13 @@ object IslandGraphs {
 
     @HandleEvent
     fun onAreaChange(event: ScoreboardAreaChangeEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) {
+        if (!IslandType.DWARVEN_MINES.isCurrent()) {
             inGlaciteTunnels = null
             return
         }
 
         // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
-        @Suppress("DEPRECATION")
-        val now = isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)
+        val now = isGlaciteTunnelsArea(SkyBlockUtils.scoreboardArea)
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             loadDwarvenMines()
@@ -206,8 +210,7 @@ object IslandGraphs {
 
     private fun loadDwarvenMines() {
         // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
-        @Suppress("DEPRECATION")
-        if (isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)) {
+        if (isGlaciteTunnelsArea(SkyBlockUtils.scoreboardArea)) {
             reloadFromJson("GLACITE_TUNNELS")
         } else {
             reloadFromJson("DWARVEN_MINES")
@@ -225,8 +228,8 @@ object IslandGraphs {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Island Graphs")
-        val islandType = LorenzUtils.skyBlockIsland.name
-        val important = LorenzUtils.inSkyBlock && lastLoadedIslandType != islandType
+        val islandType = SkyBlockUtils.currentIsland.name
+        val important = SkyBlockUtils.inSkyBlock && lastLoadedIslandType != islandType
         val list = buildList {
             add("")
             if (important) {
@@ -243,7 +246,7 @@ object IslandGraphs {
             add("")
             add("lastLoadedTime: ${lastLoadedTime.passedSince()}")
             if (important) {
-                add("last world switch: ${LorenzUtils.lastWorldSwitch.passedSince()}")
+                add("last world switch: ${SkyBlockUtils.lastWorldSwitch.passedSince()}")
             }
 
             add("")
@@ -260,17 +263,14 @@ object IslandGraphs {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
 
-        val constant = "island_graphs/$islandName"
-        val name = "constants/$constant.json"
-        val jsonFile = File(RepoManager.repoLocation, name)
-        if (!jsonFile.isFile) {
+        try {
+            val graph = RepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+            IslandAreas.display = null
+            setNewGraph(graph)
+        } catch (e: Error) {
             currentIslandGraph = null
             return
         }
-
-        val graph = RepoUtils.getConstant(RepoManager.repoLocation, constant, Graph.gson, Graph::class.java)
-        IslandAreas.display = null
-        setNewGraph(graph)
     }
 
     fun setNewGraph(graph: Graph) {
@@ -298,6 +298,14 @@ object IslandGraphs {
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
             update()
+        }
+        updateChat()
+        nextChatMessage?.let {
+            if (lastMessageSent.passedSince() > config.chatUpdateInterval.duration) {
+                it.send(pathFindMessageId)
+                nextChatMessage = null
+                lastMessageSent = SimpleTimeMark.now()
+            }
         }
     }
 
@@ -556,7 +564,7 @@ object IslandGraphs {
             },
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
-        componentText.send(pathFindMessageId)
+        nextChatMessage = componentText
     }
 
     fun overrideChatMessage(message: String) {
@@ -680,7 +688,7 @@ object IslandGraphs {
         betaOnly: Boolean,
     ) {
         val graphArea = IslandAreas.currentAreaName
-        val scoreboardArea = LorenzUtils.skyBlockArea ?: "unknown"
+        val scoreboardArea = SkyBlockUtils.scoreboardArea ?: "unknown"
 
         val extraData = mutableMapOf<String, Any>()
         userReason?.let {
@@ -689,7 +697,7 @@ object IslandGraphs {
         additionalInternalInfo?.let {
             extraData["internal info"] = it
         }
-        val island = LorenzUtils.skyBlockIsland.name
+        val island = SkyBlockUtils.currentIsland.name
         extraData["island"] = island
         extraData["location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
         if (graphArea != scoreboardArea) {
@@ -697,11 +705,10 @@ object IslandGraphs {
             extraData["area scoreboard"] = scoreboardArea
         }
 
-        RepoManager.commitTime?.let {
-            extraData["repo update time"] = it.toString()
-            extraData["repo update age"] = it.passedSince()
-        } ?: run {
-            extraData["repo update time"] = "none"
+        RepoManager.localRepoCommit.let { (hash, time) ->
+            extraData["repo update time"] = time?.toString() ?: "none"
+            extraData["repo update age"] = time?.passedSince() ?: "unknown"
+            extraData["repo update hash"] = hash ?: "none"
         }
 
         ErrorManager.logErrorStateWithData(

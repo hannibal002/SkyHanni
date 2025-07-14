@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object SkullTextureHolder {
 
@@ -25,6 +26,8 @@ object SkullTextureHolder {
 
     // Any classes that rely on textures that cannot make use of by lazy or other late initializers
     private fun fixLateInits() {
-        MiningEventType.fixGoblinItemStack()
+        DelayedRun.runNextTick {
+            MiningEventType.fixGoblinItemStack()
+        }
     }
 }

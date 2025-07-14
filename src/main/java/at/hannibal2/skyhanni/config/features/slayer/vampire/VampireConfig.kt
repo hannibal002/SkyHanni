@@ -12,17 +12,17 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Your Boss", desc = "")
     @Accordion
-    var ownBoss: OwnBossConfig = OwnBossConfig()
+    val ownBoss: OwnBossConfig = OwnBossConfig()
 
     @Expose
     @ConfigOption(name = "Others Boss", desc = "")
     @Accordion
-    var othersBoss: OthersBossConfig = OthersBossConfig()
+    val othersBoss: OthersBossConfig = OthersBossConfig()
 
     @Expose
     @ConfigOption(name = "Co-op Boss", desc = "")
     @Accordion
-    var coopBoss: CoopBossHighlightConfig = CoopBossHighlightConfig()
+    val coopBoss: CoopBossHighlightConfig = CoopBossHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
@@ -70,10 +70,10 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Blood Ichor", desc = "")
     @Accordion
-    var bloodIchor: BloodIchorConfig = BloodIchorConfig()
+    val bloodIchor: BloodIchorConfig = BloodIchorConfig()
 
     @Expose
     @ConfigOption(name = "Killer Spring", desc = "")
     @Accordion
-    var killerSpring: KillerSpringConfig = KillerSpringConfig()
+    val killerSpring: KillerSpringConfig = KillerSpringConfig()
 }

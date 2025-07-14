@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
@@ -21,13 +21,13 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -47,7 +47,11 @@ object IslandAreas {
     private var paths = mapOf<GraphNode, Graph>()
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
-    var currentAreaName = ""
+
+    @Deprecated("moved", ReplaceWith("LorenzUtils.graphArea"))
+    val currentAreaName get() = currentArea
+
+    var currentArea = ""
     private val textInput = SearchTextInput()
 
     @HandleEvent
@@ -160,7 +164,7 @@ object IslandAreas {
                 passedAreas.remove(name)
                 passedAreas.remove(null)
                 passedAreas.remove("null")
-                passedAreas.remove(currentAreaName)
+                passedAreas.remove(currentArea)
                 // so show areas needed to pass thorough
                 // TODO show this pass through in the /shnavigate command
                 if (passedAreas.isNotEmpty()) {
@@ -222,12 +226,12 @@ object IslandAreas {
             )
         }
         if (foundAreas == 0) {
-            val islandName = LorenzUtils.skyBlockIsland.displayName
+            val islandName = SkyBlockUtils.currentIsland.displayName
             if (foundCurrentArea) {
                 buildDisplay?.addSearchString("§cThere is only one area in $islandName,")
                 buildDisplay?.addSearchString("§cnothing else to navigate to!")
             } else {
-                buildDisplay?.addSearchString("§cThere is no $islandName area data avaliable yet!")
+                buildDisplay?.addSearchString("§cThere is no $islandName area data available yet!")
             }
         }
         buildDisplay?.let {
@@ -236,9 +240,9 @@ object IslandAreas {
     }
 
     private fun updateArea(name: String, onlyInternal: Boolean) {
-        if (name != currentAreaName) {
-            val oldArea = currentAreaName
-            currentAreaName = name
+        if (name != currentArea) {
+            val oldArea = currentArea
+            currentArea = name
             GraphAreaChangeEvent(name, oldArea, onlyInternal).post()
         }
     }
@@ -260,7 +264,7 @@ object IslandAreas {
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
-            if (name == currentAreaName) continue
+            if (name == currentArea) continue
             if (name == "no_area") continue
             val position = node.position
             val areaTag = node.getAreaTag(useConfig = true) ?: continue

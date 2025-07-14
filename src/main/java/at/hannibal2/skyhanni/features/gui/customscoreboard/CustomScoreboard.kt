@@ -27,16 +27,18 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -66,7 +68,7 @@ object CustomScoreboard {
         display ?: return
 
         val render =
-            if (LorenzUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache != null) cache
+            if (SkyBlockUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache != null) cache
             else display
 
         render ?: return
@@ -117,7 +119,7 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 7.seconds)
+        if (SkyBlockUtils.inSkyBlock && displayConfig.useCustomLines && SkyBlockUtils.lastWorldSwitch.passedSince() > 7.seconds)
             UnknownLinesHandler.handleUnknownLines()
     }
 
@@ -132,7 +134,7 @@ object CustomScoreboard {
     private val eventsConfig get() = displayConfig.events
 
     private fun createLines() = when {
-        !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()
+        !SkyBlockUtils.inSkyBlock -> addAllNonSkyBlockLines()
         !displayConfig.useCustomLines -> addDefaultSkyBlockLines()
         else -> addCustomSkyBlockLines()
     }
@@ -164,8 +166,8 @@ object CustomScoreboard {
         }
     }
 
-    private fun List<ScoreboardLine>.createRenderable() = Renderable.verticalContainer(
-        map { Renderable.string(it.display, horizontalAlign = it.alignment) },
+    private fun List<ScoreboardLine>.createRenderable() = VerticalContainerRenderable(
+        map { StringRenderable(it.display, horizontalAlign = it.alignment) },
         displayConfig.lineSpacing - 10,
         horizontalAlign = HorizontalAlignment.CENTER,
         verticalAlign = VerticalAlignment.CENTER,
@@ -193,7 +195,7 @@ object CustomScoreboard {
     @HandleEvent
     fun onWorldChange() {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
+            if (!SkyBlockUtils.inSkyBlock || !(SkyBlockUtils.onHypixel && OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
     }
 
@@ -218,7 +220,7 @@ object CustomScoreboard {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }
 
-        activePatterns = (ScoreboardConfigElement.getElements() + ScoreboardConfigEventElement.getEvents())
+        activePatterns = ScoreboardConfigElement.getElements()
             .flatMap { it.elementPatterns }
             .distinct()
         activePatterns += ScoreboardPattern.brokenPatterns
@@ -268,7 +270,7 @@ object CustomScoreboard {
     }
 
     private fun isEnabled() =
-        (LorenzUtils.inSkyBlock || (OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
+        (SkyBlockUtils.inSkyBlock || (OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected() && SkyBlockUtils.onHypixel)) && config.enabled.get()
 
     @JvmStatic
     fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()

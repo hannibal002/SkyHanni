@@ -15,18 +15,19 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
@@ -45,7 +46,7 @@ object OutsideSackValue {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { LorenzUtils.inSkyBlock && config.enabled && !SackApi.inventory.isInside() },
+            condition = { SkyBlockUtils.inSkyBlock && config.enabled && !SackApi.inventory.isInside() },
             onRender = {
                 config.position.renderRenderables(display, posLabel = "Outside Sacks Value")
             },
@@ -96,7 +97,7 @@ object OutsideSackValue {
         val result = buildList {
             add(
                 Renderable.clickable(
-                    Renderable.string(label),
+                    StringRenderable(label),
                     tips = buildList {
                         add(label)
                         add("")
@@ -142,7 +143,7 @@ object OutsideSackValue {
         val (label, data) = calculateData()
         return listOf(
             Renderable.clickable(
-                Renderable.string(label),
+                StringRenderable(label),
                 tips = buildList {
                     add(label)
                     add("")
