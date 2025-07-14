@@ -176,12 +176,6 @@ object RenderUtils {
         GlStateManager.enableLighting()
     }
 
-    @Deprecated("Use WorldRenderUtils' expandBlock instead")
-    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
-
-    @Deprecated("Use WorldRenderUtils' inflateBlock instead")
-    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
-
     @Deprecated("Use WorldRenderUtils' drawWaypointFilled instead")
     fun SkyHanniRenderWorldEvent.drawWaypointFilled(
         location: LorenzVec,
