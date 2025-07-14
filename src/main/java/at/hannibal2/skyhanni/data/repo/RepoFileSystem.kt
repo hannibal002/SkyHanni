@@ -37,9 +37,9 @@ sealed interface RepoFileSystem {
         return gson.fromJson<JsonElement>(jsonText)
     }
 
-    fun unzipIgnoreFirstFolder(
-        zipFilePath: String,
-    ) = ZipFile(zipFilePath).use { zip ->
+    fun loadFromZip(
+        zipFile: File,
+    ) = ZipFile(zipFile.absolutePath).use { zip ->
         zip.entries().asSequence().filter { !it.isDirectory }.forEach { entry ->
             val relative = entry.name
                 .substringAfter('/', "")
@@ -102,8 +102,8 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
     }.map { it.removePrefix("$path/") }
 
-    override fun unzipIgnoreFirstFolder(zipFilePath: String) {
-        super.unzipIgnoreFirstFolder(zipFilePath)
+    override fun loadFromZip(zipFile: File) {
+        super.loadFromZip(zipFile)
         if (flushJob != null) return
         flushJob = SkyHanniMod.launchIOCoroutine {
             saveToDisk(diskRoot)

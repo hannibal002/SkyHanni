@@ -222,7 +222,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             prepCleanRepoFileSystem()
 
             Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            repoFileSystem.unzipIgnoreFirstFolder(repoZipFile.absolutePath)
+            repoFileSystem.loadFromZip(repoZipFile)
 
             commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
             logger.debug("Successfully switched to backup repo")
@@ -318,7 +318,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         // Actually unpack the repo zip file into our local 'file system'
-        repoFileSystem.unzipIgnoreFirstFolder(repoZipFile.absolutePath)
+        repoFileSystem.loadFromZip(repoZipFile)
 
         localRepoCommit = RepoCommit(latestSha, latestCommitTime)
         commitStorage.writeToFile(localRepoCommit)
@@ -331,7 +331,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         repoDirectory.deleteRecursively()
         repoFileSystem = RepoFileSystem.createAndClean(repoDirectory, config.unzipToMemory)
         repoDirectory.mkdirs()
-        repoZipFile.mkdirs()
         repoZipFile.createNewFile()
     }
 
