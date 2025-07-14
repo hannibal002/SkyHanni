@@ -33,6 +33,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
@@ -157,7 +160,7 @@ object FarmingFortuneDisplay {
         val displayCrop = GardenApi.cropInHand ?: currentCrop ?: return@buildList
 
         val list = mutableListOf<Renderable>()
-        list.add(Renderable.itemStack(displayCrop.icon))
+        list.add(ItemStackRenderable(displayCrop.icon))
 
         var recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
         val wrongTabCrop = GardenApi.cropInHand != null && GardenApi.cropInHand != currentCrop
@@ -179,24 +182,24 @@ object FarmingFortuneDisplay {
         val wrongTabCropText = "§cBreak §e${GardenApi.cropInHand?.cropName}§c to see" + latest + " fortune!"
 
         if (!wrongTabCrop || !config.compactFormat) {
-            list.add(Renderable.string(farmingFortuneText + fortuneColorCode + fortuneAmount))
+            list.add(StringRenderable(farmingFortuneText + fortuneColorCode + fortuneAmount))
         } else {
             list.add(Renderable.hoverTips("$farmingFortuneText§c???", listOf(wrongTabCropText)))
         }
 
-        add(Renderable.horizontalContainer(list))
+        add(HorizontalContainerRenderable(list))
 
         if (ffReduction > 0) {
             if (config.compactFormat) {
-                add(Renderable.string("§cPests: §7-§e$ffReduction%"))
+                add(StringRenderable("§cPests: §7-§e$ffReduction%"))
             } else {
-                add(Renderable.string("§cPests are reducing your fortune by §e$ffReduction%§c!"))
+                add(StringRenderable("§cPests are reducing your fortune by §e$ffReduction%§c!"))
             }
 
         }
 
         if (wrongTabCrop && !config.hideMissingFortuneWarnings && !config.compactFormat) {
-            add(Renderable.string(wrongTabCropText))
+            add(StringRenderable(wrongTabCropText))
         }
     }
 

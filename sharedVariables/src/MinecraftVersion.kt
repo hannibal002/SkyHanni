@@ -9,6 +9,7 @@ enum class MinecraftVersion(
     MC189("1.8.9", 8),
     MC11605("1.16.5", 8),
     MC12105("1.21.5", 21),
+    MC12107("1.21.7", 21),
     ;
 
     val javaLanguageVersion = JavaLanguageVersion.of(javaVersion)

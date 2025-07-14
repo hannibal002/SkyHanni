@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
@@ -154,7 +155,7 @@ object SackDisplay {
                         totalMagmaFish += magmaFish
                         add(
                             Renderable.hoverTips(
-                                Renderable.string(
+                                StringRenderable(
                                     "§d$magmaFish",
                                     horizontalAlign = config.alignment,
                                 ),

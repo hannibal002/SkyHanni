@@ -22,10 +22,13 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-// https://api.hypixel.net/#tag/SkyBlock/paths/~1v2~1skyblock~1bazaar/get
 @SkyHanniModule
 object HypixelBazaarFetcher {
-    private const val URL = "https://api.hypixel.net/v2/skyblock/bazaar"
+    private val bzStatic = ApiUtils.StaticApiPath(
+        "https://api.hypixel.net/v2/skyblock/bazaar",
+        "Hypixel Bazaar"
+    )
+
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 
     var latestProductInformation = mapOf<NeuInternalName, BazaarData>()
@@ -61,12 +64,13 @@ object HypixelBazaarFetcher {
         }
     }
 
-    private fun fetchAndProcessBazaarData() {
+    private suspend fun fetchAndProcessBazaarData() {
         nextFetchTime = SimpleTimeMark.now() + 2.minutes
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
         try {
-            val jsonResponse = ApiUtils.getJSONResponse(URL, apiName = "Hypixel Bazaar").asJsonObject
+            val jsonResponse = ApiUtils.getJSONResponse(bzStatic)
+                ?: return onError(fetchType, Exception("Failed to fetch bazaar data from Hypixel API"))
             val response = ConfigManager.gson.fromJson<BazaarApiResponseJson>(jsonResponse)
             if (response.success) {
                 latestProductInformation = process(response.products)
@@ -83,8 +87,8 @@ object HypixelBazaarFetcher {
 
     private fun process(products: Map<String, BazaarProduct>) = products.mapNotNull { (key, product) ->
         val internalName = NeuItems.transHypixelNameToInternalName(key)
-        val sellOfferPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
-        val instantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantBuyPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantSellPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
 
         if (product.quickStatus.isEmpty()) {
             return@mapNotNull null
@@ -96,7 +100,7 @@ object HypixelBazaarFetcher {
             if (!isUnobtainableBazaarProduct(key) && SkyHanniDebugsAndTests.enabled) println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
-        internalName to BazaarData(internalName.repoItemName, sellOfferPrice, instantBuyPrice, product)
+        internalName to BazaarData(internalName.repoItemName, instantBuyPrice, instantSellPrice, product)
     }.toMap()
 
     private fun isUnobtainableBazaarProduct(key: String): Boolean = when (key) {

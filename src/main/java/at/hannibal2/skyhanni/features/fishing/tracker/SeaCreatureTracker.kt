@@ -121,6 +121,7 @@ object SeaCreatureTracker {
         val map = mutableMapOf(
             "Phlhlegblast" to "Plhlegblast",
             "Sea Emperor" to "The Sea Emperor",
+            "The Sea Emperor" to "The Loch Emperor",
         )
 
         for ((oldName, newName) in map) {

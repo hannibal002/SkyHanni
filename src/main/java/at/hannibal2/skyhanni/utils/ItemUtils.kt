@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -49,6 +49,9 @@ import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -356,6 +359,10 @@ object ItemUtils {
         //#endif
     }
 
+    @Suppress("SpreadOperator")
+    fun createSkull(displayName: String, uuid: String, value: String, loreColl: Collection<String>) =
+        createSkull(displayName, uuid, value, *loreColl.toTypedArray())
+
     // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
         //#if MC < 1.21
@@ -412,6 +419,13 @@ object ItemUtils {
         //$$ val stack = ItemStack(item, amount)
         //$$ stack.setCustomItemName(displayName)
         //$$ stack.setLore(lore)
+        //$$ var tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent.DEFAULT.with(DataComponentTypes.DAMAGE, true)
+        //$$ tooltipDisplay = tooltipDisplay.with(DataComponentTypes.ATTRIBUTE_MODIFIERS, true)
+        //$$ tooltipDisplay = tooltipDisplay.with(DataComponentTypes.UNBREAKABLE, true)
+        //$$ if (displayName.isBlank() && lore.isEmpty()) {
+        //$$     tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent(true, tooltipDisplay.hiddenComponents)
+        //$$ }
+        //$$ stack.set(DataComponentTypes.TOOLTIP_DISPLAY, tooltipDisplay)
         //$$ return stack
         //#endif
     }
@@ -651,6 +665,13 @@ object ItemUtils {
     }
 
     private var compactNameReplace = mapOf<String, String>()
+    var bazaarOverrides = mapOf<String, String>()
+        private set
+
+    private data class BazaarOverride(
+        @Expose @SerializedName("stock") val bazaarInternalName: String,
+        @Expose @SerializedName("id") val neuInternalName: String,
+    )
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -658,6 +679,13 @@ object ItemUtils {
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
         @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
         compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
+    }
+
+    @HandleEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val bazaarOverridesTypeToken = object : TypeToken<List<BazaarOverride>>() {}.type
+        val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", bazaarOverridesTypeToken)
+        bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
@@ -668,8 +696,8 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
-        if (this.getItemStackOrNull()?.getPetInfo() != null) {
-            return PetUtils.getCleanPetName(this@grabItemName, colored = true) + " Pet"
+        if (this.isPet) {
+            return PetUtils.getCleanPetName(this, colored = true) + " Pet"
         }
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
@@ -864,7 +892,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-        if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
+        if (!SkyBlockUtils.debug && !PlatformUtils.isDevEnvironment) return
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()

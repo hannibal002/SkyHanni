@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import org.lwjgl.opengl.GL11
@@ -102,11 +104,11 @@ object HoppityEggDisplayManager {
                 val collectedFormat = formatEggsCollected(collectedEggs)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }
-        }.map { it.partyModeReplace() }
+        }.map { CFApi.partyModeReplace(it) }
 
         if (displayList.size == 1) return emptyList()
 
-        val container = Renderable.verticalContainer(displayList.map(Renderable::string))
+        val container = VerticalContainerRenderable(displayList.map(StringRenderable::from))
         return listOf(
             if (unclaimedEggsConfig.warpClickEnabled) Renderable.clickable(
                 container,

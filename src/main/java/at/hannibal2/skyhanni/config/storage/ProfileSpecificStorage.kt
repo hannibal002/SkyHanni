@@ -620,7 +620,7 @@ class ProfileSpecificStorage(
             var attemptsSince: Int = 0
 
             @Expose
-            var xpSince: Int = 0
+            var xpSince: Long = 0
         }
 
         @Expose
@@ -729,6 +729,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var crystalNucleusTracker: CrystalNucleusTracker.Data = CrystalNucleusTracker.Data()
+
+        @Expose
+        var flowstatePersonalBest = 0
     }
 
     @Expose
@@ -903,6 +906,13 @@ class ProfileSpecificStorage(
     class CakeCounterData(
         @Expose var cakesEaten: Int? = -1,
         @Expose var soulsFound: Int = 0,
+    )
+
+    @Expose
+    var attributeShards: MutableMap<String, AttributeShardData> = mutableMapOf()
+
+    data class AttributeShardData(
+        @Expose var amountSyphoned: Int = 0,
     )
 
     @Expose

@@ -25,7 +25,7 @@ open class CircularRenderable(
     override val horizontalAlign = horizontalAlignment
     override val verticalAlign = verticalAlignment
 
-    override fun render(posX: Int, posY: Int) = when {
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = when {
         filledPercentage < 100.0 -> {
             val baseAngle = Math.PI.toFloat() * 3f / 2f
             val endAngle = (baseAngle + ((100.0 - filledPercentage) / 50.0 * Math.PI).toFloat()).mod(2f * Math.PI.toFloat())
@@ -55,10 +55,10 @@ class CircularContainerRenderable(
     verticalAlignment,
 ) {
     private val takenSpace = 2 * (radius - padding)
-    override fun render(posX: Int, posY: Int) {
-        super.render(posX, posY)
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+        super.render(mouseOffsetX, mouseOffsetY)
         DrawContextUtils.translated(padding.toFloat(), padding.toFloat(), 0f) {
-            renderable.renderXYAligned(posX + padding, posY + padding, takenSpace, takenSpace)
+            renderable.renderXYAligned(mouseOffsetX + padding, mouseOffsetY + padding, takenSpace, takenSpace)
         }
     }
 }

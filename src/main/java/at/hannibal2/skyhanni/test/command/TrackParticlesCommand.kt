@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.util.EnumParticleTypes
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
@@ -104,7 +105,7 @@ object TrackParticlesCommand {
 
         display = particlesToDisplay
             .take(10).reversed().map {
-                Renderable.string("§3" + it.second.type + " §8c:" + it.second.count + " §7s:" + it.second.speed)
+                StringRenderable("§3" + it.second.type + " §8c:" + it.second.count + " §7s:" + it.second.speed)
             }
         worldParticles = particlesToDisplay.map { it.second }.groupBy { it.location }
 
