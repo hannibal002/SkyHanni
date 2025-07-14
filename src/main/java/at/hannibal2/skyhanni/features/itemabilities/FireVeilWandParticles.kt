@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -62,9 +61,5 @@ object FireVeilWandParticles {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWands.displayColor")
         event.move(3, "itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWands.display")
-
-        event.transform(15, "itemAbilities.fireVeilWands.display") { element ->
-            ConfigUtils.migrateIntToEnum(element, DisplayEntry::class.java)
-        }
     }
 }

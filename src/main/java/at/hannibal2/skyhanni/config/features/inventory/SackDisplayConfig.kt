@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -45,13 +44,12 @@ class SackDisplayConfig {
     @ConfigEditorDropdown
     var alignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
 
-    enum class NumberFormatEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        DEFAULT("Default", 0),
-        FORMATTED("Formatted", 1),
-        UNFORMATTED("Unformatted", 2),
+    enum class NumberFormatEntry(private val displayName: String) {
+        DEFAULT("Default"),
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -65,14 +63,13 @@ class SackDisplayConfig {
     @ConfigEditorDropdown
     var sortingType: SortingTypeEntry = SortingTypeEntry.DESC_STORED
 
-    enum class SortingTypeEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        DESC_STORED("Stored Descending", 0),
-        ASC_STORED("Stored Ascending", 1),
-        DESC_PRICE("Price Descending", 2),
-        ASC_PRICE("Price Ascending", 3),
+    enum class SortingTypeEntry(private val displayName: String) {
+        DESC_STORED("Stored Descending"),
+        ASC_STORED("Stored Ascending"),
+        DESC_PRICE("Price Descending"),
+        ASC_PRICE("Price Ascending"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -105,12 +102,11 @@ class SackDisplayConfig {
     @ConfigEditorDropdown
     var priceFormat: PriceFormatEntry = PriceFormatEntry.FORMATTED
 
-    enum class PriceFormatEntry(private val displayName: String, private val legacyId: Int) : HasLegacyId {
-        FORMATTED("Formatted", 0),
-        UNFORMATTED("Unformatted", 1),
+    enum class PriceFormatEntry(private val displayName: String) {
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

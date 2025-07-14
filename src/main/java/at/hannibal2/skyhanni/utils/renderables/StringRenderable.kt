@@ -24,6 +24,10 @@ open class StringRenderable(
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         RenderableUtils.renderString(text, scale, color, inverseScale)
     }
+
+    companion object {
+        fun from(text: String) = StringRenderable(text)
+    }
 }
 
 class WrappedStringRenderable(

@@ -6,18 +6,42 @@ import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotxHandler
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 
 @SkyHanniModule
 object HotxFeatures {
 
     private val configHotm get() = SkyHanniMod.feature.mining.hotm
     private val configHotf get() = SkyHanniMod.feature.foraging.hotf
+
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        val (handler, configPos) = when {
+            HotmData.inApplicableIsland && configHotm.skyMallDisplay -> Pair(HotmData, configHotm.skyMallPosition)
+            HotfData.inApplicableIsland && configHotf.lotteryDisplay -> Pair(HotfData, configHotf.lotteryPosition)
+            else -> return
+        }
+        val rotatingPerkEntry = handler.rotatingPerkEntry
+        if (!rotatingPerkEntry.isUnlocked || !rotatingPerkEntry.enabled) return
+        val currentPerk = handler.currentRotPerk
+
+        val perkDescriptionFormat = currentPerk?.perkDescription
+            ?: "§cUnknown! Run ${"§b/${handler.name.lowercase()}"} §cto fix this."
+        val finalFormat = "§b${rotatingPerkEntry.guiName}§8: $perkDescriptionFormat"
+
+        configPos.renderRenderable(
+            StringRenderable(finalFormat),
+            posLabel = "${rotatingPerkEntry.guiName} Display",
+        )
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {

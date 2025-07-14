@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
@@ -66,6 +65,8 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
@@ -244,11 +245,11 @@ object GardenVisitorFeatures {
 
             addSackData(internalName, amount, list)
 
-            add(Renderable.horizontalContainer(list))
+            add(HorizontalContainerRenderable(list))
         }
         if (totalPrice > 0) {
             val format = totalPrice.shortFormat()
-            this[0] = Renderable.string("§7Visitor Shopping List: §7(§6$format§7)")
+            this[0] = StringRenderable("§7Visitor Shopping List: §7(§6$format§7)")
         }
     }
 
@@ -343,7 +344,7 @@ object GardenVisitorFeatures {
             }
         }
 
-        add(Renderable.horizontalContainer(list))
+        add(HorizontalContainerRenderable(list))
     }
 
     @HandleEvent
@@ -756,9 +757,7 @@ object GardenVisitorFeatures {
         event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
         event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
         event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
-        event.transform(11, "garden.visitors.rewardWarning.drops") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, VisitorReward::class.java)
-        }
+
         event.transform(12, "garden.visitors.rewardWarning.drops") { element ->
             val drops = JsonArray()
             for (jsonElement in element.asJsonArray) {
@@ -780,10 +779,6 @@ object GardenVisitorFeatures {
             }
             drops.add(JsonPrimitive(VisitorReward.COPPER_DYE.name))
             drops
-        }
-
-        event.transform(15, "garden.visitors.highlightStatus") { element ->
-            ConfigUtils.migrateIntToEnum(element, HighlightMode::class.java)
         }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")

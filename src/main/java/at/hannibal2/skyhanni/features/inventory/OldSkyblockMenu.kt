@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -27,7 +28,18 @@ import kotlin.reflect.KFunction
  */
 @SkyHanniModule
 object OldSkyblockMenu {
-    private val skyblockMenu = InventoryDetector { name -> name == "SkyBlock Menu" }
+    private val skyblockMenu = InventoryDetector(
+        openInventory = { openInvEvent ->
+            SkyBlockButton.entries.forEach {
+                val invItem = openInvEvent.inventoryItems[it.slot] ?: return@forEach
+                it.disabled = !invItem.isStainedGlassPane()
+            }
+        },
+        closeInventory = { _ ->
+            // Reset all buttons to enabled when the menu is closed
+            SkyBlockButton.entries.forEach { it.disabled = false }
+        },
+    ) { name -> name == "SkyBlock Menu" }
     private val storage get() = ProfileStorageData.profileSpecific?.maxwell
     private val enabled get() = SkyHanniMod.feature.inventory.oldSkyBlockMenu
 
@@ -37,46 +49,27 @@ object OldSkyblockMenu {
     fun onReplaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
 
-        val sbButton = slotMap[event.slot] ?: return
+        val sbButton = slotMap[event.slot]?.takeIf { !it.disabled } ?: return
+        val isAlreadySbButton = event.originalItem.displayName.endsWith(sbButton.displayName)
+        if (isAlreadySbButton) return
 
-        if (!event.originalItem.isStainedGlassPane()) {
-            sbButton.disabled = true
-            return ChatUtils.debug(
-                "Skipping adding OldSkyBlockMenu item for button ${sbButton.name} at slot ${event.slot}," +
-                    " because the original item is not a stained glass pane."
-            )
-        }
-
-        val showWarning = sbButton.requiresBoosterCookie && !BitsApi.hasCookieBuff()
-        val item = if (showWarning) sbButton.itemWithCookieWarning else sbButton.itemWithoutCookieWarning
-
-        if (sbButton == SkyBlockButton.ACCESSORY) {
-            val magicalPower = storage?.magicalPower ?: 0
-
-            val lore = item.getLore().toMutableList()
-            lore.add(4, "")
-            val format = magicalPower.addSeparators()
-            lore.add(5, "§7Magical Power: §6$format")
-
-            val newItem = item.copy()
-            newItem.setLore(lore)
-            event.replace(newItem)
-        } else event.replace(item)
+        event.replace(sbButton.item)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-
-        val sbButton = slotMap[event.slotId] ?: return
-        if (sbButton.disabled) {
-            return ChatUtils.debug("Button ${sbButton.name} at slot ${event.slotId} is disabled.")
-        }
+        val sbButton = slotMap[event.slotId]?.takeIf { !it.disabled } ?: return
 
         event.cancel()
-
         val canClick = !sbButton.requiresBoosterCookie || BitsApi.hasCookieBuff()
-        if (canClick) sbButton.command.call()
+        if (canClick) {
+            SoundUtils.playClickSound()
+            sbButton.command.call()
+        } else {
+            TitleManager.sendTitle("Requires cookie buff!", location = TitleManager.TitleLocation.INVENTORY)
+            SoundUtils.playErrorSound()
+        }
     }
 
     private val slotMap: Map<Int, SkyBlockButton> by lazy {
@@ -90,11 +83,12 @@ object OldSkyblockMenu {
     private enum class SkyBlockButton(
         val command: KFunction<Unit>,
         val slot: Int,
-        private val displayName: String,
+        val displayName: String,
         private vararg val displayDescription: String,
         private val itemData: ItemData,
         val requiresBoosterCookie: Boolean = true,
         var disabled: Boolean = false,
+        private val extraItemBuilding: ((ItemStack) -> ItemStack)? = null,
     ) {
         TRADES(
             HypixelCommands::trades,
@@ -116,6 +110,14 @@ object OldSkyblockMenu {
             "Orbs within it. All will still",
             "work while in this bag!",
             itemData = SkullItemData("2b73dd76-5fc1-4ac3-8139-6a8992f8ce80", "SB_MENU_ACCESSORY"),
+            extraItemBuilding = { item ->
+                val magicalPower = storage?.magicalPower ?: 0
+                val lore = item.getLore().toMutableList()
+                lore.add(4, "")
+                val format = magicalPower.addSeparators()
+                lore.add(5, "§7Magical Power: §6$format")
+                item.copy().setLore(lore)
+            }
         ),
         POTION(
             HypixelCommands::potionBag,
@@ -154,8 +156,10 @@ object OldSkyblockMenu {
         ),
         ;
 
-        val itemWithCookieWarning: ItemStack by lazy { createItem(true) }
-        val itemWithoutCookieWarning: ItemStack by lazy { createItem(false) }
+        val item get() = if (showWarning) itemWithCookieWarning else itemWithoutCookieWarning
+        private val showWarning get() = requiresBoosterCookie && !BitsApi.hasCookieBuff()
+        private val itemWithCookieWarning: ItemStack by lazy { createItem(true) }
+        private val itemWithoutCookieWarning: ItemStack by lazy { createItem(false) }
 
         private fun buildLore(showCookieWarning: Boolean) = buildList {
             displayDescription.map { "§7$it" }.forEach { add(it) }
@@ -169,12 +173,15 @@ object OldSkyblockMenu {
         private fun createItem(showCookieWarning: Boolean): ItemStack {
             val name = "§a$displayName"
             val lore = buildLore(showCookieWarning)
-            return when (itemData) {
+            val baseItem = when (itemData) {
                 is NormalItemData -> ItemUtils.createItemStack(itemData.displayIcon, name, lore)
                 is SkullItemData -> {
                     val skullTexture = SkullTextureHolder.getTexture(itemData.repoSkullId)
                     ItemUtils.createSkull(name, itemData.uuid, skullTexture, lore)
                 }
+            }
+            return baseItem.apply {
+                if (extraItemBuilding != null) extraItemBuilding(this)
             }
         }
     }
