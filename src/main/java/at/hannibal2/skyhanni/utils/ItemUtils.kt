@@ -672,12 +672,10 @@ object ItemUtils {
     )
 
     @HandleEvent
-    @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
     fun onRepoReload(event: RepositoryReloadEvent) {
         compactItemNameCache.clear()
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
-        val repoData = event.getConstant<ItemsJson>("Items")
-        compactNameReplace = repoData.compactNames!!
+        compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
     }
 
     @HandleEvent
