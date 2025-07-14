@@ -12,7 +12,7 @@ class FrogMaskFeaturesConfig {
     @Expose
     @ConfigOption(
         name = "Frog Mask Display",
-        desc = "Displays information about the active §2Frog Mask§7 region. §eRequires a Frog Mask to be worn.",
+        desc = "Displays information about the active §2Frog Mask§7 region. §eRequires a Frog Mask in your inventory.",
     )
     @ConfigEditorDropdown
     var display: FrogMaskCondition = FrogMaskCondition.DISABLED
@@ -20,7 +20,9 @@ class FrogMaskFeaturesConfig {
     enum class FrogMaskCondition(private val displayName: String) {
         DISABLED("Off"),
         ALWAYS("Always"),
-        PARK("In The Park")
+        PARK("In The Park"),
+        WORN("While Worn"),
+        WORN_IN_PARK("While Worn in The Park"),
         ;
 
         override fun toString() = displayName
