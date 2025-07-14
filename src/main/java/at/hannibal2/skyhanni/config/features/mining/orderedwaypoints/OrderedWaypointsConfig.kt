@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.config.features.mining.orderedwaypoints
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
-import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
