@@ -332,7 +332,7 @@ object ItemPickupLog {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(91, "inventory.itemPickupLogConfig", "inventory.itemPickupLog")
-        event.move(91, "inventory.itemPickupLog.pos", "inventory.itemPickupLog.position")
+        event.move(97, "inventory.itemPickupLogConfig", "inventory.itemPickupLog")
+        event.move(97, "inventory.itemPickupLog.pos", "inventory.itemPickupLog.position")
     }
 }

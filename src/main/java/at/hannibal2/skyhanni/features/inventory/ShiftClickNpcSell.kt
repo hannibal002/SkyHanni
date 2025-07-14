@@ -18,7 +18,7 @@ object ShiftClickNpcSell {
 
     private val config get() = SkyHanniMod.feature.inventory.shiftClickNpcSell
 
-    private val sellSlot = -4
+    private const val SELL_SLOT = -4
 
     /**
      * REGEX-TEST: §eClick to buyback!
@@ -36,7 +36,7 @@ object ShiftClickNpcSell {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryItems.isEmpty()) return
-        val item = event.inventoryItems[event.inventoryItems.keys.last() + sellSlot] ?: return
+        val item = event.inventoryItems[event.inventoryItems.keys.last() + SELL_SLOT] ?: return
 
         inInventory = lastLoreLineOfSellPattern.matches(item.getLore().lastOrNull())
     }
@@ -60,6 +60,6 @@ object ShiftClickNpcSell {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(91, "inventory.shiftClickNPCSell", "inventory.shiftClickNpcSell")
+        event.move(97, "inventory.shiftClickNPCSell", "inventory.shiftClickNpcSell")
     }
 }

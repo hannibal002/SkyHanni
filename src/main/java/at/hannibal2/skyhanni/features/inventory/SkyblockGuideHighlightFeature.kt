@@ -283,8 +283,8 @@ class SkyblockGuideHighlightFeature private constructor(
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        massMigrations.forEach { oldPath, newPath ->
-            event.move(91, oldPath, newPath)
+        massMigrations.forEach { (oldPath, newPath) ->
+            event.move(97, oldPath, newPath)
         }
     }
 }
