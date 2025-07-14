@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -58,18 +60,14 @@ object PestApi {
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
     var lastPestSpawnTime = SimpleTimeMark.farPast()
-    var lastTimeVacuumHold = SimpleTimeMark.farPast()
+    var lastTimeVacuumHeld = SimpleTimeMark.farPast()
+    var lastTimeLassoHeld = SimpleTimeMark.farPast()
 
-    // TODO move into repo
-    val vacuumVariants = listOf(
-        "SKYMART_VACUUM".toInternalName(),
-        "SKYMART_TURBO_VACUUM".toInternalName(),
-        "SKYMART_HYPER_VACUUM".toInternalName(),
-        "INFINI_VACUUM".toInternalName(),
-        "INFINI_VACUUM_HOOVERIUS".toInternalName(),
-    )
+    var vacuumVariants = listOf<NeuInternalName>()
+    private var lassoVariants = listOf<NeuInternalName>()
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
+    fun hasLassoInHand() = InventoryUtils.itemInHandId in lassoVariants
     fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
@@ -274,15 +272,20 @@ object PestApi {
     @HandleEvent
     fun onWorldChange() {
         lastPestKillTime = SimpleTimeMark.farPast()
-        lastTimeVacuumHold = SimpleTimeMark.farPast()
+        lastTimeVacuumHeld = SimpleTimeMark.farPast()
+        lastTimeLassoHeld = SimpleTimeMark.farPast()
         gardenJoinTime = SimpleTimeMark.now()
         firstScoreboardCheck = false
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (event.oldItem !in vacuumVariants) return
-        lastTimeVacuumHold = SimpleTimeMark.now()
+        if (event.oldItem in vacuumVariants) {
+            lastTimeVacuumHeld = SimpleTimeMark.now()
+        }
+        if (event.oldItem in lassoVariants) {
+            lastTimeLassoHeld = SimpleTimeMark.now()
+        }
     }
 
     private fun getPlotsWithAccuratePests() = GardenPlotApi.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
@@ -375,6 +378,13 @@ object PestApi {
                 }
             }
         }
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        vacuumVariants = data.gardenVacuums
+        lassoVariants = data.huntingLassos
     }
 
     @HandleEvent

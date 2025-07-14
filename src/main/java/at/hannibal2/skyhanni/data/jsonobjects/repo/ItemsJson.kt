@@ -13,6 +13,8 @@ data class ItemsJson(
     @Expose @SerializedName("lava_fishing_rods") val lavaFishingRods: List<NeuInternalName>,
     @Expose @SerializedName("water_fishing_rods") val waterFishingRods: List<NeuInternalName>,
     @Expose @SerializedName("dungeon_secret_items") val dungeonSecretItems: Set<NeuInternalName>,
+    @Expose @SerializedName("garden_vacuums") val gardenVacuums: List<NeuInternalName>,
+    @Expose @SerializedName("hunting_lassos") val huntingLassos: List<NeuInternalName>,
     @Expose @SerializedName("book_bundle_amount") val bookBundleAmount: Map<String, Int>,
     @Expose @SerializedName("value_calculation_data") val valueCalculationData: ItemValueCalculationDataJson,
     @Expose @SerializedName("compact_names") val compactNames: Map<String, String>,
