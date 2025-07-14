@@ -13,8 +13,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class ImprovedSBMenusConfig {
 
     @ConfigOption(
-        name = "Use NEU!",
-        desc = "This feature originally comes from NEU, and was ported to SkyHanni for 1.21+. Enable it in /neu if you want to use it."
+        name = "§cUse NEU!",
+        desc = "§eThis feature originally comes from NEU, and was ported to SkyHanni for 1.21+. Enable it in /neu if you want to use it."
     )
     @ConfigEditorInfoText
     @OnlyLegacy

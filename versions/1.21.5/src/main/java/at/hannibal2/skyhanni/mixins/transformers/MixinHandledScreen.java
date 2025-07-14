@@ -92,7 +92,11 @@ public abstract class MixinHandledScreen {
         }
     }
 
+    //#if MC < 1.21.6
     @ModifyArg(method = "drawForeground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)I"), index = 4)
+    //#else
+    //$$ @ModifyArg(method = "drawForeground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)V"), index = 4)
+    //#endif
     private int customForegroundTextColor(int x) {
         return BetterContainers.getTextColor();
     }
