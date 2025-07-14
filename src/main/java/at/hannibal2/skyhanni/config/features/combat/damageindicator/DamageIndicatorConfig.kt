@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -26,13 +25,12 @@ class DamageIndicatorConfig {
     @ConfigEditorDropdown
     var bossName: NameVisibility = NameVisibility.FULL_NAME
 
-    enum class NameVisibility(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        HIDDEN("Hidden", 0),
-        FULL_NAME("Full Name", 1),
-        SHORT_NAME("Short Name", 2),
+    enum class NameVisibility(private val displayName: String) {
+        HIDDEN("Hidden"),
+        FULL_NAME("Full Name"),
+        SHORT_NAME("Short Name"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -58,35 +56,34 @@ class DamageIndicatorConfig {
         BossCategory.GARDEN_PESTS
     )
 
-    enum class BossCategory(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
-        VANQUISHER("§bVanquisher", 2),
-        ENDERSTONE_PROTECTOR("§bEndstone Protector", 3),
-        ENDER_DRAGON("§bEnder Dragon", 4),
-        REVENANT_HORROR("§bRevenant Horror", 5),
-        TARANTULA_BROODFATHER("§bTarantula Broodfather", 6),
-        SVEN_PACKMASTER("§bSven Packmaster", 7),
-        VOIDGLOOM_SERAPH("§bVoidgloom Seraph", 8),
-        INFERNO_DEMONLORD("§bInferno Demonlord", 9),
-        HEADLESS_HORSEMAN("§bHeadless Horseman (bugged)", 10),
-        DUNGEON_FLOOR_1("§bDungeon Floor 1", 11),
-        DUNGEON_FLOOR_2("§bDungeon Floor 2", 12),
-        DUNGEON_FLOOR_3("§bDungeon Floor 3", 13),
-        DUNGEON_FLOOR_4("§bDungeon Floor 4", 14),
-        DUNGEON_FLOOR_5("§bDungeon Floor 5", 15),
-        DUNGEON_FLOOR_6("§bDungeon Floor 6", 16),
-        DUNGEON_FLOOR_7("§bDungeon Floor 7", 17),
-        DIANA_MOBS("§bDiana Mobs", 18),
-        SEA_CREATURES("§bSea Creatures", 19),
-        DUMMY("Dummy", 20),
-        ARACHNE("§bArachne", 21),
-        THE_RIFT_BOSSES("§bThe Rift Bosses", 22),
-        RIFTSTALKER_BLOODFIEND("§bRiftstalker Bloodfiend", 23),
-        REINDRAKE("§6Reindrake", 24),
-        GARDEN_PESTS("§aGarden Pests", 25),
+    enum class BossCategory(private val displayName: String) {
+        NETHER_MINI_BOSSES("§bNether Mini Bosses"),
+        VANQUISHER("§bVanquisher"),
+        ENDERSTONE_PROTECTOR("§bEndstone Protector"),
+        ENDER_DRAGON("§bEnder Dragon"),
+        REVENANT_HORROR("§bRevenant Horror"),
+        TARANTULA_BROODFATHER("§bTarantula Broodfather"),
+        SVEN_PACKMASTER("§bSven Packmaster"),
+        VOIDGLOOM_SERAPH("§bVoidgloom Seraph"),
+        INFERNO_DEMONLORD("§bInferno Demonlord"),
+        HEADLESS_HORSEMAN("§bHeadless Horseman (bugged)"),
+        DUNGEON_FLOOR_1("§bDungeon Floor 1"),
+        DUNGEON_FLOOR_2("§bDungeon Floor 2"),
+        DUNGEON_FLOOR_3("§bDungeon Floor 3"),
+        DUNGEON_FLOOR_4("§bDungeon Floor 4"),
+        DUNGEON_FLOOR_5("§bDungeon Floor 5"),
+        DUNGEON_FLOOR_6("§bDungeon Floor 6"),
+        DUNGEON_FLOOR_7("§bDungeon Floor 7"),
+        DIANA_MOBS("§bDiana Mobs"),
+        SEA_CREATURES("§bSea Creatures"),
+        DUMMY("Dummy"),
+        ARACHNE("§bArachne"),
+        THE_RIFT_BOSSES("§bThe Rift Bosses"),
+        RIFTSTALKER_BLOODFIEND("§bRiftstalker Bloodfiend"),
+        REINDRAKE("§6Reindrake"),
+        GARDEN_PESTS("§aGarden Pests"),
         BROODMOTHER("§bBroodmother");
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

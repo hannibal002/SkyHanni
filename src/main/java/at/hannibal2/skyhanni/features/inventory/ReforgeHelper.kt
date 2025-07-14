@@ -162,7 +162,7 @@ object ReforgeHelper {
                     itemUpdate()
                     waitForChat.set(false)
                 }
-                if (config?.hideChat == true) {
+                if (config.hideChat) {
                     event.blockedReason = "reforge_hide"
                 }
             }
@@ -171,7 +171,7 @@ object ReforgeHelper {
                 DelayedRun.runDelayed(2.ticks) {
                     waitForChat.set(false)
                 }
-                if (config?.hideChat == true) {
+                if (config.hideChat) {
                     event.blockedReason = "reforge_hide"
                 }
             }

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
@@ -168,23 +167,25 @@ object DebugCommand {
         }
     }
 
+    // todo clean this up so that it commonly reports on any AbstractRepoManager
     private fun repoData(event: DebugDataCollectEvent) {
         event.title("Repo Information")
         val config = SkyHanniMod.feature.dev.repo
 
         val hasDefaultSettings = config.location.hasDefaultSettings()
+        val unsuccessfulConstants = RepoManager.getFailedConstants()
         val list = buildList {
             add(" repoAutoUpdate: ${config.repoAutoUpdate}")
-            add(" usingBackupRepo: ${RepoManager.usingBackupRepo}")
+            add(" usingBackupRepo: ${RepoManager.isUsingBackup}")
             if (hasDefaultSettings) {
                 add((" repo location: default"))
             } else {
-                add(" non-default repo location: '${RepoManager.getRepoLocation()}'")
+                add(" non-default repo location: '${RepoManager.getGitHubRepoPath()}'")
             }
 
-            if (RepoManager.unsuccessfulConstants.isNotEmpty()) {
+            if (unsuccessfulConstants.isNotEmpty()) {
                 add(" unsuccessful constants:")
-                for (constant in RepoManager.unsuccessfulConstants) {
+                for (constant in unsuccessfulConstants) {
                     add("  - $constant")
                 }
             }
@@ -192,8 +193,8 @@ object DebugCommand {
             val neuRepoConfig = SkyHanniMod.feature.dev.neuRepo
             add(" neuRepoAutoUpdate: ${neuRepoConfig.repoAutoUpdate}")
 
-            if (!EnoughUpdatesRepo.hasDefaultRepositoryLocation()) {
-                add(" neu repo location: '${EnoughUpdatesRepo.getRepoLocation()}'")
+            if (!neuRepoConfig.location.hasDefaultSettings()) {
+                add(" neu repo location: '${EnoughUpdatesRepoManager.getGitHubRepoPath()}'")
             } else {
                 add(" neu repo location: default")
             }
@@ -201,7 +202,7 @@ object DebugCommand {
             add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
         }
 
-        val isRelevant = RepoManager.usingBackupRepo || RepoManager.unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
+        val isRelevant = RepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
         if (isRelevant) {
             event.addData(list)
         } else {

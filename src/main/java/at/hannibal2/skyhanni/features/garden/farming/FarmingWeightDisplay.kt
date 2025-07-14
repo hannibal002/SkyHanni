@@ -41,7 +41,6 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import com.google.gson.JsonObject
-import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -93,7 +92,7 @@ object FarmingWeightDisplay {
         if (!event.isMod(5)) return
         update()
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             getCropWeights()
         }
     }
@@ -209,7 +208,7 @@ object FarmingWeightDisplay {
                 if (display.isEmpty()) {
                     display = listOf(StringRenderable("§6${lbName()}§7: §eLoading.."))
                 }
-                SkyHanniMod.coroutineScope.launch {
+                SkyHanniMod.launchIOCoroutine {
                     loadWeight(localProfile)
                     isLoadingWeight = false
                 }
@@ -437,7 +436,7 @@ object FarmingWeightDisplay {
         if (isLoadingLeaderboard) return
         isLoadingLeaderboard = true
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             val wasNotLoaded = leaderboardPosition == -1
             leaderboardPosition = loadLeaderboardPosition()
             if (wasNotLoaded && config.showLbChange) {
@@ -475,7 +474,7 @@ object FarmingWeightDisplay {
 
     private fun lbName() = "${if (isMonthlyLB()) "Monthly " else ""}Farming Weight"
 
-    private fun loadLeaderboardPosition(): Int {
+    private suspend fun loadLeaderboardPosition(): Int {
         val uuid = PlayerUtils.getUuid()
 
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
@@ -500,7 +499,8 @@ object FarmingWeightDisplay {
 
         val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/" +
             "$uuid/$profileId$upcomingPlayersParam$atRankParam"
-        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Leaderboard")
+        val apiResponse = ApiUtils.getTypedJSONResponse<JsonObject>(url, apiName = "Elitebot Farming Leaderboard")
+            ?: return leaderboardPosition
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
@@ -545,10 +545,11 @@ object FarmingWeightDisplay {
         return eliteWeightApiGson.fromJson<EliteLeaderboardJson>(jsonObject)
     }
 
-    private fun loadWeight(localProfile: String) {
+    private suspend fun loadWeight(localProfile: String) {
         val uuid = PlayerUtils.getUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
         val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elite Farming Weight")
+            ?: return
 
         var error: Throwable? = null
 
@@ -639,26 +640,21 @@ object FarmingWeightDisplay {
     private var attemptingCropWeightFetch = false
     private var hasFetchedCropWeights = false
 
-    private fun getCropWeights() {
+    private val weightStatic = ApiUtils.StaticApiPath(
+        "https://api.elitebot.dev/weights/all",
+        "Elitebot Farming Weights",
+    )
+
+    private suspend fun getCropWeights() {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
-        val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Weight")
-
-        try {
-            val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
-            apiData.crops
-            for (crop in apiData.crops) {
-                val cropType = CropType.getByNameOrNull(crop.key) ?: continue
-                cropWeight[cropType] = crop.value
-            }
-            hasFetchedCropWeights = true
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error getting crop weights from elitebot.dev",
-                "apiResponse" to apiResponse,
-            )
+        val apiResponse = ApiUtils.getJSONResponse(weightStatic) ?: return
+        val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
+        for (crop in apiData.crops) {
+            val cropType = CropType.getByNameOrNull(crop.key) ?: continue
+            cropWeight[cropType] = crop.value
         }
+        hasFetchedCropWeights = true
     }
 
     // still needed when first joining garden and if they cant make https requests

@@ -47,7 +47,9 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
     private var scrollValue = ScrollValue()
 
     open fun addCoins(amount: Int, command: Boolean) {
-        addItem(SKYBLOCK_COIN, amount, command)
+        modify {
+            it.addItem(SKYBLOCK_COIN, amount, command)
+        }
     }
 
     open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {

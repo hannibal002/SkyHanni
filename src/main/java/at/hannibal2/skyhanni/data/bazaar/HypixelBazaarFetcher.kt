@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -22,10 +21,14 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-// https://api.hypixel.net/#tag/SkyBlock/paths/~1v2~1skyblock~1bazaar/get
 @SkyHanniModule
 object HypixelBazaarFetcher {
-    private const val URL = "https://api.hypixel.net/v2/skyblock/bazaar"
+    private val bzStatic = ApiUtils.StaticApiPath(
+        "https://api.hypixel.net/v2/skyblock/bazaar",
+        "Hypixel Bazaar"
+    )
+    private val debugConfig get() = SkyHanniMod.feature.dev.debug
+
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 
     var latestProductInformation = mapOf<NeuInternalName, BazaarData>()
@@ -61,12 +64,13 @@ object HypixelBazaarFetcher {
         }
     }
 
-    private fun fetchAndProcessBazaarData() {
+    private suspend fun fetchAndProcessBazaarData() {
         nextFetchTime = SimpleTimeMark.now() + 2.minutes
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
         try {
-            val jsonResponse = ApiUtils.getJSONResponse(URL, apiName = "Hypixel Bazaar").asJsonObject
+            val jsonResponse = ApiUtils.getJSONResponse(bzStatic)
+                ?: return onError(fetchType, Exception("Failed to fetch bazaar data from Hypixel API"))
             val response = ConfigManager.gson.fromJson<BazaarApiResponseJson>(jsonResponse)
             if (response.success) {
                 latestProductInformation = process(response.products)
@@ -93,7 +97,9 @@ object HypixelBazaarFetcher {
         if (internalName.getItemStackOrNull() == null) {
             // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in the ingame bazaar).
             // Should only include Enchants
-            if (!isUnobtainableBazaarProduct(key) && SkyHanniDebugsAndTests.enabled) println("Unknown bazaar product: $key/$internalName")
+            if (!isUnobtainableBazaarProduct(key) && debugConfig.printMissingBazaarItems) {
+                println("Unknown bazaar product: $key/$internalName")
+            }
             return@mapNotNull null
         }
         internalName to BazaarData(internalName.repoItemName, instantBuyPrice, instantSellPrice, product)
@@ -127,7 +133,7 @@ object HypixelBazaarFetcher {
             e.printStackTrace()
         } else {
             nextFetchTime = SimpleTimeMark.now() + 15.minutes
-            if (rawResponse == null || rawResponse.toString() == "{}") {
+            if (rawResponse == null || rawResponse == "{}") {
                 ChatUtils.chat(
                     "§cFailed loading Bazaar Price data!\n" +
                         "§cPlease wait until the Hypixel API is sending correct data again! There is nothing else to do at the moment.",

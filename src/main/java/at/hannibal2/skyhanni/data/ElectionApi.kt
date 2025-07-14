@@ -105,6 +105,11 @@ object ElectionApi {
     private const val ELECTION_END_MONTH = 3 // Late Spring
     private const val ELECTION_END_DAY = 27
 
+    val hypixelElectionApiStatic = ApiUtils.StaticApiPath(
+        "https://api.hypixel.net/v2/resources/skyblock/election",
+        "Hypixel Election API",
+    )
+
     /**
      * @param input: The name of the mayor
      * @return: The NotEnoughUpdates color of the mayor; If no mayor was found, it will return "§c"
@@ -216,10 +221,7 @@ object ElectionApi {
         lastUpdate = SimpleTimeMark.now()
 
         SkyHanniMod.launchIOCoroutine {
-            val jsonObject = ApiUtils.getJSONResponse(
-                "https://api.hypixel.net/v2/resources/skyblock/election",
-                apiName = "Hypixel Election",
-            )
+            val jsonObject = ApiUtils.getJSONResponse(hypixelElectionApiStatic) ?: return@launchIOCoroutine
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launchIOCoroutine
             val mayor = data.mayor ?: error("mayor is null")

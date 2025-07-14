@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class PetExperienceToolTipConfig {
     @Expose
@@ -21,7 +22,8 @@ class PetExperienceToolTipConfig {
     var showAlways: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Dragon Egg", desc = "For a Golden Dragon Egg, show progress to level 100 instead of 200.")
+    @ConfigOption(name = "Dragon Egg", desc = "For a Dragon pets that start as an egg, show progress to level 100 instead of 200.")
+    @SearchTag("golden jade")
     @ConfigEditorBoolean
-    var showGoldenDragonEgg: Boolean = true
+    var showDragonEgg: Boolean = true
 }
