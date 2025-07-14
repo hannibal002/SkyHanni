@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
@@ -72,8 +73,6 @@ object InstanceChestProfit {
 
     private val config get() = SkyHanniMod.feature.combat
 
-    private val dungeonChestNames = DungeonApi.DungeonChest.entries.map { it.inventory }.toSet()
-    private val kuudraChestNames = setOf("Free Chest", "Paid Chest")
     private var inDungeonChest = false
     private var inKuudraChest = false
     private var display: Renderable? = null
@@ -83,9 +82,9 @@ object InstanceChestProfit {
         if (!config.showInstanceChestProfit) return
 
         val name = event.inventoryName
-        if (dungeonChestNames.contains(name)) {
+        if (DungeonApi.DungeonChest.getByInventoryName(name) != null) {
             inDungeonChest = true
-        } else if (kuudraChestNames.contains(name)) {
+        } else if (KuudraApi.KuudraChest.getByInventoryName(name) != null) {
             inKuudraChest = true
         } else return
 
@@ -139,7 +138,8 @@ object InstanceChestProfit {
 
         val newDisplay = buildList {
             val chestName = if (inDungeonChest) "Dungeon"
-            else "Kuudra"
+            else if (inKuudraChest) "Kuudra"
+            else ""
             add(listOf(StringRenderable("§d§l$chestName Chest Profit")))
             add(listOf(StringRenderable("")))
 
