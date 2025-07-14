@@ -72,6 +72,6 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: RepositoryReloadEvent) {
-        EnoughUpdatesManager.reloadRepo()
+        EnoughUpdatesRepoManager.reloadLocalRepo()
     }
 }

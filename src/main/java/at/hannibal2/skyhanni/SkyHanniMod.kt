@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni
 
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -59,7 +59,7 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesRepoManager.initRepo()
         MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
@@ -118,12 +118,18 @@ object SkyHanniMod {
 
     val modules: MutableList<Any> = ArrayList()
     private val globalJob: Job = Job(null)
+
+    // todo when no more direct .launch calls are made outside of this class, make this private
+    @Deprecated(
+        "Use SkyHanniMod.launchCoroutine or SkyHanniMod.launchIOCoroutine instead",
+        ReplaceWith("SkyHanniMod.launchCoroutine { ... }"),
+    )
     val coroutineScope = CoroutineScope(
         CoroutineName("SkyHanni") + SupervisorJob(globalJob),
     )
 
-    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit) {
-        launchCoroutine {
+    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job {
+        return launchCoroutine {
             withContext(Dispatchers.IO) {
                 block()
             }
@@ -137,8 +143,10 @@ object SkyHanniMod {
         logger.log(Level.INFO, message)
     }
 
-    fun launchCoroutine(function: suspend () -> Unit) {
-        coroutineScope.launch {
+    @Suppress("DEPRECATION")
+    fun launchCoroutine(function: suspend () -> Unit): Job {
+        @Suppress("DEPRECATION")
+        return coroutineScope.launch {
             try {
                 function()
             } catch (e: Exception) {

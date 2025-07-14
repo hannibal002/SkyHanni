@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object NonGodPotEffectDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.potionEffect
+    private val config get() = SkyHanniMod.feature.misc.nonGodPotEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private val setRecently: TimeLimitedSet<NonGodPotEffect> = TimeLimitedSet(5.seconds)
@@ -101,7 +101,7 @@ object NonGodPotEffectDisplay {
             if (time.ended) continue
             if (effect == NonGodPotEffect.INVISIBILITY) continue
 
-            if (effect.isMixin && !config.nonGodPotEffectShowMixins) continue
+            if (effect.isMixin && !config.showMixins) continue
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
             val format = remaining.format(TimeUnit.HOUR)
@@ -124,7 +124,7 @@ object NonGodPotEffectDisplay {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        if (config.nonGodPotEffectDisplay) update()
+        if (config.displayEnabled) update()
 
         val effectWarning = config.expireWarning
         val effectSound = config.expireSound
@@ -163,10 +163,10 @@ object NonGodPotEffectDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !config.nonGodPotEffectDisplay) return
+        if (!isEnabled() || !config.displayEnabled) return
         if (RiftApi.inRift()) return
 
-        config.nonGodPotEffectPos.renderStrings(
+        config.position.renderStrings(
             display,
             extraSpace = 3,
             posLabel = "Non God Pot Effects",
@@ -178,6 +178,10 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
+        event.move(95, "misc.potionEffect.nonGodPotEffectPos", "misc.potionEffect.position")
+        event.move(95, "misc.potionEffect.nonGodPotEffectDisplay", "misc.potionEffect.displayEnabled")
+        event.move(95, "misc.potionEfect.nonGodPotEffectShowMixins", "misc.potionEffect.showMixins")
+        event.move(95, "misc.potionEffect", "misc.nonGodPotEffect")
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && !DungeonApi.inDungeon() && !KuudraApi.inKuudra

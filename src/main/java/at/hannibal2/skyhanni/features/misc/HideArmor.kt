@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.FakePlayer
@@ -74,10 +73,8 @@ object HideArmor {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(15, "misc.hideArmor2.mode") { element ->
-            ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)
-        }
         event.move(91, "misc.hideArmor2", "misc.hideArmor")
+
     }
 
     private val CURRENT_RENDERED_ENTITY: ThreadLocal<Entity> = ThreadLocal<Entity>()
