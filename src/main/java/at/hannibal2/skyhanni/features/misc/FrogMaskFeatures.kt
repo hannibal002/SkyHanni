@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig.WarningType
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -55,14 +57,14 @@ object FrogMaskFeatures {
     private val FROG_MASK = "FROG_MASK".toInternalName()
     private val frogMaskRenderable by lazy { ItemStackRenderable(FROG_MASK.getItemStack()) }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.THE_PARK)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
         if (!isEnabled()) return
 
         config.position.renderRenderable(display, posLabel = "Frog Mask Display")
     }
 
-    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_PARK)
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
     fun onSecondPassed() {
         if (!isEnabled()) return
         display = null
@@ -74,11 +76,12 @@ object FrogMaskFeatures {
             val helmetRegion = group("region")
 
             if (config.warning.enabled) handleWarning(helmetRegion)
-            if (config.display) handleDisplay(helmetRegion)
+            if (shouldShowDisplay()) handleDisplay(helmetRegion)
         }
     }
 
     private fun handleWarning(helmetRegion: String) {
+        if (!IslandType.THE_PARK.isCurrent()) return
         val inWrongArea = IslandAreas.currentAreaName != helmetRegion.removeColor()
         val timeToWarn = lastWarning.passedSince() > config.warning.cooldown.seconds
 
@@ -129,6 +132,11 @@ object FrogMaskFeatures {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(86, "misc.frogMaskDisplay", "misc.frogMaskFeatures.display")
         event.move(86, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.position")
+        event.transform(97, "misc.frogMaskFeatures.display") {
+            ConfigUtils.migrateBooleanToEnum(
+                it, FrogMaskFeaturesConfig.FrogMaskCondition.PARK, FrogMaskFeaturesConfig.FrogMaskCondition.DISABLED,
+            )
+        }
     }
 
     private val logTypes = BlockCompat.getAllLogs()
@@ -144,5 +152,10 @@ object FrogMaskFeatures {
 
     private fun isForaging() = lastLogClick.passedSince() < 5.seconds
 
-    private fun isEnabled() = config.display || config.warning.enabled
+    private fun isEnabled() = config.warning.enabled || shouldShowDisplay()
+    private fun shouldShowDisplay(): Boolean = when (config.display) {
+        FrogMaskFeaturesConfig.FrogMaskCondition.DISABLED -> false
+        FrogMaskFeaturesConfig.FrogMaskCondition.ALWAYS -> true
+        FrogMaskFeaturesConfig.FrogMaskCondition.PARK -> IslandType.THE_PARK.isCurrent()
+    }
 }
