@@ -214,7 +214,7 @@ var IChatComponent.url: String?
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
         //#else
-        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value)))) }
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
         //#endif
     }
 
