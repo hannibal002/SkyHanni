@@ -135,9 +135,20 @@ class DebugConfig {
     var highlightMissingRepo: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Hot Swap Detection", desc = "Show chat messages when Hot Swap starts and ends.")
+    @ConfigOption(
+        name = "Log Repo Errors",
+        desc = "Log errors that occur while reloading/fetching any AbstractRepoManager",
+    )
     @ConfigEditorBoolean
-    var hotSwapDetection: Boolean = false
+    var logRepoErrors: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Print Missing Bazaar Items",
+        desc = "Print unknown Bazaar items to the console.",
+    )
+    @ConfigEditorBoolean
+    var printMissingBazaarItems: Boolean = false
 
     @Expose
     @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always outdated.")

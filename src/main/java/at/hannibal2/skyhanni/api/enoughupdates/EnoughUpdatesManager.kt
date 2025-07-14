@@ -1,14 +1,10 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -18,14 +14,16 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -34,9 +32,6 @@ import net.minecraft.nbt.JsonToNBT
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import java.util.TreeMap
 import kotlin.math.floor
 //#if MC > 1.21
@@ -57,13 +52,13 @@ import net.minecraft.nbt.NBTException
 @SkyHanniModule
 object EnoughUpdatesManager {
 
-    val configLocation = File("config/notenoughupdates")
-    val repoLocation = File(configLocation, "repo")
+    val configDirectory = File("config/notenoughupdates")
+    val repoDirectory = File(configDirectory, "repo")
 
+    private val loadingMutex = Mutex()
     private val itemMap = TreeMap<String, JsonObject>()
     private val itemStackCache = mutableMapOf<String, ItemStack>()
     private val displayNameCache = mutableMapOf<String, String>()
-    private val recipes = mutableSetOf<PrimitiveRecipe>()
     private val recipesMap = mutableMapOf<NeuInternalName, MutableSet<PrimitiveRecipe>>()
 
     private var neuPetsJson: NeuPetsJson? = null
@@ -73,54 +68,41 @@ object EnoughUpdatesManager {
 
     fun getItemInformation() = itemMap
 
-    fun downloadRepo() {
-        SkyHanniMod.coroutineScope.launch {
-            EnoughUpdatesRepo.downloadRepo()
-        }
-    }
+    fun inLoadingState() = loadingMutex.isLocked || EnoughUpdatesRepoManager.repoMutex.isLocked
 
-    private var isLoading = false
-
-    fun reloadRepo() {
-        if (isLoading) return
-        isLoading = true
+    /**
+     * Called by the Neu Repo Manager when the NEU repo is reloaded.
+     */
+    suspend fun reloadItemsFromRepo() = loadingMutex.withLock {
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
         titleWordMap.clear()
-        recipes.clear()
         recipesMap.clear()
 
         val tempItemMap = TreeMap<String, JsonObject>()
-        SkyHanniMod.coroutineScope.launch {
-            loadItemMap(tempItemMap)
-            synchronized(itemMap) {
-                itemMap.clear()
-                itemMap.putAll(tempItemMap)
-            }
-            NeuRepositoryReloadEvent.post()
-            ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
-            isLoading = false
+        loadItemMap(tempItemMap)
+
+        synchronized(itemMap) {
+            itemMap.clear()
+            itemMap.putAll(tempItemMap)
         }
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
-    private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
-        val itemDir = File(repoLocation, "items")
-        if (!itemDir.exists()) return
-        for (file in itemDir.listFiles() ?: return) {
-            if (file.extension != "json") continue
-            try {
-                InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8).use { reader ->
-                    val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
-                    tempItemMap[file.nameWithoutExtension] = parseItem(file.nameWithoutExtension, json) ?: continue
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Error while loading neu repo")
-            }
+    private suspend fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
+        val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
+        fileSystem.list("items").mapNotNullAsync { name ->
+            val internalName = name.removeSuffix(".json")
+            val parsed = parseItem(
+                internalName = internalName,
+                json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
+            ) ?: return@mapNotNullAsync null
+            internalName to parsed
+        }.forEach { (internalName, item) ->
+            tempItemMap[internalName] = item
         }
-        return
     }
 
     private fun parseItem(internalName: String, json: JsonObject): JsonObject? {
@@ -154,7 +136,6 @@ object EnoughUpdatesManager {
     }
 
     fun registerRecipe(recipe: PrimitiveRecipe) {
-        recipes.add(recipe)
         for (internalName in recipe.outputs) {
             val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
             recipeSet.add(recipe)
@@ -459,57 +440,30 @@ object EnoughUpdatesManager {
     }
 
     private fun itemCountInRepoFolder(): Int {
-        val itemsFolder = File(repoLocation, "items")
+        val itemsFolder = File(repoDirectory, "items")
         return itemsFolder.listFiles()?.size ?: 0
     }
 
     @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
-        if (itemMap.isEmpty() && itemCountInRepoFolder() > 0) {
-            reloadRepo()
-            println("No loaded items in NEU repo, attempting to reload the repo.")
-        }
-    }
-
-    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        neuPetsJson = event.readConstant<NeuPetsJson>("pets")
-        neuPetNums = event.readConstant<JsonObject>("petnums")
+        neuPetsJson = event.getConstant<NeuPetsJson>("pets")
+        neuPetNums = event.getConstant<JsonObject>("petnums")
+        if (itemMap.isNotEmpty()) {
+            ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
+        }
     }
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        if (!PlatformUtils.isNeuLoaded()) {
-            event.registerBrigadier("neureloadrepo") {
-                aliases = listOf("shreloadneurepo")
-                description = "Reloads the NEU repo"
-                category = CommandCategory.DEVELOPER_TEST
-                simpleCallback { reloadRepo() }
-            }
-            event.registerBrigadier("neuresetrepo") {
-                aliases = listOf("shresetneurepo")
-                description = "Redownload the NEU repo"
-                category = CommandCategory.DEVELOPER_TEST
-                simpleCallback { downloadRepo() }
-            }
-        }
+    fun reportItemStatus() {
+        val loadedItems = itemMap.size
+        val directorySize = itemCountInRepoFolder()
 
-        event.registerBrigadier("shneurepostatus") {
-            description = "Get the status of the NEU repo"
-            category = CommandCategory.DEVELOPER_TEST
-            simpleCallback {
-                val loadedItems = itemMap.size
-                val directorySize = itemCountInRepoFolder()
-
-                ChatUtils.chat("NEU Repo Status:")
-                when {
-                    directorySize == 0 -> ChatUtils.chat("§cNo items directory found!", prefix = false)
-                    loadedItems == 0 -> ChatUtils.chat("§cNo items loaded!", prefix = false)
-                    loadedItems < directorySize -> ChatUtils.chat("§eLoaded $loadedItems/$directorySize items", prefix = false)
-                    loadedItems > directorySize -> ChatUtils.chat("§eLoaded Items: $loadedItems (more than directory size)", prefix = false)
-                    else -> ChatUtils.chat("§aLoaded all $loadedItems items!", prefix = false)
-                }
-            }
+        val status = when {
+            directorySize == 0 -> "§cNo items directory found!"
+            loadedItems == 0 -> "§cNo items loaded!"
+            loadedItems < directorySize -> "§eLoaded $loadedItems/$directorySize items"
+            loadedItems > directorySize -> "§eLoaded Items: $loadedItems (more than directory size)"
+            else -> "§aLoaded all $loadedItems items!"
         }
+        ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
     }
 }

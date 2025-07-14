@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -50,7 +50,7 @@ object QuiverDisplay {
 
     private fun drawDisplay() = buildList {
         val arrow = arrow ?: return@buildList
-        val itemStack = NeuItems.getItemStackOrNull(arrow.internalName.asString()) ?: ItemStack(Items.arrow)
+        val itemStack = arrow.internalName.getItemStackOrNull() ?: ItemStack(Items.arrow)
 
         val rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
         val arrowDisplayName =

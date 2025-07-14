@@ -47,12 +47,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
@@ -64,6 +64,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
@@ -520,6 +521,9 @@ object GardenVisitorFeatures {
         }
     }
 
+    val LEGENDARY_JERRY = "JERRY;4".toInternalName()
+    val SPACE_HELM = "DCTR_SPACE_HELM".toInternalName()
+
     @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         val visitor = event.visitor
@@ -541,11 +545,11 @@ object GardenVisitorFeatures {
 
         if (name.removeColor().contains("Jerry")) {
             logger.log("Jerry!")
-            ItemBlink.setBlink(NeuItems.getItemStackOrNull("JERRY;4"), 5_000)
+            ItemBlink.setBlink(LEGENDARY_JERRY.getItemStackOrNull(), 5_000)
         }
         if (name.removeColor().contains("Spaceman")) {
             logger.log("Spaceman!")
-            ItemBlink.setBlink(NeuItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
+            ItemBlink.setBlink(SPACE_HELM.getItemStackOrNull(), 5_000)
         }
     }
 
@@ -646,6 +650,7 @@ object GardenVisitorFeatures {
         return ready
     }
 
+    // todo use RenderDisplayHelper
     private fun renderDisplay() {
         if (showGui() && shouldShowShoppingList()) {
             config.shoppingList.position.renderRenderables(display, posLabel = "Visitor Shopping List")

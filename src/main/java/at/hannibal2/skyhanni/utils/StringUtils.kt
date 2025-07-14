@@ -23,6 +23,7 @@ import java.util.NavigableMap
 import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#else
@@ -586,5 +587,13 @@ object StringUtils {
 
     private fun isFormatSpecial(formatChar: Char): Boolean {
         return formatChar in 'k'..'o' || formatChar in 'K'..'O' || formatChar in "rR"
+    }
+
+    fun String.removePrefix(prefixPattern: Pattern): String {
+        val matcher = prefixPattern.matcher(this)
+        // Only remove the prefix if it matches at the start of the string
+        return if (matcher.find() && matcher.start() == 0) {
+            this.substring(matcher.end())
+        } else this
     }
 }

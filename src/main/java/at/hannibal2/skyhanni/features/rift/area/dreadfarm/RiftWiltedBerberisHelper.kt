@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import java.awt.Color
@@ -132,7 +132,7 @@ object RiftWiltedBerberisHelper {
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
                     event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW, 0.7f)
-                    event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+                    event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, seeThroughBlocks = false)
                 } else {
                     event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {

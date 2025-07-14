@@ -28,6 +28,7 @@ import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
+import java.io.File
 import java.nio.charset.StandardCharsets
 import java.security.KeyStore
 import java.util.zip.GZIPInputStream
@@ -41,14 +42,37 @@ import javax.net.ssl.TrustManagerFactory
 object ApiUtils {
 
     /**
-     * Represents the response from an Api request.
+     * Represents a generic Api response that can be used for any Api request.
+     */
+    open class ApiResponse<T> (open val success: Boolean, open val message: String?, open var data: T? = null)
+
+    /**
+     * Represents the response from an Api request that returns a ZIP file.
+     *
+     * @param success Indicates whether the Api request was successful.
+     * @param message A message describing the result of the Api request, can be null if the request was successful.
+     * @param data The [Long] representing the number of bytes written to the [File],
+     *  can be null if the request was unsuccessful or if no data was returned.
+     */
+    data class ZipApiResponse(
+        override val success: Boolean,
+        override val message: String? = null,
+        override var data: Long? = null,
+    ) : ApiResponse<Long>(success, message, data)
+
+    /**
+     * Represents the response from an Api request that returns JSON data.
      *
      * @param T The type of data returned by the Api, which must be a subtype of [JsonElement].
      * @param success Indicates whether the Api request was successful.
      * @param message A message describing the result of the Api request, can be null if the request was successful.
      * @param data The data [T] returned by the Api request, can be null if the request was unsuccessful or if no data was returned.
      */
-    data class ApiResponse<T : JsonElement> (val success: Boolean, val message: String?, var data: T? = null)
+    data class JsonApiResponse<T : JsonElement>(
+        override val success: Boolean,
+        override val message: String? = null,
+        override var data: T? = null
+    ) : ApiResponse<T>(success, message, data)
 
     /**
      * Represents a static Api path with a URL and Api name.
@@ -129,36 +153,60 @@ object ApiUtils {
             request = request,
         )
 
-        fun <T : JsonElement> toFailureApiResponse(e: Throwable? = null): ApiResponse<T> {
+        fun toFailureZipApiResponse(e: Throwable? = null): ZipApiResponse {
             val message = e?.message ?: "Request to $apiName failed"
-            return ApiResponse(false, message, null)
+            return ZipApiResponse(false, message, null)
+        }
+
+        fun <T : JsonElement> toFailureJsonApiResponse(e: Throwable? = null): JsonApiResponse<T> {
+            val message = e?.message ?: "Request to $apiName failed"
+            return JsonApiResponse(false, message, null)
         }
     }
 
     // <editor-fold desc="Client Execution Wrappers">
     /**
-     * The default exception handler for Api requests.
+     * The default exception handler for ZIP Api requests.
      * This function logs the error and returns a failure ApiResponse.
      * Override this function if you want to handle exceptions differently.
-     *
-     * @param e The exception that occurred during the Api request.
-     * @param intentionContext The context of the Api request, containing the request and possibly response data.
-     * @param silentError If true, the error will not be logged, unless debugConfig.apiUtilsNeverSilent is true.
-     * @return An [ApiResponse] indicating failure, with the error message and empty data.
      */
-    @PublishedApi
-    internal fun <T : JsonElement> defaultExceptionHandler(
+    private fun defaultZIPExceptionHandler(
         e: Throwable,
         intentionContext: ApiIntentionContext,
-        silentError: Boolean
-    ): ApiResponse<T> {
+        silentError: Boolean = true
+    ): ZipApiResponse {
         val shouldSilentError = if (debugConfig.apiUtilsNeverSilent) false else silentError
         if (!shouldSilentError) ErrorManager.logErrorWithData(
             e,
             e.message ?: "Error fetching data from ${intentionContext.apiName} Api",
             extraData = intentionContext.collectInterestingFields().toTypedArray(),
         )
-        return intentionContext.toFailureApiResponse(e)
+        return intentionContext.toFailureZipApiResponse(e)
+    }
+
+    /**
+     * The default exception handler for JSON Api requests.
+     * This function logs the error and returns a failure ApiResponse.
+     * Override this function if you want to handle exceptions differently.
+     *
+     * @param e The exception that occurred during the Api request.
+     * @param intentionContext The context of the Api request, containing the request and possibly response data.
+     * @param silentError If true, the error will not be logged, unless debugConfig.apiUtilsNeverSilent is true.
+     * @return An [JsonApiResponse] indicating failure, with the error message and empty data.
+     */
+    @PublishedApi
+    internal fun <T : JsonElement> defaultJSONExceptionHandler(
+        e: Throwable,
+        intentionContext: ApiIntentionContext,
+        silentError: Boolean
+    ): JsonApiResponse<T> {
+        val shouldSilentError = if (debugConfig.apiUtilsNeverSilent) false else silentError
+        if (!shouldSilentError) ErrorManager.logErrorWithData(
+            e,
+            e.message ?: "Error fetching data from ${intentionContext.apiName} Api",
+            extraData = intentionContext.collectInterestingFields().toTypedArray(),
+        )
+        return intentionContext.toFailureJsonApiResponse(e)
     }
 
     /**
@@ -192,34 +240,82 @@ object ApiUtils {
     }
 
     /**
+     * Generic method to execute an Api request using the provided HttpClient.
+     * Executes the given Api intention and returns an [R] (ApiResponse subtype).
+     * If the request fails, it will call the exceptionHandler with the error.
+     *
+     * @param R The type of ApiResponse expected (e.g., [ZipApiResponse] or [JsonApiResponse]).
+     * @param T The type of data expected in the ApiResponse (e.g., [Long] for ZIP responses or [JsonElement] for JSON responses).
+     * @param apiIntention The Api intention to execute, containing the request and Api name.
+     * @param silentError If true, the error will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @param exceptionHandler The function to handle exceptions, must return an ApiResponse of type [R].
+     * @return An [R] (ApiResponse subtype) indicating success or failure, with populated data where applicable.
+     */
+    @PublishedApi
+    internal inline fun <R : ApiResponse<T>, T> withHttpClient(
+        apiIntention: ApiIntentionContext,
+        silentError: Boolean = true,
+        exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> R,
+        responseHandler: (CloseableHttpResponse) -> R
+    ): R = runCatching {
+        httpClient.execute(apiIntention.request).use(responseHandler)
+    }.getOrElse { e ->
+        exceptionHandler(e, apiIntention, silentError)
+    }
+
+    /**
+     * Specific to fetching a ZIP response and saving it to a file.
+     * Executes the given Api intention and returns a ZipApiResponse.
+     * If the request fails, it will call the exceptionHandler with the error.
+     *
+     * @param file The [File] where the ZIP response will be saved.
+     * @param apiIntention The Api intention to execute.
+     * @param silentError If true, the error will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     * @param exceptionHandler The function to handle exceptions, must return a ZipApiResponse.
+     * @param entityHandler The function to handle the HttpEntity, must return the number of bytes written to the file or null.
+     * @return A [ZipApiResponse] indicating success or failure, with the number of bytes written to the file if successful.
+     */
+    private fun withZipHttpClient(
+        file: File,
+        apiIntention: ApiIntentionContext,
+        silentError: Boolean = true,
+        exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> ZipApiResponse = ::defaultZIPExceptionHandler,
+        entityHandler: (HttpEntity?) -> Long? = { it.readEntityToFile(file) },
+    ): ZipApiResponse = withHttpClient(apiIntention, silentError, exceptionHandler) { resp ->
+        apiIntention.response = resp
+        if (resp.statusLine.statusCode !in 200..299)
+            throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)
+        val entity = resp.getEntityOrNull()
+        val bytesWritten = entityHandler.invoke(entity)
+            ?: throw HttpResponseException(resp.statusLine.statusCode, "No content in response")
+        ZipApiResponse(true, "OK", bytesWritten)
+    }
+
+    /**
+     * Specific to fetching a response expecting a JSON body of some type [T].
      * Executes the given Api intention and returns a pair of ApiResponse and HttpEntity.
      * If the request fails, it will call the exceptionHandler with the error.
      *
+     * @param T The specific subtype of [JsonElement] you expect (e.g., [JsonObject] or [com.google.gson.JsonArray]).
      * @param apiIntention The Api intention to execute.
      * @param silentError If true, the error will not be logged.
      * @param exceptionHandler The function to handle exceptions, must return an ApiResponse.
      * @param entityHandler The function to handle the HttpEntity, must return a parsed JsonElement or null.
-     * @param responseHandler The function to handle the response, must return an HttpEntity or null.
-     * @return An [ApiResponse] indicating success or failure, with populated data where applicable.
+     * @return A [JsonApiResponse] indicating success or failure, with populated data where applicable.
      */
     @PublishedApi
-    internal inline fun <reified T : JsonElement> withHttpClient(
+    internal inline fun <reified T : JsonElement> withJsonHttpClient(
         apiIntention: ApiIntentionContext,
         silentError: Boolean = true,
-        exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> ApiResponse<T> = ::defaultExceptionHandler,
-        entityHandler: (HttpEntity?) -> T? = { it.readEntityResponse() },
-        responseHandler: (CloseableHttpResponse) -> HttpEntity? = { it.getEntityOrNull() },
-    ): ApiResponse<T> = runCatching {
-        httpClient.execute(apiIntention.request).use { resp ->
-            apiIntention.response = resp
-            if (resp.statusLine.statusCode !in 200..299)
-                throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)
-            val entity = responseHandler.invoke(resp)
-            val data = entityHandler.invoke(entity)
-            ApiResponse(true, "OK", data)
-        }
-    }.getOrElse { e ->
-        exceptionHandler(e, apiIntention, silentError)
+        exceptionHandler: (Throwable, ApiIntentionContext, Boolean) -> JsonApiResponse<T> = ::defaultJSONExceptionHandler,
+        entityHandler: (HttpEntity?) -> T? = { it.readEntityJsonResponse() },
+    ): JsonApiResponse<T> = withHttpClient(apiIntention, silentError, exceptionHandler) { resp ->
+        apiIntention.response = resp
+        if (resp.statusLine.statusCode !in 200..299)
+            throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)
+        val entity = resp.getEntityOrNull()
+        val data = entityHandler.invoke(entity)
+        JsonApiResponse(true, "OK", data)
     }
 
     /**
@@ -236,6 +332,22 @@ object ApiUtils {
     } else null
 
     /**
+     * Reads the content of the HttpEntity and writes it to a file.
+     *
+     * @param file The [File] where the content will be written.
+     * @return The number of bytes written to the file, or null if the entity is null or has no content.
+     */
+    private fun HttpEntity?.readEntityToFile(file: File): Long? =
+        this?.runCatching {
+            content.use { input ->
+                file.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            file.length()
+        }?.getOrNull()
+
+    /**
      * Reads the content of the HttpEntity and parses it as a JsonElement.
      *
      * @param T the specific subtype of [JsonElement] you expect (e.g., [JsonObject] or [com.google.gson.JsonArray])
@@ -243,7 +355,7 @@ object ApiUtils {
      */
     @Suppress("UNCHECKED_CAST")
     @PublishedApi
-    internal fun <T : JsonElement> HttpEntity?.readEntityResponse(
+    internal fun <T : JsonElement> HttpEntity?.readEntityJsonResponse(
         tryForceGzip: Boolean = false,
     ): T? = when {
         this == null || this.contentLength == 0L -> null
@@ -260,6 +372,61 @@ object ApiUtils {
     // </editor-fold>
 
     // <editor-fold desc="GETs">
+    /**
+     * Fetches a ZIP response from the given static Api path, and saves it to the specified file.
+     *
+     * @param file The [File] where the ZIP response will be saved.
+     * @param static The [StaticApiPath] containing the URL, Api name.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     */
+    suspend fun getZIPResponse(
+        file: File,
+        static: StaticApiPath,
+        silentError: Boolean = true,
+    ): ZipApiResponse = withContext(Dispatchers.IO) {
+        internalGetZIPResponse(file, static.url, static.apiName, silentError)
+    }
+
+    /**
+     * Fetches a ZIP response from the given URL, Api name, and saves it to the specified file.
+     *
+     * @param file The [File] where the ZIP response will be saved.
+     * @param url The URL to fetch the ZIP response from.
+     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+     */
+    suspend fun getZIPResponse(
+        file: File,
+        url: String,
+        apiName: String,
+        silentError: Boolean = true,
+    ): ZipApiResponse = withContext(Dispatchers.IO) {
+        internalGetZIPResponse(file, url, apiName, silentError)
+    }
+
+    /**
+     * Driving logic for fetching a ZIP response from the Api.
+     * This function executes the HTTP GET request and processes the response.
+     *
+     * @param url The URL to fetch the ZIP response from.
+     */
+    private fun internalGetZIPResponse(
+        file: File,
+        url: String,
+        apiName: String,
+        silentError: Boolean = true,
+    ): ZipApiResponse = withZipHttpClient(
+        file,
+        ApiIntentionContext(
+            HttpGet(url).apply {
+                addHeader("Accept-Encoding", "gzip")
+            },
+            apiName
+        ),
+        silentError = silentError,
+        entityHandler = { it.readEntityToFile(file) },
+    )
+
     /**
      * Fetches a JSON response from the given static Api path.
      * This function is a wrapper around [getJSONResponse] that uses the URL and Api name from the [StaticApiPath].
@@ -347,12 +514,13 @@ object ApiUtils {
         val request = HttpGet(url).apply {
             if (tryForceGzip) addHeader("Accept-Encoding", "gzip")
         }
-        val apiResponse = withHttpClient<T>(
+        val apiResponse = withJsonHttpClient<T>(
             ApiIntentionContext(request, apiName),
             silentError = silentError,
-            entityHandler = { it.readEntityResponse(tryForceGzip) }
+            entityHandler = { it.readEntityJsonResponse(tryForceGzip) }
         )
-        // Todo discarding the rest of the constructed ApiIntentionContext, maybe return it?
+        // Todo discarding the rest of the constructed ApiIntentionContext, maybe return it and parse
+        //  data out elsewhere as needed?
         return apiResponse.data
     }
     // </editor-fold>
@@ -365,9 +533,9 @@ object ApiUtils {
      * @param static The [StaticApiPath] containing the URL, Api name, and whether to try force gzip compression.
      * @param jsonBody The JSON body to post.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
-     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     * @return An [JsonApiResponse] containing the success status, message, and data from the Api response.
      */
-    suspend fun postJSON(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): ApiResponse<JsonElement> =
+    suspend fun postJSON(static: StaticApiPath, jsonBody: String, silentError: Boolean = true): JsonApiResponse<JsonElement> =
         withContext(Dispatchers.IO) { internalPostJSON(static.url, jsonBody, static.apiName, silentError) }
 
     /**
@@ -377,9 +545,9 @@ object ApiUtils {
      * @param jsonBody The JSON body to post.
      * @param apiName The name of the Api being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
-     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     * @return An [JsonApiResponse] containing the success status, message, and data from the Api response.
      */
-    suspend fun postJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): ApiResponse<JsonElement> =
+    suspend fun postJSON(url: String, jsonBody: String, apiName: String, silentError: Boolean = true): JsonApiResponse<JsonElement> =
         withContext(Dispatchers.IO) { internalPostJSON(url, jsonBody, apiName, silentError) }
 
     /**
@@ -390,7 +558,7 @@ object ApiUtils {
      * @param jsonBody The JSON body to post.
      * @param apiName The name of the Api being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
-     * @return An [ApiResponse] containing the success status, message, and data from the Api response.
+     * @return An [JsonApiResponse] containing the success status, message, and data from the Api response.
      */
     @PublishedApi
     internal inline fun <reified T : JsonElement> internalPostJSON(
@@ -398,12 +566,12 @@ object ApiUtils {
         jsonBody: String,
         apiName: String,
         silentError: Boolean = true
-    ): ApiResponse<T> {
+    ): JsonApiResponse<T> {
         val method = HttpPost(url).apply {
             entity = StringEntity(jsonBody, ContentType.APPLICATION_JSON)
         }
         val apiIntention = ApiIntentionContext(method, apiName)
-        return withHttpClient<T>(apiIntention, silentError = silentError)
+        return withJsonHttpClient<T>(apiIntention, silentError = silentError)
     }
     // </editor-fold>
 
