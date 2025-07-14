@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.test.renderable
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
@@ -10,9 +9,11 @@ import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackBounceDefinition
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.item.NeuItemStackProvider
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -21,9 +22,12 @@ import net.minecraft.util.EnumFacing
 @SkyHanniModule(devOnly = true)
 object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
 
+    private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
+    private val animationFrames = listOf(ItemStackAnimationFrame(boxOfSeedsProvider, ticks = 0))
+
     private val animatedItemStackRenderable by lazy {
         AnimatedItemStackRenderable(
-            "BOX_OF_SEEDS".toInternalName().getItemStack(),
+            animationFrames,
             rotation = ItemStackRotationDefinition(
                 axis = EnumFacing.Axis.Y,
                 rotationSpeed = 65.0,

@@ -321,7 +321,7 @@ object HoppityCollectionStats {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.readConstant<NeuHoppityJson>("hoppity").hoppity
+        val data = event.getConstant<NeuHoppityJson>("hoppity").hoppity
         neuCountData = data
         reCalcHotspotCount()
     }

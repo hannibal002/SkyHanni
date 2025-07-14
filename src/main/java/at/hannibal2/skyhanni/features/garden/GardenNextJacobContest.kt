@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
@@ -396,8 +397,10 @@ object GardenNextJacobContest {
 
         for (crop in contest.crops) {
             val isBoosted = crop == contest.boostedCrop
-            val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest")
-            val stack = ItemStackRenderable(cropStack, 1.0, highlight = isBoosted)
+            val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest").apply {
+                if (isBoosted) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+            }
+            val stack = ItemStackRenderable(cropStack, 1.0)
             if (config.additionalBoostedHighlight && isBoosted) {
                 add(stack.renderBounds(config.additionalBoostedHighlightColor.toColor()))
             } else add(stack)
