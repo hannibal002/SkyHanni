@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.combat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.combat.broodmother.BroodmotherConfig
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
 import at.hannibal2.skyhanni.config.features.combat.end.EndIslandConfig
@@ -10,7 +9,6 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class CombatConfig {
@@ -68,18 +66,13 @@ class CombatConfig {
     val broodmother: BroodmotherConfig = BroodmotherConfig()
 
     @Expose
+    @ConfigOption(name = "Instance Chest Profit", desc = "")
+    @Accordion
+    val instanceChestProfit: InstanceChestProfitConfig = InstanceChestProfitConfig()
+
+    @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
     @ConfigEditorBoolean
     @FeatureToggle
     var hideDamageSplash: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Instance Chest Profit", desc = "Display chest profit for kuudra and dungeons.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var showInstanceChestProfit: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = CombatConfig::class, field = "showInstanceChestProfit")
-    val position: Position = Position(107, 141)
 }

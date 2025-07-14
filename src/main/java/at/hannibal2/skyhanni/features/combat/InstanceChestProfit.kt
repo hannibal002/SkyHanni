@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -30,48 +31,54 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object InstanceChestProfit {
+    private val patternGroup = RepoPattern.group("combat.instance-chest-profit")
 
     /**
      * REGEX-TEST: §6Kraken Shard §8x1
      */
-    private val attributeShardPattern by RepoPattern.pattern(
-        "combat.attributeshard",
+    private val attributeShardPattern by patternGroup.pattern(
+        "attributeshard",
         "§.(?<name>\\w+ Shard) §.x(?<count>\\d+)",
     )
 
     /**
      * REGEX-TEST: §dCrimson Essence §8x250
+     * REGEX-TEST: §dUndead Essence §8x10
+     * REGEX-TEST: §dWither Essence §8x8
      */
-    private val essencePattern by RepoPattern.pattern(
-        "combat.essence",
+    private val essencePattern by patternGroup.pattern(
+        "essence",
         "§.(?<name>\\w+ Essence) §.x(?<count>\\d+)",
     )
 
     /**
-     * REGEX-TEST: §6500, 000 Coins
+     * REGEX-TEST: §6500,000 Coins
+     * REGEX-TEST: §6100,000 Coins
+     * REGEX-TEST: §6250,00 Coins
      */
-    private val coinsPattern by RepoPattern.pattern(
-        "combat.coins",
+    private val coinsPattern by patternGroup.pattern(
+        "coins",
         "§6(?<amount>.*) Coins",
     )
 
     /**
      * REGEX-TEST: §9Dungeon Chest Key
      */
-    private val dungeonChestKey by RepoPattern.pattern(
-        "combat.dungeonchestkey",
+    private val dungeonChestKey by patternGroup.pattern(
+        "dungeonchestkey",
         "§9Dungeon Chest Key",
     )
 
     /**
      * REGEX-TEST: §6Infernal Kuudra Key
+     * REGEX-TEST: §5Burning Kuudra Key
      */
-    private val kuudraChestKey by RepoPattern.pattern(
-        "combat.kuudrachestkey",
+    private val kuudraChestKey by patternGroup.pattern(
+        "kuudrachestkey",
         "§.\\w+ Kuudra Key",
     )
 
-    private val config get() = SkyHanniMod.feature.combat
+    private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
 
     private var inDungeonChest = false
     private var inKuudraChest = false
@@ -79,14 +86,18 @@ object InstanceChestProfit {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!config.showInstanceChestProfit) return
+        if (!config.enabled) return
 
         val name = event.inventoryName
-        if (DungeonApi.DungeonChest.getByInventoryName(name) != null) {
-            inDungeonChest = true
-        } else if (KuudraApi.KuudraChest.getByInventoryName(name) != null) {
-            inKuudraChest = true
-        } else return
+        when {
+            DungeonApi.DungeonChest.getByInventoryName(name) != null -> {
+                inDungeonChest = true
+            }
+            KuudraApi.KuudraChest.getByInventoryName(name) != null -> {
+                inKuudraChest = true
+            }
+            else -> return
+        }
 
         createDisplay(event.inventoryItems)
     }
@@ -107,7 +118,7 @@ object InstanceChestProfit {
             attributeShardPattern.matchMatcher(it.value.displayName) {
                 val name = group("name")
                 val count = group("count").toInt()
-                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull() ?: 0.0)
+                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
                 itemsWithCost.addOrPut(it.value.displayName, price)
             }
             essencePattern.matchMatcher(it.value.displayName) {
@@ -115,7 +126,7 @@ object InstanceChestProfit {
                 val rawCount = group("count").toInt()
                 val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
                 else rawCount.toDouble()
-                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull() ?: 0.0)
+                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
                 itemsWithCost.addOrPut(it.value.displayName, price)
             }
         }
@@ -123,16 +134,16 @@ object InstanceChestProfit {
         // Slot 31 has the cost information for the chest
         items[31]?.getLore()?.forEach {
             coinsPattern.matchMatcher(it) {
-                val amount = group("amount").replace(",", "").toInt()
+                val amount = group("amount").formatInt()
                 itemsWithCost.put(it, -amount.toDouble())
             }
             dungeonChestKey.matchMatcher(it) {
                 val name = NeuInternalName.fromItemName(it)
-                itemsWithCost.put(it, name.getPriceOrNull()?.times(-1) ?: 0.0)
+                itemsWithCost.put(it, name.getPriceOrNull(config.priceSource)?.times(-1) ?: 0.0)
             }
             kuudraChestKey.matchMatcher(it) {
                 val name = NeuInternalName.fromItemName(it)
-                itemsWithCost.put(it, name.getRawCraftCostOrNull()?.times(-1) ?: 0.0)
+                itemsWithCost.put(it, name.getRawCraftCostOrNull(config.priceSource)?.times(-1) ?: 0.0)
             }
         }
 
@@ -150,7 +161,7 @@ object InstanceChestProfit {
             add(listOf(StringRenderable("§a§lTotal Revenue"), StringRenderable("§a${revenue.formatCoin()}")))
 
             itemsWithCost.forEach {
-                val costColor = if (it.value < 0) "§c"
+                val coinsColor = if (it.value < 0) "§c"
                 else "§a"
 
                 if (!displayedCost && it.value < 0) {
@@ -160,10 +171,10 @@ object InstanceChestProfit {
                     displayedCost = true
                 }
 
-                val cost = "$costColor${it.value.formatCoin()}"
+                val coins = "$coinsColor${it.value.formatCoin()}"
 
                 total += it.value
-                add(listOf(StringRenderable(it.key), StringRenderable(cost)))
+                add(listOf(StringRenderable(it.key), StringRenderable(coins)))
             }
 
             val color = if (total < 0) "§c"
@@ -190,7 +201,7 @@ object InstanceChestProfit {
 
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
-        if (!config.showInstanceChestProfit || (!inDungeonChest && !inKuudraChest)) return
+        if (!config.enabled || (!inDungeonChest && !inKuudraChest)) return
 
         config.position.renderRenderable(display, posLabel = "Instance Chest Profit")
     }
