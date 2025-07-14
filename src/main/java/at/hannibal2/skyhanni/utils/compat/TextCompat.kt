@@ -172,7 +172,7 @@ var IChatComponent.hover: IChatComponent?
         //#if MC < 1.16
         this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
         //#else
-        //$$ (this as MutableText).styled {it.withHoverEvent(HoverEvent.ShowText(value))}
+        //$$ value?.let { value -> (this as MutableText).styled { it.withHoverEvent(HoverEvent.ShowText(value)) } }
         //#endif
     }
 
