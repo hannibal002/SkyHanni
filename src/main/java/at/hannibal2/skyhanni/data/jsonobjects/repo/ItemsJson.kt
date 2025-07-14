@@ -16,6 +16,7 @@ data class ItemsJson(
     @Expose @SerializedName("book_bundle_amount") val bookBundleAmount: Map<String, Int>,
     @Expose @SerializedName("value_calculation_data") val valueCalculationData: ItemValueCalculationDataJson,
     @Expose @SerializedName("compact_names") val compactNames: Map<String, String>,
+    @Expose @SerializedName("level_200_pet_names") val level200PetNames: Set<String>,
 )
 
 data class ItemValueCalculationDataJson(

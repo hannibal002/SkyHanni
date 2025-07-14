@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -110,13 +111,13 @@ object PetExpTooltip {
     }
 
     private fun getMaxValues(petName: String, petExperience: Double): Pair<Int, Int> {
-        val useGoldenDragonLevels =
-            petName.contains("Golden Dragon") && (!config.showGoldenDragonEgg || petExperience >= LEVEL_100_LEGENDARY)
+        val isLevel200Pet = ItemUtils.maxPetLevel(petName) == 200
+        val useLevel200PetLevelling = isLevel200Pet && (!config.showDragonEgg || petExperience >= LEVEL_100_LEGENDARY)
 
-        val maxLevel = if (useGoldenDragonLevels) 200 else 100
+        val maxLevel = if (useLevel200PetLevelling) 200 else 100
 
         val maxXP = when {
-            useGoldenDragonLevels -> LEVEL_200_LEGENDARY
+            useLevel200PetLevelling -> LEVEL_200_LEGENDARY
             petName.contains("Bingo") -> LEVEL_100_COMMON
 
             else -> LEVEL_100_LEGENDARY
@@ -129,10 +130,7 @@ object PetExpTooltip {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petExperienceToolTip.petDisplay", "misc.pets.petExperienceToolTip.petDisplay")
         event.move(3, "misc.petExperienceToolTip.showAlways", "misc.pets.petExperienceToolTip.showAlways")
-        event.move(
-            3,
-            "misc.petExperienceToolTip.showGoldenDragonEgg",
-            "misc.pets.petExperienceToolTip.showGoldenDragonEgg",
-        )
+        event.move(3, "misc.petExperienceToolTip.showGoldenDragonEgg", "misc.pets.petExperienceToolTip.showGoldenDragonEgg")
+        event.move(96, "misc.pets.petExperienceToolTip.showGoldenDragonEgg", "misc.pets.petExperienceToolTip.showDragonEgg")
     }
 }
