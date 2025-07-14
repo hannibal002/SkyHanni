@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -347,9 +346,6 @@ object ItemDisplayOverlayFeatures {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "inventory.itemNumberAsStackSize") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
-        }
         event.transform(29, "inventory.itemNumberAsStackSize") { element ->
             fixRemovedConfigElement(element)
         }

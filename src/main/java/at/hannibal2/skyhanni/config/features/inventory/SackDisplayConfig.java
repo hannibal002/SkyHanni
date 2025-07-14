@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import at.hannibal2.skyhanni.utils.RenderUtils;
@@ -43,27 +42,15 @@ public class SackDisplayConfig {
     @ConfigEditorDropdown
     public RenderUtils.HorizontalAlignment alignment = RenderUtils.HorizontalAlignment.LEFT;
 
-    public enum NumberFormatEntry implements HasLegacyId {
-        DEFAULT("Default", 0),
-        FORMATTED("Formatted", 1),
-        UNFORMATTED("Unformatted", 2);
+    public enum NumberFormatEntry {
+        DEFAULT("Default"),
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted");
 
         private final String displayName;
-        private final int legacyId;
 
-        NumberFormatEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         NumberFormatEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override
@@ -85,28 +72,16 @@ public class SackDisplayConfig {
     @ConfigEditorDropdown
     public SortingTypeEntry sortingType = SortingTypeEntry.DESC_STORED;
 
-    public enum SortingTypeEntry implements HasLegacyId {
-        DESC_STORED("Stored Descending", 0),
-        ASC_STORED("Stored Ascending", 1),
-        DESC_PRICE("Price Descending", 2),
-        ASC_PRICE("Price Ascending", 3);
+    public enum SortingTypeEntry {
+        DESC_STORED("Stored Descending"),
+        ASC_STORED("Stored Ascending"),
+        DESC_PRICE("Price Descending"),
+        ASC_PRICE("Price Ascending");
 
         private final String displayName;
-        private final int legacyId;
 
-        SortingTypeEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         SortingTypeEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override
@@ -142,26 +117,14 @@ public class SackDisplayConfig {
     @ConfigEditorDropdown
     public PriceFormatEntry priceFormat = PriceFormatEntry.FORMATTED;
 
-    public enum PriceFormatEntry implements HasLegacyId {
-        FORMATTED("Formatted", 0),
-        UNFORMATTED("Unformatted", 1);
+    public enum PriceFormatEntry {
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted");
 
         private final String displayName;
-        private final int legacyId;
 
-        PriceFormatEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         PriceFormatEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override

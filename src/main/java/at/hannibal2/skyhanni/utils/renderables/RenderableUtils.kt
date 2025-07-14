@@ -22,8 +22,10 @@ import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
+//#if MC > 1.21
+//$$ import net.minecraft.text.Text
+//#endif
 
-// todo 1.21 impl needed
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
@@ -178,6 +180,21 @@ internal object RenderableUtils {
         DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
         DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
+
+    //#if MC > 1.21
+    //$$ fun renderString(
+    //$$     text: Text,
+    //$$     scale: Double = 1.0,
+    //$$     color: Color = Color.WHITE,
+    //$$     inverseScale: Double = 1 / scale,
+    //$$ ) {
+    //$$     DrawContextUtils.translate(1.0, 1.0, 0.0)
+    //$$     DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
+    //$$     GuiRenderUtils.drawString(text, 0f, 0f, color.rgb)
+    //$$     DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
+    //$$     DrawContextUtils.translate(-1.0, -1.0, 0.0)
+    //$$ }
+    //#endif
 
     inline fun <T> MutableList<Searchable>.addNullableButton(
         label: String,
@@ -379,7 +396,7 @@ internal object RenderableUtils {
     }
 
     fun MutableList<Renderable>.addCenteredString(string: String) =
-        this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
+        this.add(StringRenderable(string, horizontalAlign = HorizontalAlignment.CENTER))
 
     fun fillTable(
         data: List<DisplayTableEntry>,
@@ -398,7 +415,7 @@ internal object RenderableUtils {
                 tips = entry.hover,
                 highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
             )
-            val right = Renderable.string(entry.right)
+            val right = StringRenderable(entry.right)
             outerList.add(listOf(item, left, right))
         }
         return Renderable.table(outerList, xPadding = 5, yPadding = padding)

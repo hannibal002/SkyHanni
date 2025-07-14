@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.isGreedy
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import at.hannibal2.skyhanni.utils.StringUtils.hasWhitespace
 import at.hannibal2.skyhanni.utils.StringUtils.splitLastWhitespace
@@ -37,7 +38,11 @@ class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBu
 
 open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     val builder: ArgumentBuilder<Any?, B>,
+    private val hasGreedyArg: Boolean = false,
 ) {
+    private fun checkGreedy() =
+        require(!hasGreedyArg) { "Cannot add an argument/literal to a builder that has a greedy argument." }
+
     /** Executes the code block when the command is executed. */
     fun callback(block: ArgContext.() -> Unit) {
         this.builder.executes {
@@ -89,6 +94,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
      * ```
      */
     fun literal(vararg names: String, action: LiteralCommandBuilder.() -> Unit) {
+        checkGreedy()
         for (name in names) {
             if (name.hasWhitespace()) {
                 val (prevLiteral, nextLiteral) = name.splitLastWhitespace()
@@ -160,6 +166,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         suggestions: SuggestionProvider<Any?>? = null,
         action: ArgumentCommandBuilder<T>.() -> Unit,
     ) {
+        checkGreedy()
         if (name.hasWhitespace()) {
             val (prevLiteral, nextLiteral) = name.splitLastWhitespace()
             literal(prevLiteral) {
@@ -167,10 +174,12 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
             }
             return
         }
+        val isGreedy = argument.isGreedy()
         val builder = BrigadierBuilder(
             RequiredArgumentBuilder.argument<Any?, T>(name, argument).apply {
                 if (suggestions != null) suggests(suggestions)
             },
+            isGreedy,
         )
         builder.action()
         this.builder.then(builder.builder)

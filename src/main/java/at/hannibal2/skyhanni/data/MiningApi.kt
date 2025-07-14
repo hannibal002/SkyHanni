@@ -52,6 +52,11 @@ object MiningApi {
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
     /**
+     * REGEX-TEST: Mines of Divan
+     */
+    private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
+
+    /**
      * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
      * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
      */
@@ -193,6 +198,8 @@ object MiningApi {
     fun inRegularDwarven() = IslandType.DWARVEN_MINES.isCurrent() && !inGlacialTunnels()
 
     fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isCurrent()
+
+    fun inMinesOfDivan() = inCrystalHollows() && minesOfDivanPattern.matches(HypixelData.skyBlockArea)
 
     fun inMineshaft() = IslandType.MINESHAFT.isCurrent()
 

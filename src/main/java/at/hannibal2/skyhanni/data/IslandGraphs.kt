@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
@@ -44,7 +43,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.ChatComponentText
 import java.awt.Color
-import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -109,6 +107,7 @@ object IslandGraphs {
     private val config get() = SkyHanniMod.feature.misc.pathfinding
 
     var currentIslandGraph: Graph? = null
+        private set
     private var lastLoadedIslandType = "nothing"
     private var lastLoadedTime = SimpleTimeMark.farPast()
 
@@ -264,17 +263,14 @@ object IslandGraphs {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
 
-        val constant = "island_graphs/$islandName"
-        val name = "constants/$constant.json"
-        val jsonFile = File(RepoManager.repoLocation, name)
-        if (!jsonFile.isFile) {
+        try {
+            val graph = RepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+            IslandAreas.display = null
+            setNewGraph(graph)
+        } catch (e: Error) {
             currentIslandGraph = null
             return
         }
-
-        val graph = RepoUtils.getConstant(RepoManager.repoLocation, constant, Graph.gson, Graph::class.java)
-        IslandAreas.display = null
-        setNewGraph(graph)
     }
 
     fun setNewGraph(graph: Graph) {
@@ -709,11 +705,10 @@ object IslandGraphs {
             extraData["area scoreboard"] = scoreboardArea
         }
 
-        RepoManager.commitTime?.let {
-            extraData["repo update time"] = it.toString()
-            extraData["repo update age"] = it.passedSince()
-        } ?: run {
-            extraData["repo update time"] = "none"
+        RepoManager.localRepoCommit.let { (hash, time) ->
+            extraData["repo update time"] = time?.toString() ?: "none"
+            extraData["repo update age"] = time?.passedSince() ?: "unknown"
+            extraData["repo update hash"] = hash ?: "none"
         }
 
         ErrorManager.logErrorStateWithData(
