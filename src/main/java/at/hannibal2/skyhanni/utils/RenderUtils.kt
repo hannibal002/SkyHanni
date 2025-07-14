@@ -176,31 +176,6 @@ object RenderUtils {
         GlStateManager.enableLighting()
     }
 
-    @Deprecated("Use WorldRenderUtils' drawWaypointFilled instead")
-    fun SkyHanniRenderWorldEvent.drawWaypointFilled(
-        location: LorenzVec,
-        color: Color,
-        seeThroughBlocks: Boolean = false,
-        beacon: Boolean = false,
-        extraSize: Double = 0.0,
-        extraSizeTopY: Double = extraSize,
-        extraSizeBottomY: Double = extraSize,
-        minimumAlpha: Float = 0.2f,
-        inverseAlphaScale: Boolean = false,
-    ) {
-        _drawWaypointFilled(
-            location,
-            color,
-            seeThroughBlocks,
-            beacon,
-            extraSize,
-            extraSizeTopY,
-            extraSizeBottomY,
-            minimumAlpha,
-            inverseAlphaScale,
-        )
-    }
-
     @Deprecated("Use WorldRenderUtils' drawString instead")
     fun SkyHanniRenderWorldEvent.drawString(
         location: LorenzVec,
