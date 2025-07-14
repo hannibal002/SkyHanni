@@ -52,7 +52,7 @@ object NeuItems {
      */
     private val neuPetLevelRegex by patternGroup.pattern(
         "pet-level",
-        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] ?"
+        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] "
     )
 
     /** Keys are internal names as String */
