@@ -253,7 +253,7 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    @Deprecated("Use ChromaColour instead")
+    @Deprecated("Use ChromaColor instead")
     fun chromaColor(
         timeTillRepeat: Duration,
         offset: Float = 0f,
