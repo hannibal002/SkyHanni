@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
@@ -397,9 +396,6 @@ object CropMoneyDisplay {
         event.move(3, "garden.moneyPerHourDicer", "garden.moneyPerHours.dicer")
         event.move(3, "garden.moneyPerHourHideTitle", "garden.moneyPerHours.hideTitle")
         event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHours.pos")
-        event.transform(11, "garden.moneyPerHours.customFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, CustomFormatEntry::class.java)
-        }
     }
 
     private fun CropMoneyData.toPrices(): List<Double> {
