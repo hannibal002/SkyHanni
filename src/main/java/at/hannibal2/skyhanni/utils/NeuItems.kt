@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isVanillaItem
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
+import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
@@ -45,14 +45,14 @@ object NeuItems {
     private val patternGroup = RepoPattern.group("data.neu.items")
 
     /**
-     * REGEX-TEST: §7[lvl 1➡100]
-     * REGEX-TEST: §f§f§7[lvl {lvl}]
-     * REGEX-TEST: §f§f§7[lvl 1➡100]
-     * REGEX-TEST: §f§f§7[Lvl {LVL}]
+     * WRAPPED-REGEX-TEST: "§7[lvl 1➡100] "
+     * WRAPPED-REGEX-TEST: "§f§f§7[lvl {lvl}] "
+     * WRAPPED-REGEX-TEST: "§f§f§7[lvl 1➡100] "
+     * WRAPPED-REGEX-TEST: "§f§f§7[Lvl {LVL}] "
      */
     private val neuPetLevelRegex by patternGroup.pattern(
         "pet-level",
-        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] ?"
+        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] "
     )
 
     /** Keys are internal names as String */
@@ -113,7 +113,7 @@ object NeuItems {
                 else println("wrong name: '$cleanName'")
             }
 
-            val newCleanName = cleanName.removeNonAscii().trim()
+            val newCleanName = cleanName.removeNonAsciiNonColorCode().trim()
 
             tempAllItemCache[newCleanName] = internalName
             tempNoColor[newCleanName.removeColor()] = internalName

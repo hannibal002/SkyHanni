@@ -20,7 +20,7 @@ object ColorfulItemStats {
      */
     private val genericStat by group.pattern(
         "generic",
-        "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.%]+)",
+        "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.,%]+)",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
