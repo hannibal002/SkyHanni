@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -30,31 +30,32 @@ import kotlin.time.Duration.Companion.milliseconds
 object RiftWiltedBerberisHelper {
 
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
+
+    private val berberisSounds = setOf("mob.horse.donkey.death", "mob.horse.donkey.hit")
+    private val list = mutableSetOf<WiltedBerberis>()
+
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
-    private var list = listOf<WiltedBerberis>()
 
     data class WiltedBerberis(var currentParticles: LorenzVec) {
-
         var previous: LorenzVec? = null
         var moving = true
         var y = 0.0
         var lastTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        list = list.editCopy { removeIf { it.lastTime.passedSince() > 500.milliseconds } }
+        list.removeIf { it.lastTime.passedSince() > 500.milliseconds }
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
         if (MinecraftCompat.localPlayer.onGround) {
-            val block = LorenzVec.getBlockBelowPlayer().getBlockAt()
-            val currentY = LocationUtils.playerLocation().y
-            isOnFarmland = block == Blocks.farmland && (currentY % 1 == 0.0)
+            // We check 0.1 blocks below the player's feet because farmland is not a full block on modern versions
+            isOnFarmland = LocationUtils.playerLocation().add(0.0, -0.1, 0.0).getBlockAt() == Blocks.farmland
         }
     }
 
@@ -62,7 +63,7 @@ object RiftWiltedBerberisHelper {
         list.filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
@@ -82,7 +83,7 @@ object RiftWiltedBerberisHelper {
         }
 
         if (berberis == null) {
-            list = list.editCopy { add(WiltedBerberis(location)) }
+            list.add(WiltedBerberis(location))
             return
         }
 
@@ -107,17 +108,16 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isMuteOthersSoundsEnabled()) return
-        val soundName = event.soundName
 
-        if (soundName == "mob.horse.donkey.death" || soundName == "mob.horse.donkey.hit") {
+        if (event.soundName in berberisSounds) {
             event.cancel()
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
@@ -158,10 +158,9 @@ object RiftWiltedBerberisHelper {
         return LorenzVec(x, y, z)
     }
 
-    private fun isEnabled() = RiftApi.inRift() && RiftApi.inDreadfarm() && config.enabled
+    private fun isEnabled() = RiftApi.inDreadfarm() && config.enabled
 
-    private fun isMuteOthersSoundsEnabled() = RiftApi.inRift() &&
-        config.muteOthersSounds &&
+    private fun isMuteOthersSoundsEnabled() = config.muteOthersSounds &&
         (RiftApi.inDreadfarm() || RiftApi.inWestVillage()) &&
         !(hasFarmingToolInHand && isOnFarmland)
 }

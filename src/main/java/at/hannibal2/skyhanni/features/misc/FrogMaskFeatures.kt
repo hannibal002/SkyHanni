@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -33,6 +34,7 @@ import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -69,15 +71,21 @@ object FrogMaskFeatures {
         if (!isEnabled()) return
         display = null
 
-        val helmet = InventoryUtils.getHelmet() ?: return
-        if (helmet.getInternalName() != FROG_MASK) return
-
-        activeRegionPattern.firstMatcher(helmet.getLore()) {
+        val frogMask = findFrogMask() ?: return
+        activeRegionPattern.firstMatcher(frogMask.getLore()) {
             val helmetRegion = group("region")
 
             if (config.warning.enabled) handleWarning(helmetRegion)
             if (shouldShowDisplay()) handleDisplay(helmetRegion)
         }
+    }
+
+    private fun findFrogMask(): ItemStack? {
+        val helmet = InventoryUtils.getHelmet()
+        if (helmet?.getInternalNameOrNull() == FROG_MASK) {
+            return helmet
+        }
+        return InventoryUtils.getItemsInOwnInventory().firstOrNull { it.getInternalNameOrNull() == FROG_MASK }
     }
 
     private fun handleWarning(helmetRegion: String) {
@@ -134,7 +142,7 @@ object FrogMaskFeatures {
         event.move(86, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.position")
         event.transform(97, "misc.frogMaskFeatures.display") {
             ConfigUtils.migrateBooleanToEnum(
-                it, FrogMaskFeaturesConfig.FrogMaskCondition.PARK, FrogMaskFeaturesConfig.FrogMaskCondition.DISABLED,
+                it, FrogMaskFeaturesConfig.FrogMaskCondition.WORN_IN_PARK, FrogMaskFeaturesConfig.FrogMaskCondition.DISABLED,
             )
         }
     }
@@ -157,5 +165,7 @@ object FrogMaskFeatures {
         FrogMaskFeaturesConfig.FrogMaskCondition.DISABLED -> false
         FrogMaskFeaturesConfig.FrogMaskCondition.ALWAYS -> true
         FrogMaskFeaturesConfig.FrogMaskCondition.PARK -> IslandType.THE_PARK.isCurrent()
+        FrogMaskFeaturesConfig.FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == FROG_MASK
+        FrogMaskFeaturesConfig.FrogMaskCondition.WORN_IN_PARK -> InventoryUtils.getHelmet()?.getInternalName() == FROG_MASK
     }
 }

@@ -55,6 +55,11 @@ class InventoryConfig {
     val chocolateFactory: CFConfig = CFConfig()
 
     @Expose
+    @ConfigOption(name = "Improved SB Menus", desc = "")
+    @Accordion
+    val improvedSBMenus: ImprovedSBMenusConfig = ImprovedSBMenusConfig()
+
+    @Expose
     @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
     @Accordion
     val itemPickupLog: ItemPickupLogConfig = ItemPickupLogConfig()
@@ -259,6 +264,7 @@ class InventoryConfig {
             "§cOnly works with the booster cookie effect active.",
     )
     @ConfigEditorBoolean
+    @SearchTag("SB")
     @FeatureToggle
     var oldSkyBlockMenu: Boolean = false
 

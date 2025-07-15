@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
+import at.hannibal2.skyhanni.features.inventory.BetterContainers;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.DelayedRun;
@@ -17,11 +18,13 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -88,4 +91,24 @@ public abstract class MixinHandledScreen {
             cir.setReturnValue(false);
         }
     }
+
+    //#if MC < 1.21.6
+    @ModifyArg(method = "drawForeground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)I"), index = 4)
+    //#else
+    //$$ @ModifyArg(method = "drawForeground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)V"), index = 4)
+    //#endif
+    private int customForegroundTextColor(int x) {
+        return BetterContainers.getTextColor();
+    }
+
+    @Redirect(method = "drawSlotHighlightBack", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
+    private boolean canBeHighlightedBack(Slot slot) {
+        return BetterContainers.slotCanBeHighlighted(slot);
+    }
+
+    @Redirect(method = "drawSlotHighlightFront", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
+    private boolean canBeHighlightedFront(Slot slot) {
+        return BetterContainers.slotCanBeHighlighted(slot);
+    }
+
 }
