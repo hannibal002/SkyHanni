@@ -256,10 +256,6 @@ object PestSpawnTimer {
                 if (entry.asBoolean) add(HeldItem.VACUUM)
                 entry
             }
-            event.transform(97, "garden.pests.pestTimer.onlyWithLasso") { entry ->
-                if (entry.asBoolean) add(HeldItem.LASSO)
-                entry
-            }
         }
 
         if (userSelections.isNotEmpty()) {
