@@ -26,6 +26,6 @@ class TamingSixtyConfig {
     var otherTiers: Boolean = false
 
     @Expose
-    @ConfigLink(owner = TamingSixtyConfig::class, field = "display")
+    @ConfigLink(owner = TamingSixtyConfig::class, field = "enabled")
     val position: Position = Position(125, 250)
 }

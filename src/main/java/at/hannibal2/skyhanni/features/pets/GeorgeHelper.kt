@@ -32,7 +32,7 @@ object GeorgeHelper {
     private val useFandomWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useFandom
     private const val SPAWN_EGG_SLOT = 41
 
-    private val patternGroup = RepoPattern.group("tamingcap")
+    private val patternGroup = RepoPattern.group("george.taming-sixty")
 
     /**
      * REGEX-TEST:   §dMythic Enderman
@@ -48,9 +48,10 @@ object GeorgeHelper {
 
     init {
         InventoryDetector(
-            pattern = "Offer Pets".toPattern(),
             openInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
-        )
+        ) { name ->
+            name == "Offer Pets"
+        }
     }
 
     private var display = emptyList<Renderable>()
@@ -121,7 +122,7 @@ object GeorgeHelper {
         return PetInfo(cheapestPrice, HorizontalContainerRenderable(listOf(stack, clickableRenderable)))
     }
 
-    private fun findCheapestTier(pet: String, originalTier: Int) = buildList<Pair<Int, Double>> {
+    private fun findCheapestTier(pet: String, originalTier: Int) = buildList {
         this.add(originalTier to petInternalName(pet, originalTier).getPetPrice())
         if (config.otherTiers) {
             this.add(originalTier - 1 to petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true))
