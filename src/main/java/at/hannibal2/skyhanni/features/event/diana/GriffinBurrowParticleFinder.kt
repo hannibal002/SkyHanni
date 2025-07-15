@@ -67,7 +67,7 @@ object GriffinBurrowParticleFinder {
         val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
         // TODO the rounding is a workaround, may need to be removed once we know what is going on exactly and can fix this properly
-        val location = event.location.roundLocationToBlock().down()
+        val location = event.location.roundToBlock().down()
 
         val burrow = burrows.getOrPut(location) { Burrow(location) }
         val oldBurrowType = burrow.type

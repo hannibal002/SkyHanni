@@ -139,9 +139,9 @@ data class LorenzVec(
 
     fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
-    fun roundLocationToBlock() = LorenzVec(floor(x), floor(y), floor(z))
+    fun roundToBlock() = LorenzVec(floor(x), floor(y), floor(z))
 
-    fun blockCenter() = roundLocationToBlock().add(0.5, 0.5, 0.5)
+    fun blockCenter() = roundToBlock().add(0.5, 0.5, 0.5)
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 

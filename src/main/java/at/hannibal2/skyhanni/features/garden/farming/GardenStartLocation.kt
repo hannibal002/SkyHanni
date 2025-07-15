@@ -65,7 +65,7 @@ object GardenStartLocation {
             ChatUtils.chat("Auto updated your Crop Start Location for ${crop.cropName}")
         }
 
-        lastFarmedLocations[crop] = LocationUtils.playerLocation().roundLocationToBlock()
+        lastFarmedLocations[crop] = LocationUtils.playerLocation().roundToBlock()
         shouldShowLastFarmedWaypoint = false
     }
 
@@ -76,7 +76,7 @@ object GardenStartLocation {
 
         if (showStartWaypoint()) {
             GardenApi.storage?.cropStartLocations?.get(crop)
-                ?.roundLocationToBlock()
+                ?.roundToBlock()
                 ?.also {
                     event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
                     event.drawDynamicText(it, "§b${crop.cropName}", 1.5)
