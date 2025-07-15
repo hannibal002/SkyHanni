@@ -35,7 +35,7 @@ object PrecisionMiningHighlight {
         val particleBoundingBox = event.location.add(-0.12, -0.12, -0.12)
             .axisAlignedTo(event.location.clone().add(0.12, 0.12, 0.12))
 
-        val blockBoundingBox = BlockUtils.getBlockLookingAt()?.let {
+        val blockBoundingBox = BlockUtils.getTargetedBlock()?.let {
             it.axisAlignedTo(it.add(1.0, 1.0, 1.0))
         } ?: return
         if (!blockBoundingBox.intersectsWith(particleBoundingBox)) return
