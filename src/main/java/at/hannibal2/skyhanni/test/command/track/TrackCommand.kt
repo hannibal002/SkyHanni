@@ -91,7 +91,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     private fun alreadyRecordingCheck(): Boolean {
         return if (isRecording) {
             ChatUtils.userError(
-                "Still tracking $commonNamePlural, wait for the other tracking to complete before starting a new one, " +
+                "§cStill tracking §e$commonNamePlural§c, wait for the other tracking to complete before starting a new one, " +
                     "or type §e/$commandName end §cto end it prematurely",
             )
             false
@@ -104,7 +104,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         val raw = args.firstOrNull()
         val durSec = raw?.toIntOrNull()
         if (raw != null && durSec == null) {
-            ChatUtils.userError("Invalid duration: \"§e$raw§c\" isn’t a number")
+            ChatUtils.userError("§cInvalid duration: \"§4$raw§c\" isn’t a number")
             return
         }
 
@@ -112,10 +112,10 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         tracked.clear()
         startTime = SimpleTimeMark.now()
         cutOffTime = if (durSec != null) {
-            ChatUtils.chat("Now started tracking $commonNamePlural for $durSec seconds")
+            ChatUtils.chat("§eNow started tracking §a$commonNamePlural §efor §b${durSec}s")
             durSec.seconds.fromNow()
         } else {
-            ChatUtils.chat("Now started tracking $commonNamePlural until manually ended")
+            ChatUtils.chat("§eNow started tracking $commonNamePlural §euntil manually ended")
             SimpleTimeMark.farFuture()
         }
     }
@@ -130,7 +130,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
             "Time: ${it.time.passedSince().inWholeMilliseconds} $cancelFormat ${it.event}"
         }
         OSUtils.copyToClipboard(string)
-        ChatUtils.chat("${tracked.size} $commonNamePlural copied into the clipboard!")
+        ChatUtils.chat("§b${tracked.size} §a$commonNamePlural §ecopied into the clipboard!")
         tracked.clear()
         isRecording = false
     }
@@ -202,7 +202,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
 
     open fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier(commandName) {
-            description = "Tracks the $commonNamePlural for the specified duration (in seconds) and copies it to the clipboard"
+            description = "§eTracks the §a$commonNamePlural §efor the specified duration (in seconds) and copies it to the clipboard"
             category = CommandCategory.DEVELOPER_TEST
             literalCallback("end") { endRecording() }
             literal("ignore") {
