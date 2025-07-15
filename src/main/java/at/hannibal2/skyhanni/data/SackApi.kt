@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
+import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -367,7 +367,7 @@ object SackApi {
         sacks = sacksData.mapValues { it.value.contents }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
-        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
+        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase() }.toSet()
     }
 
     @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)

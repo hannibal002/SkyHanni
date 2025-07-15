@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
+import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.WhenToShow
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -23,6 +25,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -141,20 +144,37 @@ object PestFinder {
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
         if (!config.showDisplay) return false
-        if (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) return false
+        if (!shouldShowBasedOnHeldItem()) return false
 
         return true
     }
 
-    private fun heldItemDisabled() = config.onlyWithVacuum && !PestApi.hasVacuumInHand()
-    private fun timePassedDisabled() = PestApi.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
+    private fun shouldShowBasedOnHeldItem(): Boolean {
+        return when (config.whenToShow) {
+            WhenToShow.ALWAYS -> true
+            WhenToShow.BOTH -> PestApi.hasVacuumInHand() || PestApi.hasLassoInHand()
+            WhenToShow.ONLY_WITH_VACUUM_IN_HAND -> PestApi.hasVacuumInHand()
+            WhenToShow.ONLY_WITH_LASSO_IN_HAND -> PestApi.hasLassoInHand()
+        }
+    }
+
+    private fun timePassedDisabled(): Boolean {
+        val vacuumPassed = PestApi.lastTimeVacuumHeld.passedSince() > config.showBorderForSeconds.seconds
+        val lassoPassed = PestApi.lastTimeLassoHeld.passedSince() > config.showBorderForSeconds.seconds
+        return when (config.whenToShow) {
+            WhenToShow.ALWAYS -> false
+            WhenToShow.ONLY_WITH_VACUUM_IN_HAND -> vacuumPassed
+            WhenToShow.ONLY_WITH_LASSO_IN_HAND -> lassoPassed
+            WhenToShow.BOTH -> vacuumPassed && lassoPassed
+        }
+    }
 
     // priority to low so that this happens after other renderPlot calls.
     @HandleEvent(priority = HandleEvent.LOW)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
-        if (heldItemDisabled() && timePassedDisabled()) return
+        if (!shouldShowBasedOnHeldItem() && timePassedDisabled()) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         val visibility = config.visibilityType
@@ -215,7 +235,7 @@ object PestFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (config.muteVacuum && event.soundName == "mob.wither.shoot") {
+        if (PestApi.config.muteVacuum && event.soundName == "mob.wither.shoot") {
             event.cancel()
         }
     }
@@ -251,4 +271,12 @@ object PestFinder {
     }
 
     fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(97, "garden.pests.pestFinder.muteVacuum", "garden.pests.muteVacuum")
+        event.move(97, "garden.pests.pestFinder.onlyWithVacuum", "garden.pests.pestFinder.whenToShow") {
+            ConfigUtils.migrateBooleanToEnum(it, WhenToShow.BOTH, WhenToShow.ALWAYS)
+        }
+    }
 }

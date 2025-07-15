@@ -6,5 +6,5 @@ import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
 
-class EntityClickEvent(clickType: ClickType, val action: C02PacketUseEntity.Action, val clickedEntity: Entity?, itemInHand: ItemStack?) :
+class EntityClickEvent(clickType: ClickType, val action: C02PacketUseEntity.Action, val clickedEntity: Entity, itemInHand: ItemStack?) :
     WorldClickEvent(itemInHand, clickType)

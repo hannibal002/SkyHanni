@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -232,10 +232,12 @@ class DebugConfig {
     val addonsDebugPosition: Position = Position(300, 300)
 
     @Expose
-    @NoConfigLink
-    val trackSoundPosition: Position = Position(0, 0)
+    @ConfigOption(name = "Track Sound", desc = "")
+    @Accordion
+    val trackSound: TrackCommandConfig = TrackCommandConfig()
 
     @Expose
-    @NoConfigLink
-    val trackParticlePosition: Position = Position(0, 0)
+    @ConfigOption(name = "Track Particle", desc = "")
+    @Accordion
+    val trackParticle: TrackCommandConfig = TrackCommandConfig()
 }

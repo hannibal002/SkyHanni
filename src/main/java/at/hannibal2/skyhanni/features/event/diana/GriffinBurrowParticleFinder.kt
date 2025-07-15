@@ -113,6 +113,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
+    // todo move to ParticleUtils or similar
     // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(

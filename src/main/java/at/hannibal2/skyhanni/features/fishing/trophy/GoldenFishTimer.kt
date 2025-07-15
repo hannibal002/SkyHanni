@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.GoldenFishTimerConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -17,6 +19,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -35,6 +38,9 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -188,52 +194,96 @@ object GoldenFishTimer {
     }
 
     private fun updateDisplay() {
-        display = HorizontalContainerRenderable(drawDisplay())
+        display = when (config.displayDesign) {
+            GoldenFishTimerConfig.DesignFormat.COMPACT -> buildCompactDisplay()
+            GoldenFishTimerConfig.DesignFormat.DETAILED -> buildDisplay(false)
+            GoldenFishTimerConfig.DesignFormat.DETAILED_WITH_ICON -> buildDisplay(true)
+            GoldenFishTimerConfig.DesignFormat.OFF -> null
+        }
     }
 
-    private fun drawDisplay() = buildList {
-        if (config.showHead) add(
-            ItemStackRenderable(
-                goldenFishSkullItem,
-                2.5,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            ),
-        )
-        val text = buildList {
-            add("§6§lGolden Fish Timer")
-            if (!isGoldenFishActive()) {
-                if (lastGoldenFishTime.isFarPast()) add("§7Last Golden Fish: §cNone this session")
-                else add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
-                if (lastRodThrowTime.isFarPast()) add("§7Last Rod Throw: §cNone yet")
-                else add(
-                    "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().formatTime()} " +
-                        "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().formatTime()})",
-                )
-                if (timePossibleSpawn.isFarFuture()) add("§7Can spawn in: §cUnknown")
-                else if (timePossibleSpawn.isInFuture()) add(
-                    "§7Can spawn in: §b${
-                        (timePossibleSpawn + 1.seconds).timeUntil().formatTime()
-                    }",
-                )
-                else {
-                    add("§7Can spawn since: §b${timePossibleSpawn.passedSince().formatTime()}")
-                    val diff = maximumSpawnTime - minimumSpawnTime
-                    val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / diff.inWholeSeconds
-                    add("§7Chance: §b${chance.coerceAtMost(1.0).formatPercentage()}")
-                }
-            } else {
-                add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
-                add("§7Despawn in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().formatTime()}")
-            }
+    private fun buildCompactDisplay(): Renderable {
+        return Renderable.line {
+            addItemStack(goldenFishSkullItem)
+            addHorizontalSpacer()
+            addString(
+                if (isGoldenFishActive()) {
+                    "§aSpawned! ${formattedTimeUntilDespawn()}"
+                } else if (timePossibleSpawn.isFarFuture() || timePossibleSpawn.isInFuture()) {
+                    formattedTimeUntilSpawn()
+                } else {
+                    "§a${formattedTimeSinceAvailable()} §7(${formattedChance()}§7)"
+                },
+            )
         }
+    }
 
-        add(
-            VerticalContainerRenderable(
-                text.map { StringRenderable(it) },
-                spacing = 1,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            ),
-        )
+    private fun buildDisplay(icon: Boolean): Renderable = HorizontalContainerRenderable(
+        buildList {
+            if (icon) {
+                add(
+                    ItemStackRenderable(
+                        goldenFishSkullItem,
+                        2.5,
+                        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                    ),
+                )
+            }
+            val text = buildList {
+                Renderable.vertical {
+                    add("§6§lGolden Fish Timer")
+                    if (!isGoldenFishActive()) {
+                        if (lastGoldenFishTime.isFarPast()) {
+                            add("§7Last Golden Fish: §cNone this session")
+                        } else {
+                            add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
+                        }
+                        if (lastRodThrowTime.isFarPast()) {
+                            add("§7Last Rod Throw: §cNone yet")
+                        } else {
+                            add(
+                                "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().formatTime()} " +
+                                    "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().formatTime()})",
+                            )
+                        }
+                        if (timePossibleSpawn.isFarFuture()) add("§7Can spawn in: §cUnknown")
+                        else if (timePossibleSpawn.isInFuture()) {
+                            add(formattedTimeUntilSpawn())
+                        } else {
+                            add(formattedTimeSinceAvailable())
+                            add("§7Chance: ${formattedChance()}")
+                        }
+                    } else {
+                        add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
+                        add(formattedTimeUntilDespawn())
+                    }
+                }
+            }
+            add(
+                VerticalContainerRenderable(
+                    text.map { StringRenderable(it) },
+                    spacing = 1,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                ),
+            )
+        },
+    )
+
+    private fun formattedTimeUntilDespawn(): String =
+        "§7Despawns in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().formatTime()}"
+
+    private fun formattedTimeUntilSpawn(): String =
+        if (!timePossibleSpawn.isFarFuture()) {
+            "§7Can spawn in: §b${(timePossibleSpawn + 1.seconds).timeUntil().formatTime()}"
+        } else "§cCast rod to start!"
+
+    private fun formattedTimeSinceAvailable(): String =
+        "§7Can spawn since: §b${timePossibleSpawn.passedSince().formatTime()}"
+
+    private fun formattedChance(): String {
+        val diff = maximumSpawnTime - minimumSpawnTime
+        val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / diff.inWholeSeconds
+        return "§b${chance.coerceAtMost(1.0).formatPercentage()}"
     }
 
     @HandleEvent
@@ -304,6 +354,19 @@ object GoldenFishTimer {
         interactions = 0
         display = null
         removeGoldenFish()
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            97,
+            "fishing.trophyFishing.goldenFishTimer.showHead",
+            "fishing.trophyFishing.goldenFishTimer.displayDesign",
+        ) {
+            ConfigUtils.migrateBooleanToEnum(
+                it, GoldenFishTimerConfig.DesignFormat.DETAILED_WITH_ICON, GoldenFishTimerConfig.DesignFormat.DETAILED,
+            )
+        }
     }
 
     @HandleEvent
