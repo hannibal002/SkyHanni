@@ -73,10 +73,20 @@ object BlockUtils {
     //$$ }
     //#endif
 
-    fun getBlockLookingAt(): LorenzVec? {
-        val mouseOverObject = Minecraft.getMinecraft().objectMouseOver ?: return null
-        if (mouseOverObject.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return null
-        return mouseOverObject.blockPos.toLorenzVec().roundLocationToBlock()
+    fun getBlockLookingAt(distance: Double? = null): LorenzVec? {
+        return if (distance == null) {
+            // Default reach distance - just ask Minecraft
+            val mouseOverObject = Minecraft.getMinecraft().objectMouseOver ?: return null
+            if (mouseOverObject.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return null
+            mouseOverObject.blockPos.toLorenzVec()
+        } else {
+            // Custom reach distance, so we need to ray trace manually
+            rayTrace(
+                LocationUtils.playerEyeLocation(),
+                MinecraftCompat.localPlayer.lookVec.toLorenzVec(),
+                distance,
+            )
+        }.roundLocationToBlock()
     }
 
     private fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
