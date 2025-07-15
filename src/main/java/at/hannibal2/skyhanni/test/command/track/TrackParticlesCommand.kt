@@ -21,13 +21,14 @@ import net.minecraft.util.EnumParticleTypes
 //#else
 //$$ import at.hannibal2.skyhanni.utils.ParticleUtils
 //$$ import net.minecraft.particle.ParticleType
+//$$ import net.minecraft.util.Identifier
 //#endif
 
 @SkyHanniModule
 //#if MC < 1.21
 object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTypes>(
 //#else
-//$$ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, ParticleType<*>>(
+//$$ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, Identifier>(
 //#endif
     commonName = "particle",
 ) {
@@ -50,7 +51,8 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     //#if MC < 1.21
     override fun ReceiveParticleEvent.getTypeIdentifier(): EnumParticleTypes = type
     //#else
-    //$$ override fun ReceiveParticleEvent.getTypeIdentifier(): ParticleType<*> = type
+    //$$ override fun ReceiveParticleEvent.getTypeIdentifier(): Identifier = Registries.PARTICLE_TYPE.getId(type)
+    //$$    ?: throw IllegalStateException("Particle type $type is not registered in the registry")
     //#endif
 
     override fun ReceiveParticleEvent.formatForDisplay() = "§3$type §8c:$count §7s:$speed"
