@@ -93,7 +93,7 @@ object StorageApi {
             return
         }
         if (!IslandType.PRIVATE_ISLAND.isCurrent() || !isPrivateIslandStorageEnabled()) return
-        if(InventoryUtils.isInNormalChest(event.inventoryName)) {
+        if (InventoryUtils.isInNormalChest(event.inventoryName)) {
             handlePrivateIslandRead(event.inventoryItemsWithNull.values)
         }
     }
@@ -122,7 +122,7 @@ object StorageApi {
         shouldSave = false
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onMinutePassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(60) || !isPrivateIslandStorageEnabled()) return
         mutableIslandChest.removeIf { _, chest ->
@@ -192,7 +192,7 @@ object StorageApi {
             it to it.getBlockAt()
         }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         if (!isPrivateIslandStorageEnabled()) return
@@ -221,6 +221,5 @@ object StorageApi {
         }
     }
 
-    // TODO add config value
-    private fun isPrivateIslandStorageEnabled() = true
+    private fun isPrivateIslandStorageEnabled() = SkyHanniMod.feature.inventory.savePrivateIslandChests
 }
