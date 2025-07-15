@@ -12,6 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class PetConfig {
     @Expose
@@ -33,6 +34,12 @@ class PetConfig {
     @ConfigOption(name = "Pet Nametag", desc = "")
     @Accordion
     val nametag: PetNametagConfig = PetNametagConfig()
+
+    @Expose
+    @ConfigOption(name = "Taming 60 Helper", desc = "")
+    @SearchTag("George")
+    @Accordion
+    val tamingSixty: TamingSixtyConfig = TamingSixtyConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Current Pet", desc = "")

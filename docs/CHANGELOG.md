@@ -32,6 +32,8 @@
 
 + Added SkyBlock Profile Viewer support for updating data from Pv. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
 + Added support for 1.21.7. - Vixid & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4349)
++ Added Taming 60 helper. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4344)
+    + Shows which pets are cheapest to unlock the next taming level.
 
 #### Dungeons
 
@@ -59,6 +61,11 @@
 
 + Added "Old SB Menu" from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4271)
 + Added colors to stat numbers in tooltips. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4345)
++ Added chest profit calculator for dungeons and kuudra. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
++ Added Improved SB Menus. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4270)
+    + Allows you to smooth the look of glass panes in SkyBlock inventories.
+    + Functionality should be a near, if not perfect match to the NEU feature.
+    + Can only be used on Minecraft 1.21.
 
 #### Hoppity
 
@@ -84,6 +91,8 @@
 
 + Added option to not send Jacob contest summary stats if you haven't broken any crops. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4076)
     + Mainly useful for pest farming.
++ Added options to make pest features display when holding lassos. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4372)
+    + Applies to the Pest Finder display + plot markers and Pest Timer display.
 
 #### Misc
 
@@ -96,6 +105,12 @@
 #### Foraging
 
 + Made Moonglade beacon solver notify you if you are wearing stereo pants. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4348)
++ Added additional display options for the Frog Mask. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3522)
+
+#### Fishing
+
++ Added compact display mode for Golden Fish timer. - appable (https://github.com/hannibal002/SkyHanni/pull/3696)
++ Improved bait detection accuracy. - ninjaguardian (https://github.com/hannibal002/SkyHanni/pull/4379)
 
 #### Commands
 
@@ -106,6 +121,8 @@
 #### Rift
 
 + Fixed Enigma Soul tracker sometimes sending you to the wrong soul. - Luna (https://github.com/hannibal002/SkyHanni/pull/4320)
++ Fixed Berberis Highlight not working on 1.21 if Only on Farmland is enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/4373)
++ Fixed Vermin Tracker not counting Vermin Bin on Minecraft 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4371)
 
 #### Misc
 
@@ -119,10 +136,15 @@
 + Fixed Crown of Avarice tracker sometimes not working on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4348)
 + Fixed issues with NEU items not loading correctly. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4314)
 + Fixed Keybind issuses maybe. - nopo (https://github.com/hannibal002/SkyHanni/pull/4360)
++ Fixed an edge case where shiny orb tracker would show up when it isn't meant to. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4375)
++ Fixed deadlock issue with repo management. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4374)
++ Fixed gfs command not working on most items that were more than one word. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4367)
 
 #### Chat
 
 + Fixed Hide lottery messages only hiding the buff message and not all lottery messages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4339)
++ Fixed rare crash when hovering over chat messages on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4369)
+    + Example: Compact Tree Gift with 0 rewards.
 
 #### Inventory
 
@@ -133,6 +155,9 @@
 + Fixed crash with Old Skyblock Menus. - nopo (https://github.com/hannibal002/SkyHanni/pull/4352)
 + Fixed bazaar errors relating to Drain (Syphon) books. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4354)
 + Fixed CF-closing blockers being over-eager. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4347)
++ Fixed colorful stat number tooltips breaking when the stat is over 1,000. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4365)
++ Fixed estimated item value tooltip pricing enchanted books at twice their value. - SuperCl4sh (https://github.com/hannibal002/SkyHanni/pull/4247)
++ Fixed True Defense in Colour Item Stat Numbers being the wrong colour. - nopo (https://github.com/hannibal002/SkyHanni/pull/4366)
 
 ### Technical Details
 
@@ -186,6 +211,22 @@
 + Ported `config/features/inventory/customwardrobe` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4197)
 + Removed HasLegacyId class, and stripped legacy IDs from enum classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4071)
 + Shader support on 1.21.7. - Vixid (https://github.com/hannibal002/SkyHanni/pull/4349)
++ Abstracted code for tracking particles/sounds. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4307)
+    + Added config options for each in debug config.
+    + Both commands now use qualified args.
++ Added `KuudraChest` enum class to KuudraApi. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
++ Added `WRAPPED-REGEX-TEST`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4368)
+    + Ability to wrap regex tests in quotes.
++ Added animated pet skin loading to PetUtils and PetData. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4261)
++ Added ParticleUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4307)
++ Added Storage API. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4003)
++ Fixed .rawCraftCostOrNull() returning 0 craft cost for items dropped from mobs or minibosses. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
+    + Caused all kuudra keys to have a raw craft cost of 0.
++ Made entity in EntityClickEvent no longer nullable . - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4375)
++ Ported `config/features/inventory/experimentationtable` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4199)
++ Ported the rest of misc. files in `config/features/inventory` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4199)
++ Ported ~1/2 of misc. files in `config/features/inventory` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4198)
++ Removed deprecated utils from RenderUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4362)
 
 ## Version 4.0.0
 
