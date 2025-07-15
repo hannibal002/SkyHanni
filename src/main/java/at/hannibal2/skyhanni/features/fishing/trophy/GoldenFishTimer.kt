@@ -39,6 +39,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -202,9 +204,9 @@ object GoldenFishTimer {
 
     private fun buildCompactDisplay(): Renderable {
         return Renderable.line {
-            ItemStackRenderable(goldenFishSkullItem)
+            addItemStack(goldenFishSkullItem)
             addHorizontalSpacer()
-            StringRenderable(
+            addString(
                 if (isGoldenFishActive()) {
                     "§aSpawned! ${formattedTimeUntilDespawn()}"
                 } else if (timePossibleSpawn.isFarFuture() || timePossibleSpawn.isInFuture()) {
