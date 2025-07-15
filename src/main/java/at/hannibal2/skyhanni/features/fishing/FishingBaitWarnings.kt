@@ -64,7 +64,9 @@ object FishingBaitWarnings {
 
     private fun checkBait() {
         FishingApi.bobber ?: return
-        val bait = baitEntities.filter { it.bobberDistance < 2 }.minByOrNull { it.bobberDistance }?.name // If user has no bait, but another player's bait spawns really close, it will be wrong.
+        // If the user has no bait, and another player's bait spawns really close, it will be wrong.
+        @Suppress("Wrapping")
+        val bait = baitEntities.filter { it.bobberDistance < 2 }.minByOrNull { it.bobberDistance }?.name
         baitEntities.clear()
 
         if (bait == null) {
