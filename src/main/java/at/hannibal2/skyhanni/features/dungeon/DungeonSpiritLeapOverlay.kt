@@ -183,16 +183,14 @@ object DungeonSpiritLeapOverlay {
                         } else {
                             Renderable.placeholder(width = 10, height = (12 * scaleFactor).toInt())
                         },
-                        Renderable.paddingContainer(
-                            Renderable.fixedSizeColumn(
-                                Renderable.fixedSizeLine(
-                                    buttonLayout,
-                                    width = (containerWidth * 0.40).toInt(),
-                                    verticalAlign = VerticalAlignment.CENTER,
-                                ),
-                                height = (containerHeight * 0.35).toInt(),
+                        Renderable.placeholder(0, height = (-15 * scaleFactor).toInt()),
+                        Renderable.fixedSizeColumn(
+                            Renderable.fixedSizeLine(
+                                buttonLayout,
+                                width = (containerWidth * 0.40).toInt(),
+                                verticalAlign = VerticalAlignment.CENTER,
                             ),
-                            topSpacing = (-15 * scaleFactor).toInt(),
+                            height = (containerHeight * 0.35).toInt(),
                         ),
                     ),
                 ),
@@ -235,12 +233,12 @@ object DungeonSpiritLeapOverlay {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(97, "dungeon.spiritLeapOverlay.archerClassColor", "dungeon.spiritLeapOverlay.colorConfig.archerClassColor")
-        event.move(97, "dungeon.spiritLeapOverlay.mageClassColor", "dungeon.spiritLeapOverlay.colorConfig.mageClassColor")
-        event.move(97, "dungeon.spiritLeapOverlay.berserkClassColor", "dungeon.spiritLeapOverlay.colorConfig.berserkClassColor")
-        event.move(97, "dungeon.spiritLeapOverlay.tankClassColor", "dungeon.spiritLeapOverlay.colorConfig.tankClassColor")
-        event.move(97, "dungeon.spiritLeapOverlay.healerClassColor", "dungeon.spiritLeapOverlay.colorConfig.healerClassColor")
-        event.move(97, "dungeon.spiritLeapOverlay.defaultColor", "dungeon.spiritLeapOverlay.colorConfig.defaultColor")
-        event.move(97, "dungeon.spiritLeapOverlay.deadTeammateColor", "dungeon.spiritLeapOverlay.colorConfig.deadTeammateColor")
+        event.move(98, "dungeon.spiritLeapOverlay.archerClassColor", "dungeon.spiritLeapOverlay.colorConfig.archerClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.mageClassColor", "dungeon.spiritLeapOverlay.colorConfig.mageClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.berserkClassColor", "dungeon.spiritLeapOverlay.colorConfig.berserkClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.tankClassColor", "dungeon.spiritLeapOverlay.colorConfig.tankClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.healerClassColor", "dungeon.spiritLeapOverlay.colorConfig.healerClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.defaultColor", "dungeon.spiritLeapOverlay.colorConfig.defaultColor")
+        event.move(98, "dungeon.spiritLeapOverlay.deadTeammateColor", "dungeon.spiritLeapOverlay.colorConfig.deadTeammateColor")
     }
 }
