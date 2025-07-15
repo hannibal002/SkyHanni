@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.RaritySpecificNums
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeComponent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
@@ -46,11 +47,15 @@ object BaseGsonBuilder {
         .registerTypeAdapter(NeuRecipeType::class.java, SkyHanniTypeAdapters.NEU_RECIPE_TYPE.nullSafe())
         .registerTypeAdapter(
             NeuAbstractRecipe::class.java,
-            NeuAbstractRecipe.Companion.AbstractNeuRecipeSerializer()
+            NeuAbstractRecipe.Companion.AbstractNeuRecipeSerializer(),
         )
         .registerTypeAdapter(
             NeuAbstractRecipe::class.java,
-            NeuAbstractRecipe.Companion.AbstractNeuRecipeDeserializer()
+            NeuAbstractRecipe.Companion.AbstractNeuRecipeDeserializer(),
+        )
+        .registerTypeAdapter(
+            RaritySpecificNums::class.java,
+            RaritySpecificNums.Companion.RaritySpecificNumsDeserializer(),
         )
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
