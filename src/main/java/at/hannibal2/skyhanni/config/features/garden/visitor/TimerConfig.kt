@@ -38,6 +38,15 @@ class TimerConfig {
 
     @Expose
     @ConfigOption(
+        name = "Sixth Visitor Webhook",
+        desc = "Send a webhook when it is believed that the sixth visitor has arrived.\n" +
+            "§eMay be inaccurate with co-op members farming simultaneously."
+    )
+    @ConfigEditorBoolean
+    var sixthVisitorWebhook: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "New Visitor Ping",
         desc = "Ping you when you are less than 10 seconds away from getting a new visitor.\n" +
             "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."

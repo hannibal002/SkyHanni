@@ -40,7 +40,7 @@ class BitsConfig {
         desc = "Send a webhook when you have no bits available."
     )
     @ConfigEditorBoolean
-    public boolean noBitsNotification = true;
+    var noBitsNotification: Boolean = true;
 
     @Expose
     @ConfigOption(name = "Notification Sound", desc = "Play a notification sound when you get a warning.")

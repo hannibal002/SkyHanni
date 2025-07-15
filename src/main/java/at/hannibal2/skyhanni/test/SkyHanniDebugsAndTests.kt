@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test
 
+
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
@@ -66,10 +67,10 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.play.server.S40PacketDisconnect
 import net.minecraft.util.ChatComponentText
-import net.minecraft.util.IChatComponent
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
 //#endif
@@ -487,121 +488,6 @@ object SkyHanniDebugsAndTests {
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
-    @HandleEvent
-    @Suppress("ConstantConditionIf")
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (false) {
-            dragAbleTest()
-        }
-    }
-
-    private fun dragAbleTest() {
-        val bone = ItemStack(Items.bone, 1).toDragItem()
-        val leaf = ItemStack(Blocks.leaves, 1).toDragItem()
-
-        config.debugItemPos.renderRenderables(
-            listOf(
-                DragNDrop.draggable(Renderable.string("A Bone"), { bone }),
-                Renderable.placeholder(0, 30),
-                DragNDrop.draggable(Renderable.string("A Leaf"), { leaf }),
-                Renderable.placeholder(0, 30),
-                DragNDrop.droppable(
-                    Renderable.string("Feed Dog"),
-                    object : Droppable {
-                        override fun handle(drop: Any?) {
-                            val unit = drop as ItemStack
-                            if (unit.item == Items.bone) {
-                                LorenzDebug.chatAndLog("Oh, a bone!")
-                            } else {
-                                LorenzDebug.chatAndLog("Disgusting that is not a bone!")
-                            }
-                        }
-
-                        override fun validTarget(item: Any?) = item is ItemStack
-
-                    },
-                ),
-            ),
-            posLabel = "Item Debug",
-        )
-    }
-
-    private fun itemRenderDebug() {
-        val scale = 0.1
-        val renderables = listOf(
-            ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
-            ItemStack(Blocks.melon_block),
-        ).map { item ->
-            generateSequence(scale) { it + 0.1 }.take(25).map {
-                Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
-            }.toList()
-        }.editCopy {
-            this.add(
-                0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }.toList(),
-            )
-        }
-        config.debugItemPos.renderRenderables(
-            listOf(
-                Renderable.table(renderables),
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.string("Test:").renderBounds(),
-                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
-                    ),
-                    spacing = 1,
-                ),
-            ),
-            posLabel = "Item Debug",
-        )
-    }
-
-    fun simulateServerDisconnect(args: Array<String>) {
-        val mutArgs = args.toMutableList()
-
-        val tag = mutArgs.getOrNull(0)
-        when (tag) {
-            "-permaban", "-30d", "-90d", "-360d" -> mutArgs.removeAt(0)
-        }
-
-        val reason = if (mutArgs.isNotEmpty()) mutArgs.joinToString(" ")
-        else "Cheating through the use of unfair game advantages"
-
-        val component = when (tag) {
-            "-permaban" -> createBanScreen("permanent", reason)
-            "-30d" -> createBanScreen("29d 23h 59m 59s", reason)
-            "-90d" -> createBanScreen("89d 23h 59m 59s", reason)
-            "-360d" -> createBanScreen("359d 23h 59m 59s", reason)
-            else -> ChatComponentText(reason)
-        }
-
-        try {
-            Minecraft.getMinecraft().netHandler.networkManager.channelRead(null, S40PacketDisconnect(component))
-        } catch (e: Exception) {
-            ErrorManager.logErrorStateWithData(
-                "Error while disconnecting from server.",
-                "Error while disconnecting",
-                "tag" to tag,
-                "reason" to reason,
-            )
-        }
-    }
-
-    fun createBanScreen(
-        duration: String = "29d 23h 59m 59s",
-        reason: String,
-    ): IChatComponent {
-        val component = if (duration == "permanent") ChatComponentText("\u00a7cYou are permanently banned from this server!")
-        else ChatComponentText("\u00a7cYou are temporarily banned for §r$duration §r§cfor from this server!")
-        component.appendText("\n")
-        component.appendText("\n\u00a77Reason: \u00a7r$reason")
-        component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal")
-        component.appendText("\n")
-        component.appendText("\n\u00a77Ban ID: \u00a7r#49871982")
-        component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!")
-        return component
-    }
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
         if (!debugConfig.oreEventMessages) return
@@ -633,6 +519,18 @@ object SkyHanniDebugsAndTests {
 //        println("particleCount: $particleCount")
 //        println("particleSpeed: $particleSpeed")
 //        println("offset: $offset")
+    }
+
+    fun simulateServerDisconnect(reason: String) {
+        try {
+            Minecraft.getMinecraft().netHandler.networkManager.channelRead(null, S40PacketDisconnect(ChatComponentText(reason)))
+        } catch (e: Exception) {
+            ErrorManager.logErrorStateWithData(
+                "Error while disconnecting from server.",
+                "Error while disconnecting",
+                "reason" to reason,
+            )
+        }
     }
 
     @HandleEvent

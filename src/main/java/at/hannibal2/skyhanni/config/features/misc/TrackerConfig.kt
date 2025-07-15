@@ -76,6 +76,19 @@ class TrackerConfig {
         @ConfigOption(name = "Title Price", desc = "Items above this price will show up as a title.")
         @ConfigEditorSlider(minValue = 1f, maxValue = 50000000f, minStep = 1f)
         var minimumTitle: Int = 5000000
+
+        @Expose
+        @ConfigOption(
+            name = "Webhook Notification",
+            desc = "Send a webhook when you pick up an expensive item."
+        )
+        @ConfigEditorBoolean
+        var priceNotification: Boolean = true
+
+        @Expose
+        @ConfigOption(name = "Webhook Price", desc = "Items above this price will send a webhook notification.")
+        @ConfigEditorSlider(minValue = 1f, maxValue = 50000000f, minStep = 1f)
+        var minimumNotification: Int = 5000000
     }
 
     @Expose

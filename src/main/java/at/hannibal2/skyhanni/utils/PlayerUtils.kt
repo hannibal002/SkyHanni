@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.Minecraft
 import java.util.UUID
 
 //#if MC > 1.21

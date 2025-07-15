@@ -305,6 +305,14 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Server Restart Webhook",
+        desc = "Send a webhook when the server is about to restart after a Game Update or Scheduled Restart.",
+    )
+    @ConfigEditorBoolean
+    var serverRestartNotification: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Piece Of Wizard Portal",
         desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.",
     )
@@ -352,6 +360,12 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var showLimboTimeInPlaytimeDetailed: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Limbo Webhook Alert", desc = "Send a webhook alert when you enter limbo.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var limboWebhookAlert: Boolean = true
 
     @Expose
     @ConfigOption(name = "Lesser Orb of Healing Hider", desc = "Hide the Lesser Orb of Healing.")
