@@ -78,7 +78,7 @@ data class NeuItemJson(
                 "nbtTagString" to nbtTagString,
                 "itemId" to itemId,
                 "internalName" to internalName,
-                "fixedNbt" to  fixedNbt
+                "fixedNbt" to fixedNbt
             ).toTypedArray()
         )
         null

@@ -328,29 +328,25 @@ class ItemResolutionQuery {
         if (itemType === Items.skull && displayName.contains("Essence")) {
             findInternalNameByDisplayName(displayName, false)?.let { return it }
         }
-        if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
+
+        return if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
+            var enchantmentIdCandidate: NeuInternalName? = null
             for (loreLine in compound.getLore()) {
-                val enchantmentIdCandidate = resolveEnchantmentByName(loreLine)
-                if (enchantmentIdCandidate != null) return enchantmentIdCandidate
+                enchantmentIdCandidate = resolveEnchantmentByName(loreLine)
+                if (enchantmentIdCandidate != null) break
             }
-            return null
-        }
-        if (guiName == "Catacombs RNG Meter") {
-            return resolveItemInCatacombsRngMeter()
-        }
-        if (guiName.startsWith("Choose Pet")) {
-            return findInternalNameByDisplayName(displayName, false)
-        }
-        if (guiName.endsWith("Experimentation Table RNG")) {
-            return resolveEnchantmentByName(displayName)
-        }
-        if (guiName == "Attribute Menu") {
-            return resolveItemInAttributeMenu(compound.getLore())
-        }
-        if (guiName == "Hunting Box" || guiName == "Fusion Box") {
-            return resolveItemInHuntingBoxMenu(displayName)
-        }
-        return null
+            enchantmentIdCandidate
+        } else if (guiName == "Catacombs RNG Meter") {
+            resolveItemInCatacombsRngMeter()
+        } else if (guiName.startsWith("Choose Pet")) {
+            findInternalNameByDisplayName(displayName, false)
+        } else if (guiName.endsWith("Experimentation Table RNG")) {
+            resolveEnchantmentByName(displayName)
+        } else if (guiName == "Attribute Menu") {
+            resolveItemInAttributeMenu(compound.getLore())
+        } else if (guiName == "Hunting Box" || guiName == "Fusion Box") {
+            resolveItemInHuntingBoxMenu(displayName)
+        } else null
     }
 
     private fun isBazaar(chest: IInventory): Boolean {

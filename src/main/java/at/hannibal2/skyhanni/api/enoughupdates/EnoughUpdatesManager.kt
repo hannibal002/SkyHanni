@@ -278,7 +278,8 @@ object EnoughUpdatesManager {
         return buildMap {
             put("LVL", petData.getLevelReplacement(properInternalName))
             val raritySpecific = neuPetNums?.get(properInternalName)?.get(petData.rarity) ?: return@buildMap
-            addStatReplacements(petData, raritySpecific)
+            if (petData.level == 0) addUnlevelledStatReplacements(raritySpecific)
+            else addLevelledStatReplacements(petData, raritySpecific)
         }
     }
 
@@ -290,55 +291,53 @@ object EnoughUpdatesManager {
         } ?: "1➡100"
     }
 
-    private fun MutableMap<String, String>.addStatReplacements(
-        petData: PetData,
-        nums: RaritySpecificNums,
-    ) {
+    private fun MutableMap<String, String>.addUnlevelledStatReplacements(nums: RaritySpecificNums) {
+        val otherNumsMin = nums.min.otherNums
+        val otherNumsMax = nums.max.otherNums
+
+        val addZero = nums.statLevellingType == 1
+
+        for (i in 0..otherNumsMax.size) {
+            val start = if (addZero) "0➡" else ""
+            this[i.toString()] = "$start${otherNumsMin[i]}➡${otherNumsMax[i]}"
+        }
+
+        for ((stat, statMax) in nums.max.statNums) {
+            val statMin = nums.min.statNums[stat] ?: continue
+            val start = "${if (addZero) "0➡" else ""}${if (statMin > 0) "+" else ""}"
+            this[stat.name] = "$start$statMin➡$statMax"
+        }
+    }
+
+    private fun MutableMap<String, String>.addLevelledStatReplacements(petData: PetData, nums: RaritySpecificNums) {
         val level = petData.level
-        val min = nums.min
-        val max = nums.max
-        val otherNumsMin = min.otherNums
-        val otherNumsMax = max.otherNums
+        val otherNumsMin = nums.min.otherNums
+        val otherNumsMax = nums.max.otherNums
 
-        if (petData.level == 0) {
-            val addZero = nums.statLevellingType == 1
+        val minStatLevel = nums.minStatsLevel ?: 0
+        val maxStatLevel = nums.maxStatsLevel ?: 100
+        val statLevellingType = nums.statLevellingType ?: -1
+        val statsLevel = if (statLevellingType in 0..1) {
+            if (level < minStatLevel) 1
+            else if (level < maxStatLevel) level - minStatLevel + 1
+            else maxStatLevel - minStatLevel + 1
+        } else level
 
-            for (i in 0..otherNumsMax.size) {
-                val start = if (addZero) "0➡" else ""
-                this[i.toString()] = "$start${otherNumsMin[i]}➡${otherNumsMax[i]}"
-            }
+        val minMix = (maxStatLevel - (minStatLevel - (if (statLevellingType == -1) 0 else 1)) - statsLevel) / 99f
+        val maxMix = (statsLevel - 1) / 99f
+        for (i in 0 until otherNumsMax.size) {
+            val num = otherNumsMin[i] * minMix + otherNumsMax[i] * maxMix
+            this[i.toString()] = if (statLevellingType == 1 && level < minStatLevel) "0"
+            else (floor(num * 10) / 10f).removeUnusedDecimal()
+        }
 
-            for ((stat, statMax) in max.statNums) {
-                val statMin = min.statNums[stat] ?: continue
-                val start = "${if (addZero) "0➡" else ""}${if (statMin > 0) "+" else ""}"
-                this[stat.name] = "$start$statMin➡$statMax"
-            }
-        } else {
-            val minStatLevel = nums.minStatsLevel ?: 0
-            val maxStatLevel = nums.maxStatsLevel ?: 100
-            val statLevellingType = nums.statLevellingType ?: -1
-            val statsLevel = if (statLevellingType in 0..1) {
-                if (level < minStatLevel) 1
-                else if (level < maxStatLevel) level - minStatLevel + 1
-                else maxStatLevel - minStatLevel + 1
-            } else level
-
-            val minMix = (maxStatLevel - (minStatLevel - (if (statLevellingType == -1) 0 else 1)) - statsLevel) / 99f
-            val maxMix = (statsLevel - 1) / 99f
-            for (i in 0 until otherNumsMax.size) {
-                val num = otherNumsMin[i] * minMix + otherNumsMax[i] * maxMix
-                this[i.toString()] = if (statLevellingType == 1 && level < minStatLevel) "0"
-                else (floor(num * 10) / 10f).removeUnusedDecimal()
-            }
-
-            for ((stat, statMax) in max.statNums) {
-                this[stat.name] = if (statLevellingType == 1 && level < minStatLevel) "0"
-                else {
-                    val statMin = min.statNums[stat] ?: continue
-                    val num = statMin * minMix + statMax * maxMix
-                    val baseFormat = (if (statMin > 0) "+" else "")
-                    baseFormat + (floor(num * 10) / 10).removeUnusedDecimal()
-                }
+        for ((stat, statMax) in nums.max.statNums) {
+            this[stat.name] = if (statLevellingType == 1 && level < minStatLevel) "0"
+            else {
+                val statMin = nums.min.statNums[stat] ?: continue
+                val num = statMin * minMix + statMax * maxMix
+                val baseFormat = (if (statMin > 0) "+" else "")
+                baseFormat + (floor(num * 10) / 10).removeUnusedDecimal()
             }
         }
     }
@@ -359,13 +358,11 @@ object EnoughUpdatesManager {
         return loreList
     }
 
-    fun getDisplayName(internalName: NeuInternalName): String {
-        return displayNameCache.getOrPut(internalName) {
-            // Intentionally toString() instead of asString()
-            val itemInfo = getItemById(internalName) ?: return@getOrPut internalName.toString()
-            itemInfo.displayName ?: run {
-                ErrorManager.skyHanniError("No displayname for $internalName")
-            }
+    fun getDisplayName(internalName: NeuInternalName): String = displayNameCache.getOrPut(internalName) {
+        // Intentionally toString() instead of asString() to indicate failure
+        val itemInfo = getItemById(internalName) ?: return@getOrPut internalName.toString()
+        itemInfo.displayName ?: run {
+            ErrorManager.skyHanniError("No displayname for $internalName")
         }
     }
 

@@ -17,7 +17,7 @@ data class RaritySpecificNums(
     @Expose @SerializedName("100") val max: PetNums,
     @Expose @SerializedName("stats_levelling_curve") private val levelCurveString: String? = null,
 ) {
-    private val curveSplits = levelCurveString?.split(":")?.map{ it.toInt() }.orEmpty()
+    private val curveSplits = levelCurveString?.split(":")?.map { it.toInt() }.orEmpty()
     val minStatsLevel: Int? = curveSplits.getOrNull(0)
     val maxStatsLevel: Int? = curveSplits.getOrNull(1)
     val statLevellingType: Int? = curveSplits.getOrNull(2)

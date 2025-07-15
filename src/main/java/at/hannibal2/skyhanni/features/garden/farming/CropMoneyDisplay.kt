@@ -42,7 +42,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.line
 import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import kotlinx.coroutines.launch
 
 @SkyHanniModule
 object CropMoneyDisplay {
