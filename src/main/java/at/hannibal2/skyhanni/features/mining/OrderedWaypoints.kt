@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.FriendApi.saveConfig
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
@@ -80,7 +79,7 @@ object OrderedWaypoints {
                 orderedWaypointsList[renderWaypoints[i]].location,
                 wpColor,
                 config.blockOutlineThickness.toInt(),
-                false
+                false,
             )
 
             if (config.showAll || i < 3) {
@@ -88,7 +87,7 @@ object OrderedWaypoints {
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
                     "§e${orderedWaypointsList[renderWaypoints[i]].number}",
-                    seeThroughBlocks = true
+                    seeThroughBlocks = true,
                 )
             }
 
@@ -97,7 +96,7 @@ object OrderedWaypoints {
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.0, 0.5),
                     "§e${orderedWaypointsList[renderWaypoints[i]].location.distanceToPlayer().roundTo(1).addSeparators()} m",
-                    seeThroughBlocks = true
+                    seeThroughBlocks = true,
                 )
             }
         }
@@ -109,7 +108,7 @@ object OrderedWaypoints {
                 traceWP.location.add(0.5, 0.25, 0.5),
                 lineColor,
                 config.traceLineThickness.toInt(),
-                depth = true
+                depth = true,
             )
         }
 
@@ -120,7 +119,7 @@ object OrderedWaypoints {
                 traceWP.location.add(0.5, 0.5, 0.5),
                 lineColor,
                 config.setupModeLineThickness.toInt(),
-                depth = true
+                depth = true,
             )
         }
 
@@ -134,104 +133,82 @@ object OrderedWaypoints {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shorderedload") {
-            description = "Loads ordered waypoints from your clipboard or config."
+        event.registerBrigadier("shordered") {
+            description = "Ordered Waypoints commands."
             category = CommandCategory.USERS_ACTIVE
-            arg(
-                "name", BrigadierArguments.string(), ::genRouteSuggestions
-            ) { name ->
-                callback { load(getArg(name)) }
+            aliases = listOf("sho")
+            literal("load", "import") {
+                description = "Loads ordered waypoints from your clipboard or config."
+                arg(
+                    "name", BrigadierArguments.string(), ::genRouteSuggestions,
+                ) { name ->
+                    callback { load(getArg(name)) }
+                }
+                simpleCallback { load("") }
             }
-            simpleCallback { load("") }
-            aliases = generateAliases(listOf("load", "import"))
-        }
-
-        event.registerBrigadier("shorderedunload") {
-            description = "Unloads the current ordered waypoints."
-            category = CommandCategory.USERS_ACTIVE
-            callback { unload() }
-            aliases = generateAliases(listOf("unload", "clear"))
-        }
-
-        event.registerBrigadier("shorderedskip") {
-            description = "Skips the next inputted number many waypoints."
-            category = CommandCategory.USERS_ACTIVE
-            arg("amount", BrigadierArguments.integer()) { amount ->
-                callback { skip(getArg(amount)) }
+            literal("unload", "clear") {
+                description = "Unloads the current ordered waypoints."
+                simpleCallback { unload() }
             }
-            simpleCallback { skip(1) }
-            aliases = generateAliases(listOf("skip"))
-        }
-
-        event.registerBrigadier("shorderedskipto") {
-            description = "Skips to the waypoint with the inputted number."
-            category = CommandCategory.USERS_ACTIVE
-            arg("number", BrigadierArguments.integer()) { number ->
-                callback { skipto(getArg(number)) }
+            literal("skip") {
+                description = "Skips the next waypoint."
+                arg("amount", BrigadierArguments.integer()) { amount ->
+                    callback { skip(getArg(amount)) }
+                }
+                simpleCallback { skip(1) }
             }
-            aliases = generateAliases(listOf("skipto"))
-        }
-
-        event.registerBrigadier("shorderedunskip") {
-            description = "Goes back by the number inputted many waypoints."
-            category = CommandCategory.USERS_ACTIVE
-            arg("amount", BrigadierArguments.integer()) { amount ->
-                callback { unskip(getArg(amount)) }
+            literal("skipto") {
+                description = "Skips to the waypoint with the inputted number."
+                arg("number", BrigadierArguments.integer()) { number ->
+                    callback { skipto(getArg(number)) }
+                }
+                simpleCallback { skip(1) }
             }
-            aliases = generateAliases(listOf("unskip"))
-        }
-
-        event.registerBrigadier("shordereddelete") {
-            description = "Deletes the waypoint with the inputted number."
-            category = CommandCategory.USERS_ACTIVE
-            arg("number", BrigadierArguments.integer()) { number ->
-                callback { delete(getArg(number)) }
+            literal("unskip") {
+                description = "Goes back by the number inputted many waypoints."
+                arg("amount", BrigadierArguments.integer()) { amount ->
+                    callback { unskip(getArg(amount)) }
+                }
+                simpleCallback { unskip(1) }
             }
-            aliases = generateAliases(listOf("delete", "remove"))
-        }
-
-        event.registerBrigadier("shorderedadd") {
-            description = "Inserts a waypoint with the specified numbering below the player."
-            category = CommandCategory.USERS_ACTIVE
-            arg("number", BrigadierArguments.integer()) { number ->
-                callback { add(getArg(number)) }
+            literal("delete", "remove") {
+                description = "Deletes the waypoint with the inputted number."
+                arg("number", BrigadierArguments.integer()) { number ->
+                    callback { delete(getArg(number)) }
+                }
             }
-            aliases = generateAliases(listOf("add", "insert"))
-        }
-
-        event.registerBrigadier("shorderedexport") {
-            description = "Exports the loaded ordered waypoints to clipboard."
-            category = CommandCategory.USERS_ACTIVE
-            arg("format", BrigadierArguments.string(), ::getFormatSuggestions) { format ->
-                callback { export(getArg(format)) }
+            literal("add", "insert") {
+                description = "Inserts a waypoint with the specified numbering below the player."
+                arg("number", BrigadierArguments.integer()) { number ->
+                    callback { add(getArg(number)) }
+                }
             }
-            simpleCallback { export("coleweight") }
-            aliases = generateAliases(listOf("export"))
-        }
-
-        event.registerBrigadier("shorderedsave") {
-            description = "Saves the loaded ordered waypoints to your config."
-            category = CommandCategory.USERS_ACTIVE
-            arg("name", BrigadierArguments.string()) { name ->
-                callback { save(getArg(name)) }
+            literal("export") {
+                description = "Exports the loaded ordered waypoints to clipboard."
+                arg("format", BrigadierArguments.string(), ::getFormatSuggestions) { format ->
+                    callback { export(getArg(format)) }
+                }
+                simpleCallback { export("coleweight") }
             }
-            aliases = generateAliases(listOf("save"))
-        }
-
-        event.registerBrigadier("shorderederase") {
-            description = "Erases the route with the specified name."
-            category = CommandCategory.USERS_ACTIVE
-            arg("name", BrigadierArguments.string(), ::genRouteSuggestions) { name ->
-                callback { erase(getArg(name)) }
+            literal("save") {
+                description = "Saves the loaded ordered waypoints to your config."
+                arg("name", BrigadierArguments.string()) { name ->
+                    callback { save(getArg(name)) }
+                }
             }
-            aliases = generateAliases(listOf("erase"))
+            literal("erase", "delete-route") {
+                description = "Erases the route with the specified name."
+                arg("name", BrigadierArguments.string(), ::genRouteSuggestions) { name ->
+                    callback { erase(getArg(name)) }
+                }
+            }
         }
     }
 
     @Suppress("UnusedParameter")
     private fun genRouteSuggestions(
         context: CommandContext<Any?>,
-        builder: SuggestionsBuilder
+        builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> {
         val routes = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys
         for (route in routes.orEmpty()) {
@@ -245,7 +222,7 @@ object OrderedWaypoints {
     @Suppress("UnusedParameter")
     private fun getFormatSuggestions(
         context: CommandContext<Any?>,
-        builder: SuggestionsBuilder
+        builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> {
         val formats = ServiceLoader.load(WaypointFormat::class.java).map { it.name }
         for (format in formats) {
@@ -281,7 +258,7 @@ object OrderedWaypoints {
                     ChatUtils.userError(
                         "Route $name doesn't exist.\n" +
                             "§cSaved Routes: ${routes?.keys?.toList()?.joinToString(", ")}\n" +
-                            "§cIf you would like to import a route from your clipboard, leave the route name blank."
+                            "§cIf you would like to import a route from your clipboard, leave the route name blank.",
                     )
                     return@launchIOCoroutine
                 }
@@ -295,7 +272,7 @@ object OrderedWaypoints {
             } ?: run {
                 ChatUtils.userError(
                     "There was an error parsing waypoints. " +
-                        "Please make sure they are Coleweight formatted waypoints."
+                        "Please make sure they are Coleweight formatted waypoints.",
                 )
                 return@launchIOCoroutine
             }
@@ -462,8 +439,7 @@ object OrderedWaypoints {
                 !renderWaypoints.contains(it.number - 1) &&
                 it.location.distanceToPlayer() < config.setupModeRange
             inSetupRange || config.showAll
-        }.forEach {
-                waypoint ->
+        }.forEach { waypoint ->
             renderWaypoints.add(waypoint.number - 1)
         }
     }

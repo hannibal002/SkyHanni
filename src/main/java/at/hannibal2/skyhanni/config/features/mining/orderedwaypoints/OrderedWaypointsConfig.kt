@@ -87,7 +87,7 @@ class OrderedWaypointsConfig {
     var setupModeLineThickness: Float = 1.0f
 
     @Expose
-    @ConfigOption(name = "Show All Waypoints", desc = "Whether all waypoints should be displayed. May cause lag.")
+    @ConfigOption(name = "Show All Waypoints", desc = "Whether all waypoints should be displayed.")
     @ConfigEditorBoolean
     var showAll: Boolean = false
 
