@@ -274,8 +274,8 @@ object PestFinder {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(98, "garden.pests.pestFinder.muteVacuum", "garden.pests.muteVacuum")
-        event.move(98, "garden.pests.pestFinder.onlyWithVacuum", "garden.pests.pestFinder.whenToShow") {
+        event.move(97, "garden.pests.pestFinder.muteVacuum", "garden.pests.muteVacuum")
+        event.move(97, "garden.pests.pestFinder.onlyWithVacuum", "garden.pests.pestFinder.whenToShow") {
             ConfigUtils.migrateBooleanToEnum(it, WhenToShow.BOTH, WhenToShow.ALWAYS)
         }
     }

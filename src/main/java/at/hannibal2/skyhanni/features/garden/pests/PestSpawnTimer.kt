@@ -248,22 +248,22 @@ object PestSpawnTimer {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val userSelections: List<HeldItem> = buildList {
-            event.transform(98, "garden.pests.pestTimer.onlyWithFarmingTool") { entry ->
+            event.transform(97, "garden.pests.pestTimer.onlyWithFarmingTool") { entry ->
                 if (entry.asBoolean) add(HeldItem.FARMING_TOOL)
                 entry
             }
-            event.transform(98, "garden.pests.pestTimer.onlyWithVacuum") { entry ->
+            event.transform(97, "garden.pests.pestTimer.onlyWithVacuum") { entry ->
                 if (entry.asBoolean) add(HeldItem.VACUUM)
                 entry
             }
-            event.transform(98, "garden.pests.pestTimer.onlyWithLasso") { entry ->
+            event.transform(97, "garden.pests.pestTimer.onlyWithLasso") { entry ->
                 if (entry.asBoolean) add(HeldItem.LASSO)
                 entry
             }
         }
 
         if (userSelections.isNotEmpty()) {
-            event.add(98, "garden.pests.pestTimer.onlyWhenHolding") {
+            event.add(97, "garden.pests.pestTimer.onlyWhenHolding") {
                 ConfigManager.gson.toJsonTree(userSelections)
             }
         }

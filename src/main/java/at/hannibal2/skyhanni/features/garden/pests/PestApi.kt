@@ -3,11 +3,9 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -29,11 +27,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -63,11 +64,8 @@ object PestApi {
     var lastTimeVacuumHeld = SimpleTimeMark.farPast()
     var lastTimeLassoHeld = SimpleTimeMark.farPast()
 
-    var vacuumVariants = listOf<NeuInternalName>()
-    private var lassoVariants = listOf<NeuInternalName>()
-
-    fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
-    fun hasLassoInHand() = InventoryUtils.itemInHandId in lassoVariants
+    fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
+    fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
     fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
@@ -280,10 +278,10 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (event.oldItem in vacuumVariants) {
+        if (event.oldItem.getItemStack().getItemCategoryOrNull() == ItemCategory.VACUUM) {
             lastTimeVacuumHeld = SimpleTimeMark.now()
         }
-        if (event.oldItem in lassoVariants) {
+        if (event.oldItem.getItemStack().getItemCategoryOrNull() == ItemCategory.LASSO) {
             lastTimeLassoHeld = SimpleTimeMark.now()
         }
     }
@@ -378,13 +376,6 @@ object PestApi {
                 }
             }
         }
-    }
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ItemsJson>("Items")
-        vacuumVariants = data.gardenVacuums
-        lassoVariants = data.huntingLassos
     }
 
     @HandleEvent
