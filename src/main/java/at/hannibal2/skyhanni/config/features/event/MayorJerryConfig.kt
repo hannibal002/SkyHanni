@@ -14,11 +14,11 @@ class MayorJerryConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var highlightJerries: Property<Boolean> = Property.of(true)
+    val highlightJerries: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Line to Jerries", desc = "Shows a line to your Jerries found from the Jerrypocalypse perk.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var lineJerries: Property<Boolean> = Property.of(true)
+    val lineJerries: Property<Boolean> = Property.of(true)
 }

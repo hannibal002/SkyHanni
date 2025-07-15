@@ -30,6 +30,6 @@ public abstract class MixinEntity {
     @Inject(method = "getBrightness", at = @At("HEAD"), cancellable = true)
     public void onGetBrightness(float p_getBrightness_1_, CallbackInfoReturnable<Float> cir) {
         if (((Entity) (Object) this).worldObj == null)
-            cir.setReturnValue(1.0F);
+            cir.setReturnValue(1f);
     }
 }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -7,6 +8,8 @@ import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
+import java.util.UUID
+
 //#if MC > 1.21
 //$$ import net.minecraft.entity.attribute.EntityAttributes
 //#endif
@@ -57,7 +60,15 @@ object PlayerUtils {
         //#if MC < 1.21
         return (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
         //#else
-        //$$ return MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED).toInt()
+        //$$ return (MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED) * 1000).toInt()
         //#endif
     }
+
+    fun getUuid() = getRawUuid().toDashlessUUID()
+
+    fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uniqueID
+
+    fun getName(): String = MinecraftCompat.localPlayer.name
+
+    fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround
 }

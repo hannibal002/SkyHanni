@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -60,7 +60,7 @@ object JacobFarmingContestsInventory {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (event.inventoryName != "Your Contests") return
+        if (!FarmingContestApi.inInventory) return
 
         realTime.clear()
 
@@ -95,6 +95,7 @@ object JacobFarmingContestsInventory {
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
+                if (!FarmingContestApi.inInventory) return
                 val (year, month, day) = FarmingContestApi.getSBDateFromItemName(itemName) ?: return
                 openContest(year, month, day)
                 event.cancel()
@@ -123,7 +124,7 @@ object JacobFarmingContestsInventory {
             }
 
             "§bClaim your rewards!" -> {
-                OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/${HypixelData.profileName}/contests")
+                OSUtils.openBrowser("https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests")
                 ChatUtils.chat("Opening your contests in elitebot.dev")
             }
 
@@ -162,7 +163,7 @@ object JacobFarmingContestsInventory {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
+        if (!FarmingContestApi.inInventory) return
         if (!config.highlightRewards) return
 
         // hide green border for a tick
@@ -180,7 +181,7 @@ object JacobFarmingContestsInventory {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
-        if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
+        if (!FarmingContestApi.inInventory) return
 
         val slot = event.slot.slotNumber
         if (config.realTime) {
@@ -196,7 +197,7 @@ object JacobFarmingContestsInventory {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!config.medalIcon) return
-        if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
+        if (!FarmingContestApi.inInventory) return
 
         val stack = event.stack ?: return
         var finneganContest = false

@@ -19,7 +19,7 @@ class BackgroundOutlineConfig {
 
     @Expose
     @ConfigOption(name = "Blur", desc = "Amount that the outline is blurred.")
-    @ConfigEditorSlider(minValue = 0.0f, maxValue = 1.0f, minStep = 0.1f)
+    @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.1f)
     var blur: Float = 0.7f
 
     @Expose

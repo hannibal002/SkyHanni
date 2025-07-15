@@ -9,19 +9,20 @@ import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 
 private val config get() = SkyHanniMod.feature.gui.mayorOverlay
 
 enum class MayorOverlay(private val configLine: String, private val createLines: () -> Renderable) {
     TITLE(
         "Title",
-        {
-            Renderable.string("§6§lMAYOR OVERLAY")
-        },
+        { StringRenderable("§6§lMAYOR OVERLAY") },
     ),
     MAYOR(
         "Mayor",
@@ -50,7 +51,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         {
             val candidates = ElectionApi.rawMayorData?.current?.candidates.orEmpty()
 
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 candidates.map { candidate ->
                     renderPerson(
                         "Candidate",
@@ -65,7 +66,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     NEW_MAYOR(
         "New Mayor Time",
         {
-            Renderable.string("§7New Mayor in: §e${ElectionApi.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}")
+            StringRenderable("§7New Mayor in: §e${ElectionApi.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}")
         },
     ),
     ;
@@ -80,7 +81,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         fun onSecondPassed(event: SecondPassedEvent) {
             if (!isEnabled()) return
             with(config) {
-                display = mayorOverlay.map { it.createLines() }.let { Renderable.verticalContainer(it, spacing = spacing) }
+                display = VerticalContainerRenderable(mayorOverlay.map { it.createLines() }, spacing = spacing)
             }
         }
 
@@ -90,7 +91,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
             display?.let { config.position.renderRenderable(it, posLabel = "Mayor Overlay") }
         }
 
-        private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.MAYOR_OVERLAY.isSelected()) && config.enabled
+        private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MAYOR_OVERLAY.isSelected()) && config.enabled
     }
 }
 
@@ -100,17 +101,17 @@ private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Rend
         " ${if (perk.minister) "§6✯ " else ""}§e${perk.perkName}" to "§7${perk.description}"
     }.orEmpty()
 
-    return Renderable.verticalContainer(
+    return VerticalContainerRenderable(
         buildMap {
             name?.let { put("$colorCode$title $it", null) }
             putAll(perkLines)
         }.map { (key, value) ->
             value?.let {
                 Renderable.hoverTips(
-                    Renderable.string(key),
-                    listOf(Renderable.wrappedString(it, 200)),
+                    StringRenderable(key),
+                    listOf(WrappedStringRenderable(it, 200)),
                 )
-            } ?: Renderable.string(key)
+            } ?: StringRenderable(key)
         },
     )
 }

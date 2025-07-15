@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.features.webhook.DiscordEmbed
 import at.hannibal2.skyhanni.features.webhook.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -107,7 +107,7 @@ object FriendApi {
 
     private val tempFriends = mutableListOf<Friend>()
 
-    private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(LorenzUtils.getRawPlayerUuid()) {
+    private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(PlayerUtils.getRawUuid()) {
         FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
     }.friends
 
@@ -211,7 +211,7 @@ object FriendApi {
                     }
                 }
             }
-            val bestFriend = sibling.unformattedText.contains("§l")
+            val bestFriend = sibling.unformattedText.split(" ").firstOrNull()?.contains("§l") ?: false
             val name = readName(sibling)
             if (uuid != null && name != null) {
                 getFriends()[uuid] = Friend().also {

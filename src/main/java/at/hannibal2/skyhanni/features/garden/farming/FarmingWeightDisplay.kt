@@ -25,22 +25,22 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import com.google.gson.JsonObject
-import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -92,7 +92,7 @@ object FarmingWeightDisplay {
         if (!event.isMod(5)) return
         update()
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             getCropWeights()
         }
     }
@@ -206,9 +206,9 @@ object FarmingWeightDisplay {
 
                 isLoadingWeight = true
                 if (display.isEmpty()) {
-                    display = listOf(RenderableString("§6${lbName()}§7: §eLoading.."))
+                    display = listOf(StringRenderable("§6${lbName()}§7: §eLoading.."))
                 }
-                SkyHanniMod.coroutineScope.launch {
+                SkyHanniMod.launchIOCoroutine {
                     loadWeight(localProfile)
                     isLoadingWeight = false
                 }
@@ -226,7 +226,7 @@ object FarmingWeightDisplay {
             Renderable.clickable(
                 "§6${lbName()}§7: $weight$leaderboard",
                 tips = listOf("§eClick to open your Farming Profile."),
-                onLeftClick = { openWebsite(LorenzUtils.getPlayerName()) },
+                onLeftClick = { openWebsite(PlayerUtils.getName()) },
             ),
         )
 
@@ -362,7 +362,7 @@ object FarmingWeightDisplay {
         val weightFormat = (weightUntilOvertake.roundTo(2) + 0.0).addSeparators()
         val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
         return if (showRankGoal) {
-            Renderable.string(text)
+            StringRenderable(text)
         } else {
             Renderable.clickable(
                 text,
@@ -395,13 +395,13 @@ object FarmingWeightDisplay {
                 "§eClick to open your Farming Weight",
                 "§eprofile on §celitebot.dev",
             ),
-            "/shfarmingprofile ${LorenzUtils.getPlayerName()}",
+            "/shfarmingprofile ${PlayerUtils.getName()}",
         )
     }
 
     private fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
-    private fun outsideEnabled() = OutsideSBFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
-    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenApi.inGarden()) || config.showOutsideGarden
+    private fun outsideEnabled() = OutsideSBFeature.FARMING_WEIGHT.isSelected() && !SkyBlockUtils.inSkyBlock
+    private fun inGardenEnabled() = (SkyBlockUtils.inSkyBlock && GardenApi.inGarden()) || config.showOutsideGarden
 
     private fun isEtaEnabled() = config.overtakeETA
     private fun isMonthlyLB() = config.eliteLBType.get() == EliteFarmingWeightConfig.EliteFarmingWeightLBType.MONTHLY
@@ -436,7 +436,7 @@ object FarmingWeightDisplay {
         if (isLoadingLeaderboard) return
         isLoadingLeaderboard = true
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             val wasNotLoaded = leaderboardPosition == -1
             leaderboardPosition = loadLeaderboardPosition()
             if (wasNotLoaded && config.showLbChange) {
@@ -474,8 +474,8 @@ object FarmingWeightDisplay {
 
     private fun lbName() = "${if (isMonthlyLB()) "Monthly " else ""}Farming Weight"
 
-    private fun loadLeaderboardPosition(): Int {
-        val uuid = LorenzUtils.getPlayerUuid()
+    private suspend fun loadLeaderboardPosition(): Int {
+        val uuid = PlayerUtils.getUuid()
 
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val upcomingPlayersParam = when {
@@ -499,7 +499,8 @@ object FarmingWeightDisplay {
 
         val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/" +
             "$uuid/$profileId$upcomingPlayersParam$atRankParam"
-        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Leaderboard")
+        val apiResponse = ApiUtils.getTypedJSONResponse<JsonObject>(url, apiName = "Elitebot Farming Leaderboard")
+            ?: return leaderboardPosition
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
@@ -544,10 +545,11 @@ object FarmingWeightDisplay {
         return eliteWeightApiGson.fromJson<EliteLeaderboardJson>(jsonObject)
     }
 
-    private fun loadWeight(localProfile: String) {
-        val uuid = LorenzUtils.getPlayerUuid()
+    private suspend fun loadWeight(localProfile: String) {
+        val uuid = PlayerUtils.getUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
         val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elite Farming Weight")
+            ?: return
 
         var error: Throwable? = null
 
@@ -619,7 +621,7 @@ object FarmingWeightDisplay {
     }
 
     private fun lookUpCommand(it: Array<String>) {
-        val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
+        val name = if (it.size == 1) it[0] else PlayerUtils.getName()
         openWebsite(name, ignoreCooldown = true)
     }
 
@@ -638,26 +640,21 @@ object FarmingWeightDisplay {
     private var attemptingCropWeightFetch = false
     private var hasFetchedCropWeights = false
 
-    private fun getCropWeights() {
+    private val weightStatic = ApiUtils.StaticApiPath(
+        "https://api.elitebot.dev/weights/all",
+        "Elitebot Farming Weights",
+    )
+
+    private suspend fun getCropWeights() {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
-        val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Weight")
-
-        try {
-            val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
-            apiData.crops
-            for (crop in apiData.crops) {
-                val cropType = CropType.getByNameOrNull(crop.key) ?: continue
-                cropWeight[cropType] = crop.value
-            }
-            hasFetchedCropWeights = true
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error getting crop weights from elitebot.dev",
-                "apiResponse" to apiResponse,
-            )
+        val apiResponse = ApiUtils.getJSONResponse(weightStatic) ?: return
+        val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
+        for (crop in apiData.crops) {
+            val cropType = CropType.getByNameOrNull(crop.key) ?: continue
+            cropWeight[cropType] = crop.value
         }
+        hasFetchedCropWeights = true
     }
 
     // still needed when first joining garden and if they cant make https requests

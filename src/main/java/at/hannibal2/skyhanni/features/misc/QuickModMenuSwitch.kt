@@ -11,16 +11,19 @@ import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
+//#if FORGE
 import net.minecraftforge.client.ClientCommandHandler
+//#endif
 
 @SkyHanniModule
 object QuickModMenuSwitch {
@@ -135,7 +138,7 @@ object QuickModMenuSwitch {
             }
             val nameSuffix = if (opening) " §7(opening...)" else ""
             val renderable = Renderable.link(
-                Renderable.string(nameFormat + mod.name),
+                StringRenderable(nameFormat + mod.name),
                 bypassChecks = true,
                 onLeftClick = { open(mod) },
                 condition = { System.currentTimeMillis() > lastGuiOpen + 250 },
@@ -152,7 +155,9 @@ object QuickModMenuSwitch {
         currentlyOpeningMod = mod.name
         update()
         try {
+            //#if FORGE
             ClientCommandHandler.instance.executeCommand(MinecraftCompat.localPlayer, "/" + mod.command)
+            //#endif
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }
@@ -167,7 +172,7 @@ object QuickModMenuSwitch {
         DrawContextUtils.popMatrix()
     }
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
+    private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.misc.limbo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -15,10 +17,10 @@ import at.hannibal2.skyhanni.features.webhook.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.util.AxisAlignedBB
@@ -36,15 +38,12 @@ object LimboTimeTracker {
     private var inFakeLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
-    private var userLuck: Float = 0.0F
+    private var userLuck: Float = 0f
     private const val USER_LUCK_MULTIPLIER = 0.000810185F
     private const val FIRE_MULTIPLIER = 1.01F
     private var onFire = false
 
     private val bedWarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
-
-    private var doMigrate = false
-    private var notMigratedPB = 0
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -117,7 +116,7 @@ object LimboTimeTracker {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inLimbo) return
-        if (LorenzUtils.inSkyBlock) {
+        if (SkyBlockUtils.inSkyBlock) {
             leaveLimbo()
             return
         }
@@ -202,32 +201,20 @@ object LimboTimeTracker {
         }
     }
 
-    fun workaroundMigration(personalBest: Int) {
-        doMigrate = true
-        notMigratedPB = personalBest
-    }
-
-    @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
-        if (!doMigrate) return
-        if (notMigratedPB != 0) {
-            ChatUtils.debug("Migrating limbo personalBest")
-            storage?.personalBest = notMigratedPB
-            storage?.userLuck = notMigratedPB * USER_LUCK_MULTIPLIER
-        }
-        if ((storage?.personalBest ?: 0) > (storage?.playtime ?: 0)) {
-            ChatUtils.debug("Migrating limbo playtime")
-            storage?.playtime = (storage?.personalBest ?: 0)
-        }
-        doMigrate = false
-        notMigratedPB = 0
-    }
-
     fun isEnabled() = config.showTimeInLimbo
 
     private fun tryTruncateFloat(input: Float): String {
         val string = input.toString()
         return if (string.endsWith(".0")) return string.dropLast(2)
         else string
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shlimbostats") {
+            description = "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { printStats() }
+        }
     }
 }

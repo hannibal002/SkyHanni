@@ -58,7 +58,9 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
     fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
 
     @JvmOverloads
-    fun toChromaColor(alpha: Int = this.color.alpha, chroma: Int = 0): ChromaColour = color.toChromaColor(alpha, chroma)
+    fun toChromaColor(alpha: Int = this.color.alpha, chromaSpeedMillis: Int = 0): ChromaColour {
+        return color.toChromaColor(alpha, chromaSpeedMillis)
+    }
 
     fun toDyeColor(): EnumDyeColor = when (this) {
         WHITE -> EnumDyeColor.WHITE

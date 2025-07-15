@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -19,16 +18,19 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -330,7 +332,7 @@ object GiftProfitTracker {
             val specificGiftFormat = if (applicableGifts.count() == 1) applicableGifts.keys.first().displayName else "§eGifts"
             val giftFormat = "§7${it.addSeparators()}x $specificGiftFormat§7: §c-${totalGiftCost.shortFormat()}"
             add(
-                if (applicableGifts.count() == 1) Renderable.string(giftFormat).toSearchable(specificGiftFormat)
+                if (applicableGifts.count() == 1) StringRenderable(giftFormat).toSearchable(specificGiftFormat)
                 else Renderable.hoverTips(
                     giftFormat,
                     giftCostStrings,
@@ -350,21 +352,7 @@ object GiftProfitTracker {
         }
 
         // Skill XP gains
-        data.skillXpGained.sumAllValues().takeIf { it > 0 }?.let { sumXpGained ->
-            val applicableSkills = data.skillXpGained.filter { it.value > 0 }
-            val skillHoverTips = applicableSkills.map { (skill, xp) ->
-                "§7${xp.addSeparators()} §3${skill.displayName} XP"
-            }.toMutableList()
-            if (applicableSkills.size > 1) {
-                skillHoverTips.add("§7You gained §e${sumXpGained.addSeparators()} §7total skill XP.")
-            }
-            add(
-                Renderable.hoverTips(
-                    "§7${sumXpGained.shortFormat()} §3Skill XP",
-                    skillHoverTips,
-                ).toSearchable("Skill XP"),
-            )
-        }
+        addSkillXpInfo(data.skillXpGained)
 
         // Breakdown of rewards by rarity
         val totalRewards = data.rarityRewardTypesGained.sumAllValues().toLong()
@@ -386,5 +374,5 @@ object GiftProfitTracker {
     }
 
     private fun holdingEnabled() = !config.holdingGift || GiftApi.isHoldingGift()
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && holdingEnabled()
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && holdingEnabled()
 }

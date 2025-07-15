@@ -16,36 +16,36 @@ class SlayerConfig {
     @Expose
     @Category(name = "Enderman", desc = "Enderman Slayer Feature")
     @Accordion
-    var endermen: EndermanConfig = EndermanConfig()
+    val endermen: EndermanConfig = EndermanConfig()
 
     // TODO rename to "blaze"
     @Expose
     @Category(name = "Blaze", desc = "Blaze Slayer Features")
-    var blazes: BlazeConfig = BlazeConfig()
+    val blazes: BlazeConfig = BlazeConfig()
 
     @Expose
     @Category(name = "Vampire", desc = "Vampire Slayer Features")
-    var vampire: VampireConfig = VampireConfig()
+    val vampire: VampireConfig = VampireConfig()
 
     @Expose
     @ConfigOption(name = "Item Profit Tracker", desc = "")
     @Accordion
-    var itemProfitTracker: SlayerProfitTrackerConfig = SlayerProfitTrackerConfig()
+    val itemProfitTracker: SlayerProfitTrackerConfig = SlayerProfitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Items on Ground", desc = "")
     @Accordion
-    var itemsOnGround: ItemsOnGroundConfig = ItemsOnGroundConfig()
+    val itemsOnGround: ItemsOnGroundConfig = ItemsOnGroundConfig()
 
     @Expose
     @ConfigOption(name = "RNG Meter Display", desc = "")
     @Accordion
-    var rngMeterDisplay: RngMeterDisplayConfig = RngMeterDisplayConfig()
+    val rngMeterDisplay: RngMeterDisplayConfig = RngMeterDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Boss Spawn Warning", desc = "")
     @Accordion
-    var slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
+    val slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
 
     @Expose
     @ConfigOption(
