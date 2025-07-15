@@ -29,7 +29,7 @@ object LocationUtils {
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
-    // Block heights are are multiples of 1/16, so we subtract 1/16 to find the right block
+    // Block heights are multiples of 1/16, so we subtract 1/16 to find the right block
     fun getBlockBelowPlayer() = playerLocation().add(0.0, -1.0 / 16.0, 0.0).roundLocationToBlock()
 
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())

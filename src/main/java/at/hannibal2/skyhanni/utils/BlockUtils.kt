@@ -86,7 +86,7 @@ object BlockUtils {
                 MinecraftCompat.localPlayer.lookVec.toLorenzVec(),
                 distance,
             )
-        }.roundLocationToBlock()
+        }?.roundLocationToBlock()
     }
 
     private fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
