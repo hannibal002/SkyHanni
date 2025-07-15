@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
@@ -70,22 +71,11 @@ object MineshaftDetection {
         if (type == config.mineshaftToTrack) {
             TitleManager.sendTitle(config.mineshaftToTrack.displayName)
 
-            val builder = StringBuilder()
-            builder.append("It took ")
-                .append(LorenzColor.RED.getChatColor())
-                .append(timeSinceThis.passedSince().format())
-                .append(LorenzColor.YELLOW.getChatColor())
-                .append(" and ")
-                .append(LorenzColor.RED.getChatColor())
-                .append(sinceThis)
-                .append(LorenzColor.YELLOW.getChatColor())
-                .append(if (sinceThis == 1) " mineshaft " else " mineshafts ")
-                .append("entered to get a ")
-                .append(config.mineshaftToTrack.displayName)
-                .append(LorenzColor.YELLOW.getChatColor())
-                .append(" mineshaft.")
+            val message = "It took §c${timeSinceThis.passedSince().format()} §eand" +
+                " §c$sinceThis ${"mineshaft".pluralize(sinceThis)}" +
+                " entered to get a ${config.mineshaftToTrack.displayName} mineshaft."
 
-            ChatUtils.chat(builder.toString())
+            ChatUtils.chat(message)
         }
 
         handleShaftData(type)
