@@ -55,7 +55,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     //$$    ?: throw IllegalStateException("Particle type $type is not registered in the registry")
     //#endif
 
-    override fun ReceiveParticleEvent.formatForDisplay() = "§3$type §8c:$count §7s:$speed"
+    override fun ReceiveParticleEvent.formatForDisplay() = "§3${getTypeIdentifier()} §8c:$count §7s:$speed"
 
     override fun ReceiveParticleEvent.formatForWorldRender() = "§7C: §e$count §7S: §a${speed.roundTo(2)}"
 
