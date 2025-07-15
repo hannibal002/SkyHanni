@@ -25,6 +25,6 @@ class InstanceChestProfitConfig {
     var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
 
     @Expose
-    @ConfigLink(owner = CombatConfig::class, field = "showInstanceChestProfit")
+    @ConfigLink(owner = InstanceChestProfitConfig::class, field = "enabled")
     val position: Position = Position(107, 141)
 }
