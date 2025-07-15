@@ -181,7 +181,7 @@ object PigFeaturesApi {
 
         if (InventoryUtils.getItemInHand()?.getInternalNameOrNull() != SHINY_ORB_ITEM) return
 
-        val entity = event.clickedEntity ?: return
+        val entity = event.clickedEntity
         if (entity is EntityPig && entity.mob?.name == "SHINY PIG") entity.handlePigClick()
     }
 
