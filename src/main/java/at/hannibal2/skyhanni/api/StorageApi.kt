@@ -25,20 +25,30 @@ object StorageApi {
         get() = ProfileStorageData.storageProfiles?.data ?: TreeMap()
 
     /**
+     * REGEX-TEST: Ender Chest
      * REGEX-TEST: Ender Chest (1/9)
      */
-    private val enderchestPattern by RepoPattern.pattern("storage.enderchest", "Ender Chest \\((?<page>\\d+)/\\d+\\)")
+    private val enderchestPattern by RepoPattern.pattern(
+        "storage.enderchest",
+        "Ender Chest(?: \\((?<page>\\d+)/\\d+\\))?",
+    )
 
     /**
      * REGEX-TEST: Jumbo Backpack§r (Slot #2)
      */
-    private val backpackPattern by RepoPattern.pattern("storage.backpack", ".* Backpack§r \\(Slot #(?<page>\\d+)\\)")
+    private val backpackPattern by RepoPattern.pattern(
+        "storage.backpack",
+        ".* Backpack§r \\(Slot #(?<page>\\d+)\\)",
+    )
 
     /**
      * REGEX-TEST: Rift Storage (1/2)
      * REGEX-TEST: Rift Storage
      */
-    private val riftStoragePattern by RepoPattern.pattern("storage.rift", "Rift Storage(?: \\((?<page>\\d+)/\\d+\\))?")
+    private val riftStoragePattern by RepoPattern.pattern(
+        "storage.rift",
+        "Rift Storage(?: \\((?<page>\\d+)/\\d+\\))?",
+    )
 
     val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
     val enderchest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
@@ -51,17 +61,17 @@ object StorageApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         enderchestPattern.matchMatcher(event.inventoryName) {
-            val page = groupOrNull("page")?.toInt()
+            val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Ender Chest $page", event.inventoryItemsWithNull.values)
             return
         }
         backpackPattern.matchMatcher(event.inventoryName) {
-            val page = groupOrNull("page")?.toInt()
+            val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Backpack $page", event.inventoryItemsWithNull.values)
             return
         }
         riftStoragePattern.matchMatcher(event.inventoryName) {
-            val page = groupOrNull("page")?.toInt()
+            val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Rift Storage $page", event.inventoryItemsWithNull.values)
             return
         }
