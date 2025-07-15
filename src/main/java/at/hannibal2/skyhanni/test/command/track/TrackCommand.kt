@@ -41,7 +41,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
 ) {
     private data class Tracked<T>(
         val event: T,
-        private val manualTime: SimpleTimeMark? = null
+        private val manualTime: SimpleTimeMark? = null,
     ) {
         val time: SimpleTimeMark = manualTime ?: SimpleTimeMark.now()
     }
@@ -72,10 +72,10 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
 
     protected fun handleIgnorable(ignorable: K) = if (ignorable in ignoredTypes) {
         ignoredTypes.remove(ignorable)
-        ChatUtils.chat("§cRemoved $commonName '§e$ignorable§c' from the ignore list")
+        ChatUtils.chat("§cRemoved $commonName §e'$ignorable' §cfrom the ignore list")
     } else {
         ignoredTypes.add(ignorable)
-        ChatUtils.chat("§aAdded $commonName '§e$ignorable§c' to the ignore list")
+        ChatUtils.chat("§aAdded $commonName §e'$ignorable' §ato the ignore list")
     }
 
     private fun skyBlockCheck(): Boolean = if (onlyOnSkyblock && !SkyBlockUtils.inSkyBlock) {
