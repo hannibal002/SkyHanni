@@ -10,8 +10,7 @@ enum class NeuRecipeType(
     MOB_DROP("drops", false, castClazz = NeuMobDropsRecipeJson::class.java),
     NPC_SHOP("npc_shop", castClazz = NeuNpcShopRecipeJson::class.java),
     KAT_UPGRADE("katgrade", false, castClazz = NeuKatUpgradeRecipeJson::class.java),
-    ESSENCE, // Unused ?
-    CRAFTING(castClazz = NeuCraftingRecipeJson::class.java),
+    CRAFTING("crafting", castClazz = NeuCraftingRecipeJson::class.java),
     ;
 
     companion object {

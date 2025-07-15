@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
 import java.lang.reflect.Type
 
 abstract class NeuAbstractRecipe {
@@ -28,14 +26,6 @@ abstract class NeuAbstractRecipe {
     }
 
     companion object {
-        class AbstractNeuRecipeSerializer : JsonSerializer<NeuAbstractRecipe> {
-            override fun serialize(
-                src: NeuAbstractRecipe,
-                typeOfSrc: Type,
-                context: JsonSerializationContext,
-            ): JsonElement = context.serialize(src, src.type.castClazz)
-        }
-
         class AbstractNeuRecipeDeserializer : JsonDeserializer<NeuAbstractRecipe> {
             override fun deserialize(
                 json: JsonElement,
@@ -44,10 +34,10 @@ abstract class NeuAbstractRecipe {
             ): NeuAbstractRecipe {
                 val obj = json.asJsonObject
                 val typeId = obj.get("type").asString
-                val recipeType = NeuRecipeType.fromNeuId(typeId)
+                val recipeType = NeuRecipeType.fromNeuIdOrNull(typeId)
+                    ?: throw IllegalArgumentException("Unknown recipe type: $typeId")
                 return ConfigManager.gson.fromJson(obj, recipeType.castClazz)
             }
-
         }
     }
 }

@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 
 @KSerializable
 data class NeuCraftingRecipeJson(
-    @Expose override val type: NeuRecipeType = NeuRecipeType.CRAFTING,
+    override val type: NeuRecipeType = NeuRecipeType.CRAFTING,
     /**
      * Top row of the 3x3 crafting grid (L -> R).
      */

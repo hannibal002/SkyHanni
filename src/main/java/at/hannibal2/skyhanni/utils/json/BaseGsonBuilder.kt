@@ -47,10 +47,6 @@ object BaseGsonBuilder {
         .registerTypeAdapter(NeuRecipeType::class.java, SkyHanniTypeAdapters.NEU_RECIPE_TYPE.nullSafe())
         .registerTypeAdapter(
             NeuAbstractRecipe::class.java,
-            NeuAbstractRecipe.Companion.AbstractNeuRecipeSerializer(),
-        )
-        .registerTypeAdapter(
-            NeuAbstractRecipe::class.java,
             NeuAbstractRecipe.Companion.AbstractNeuRecipeDeserializer(),
         )
         .registerTypeAdapter(
