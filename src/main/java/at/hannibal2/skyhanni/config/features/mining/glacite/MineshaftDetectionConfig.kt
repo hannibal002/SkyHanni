@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -44,7 +43,7 @@ class MineshaftDetectionConfig {
             "Other mineshafts will still be tracked."
     )
     @ConfigEditorDraggableList
-    var mineshaftToTrack: MutableList<MineshaftDetection.MineshaftTypes> = mutableListOf(
+    val mineshaftsToTrack: MutableList<MineshaftDetection.MineshaftTypes> = mutableListOf(
         MineshaftDetection.MineshaftTypes.FAIR1,
         MineshaftDetection.MineshaftTypes.JASP1
     )
