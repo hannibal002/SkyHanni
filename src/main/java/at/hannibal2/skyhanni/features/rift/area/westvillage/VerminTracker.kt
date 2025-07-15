@@ -15,7 +15,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -56,21 +57,25 @@ object VerminTracker {
     )
 
     /**
+     * REGEX-TEST: Vermin Bin: §a27 Silverfishes
+     * REGEX-TEST: Vermin Bin: §a19 Flies
      * REGEX-TEST: §fVermin Bin: §a27 Silverfishes
      * REGEX-TEST: §fVermin Bin: §a19 Flies
      */
     private val verminBinPattern by patternGroup.pattern(
         "binline",
-        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)",
+        "(?:§f)?Vermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)",
     )
 
     /**
+     * REGEX-TEST: Vacuum Bag: §72 Silverfishes
+     * REGEX-TEST: Vacuum Bag: §70 Spiders
      * REGEX-TEST: §fVacuum Bag: §72 Silverfishes
      * REGEX-TEST: §fVacuum Bag: §70 Spiders
      */
     private val verminBagPattern by patternGroup.pattern(
         "bagline",
-        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)",
+        "(?:§f)?Vacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)",
     )
 
     private var hasVacuum = false
@@ -145,13 +150,11 @@ object VerminTracker {
             VerminType.SPIDER to 0,
             VerminType.FLY to 0,
         )
-        for (line in lore) {
-            pattern.matchMatcher(line) {
-                val vermin = group("vermin")?.lowercase() ?: continue
-                val verminCount = group("count")?.toInt() ?: continue
-                val verminType = getVerminType(vermin)
-                verminCounts[verminType] = verminCount
-            }
+        pattern.matchAll(lore) {
+            val vermin =group("vermin").lowercase()
+            val verminCount = group("count").formatInt()
+            val verminType = getVerminType(vermin)
+            verminCounts[verminType] = verminCount
         }
         return verminCounts
     }
