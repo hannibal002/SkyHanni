@@ -220,7 +220,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             prepCleanRepoFileSystem()
 
             Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            repoFileSystem.loadFromZip(repoZipFile)
+            if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
+                logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
+            }
 
             commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
             logger.debug("Successfully switched to backup repo")
@@ -309,7 +311,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         // Actually unpack the repo zip file into our local 'file system'
-        repoFileSystem.loadFromZip(repoZipFile)
+        if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
+            downloadFailed = true
+            logger.logError("Failed to unpack the downloaded zip file.")
+        }
 
         localRepoCommit = RepoCommit(latestSha, latestCommitTime)
         commitStorage.writeToFile(localRepoCommit)
