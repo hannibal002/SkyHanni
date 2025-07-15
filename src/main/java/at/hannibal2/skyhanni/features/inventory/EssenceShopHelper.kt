@@ -147,7 +147,7 @@ object EssenceShopHelper {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val repoEssenceShops = event.readConstant<Map<String, Map<String, NeuEssenceShopJson>>>("essenceshops")
+        val repoEssenceShops = event.getConstant<Map<String, Map<String, NeuEssenceShopJson>>>("essenceshops")
         essenceShops = repoEssenceShops.map { (key, value) ->
             EssenceShop(key, value.values.toMutableList())
         }.toMutableList()

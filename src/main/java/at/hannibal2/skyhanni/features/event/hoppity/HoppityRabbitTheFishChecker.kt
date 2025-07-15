@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -75,15 +76,14 @@ object HoppityRabbitTheFishChecker {
         }?.key
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 
         // Prevent opening chocolate factory when Rabbit the Fish is present
         val stack = event.slot?.stack ?: return
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
-            event.cancel()
-            SoundUtils.playErrorSound()
+            event.sendPreventClosureTitle()
         } else if (rabbitTheFishIndex == event.slot.slotIndex) {
             rabbitTheFishIndex = null
         }
@@ -92,7 +92,10 @@ object HoppityRabbitTheFishChecker {
     @HandleEvent
     fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
+        event.sendPreventClosureTitle()
+    }
 
+    private fun SkyHanniEvent.Cancellable.sendPreventClosureTitle() {
         TitleManager.sendTitle(
             "§cRabbit the Fish Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",
@@ -100,7 +103,7 @@ object HoppityRabbitTheFishChecker {
             location = TitleManager.TitleLocation.INVENTORY,
         )
         SoundUtils.playErrorSound()
-        event.cancel()
+        cancel()
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && HoppityApi.isHoppityEvent() && config.preventMissingRabbitTheFish

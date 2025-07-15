@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class CFStrayRabbitWarningConfig {
@@ -30,6 +31,7 @@ class CFStrayRabbitWarningConfig {
         desc = "Block closing the Chocolate Factory while there is a stray active.\n" +
             "§eHold §cShift §eto bypass"
     )
+    @SearchTag("prevent close")
     @ConfigEditorBoolean
     var blockClosing: Boolean = false
 

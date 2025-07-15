@@ -21,7 +21,7 @@ enum class ModrinthInfo(
         ),
     ),
     FABRIC_1_21_7(
-        minecraftVersions = listOf("1.21.6", "1.21.7"),
+        minecraftVersions = listOf("1.21.7"),
         loader = "fabric",
         dependencies = mapOf(
             ModrinthDependency.FABRIC_API to DependencyType.REQUIRED,

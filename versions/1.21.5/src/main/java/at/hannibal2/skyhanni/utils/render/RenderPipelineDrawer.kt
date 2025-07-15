@@ -10,10 +10,18 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BufferBuilder
 import net.minecraft.client.render.BuiltBuffer
 import net.minecraft.client.render.Tessellator
+//#if MC < 1.21.6
 import net.minecraft.client.util.math.MatrixStack
+//#else
+//$$ import org.joml.Matrix3x2f
+//#endif
 
 object RenderPipelineDrawer {
+    //#if MC < 1.21.6
     val matrices: MatrixStack.Entry get() = DrawContextUtils.drawContext.matrices.peek()
+    //#else
+    //$$ val matrices: Matrix3x2f get() = Matrix3x2f(DrawContextUtils.drawContext.matrices)
+    //#endif
     fun getBuffer(
         pipeline: RenderPipeline,
     ): BufferBuilder = Tessellator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)

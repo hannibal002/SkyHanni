@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -25,14 +24,14 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object JacobContestFFNeededDisplay {
 
-    private val config get() = GardenApi.config
+    private val config get() = GardenApi.config.jacobContest
     private var display = emptyList<Renderable>()
     private var lastToolTipTime = SimpleTimeMark.farPast()
     private val cache = mutableMapOf<ItemStack, List<Renderable>>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
-        if (!isEnabled()) return
+        if (!config.ffForContest) return
 
         if (!FarmingContestApi.inInventory) return
         val stack = event.stack
@@ -141,15 +140,13 @@ object JacobContestFFNeededDisplay {
         return " ${bracket.displayName}§f: §6$format FF §7(${counter.addSeparators()} crops)"
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.ffForContest) return
         if (!FarmingContestApi.inInventory) return
         if (lastToolTipTime.passedSince() > 200.milliseconds) return
-        config.farmingFortuneForContestPos.renderRenderables(display, posLabel = "Jacob Contest Crop Data")
+        config.ffForContestPosition.renderRenderables(display, posLabel = "Jacob Contest Crop Data")
     }
-
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.farmingFortuneForContest
 }
 
 private fun CropType.getRealBlocksPerSecond(): Double {

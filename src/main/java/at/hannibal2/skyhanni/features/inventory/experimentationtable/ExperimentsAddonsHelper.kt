@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -135,8 +136,13 @@ object ExperimentsAddonsHelper {
     }.sortedBy {
         hypixelUltrasequencerData.indexOf(it.slotNumber)
     }.forEachIndexed { slotIndex, slot ->
-        val alphaValue = (255 / (1 + slotIndex))
-        val slotColor = LorenzColor.GREEN.addOpacity(alphaValue)
+        if (slotIndex == 1) config.nextColor
+        val slotColor = if (slotIndex == 0) {
+            config.nextColor.getEffectiveColour()
+        } else {
+            val alphaValue = (255 / (slotIndex))
+            config.secondColor.getEffectiveColour().addAlpha(alphaValue)
+        }
         slot.highlight(slotColor)
     }
 

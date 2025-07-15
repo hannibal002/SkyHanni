@@ -79,7 +79,6 @@ object HighlightVisitorsOutsideOfGarden {
             VisitorBlockBehaviour.DONT -> false
             VisitorBlockBehaviour.ALWAYS -> true
             VisitorBlockBehaviour.ONLY_ON_BINGO -> SkyBlockUtils.isBingoProfile
-            null -> false
         }
 
     private fun isVisitorNearby(location: LorenzVec) =
@@ -89,7 +88,7 @@ object HighlightVisitorsOutsideOfGarden {
     fun onClickEntity(event: EntityClickEvent) {
         if (!shouldBlock) return
         if (MinecraftCompat.localPlayer.isSneaking) return
-        val entity = event.clickedEntity ?: return
+        val entity = event.clickedEntity
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             if (event.action != Action.INTERACT_AT) {
                 ChatUtils.chatAndOpenConfig(
