@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -201,5 +202,5 @@ object CompactSweepDetails {
 
     private fun isFinalCalculation(regexGroup: String): Boolean = regexGroup == "§a"
 
-    private fun isInIsland(): Boolean = IslandTypeTags.FORAGING.inAny()
+    private fun isInIsland(): Boolean = IslandTypeTags.FORAGING.inAny() || IslandType.HUB.isCurrent()
 }

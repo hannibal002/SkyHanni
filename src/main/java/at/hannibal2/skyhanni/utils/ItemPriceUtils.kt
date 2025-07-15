@@ -91,7 +91,7 @@ object ItemPriceUtils {
         pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? = getRecipes(this).filter { it !in pastRecipes }
         .map { it.getRecipePrice(priceSource, pastRecipes + it) }
-        .filter { it >= 0 }
+        .filter { it > 0 }
         .minOrNull()
 
     fun NeuInternalName.getNpcPrice(): Double = getNpcPriceOrNull() ?: 0.0

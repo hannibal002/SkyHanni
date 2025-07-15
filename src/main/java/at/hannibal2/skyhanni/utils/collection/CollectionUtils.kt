@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.utils.collection
 
 import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -115,6 +118,22 @@ object CollectionUtils {
 
     fun <T, R> Sequence<IndexedValue<T>>.runningIndexedFold(initial: R, operation: (R, T) -> R): Sequence<IndexedValue<R>> =
         map { it.value }.runningFold(initial, operation).zip(map { it.index }) { value, index -> IndexedValue(index, value) }
+
+    suspend inline fun <T, R> Iterable<T>.mapAsync(
+        crossinline transform: (T) -> R
+    ): List<R> = coroutineScope {
+        map {
+            async { transform(it) }
+        }.awaitAll()
+    }
+
+    suspend inline fun <T, R> Iterable<T>.mapNotNullAsync(
+        crossinline transform: (T) -> R?
+    ): List<R> = coroutineScope {
+        mapNotNull {
+            async { transform(it) }
+        }.awaitAll().filterNotNull()
+    }
 
     fun <T : Any> Sequence<T>.firstTwiceOf(a: (T) -> Boolean, b: (T) -> Boolean): Pair<T?, T?> {
         var firstA: T? = null

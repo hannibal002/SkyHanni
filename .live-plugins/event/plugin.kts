@@ -107,7 +107,9 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                 }
 
                 // Validate function annotation and parameters
-                if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic) {
+                if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic &&
+                    !function.hasModifier(KtTokens.OPEN_KEYWORD)
+                ) {
                     holder.registerProblem(
                         function,
                         "Event handler function should be annotated with @HandleEvent",

@@ -64,13 +64,13 @@ object RenderableTestSuite {
      *
      * How to use:
      * Declare an object with [RenderableTestSuite.TestRenderable] as supertype.
-     * Annotate the object with ``@SkyHanniModule(devOnly = true)``.
+     * Annotate the object with `@SkyHanniModule(devOnly = true)`.
      * Give it a lowercase [name] (this is used to call it via the command later on).
      * Define your test you want to do with the [renderable] function.
      *
-     * Ingame call it with ``\shrenderable [name]`` to show it (calling it again will disable it)
+     * Ingame call it with `\shrenderable [name]` to show it (calling it again will disable it)
      *
-     * @param name Name of the Test, is the name you have to type to use it ingame with ``\shrenderable``.
+     * @param name Name of the Test, is the name you have to type to use it ingame with `\shrenderable`.
      * @param shouldRenderBounds Enables a Red Boundary around the test [renderable].
      * @property renderable Function that is called for retrieving the [Renderable] that is going to be tested (and rendered on screen, once active). Define here your test you want to do.
      * @property position The position at which the test will be rendered. There should be no reason that is touched. Other than inside [RenderableTestSuite].

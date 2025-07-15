@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.storage
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import io.github.notenoughupdates.moulconfig.observer.Property
 import java.lang.reflect.Modifier
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
@@ -24,16 +25,17 @@ abstract class ResettableStorageSet {
     private val classSimpleName by lazy { this::class.simpleName ?: "UnknownClass" }
     private val props = run {
         val vars = this::class.memberProperties.filterIsInstance<KMutableProperty1<out ResettableStorageSet, Any?>>()
-        val (cols, maps, iters) = listOf(
+        val others = listOf(
             MutableCollection::class,
             MutableMap::class,
-            MutableIterator::class
-        ).map { type ->
+            MutableIterator::class,
+            Property::class
+        ).flatMap { type ->
             this::class.memberProperties.filter {
                 it.returnType.jvmErasure.isSubclassOf(type)
             }
         }
-        (vars + cols + maps + iters).filter { prop ->
+        (vars + others).filter { prop ->
             val annotatedIgnore = prop.hasAnnotation<Transient>()
             val modifiedIgnore = prop.javaField?.let { Modifier.isTransient(it.modifiers) } ?: false
             !annotatedIgnore && !modifiedIgnore
@@ -77,6 +79,14 @@ abstract class ResettableStorageSet {
             val mutableProp = this as KMutableProperty1<Any, Any?>
             val defaultValue = mutableProp.get(defaults)
             mutableProp.set(this@ResettableStorageSet, defaultValue)
+        }
+        current is Property<*> -> {
+            @Suppress("UNCHECKED_CAST")
+            val propRef = this as KProperty1<ResettableStorageSet, Property<Any?>>
+            val defaultProp = propRef.get(defaults)
+            @Suppress("UNCHECKED_CAST")
+            val propCurrent = current as Property<Any?>
+            propCurrent.set(defaultProp.get())
         }
         current is MutableCollection<*> -> current.clear()
         current is MutableMap<*, *> -> current.clear()
