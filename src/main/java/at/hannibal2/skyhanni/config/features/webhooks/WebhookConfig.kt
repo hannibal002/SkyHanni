@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.webhooks
 
-import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
-import at.hannibal2.skyhanni.features.webhooks.Webhook
+import at.hannibal2.skyhanni.features.webhook.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhook.Webhook
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.annotations.Expose

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.webhooks
+package at.hannibal2.skyhanni.features.webhook
 
 import com.google.gson.annotations.SerializedName
 
