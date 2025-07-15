@@ -92,8 +92,6 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    private fun workaround(location: LorenzVec) = location.roundLocationToBlock().down()
-
     // TODO this function needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
     // and instead of ticks alive, should use found timestamp and use passed since > 1.min
     @HandleEvent(onlyOnIsland = IslandType.HUB)
