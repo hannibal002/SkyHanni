@@ -69,10 +69,12 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.network.play.server.S40PacketDisconnect
 import net.minecraft.util.ChatComponentText
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
+import net.minecraft.network.play.server.S40PacketDisconnect
+//#else
+//$$ import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket
 //#endif
 import java.io.File
 import java.time.LocalDate
@@ -523,7 +525,15 @@ object SkyHanniDebugsAndTests {
 
     fun simulateServerDisconnect(reason: String) {
         try {
+            //#if MC < 1.21
             Minecraft.getMinecraft().netHandler.networkManager.channelRead(null, S40PacketDisconnect(ChatComponentText(reason)))
+            //#else
+            //$$ MinecraftClient.getInstance().networkHandler?.onDisconnect(
+            //$$    DisconnectS2CPacket(
+            //$$        Text.literal(reason)
+            //$$    )
+            //$$ )
+            //#endif
         } catch (e: Exception) {
             ErrorManager.logErrorStateWithData(
                 "Error while disconnecting from server.",
@@ -649,6 +659,19 @@ object SkyHanniDebugsAndTests {
                 } else {
                     ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
                 }
+            }
+        }
+        event.register("shsimulatedisconnect") {
+            description = "Simulates a server disconnect with the given reason."
+            category = CommandCategory.DEVELOPER_TEST
+            callback {
+                if (it.isEmpty()) {
+                    ChatUtils.userError("§cPlease provide a reason for the disconnect.")
+                    return@callback
+                }
+                val reason = it.joinToString(" ")
+                ChatUtils.chat("§eSimulated disconnect with reason: §7$reason")
+                simulateServerDisconnect(reason)
             }
         }
     }

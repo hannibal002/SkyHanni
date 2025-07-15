@@ -42,9 +42,13 @@ import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
+import kotlin.time.Duration.Companion.seconds
+//#if MC < 1.21
 import net.minecraft.network.login.server.S00PacketDisconnect
 import net.minecraft.network.play.server.S40PacketDisconnect
-import kotlin.time.Duration.Companion.seconds
+//#else
+//$$ import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket
+//#endif
 
 @SkyHanniModule
 object HypixelData {
@@ -362,16 +366,27 @@ object HypixelData {
 
     @HandleEvent
     fun onServerDisconnect(event: PacketReceivedEvent) {
+        //#if MC < 1.21
+        if (event.packet !is S40PacketDisconnect && event.packet !is S00PacketDisconnect) return
         val kickReason: String
-        if (event.packet is S40PacketDisconnect) {
-            val packet = event.packet
-            kickReason = packet.reason.formattedText.removeColor()
-        } else if (event.packet is S00PacketDisconnect) {
-            val packet = event.packet
-            kickReason = packet.func_149603_c().formattedText.removeColor()
-        } else {
-            return
+        when (event.packet) {
+            is S00PacketDisconnect -> {
+                val packet = event.packet
+                kickReason = packet.func_149603_c().formattedText.removeColor()
+            }
+            is S40PacketDisconnect -> {
+                val packet = event.packet
+                kickReason = packet.reason.formattedText.removeColor()
+            }
+            else -> {
+                kickReason = "Unknown disconnect reason"
+            }
         }
+        //#else
+        //$$ if (event.packet !is DisconnectS2CPacket) return
+        //$$ val kickReason = event.packet.reason.formattedTextCompat().removeColor()
+        //#endif
+
         Webhook().addEmbed(
             DiscordEmbed(
                 title = "Disconnected!",
