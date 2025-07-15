@@ -10,8 +10,10 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityItem
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -23,7 +25,7 @@ object FishingBaitWarnings {
 
     private data class Bait(
         private val entity: EntityItem,
-        val bobberDistance: Float,
+        val bobberDistance: Double,
         val name: String = entity.entityItem.displayName,
     )
 
@@ -49,11 +51,7 @@ object FishingBaitWarnings {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityItem>) {
         if (KuudraApi.inKuudra || !FishingApi.isFishing()) return
-        //#if MC < 1.16
-        val bobberDistance = event.entity.getDistanceToEntity(FishingApi.bobber ?: return)
-        //#else
-        //$$ val bobberDistance = event.entity.distanceTo(FishingApi.bobber ?: return)
-        //#endif
+        val bobberDistance = event.entity.distanceTo(FishingApi.bobber?.getLorenzVec() ?: return)
         if (bobberDistance > 2) return
         DelayedRun.runNextTick {
             if (event.entity.entityItem.isBait()) {
@@ -64,8 +62,7 @@ object FishingBaitWarnings {
 
     private fun checkBait() {
         FishingApi.bobber ?: return
-        // If the user has no bait, and another player's bait spawns really close, it will be wrong.
-        @Suppress("Wrapping")
+        // If user has no bait, but another player's bait spawns really close, it will be wrong.
         val bait = baitEntities.filter { it.bobberDistance < 2 }.minByOrNull { it.bobberDistance }?.name
         baitEntities.clear()
 
