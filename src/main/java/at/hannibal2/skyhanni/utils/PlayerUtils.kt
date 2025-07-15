@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.client.Minecraft
-import kotlin.time.Duration.Companion.minutes
+import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import net.minecraft.client.Minecraft
 import java.util.UUID
+import kotlin.time.Duration.Companion.minutes
 
 //#if MC > 1.21
 //$$ import net.minecraft.entity.attribute.EntityAttributes

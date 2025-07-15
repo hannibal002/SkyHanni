@@ -63,7 +63,7 @@ class WebhookConfig {
         desc = "What thumbnail to use for embeds."
     )
     @ConfigEditorDropdown
-    var embedThumbnail: Property<EmbedThumbnailType> = Property.of(EmbedThumbnailType.SKIN)
+    var embedThumbnail: EmbedThumbnailType = EmbedThumbnailType.SKIN
 
     @Expose
     @ConfigOption(

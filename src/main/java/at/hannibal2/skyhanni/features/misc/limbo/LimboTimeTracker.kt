@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.webhook.DiscordEmbed
 import at.hannibal2.skyhanni.features.webhook.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
