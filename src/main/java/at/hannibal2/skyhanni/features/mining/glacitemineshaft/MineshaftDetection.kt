@@ -68,12 +68,12 @@ object MineshaftDetection {
 
         ChatUtils.chat("You entered a ${type.displayName} mineshaft!")
 
-        if (type == config.mineshaftToTrack) {
-            TitleManager.sendTitle(config.mineshaftToTrack.displayName)
+        if (type in config.mineshaftToTrack) {
+            TitleManager.sendTitle(type.displayName)
 
             val message = "It took §c${timeSinceThis.passedSince().format()} §eand" +
                 " §c$sinceThis ${"mineshaft".pluralize(sinceThis)}" +
-                " entered to get a ${config.mineshaftToTrack.displayName} mineshaft."
+                " entered to get a ${type.displayName} mineshaft."
 
             ChatUtils.chat(message)
         }
@@ -87,15 +87,6 @@ object MineshaftDetection {
                 .replace("{type}", type.displayName)
                 .replace("{sinceThis}", sinceThis.toString())
                 .replace("{timeSinceThis}", timeSinceThis.passedSince().format())
-                .let { msg ->
-                    if (type != config.mineshaftToTrack) {
-                        msg
-                            .replace("{sinceConfigShaft}", getSinceMineshaftType(config.mineshaftToTrack).toString())
-                            .replace("{timeSinceConfigShaft}", getTimeSinceMineshaftType(config.mineshaftToTrack).passedSince().format())
-                    } else {
-                        msg
-                    }
-                }
 
             partyChatBuilder.append(formattedMessage)
 

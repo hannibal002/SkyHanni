@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -30,8 +31,8 @@ class MineshaftDetectionConfig {
     @ConfigOption(
         name = "Party Chat Format",
         desc = "The party chat message format.\n" +
-            "Available variables: {type}, {sinceThis}, {timeSinceThis}, {sinceConfigShaft}, {timeSinceConfigShaft}\n" +
-            "Note: Using multiple variables can cause the message to be too long and be cut off."
+            "Available variables: {type}, {amountSinceThis}, {timeSinceThis}\n" +
+            "§eNote: Using multiple variables can cause the message to be too long and be cut off."
     )
     @ConfigEditorText
     var partyChatFormat: String = "Entered a {type} mineshaft!"
@@ -42,6 +43,9 @@ class MineshaftDetectionConfig {
         desc = "The mineshaft to for {sinceConfigShaft} and {timeSinceConfigShaft}.\n" +
             "Other mineshafts will still be tracked."
     )
-    @ConfigEditorDropdown
-    var mineshaftToTrack: MineshaftDetection.MineshaftTypes = MineshaftDetection.MineshaftTypes.FAIR1
+    @ConfigEditorDraggableList
+    var mineshaftToTrack: MutableList<MineshaftDetection.MineshaftTypes> = mutableListOf(
+        MineshaftDetection.MineshaftTypes.FAIR1,
+        MineshaftDetection.MineshaftTypes.JASP1
+    )
 }
