@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.util.EnumParticleTypes
 //#else
 //$$ import at.hannibal2.skyhanni.utils.ParticleUtils
-//$$ import net.minecraft.particle.ParticleType
+//$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
 //#endif
 
