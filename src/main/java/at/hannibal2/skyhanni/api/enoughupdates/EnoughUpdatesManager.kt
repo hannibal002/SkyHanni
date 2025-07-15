@@ -45,7 +45,6 @@ import kotlin.math.floor
 //#if MC > 1.21
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
-//$$ import net.minecraft.nbt.NbtString
 //$$ import net.minecraft.text.Text
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
