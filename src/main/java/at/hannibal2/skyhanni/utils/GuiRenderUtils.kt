@@ -46,6 +46,7 @@ import java.nio.FloatBuffer
 //#endif
 //#if MC > 1.21.6
 //$$ import net.minecraft.client.render.ProjectionMatrix2
+//$$ import org.joml.Vector4f
 //#endif
 
 // todo 1.21 impl needed
@@ -394,7 +395,7 @@ object GuiRenderUtils {
     }
 
     //#if MC > 1.21.6
-    //$$ val projMatrix = ProjectionMatrix2("ItemStack", 1000.0f, 11000.0f, true)
+    //$$ val projMatrix = ProjectionMatrix2("ItemStack", -1000.0f, 1000.0f, true)
     //#endif
 
     fun ItemStack.renderOnScreen(
@@ -508,19 +509,28 @@ object GuiRenderUtils {
             //$$     client.window.framebufferHeight.toFloat() / client.window.scaleFactor.toFloat()
             //$$ )
             //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
+
+            //$$ val modelView = Matrix4f()
+            //$$     .setTranslation(translateX, translateY, zT)
+            //$$     .scale(finalScale, finalScale, zS)
+            //$$     .translate(hx, hy, hz)
+            //$$ val rad = Math.PI.toFloat() / 180f
+            //$$ if (rotX != 0f) modelView.rotateX(rotX * rad)
+            //$$ if (rotY != 0f) modelView.rotateY(rotY * rad)
+            //$$ if (rotZ != 0f) modelView.rotateZ(rotZ * rad)
+
+            //$$ RenderSystem.getDynamicUniforms().write(
+            //$$     modelView,
+            //$$     Vector4f(1f, 1f, 1f, 1f),
+            //$$     RenderSystem.getModelOffset(),
+            //$$     RenderSystem.getTextureMatrix(),
+            //$$     RenderSystem.getShaderLineWidth()
+            //$$ )
+
             //$$ val matrixStack = MatrixStack()
             //$$ matrixStack.push()
-            //$$ matrixStack.translate(translateX.toDouble(), translateY.toDouble(), zT.toDouble())
-            //$$ matrixStack.scale(finalScale, finalScale, zS)
-            //$$ matrixStack.translate(hx.toDouble(), hy.toDouble(), hz.toDouble())
-            //$$ val rad = Math.PI.toFloat() / 180f
-            //$$ val quat = Quaternionf()
-            //$$ if (rotX != 0f) matrixStack.multiply(quat.rotationX(rotX * rad))
-            //$$ if (rotY != 0f) matrixStack.multiply(quat.rotationY(rotY * rad))
-            //$$ if (rotZ != 0f) matrixStack.multiply(quat.rotationZ(rotZ * rad))
-            //$$ matrixStack.translate(-hx.toDouble(), -hy.toDouble(), -hz.toDouble())
             //$$ client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-            //$$ val guiAllocator = BufferAllocator(256)
+            //$$ val guiAllocator = BufferAllocator(2048)
             //$$ val vcProvider = VertexConsumerProvider.immediate(guiAllocator)
             //$$ client.itemRenderer.renderItem(
             //$$     client.player,
@@ -533,6 +543,7 @@ object GuiRenderUtils {
             //$$     0,
             //$$     0
             //$$ )
+            //$$ vcProvider.draw()
             //$$ guiAllocator.clear()
             //$$ matrixStack.pop()
             //$$ RenderSystem.restoreProjectionMatrix()
