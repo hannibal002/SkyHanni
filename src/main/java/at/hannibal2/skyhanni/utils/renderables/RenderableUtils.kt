@@ -16,8 +16,9 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
@@ -384,7 +385,7 @@ internal object RenderableUtils {
             RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
         )
 
-        return Renderable.line {
+        return Renderable.horizontal {
             addString("§7$label §a[")
             val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
             when (enableUniverseScroll) {
@@ -395,8 +396,7 @@ internal object RenderableUtils {
         }.toSearchable()
     }
 
-    fun MutableList<Renderable>.addCenteredString(string: String) =
-        this.add(StringRenderable(string, horizontalAlign = HorizontalAlignment.CENTER))
+    fun MutableList<Renderable>.addCenteredString(string: String) = addString(string, horizontalAlign = HorizontalAlignment.CENTER)
 
     fun fillTable(
         data: List<DisplayTableEntry>,
@@ -426,14 +426,14 @@ internal object RenderableUtils {
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {
-                ItemStackRenderable(it, scale = itemScale)
+                Renderable.item(it, scale = itemScale)
             } ?: continue
             val left = hoverTips(
                 entry.left,
                 tips = entry.hover,
                 highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
             )
-            val right = StringRenderable(entry.right)
+            val right = Renderable.text(entry.right)
             outerList.add(listOf(item, left, right))
         }
         return outerList
@@ -441,16 +441,9 @@ internal object RenderableUtils {
 }
 
 fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
-    add(HorizontalContainerRenderable(buildList { builderAction() }))
+    add(Renderable.horizontal(buildList { builderAction() }))
 }
 
 fun MutableList<Renderable>.addLine(tips: List<String>, builderAction: MutableList<Renderable>.() -> Unit) {
-    add(hoverTips(HorizontalContainerRenderable(buildList { builderAction() }, 0), tips = tips))
-}
-
-internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
-    override val width = content.width
-    override val height = content.height
-    override val horizontalAlign = content.horizontalAlign
-    override val verticalAlign = content.verticalAlign
+    add(hoverTips(Renderable.horizontal(buildList { builderAction() }, 0), tips = tips))
 }
