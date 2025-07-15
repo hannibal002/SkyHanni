@@ -153,8 +153,8 @@ object ReforgeApi {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val reforgeStoneData = event.readConstant<Map<String, NeuReforgeJson>>("reforgestones", reforgeGson).values
-        val reforgeData = event.readConstant<Map<String, NeuReforgeJson>>("reforges", reforgeGson).values
+        val reforgeStoneData = event.getConstant<Map<String, NeuReforgeJson>>("reforgestones", gson = reforgeGson).values
+        val reforgeData = event.getConstant<Map<String, NeuReforgeJson>>("reforges", gson = reforgeGson).values
         reforgeList = (reforgeStoneData + reforgeData).map(::mapReforge)
     }
 

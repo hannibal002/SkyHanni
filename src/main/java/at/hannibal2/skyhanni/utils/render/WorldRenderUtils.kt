@@ -885,7 +885,7 @@ object WorldRenderUtils {
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceVew: Double = 5.0,
-        ignoreBlocks: Boolean = true,
+        seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
     ) {
@@ -911,7 +911,7 @@ object WorldRenderUtils {
 
         if (distToPlayer < hideTooCloseAt) return
         maxDistance?.let {
-            if (ignoreBlocks && distToPlayer > it) return
+            if (seeThroughBlocks && distToPlayer > it) return
         }
 
         val distRender = distToPlayer.coerceAtMost(50.0)
@@ -926,7 +926,7 @@ object WorldRenderUtils {
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        renderText(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
+        renderText(renderLocation, "§f$text", scale, !seeThroughBlocks, true, yOff)
     }
 
     private fun SkyHanniRenderWorldEvent.renderText(

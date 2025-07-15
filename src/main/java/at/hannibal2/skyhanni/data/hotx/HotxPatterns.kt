@@ -34,4 +34,6 @@ object HotxPatterns {
         "perk.item.before",
         "§aYour Current Effect"
     )
+
+    fun Enum<*>.asPatternId(): String = name.lowercase().replace("_", ".")
 }

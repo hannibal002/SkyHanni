@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.NotificationManager
+import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,10 +15,11 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ModernPatterns
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -26,6 +29,7 @@ import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MoongladeBeacon {
@@ -111,6 +115,15 @@ object MoongladeBeacon {
             upgradingStrength = true
         }
         currentServerTicks = 0
+        checkPants()
+    }
+
+    private val STEREO_PANTS = "MUSIC_PANTS".toInternalName()
+
+    private fun checkPants() {
+        if (InventoryUtils.getLeggings()?.getInternalName() != STEREO_PANTS) return
+        val text = "The solver may not work properly if you are wearing Stereo Pants!"
+        NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
     }
 
     @HandleEvent

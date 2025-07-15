@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
+import at.hannibal2.skyhanni.config.features.garden.contest.JacobContestConfig
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig
 import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesConfig
@@ -14,7 +15,6 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
@@ -78,9 +78,9 @@ class GardenConfig {
     val moneyPerHours: MoneyPerHourConfig = MoneyPerHourConfig()
 
     @Expose
-    @ConfigOption(name = "Next Jacob's Contest", desc = "")
+    @ConfigOption(name = "Jacob's Contest", desc = "")
     @Accordion
-    val nextJacobContests: NextJacobContestConfig = NextJacobContestConfig()
+    val jacobContest: JacobContestConfig = JacobContestConfig()
 
     @Expose
     @ConfigOption(name = "Armor Drop Tracker", desc = "")
@@ -146,11 +146,6 @@ class GardenConfig {
     val atmosphericFilterDisplay: AtmosphericFilterDisplayConfig = AtmosphericFilterDisplayConfig()
 
     @Expose
-    @ConfigOption(name = "Personal Bests", desc = "")
-    @Accordion
-    val personalBests: PersonalBestsConfig = PersonalBestsConfig()
-
-    @Expose
     @ConfigOption(
         name = "Plot Price",
         desc = "Show the price of the plot in coins when inside the Configure Plots inventory.",
@@ -173,55 +168,6 @@ class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var burrowingSporesNotification: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "FF for Contest",
-        desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var farmingFortuneForContest: Boolean = true
-
-    @Expose
-    @ConfigLink(owner = GardenConfig::class, field = "farmingFortuneForContest")
-    val farmingFortuneForContestPos: Position = Position(180, 156)
-
-    @Expose
-    @ConfigOption(
-        name = "Contest Time Needed",
-        desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var jacobContestTimes: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Custom BPS",
-        desc = "Use custom Blocks per Second value in some GUIs instead of the real one.",
-    )
-    @ConfigEditorBoolean
-    var jacobContestCustomBps: Boolean = true
-
-    // TODO Write ConditionalUtils.onToggle()-s for these values in their feature classes
-    @Expose
-    @ConfigOption(name = "Custom BPS Value", desc = "Set a custom Blocks per Second value.")
-    @ConfigEditorSlider(minValue = 15f, maxValue = 20f, minStep = 0.1f)
-    var jacobContestCustomBpsValue: Double = 19.9
-
-    @Expose
-    @ConfigLink(owner = GardenConfig::class, field = "jacobContestTimes")
-    val jacobContestTimesPosition: Position = Position(-359, 149)
-
-    @Expose
-    @ConfigOption(
-        name = "Contest Summary",
-        desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var jacobContestSummary: Boolean = true
 
     @Expose
     @NoConfigLink
