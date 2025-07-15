@@ -2,13 +2,17 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.dungeon.SpiritLeapConfig
+import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapColorConfig
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -16,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
@@ -30,17 +35,19 @@ import kotlin.math.min
 @SkyHanniModule
 object DungeonSpiritLeapOverlay {
     private val config get() = SkyHanniMod.feature.dungeon.spiritLeapOverlay
+    private val colorConfig get() = config.colorConfig
 
     private var scaleFactor: Double = 1.0
     private var overlayPosition: Position? = null
     private var containerWidth = 0
     private var containerHeight = 0
+    private var playerList = emptyList<PlayerStackInfo>()
     private val validInventoryNames = setOf("Spirit Leap", "Teleport to Player")
 
     data class PlayerStackInfo(val playerInfo: DungeonApi.TeamMember?, val stack: ItemStack, val slotNumber: Int)
 
     @HandleEvent
-    fun onSpiritLeapGuiDraw(event: GuiContainerEvent.PreDraw) {
+    fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
         if (!isEnabled()) return
 
         val gui = event.gui
@@ -51,8 +58,7 @@ object DungeonSpiritLeapOverlay {
         scaleFactor = min(containerWidth, containerHeight).toDouble() / max(containerWidth, containerHeight).toDouble()
 
         val chest = gui.inventorySlots as ContainerChest
-
-        val playerList = buildList {
+        playerList = buildList {
             for ((slot, stack) in chest.getUpperItems()) {
                 val lore = stack.getLore()
                 if (lore.isNotEmpty()) {
@@ -62,7 +68,10 @@ object DungeonSpiritLeapOverlay {
             }
         }.sortedBy { it.playerInfo?.dungeonClass?.ordinal }
 
-        val leapRenderItems = playerList.mapNotNull { createLeapItem(it) }
+        val leapRenderItems = playerList.mapIndexedNotNull { index, player ->
+            createLeapItem(player, index)
+        }
+
         val spiritLeapOverlay = createSpiritLeapOverlay(leapRenderItems)
 
         overlayPosition = Position(
@@ -72,6 +81,26 @@ object DungeonSpiritLeapOverlay {
             renderRenderable(spiritLeapOverlay, posLabel = "Spirit Leap Overlay", addToGuiManager = false)
         }
         event.cancel()
+    }
+
+    @HandleEvent
+    fun onKeyPress(event: KeyDownEvent) {
+        if (!isEnabled() || !config.spiritLeapKeybindConfig.enableKeybind) return
+        val index = getKeybindIndex(event.keyCode)
+        if (index !in 0..<playerList.count()) return
+        leapToPlayer(playerList[index])
+    }
+
+    private val spiritLeapKeybinds
+        get() = intArrayOf(
+            config.spiritLeapKeybindConfig.keybindOption1,
+            config.spiritLeapKeybindConfig.keybindOption2,
+            config.spiritLeapKeybindConfig.keybindOption3,
+            config.spiritLeapKeybindConfig.keybindOption4,
+        )
+
+    private fun getKeybindIndex(keyCode: Int): Int {
+        return spiritLeapKeybinds.indexOf(keyCode)
     }
 
     private fun createSpiritLeapOverlay(leapRenderItems: List<Renderable>): Renderable {
@@ -89,7 +118,7 @@ object DungeonSpiritLeapOverlay {
         )
     }
 
-    private fun createLeapItem(playerStackInfo: PlayerStackInfo): Renderable? {
+    private fun createLeapItem(playerStackInfo: PlayerStackInfo, index: Int): Renderable? {
         val player = playerStackInfo.playerInfo ?: return null
         val classInfo = buildString {
             player.dungeonClass?.let {
@@ -136,13 +165,34 @@ object DungeonSpiritLeapOverlay {
 
         return Renderable.clickable(
             Renderable.drawInsideRoundedRectWithOutline(
-                Renderable.fixedSizeColumn(
-                    Renderable.fixedSizeLine(
-                        buttonLayout,
-                        width = (containerWidth * 0.40).toInt(),
-                        verticalAlign = VerticalAlignment.CENTER,
+                VerticalContainerRenderable(
+                    listOf(
+                        if (config.spiritLeapKeybindConfig.showKeybindHint && index in 0..<spiritLeapKeybinds.count()) {
+                            Renderable.drawInsideRoundedRectOutline(
+                                StringRenderable(
+                                    KeyboardManager.getKeyName(spiritLeapKeybinds[index]),
+                                    (scaleFactor * 0.9) + 0.7,
+                                    verticalAlign = VerticalAlignment.CENTER,
+                                ),
+                                topOutlineColor = 0xFFFFF,
+                                bottomOutlineColor = 0xFFFFF,
+                                borderOutlineThickness = 2,
+                                padding = 4,
+                                horizontalAlign = HorizontalAlignment.RIGHT,
+                            )
+                        } else {
+                            Renderable.placeholder(width = 10, height = (12 * scaleFactor).toInt())
+                        },
+                        Renderable.placeholder(0, height = (-15 * scaleFactor).toInt()),
+                        Renderable.fixedSizeColumn(
+                            Renderable.fixedSizeLine(
+                                buttonLayout,
+                                width = (containerWidth * 0.40).toInt(),
+                                verticalAlign = VerticalAlignment.CENTER,
+                            ),
+                            height = (containerHeight * 0.35).toInt(),
+                        ),
                     ),
-                    height = (containerHeight * 0.35).toInt(),
                 ),
                 verticalAlign = VerticalAlignment.CENTER,
                 color = backgroundColor.toSpecialColor(),
@@ -153,22 +203,42 @@ object DungeonSpiritLeapOverlay {
                 smoothness = 10,
                 padding = 5,
             ),
-            onLeftClick = { InventoryUtils.clickSlot(playerStackInfo.slotNumber, mouseButton = 2, mode = 3) },
+            onLeftClick = { leapToPlayer(playerStackInfo) },
         )
     }
 
-    private val deadTeammateColor = config.deadTeammateColor
+    private fun leapToPlayer(player: PlayerStackInfo) {
+        val playerInfo = player.playerInfo ?: return
+        if (playerInfo.playerDead) {
+            ChatUtils.chat("§cCannot leap — §e${playerInfo.username} §cis dead.")
+            return
+        }
+        InventoryUtils.clickSlot(player.slotNumber, mouseButton = 2, mode = 3)
+    }
+
+    private val deadTeammateColor = colorConfig.deadTeammateColor
 
     private fun getClassColor(dungeonClass: DungeonApi.DungeonClass?): String {
         return when (dungeonClass) {
-            DungeonApi.DungeonClass.ARCHER -> config.archerClassColor
-            DungeonApi.DungeonClass.MAGE -> config.mageClassColor
-            DungeonApi.DungeonClass.BERSERK -> config.berserkClassColor
-            DungeonApi.DungeonClass.TANK -> config.tankClassColor
-            DungeonApi.DungeonClass.HEALER -> config.healerClassColor
-            else -> SpiritLeapConfig.DEFAULT_COLOR
+            DungeonApi.DungeonClass.ARCHER -> colorConfig.archerClassColor
+            DungeonApi.DungeonClass.MAGE -> colorConfig.mageClassColor
+            DungeonApi.DungeonClass.BERSERK -> colorConfig.berserkClassColor
+            DungeonApi.DungeonClass.TANK -> colorConfig.tankClassColor
+            DungeonApi.DungeonClass.HEALER -> colorConfig.healerClassColor
+            else -> SpiritLeapColorConfig.DEFAULT_COLOR
         }
     }
 
     private fun isEnabled() = config.enabled && DungeonApi.inDungeon() && DungeonApi.started && !DungeonApi.completed
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(98, "dungeon.spiritLeapOverlay.archerClassColor", "dungeon.spiritLeapOverlay.colorConfig.archerClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.mageClassColor", "dungeon.spiritLeapOverlay.colorConfig.mageClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.berserkClassColor", "dungeon.spiritLeapOverlay.colorConfig.berserkClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.tankClassColor", "dungeon.spiritLeapOverlay.colorConfig.tankClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.healerClassColor", "dungeon.spiritLeapOverlay.colorConfig.healerClassColor")
+        event.move(98, "dungeon.spiritLeapOverlay.defaultColor", "dungeon.spiritLeapOverlay.colorConfig.defaultColor")
+        event.move(98, "dungeon.spiritLeapOverlay.deadTeammateColor", "dungeon.spiritLeapOverlay.colorConfig.deadTeammateColor")
+    }
 }
