@@ -68,7 +68,7 @@ data class NeuItemJson(
     private val nbtListRegex = Regex("([\\[,])\\d+:")
     private val fixedNbt by lazy { nbtTagString.replace(nbtListRegex, "$1") }
 
-    private fun getNeuNbt(): NeuNbtInfoJson? = runCatching {
+    private fun convertToNeuNbt(): NeuNbtInfoJson? = runCatching {
         ConfigManager.gson.fromJson<NeuNbtInfoJson>(fixedNbt)
     }.getOrElse {
         ErrorManager.logErrorWithData(
@@ -84,5 +84,5 @@ data class NeuItemJson(
         null
     }
 
-    val neuNbt by lazy { getNeuNbt() }
+    val neuNbt by lazy { convertToNeuNbt() }
 }
