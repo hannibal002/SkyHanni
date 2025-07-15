@@ -286,6 +286,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to keep clicked items visible within Superpairs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4081)
 + Added "Old SB Menu" from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4271)
 + Added colors to stat numbers in tooltips. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4345)
++ Added chest profit calculator for dungeons and kuudra. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
++ Added Improved SB Menus from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4270)
+    + Functionality should be a near, if not perfect match.
+    + Can only be used on modern Minecraft versions.
 
 </details>
 <details open><summary>
@@ -1696,6 +1700,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hides Ex Co-op Members from Collections.
 + Added SkyBlock Profile Viewer support for updating data from Pv. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
 + Added support for 1.21.7. - Vixid & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4349)
++ Added Taming 60 helper. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4344)
 
 </details>
 <details open><summary>
