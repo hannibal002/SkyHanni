@@ -35,8 +35,17 @@ import java.nio.FloatBuffer
 //#else
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import com.mojang.blaze3d.systems.RenderSystem
-//$$ import org.joml.Matrix4f
+//$$ import com.mojang.blaze3d.systems.ProjectionType
+//$$ import net.minecraft.client.render.VertexConsumerProvider
+//$$ import net.minecraft.client.util.BufferAllocator
+//$$ import net.minecraft.client.util.math.MatrixStack
+//$$ import net.minecraft.item.ItemDisplayContext
 //$$ import net.minecraft.text.Text
+//$$ import org.joml.Matrix4f
+//$$ import org.joml.Quaternionf
+//#endif
+//#if MC > 1.21.6
+//$$ import net.minecraft.client.render.ProjectionMatrix2
 //#endif
 
 // todo 1.21 impl needed
@@ -384,6 +393,9 @@ object GuiRenderUtils {
         )
     }
 
+    //#if MC > 1.21.6
+    //$$ val projMatrix = ProjectionMatrix2("ItemStack", 1000.0f, 11000.0f, true)
+    //#endif
 
     fun ItemStack.renderOnScreen(
         x: Float,
@@ -423,6 +435,7 @@ object GuiRenderUtils {
             DrawContextUtils.translate(translateX, translateY, zT)
             DrawContextUtils.scale(finalScale, finalScale, zS)
 
+            //#if MC < 1.21.6
             //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
             //#else
@@ -484,6 +497,45 @@ object GuiRenderUtils {
 
             //#if MC < 1.21
             GL11.glDisable(GL11.GL_NORMALIZE)
+            //#endif
+
+            //#else
+            //$$ RenderSystem.assertOnRenderThread()
+            //$$ RenderSystem.backupProjectionMatrix()
+            //$$ val client = MinecraftClient.getInstance()
+            //$$ val slice = projMatrix.set(
+            //$$     client.window.framebufferWidth.toFloat() / client.window.scaleFactor.toFloat(),
+            //$$     client.window.framebufferHeight.toFloat() / client.window.scaleFactor.toFloat()
+            //$$ )
+            //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
+            //$$ val matrixStack = MatrixStack()
+            //$$ matrixStack.push()
+            //$$ matrixStack.translate(translateX.toDouble(), translateY.toDouble(), zT.toDouble())
+            //$$ matrixStack.scale(finalScale, finalScale, zS)
+            //$$ matrixStack.translate(hx.toDouble(), hy.toDouble(), hz.toDouble())
+            //$$ val rad = Math.PI.toFloat() / 180f
+            //$$ val quat = Quaternionf()
+            //$$ if (rotX != 0f) matrixStack.multiply(quat.rotationX(rotX * rad))
+            //$$ if (rotY != 0f) matrixStack.multiply(quat.rotationY(rotY * rad))
+            //$$ if (rotZ != 0f) matrixStack.multiply(quat.rotationZ(rotZ * rad))
+            //$$ matrixStack.translate(-hx.toDouble(), -hy.toDouble(), -hz.toDouble())
+            //$$ client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
+            //$$ val guiAllocator = BufferAllocator(256)
+            //$$ val vcProvider = VertexConsumerProvider.immediate(guiAllocator)
+            //$$ client.itemRenderer.renderItem(
+            //$$     client.player,
+            //$$     item,
+            //$$     ItemDisplayContext.GUI,
+            //$$     matrixStack,
+            //$$     vcProvider,
+            //$$     client.world,
+            //$$     15728880,
+            //$$     0,
+            //$$     0
+            //$$ )
+            //$$ guiAllocator.clear()
+            //$$ matrixStack.pop()
+            //$$ RenderSystem.restoreProjectionMatrix()
             //#endif
         }
     }
