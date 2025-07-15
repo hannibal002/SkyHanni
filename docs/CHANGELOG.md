@@ -33,6 +33,7 @@
 + Added SkyBlock Profile Viewer support for updating data from Pv. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
 + Added support for 1.21.7. - Vixid & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4349)
 + Added Taming 60 helper. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4344)
+    + Shows which pets are cheapest to unlock the next taming level.
 
 #### Dungeons
 
@@ -61,9 +62,10 @@
 + Added "Old SB Menu" from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4271)
 + Added colors to stat numbers in tooltips. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4345)
 + Added chest profit calculator for dungeons and kuudra. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
-+ Added Improved SB Menus from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4270)
-    + Functionality should be a near, if not perfect match.
-    + Can only be used on modern Minecraft versions.
++ Added Improved SB Menus. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4270)
+    + Allows you to smooth the look of glass panes in SkyBlock inventories.
+    + Functionality should be a near, if not perfect match to the NEU feature.
+    + Can only be used on Minecraft 1.21.
 
 #### Hoppity
 
