@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -138,8 +139,8 @@ object VerminTracker {
     private fun countVerminBin(lore: List<String>): Map<VerminType, Int> =
         buildMap {
             verminBinPattern.matchAll(lore.map { it.removeColor() }) {
-                val vermin = group("vermin")?.lowercase() ?: return@matchAll
-                val verminCount = group("count")?.toInt() ?: return@matchAll
+                val vermin = group("vermin").lowercase()
+                val verminCount = group("count").formatInt()
                 val verminType = getVerminType(vermin)
                 put(verminType, verminCount)
             }

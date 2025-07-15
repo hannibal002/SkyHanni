@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.kdoc.psi.api.KDoc
 import org.jetbrains.kotlin.psi.*
 
 // depends-on-plugin org.jetbrains.kotlin
-// depends-on-plugin liveplugin
 
 registerIntention(RenameKotlinFunctionToUseCamelCaseIntention())
 if (!isIdeStartup) show("Reloaded Regex intentions")
