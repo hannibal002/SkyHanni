@@ -68,7 +68,7 @@ object MineshaftDetection {
 
         ChatUtils.chat("You entered a ${type.displayName} mineshaft!")
 
-        if (type in config.mineshaftToTrack) {
+        if (type in config.mineshaftsToTrack) {
             TitleManager.sendTitle(type.displayName)
 
             val message = "It took §c${timeSinceThis.passedSince().format()} §eand" +
