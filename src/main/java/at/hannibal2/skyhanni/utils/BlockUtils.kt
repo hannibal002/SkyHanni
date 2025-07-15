@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
 import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
@@ -72,11 +73,11 @@ object BlockUtils {
     //$$ }
     //#endif
 
-    fun getBlockLookingAt(distance: Double = 10.0) = rayTrace(
-        LocationUtils.playerEyeLocation(),
-        MinecraftCompat.localPlayer.lookVec.toLorenzVec(),
-        distance,
-    )
+    fun getBlockLookingAt(): LorenzVec? {
+        val mouseOverObject = Minecraft.getMinecraft().objectMouseOver ?: return null
+        if (mouseOverObject.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return null
+        return mouseOverObject.blockPos.toLorenzVec().roundLocationToBlock()
+    }
 
     private fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
         val from = center.add(-distance, -distance, -distance).toBlockPos()

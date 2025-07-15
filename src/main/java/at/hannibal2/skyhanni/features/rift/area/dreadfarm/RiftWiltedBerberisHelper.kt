@@ -54,8 +54,7 @@ object RiftWiltedBerberisHelper {
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
         if (MinecraftCompat.localPlayer.onGround) {
-            // We check 0.1 blocks below the player's feet because farmland is not a full block on modern versions
-            isOnFarmland = LocationUtils.playerLocation().add(0.0, -0.1, 0.0).getBlockAt() == Blocks.farmland
+            isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.farmland
         }
     }
 
