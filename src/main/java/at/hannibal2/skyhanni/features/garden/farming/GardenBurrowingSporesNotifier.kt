@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -12,8 +13,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-
-private typealias Type = GardenConfig.BurrowingSporesNotificationType
+import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object GardenBurrowingSporesNotifier {
@@ -26,15 +26,29 @@ object GardenBurrowingSporesNotifier {
     )
     private val BURROWING_SPORES = "BURROWING_SPORES".toInternalName()
 
+    private val titleSet = setOf(GardenConfig.BurrowingSporesNotificationType.TITLE, GardenConfig.BurrowingSporesNotificationType.BOTH)
+    private val blinkSet = setOf(GardenConfig.BurrowingSporesNotificationType.BLINK, GardenConfig.BurrowingSporesNotificationType.BOTH)
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
         val selected = config.burrowingSporesNotificationType
-        val titleEnabled = selected in listOf(Type.TITLE, Type.BOTH)
-        val blinkEnabled = selected in listOf(Type.BLINK, Type.BOTH)
+        val titleEnabled = selected in titleSet
+        val blinkEnabled = selected in blinkSet
         if (!titleEnabled && !blinkEnabled) return
         if (!sporeDropMessage.matches(event.message)) return
 
         if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!")
         if (blinkEnabled) ItemBlink.setBlink(BURROWING_SPORES.getItemStackOrNull(), 5_000)
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(99, "garden.burrowingSporesNotification", "garden.burrowingSporesNotificationType") {
+            val newProp = runCatching {
+                if (it.asBoolean) GardenConfig.BurrowingSporesNotificationType.BOTH
+                else GardenConfig.BurrowingSporesNotificationType.NONE
+            }.getOrNull() ?: GardenConfig.BurrowingSporesNotificationType.NONE
+            JsonPrimitive(newProp.name)
+        }
     }
 }
