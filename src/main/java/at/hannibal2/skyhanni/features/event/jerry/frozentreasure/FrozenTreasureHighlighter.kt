@@ -37,8 +37,9 @@ object FrozenTreasureHighlighter {
         if (!WinterApi.inGlacialCave()) return
         treasureLocations.clear()
 
+        @Suppress("LoopWithTooManyJumpStatements")
         for (armorStand in EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(50.0)) {
-            if (armorStand.getInventoryItems().filter { it.isNotEmpty() }.size != 1) continue
+            if (armorStand.getInventoryItems().count { it.isNotEmpty() } != 1) continue
 
             val standHelmet = armorStand.getStandHelmet().orNull() ?: continue
             if (standHelmet.isSkull() && standHelmet.displayName.endsWith("Head")) continue
