@@ -77,6 +77,9 @@ object SeaCreatureManager {
 
                 val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity)
                 seaCreatureMap[chatMessage] = creature
+                for (alternateMessage in seaCreature.alternateMessages) {
+                    seaCreatureMap[alternateMessage] = creature
+                }
                 allFishingMobs[name] = creature
                 variantFishes.add(name)
                 counter++

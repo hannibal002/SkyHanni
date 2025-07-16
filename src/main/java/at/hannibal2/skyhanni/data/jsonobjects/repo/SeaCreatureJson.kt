@@ -17,6 +17,7 @@ data class SeaCreatureJson(
 
 data class SeaCreatureInfo(
     @Expose @SerializedName("chat_message") val chatMessage: String,
+    @Expose @SerializedName("alternate_messages") val alternateMessages: List<String> = emptyList(),
     @Expose @SerializedName("fishing_experience") val fishingExperience: Int,
     @Expose val rare: Boolean = false,
     @Expose val rarity: LorenzRarity,
