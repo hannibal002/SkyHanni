@@ -157,9 +157,7 @@ object DragonProfitTracker {
 
 
         val eyePrice = SkyHanniTracker.getPricePer(SUMMONING_EYE)
-        if (eyePrice != null) {
-            totalProfit -= eyePrice * lastPlaced
-        }
+        totalProfit -= eyePrice * lastPlaced
 
         val hover = lootMap.sortedDesc().keys.toMutableList()
 

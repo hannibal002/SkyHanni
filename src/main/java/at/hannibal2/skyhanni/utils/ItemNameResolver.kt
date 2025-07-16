@@ -128,10 +128,6 @@ object ItemNameResolver {
     }
 
     private fun getInternalNameOrNullIgnoreCase(itemName: String): NeuInternalName? {
-        itemNameCache[itemName]?.let {
-            return it
-        }
-
         // supports colored names, rarities
         NeuItems.allItemsCache[itemName]?.let {
             itemNameCache[itemName] = it

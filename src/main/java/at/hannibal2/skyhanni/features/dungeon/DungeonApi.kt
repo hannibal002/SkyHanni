@@ -435,9 +435,9 @@ object DungeonApi {
 
     data class TeamMember(
         val username: String,
-        val dungeonClass: DungeonClass? = null,
-        val classLevel: Int = 0,
-        val playerDead: Boolean = false,
+        var dungeonClass: DungeonClass? = null,
+        var classLevel: Int = 0,
+        var playerDead: Boolean = false,
     )
 
     private val playerTeamClasses: MutableList<TeamMember> = mutableListOf()
@@ -449,31 +449,32 @@ object DungeonApi {
     fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
 
-        val updatedTeamMembers = mutableListOf<TeamMember>()
-
         playerDungeonTeamPattern.matchAll(event.tabList) {
             val username = group("playerName").removeColor()
-            val dungeonClassName = group("className")
-            val classLevel = group("classLevel")
             val playerDead = group("playerDead") == "DEAD"
-            val oldPlayerData = getPlayerInfo(username)
-            val dungeonClass = if (playerDead) oldPlayerData.dungeonClass
-            else DungeonClass.getByClassName(dungeonClassName) ?: oldPlayerData.dungeonClass
-            val dungeonClassLevel = if (playerDead) oldPlayerData.classLevel else classLevel.romanToDecimalIfNecessary()
 
-            updatedTeamMembers.add(
-                TeamMember(
-                    username = username,
-                    dungeonClass = dungeonClass,
-                    classLevel = dungeonClassLevel,
-                    playerDead = playerDead,
-                ),
-            )
-        }
+            val dungeonClassName = group("className")
+            val dungeonClassLevel = group("classLevel")
 
-        playerTeamClasses.apply {
-            clear()
-            addAll(updatedTeamMembers)
+            playerTeamClasses.find { it.username == username }?.let { player ->
+                player.playerDead = playerDead
+                if (player.dungeonClass == null && !playerDead) {
+                    player.dungeonClass = DungeonClass.getByClassName(dungeonClassName)
+                    player.classLevel = dungeonClassLevel.romanToDecimalIfNecessary()
+                }
+            } ?: run {
+                val dungeonClass = DungeonClass.getByClassName(dungeonClassName)
+                val classLevel = dungeonClassLevel.romanToDecimalIfNecessary()
+
+                playerTeamClasses.add(
+                    TeamMember(
+                        username = username,
+                        dungeonClass = dungeonClass,
+                        classLevel = classLevel,
+                        playerDead = playerDead,
+                    ),
+                )
+            }
         }
     }
 }

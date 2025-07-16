@@ -15,12 +15,15 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -43,6 +46,8 @@ object PigFeaturesApi {
     )
 
     private val patternGroup = RepoPattern.group("event.year-of-the-pig")
+
+    private val SHINY_ORB_ITEM = "SHINY_ORB".toInternalName()
 
     private val data: MutableList<ShinyOrbData> = mutableListOf()
     val dataSetList get() = data
@@ -173,8 +178,10 @@ object PigFeaturesApi {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onEntityClick(event: EntityClickEvent) {
         if (!isYearOfThePig()) return
-        val entity = event.clickedEntity ?: return
 
+        if (InventoryUtils.getItemInHand()?.getInternalNameOrNull() != SHINY_ORB_ITEM) return
+
+        val entity = event.clickedEntity
         if (entity is EntityPig && entity.mob?.name == "SHINY PIG") entity.handlePigClick()
     }
 
