@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.misc.PathfindConfig
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -23,6 +26,13 @@ object NavigationFeedback {
     private var lastChatMessageSent = SimpleTimeMark.farPast()
     private var navActive: Boolean = false
     private var navLastActive: SimpleTimeMark = SimpleTimeMark.farPast()
+
+    @HandleEvent
+    fun onConfigLoad() {
+        ConditionalUtils.onToggle(config.feedbackMode) {
+            guiRenderable = null
+        }
+    }
 
     private fun isActive() = navActive || navLastActive.passedSince() < 3.seconds
 
