@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.random.Random
+import kotlin.time.Duration
 
 @SkyHanniModule
 object PartyApi {
@@ -39,6 +40,14 @@ object PartyApi {
         "(?<name>.*) §ejoined the party\\.",
     )
 
+    //TODO the invited you to their party was created based on what i had in mind. has to be tested still!
+    /**
+     * REGEX-TEST: §b[MVP§d+§b] Throwpo §einvited you to join their Party.
+     */
+    val receivedInvitePattern by patternGroup.pattern(
+        "others.joined",
+        "(?<name>.*) §einvited you to join their Party\\.",
+    )
     /**
      * REGEX-TEST: §eYou'll be partying with: §a[VIP] FungalBeatle550
      */
@@ -144,6 +153,7 @@ object PartyApi {
 
     var partyLeader: String? = null
     var prevPartyLeader: String? = null
+    var allInvite: Boolean = false
 
     fun isInParty() = partyMembers.isNotEmpty()
 
@@ -283,6 +293,14 @@ object PartyApi {
         partyMembers.clear()
         partyLeader = null
         prevPartyLeader = null
+        allInvite = false
+    }
+
+    fun isPartyLeader() = partyLeader == PlayerUtils.getName()
+
+    fun canInvite(): Boolean {
+        if (!isInParty()) return true
+        return isPartyLeader() || isModerator() || allInvite
     }
 
     @HandleEvent
@@ -315,4 +333,98 @@ object PartyApi {
         }
     }
 
+
+    fun warp(): Boolean {
+        if (!isPartyLeader()) return false
+        send("party warp")
+        return true
+    }
+
+    fun partyTransfer(player: String): Boolean {
+        if (!isPartyLeader()) return false
+        send("party transfer $player")
+        return true
+    }
+
+    fun promote(player: String): Boolean {
+        if (!isPartyLeader()) return false
+        send("party promote $player")
+        return true
+    }
+
+    fun disband(): Boolean {
+        if (!isPartyLeader()) return false
+        send("party disband")
+        return true
+    }
+
+    fun kick(player: String): Boolean {
+        if (!isPartyLeader()) return false
+        send("party kick $player")
+        return true
+    }
+
+    fun kick(player: List<String>): Boolean {
+        if (!isPartyLeader()) return false
+        player.forEach {
+            send("party kick $it")
+        }
+        return true
+    }
+
+    fun kickOffline(): Boolean {
+        if (!isPartyLeader()) return false
+        send("party kickoffline")
+        return true
+    }
+
+    fun allInvite(): Boolean {
+        if (!isPartyLeader()) return false
+        send("party settings allinvite")
+        return true
+    }
+
+
+    fun invite(username: String): Boolean {
+        if (!canInvite()) return false
+        send("party invite $username")
+        return true
+    }
+    //TODO add something that slows down invites if a lot people are supposed to be invited.
+
+    fun invite(usernames: List<String>): Boolean {
+        if (!canInvite()) return false
+        for (chunked in usernames.chunked(5)) {
+            send("party invite ${chunked.joinToString(" ")}")
+        }
+        return true
+    }
+
+    private fun send(message: String) {
+        ChatUtils.sendMessageToServer("/$message")
+    }
+
+    fun isModerator() : Boolean {
+        //TODO add moderator tracking
+        //TODO add allinvite tracking
+        //WARNING if you add moderator tracking but not allinvite this blocks commands due to expecting not being able to invite.
+        return true
+    }
+
+    fun leaveParty() {
+        if (!isInParty()) return
+        send("party leave")
+    }
+
+    fun joinParty(user: String) : Boolean {
+        if (isInParty()) return false
+        send("party join $user")
+        return true
+    }
+
+    fun acceptParty(user: String) : Boolean {
+        if (isInParty()) return false
+        send("party accept $user")
+        return true
+    }
 }

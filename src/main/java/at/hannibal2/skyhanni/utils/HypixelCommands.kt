@@ -121,47 +121,11 @@ object HypixelCommands {
         send("ec $position")
     }
 
-    fun partyAccept(player: String) {
-        send("party accept $player")
-    }
-
-    fun partyWarp() {
-        send("party warp")
-    }
-
-    fun partyTransfer(player: String) {
-        send("party transfer $player")
-    }
-
-    fun partyDisband() {
-        send("party disband")
-    }
-
-    fun partyKick(player: String) {
-        send("party kick $player")
-    }
-
-    fun partyKickOffline() {
-        send("party kickoffline")
-    }
-
-    fun partyAllInvite() {
-        send("party settings allinvite")
-    }
-
-    fun partyPromote(player: String) {
-        send("party promote $player")
-    }
-
     fun partyChat(message: String, prefix: Boolean = false) {
         when (prefix) {
             false -> send("pc $message")
             true -> send("pc [SkyHanni] $message")
         }
-    }
-
-    fun partyInvite(player: String) {
-        send("party $player")
     }
 
     fun allChat(message: String) {

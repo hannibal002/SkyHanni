@@ -45,7 +45,7 @@ object PartyChatCommands {
             { config.transferCommand },
             triggerableBySelf = false,
             executable = {
-                HypixelCommands.partyTransfer(it.cleanedAuthor)
+                PartyApi.partyTransfer(it.cleanedAuthor)
             },
         ),
         PartyChatCommand(
@@ -53,7 +53,7 @@ object PartyChatCommands {
             { config.warpCommand && lastWarp.passedSince() > 5.seconds },
             executable = {
                 lastWarp = SimpleTimeMark.now()
-                HypixelCommands.partyWarp()
+                PartyApi.warp()
             },
         ),
         PartyChatCommand(
@@ -61,7 +61,7 @@ object PartyChatCommands {
             { config.allInviteCommand && lastAllInvite.passedSince() > 2.seconds },
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
-                HypixelCommands.partyAllInvite()
+                PartyApi.allInvite()
             },
         ),
         PartyChatCommand(

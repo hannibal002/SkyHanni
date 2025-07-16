@@ -2,17 +2,29 @@ package at.hannibal2.skyhanni.config.features.event.bingo
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.BingoNetConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
+import org.lwjgl.input.Keyboard
 
 class BingoConfig {
+
+
+
     @Expose
     @ConfigOption(name = "Bingo Card", desc = "")
     @Accordion
     val bingoCard: BingoCardConfig = BingoCardConfig()
+
+    @Expose
+    @ConfigOption(name = "Bingo Net", desc = "")
+    @Accordion
+    val bingoNet: BingoNetConfig = BingoNetConfig()
 
     @Expose
     @ConfigOption(name = "Compact Chat Messages", desc = "")
@@ -50,4 +62,25 @@ class BingoConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var boopParty: Boolean = false
+
+    @Expose
+    @FeatureToggle
+    @ConfigOption(
+        name = "Splasher Overlay",
+        desc = "Show Data that is useful for a Splasher in an Overlay after you announced a Splash."
+    )
+    val useSplasherOverlay: Boolean = true
+
+    @FeatureToggle
+    @Expose
+    @ConfigOption(
+        name = "Show Splash Status Updates",
+        desc = "Will inform you about Splash Status Updates in the Chat."
+    )
+    val showSplashStatusUpdates: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Bingo Multipurpose", desc = "Used for various Features in regards to Bingo such as Warp to Hub Selector (Splash) or Minion crafting.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
+    val bingoKeybind: Property<Int> = Property.of(Keyboard.KEY_R)
 }

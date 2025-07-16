@@ -26,17 +26,17 @@ object PartyCommands {
 
     private fun kickOffline() {
         if (!config.shortCommands) return
-        HypixelCommands.partyKickOffline()
+        PartyApi.kickOffline()
     }
 
     private fun disband() {
         if (!config.shortCommands) return
-        HypixelCommands.partyDisband()
+        PartyApi.disband()
     }
 
     private fun warp() {
         if (!config.shortCommands) return
-        HypixelCommands.partyWarp()
+        PartyApi.warp()
     }
 
     private fun kick(args: Array<String>) {
@@ -47,7 +47,7 @@ object PartyCommands {
         if (kickedReason.isNotEmpty() && config.partyKickReason) {
             HypixelCommands.partyChat("Kicking $kickedPlayer: $kickedReason")
         }
-        HypixelCommands.partyKick(kickedPlayer)
+        PartyApi.kick(listOf(kickedPlayer))
     }
 
     private fun transfer(args: Array<String>) {
@@ -60,13 +60,13 @@ object PartyCommands {
             return
         }
         if (!config.shortCommands) return
-        HypixelCommands.partyTransfer(args[0])
+        PartyApi.partyTransfer(args[0])
     }
 
     private fun promote(args: Array<String>) {
         if (!config.shortCommands) return
         if (args.isEmpty()) return
-        HypixelCommands.partyPromote(args[0])
+        PartyApi.promote(args[0])
     }
 
     private fun reverseTransfer() {
@@ -77,7 +77,7 @@ object PartyCommands {
     }
 
     private fun autoPartyTransfer(prevPartyLeader: String) {
-        HypixelCommands.partyTransfer(prevPartyLeader)
+        PartyApi.partyTransfer(prevPartyLeader)
         config.reversePT.message.takeIf { it.isNotBlank() }?.let {
             HypixelCommands.partyChat(it)
         }
@@ -98,7 +98,7 @@ object PartyCommands {
         if (kickReason.isEmpty()) return
         event.cancel()
         HypixelCommands.partyChat("Kicking $kickedPlayer: $kickReason")
-        HypixelCommands.partyKick(kickedPlayer)
+        PartyApi.kick(listOf(kickedPlayer))
     }
 
     fun customTabComplete(command: String): List<String>? {
