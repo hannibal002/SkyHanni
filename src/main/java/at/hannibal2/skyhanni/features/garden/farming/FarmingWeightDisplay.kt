@@ -498,11 +498,11 @@ object FarmingWeightDisplay {
         val lbType = if (isMonthlyLB()) "-monthly" else ""
         val atRankParam = if (atRank != null) "&atRank=$atRank" else ""
 
-        val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/" +
-            "$uuid/$profileId$upcomingPlayersParam$atRankParam"
-        val apiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(url, apiName = "Elitebot Farming Leaderboard").assertSuccess()
-            ?: return leaderboardPosition
-        val responseData = apiResponse.data ?: return leaderboardPosition
+        val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/$uuid/$profileId$upcomingPlayersParam$atRankParam"
+        val (apiResponse, responseData) = ApiUtils.getTypedJsonResponse<JsonObject>(
+            url,
+            apiName = "Elitebot Farming Leaderboard"
+        ).assertSuccessWithData() ?: return leaderboardPosition
 
         try {
             val apiData = toEliteLeaderboardJson(responseData).data

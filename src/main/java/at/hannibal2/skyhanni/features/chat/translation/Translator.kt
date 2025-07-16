@@ -112,8 +112,8 @@ object Translator {
         val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=$encode"
 
         var messageToSend = ""
-        val apiResponse = ApiUtils.getTypedJsonResponse<JsonArray>(url, "Google Translate API").assertSuccess() ?: return null
-        val jsonResponse = apiResponse.data ?: return null
+        val (_, jsonResponse) = ApiUtils.getTypedJsonResponse<JsonArray>(url, "Google Translate API").assertSuccessWithData()
+            ?: return null
         val fullResponse = jsonResponse.asJsonArray
         if (fullResponse.size() < 3) return null
 

@@ -27,8 +27,7 @@ class HypixelItemApi {
 
     private suspend fun loadNpcPrices(): MutableMap<NeuInternalName, Double> {
         val list = mutableMapOf<NeuInternalName, Double>()
-        val apiResponse = ApiUtils.getJsonResponse(hypixelItemStatic).assertSuccess() ?: return list
-        val apiResponseData = apiResponse.data ?: return list
+        val (_, apiResponseData) = ApiUtils.getJsonResponse(hypixelItemStatic).assertSuccessWithData() ?: return list
         val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponseData)
 
         val motesPrice = mutableMapOf<NeuInternalName, Double>()
