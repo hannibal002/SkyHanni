@@ -631,6 +631,18 @@ object IslandGraphs {
             category = CommandCategory.USERS_BUG_FIX
             callback { reportCommand(it) }
         }
+        event.register("shstopnavigation") {
+            description = "Stops the current pathfinding."
+            category = CommandCategory.USERS_ACTIVE
+            callback {
+                if (currentTarget != null) {
+                    stop()
+                    NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+                } else {
+                    ChatUtils.userError("No navigation is currently active.")
+                }
+            }
+        }
     }
 
     private fun reportCommand(args: Array<String>) {
