@@ -141,6 +141,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Color Override to Dungeon Livid Finder. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3511)
 + Added Trinity helper. - Bugzilla + Daveed (https://github.com/hannibal002/SkyHanni/pull/4063)
     + Notifies you when it is likely that there is a Trinity room in your dungeon.
++ Spirit Leap Keybinds. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/3844)
+    + Allows player to use keybinds to leap to specific player.
+    + Keybind hints added for easier keybind usage.
 
 </details>
 <details open><summary>
@@ -285,6 +288,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows missing fishes for the NPC, sorted by price.
 + Added option to keep clicked items visible within Superpairs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4081)
 + Added "Old SB Menu" from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4271)
++ Added colors to stat numbers in tooltips. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4345)
++ Added chest profit calculator for dungeons and kuudra. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
++ Added Improved SB Menus. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4270)
+    + Allows you to smooth the look of glass panes in SkyBlock inventories.
+    + Functionality should be a near, if not perfect match to the NEU feature.
+    + Can only be used on Minecraft 1.21.
 
 </details>
 <details open><summary>
@@ -1029,6 +1038,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added gemstone money per hour display when mining. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3586)
 + Added HotM Sky Mall display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
 + Added metal detector solver, mute metal detector option, and all tools alert. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3589)
++ Added Mineshaft Detection. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4343)
+    + Ability to send entered Mineshaft to party chat.
+    + Tracks how many shafts you entered since each Mineshaft Type.
 
 </details>
 <details open><summary>
@@ -1105,6 +1117,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Gift Profit Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3072)
     + Does NOT auto-track used gifts - see `/shaddusedgifts`.
 + Added precise Diana burrow prediction. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3249)
++ Added Shiny orb helper. - Daveed & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4355)
+    + Shows lines between you, your pig and it's orb.
++ Added Shiny orb tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4355)
 
 ### Hoppity and Chocolate Factory
 
@@ -1691,6 +1706,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Ex Co-op Member Hider. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3795)
     + Hides Ex Co-op Members from Collections.
 + Added SkyBlock Profile Viewer support for updating data from Pv. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
++ Added support for 1.21.7. - Vixid & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4349)
++ Added Taming 60 helper. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4344)
+    + Shows which pets are cheapest to unlock the next taming level.
++ Added Frozen Treasure highlighter for the Glacial Caves. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4393)
++ Added Glowing Mushroom highlighter for the Glowing Mushroom Cave. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4392)
 
 </details>
 <details open><summary>

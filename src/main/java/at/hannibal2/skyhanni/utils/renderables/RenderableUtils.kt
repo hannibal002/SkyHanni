@@ -403,8 +403,26 @@ internal object RenderableUtils {
         padding: Int = 1,
         itemScale: Double = NeuItems.ITEM_FONT_SIZE,
     ): Renderable {
-        val sorted = data.sortedByDescending { it.sort }
+        val outerList = constructOuterList(data, itemScale)
+        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
+    }
 
+    fun fillScrollTable(
+        data: List<DisplayTableEntry>,
+        padding: Int = 1,
+        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
+        height: Int,
+        velocity: Double = 2.0,
+    ): Renderable {
+        val outerList = constructOuterList(data, itemScale)
+        return Renderable.scrollTable(outerList, height, xPadding = 5, yPadding = padding, velocity = velocity)
+    }
+
+    private fun constructOuterList(
+        data: List<DisplayTableEntry>,
+        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
+    ): MutableList<List<Renderable>> {
+        val sorted = data.sortedByDescending { it.sort }
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {
@@ -418,7 +436,7 @@ internal object RenderableUtils {
             val right = StringRenderable(entry.right)
             outerList.add(listOf(item, left, right))
         }
-        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
+        return outerList
     }
 }
 

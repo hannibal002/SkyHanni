@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -44,7 +45,7 @@ object AttributeShardOverlay {
 
     fun updateDisplay() {
         if (!config.enabled) return
-        val newData = storage?.toMap().orEmpty()
+        val newData = storage?.toMap().orEmpty().filter { it.key !in AttributeShardsData.unconsumableAttributes }
         val newTotalSyphoned = newData.values.sumOf { it.amountSyphoned }
 
         if (lastShardsData == newData && newTotalSyphoned == lastTotalSyphoned) return
@@ -104,6 +105,7 @@ object AttributeShardOverlay {
                     currentTier = tier,
                     amountToNextTier = toNextTier,
                     amountUntilMaxed = toMax,
+                    amountInHuntingBox = if (config.includeHuntingBox) shardData.amountInBox else 0,
                 ),
             )
         }
@@ -182,6 +184,16 @@ object AttributeShardOverlay {
                 reconstructDisplay()
             },
         )
+
+        addRenderableButton(
+            label = "Include Hunting Box",
+            config = config::includeHuntingBox,
+            enabled = "Include Hunting Box",
+            disabled = "Exclude Hunting Box",
+            onChange = {
+                reconstructDisplay()
+            },
+        )
     }
 
     private fun createShardRenderable(
@@ -189,39 +201,56 @@ object AttributeShardOverlay {
         currentTier: Int,
         amountToNextTier: Int,
         amountUntilMaxed: Int,
+        amountInHuntingBox: Int,
     ): AttributeShardDisplayLine {
         val individualPrice = internalName.getPrice(config.overlayPriceSource.priceSource)
-        val priceUntilNextTier = individualPrice * amountToNextTier
-        val priceUntilMaxed = individualPrice * amountUntilMaxed
+
+        val actualAmountToNextTier = (amountToNextTier - amountInHuntingBox).coerceAtLeast(0)
+        val actualAmountUntilMaxed = (amountUntilMaxed - amountInHuntingBox).coerceAtLeast(0)
+
+        val priceUntilNextTier = individualPrice * actualAmountToNextTier
+        val priceUntilMaxed = individualPrice * actualAmountUntilMaxed
         val shardItemName = internalName.repoItemName
+
+        val priceToNextTierString = if (actualAmountToNextTier == 0) {
+            "§aEnough in Hunting Box"
+        } else {
+            "§6${(individualPrice * actualAmountToNextTier).shortFormat()}"
+        }
+        val priceUntilMaxedString = if (actualAmountUntilMaxed == 0) {
+            "§aEnough in Hunting Box"
+        } else {
+            "§6${(individualPrice * actualAmountUntilMaxed).shortFormat()}"
+        }
 
         priceToMax += priceUntilMaxed
 
         val priceString = when {
             currentTier == 10 -> "§a§lMaxed"
             config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> "§6${priceUntilMaxed.shortFormat()}"
-            else -> "§6${priceUntilNextTier.shortFormat()}"
+            else -> "§6$priceToNextTierString"
         }
 
         val bazaarAmount = when {
-            currentTier == 10 -> 1
-            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> amountUntilMaxed
-            else -> amountToNextTier
-        }
+            actualAmountUntilMaxed == 0 -> 1
+            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> actualAmountUntilMaxed
+            else -> actualAmountToNextTier
+        }.coerceAtLeast(1)
 
         val tooltip = buildList {
             add(shardItemName)
             add("§7Current Tier: §e$currentTier")
             add("§7Price per Shard: §6${individualPrice.shortFormat()}")
+            add("§7Amount in Hunting Box: §a${amountInHuntingBox.addSeparators()}")
             if (currentTier < 10) {
                 if (currentTier != 9) {
                     add("")
-                    add("§7Amount to Next Tier: §a$amountToNextTier")
-                    add("§7Price to Next Tier: §6${priceUntilNextTier.shortFormat()}")
+                    if (actualAmountToNextTier != 0) add("§7Amount to Next Tier: §a$actualAmountToNextTier")
+                    add("§7Price to Next Tier: §6$priceToNextTierString")
                 }
                 add("")
-                add("§7Amount Until Maxed: §a$amountUntilMaxed")
-                add("§7Price Until Maxed: §6${priceUntilMaxed.shortFormat()}")
+                if (actualAmountUntilMaxed != 0) add("§7Amount Until Maxed: §a$actualAmountUntilMaxed")
+                add("§7Price Until Maxed: §6$priceUntilMaxedString")
             }
             add("")
             add("§eClick to open on bazaar!")

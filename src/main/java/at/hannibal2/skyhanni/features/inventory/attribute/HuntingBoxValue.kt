@@ -26,8 +26,16 @@ object HuntingBoxValue {
     private val config get() = AttributeShardsData.config
     private var display = emptyList<Renderable>()
 
+    private var totalShards = 0
+    private var totalInstantSell = 0.0
+    private var totalInstantBuy = 0.0
+
     fun processInventory(slots: List<Slot>) {
         if (!config.huntingBoxValue) return
+
+        totalShards = 0
+        totalInstantSell = 0.0
+        totalInstantBuy = 0.0
 
         val table = mutableListOf<DisplayTableEntry>()
 
@@ -39,8 +47,13 @@ object HuntingBoxValue {
         }
 
         val newList = mutableListOf<Renderable>()
+
         newList.add(StringRenderable("§eHunting Box Value"))
-        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+        newList.add(RenderableUtils.fillScrollTable(table, padding = 5, itemScale = 0.7, height = 225, velocity = 5.0))
+
+        newList.add(StringRenderable("§7Total Attribute Shards: §a$totalShards"))
+        newList.add(StringRenderable("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}"))
+        newList.add(StringRenderable("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}"))
         display = newList
     }
 
@@ -50,12 +63,15 @@ object HuntingBoxValue {
         val amountOwned = AttributeShardsData.amountOwnedPattern.firstMatcher(stack.getLore()) {
             group("amount").formatInt()
         } ?: return
+        totalShards += amountOwned
 
         val pricePerInstantSell = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
         val totalPriceInstantSell = pricePerInstantSell * amountOwned
+        totalInstantSell += totalPriceInstantSell
 
         val pricePerInstantBuy = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
         val totalPriceInstantBuy = pricePerInstantBuy * amountOwned
+        totalInstantBuy += totalPriceInstantBuy
 
         val hover = buildList {
             add(internalName.repoItemName)

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import com.google.gson.JsonObject
@@ -101,7 +102,7 @@ object ApiUtils {
 
     @PublishedApi
     internal val httpClient: CloseableHttpClient = HttpClients.custom()
-        .setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
+        .setUserAgent("SkyHanni/${SkyHanniMod.VERSION}-${PlatformUtils.MC_VERSION}")
         .setDefaultHeaders(defaultHeaders)
         .setDefaultRequestConfig(gatedConnectionConfig)
         .useSystemProperties()

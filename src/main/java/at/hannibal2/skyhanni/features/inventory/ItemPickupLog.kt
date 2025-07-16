@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -83,7 +85,7 @@ object ItemPickupLog {
         fun isExpired() = timeUntilExpiry.passedSince() > config.expireAfter.seconds
     }
 
-    private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
+    private val config get() = SkyHanniMod.feature.inventory.itemPickupLog
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
     private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
@@ -106,7 +108,7 @@ object ItemPickupLog {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        display?.let { config.pos.renderRenderable(it, posLabel = "Item Pickup Log Display") }
+        display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
 
     @HandleEvent
@@ -127,6 +129,16 @@ object ItemPickupLog {
 
             updateItem(itemStack.hash(), item, it.delta < 0)
         }
+    }
+
+    @HandleEvent
+    fun onShardGain(event: ShardGainEvent) {
+        if (!isEnabled() || !config.shards) return
+
+        val itemStack = event.shardInternalName.getItemStack()
+        val item = PickupEntry(itemStack.dynamicName(), event.amount.absoluteValue.toLong(), event.shardInternalName)
+
+        updateItem(itemStack.hash(), item, event.amount < 0)
     }
 
     @HandleEvent
@@ -328,4 +340,10 @@ object ItemPickupLog {
     private fun worldChangeCooldown(): Boolean = SkyBlockUtils.lastWorldSwitch.passedSince() > 2.seconds
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(97, "inventory.itemPickupLogConfig", "inventory.itemPickupLog")
+        event.move(97, "inventory.itemPickupLog.pos", "inventory.itemPickupLog.position")
+    }
 }

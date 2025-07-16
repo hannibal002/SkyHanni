@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldItem
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
@@ -17,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.hasFarmingToolInHand
 import at.hannibal2.skyhanni.features.garden.GardenApi.lastCropBrokenTime
 import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasLassoInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -211,13 +215,18 @@ object PestSpawnTimer {
         display = drawDisplay()
     }
 
-    private fun shouldRender(): Boolean = when {
-        !isEnabled() -> false
-        config.onlyWithFarmingTool && config.onlyWithVacuum -> hasFarmingToolInHand() || hasVacuumInHand()
-        config.onlyWithFarmingTool -> hasFarmingToolInHand()
-        config.onlyWithVacuum -> hasVacuumInHand()
+    private fun shouldRender(): Boolean {
+        if (!isEnabled()) return false
 
-        else -> true
+        if (config.onlyWhenHolding.isEmpty()) return true
+
+        return config.onlyWhenHolding.any {
+            when (it) {
+                HeldItem.FARMING_TOOL -> hasFarmingToolInHand()
+                HeldItem.VACUUM -> hasVacuumInHand()
+                HeldItem.LASSO -> hasLassoInHand()
+            }
+        }
     }
 
     private fun cooldownExpired() {
@@ -235,4 +244,24 @@ object PestSpawnTimer {
     }
 
     private fun isEnabled() = GardenApi.inGarden() && config.enabled
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val userSelections: List<HeldItem> = buildList {
+            event.transform(97, "garden.pests.pestTimer.onlyWithFarmingTool") { entry ->
+                if (entry.asBoolean) add(HeldItem.FARMING_TOOL)
+                entry
+            }
+            event.transform(97, "garden.pests.pestTimer.onlyWithVacuum") { entry ->
+                if (entry.asBoolean) add(HeldItem.VACUUM)
+                entry
+            }
+        }
+
+        if (userSelections.isNotEmpty()) {
+            event.add(97, "garden.pests.pestTimer.onlyWhenHolding") {
+                ConfigManager.gson.toJsonTree(userSelections)
+            }
+        }
+    }
 }
