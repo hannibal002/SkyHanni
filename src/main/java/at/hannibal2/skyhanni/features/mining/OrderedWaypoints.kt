@@ -18,7 +18,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -26,6 +28,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
@@ -41,7 +44,6 @@ object OrderedWaypoints {
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
-
 
     @HandleEvent(HypixelJoinEvent::class)
     fun onHypixelJoin() {
@@ -64,7 +66,7 @@ object OrderedWaypoints {
                 when (i) {
                     0 -> config.previousWaypointColor.toColor()
                     1 -> config.currentWaypointColor.toColor()
-                    2 -> config.nextWaypointColor.toColor()
+                    in 2..(1 + config.nextCount.toInt()) -> config.nextWaypointColor.toColor()
                     else -> config.setupModeColor.toColor()
                 }
             } else config.showAllWaypointColor.toColor()
@@ -74,15 +76,21 @@ object OrderedWaypoints {
                 continue
             }
 
-            // Outline
-            event.drawEdges(
-                orderedWaypointsList[renderWaypoints[i]].location,
-                wpColor,
-                config.blockOutlineThickness.toInt(),
-                false,
-            )
+            when (config.fillBlock) {
+                true -> event.drawWaypointFilled(
+                    orderedWaypointsList[renderWaypoints[i]].location,
+                    wpColor,
+                    true,
+                )
+                else -> event.drawEdges(
+                    orderedWaypointsList[renderWaypoints[i]].location,
+                    wpColor,
+                    config.blockOutlineThickness.toInt(),
+                    false
+                )
+            }
 
-            if (config.showAll || i < 3) {
+            if (config.setupMode || config.showAll || i in 0..(1 + config.nextCount.toInt())) {
                 // Waypoint name (number)
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
@@ -101,23 +109,29 @@ object OrderedWaypoints {
             }
         }
 
-        val traceWP = orderedWaypointsList[renderWaypoints.getOrNull(2) ?: return decideWaypoints()]
-        val lineColor = config.traceLineColor.toColor()
-        if (!config.setupMode && config.traceLine && !config.showAll) {
+        if (renderWaypoints.size <= 1) return decideWaypoints()
+
+        val traceWP = if (renderWaypoints.size == 2) orderedWaypointsList[renderWaypoints[0]]
+        else orderedWaypointsList[renderWaypoints[2]]
+        val traceLineColor = config.traceLineColor.toColor()
+        if (config.traceLine && !config.showAll && !config.setupMode) {
             event.drawLineToEye(
                 traceWP.location.add(0.5, 0.25, 0.5),
-                lineColor,
+                traceLineColor,
                 config.traceLineThickness.toInt(),
                 depth = true,
             )
         }
 
-        val currentWP = orderedWaypointsList[renderWaypoints.getOrNull(1) ?: return decideWaypoints()]
+        val currentWP = orderedWaypointsList[renderWaypoints[1]]
+        val setupModeLineColor = config.setupModeLineColor.toColor()
         if (config.setupMode && !config.showAll) {
+            val eyePos = if (config.sneakingDuringRoute) 1.54
+            else 1.62
             event.draw3DLine(
-                currentWP.location.add(0.5, 2.65, 0.5),
+                currentWP.location.add(0.5, 1.0 + eyePos, 0.5),
                 traceWP.location.add(0.5, 0.5, 0.5),
-                lineColor,
+                setupModeLineColor,
                 config.setupModeLineThickness.toInt(),
                 depth = true,
             )
@@ -224,28 +238,13 @@ object OrderedWaypoints {
         context: CommandContext<Any?>,
         builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> {
-        val formats = ServiceLoader.load(WaypointFormat::class.java).map { it.name }
+        val formats = getWaypointFormats()
         for (format in formats) {
             if (format.startsWith(builder.remainingLowerCase)) {
                 builder.suggest(format)
             }
         }
         return builder.buildFuture()
-    }
-
-
-    // Assumes that commands[0] has already been registered as `/shordered$commands[0]`
-    private fun generateAliases(commands: List<String>): List<String> {
-        val prefixes = listOf("sho")
-        return buildList {
-            prefixes.forEach { prefix ->
-                addAll(commands.map { "$prefix$it" })
-            }
-
-            commands.drop(1).forEach {
-                add("shordered$it")
-            }
-        }
     }
 
     private fun load(name: String) {
@@ -266,18 +265,18 @@ object OrderedWaypoints {
 
             res?.let {
                 orderedWaypointsList = it.deepCopy()
-                currentOrderedWaypointIndex = 0
+                orderedWaypointsList.sortedBy { waypoint -> waypoint.number }
+                currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
                 renderWaypoints.clear()
                 ChatUtils.chat("Loaded ordered waypoints!")
             } ?: run {
                 ChatUtils.userError(
                     "There was an error parsing waypoints. " +
-                        "Please make sure they are Coleweight formatted waypoints.",
+                        "Please make sure they are properly formatted and in a supported format.\n" +
+                        "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
                 )
                 return@launchIOCoroutine
             }
-
-            orderedWaypointsList.sortedBy { item -> item.number }
         }
     }
 
@@ -370,7 +369,10 @@ object OrderedWaypoints {
                 ClipboardUtils.copyToClipboard(it)
                 ChatUtils.chat("Route was copied to clipboard.")
             } ?: run {
-                ChatUtils.userError("Invalid waypoint format specified.")
+                ChatUtils.userError(
+                    "Invalid waypoint format specified.\n" +
+                        "§cFormats: ${getWaypointFormats().joinToString { ", " }}"
+                )
             }
         }
     }
@@ -395,11 +397,8 @@ object OrderedWaypoints {
         if (orderedWaypointsList.isEmpty()) return
 
         val beforeWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex - 1)
-        if (beforeWaypoint != null) {
-            renderWaypoints.add(beforeWaypoint.number - 1)
-        } else {
-            renderWaypoints.add(orderedWaypointsList[orderedWaypointsList.size - 1].number - 1)
-        }
+            ?: orderedWaypointsList.last()
+        renderWaypoints.add(beforeWaypoint.number - 1)
 
         val currentWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex)
 
@@ -410,12 +409,13 @@ object OrderedWaypoints {
         }
 
         val nextWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex + 1)
-            ?: orderedWaypointsList.getOrNull(0)
+            ?: orderedWaypointsList.first()
 
-        var distanceTo2 = Double.POSITIVE_INFINITY
-        if (nextWaypoint != null) {
-            distanceTo2 = nextWaypoint.location.distanceToPlayer()
-            renderWaypoints.add(nextWaypoint.number - 1)
+        val distanceTo2 = nextWaypoint.location.distanceToPlayer()
+        if (nextWaypoint.number - 1 !in renderWaypoints) renderWaypoints.add(nextWaypoint.number - 1)
+        for (it in 1..config.nextCount.toInt().dec()) {
+            val index = (nextWaypoint.number - 1 + it) % orderedWaypointsList.size
+            if (index !in renderWaypoints) renderWaypoints.add(index)
         }
 
         if (
@@ -458,5 +458,9 @@ object OrderedWaypoints {
 
     private fun exportWaypoints(waypoints: Waypoints<SkyhanniWaypoint>, name: String): String? {
         return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.export(waypoints)
+    }
+
+    private fun getWaypointFormats(): List<String> {
+        return ServiceLoader.load(WaypointFormat::class.java).map { it.name }
     }
 }

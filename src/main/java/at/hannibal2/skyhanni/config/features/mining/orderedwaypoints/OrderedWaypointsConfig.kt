@@ -32,14 +32,24 @@ class OrderedWaypointsConfig {
     var previousWaypointColor: ChromaColour = ChromaColour.fromRGB(85, 85, 255, 0, 153)
 
     @Expose
-    @ConfigOption(name = "Next Color", desc = "Color of the next ordered waypoint.")
+    @ConfigOption(name = "Next Color", desc = "Color of the next ordered waypoint(s).")
     @ConfigEditorColour
     var nextWaypointColor: ChromaColour = ChromaColour.fromRGB(255, 255, 85, 0, 153)
+
+    @Expose
+    @ConfigOption(name = "Next Waypoints", desc = "How many waypoints in front of the current waypoint should be rendered.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 5f, minStep = 1f)
+    var nextCount: Float = 1f
 
     @Expose
     @ConfigOption(name = "Block Outline Thickness", desc = "Thickness of the block outline.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
     var blockOutlineThickness: Float = 1f
+
+    @Expose
+    @ConfigOption(name = "Fill Block", desc = "Whether the waypoints should be filled instead of just being the outline.")
+    @ConfigEditorBoolean
+    var fillBlock: Boolean = false
 
     @Expose
     @ConfigOption(name = "Waypoint Range", desc = "How close you have to be for it to go to the next waypoint.")
@@ -67,9 +77,14 @@ class OrderedWaypointsConfig {
     var showDistance: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Setup mode", desc = "Setup mode for route clearing.")
+    @ConfigOption(name = "Setup Mode", desc = "Setup mode for route clearing.")
     @ConfigEditorBoolean
     var setupMode: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Setup Mode Line Color", desc = "Line color for the setup mode lines.")
+    @ConfigEditorColour
+    var setupModeLineColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 0, 102)
 
     @Expose
     @ConfigOption(name = "Setup Mode Waypoint Color", desc = "Color used for additional waypoints displayed by setup mode.")
@@ -85,6 +100,16 @@ class OrderedWaypointsConfig {
     @ConfigOption(name = "Setup Mode Line Thickness", desc = "Thickness of the setup mode lines.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
     var setupModeLineThickness: Float = 1.0f
+
+    @Expose
+    @ConfigOption(
+        name = "Sneaking During Route",
+        desc = "" +
+            "Whether you'll be sneaking when moving between waypoints (e.g., using AOTV)."
+            + "This is used for drawing the line of sight line for setup mode."
+    )
+    @ConfigEditorBoolean
+    var sneakingDuringRoute: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Whether all waypoints should be displayed.")
