@@ -30,7 +30,7 @@ class MineshaftDetectionConfig {
     @ConfigOption(
         name = "Party Chat Format",
         desc = "The party chat message format.\n" +
-            "Available variables: {type}, {amountSinceThis}, {timeSinceThis}\n" +
+            "Available variables: §e{type}§7, §e{amountSinceThis}§7, §e{timeSinceThis}\n" +
             "§eNote: Using multiple variables can cause the message to be too long and be cut off."
     )
     @ConfigEditorText

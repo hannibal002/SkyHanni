@@ -65,15 +65,20 @@ object MineshaftDetection {
 
         val sinceThis = getSinceMineshaftType(type)
         val timeSinceThis = getTimeSinceMineshaftType(type)
+        val formattedTime = if (!timeSinceThis.isFarPast()) {
+            timeSinceThis.passedSince().format()
+        } else {
+            "Unknown (no data yet)"
+        }
 
         ChatUtils.chat("You entered a ${type.displayName} mineshaft!")
 
         if (type in config.mineshaftsToTrack) {
             TitleManager.sendTitle(type.displayName)
 
-            val message = "It took §c${timeSinceThis.passedSince().format()} §eand" +
-                " §c$sinceThis ${"mineshaft".pluralize(sinceThis)}" +
-                " entered to get a ${type.displayName} mineshaft."
+            val message = "§aIt took §e$formattedTime §aand" +
+                " §e$sinceThis ${"§amineshaft".pluralize(sinceThis)}" +
+                " entered to get a §e${type.displayName} §amineshaft."
 
             ChatUtils.chat(message)
         }
@@ -85,8 +90,8 @@ object MineshaftDetection {
 
             val formattedMessage = config.partyChatFormat
                 .replace("{type}", type.displayName)
-                .replace("{sinceThis}", sinceThis.toString())
-                .replace("{timeSinceThis}", timeSinceThis.passedSince().format())
+                .replace("{amountSinceThis}", sinceThis.toString())
+                .replace("{timeSinceThis}", formattedTime)
 
             partyChatBuilder.append(formattedMessage)
 
