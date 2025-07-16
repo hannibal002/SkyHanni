@@ -39,7 +39,7 @@ class MineshaftDetectionConfig {
     @Expose
     @ConfigOption(
         name = "Mineshaft to Track",
-        desc = "The mineshafts to send stats about for §e{sinceConfigShaft}§7 and §e{timeSinceConfigShaft}§7.\n" +
+        desc = "Which mineshafts to send stats about.\n" +
             "Other mineshafts will still have their data tracked, it just won't send stats for them."
     )
     @ConfigEditorDraggableList
