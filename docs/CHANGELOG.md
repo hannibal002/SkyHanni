@@ -15,6 +15,9 @@
 + Added HotM Sky Mall display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
 + Added metal detector solver, mute metal detector option, and all tools alert. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3589)
 + Added gemstone money per hour display when mining. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3586)
++ Added Mineshaft Detection. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4343)
+    + Ability to send entered Mineshaft to party chat.
+    + Tracks how many shafts you entered since each Mineshaft Type.
 
 #### Combat
 
@@ -34,11 +37,16 @@
 + Added support for 1.21.7. - Vixid & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4349)
 + Added Taming 60 helper. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4344)
     + Shows which pets are cheapest to unlock the next taming level.
++ Added Frozen Treasure highlighter for the Glacial Caves. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4393)
++ Added Glowing Mushroom highlighter for the Glowing Mushroom Cave. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4392)
 
 #### Dungeons
 
 + Added Trinity helper. - Bugzilla + Daveed (https://github.com/hannibal002/SkyHanni/pull/4063)
     + Notifies you when it is likely that there is a Trinity room in your dungeon.
++ Spirit Leap Keybinds. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/3844)
+    + Allows player to use keybinds to leap to specific player.
+    + Keybind hints added for easier keybind usage.
 
 #### Chat
 
@@ -82,10 +90,10 @@
 + Added Fishing rod upgrades to estimated item value calculator. - hellcat (https://github.com/hannibal002/SkyHanni/pull/3975)
 + Allowed you to change the color of the highlights for the experiments addons helpers. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4338)
 + Added warning title when trying to use Old SB Menu buttons without cookie. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4346)
-
-#### Fishing
-
-+ Allowed trophy fish display to show while wearing Ember Armor. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4064)
++ Added an option for item pickup log to show shard gains. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Added an option for the attribute shard overlay to account for shards you already own. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Made hunting box value overlay be scrollable. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Made hunting box value show the total value of shards in your hunting box. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
 
 #### Farming
 
@@ -111,10 +119,15 @@
 
 + Added compact display mode for Golden Fish timer. - appable (https://github.com/hannibal002/SkyHanni/pull/3696)
 + Improved bait detection accuracy. - ninjaguardian (https://github.com/hannibal002/SkyHanni/pull/4379)
++ Allowed trophy fish display to show while wearing Ember Armor. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4064)
 
 #### Commands
 
 + Added /shresetkeybinds. - nopo (https://github.com/hannibal002/SkyHanni/pull/4340)
+
+#### Chat
+
++ Added filter for Swoop's message. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4388)
 
 ### Fixes
 
@@ -123,6 +136,7 @@
 + Fixed Enigma Soul tracker sometimes sending you to the wrong soul. - Luna (https://github.com/hannibal002/SkyHanni/pull/4320)
 + Fixed Berberis Highlight not working on 1.21 if Only on Farmland is enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/4373)
 + Fixed Vermin Tracker not counting Vermin Bin on Minecraft 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4371)
++ Fixed Agaricus Cap timer incorrectly resetting whenever you move your camera on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
 
 #### Misc
 
@@ -158,6 +172,15 @@
 + Fixed colorful stat number tooltips breaking when the stat is over 1,000. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4365)
 + Fixed estimated item value tooltip pricing enchanted books at twice their value. - SuperCl4sh (https://github.com/hannibal002/SkyHanni/pull/4247)
 + Fixed True Defense in Colour Item Stat Numbers being the wrong colour. - nopo (https://github.com/hannibal002/SkyHanni/pull/4366)
++ Fixed Crop Fortune Colours in Colourful Item Stats. - nopo (https://github.com/hannibal002/SkyHanni/pull/4391)
+
+#### Fishing
+
++ Fixed grinch sea creature detection on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4394)
+
+#### Farming
+
++ Fixed Jacob Contests Saying they went for 55 years. - nopo (https://github.com/hannibal002/SkyHanni/pull/4383)
 
 ### Technical Details
 
@@ -227,6 +250,16 @@
 + Ported the rest of misc. files in `config/features/inventory` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4199)
 + Ported ~1/2 of misc. files in `config/features/inventory` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4198)
 + Removed deprecated utils from RenderUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4362)
++ Added Renderable.fillScrollTable to create a filledTable that also can scroll. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Added ShardGainEvent for when shards go in and out of the hunting box. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Added the ability for sea creatures to have alternate messages that they match on. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4394)
++ Fixed /shtestmessage reporting that messages were blocked when they weren't. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4394)
++ Improved `BlockUtils.getBlockLookingAt()` and split it up into `getTargetedBlock()` and `getTargetedBlockAtDistance()`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
+    + Coordinates are now explicitly rounded to a full block to match 1.8 behavior.
+    + The former gets the targeted block directly from Minecraft using the default reach distance instead of 10, while the latter can still be used for custom distances.
++ Moved `LorenzVec.getBlockBelowPlayer()` to `LocationUtils` and fixed incorrect behavior when the player is standing on a non-full block. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
++ Removed unused deprecated functions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4381)
++ Renamed `LorenzVec.roundLocationToBlock()` to `roundToBlock()` and fixed incorrect rounding. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
 
 ## Version 4.0.0
 
