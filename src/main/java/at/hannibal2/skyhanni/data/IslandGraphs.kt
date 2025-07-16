@@ -104,8 +104,6 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object IslandGraphs {
 
-    private val config get() = SkyHanniMod.feature.misc.pathfinding
-
     var currentIslandGraph: Graph? = null
         private set
     private var lastLoadedIslandType = "nothing"
