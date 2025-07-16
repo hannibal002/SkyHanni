@@ -15,7 +15,6 @@ class HuntingFilterConfig {
 
     @Expose
     @ConfigOption(name = "Swoop Huntaxe", desc = "Hide Swoop's message about monsters only taking damage from axes.")
-    @SearchTag("swoop axe")
     @ConfigEditorBoolean
     var swoopAxeMessage: Boolean = false
 
