@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.BNConnection
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -16,8 +19,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket
+import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket.PartyStatePacket
 import kotlin.random.Random
-import kotlin.time.Duration
 
 @SkyHanniModule
 object PartyApi {
@@ -48,6 +52,7 @@ object PartyApi {
         "others.joined",
         "(?<name>.*) §einvited you to join their Party\\.",
     )
+
     /**
      * REGEX-TEST: §eYou'll be partying with: §a[VIP] FungalBeatle550
      */
@@ -404,7 +409,7 @@ object PartyApi {
         ChatUtils.sendMessageToServer("/$message")
     }
 
-    fun isModerator() : Boolean {
+    fun isModerator(): Boolean {
         //TODO add moderator tracking
         //TODO add allinvite tracking
         //WARNING if you add moderator tracking but not allinvite this blocks commands due to expecting not being able to invite.
@@ -416,15 +421,44 @@ object PartyApi {
         send("party leave")
     }
 
-    fun joinParty(user: String) : Boolean {
+    fun joinParty(user: String): Boolean {
         if (isInParty()) return false
         send("party join $user")
         return true
     }
 
-    fun acceptParty(user: String) : Boolean {
+    fun acceptParty(user: String): Boolean {
         if (isInParty()) return false
         send("party accept $user")
         return true
     }
+
+    fun allPartyPlayersInLobby(): Boolean {
+        return partyMembers.all { PlayerUtils.isPlayerInLobby(it) }
+    }
+
+    fun onRequestPartyStatePacket(requestPartyStatePacket: RequestPartyStatePacket) {
+        val general = SkyHanniMod.feature.event.bingo.bingoNet.allow_bn_server_party
+        val count = if (general) partyMembers.size else 0
+        val response = PartyStatePacket(
+            general,
+            general && isInParty(),
+            !general || allPartyPlayersInLobby(),
+            count,
+            general && isPartyLeader(),
+            general && canInvite(),
+        )
+        BNConnection.sendPacket(requestPartyStatePacket.preparePacketToReplyToThis(response))
+    }
+
+    /**
+     * PC does not need to be refactored in my opinion so take this helper if your looking here for it.
+     */
+    fun partyChat(message: String, prefix: Boolean = false) {
+        HypixelCommands.partyChat(
+            message,
+            prefix
+        )
+    }
+    //TODO track party invites as part of player count since potential accepts.
 }

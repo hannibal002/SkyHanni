@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.GetFromSackApi
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
 
@@ -119,6 +120,51 @@ object HypixelCommands {
 
     fun enderChest(position: Int) {
         send("ec $position")
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.acceptParty(player)"))
+    fun partyAccept(player: String) {
+        PartyApi.acceptParty(player)
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.warp()"))
+    fun partyWarp() {
+        PartyApi.warp()
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.partyTransfer(player)"))
+    fun partyTransfer(player: String) {
+        PartyApi.partyTransfer(player)
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.disband()"))
+    fun partyDisband() {
+        PartyApi.disband()
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.kick(player)"))
+    fun partyKick(player: String) {
+        PartyApi.kick(player)
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.kickOffline()"))
+    fun partyKickOffline() {
+        PartyApi.kickOffline()
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.allInvite()"))
+    fun partyAllInvite() {
+        PartyApi.allInvite()
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.promote(player)"))
+    fun partyPromote(player: String) {
+        PartyApi.promote(player)
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.invite(player)"))
+    fun partyInvite(player: String) {
+        PartyApi.invite(player)
     }
 
     fun partyChat(message: String, prefix: Boolean = false) {

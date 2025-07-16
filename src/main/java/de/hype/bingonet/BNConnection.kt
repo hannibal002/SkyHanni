@@ -1,20 +1,26 @@
 package at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.BNPacketManager
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.PacketUtils
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.features.bingo.bingonet.SplashStatusUpdateListener
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
+import de.hype.bingonet.environment.packetconfig.PacketUtils
 import de.hype.bingonet.shared.constants.*
 import de.hype.bingonet.shared.objects.*
 import de.hype.bingonet.shared.packets.function.*
@@ -43,8 +49,10 @@ import kotlin.map
 import kotlin.math.min
 import kotlin.sequences.map
 import kotlin.text.map
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("SkyHanniModuleInspection")
 object BNConnection {
     var messageReceiverThread: Thread? = null
     var messageSenderThread: Thread? = null
@@ -67,6 +75,8 @@ object BNConnection {
     }
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoNet
+
+    val waypoints: MutableList<WaypointData> = ArrayList()
 
 
     private fun createSSLContext(): SSLContext {
@@ -168,7 +178,7 @@ object BNConnection {
         }
     }
 
-    fun <T : AbstractPacket?> dummy(o: T?) {
+    fun <T : AbstractPacket> dummy(o: T?) {
         //this does absolutely nothing. dummy for packet in packt manager
     }
 
@@ -205,9 +215,6 @@ object BNConnection {
         val waitTime: Int
         if (packet.splash.announcer == PlayerUtils.getName() && config.autoSplashStatusUpdates) {
             ChatUtils.chat("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard")
-            val splashStatusUpdateListener = SplashStatusUpdateListener(packet.splash)
-            UpdateListenerManager.splashStatusUpdateListener = splashStatusUpdateListener
-            BingoNet.executionService.execute(splashStatusUpdateListener)
         } else {
             SplashManager.addSplash(packet.splash)
             if (packet.splash.lessWaste) {
@@ -215,12 +222,9 @@ object BNConnection {
             } else {
                 waitTime = 0
             }
-            BingoNet.executionService.schedule(
-                Runnable {
-                    SplashManager.display(packet.splash.splashId)
-                },
-                waitTime.toLong(), TimeUnit.MILLISECONDS,
-            )
+            DelayedRun.runDelayed(waitTime.milliseconds) {
+                SplashManager.display(packet.splash.splashId, SplashManager.SplashSource.BN)
+            }
         }
     }
 
@@ -274,7 +278,14 @@ object BNConnection {
         } else if (packet.waitBeforeReconnect?.isEmpty() ?: true) {
             ChatUtils.chat("§cBN: You have been disconnected from the Bingo Net Network.")
         } else {
-            //TODO schedule reconnects here. also add a button for later retry if the user wants to.
+            for (i in packet.waitBeforeReconnect) {
+                DelayedRun.runDelayed(
+                    i.seconds,
+                    {
+                        conditionalReconnectToBBserver()
+                    },
+                )
+            }
         }
     }
 
@@ -469,10 +480,10 @@ object BNConnection {
         }
     }
 
-    fun onGetWaypointsPacket(packet: GetWaypointsPacket?) {
+    fun onGetWaypointsPacket(packet: GetWaypointsPacket) {
         sendPacket(
             GetWaypointsPacket(
-                Waypoints.waypoints.values.stream()
+                Waypoints.waypoints.values
                     .map<ClientWaypointData?>((Function { waypoint: Waypoints? -> (waypoint as ClientWaypointData?) }))
                     .collect(
                         Collectors.toList(),
@@ -560,21 +571,28 @@ object BNConnection {
         BingoNet.temporaryConfig.lastChatPromptAnswer = prompt
     }
 
-    companion object {
-        @JvmStatic
-        fun isCommandSafe(command: kotlin.String): Boolean {
-            if (command.startsWith("/p ") || command.startsWith("/party ") || command.startsWith("/boop ") || command.startsWith(
-                    "/msg ",
-                ) || command.startsWith("/hub ")
-            ) {
-                return true
-            } else {
-                val emergencyMessage =
-                    "We detected that there was a command used which is not configured to be safe! $command please check if its safe. IMMEDIATELY report this to the Admins and DeveloperAbstractConfig Hype_the_Time (@hackthetime). If it is not safe immediately remove BingoNet!!!!!!!! "
-                println(emergencyMessage)
-                Chat.sendPrivateMessageToSelfFatal("§4$emergencyMessage\n\n")
-            }
-            return false
+    @HandleEvent
+    fun rendering(event: SkyHanniRenderWorldEvent) {
+        for (data in waypoints.filter { it.visible }) {
+            val position = data.position.toLorenz()
+            val distance = position.distanceToPlayer()
+            if (distance > data.renderDistance) continue
+
+            event.drawWaypointFilled(
+                position,
+                data.color,
+                seeThroughBlocks = data.renderThroughBlocks,
+                beacon = data.renderBeacon,
+            )
+            event.drawDynamicText(position,"§6[BN]-${data.text}",1.0)
         }
     }
+}
+
+private fun Position.toLorenz(): LorenzVec {
+    return LorenzVec(
+        x.toDouble(),
+        y.toDouble(),
+        z.toDouble(),
+    )
 }

@@ -2,11 +2,11 @@ package de.hype.bingonet.environment.packetconfig
 
 import de.hype.bingonet.client.common.chat.Chat
 import de.hype.bingonet.client.common.client.BingoNet
-import de.hype.bingonet.client.common.communication.BBsentialConnection
+import de.hype.bingonet.client.common.communication.BNConnection
 import de.hype.bingonet.shared.packets.network.InvalidCommandFeedbackPacket
 
 open class AbstractPacket protected constructor(val apiVersionMin: Int = 1, val apiVersionMax: Int = 1) {
-    fun isValid(connection: BBsentialConnection?, allowedNullFields: Array<String?>?): Boolean {
+    fun isValid(connection: BNConnection?, allowedNullFields: Array<String?>?): Boolean {
         if (this.isApiSupported) {
             Chat.sendPrivateMessageToSelfFatal("You are using an outdated version of the mod")
         }

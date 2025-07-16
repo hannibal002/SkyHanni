@@ -1,36 +1,39 @@
-package at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig
+package de.hype.bingonet.environment.packetconfig
 
 import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.BNConnection
+import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.BNGson
+import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.BNPacketManager
+import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
 import com.google.gson.Gson
-import de.hype.bingonet.environment.packetconfig.AbstractPacket
 import java.lang.Error
 import java.lang.Exception
 import java.lang.RuntimeException
 import java.util.ArrayList
 
 object PacketUtils {
-    val gson: Gson = CustomGson.createNotPrettyPrinting()
+    val gson: Gson = BNGson.createNotPrettyPrinting()
+    val knownPacketIssues: MutableSet<String> = HashSet<String>()
 
-    fun parsePacketToJson(packet: AbstractPacket?): String {
+    fun parsePacketToJson(packet: AbstractPacket): String {
         return gson.toJson(packet).replace("\n", "/n")
     }
 
-    fun <T : AbstractPacket?> tryToProcessPacket(
-        packet: Packet<T?>,
+    fun <T : AbstractPacket> tryToProcessPacket(
+        packet: Packet<T>,
         rawJson: String
     ) {
-        val clazz = packet.getClazz()
-        val consumer = packet.getConsumer()
-        val abstractPacket = gson.fromJson<T?>(rawJson.replace("/n", "\n"), clazz)
-        if (handleIntercept<T?>(abstractPacket)) consumer.accept(abstractPacket)
+        val clazz = packet.clazz
+        val consumer = packet.consumer
+        val abstractPacket = gson.fromJson(rawJson.replace("/n", "\n"), clazz)
+        if (handleIntercept(abstractPacket)) consumer.accept(abstractPacket)
     }
 
-    private fun showError(t: Throwable, errorMessage: String?) {
+    private fun showError(t: Throwable, errorMessage: String) {
         println(errorMessage + " because of: " + t.javaClass.getSimpleName() + ":  " + t.message)
         Error(errorMessage, t).printStackTrace()
     }
 
-    fun <T : AbstractPacket?> getAsPacket(message: String, clazz: Class<T?>): T? {
+    fun <T : AbstractPacket?> getAsPacket(message: String, clazz: Class<T>): T? {
         if (!message.contains(".")) return null
         val packetName = message.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
         val rawJson = message.substring(packetName.length + 1)
@@ -41,13 +44,13 @@ object PacketUtils {
             } catch (t: Throwable) {
                 showError(
                     t,
-                    "Could not process packet '" + packetName + "' from " + EnvironmentPacketConfig.notEnviroment
+                    "Could not process packet '$packetName' from Server"
                 )
             }
         }
-        val errorMessage = "Could not process packet '" + packetName + "' from " + EnvironmentPacketConfig.notEnviroment
+        val errorMessage = "Could not process packet '$packetName' from Server"
 
-        showError(APIException("Found unknown packet: " + packetName + "'"), errorMessage)
+        showError(APIException("Found unknown packet: $packetName'"), errorMessage)
         return null
     }
 
@@ -63,7 +66,7 @@ object PacketUtils {
     fun isPacket(message: String): Boolean {
         if (!message.contains(".")) return false
         val packetName = message.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-        for (packetClass in BNPacketManager.Companion.getAllPacketClasses()) {
+        for (packetClass in BNPacketManager.getAllPacketClasses()) {
             if (packetName != packetClass.getSimpleName()) {
                 return true
             }
@@ -78,9 +81,8 @@ object PacketUtils {
         val rawJson = message.substring(packetName.length + 1)
         val manager = BNPacketManager(connection)
         for (packet in manager.getPackets()) {
-            if (packetName != packet.getClazz().getSimpleName()) continue
+            if (packetName != packet?.clazz?.getSimpleName()) continue
             try {
-                if (BingoNet.developerConfig.isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug(packetName + ":" + rawJson)
                 PacketUtils.tryToProcessPacket(packet, rawJson)
                 return true
             } catch (e: RuntimeException) {
