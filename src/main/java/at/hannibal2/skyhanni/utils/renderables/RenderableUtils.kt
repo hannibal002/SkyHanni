@@ -22,7 +22,6 @@ import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
-
 //#if MC > 1.21
 //$$ import net.minecraft.text.Text
 //#endif

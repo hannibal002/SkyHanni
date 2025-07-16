@@ -28,9 +28,9 @@ class AttributeShardsConfig {
     var onlyNotUnlocked: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Accounts for Hunting Box", desc = "Accounts for shards currently held in your hunting box.")
+    @ConfigOption(name = "Include Hunting Box", desc = "Accounts for the amount of shards you currently have held in your hunting box.")
     @ConfigEditorBoolean
-    var accountForHuntingBox: Boolean = true
+    var includeHuntingBox: Boolean = true
 
     @Expose
     @ConfigOption(name = "Display Sorting Method", desc = "The method used to sort the attribute shards in the overlay.")

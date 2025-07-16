@@ -105,7 +105,7 @@ object AttributeShardOverlay {
                     currentTier = tier,
                     amountToNextTier = toNextTier,
                     amountUntilMaxed = toMax,
-                    amountInHuntingBox = if (config.accountForHuntingBox) shardData.amountInBox else 0,
+                    amountInHuntingBox = if (config.includeHuntingBox) shardData.amountInBox else 0,
                 ),
             )
         }
@@ -186,10 +186,10 @@ object AttributeShardOverlay {
         )
 
         addRenderableButton(
-            label = "Account for Hunting Box",
-            config = config::accountForHuntingBox,
+            label = "Include Hunting Box",
+            config = config::includeHuntingBox,
             enabled = "Include Hunting Box",
-            disabled = "Don't Include Hunting Box",
+            disabled = "Exclude Hunting Box",
             onChange = {
                 reconstructDisplay()
             },
