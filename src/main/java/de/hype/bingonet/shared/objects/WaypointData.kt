@@ -9,8 +9,13 @@ open class WaypointData(
     var visible: Boolean,
     var deleteOnServerSwap: Boolean,
     var render: MutableList<RenderInformation> = mutableListOf(),
-    var color: Color = Color(1f,1f,1f),
+    var color: Color = Color(1f, 1f, 1f),
     var renderThroughBlocks: Boolean = true,
     var renderBeacon: Boolean = false,
     var doTracer: Boolean = true,
-)
+) {
+    val waypointId: Int = counter++
+    companion object {
+        var counter: Int = 1
+    }
+}

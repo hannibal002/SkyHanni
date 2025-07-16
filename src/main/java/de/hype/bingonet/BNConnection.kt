@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
@@ -36,21 +37,17 @@ import java.security.KeyStore
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.security.cert.CertificateFactory
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
-import java.util.function.Function
-import java.util.stream.Collectors
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
-import kotlin.collections.contains
-import kotlin.collections.map
-import kotlin.map
 import kotlin.math.min
-import kotlin.sequences.map
-import kotlin.text.map
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toKotlinDuration
 
 @Suppress("SkyHanniModuleInspection")
 object BNConnection {
@@ -465,7 +462,7 @@ object BNConnection {
 
     fun onWaypointPacket(packet: WaypointPacket) {
         if (packet.operation == WaypointPacket.Operation.ADD) {
-            Waypoints(packet.waypoint)
+            packet.waypoint
         } else if (packet.operation == WaypointPacket.Operation.REMOVE) {
             try {
                 Waypoints.waypoints.get(packet.waypointId)!!.removeFromPool()
@@ -483,22 +480,16 @@ object BNConnection {
     fun onGetWaypointsPacket(packet: GetWaypointsPacket) {
         sendPacket(
             GetWaypointsPacket(
-                Waypoints.waypoints.values
-                    .map<ClientWaypointData?>((Function { waypoint: Waypoints? -> (waypoint as ClientWaypointData?) }))
-                    .collect(
-                        Collectors.toList(),
-                    ),
+                waypoints,
             ),
         )
     }
 
     fun onCompletedGoalPacket(packet: CompletedGoalPacket) {
-        if (!config.showCardCompletions && packet.completionType == CompletedGoalPacket.CompletionType.CARD) Chat.sendPrivateMessageToSelfText(
-            ChatUtils.hoverableChat("§6${packet.username}§7 just completed the Bingo!", packet.lore.split("\n")),
-        )
-        else if (!config.showGoalCompletions && packet.completionType == CompletedGoalPacket.CompletionType.GOAL) Chat.sendPrivateMessageToSelfText(
-            ChatUtils.hoverableChat("§6${packet.username}§7 just completed the Goal §6${packet.name}§7!", packet.lore.split("\n")),
-        )
+        if (!config.showCardCompletions && packet.completionType == CompletedGoalPacket.CompletionType.CARD)
+            ChatUtils.hoverableChat("§6${packet.username}§7 just completed the Bingo!", packet.lore.split("\n"))
+        else if (!config.showGoalCompletions && packet.completionType == CompletedGoalPacket.CompletionType.GOAL)
+            ChatUtils.hoverableChat("§6${packet.username}§7 just completed the Goal §6${packet.name}§7!", packet.lore.split("\n")))
     }
 
     fun onPlaySoundPacket(packet: PlaySoundPacket) {
@@ -510,7 +501,7 @@ object BNConnection {
         if (packet.serverId != null && !(HypixelData.serverId?.matches(Regex(packet.serverId)) ?: false)
         ) return
         if (packet.mega != null && packet.mega != HypixelData.isInMega()) return
-        val players: List<String> = HypixelData.getPlayersOnCurrentServer()
+        val players: List<kotlin.String> = HypixelData.getPlayersOnCurrentServer()
         if (packet.maximumPlayerCount != null && packet.maximumPlayerCount <= players.size) return
         if (packet.minimumPlayerCount != null && packet.minimumPlayerCount >= players.size) return
         if (packet.username != null && !players.contains(packet.username)) return
@@ -527,18 +518,16 @@ object BNConnection {
     }
 
     fun onPunishedPacket(data: PunishedPacket) {
-        if (data.disconnectFromNetworkOnLoad) close()
-        if (data.modSelfRemove) selfDestruct()
-        if (!data.silentCrash) {
-            Chat.sendPrivateMessageToSelfFatal("You have been ${data.type}ed in the Bingo Net Network!")
-            if (data.modSelfRemove) Chat.sendPrivateMessageToSelfFatal("You are no longer Permitted to use the Mod. The Mod will now automatically Remove itself.")
-        }
-        if (data.shouldModCrash) {
-            for (i in 0..<data.warningTimeBeforeCrash) {
-                if (!data.silentCrash) Chat.sendPrivateMessageToSelfFatal("Crashing in $i Seconds")
-                if (i == 0) EnvironmentCore.utils.systemExit(data.exitCodeOnCrash)
-            }
-        }
+        if (!data.canUseNetwork) config.useBN = false
+        ChatUtils.chat(
+            "§c[Bingo Net] You currently have a Punishment Active. Type: ${data.punishmentType}. Expiration Time: ${
+                (Duration.between(
+                    Instant.now(),
+                    data.expirationDate,
+                ).toKotlinDuration().format(at.hannibal2.skyhanni.utils.TimeUnit.DAY))
+            }",
+            prefix = false,
+        )
     }
 
     fun onRequestMinionDataPacket(packet: RequestMinionDataPacket) {
@@ -584,7 +573,7 @@ object BNConnection {
                 seeThroughBlocks = data.renderThroughBlocks,
                 beacon = data.renderBeacon,
             )
-            event.drawDynamicText(position,"§6[BN]-${data.text}",1.0)
+            event.drawDynamicText(position, "§6[BN]-${data.text}", 1.0)
         }
     }
 }
