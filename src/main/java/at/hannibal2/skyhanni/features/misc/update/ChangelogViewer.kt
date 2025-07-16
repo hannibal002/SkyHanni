@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
@@ -69,7 +69,7 @@ object ChangelogViewer {
         var pageNumber = 1
         while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
             val pagedUrl = "$url$pageNumber"
-            val jsonObject = ApiUtils.getJSONResponse(pagedUrl, apiName = "github")
+            val (_, jsonObject) = ApiUtils.getJsonResponse(pagedUrl, apiName = "github").assertSuccessWithData()
                 ?: ErrorManager.skyHanniError("Changelog Loading Failed")
             val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
             data.addAll(page)
