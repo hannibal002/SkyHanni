@@ -18,7 +18,7 @@ class WinterConfig {
     @Expose
     @ConfigOption(name = "Frozen Treasure Highlighter", desc = "")
     @Accordion
-    val frozenTreasureHighlighter: FrozenTreasureHighlighter = FrozenTreasureHighlighter()
+    val frozenTreasureHighlighter: FrozenTreasureHighlighterConfig = FrozenTreasureHighlighterConfig()
 
     @Accordion
     @Expose

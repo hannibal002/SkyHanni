@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class FrozenTreasureHighlighter {
+class FrozenTreasureHighlighterConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Highlights Frozen Treasures in the Glacial Cave on the Jerry Island.")
