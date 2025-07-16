@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -128,6 +129,16 @@ object ItemPickupLog {
 
             updateItem(itemStack.hash(), item, it.delta < 0)
         }
+    }
+
+    @HandleEvent
+    fun onShardGain(event: ShardGainEvent) {
+        if (!isEnabled() || !config.shards) return
+
+        val itemStack = event.shardInternalName.getItemStack()
+        val item = PickupEntry(itemStack.dynamicName(), event.amount.absoluteValue.toLong(), event.shardInternalName)
+
+        updateItem(itemStack.hash(), item, event.amount < 0)
     }
 
     @HandleEvent

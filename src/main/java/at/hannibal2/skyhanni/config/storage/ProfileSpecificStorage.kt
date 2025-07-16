@@ -918,6 +918,7 @@ class ProfileSpecificStorage(
 
     data class AttributeShardData(
         @Expose var amountSyphoned: Int = 0,
+        @Expose var amountInBox: Int = 0,
     )
 
     @Expose
