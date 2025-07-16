@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
-class GlowingMushroomHighlighter {
+class GlowingMushroomHighlighterConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Highlights Glowing Mushrooms in the glowing mushroom cave.")

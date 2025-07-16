@@ -76,5 +76,4 @@ object GlowingMushroomHighlighter {
             event.drawFilledBoundingBox(aabb, config.mushroomColor.getEffectiveColour(), renderRelativeToCamera = false)
         }
     }
-
 }

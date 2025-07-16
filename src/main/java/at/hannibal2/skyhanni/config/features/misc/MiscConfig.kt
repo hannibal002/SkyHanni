@@ -157,7 +157,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Glowing Mushroom Highlighter", desc = "")
     @Accordion
-    val glowingMushroomHighlighter: GlowingMushroomHighlighter = GlowingMushroomHighlighter()
+    val glowingMushroomHighlighter: GlowingMushroomHighlighterConfig = GlowingMushroomHighlighterConfig()
 
     @Expose
     @ConfigOption(name = "Colorful Item Tooltips", desc = "")
