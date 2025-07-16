@@ -13,16 +13,16 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -65,7 +65,7 @@ object GeorgeHelper {
     private fun constructDisplay(lore: List<String>) {
         var totalCost = 0.0
         display = buildList {
-            add(StringRenderable("§dTaming 60 Helper"))
+            addString("§dTaming 60 Helper")
             lore.forEach { line ->
                 neededPetPattern.matchMatcher(line) {
                     val petInfo = findCheapestPet(group("tier"), group("pet"), group("tierColorCodes"))
@@ -73,7 +73,7 @@ object GeorgeHelper {
                     add(petInfo.renderableInfo)
                 }
             }
-            add(StringRenderable("§7Total Cost: §6${totalCost.addSeparators()} coins"))
+            addString("§7Total Cost: §6${totalCost.addSeparators()} coins")
         }
     }
 
@@ -84,7 +84,7 @@ object GeorgeHelper {
         val (cheapestTier, cheapestPrice) = findCheapestTier(colorlessPetName, tierNumber)
 
         val stackRenderableInternalName = petInternalName(colorlessPetName, tierNumber).toInternalName()
-        val stack = ItemStackRenderable(stackRenderableInternalName.getItemStack())
+        val stack = Renderable.item(stackRenderableInternalName)
 
         val rarityColorCode = LorenzRarity.getById(cheapestTier)?.chatColorCode ?: tierColorCodes
         val formattedPet = "${rarityColorCode}${LorenzRarity.getById(cheapestTier)?.formattedName} $petName"
@@ -119,7 +119,7 @@ object GeorgeHelper {
             )
         }
 
-        return PetInfo(cheapestPrice, HorizontalContainerRenderable(listOf(stack, clickableRenderable)))
+        return PetInfo(cheapestPrice, Renderable.horizontal(stack, clickableRenderable))
     }
 
     private fun findCheapestTier(pet: String, originalTier: Int) = buildList {

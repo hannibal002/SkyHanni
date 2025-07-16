@@ -36,10 +36,10 @@ import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -102,7 +102,7 @@ object SkillProgress {
     private fun renderDisplay() {
         when (val textAlignment = config.textAlignmentProperty.get()) {
             SkillProgressConfig.TextAlignment.NONE -> {
-                val content = HorizontalContainerRenderable(display)
+                val content = Renderable.horizontal(display)
                 config.displayPosition.renderRenderable(content, posLabel = "Skill Progress")
             }
 
@@ -111,7 +111,7 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
                 val horizontalAlignment = textAlignment.alignment ?: RenderUtils.HorizontalAlignment.LEFT
-                val content = HorizontalContainerRenderable(display, horizontalAlign = horizontalAlignment)
+                val content = Renderable.horizontal(display, horizontalAlign = horizontalAlignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
                 config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
@@ -358,37 +358,33 @@ object SkillProgress {
             }
         }
 
-        add(StringRenderable("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel"))
+        addString("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel")
 
         if (useCustomGoalLevel)
-            add(StringRenderable("§7Needed XP: §e${remaining.addSeparators()}"))
+            addString("§7Needed XP: §e${remaining.addSeparators()}")
 
         var xpInterp = xpInfo.xpGainHour
 
         if (have > need) {
-            add(StringRenderable("§7In §cIncrease level cap!"))
+            addString("§7In §cIncrease level cap!")
         } else if (xpInfo.xpGainHour < 1000) {
-            add(StringRenderable("§7In §cN/A"))
+            addString("§7In §cN/A")
         } else {
             val duration = ((remaining) * 1000 * 60 * 60 / xpInterp.toLong()).milliseconds
             val format = duration.format(TimeUnit.DAY)
-            add(
-                StringRenderable(
-                    "§7In §b$format " +
-                        if (xpInfo.isActive) "" else "§c(PAUSED)",
-                ),
+            addString(
+                "§7In §b$format " +
+                    if (xpInfo.isActive) "" else "§c(PAUSED)",
             )
         }
 
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
-            add(StringRenderable("§7XP/h: §cN/A"))
+            addString("§7XP/h: §cN/A")
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
-            add(
-                StringRenderable(
-                    "§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
-                        if (xpInfo.isActive) "" else "§c(PAUSED)",
-                ),
+            addString(
+                "§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
+                    if (xpInfo.isActive) "" else "§c(PAUSED)",
             )
         }
 
@@ -438,47 +434,45 @@ object SkillProgress {
                 SkillLevel(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
 
         if (config.showLevel.get())
-            add(StringRenderable("§9[§d$level§9] "))
+            addString("§9[§d$level§9] ")
 
         if (config.useIcon.get()) {
-            add(ItemStackRenderable(activeSkill.item, 1.0))
+            addItemStack(activeSkill.item, scale = 1.0)
         }
 
-        add(
-            StringRenderable(
-                buildString {
-                    append("§b+${skill.lastGain} ")
+        addString(
+            buildString {
+                append("§b+${skill.lastGain} ")
 
-                    if (config.useSkillName.get())
-                        append("${activeSkill.displayName} ")
+                if (config.useSkillName.get())
+                    append("${activeSkill.displayName} ")
 
-                    val (barCurrent, barMax) =
-                        if (useCustomGoalLevel && customGoalConfig.enableInProgressBar)
-                            Pair(currentXP, currentXPMax)
-                        else if (config.overflowConfig.enableInProgressBar.get())
-                            Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
-                        else
-                            Pair(skill.currentXp, skill.currentXpMax)
+                val (barCurrent, barMax) =
+                    if (useCustomGoalLevel && customGoalConfig.enableInProgressBar)
+                        Pair(currentXP, currentXPMax)
+                    else if (config.overflowConfig.enableInProgressBar.get())
+                        Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
+                    else
+                        Pair(skill.currentXp, skill.currentXpMax)
 
-                    val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
-                    skillExpPercentage = (barPercent.toDouble() / 100)
+                val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
+                skillExpPercentage = (barPercent.toDouble() / 100)
 
-                    val percent = if (currentXPMax == 0L) 100F else 100F * currentXP / currentXPMax
+                val percent = if (currentXPMax == 0L) 100F else 100F * currentXP / currentXPMax
 
-                    if (config.usePercentage.get())
-                        append("§7(§6${percent.roundTo(2)}%§7)")
-                    else {
-                        if (currentXPMax == 0L)
-                            append("§7(§6${currentXP.addSeparators()}§7)")
-                        else
-                            append("§7(§6${currentXP.addSeparators()}§7/§6${currentXPMax.addSeparators()}§7)")
-                    }
+                if (config.usePercentage.get())
+                    append("§7(§6${percent.roundTo(2)}%§7)")
+                else {
+                    if (currentXPMax == 0L)
+                        append("§7(§6${currentXP.addSeparators()}§7)")
+                    else
+                        append("§7(§6${currentXP.addSeparators()}§7/§6${currentXPMax.addSeparators()}§7)")
+                }
 
-                    if (config.showActionLeft.get() && percent != 100f) {
-                        append(" - " + addActionsLeft(skill, currentXPMax, currentXP))
-                    }
-                },
-            ),
+                if (config.showActionLeft.get() && percent != 100f) {
+                    append(" - " + addActionsLeft(skill, currentXPMax, currentXP))
+                }
+            },
         )
     }
 

@@ -16,14 +16,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
 @SkyHanniModule
@@ -121,24 +121,24 @@ object AttributeShardOverlay {
         }
 
         display = buildList {
-            add(StringRenderable("§eAttribute Shard Overlay"))
-            add(StringRenderable("§7Found Shards: §a$unlockedShards/${AttributeShardsData.maxShards}"))
-            add(StringRenderable("§7Maxed Shards: §a$maxedShards/${AttributeShardsData.maxShards}"))
-            add(StringRenderable("§7Total Shard Levels: §a$totalShardLevels/${AttributeShardsData.maxShards * 10}"))
+            addString("§eAttribute Shard Overlay")
+            addString("§7Found Shards: §a$unlockedShards/${AttributeShardsData.maxShards}")
+            addString("§7Maxed Shards: §a$maxedShards/${AttributeShardsData.maxShards}")
+            addString("§7Total Shard Levels: §a$totalShardLevels/${AttributeShardsData.maxShards * 10}")
             if (shardsWithData != AttributeShardsData.maxShards) {
                 val missingAmount = AttributeShardsData.maxShards - shardsWithData
                 val plural = StringUtils.pluralize(missingAmount, "shard")
-                add(StringRenderable("§cMissing shard data for $missingAmount $plural"))
-                add(StringRenderable("§cPlease open /am and turn on advanced mode."))
+                addString("§cMissing shard data for $missingAmount $plural")
+                addString("§cPlease open /am and turn on advanced mode.")
             }
             if (filtered.isEmpty()) {
-                add(StringRenderable("§cNo Shards Found"))
-                add(StringRenderable("§cTry changing your settings below."))
+                addString("§cNo Shards Found")
+                addString("§cTry changing your settings below.")
             } else {
                 add(filtered.map { it.renderLine }.buildSearchableScrollable(height = 225, textInput, velocity = 25.0))
             }
             if (priceToMax > 0) {
-                add(StringRenderable("§7Total Price to Max All Shards: §6${priceToMax.shortFormat()}"))
+                addString("§7Total Price to Max All Shards: §6${priceToMax.shortFormat()}")
             }
             addButtons()
         }
@@ -256,7 +256,7 @@ object AttributeShardOverlay {
             add("§eClick to open on bazaar!")
         }
 
-        val stack = ItemStackRenderable(internalName.getItemStack())
+        val stack = Renderable.item(internalName.getItemStack())
 
         val clickable = Renderable.clickable(
             " §7- $shardItemName §e$currentTier $priceString",
@@ -265,9 +265,7 @@ object AttributeShardOverlay {
                 BazaarApi.searchForBazaarItem(shardItemName, bazaarAmount)
             },
         )
-        val searchable = HorizontalContainerRenderable(
-            listOf(stack, clickable),
-        ).toSearchable(shardItemName)
+        val searchable = Renderable.horizontal(stack, clickable).toSearchable(shardItemName)
 
         return AttributeShardDisplayLine(
             shardItemName.removeColor(), currentTier, priceUntilNextTier, priceUntilMaxed, searchable,

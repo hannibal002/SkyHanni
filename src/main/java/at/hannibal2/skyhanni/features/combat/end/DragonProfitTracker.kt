@@ -22,8 +22,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -89,13 +87,13 @@ object DragonProfitTracker {
         val totalEyePrice = eyePrice * bucketData.eyesPlaced
         profit -= totalEyePrice
         val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §c${(-totalEyePrice).shortFormat()}"
-        add(StringRenderable(eyeFormat).toSearchable("Summoning Eye"))
+        addSearchString(eyeFormat, "Summoning Eye")
 
         val colorCode = bucketData.selectedBucket?.color ?: LorenzColor.AQUA
         val displayName = bucketData.selectedBucket?.displayName ?: "Total Dragon"
         val killAmount = bucketData.getTotalDragonCount()
         val dragonString = "${colorCode.getChatColor()}$displayName §r§bkills: $killAmount"
-        add(StringRenderable(dragonString).toSearchable())
+        addSearchString(dragonString)
 
         add(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon"))
 

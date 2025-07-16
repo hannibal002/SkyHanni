@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
@@ -48,12 +48,12 @@ object HuntingBoxValue {
 
         val newList = mutableListOf<Renderable>()
 
-        newList.add(StringRenderable("§eHunting Box Value"))
+        newList.addString("§eHunting Box Value")
         newList.add(RenderableUtils.fillScrollTable(table, padding = 5, itemScale = 0.7, height = 225, velocity = 5.0))
 
-        newList.add(StringRenderable("§7Total Attribute Shards: §a$totalShards"))
-        newList.add(StringRenderable("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}"))
-        newList.add(StringRenderable("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}"))
+        newList.addString("§7Total Attribute Shards: §a$totalShards")
+        newList.addString("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}")
+        newList.addString("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}")
         display = newList
     }
 

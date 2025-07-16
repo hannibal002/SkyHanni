@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -332,7 +332,7 @@ object GiftProfitTracker {
             val specificGiftFormat = if (applicableGifts.count() == 1) applicableGifts.keys.first().displayName else "§eGifts"
             val giftFormat = "§7${it.addSeparators()}x $specificGiftFormat§7: §c-${totalGiftCost.shortFormat()}"
             add(
-                if (applicableGifts.count() == 1) StringRenderable(giftFormat).toSearchable(specificGiftFormat)
+                if (applicableGifts.count() == 1) Renderable.text(giftFormat).toSearchable(specificGiftFormat)
                 else Renderable.hoverTips(
                     giftFormat,
                     giftCostStrings,
