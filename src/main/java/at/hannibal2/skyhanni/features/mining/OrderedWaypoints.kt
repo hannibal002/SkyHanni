@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -380,7 +379,7 @@ object OrderedWaypoints {
     private fun save(name: String) {
         ProfileStorageData.orderedWaypointsRoutes?.routes?.set(name, orderedWaypointsList.deepCopy())
         saveConfig()
-        ChatUtils.chat("Route saved as $name. Do /shorderedload $name to import it.")
+        ChatUtils.chat("Route saved as $name. Do /sho load $name to import it.")
     }
 
     private fun erase(name: String) {

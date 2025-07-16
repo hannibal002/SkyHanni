@@ -105,8 +105,8 @@ class OrderedWaypointsConfig {
     @ConfigOption(
         name = "Sneaking During Route",
         desc = "" +
-            "Whether you'll be sneaking when moving between waypoints (e.g., using AOTV)."
-            + "This is used for drawing the line of sight line for setup mode."
+            "Whether you'll be sneaking when moving between waypoints (e.g., using AOTV)." +
+            "This is used for drawing the line of sight line for setup mode."
     )
     @ConfigEditorBoolean
     var sneakingDuringRoute: Boolean = true
