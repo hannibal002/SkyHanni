@@ -14,7 +14,6 @@ import net.minecraft.network.packet.s2c.play.DamageTiltS2CPacket
 object EntityEvents {
 
     @HandleEvent
-
     fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? DamageTiltS2CPacket ?: return
 
