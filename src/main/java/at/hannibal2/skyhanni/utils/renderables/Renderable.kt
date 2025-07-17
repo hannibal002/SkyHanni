@@ -1176,7 +1176,7 @@ interface Renderable {
             }
         }
 
-        private fun searchableScrollTable(
+        fun searchableScrollTable(
             content: Map<List<Renderable>, String?>,
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
