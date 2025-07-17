@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import org.lwjgl.input.Keyboard
@@ -122,7 +121,7 @@ object GriffinBurrowHelper {
 
     private fun loadTestGriffinSpots() {
         if (!testGriffinSpots) return
-        val center = LocationUtils.playerLocation().toBlockPos().toLorenzVec()
+        val center = LocationUtils.playerLocation().roundToBlock()
         val list = mutableListOf<LorenzVec>()
         for (x in -5 until 5) {
             for (z in -5 until 5) {

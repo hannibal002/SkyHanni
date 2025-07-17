@@ -59,8 +59,9 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -158,7 +159,7 @@ object ComposterOverlay {
         if (!config.overlay) return
         val composterUpgrades = ComposterApi.composterUpgrades ?: return
         if (composterUpgrades.isEmpty()) {
-            StringRenderable("§cOpen Composter Upgrades!").let {
+            Renderable.text("§cOpen Composter Upgrades!").let {
                 organicMatterDisplay = it
                 fuelExtraDisplay = it
             }
@@ -196,12 +197,12 @@ object ComposterOverlay {
 
     private fun preview(upgrade: ComposterUpgrade?): Renderable =
         if (upgrade == null) {
-            StringRenderable("§7Preview: Nothing")
+            Renderable.text("§7Preview: Nothing")
         } else {
             val level = upgrade.getLevel(null)
             val nextLevel = if (maxLevel) "§6§lMAX" else "§c➜ §a" + (level + 1)
             val displayName = upgrade.displayName
-            StringRenderable("§7Preview §a$displayName§7: §a$level $nextLevel")
+            Renderable.text("§7Preview §a$displayName§7: §a$level $nextLevel")
         }
 
     private fun drawUpgradeStats(): Renderable {

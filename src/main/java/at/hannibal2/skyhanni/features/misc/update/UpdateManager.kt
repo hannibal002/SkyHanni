@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -163,7 +163,7 @@ object UpdateManager {
         context.cleanup()
         UpdateUtils.patchConnection {
             if (it is HttpsURLConnection) {
-                ApiUtils.patchHttpsRequest(it)
+                ApiInternalUtils.patchHttpsRequest(it)
             }
         }
     }

@@ -51,6 +51,14 @@ class PestsConfig {
     val pesthunterShop: PesthunterShopConfig = PesthunterShopConfig()
 
     @Expose
+    @ConfigOption(
+        name = "Mute Vacuum",
+        desc = "Mute the pest vacuum when using its right click ability.",
+    )
+    @ConfigEditorBoolean
+    var muteVacuum: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Bonus Chance Display", desc = "Displays your bonus pest chance and if it is enabled or not.")
     @ConfigEditorBoolean
     @FeatureToggle

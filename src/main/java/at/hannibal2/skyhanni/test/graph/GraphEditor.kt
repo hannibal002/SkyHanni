@@ -560,7 +560,7 @@ object GraphEditor {
         if (selectedEdge != null) {
             if (config.splitKey.isKeyClicked()) {
                 feedBackInTutorial("Split Edge into a Node and two edges.")
-                val middle = selectedEdge.node1.position.middle(selectedEdge.node2.position).roundLocationToBlock()
+                val middle = selectedEdge.node1.position.middle(selectedEdge.node2.position).roundToBlock()
                 val node = GraphingNode(id++, middle)
                 nodes.add(node)
                 edges.remove(selectedEdge)
@@ -686,7 +686,7 @@ object GraphEditor {
             }
         }
 
-        val position = ghostPosition ?: LocationUtils.playerEyeLocation().roundLocationToBlock()
+        val position = ghostPosition ?: LocationUtils.playerEyeLocation().roundToBlock()
         if (nodes.any { it.position == position }) {
             feedBackInTutorial("Can't create node, here is already another one.")
             return
@@ -703,7 +703,7 @@ object GraphEditor {
             ghostPosition = null
             feedBackInTutorial("Disabled Ghost Position.")
         } else {
-            ghostPosition = LocationUtils.playerEyeLocation().roundLocationToBlock()
+            ghostPosition = LocationUtils.playerEyeLocation().roundToBlock()
             feedBackInTutorial("Enabled Ghost Position.")
         }
     }

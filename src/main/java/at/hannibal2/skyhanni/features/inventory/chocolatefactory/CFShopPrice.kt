@@ -29,9 +29,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -165,12 +165,12 @@ object CFShopPrice {
         }
 
         display = buildList {
-            add(StringRenderable("§e§lCoins per million chocolate§f:"))
+            addString("§e§lCoins per million chocolate§f:")
             // TODO update this value every second
             // TODO add time until can afford
-            add(StringRenderable("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
+            addString("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}")
             // TODO add chocolate spend needed for next milestone
-            add(StringRenderable("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
+            addString("§eChocolate spent: §6${chocolateSpent.addSeparators()}")
             add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale.toDouble()))
         }
     }

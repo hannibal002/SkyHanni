@@ -1,12 +1,15 @@
-package at.hannibal2.skyhanni.utils.renderables.item
+package at.hannibal2.skyhanni.utils.renderables.animated
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
+import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.Vec3
@@ -55,7 +58,7 @@ data class ItemStackRotationDefinition(
  */
 class ItemStackAnimationFrame(
     private val stackProvider: () -> ItemStack,
-    val ticks: Int = 0
+    val ticks: Int = 0,
 ) {
     constructor(itemStack: ItemStack, ticks: Int = 0) : this({ itemStack }, ticks)
     constructor(provider: NeuItemStackProvider, ticks: Int = 0) : this(provider::stack, ticks)
@@ -63,7 +66,7 @@ class ItemStackAnimationFrame(
     val stack: ItemStack get() = stackProvider()
 }
 
-class AnimatedItemStackRenderable(
+class AnimatedItemStackRenderable private constructor(
     frames: Collection<ItemStackAnimationFrame>,
     private val rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
     private val bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
@@ -74,19 +77,23 @@ class AnimatedItemStackRenderable(
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) : ItemStackRenderable(
-    frames.firstOrNull()?.stack ?: ErrorManager.skyHanniError(
-        "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
-    ),
+    {
+        frames.firstOrNull()?.stack ?: ErrorManager.skyHanniError(
+            "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
+        )
+    },
     scale,
     xSpacing,
     ySpacing,
     rescaleSkulls,
     horizontalAlign,
     verticalAlign,
-) {
+),
+    TimeDependentRenderable {
     private var frameIndex = 0
     private var ticksInFrame = 0.0
     private val frameDefs = frames.toList()
+    override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
 
     private val startTime = SimpleTimeMark.now()
     private val baseItemHeight = (15.5 * scale + 0.5).toInt() + ySpacing
@@ -145,5 +152,21 @@ class AnimatedItemStackRenderable(
             rescaleSkulls = rescaleSkulls,
             rotationDegrees = currentRotation,
         )
+    }
+
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = super<TimeDependentRenderable>.render(mouseOffsetX, mouseOffsetY)
+
+    companion object {
+        fun Renderable.Companion.animatedItemStack(
+            frames: Collection<ItemStackAnimationFrame>,
+            rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
+            bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
+            scale: Double = NeuItems.ITEM_FONT_SIZE,
+            xSpacing: Int = 2,
+            ySpacing: Int = 1,
+            rescaleSkulls: Boolean = true,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+        ) = AnimatedItemStackRenderable(frames, rotation, bounce, scale, xSpacing, ySpacing, rescaleSkulls, horizontalAlign, verticalAlign)
     }
 }

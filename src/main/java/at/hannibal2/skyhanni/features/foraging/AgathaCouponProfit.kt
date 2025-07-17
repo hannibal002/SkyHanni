@@ -21,9 +21,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -66,7 +66,7 @@ object AgathaCouponProfit {
         }
 
         display = buildList {
-            add(StringRenderable("§eProfit per Agatha Coupon"))
+            addString("§eProfit per Agatha Coupon")
             add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         }
     }

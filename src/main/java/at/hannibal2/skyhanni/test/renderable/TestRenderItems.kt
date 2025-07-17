@@ -2,18 +2,18 @@ package at.hannibal2.skyhanni.test.renderable
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackBounceDefinition
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
-import at.hannibal2.skyhanni.utils.renderables.item.NeuItemStackProvider
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
+import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
+import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackBounceDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -26,7 +26,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
     private val animationFrames = listOf(ItemStackAnimationFrame(boxOfSeedsProvider, ticks = 0))
 
     private val animatedItemStackRenderable by lazy {
-        AnimatedItemStackRenderable(
+        Renderable.animatedItemStack(
             animationFrames,
             rotation = ItemStackRotationDefinition(
                 axis = EnumFacing.Axis.Y,
@@ -46,34 +46,30 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
 
         val scaleList = generateSequence(scale) { it + 0.1 }.take(25).toList()
 
-        val labels = scaleList.map { StringRenderable(it.roundTo(1).toString()) }
+        val labels = scaleList.map { Renderable.text(it.roundTo(1).toString()) }
 
         val items = listOf(
             ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
             ItemStack(Blocks.melon_block),
         ).map { item ->
-            scaleList.map { ItemStackRenderable(item, it, 0).renderBounds() }
+            scaleList.map { Renderable.item(item, it, 0).renderBounds() }
         }
 
-        val table = listOf(labels) + items
+        val tableContent = listOf(labels) + items
 
-        return HorizontalContainerRenderable(
-            listOf(
-                VerticalContainerRenderable(
-                    listOf(
-                        Renderable.table(table),
-                        HorizontalContainerRenderable(
-                            listOf(
-                                StringRenderable("Default:").renderBounds(),
-                                ItemStackRenderable(ItemStack(Items.diamond_sword)).renderBounds(),
-                            ),
-                            spacing = 1,
-                        ),
+        return with(Renderable) {
+            horizontal(
+                vertical(
+                    table(tableContent),
+                    horizontal(
+                        text("Default:").renderBounds(),
+                        item(ItemStack(Items.diamond_sword)).renderBounds(),
+                        spacing = 1,
                     ),
                 ),
                 animatedItemStackRenderable,
-            ),
-            4
-        )
+                spacing = 4,
+            )
+        }
     }
 }

@@ -100,7 +100,7 @@ object PetStorageApi {
     @Suppress("MaxLineLength")
     private val petTabWidgetXpPattern by patternGroup.pattern(
         "tab.xp",
-        " (?:§.)+(?:(?<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:§.|\\/)*(?<next>[\\d,.kM]*) XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)",
+        " (?:§.)+(?:(?<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:(?:§.|\\/)*(?<next>[\\d,.kM]+))? XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)",
     )
 
     /**
