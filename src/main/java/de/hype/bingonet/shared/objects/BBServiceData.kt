@@ -3,7 +3,7 @@ package de.hype.bingonet.shared.objects
 import de.hype.bingonet.server.objects.BBUser
 import de.hype.bingonet.shared.constants.StatusConstants
 import de.hype.bingonet.shared.constants.TradeType
-import kotlinx.datetime.Clock
+import java.time.Instant
 
 data class BBServiceData(
     val serviceId: Int,
@@ -26,7 +26,7 @@ data class BBServiceData(
         @JvmField val user: BBUser,
         @JvmField val price: Int,
         @JvmField val priority: Boolean = false,
-        @JvmField val joinTime: kotlinx.datetime.Instant = Clock.System.now(),
+        @JvmField val joinTime: Instant = Instant.now(),
         @JvmField val autoRequeue: Boolean = false
     ) {
         override fun equals(other: Any?): Boolean {

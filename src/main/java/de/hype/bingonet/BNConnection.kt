@@ -139,7 +139,7 @@ object BNConnection {
             },
         ).apply {
             isDaemon = true
-            name="BingoNet-Receiver"
+            name = "BingoNet-Receiver"
             start()
         }
 
@@ -158,7 +158,7 @@ object BNConnection {
             },
         ).apply {
             isDaemon = true
-            name="BingoNet-Sender"
+            name = "BingoNet-Sender"
             start()
         }
     }
@@ -173,15 +173,19 @@ object BNConnection {
             }
             if (handleIntercept(packet.second)) {
                 if (SkyHanniMod.feature.event.bingo.bingoNet.showPacketTraffic && roles.contains(BNRole.DEBUG)) {
-                    val json = message.split(Regex("\\."),2)[1]
-                    ChatUtils.clickableChat("§b[BN-REC]: $json",{
-                        OSUtils.copyToClipboard(json)
-                    }, prefix = false)
+                    val json = message.split(Regex("\\."), 2)[1]
+                    ChatUtils.clickableChat(
+                        "§b[BN-REC]: $json",
+                        {
+                            OSUtils.copyToClipboard(json)
+                        },
+                        prefix = false,
+                    )
                 }
-                val consumer : Consumer<AbstractPacket> = packet.first.consumer as Consumer<AbstractPacket>
+                val consumer: Consumer<AbstractPacket> = packet.first.consumer as Consumer<AbstractPacket>
                 consumer.accept(packet.second)
             }
-        }catch (e: Throwable){
+        } catch (e: Throwable) {
             //This should prevent any Issues from Bingo Net from causing an actual Issue. The Set Filter should prevent Error Spam.
             val key = "${e::class.java.name}:${e.message}"
             if (reportedErrors.add(key)) {
@@ -197,7 +201,7 @@ object BNConnection {
                         if (current != null) appendLine("Caused by:")
                     }
                 }
-                ChatUtils.clickToClipboard("§cBN: Error processing message: ${e.localizedMessage}",errorReport.split("\n"))
+                ChatUtils.clickToClipboard("§cBN: Error processing message: ${e.localizedMessage}", errorReport.split("\n"))
                 e.printStackTrace()
             }
         }
@@ -349,7 +353,7 @@ object BNConnection {
     }
 
     fun onDisconnectPacket(packet: DisconnectPacket) {
-        for (i in packet.waitBeforeReconnect!!.indices) {
+        for (i in packet.waitBeforeReconnect.indices) {
             val finalI = i
             DelayedRun.runDelayed(
                 (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)).seconds,
@@ -472,7 +476,7 @@ object BNConnection {
     }
 
     fun onRequestAuthentication(packet: RequestAuthentication) {
-        if (socket!!.getPort() == 5011) {
+        if (socket?.getPort() == 5011) {
             ChatUtils.chat("§aBN: Logging into Bingo Net (§6Beta§a)")
             ChatUtils.chat("§6You may test here but do NOT Spam unless you have very good reasons. Spamming may still be punished")
         } else {
@@ -521,7 +525,8 @@ object BNConnection {
     val isConnected: Boolean
         get() {
             try {
-                return socket!!.isConnected() && !socket!!.isClosed()
+                val socket = this.socket ?: return false
+                return socket.isConnected && !socket.isClosed
             } catch (e: Exception) {
                 return false
             }
@@ -529,30 +534,11 @@ object BNConnection {
 
     fun close() {
         try {
-            if (messageReceiverThread != null) {
-                messageReceiverThread!!.interrupt()
-            }
-            if (messageSenderThread != null) {
-                messageSenderThread!!.interrupt()
-            }
-            if (BingoNet.bbthread != null) {
-                BingoNet.bbthread.interrupt()
-            }
+            messageReceiverThread?.interrupt()
+            messageSenderThread?.interrupt()
             writer?.close()
             reader?.close()
             messageQueue?.clear()
-            if (BingoNet.bbthread != null) {
-                BingoNet.bbthread.interrupt()
-                BingoNet.bbthread = null
-            }
-            if (messageSenderThread != null) {
-                messageSenderThread!!.interrupt()
-                messageSenderThread = null
-            }
-            if (messageReceiverThread != null) {
-                messageReceiverThread!!.interrupt()
-                messageReceiverThread = null
-            }
             writer = null
             reader = null
             socket = null
@@ -627,19 +613,6 @@ object BNConnection {
 
     fun onRequestMinionDataPacket(packet: RequestMinionDataPacket) {
         sendPacket(packet.preparePacketToReplyToThis(EnvironmentCore.utils.getMiniondata()))
-    }
-
-    fun onCommandChatPromptPacket(packet: CommandChatPromptPacket) {
-        val prompt = ChatPrompt(
-            Runnable {
-                for (command in packet.getCommands()) {
-                    BingoNet.sender.addSendTask(command.command, command.delay)
-                }
-            },
-            10,
-        )
-        Chat.sendPrivateMessageToSelfText(packet.printMessage)
-        BingoNet.temporaryConfig.lastChatPromptAnswer = prompt
     }
 
     fun onPacketChatPromptPacket(packet: PacketChatPromptPacket) {

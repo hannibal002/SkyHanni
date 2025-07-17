@@ -3,10 +3,7 @@ package de.hype.bingonet.shared.packets.base
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
 import java.util.*
 
-open class ExpectReplyPacket<RespondPacket : ExpectReplyPacket.ReplyPacket> protected constructor(
-    version: Int,
-    minVersion: Int
-) : AbstractPacket(version, minVersion) {
+open class ExpectReplyPacket<RespondPacket : ExpectReplyPacket.ReplyPacket> protected constructor() : AbstractPacket() {
     var packetDate: Long = Date().time
 
     fun preparePacketToReplyToThis(packet: RespondPacket): RespondPacket {

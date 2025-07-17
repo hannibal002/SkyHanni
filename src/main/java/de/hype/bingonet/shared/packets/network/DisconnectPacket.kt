@@ -15,7 +15,7 @@ class DisconnectPacket
  * @param displayMessage      Message is shown on the client.
  */(
     val internalReason: InternalReasonConstants?,
-    val waitBeforeReconnect: IntArray?,
+    val waitBeforeReconnect: IntArray,
     val randomExtraDelay: Int,
     val displayReason: String?,
     val displayMessage: String?
