@@ -47,6 +47,7 @@ object TentacleWaypoint {
 
         // Fixes Wall Damage counting as tentacle damage
         if (event.source.damageType != "generic") return
+
         tentacleHits[entity]?.let { tentacleHits[entity] = it + 1 }
     }
 
