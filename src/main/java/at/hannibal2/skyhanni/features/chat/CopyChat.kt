@@ -91,7 +91,11 @@ object CopyChat {
         return null
         //#else
         //$$ val chatLineY = chatGui.toChatLineY(mouseY.toDouble())
+        //$$ val chatLineX = chatGui.toChatLineX(mouseX.toDouble())
         //$$ val lineIndex = (chatGui.scrolledLines + chatLineY).toInt()
+        //$$
+        //$$ if (chatLineX < -4.0 || chatLineX > MathHelper.floor(chatGui.width.toDouble() / chatGui.chatScale).toDouble()) return null
+        //$$
         //$$ if (lineIndex < 0) return null
         //$$ val visibleLines = chatGui.visibleMessages
         //$$ if (lineIndex > visibleLines.size) return null
