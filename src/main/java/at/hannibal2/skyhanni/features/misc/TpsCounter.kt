@@ -69,7 +69,7 @@ object TpsCounter {
     private fun updateDisplay() {
         val timeUntil = minimumSecondsDisplayDelay - timeSinceWorldSwitch
         val text = if (timeUntil.isPositive()) {
-            "§f${timeUntil.inWholeSeconds}s"
+            "§f(${timeUntil.inWholeSeconds}s)"
         } else {
             // when in limbo we don't receive any packets
             if (tpsList.isEmpty()) {
