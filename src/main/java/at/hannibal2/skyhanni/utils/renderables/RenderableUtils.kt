@@ -415,6 +415,7 @@ internal object RenderableUtils {
         velocity: Double = 2.0,
     ): Renderable {
         val outerList = constructOuterList(data, itemScale)
+        if (outerList.isEmpty()) return Renderable.table(emptyList(), xPadding = 5, yPadding = padding)
         return Renderable.scrollTable(outerList, height, xPadding = 5, yPadding = padding, velocity = velocity)
     }
 

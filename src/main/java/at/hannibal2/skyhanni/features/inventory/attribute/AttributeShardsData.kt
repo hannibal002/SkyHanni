@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -221,9 +222,8 @@ object AttributeShardsData {
             val attributeName = group("attributeName")
             val level = group("level").toInt()
             val untilNext = group("untilNext").toInt()
-            val shardName = attributeAbilityNameToShard[attributeName]
-                ?: ErrorManager.skyHanniError("Unknown attribute shard name for ability: $attributeName")
-            val shardInternalName = shardNameToInternalName(shardName)
+            val shardName = abilityNameToShardName(attributeName) ?: return
+            val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, level, untilNext)
 
             ShardGainEvent(shardInternalName, -group("amount").toInt()).post()
@@ -233,9 +233,8 @@ object AttributeShardsData {
         }
         shardSyphonedMaxedPattern.matchMatcher(event.message) {
             val attributeName = group("attributeName")
-            val shardName = attributeAbilityNameToShard[attributeName]
-                ?: ErrorManager.skyHanniError("Unknown attribute shard name for ability: $attributeName")
-            val shardInternalName = shardNameToInternalName(shardName)
+            val shardName = abilityNameToShardName(attributeName) ?: return
+            val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, 10, 0)
 
             ShardGainEvent(shardInternalName, -group("amount").toInt()).post()
@@ -260,7 +259,10 @@ object AttributeShardsData {
                 val amount = groupOrNull("amount")?.toInt() ?: 1
 
                 val shardInternalName = ItemResolutionQuery.attributeNameToInternalName(shardName)?.toInternalName()
-                    ?: ErrorManager.skyHanniError("Unknown attribute shard name: $shardName")
+                if (shardInternalName == null) {
+                    ItemUtils.addMissingRepoItem(shardName, "Could not find internal name for attribute shard: $shardName")
+                    return
+                }
 
                 ShardGainEvent(shardInternalName, amount).post()
                 return
@@ -388,9 +390,20 @@ object AttributeShardsData {
             ?: ErrorManager.skyHanniError("Unknown attribute shard internal name: $internalName")
     }
 
-    fun shardNameToInternalName(shardName: String): NeuInternalName {
-        return attributeInfo[shardName]?.internalName
-            ?: ErrorManager.skyHanniError("Unknown attribute shard name: $shardName")
+    private fun abilityNameToShardName(ability: String): String? {
+        val shardName = attributeAbilityNameToShard[ability]
+        if (shardName == null) {
+            ItemUtils.addMissingRepoItem(ability, "Could not find shard name for attribute ability: $ability")
+        }
+        return shardName
+    }
+
+    fun shardNameToInternalName(shardName: String): NeuInternalName? {
+        val internalName = attributeInfo[shardName]?.internalName
+        if (internalName == null) {
+            ItemUtils.addMissingRepoItem(shardName, "Could not find internal name for attribute shard: $shardName")
+        }
+        return internalName
     }
 
     fun isAttributeShard(internalName: NeuInternalName): Boolean {

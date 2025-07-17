@@ -89,7 +89,8 @@ object AttributeShardOverlay {
         val lines = mutableListOf<AttributeShardDisplayLine>()
 
         for ((shardName, shardData) in lastShardsData) {
-            val shardInternalName = AttributeShardsData.shardNameToInternalName(shardName)
+            val shardInternalName = AttributeShardsData.shardNameToInternalName(shardName) ?: continue
+
             val amountSyphoned = shardData.amountSyphoned
             val (tier, toNextTier, toMax) = AttributeShardsData.findTierAndAmountUntilNext(shardName, amountSyphoned)
             if (tier == 10) {
