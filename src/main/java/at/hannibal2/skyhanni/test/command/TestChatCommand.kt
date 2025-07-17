@@ -78,7 +78,7 @@ object TestChatCommand {
         val event = SkyHanniChatEvent(message, componentText)
         event.post()
 
-        if (event.blockedReason != "") {
+        if (event.blockedReason != null) {
             if (!isHidden) ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
             return
         }

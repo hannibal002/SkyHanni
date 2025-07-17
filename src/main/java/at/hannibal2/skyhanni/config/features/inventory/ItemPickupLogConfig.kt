@@ -35,6 +35,11 @@ class ItemPickupLogConfig {
     var sack: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Shards", desc = "Show items added and removed from your hunting box.")
+    @ConfigEditorBoolean
+    var shards: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Coins", desc = "Show coins added and removed from purse.")
     @ConfigEditorBoolean
     var coins: Boolean = false

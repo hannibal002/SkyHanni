@@ -43,10 +43,11 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -233,61 +234,58 @@ object HoppityLiveDisplay {
         return percentText to percentageColor
     }
 
-    private fun buildTitle(statYear: Int) = VerticalContainerRenderable(
-        buildList {
-            addString(
-                CFApi.partyModeReplace(
-                    when (statYear) {
-                        Int.MAX_VALUE -> "§dHoppity's Hunt All-Time Stats"
-                        else -> "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats"
-                    },
-                ),
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            )
-            if (statYear == Int.MAX_VALUE) {
-                val numberEvents = storage?.hoppityEventStats?.keys?.count { it <= currentSbYear } ?: 0
-                addCenteredString(
-                    CFApi.partyModeReplace("§7Compiled from §f$numberEvents §7events"),
-                )
-                return@buildList
-            }
-
-            val eventEnd = getEventEndMark(statYear)
-            val isHoppity = HoppityApi.isHoppityEvent()
-
-            val isCurrentEvent = isHoppity && HoppityEventSummary.statYear == currentSbYear
-            val isPastEvent = HoppityEventSummary.statYear < currentSbYear || (HoppityEventSummary.statYear == currentSbYear && !isHoppity)
-
-            val configMatches = when {
-                isCurrentEvent -> config.dateTimeDisplay.contains(DTType.CURRENT)
-                isPastEvent -> config.dateTimeDisplay.contains(DTType.PAST_EVENTS)
-                else -> config.dateTimeDisplay.contains(DTType.NEXT_EVENT)
-            }
-            if (!configMatches) return@buildList
-
-            val (timeMarkFormat, timeMarkAbs) = when {
-                isCurrentEvent || isPastEvent -> eventEnd
-                else -> getEventStartMark(HoppityEventSummary.statYear)
-            }.formatForHoppity()
-
-            val grammarFormat = when {
-                isCurrentEvent -> if (timeMarkAbs) "Ends" else "Ends in"
-                isPastEvent -> if (timeMarkAbs) "" else " ago"
-                else -> if (timeMarkAbs) "Starts" else "Starts in"
-            }
-
+    private fun buildTitle(statYear: Int) = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
+        addString(
+            CFApi.partyModeReplace(
+                when (statYear) {
+                    Int.MAX_VALUE -> "§dHoppity's Hunt All-Time Stats"
+                    else -> "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats"
+                },
+            ),
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        )
+        if (statYear == Int.MAX_VALUE) {
+            val numberEvents = storage?.hoppityEventStats?.keys?.count { it <= currentSbYear } ?: 0
             addCenteredString(
-                CFApi.partyModeReplace(
-                    when {
-                        isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
-                        isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
-                        else -> "§7$grammarFormat §f$timeMarkFormat"
-                    },
-                ),
+                CFApi.partyModeReplace("§7Compiled from §f$numberEvents §7events"),
             )
-        },
-        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-    )
+            return@vertical
+        }
+
+        val eventEnd = getEventEndMark(statYear)
+        val isHoppity = HoppityApi.isHoppityEvent()
+
+        val isCurrentEvent = isHoppity && HoppityEventSummary.statYear == currentSbYear
+        val isPastEvent = HoppityEventSummary.statYear < currentSbYear || (HoppityEventSummary.statYear == currentSbYear && !isHoppity)
+
+        val configMatches = when {
+            isCurrentEvent -> config.dateTimeDisplay.contains(DTType.CURRENT)
+            isPastEvent -> config.dateTimeDisplay.contains(DTType.PAST_EVENTS)
+            else -> config.dateTimeDisplay.contains(DTType.NEXT_EVENT)
+        }
+        if (!configMatches) return@vertical
+
+        val (timeMarkFormat, timeMarkAbs) = when {
+            isCurrentEvent || isPastEvent -> eventEnd
+            else -> getEventStartMark(HoppityEventSummary.statYear)
+        }.formatForHoppity()
+
+        val grammarFormat = when {
+            isCurrentEvent -> if (timeMarkAbs) "Ends" else "Ends in"
+            isPastEvent -> if (timeMarkAbs) "" else " ago"
+            else -> if (timeMarkAbs) "Starts" else "Starts in"
+        }
+
+        addCenteredString(
+            CFApi.partyModeReplace(
+                when {
+                    isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
+                    isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
+                    else -> "§7$grammarFormat §f$timeMarkFormat"
+                },
+            ),
+        )
+    }
 
     private fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
         if (SkyHanniMod.feature.event.hoppityEggs.eventSummary.liveDisplay.dateTimeFormat == RELATIVE)
@@ -359,7 +357,7 @@ object HoppityLiveDisplay {
 
     private fun HoppityEventStats.getRenderableContainer(
         statYear: Int,
-    ): Renderable = VerticalContainerRenderable(
+    ): Renderable = Renderable.vertical(
         HoppityEventSummary.getMappedStatStrings(this, statYear)
             .dropConsecutiveEmpties()
             .mapToRenderables(this, statYear)
@@ -368,7 +366,7 @@ object HoppityLiveDisplay {
                 val isEmpty = renderableList.isEmpty() || renderableList.all { it.isEmpty() }
 
                 if (isEmpty) buildEmptyFallback(isCurrentEvent).map {
-                    StringRenderable(CFApi.partyModeReplace(it.string))
+                    Renderable.text(CFApi.partyModeReplace(it.string))
                 } else renderableList
             },
     )
@@ -377,8 +375,8 @@ object HoppityLiveDisplay {
         stats: HoppityEventStats,
         statYear: Int,
     ): MutableList<Renderable> = map { (stat, statStrings) ->
-        val baseRenderable = VerticalContainerRenderable(
-            statStrings.map { StringRenderable(CFApi.partyModeReplace(it.string)) },
+        val baseRenderable = Renderable.vertical(
+            statStrings.map { Renderable.text(CFApi.partyModeReplace(it.string)) },
         )
         renderableOverridesOperationList[stat]?.invoke(
             RenderableOverrideOperation(
@@ -396,7 +394,7 @@ object HoppityLiveDisplay {
     private fun MutableList<Renderable>.tryAddYearSwitchers(statYear: Int) {
         if (!isInInventory()) return
         val renderable = buildYearSwitcherRenderables(statYear) ?: return
-        val container = HorizontalContainerRenderable(
+        val container = Renderable.horizontal(
             renderable,
             spacing = 5,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

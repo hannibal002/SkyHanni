@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.test.renderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule(devOnly = true)
 object TestWrappedString : RenderableTestSuite.TestRenderable("wrapped_string") {
@@ -31,19 +31,20 @@ object TestWrappedString : RenderableTestSuite.TestRenderable("wrapped_string") 
             "§eYellow §lBold§r normal" to 20,
         )
 
-        val render = testString.map {
-            Renderable.table(
-                listOf(
-                    listOf(StringRenderable("Orignal:"), StringRenderable(it.key)),
+        val render = with(Renderable) {
+            testString.map {
+                table(
                     listOf(
-                        Renderable.placeholder(0, 0),
-                        Renderable.fixedSizeLine(StringRenderable("Limited Width", horizontalAlign = HorizontalAlignment.CENTER), it.value)
-                            .renderBounds(),
+                        listOf(text("Orignal:"), text(it.key)),
+                        listOf(
+                            empty(),
+                            fixedSizeLine(text("Limited Width", horizontalAlign = HorizontalAlignment.CENTER), it.value).renderBounds(),
+                        ),
+                        listOf(text("Wrapped:"), wrappedText(it.key, it.value).renderBounds()),
                     ),
-                    listOf(StringRenderable("Wrapped:"), WrappedStringRenderable(it.key, it.value).renderBounds()),
-                ),
-            )
+                )
+            }
         }
-        return VerticalContainerRenderable(render)
+        return Renderable.vertical(render)
     }
 }

@@ -7,13 +7,12 @@ import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isMousematSign
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.gui.inventory.GuiEditSign
 
@@ -36,7 +35,7 @@ object GardenOptimalAngles {
 
         display = if (config.compactMousematGui) {
             crops.groupBy({ it.second }, { it.first }).map { (angles, crops) ->
-                val stacks = HorizontalContainerRenderable(crops.map { ItemStackRenderable(it.icon) })
+                val stacks = Renderable.horizontal(crops.map { Renderable.item(it.icon) })
                 val clickable = Renderable.clickable(
                     " §7- §e${angles.first}§7/§e${angles.second}",
                     tips = listOf(
@@ -45,16 +44,16 @@ object GardenOptimalAngles {
                     ),
                     onLeftClick = { setAngles(angles) },
                 )
-                HorizontalContainerRenderable(
-                    listOf(stacks, clickable),
-                    2,
-                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
+                Renderable.horizontal(
+                    stacks,
+                    clickable,
+                    spacing = 2,
                 )
             }
         } else {
             crops.map { (crop, angles) ->
                 val color = if (lastCrop == crop) LorenzColor.GOLD else LorenzColor.GREEN
-                val stack = ItemStackRenderable(crop.icon)
+                val stack = Renderable.item(crop.icon)
                 val clickable = Renderable.clickable(
                     "${color.getChatColor()}${crop.cropName} §7- §e${angles.first}§7/§e${angles.second}",
                     tips = listOf(
@@ -63,10 +62,10 @@ object GardenOptimalAngles {
                     ),
                     onLeftClick = { setAngles(angles) },
                 )
-                HorizontalContainerRenderable(
-                    listOf(stack, clickable),
-                    2,
-                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
+                Renderable.horizontal(
+                    stack,
+                    clickable,
+                    spacing = 2,
                 )
             }
         }

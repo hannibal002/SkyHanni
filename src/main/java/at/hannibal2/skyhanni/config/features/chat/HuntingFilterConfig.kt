@@ -13,4 +13,9 @@ class HuntingFilterConfig {
     @ConfigEditorBoolean
     var redundantComments: Boolean = false
 
+    @Expose
+    @ConfigOption(name = "Swoop Huntaxe", desc = "Hide Swoop's message about monsters only taking damage from axes.")
+    @ConfigEditorBoolean
+    var swoopAxeMessage: Boolean = false
+
 }

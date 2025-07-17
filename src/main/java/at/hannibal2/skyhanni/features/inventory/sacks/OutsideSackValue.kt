@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
 // shows the sack items and price in sacks while not in the sacks
@@ -97,7 +97,7 @@ object OutsideSackValue {
         val result = buildList {
             add(
                 Renderable.clickable(
-                    StringRenderable(label),
+                    Renderable.text(label),
                     tips = buildList {
                         add(label)
                         add("")
@@ -143,7 +143,7 @@ object OutsideSackValue {
         val (label, data) = calculateData()
         return listOf(
             Renderable.clickable(
-                StringRenderable(label),
+                Renderable.text(label),
                 tips = buildList {
                     add(label)
                     add("")

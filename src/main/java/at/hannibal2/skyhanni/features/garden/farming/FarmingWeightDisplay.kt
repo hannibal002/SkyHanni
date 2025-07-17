@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -35,11 +34,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonObject
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
@@ -163,6 +164,7 @@ object FarmingWeightDisplay {
     // Caused by various inaccuracies, including pest calc
     private var shWeightDiff = 0.0
     private var apiWeight = 0.0
+
     // Calculated weight number to display
     private val displayWeight get() = localWeight + weight - shWeightDiff
 
@@ -206,7 +208,7 @@ object FarmingWeightDisplay {
 
                 isLoadingWeight = true
                 if (display.isEmpty()) {
-                    display = listOf(StringRenderable("§6${lbName()}§7: §eLoading.."))
+                    display = listOf(Renderable.text("§6${lbName()}§7: §eLoading.."))
                 }
                 SkyHanniMod.launchIOCoroutine {
                     loadWeight(localProfile)
@@ -362,7 +364,7 @@ object FarmingWeightDisplay {
         val weightFormat = (weightUntilOvertake.roundTo(2) + 0.0).addSeparators()
         val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
         return if (showRankGoal) {
-            StringRenderable(text)
+            Renderable.text(text)
         } else {
             Renderable.clickable(
                 text,
@@ -497,13 +499,14 @@ object FarmingWeightDisplay {
         val lbType = if (isMonthlyLB()) "-monthly" else ""
         val atRankParam = if (atRank != null) "&atRank=$atRank" else ""
 
-        val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/" +
-            "$uuid/$profileId$upcomingPlayersParam$atRankParam"
-        val apiResponse = ApiUtils.getTypedJSONResponse<JsonObject>(url, apiName = "Elitebot Farming Leaderboard")
-            ?: return leaderboardPosition
+        val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/$uuid/$profileId$upcomingPlayersParam$atRankParam"
+        val (apiResponse, responseData) = ApiUtils.getTypedJsonResponse<JsonObject>(
+            url,
+            apiName = "Elitebot Farming Leaderboard"
+        ).assertSuccessWithData() ?: return leaderboardPosition
 
         try {
-            val apiData = toEliteLeaderboardJson(apiResponse).data
+            val apiData = toEliteLeaderboardJson(responseData).data
             val newData = apiWeight < apiData.amount
 
             minAmount = apiData.minAmount
@@ -548,13 +551,13 @@ object FarmingWeightDisplay {
     private suspend fun loadWeight(localProfile: String) {
         val uuid = PlayerUtils.getUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
-        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elite Farming Weight")
-            ?: return
+        val apiResponse = ApiUtils.getJsonResponse(url, apiName = "Elite Farming Weight").assertSuccess() ?: return
+        val apiResponseData = apiResponse.data ?: return
 
         var error: Throwable? = null
 
         try {
-            val apiData = eliteWeightApiGson.fromJson<ElitePlayerWeightJson>(apiResponse)
+            val apiData = eliteWeightApiGson.fromJson<ElitePlayerWeightJson>(apiResponseData)
 
             val selectedProfileId = apiData.selectedProfileId
             var selectedProfileEntry = apiData.profiles.find { it.profileId == selectedProfileId }
@@ -640,7 +643,7 @@ object FarmingWeightDisplay {
     private var attemptingCropWeightFetch = false
     private var hasFetchedCropWeights = false
 
-    private val weightStatic = ApiUtils.StaticApiPath(
+    private val weightStatic = ApiStaticGetPath(
         "https://api.elitebot.dev/weights/all",
         "Elitebot Farming Weights",
     )
@@ -648,8 +651,9 @@ object FarmingWeightDisplay {
     private suspend fun getCropWeights() {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
-        val apiResponse = ApiUtils.getJSONResponse(weightStatic) ?: return
-        val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
+        val apiResponse = ApiUtils.getJsonResponse(weightStatic).assertSuccess() ?: return
+        val apiResponseData = apiResponse.data ?: return
+        val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponseData)
         for (crop in apiData.crops) {
             val cropType = CropType.getByNameOrNull(crop.key) ?: continue
             cropWeight[cropType] = crop.value

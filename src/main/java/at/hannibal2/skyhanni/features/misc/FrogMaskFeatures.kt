@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -30,9 +29,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
@@ -57,7 +56,7 @@ object FrogMaskFeatures {
     )
 
     private val FROG_MASK = "FROG_MASK".toInternalName()
-    private val frogMaskRenderable by lazy { ItemStackRenderable(FROG_MASK.getItemStack()) }
+    private val frogMaskRenderable = Renderable.item(FROG_MASK)
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
@@ -126,11 +125,9 @@ object FrogMaskFeatures {
     private fun updateDisplay(helmetRegion: String, nextDay: SimpleTimeMark) {
         val timeRemaining = nextDay.timeUntil()
 
-        display = HorizontalContainerRenderable(
-            listOf(
-                frogMaskRenderable,
-                StringRenderable("§5Frog Mask§6 - $helmetRegion §6for §b${timeRemaining.format()}"),
-            ),
+        display = Renderable.horizontal(
+            frogMaskRenderable,
+            Renderable.text("§5Frog Mask§6 - $helmetRegion §6for §b${timeRemaining.format()}"),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )
