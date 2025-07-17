@@ -164,6 +164,7 @@ object DungeonMobManager {
     }
 
     @HandleEvent
+    @Suppress("AvoidBritishSpelling")
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val base = "dungeon.objectHighlighter"
         event.move(99, "$base.starred.colour", "$base.starred.color")
