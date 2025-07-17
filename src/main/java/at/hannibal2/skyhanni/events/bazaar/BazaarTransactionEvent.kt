@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 class BazaarTransactionEvent(
     val transactionType: TransactionType,
     val coinAmount: Double,
+    val coinAmountAfterTax: Double,
 ) : SkyHanniEvent() {
     enum class TransactionType {
         INSTANT_BUY,

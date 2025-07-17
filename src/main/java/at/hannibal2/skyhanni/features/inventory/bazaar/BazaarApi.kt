@@ -243,7 +243,7 @@ object BazaarApi {
         transactionPattern.matchMatcher(message) {
             val item = group("item")
             val coins = group("coins").replace(",", "").toDoubleOrNull() ?: return
-            val adjustedCoins = when (group("type")) {
+            val coinsAfterTax = when (group("type")) {
                 "Sold" -> coins * (1 - taxRate / 100)
                 else -> coins
             }
@@ -255,7 +255,7 @@ object BazaarApi {
                 "Order Flipped!" -> TransactionType.FLIP_ORDER
                 else -> return
             }
-            BazaarTransactionEvent(transactionType, adjustedCoins).post()
+            BazaarTransactionEvent(transactionType, coins, coinsAfterTax).post()
             if (currentSearchedItem == item) {
                 currentSearchedItem = ""
             }
