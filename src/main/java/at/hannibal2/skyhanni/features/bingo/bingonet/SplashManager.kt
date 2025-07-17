@@ -21,21 +21,17 @@ import kotlin.time.Duration.Companion.minutes
 @Suppress("SkyHanniModuleInspection")
 //Not needed since the SH Message Event is asked for by the Player. Not needed to be a module.
 object SplashManager {
-    var splashPool: MutableMap<Int?, DisplaySplash?> = HashMap<Int?, DisplaySplash?>()
+    var splashPool: MutableMap<Int, DisplaySplash> = HashMap<Int, DisplaySplash>()
 
     fun addSplash(splash: SplashData, source: SplashSource) {
-        try {
-            splashPool.put(splash.splashId, DisplaySplash(splash))
-            DelayedRun.runDelayed(
-                5.minutes,
-                {
-                    splashPool.remove(splash.splashId)
-                },
-            )
-            SplashManager.display(splash.splashId, source)
-        } catch (ignored: Exception) {
-            //cant happen anyway
-        }
+        splashPool[splash.splashId] = DisplaySplash(splash)
+        DelayedRun.runDelayed(
+            5.minutes,
+            {
+                splashPool.remove(splash.splashId)
+            },
+        )
+        SplashManager.display(splash.splashId, source)
     }
 
     fun handleSplash(data: SplashData, source: SplashSource) {

@@ -137,9 +137,9 @@ object BNConnection {
                     close()
                 }
             },
-            "BBsential-Receiver",
         ).apply {
             isDaemon = true
+            name="BingoNet-Receiver"
             start()
         }
 
@@ -156,14 +156,14 @@ object BNConnection {
                     Thread.currentThread().interrupt()
                 }
             },
-            "BBsential-Sender",
         ).apply {
             isDaemon = true
+            name="BingoNet-Sender"
             start()
         }
     }
 
-
+    private val reportedErrors = mutableSetOf<kotlin.String>()
     fun onMessageReceived(message: kotlin.String) {
         try {
             val packet: Pair<Packet<out AbstractPacket>, AbstractPacket>? = PacketUtils.parsePacket(message)
@@ -181,8 +181,25 @@ object BNConnection {
                 val consumer : Consumer<AbstractPacket> = packet.first.consumer as Consumer<AbstractPacket>
                 consumer.accept(packet.second)
             }
-        }catch (e: Exception){
-
+        }catch (e: Throwable){
+            //This should prevent any Issues from Bingo Net from causing an actual Issue. The Set Filter should prevent Error Spam.
+            val key = "${e::class.java.name}:${e.message}"
+            if (reportedErrors.add(key)) {
+                val errorReport = buildString {
+                    appendLine("Bingo Net Connection Error Report")
+                    appendLine("Received packet: $message")
+                    var current: Throwable? = e
+                    while (current != null) {
+                        appendLine("Exception: ${current::class.java.name}: ${current.localizedMessage}")
+                        appendLine("Stacktrace:")
+                        current.stackTrace.forEach { appendLine("  at $it") }
+                        current = current.cause
+                        if (current != null) appendLine("Caused by:")
+                    }
+                }
+                ChatUtils.clickToClipboard("§cBN: Error processing message: ${e.localizedMessage}",errorReport.split("\n"))
+                e.printStackTrace()
+            }
         }
     }
 
@@ -296,7 +313,7 @@ object BNConnection {
         if (packet.splash.announcer == PlayerUtils.getName() && config.autoSplashStatusUpdates) {
             ChatUtils.chat("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard")
         } else {
-            SplashManager.addSplash(packet.splash)
+            SplashManager.addSplash(packet.splash, SplashManager.SplashSource.BN)
             if (packet.splash.lessWaste) {
                 waitTime = min(((EnvironmentCore.utils.getPotTime() * 1000) / 80), 25 * 1000)
             } else {
@@ -375,6 +392,8 @@ object BNConnection {
     }
 
     fun onPartyPacket(packet: PartyPacket) {
+        //This allows Deactivating the Remote Party Control HOWEVER
+        //It is needed for a LOT of Features which can both cause Issues and will block some Features that depend on it to not work.
         if (config.allowBNServerPartyManagement) {
             val isInParty = PartyApi.isInParty()
             if (!isInParty && !(packet.type == PartyConstants.JOIN || packet.type == PartyConstants.ACCEPT || packet.type == PartyConstants.INVITE)) return
@@ -626,7 +645,7 @@ object BNConnection {
     fun onPacketChatPromptPacket(packet: PacketChatPromptPacket) {
         val prompt = ChatPrompt(
             Runnable {
-                for (p in packet.packets!!) {
+                for (p in packet.packets) {
                     sendPacket(p)
                 }
             },

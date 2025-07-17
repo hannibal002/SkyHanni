@@ -6,30 +6,21 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class BingoNetConfig {
-
-
-
     @Expose
     @ConfigOption(name = "Enable Bingo Net", desc = "Bingo Net is based on a closed Source Project by Hype_the_Time")
     @ConfigEditorBoolean
     @FeatureToggle
-    var useBN: Boolean = true
+    var useBN: Boolean = false
 
     //TODO requires restart rn still so fix somehow?
 
     @Expose
-    @ConfigOption(name = "Enable BB Integration", desc = "Whether your want to enable our BingoBrewers Port. (Since no official modern support)")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var useBB: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Enable Bingo Net", desc = "Bingo Net is based on a closed Source Project by Hype_the_Time")
+    @ConfigOption(name = "Bingo Net Splashes", desc = "Show Splashes announced via the Bingo Net Server.")
     @ConfigEditorBoolean
     var showSplashes: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Enable Bingo Net", desc = "Bingo Net is based on a closed Source Project by Hype_the_Time")
+    @ConfigOption(name = "Bingo Net ChChests", desc = "Subscribe to the Bingo Net ChChests.")
     @ConfigEditorBoolean
     var chestWaypoints: Boolean = true
 

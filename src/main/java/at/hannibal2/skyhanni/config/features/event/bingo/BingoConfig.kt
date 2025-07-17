@@ -22,6 +22,8 @@ class BingoConfig {
     @Accordion
     val bingoNet: BingoNetConfig = BingoNetConfig()
 
+    val bingoBrewers: BingoBrewersConfig = BingoBrewersConfig()
+
     @Expose
     @ConfigOption(name = "Compact Chat Messages", desc = "")
     @Accordion
