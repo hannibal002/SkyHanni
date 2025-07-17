@@ -15,8 +15,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_50
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
@@ -413,12 +411,10 @@ object SkillProgress {
         val xp = skill.totalXp
         val lvl = skill.level
         val cap = activeSkill.maxLevel
+        // This code is probably still wrong for hunting
+        // But i can not understand why we are doing this in the first place
         val add = if (lvl >= 50) {
-            when (cap) {
-                50 -> XP_NEEDED_FOR_50
-                60 -> XP_NEEDED_FOR_60
-                else -> 0
-            }
+            SkillUtil.xpRequiredForLevel(cap)
         } else {
             0
         }
