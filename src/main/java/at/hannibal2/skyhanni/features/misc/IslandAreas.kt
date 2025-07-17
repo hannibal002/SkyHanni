@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -63,7 +62,7 @@ object IslandAreas {
         updateArea("no_area", onlyInternal = true)
     }
 
-    fun nodeMoved() = SkyHanniMod.launchCoroutine(::updateNodes)
+    fun nodeMoved() = SkyHanniMod.launchNoScopeCoroutine(::updateNodes)
 
     private fun updateNodes() {
         if (!isEnabled()) return

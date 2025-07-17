@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import kotlinx.coroutines.launch
 import java.awt.Desktop
 import java.io.File
 import java.io.IOException

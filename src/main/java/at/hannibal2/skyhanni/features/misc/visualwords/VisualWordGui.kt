@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import com.google.gson.JsonObject
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard

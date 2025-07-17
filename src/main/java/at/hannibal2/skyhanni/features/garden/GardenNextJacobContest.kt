@@ -48,7 +48,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration

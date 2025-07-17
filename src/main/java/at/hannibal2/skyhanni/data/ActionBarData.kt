@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import kotlinx.coroutines.launch
 import net.minecraft.util.IChatComponent
 
 @SkyHanniModule

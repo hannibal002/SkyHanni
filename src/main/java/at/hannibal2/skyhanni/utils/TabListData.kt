@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem

@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 

@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule

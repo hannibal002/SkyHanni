@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import kotlinx.coroutines.launch
 
 @SkyHanniModule
 object AllBurrowsList {
