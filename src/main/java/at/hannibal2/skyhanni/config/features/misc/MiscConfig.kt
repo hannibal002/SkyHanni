@@ -155,6 +155,11 @@ class MiscConfig {
     val frogMaskFeatures: FrogMaskFeaturesConfig = FrogMaskFeaturesConfig()
 
     @Expose
+    @ConfigOption(name = "Glowing Mushroom Highlighter", desc = "")
+    @Accordion
+    val glowingMushroomHighlighter: GlowingMushroomHighlighterConfig = GlowingMushroomHighlighterConfig()
+
+    @Expose
     @ConfigOption(name = "Colorful Item Tooltips", desc = "")
     @Accordion
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()

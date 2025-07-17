@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.transpose
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import java.awt.Color
 
@@ -44,30 +44,31 @@ object TestWrappedString : RenderableTestSuite.TestRenderable("wrapped_string") 
         ).asSequence().sortedBy { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.key) }.toList()
 
 
-        val render = Renderable.table(
-            testString.split(3).transpose().map { list ->
-                list.mapNotNull {
-                    if (it == null) null else
-                        Renderable.table(
-                            listOf(
-                                listOf(StringRenderable("Orignal:"), StringRenderable(it.key)),
+        val render = with(Renderable) {
+            table(
+                testString.split(3).transpose().map { list ->
+                    list.mapNotNull {
+                        if (it == null) null else
+                            table(
                                 listOf(
-                                    Renderable.placeholder(0, 0),
-                                    Renderable.fixedSizeLine(
-                                        StringRenderable(
-                                            "Limited Width",
-                                            horizontalAlign = HorizontalAlignment.CENTER,
-                                        ),
-                                        it.value,
-                                    )
-                                        .renderBounds(),
+                                    listOf(text("Orignal:"), text(it.key)),
+                                    listOf(
+                                        empty(),
+                                        fixedSizeLine(
+                                            text(
+                                                "Limited Width",
+                                                horizontalAlign = HorizontalAlignment.CENTER,
+                                            ),
+                                            it.value,
+                                        ).renderBounds(),
+                                    ),
+                                    listOf(text("Wrapped:"), wrappedText(it.key, it.value).renderBounds()),
                                 ),
-                                listOf(StringRenderable("Wrapped:"), WrappedStringRenderable(it.key, it.value).renderBounds()),
-                            ),
-                        )
-                }
-            },
-        )
+                            )
+                    }
+                },
+            )
+        }
         return render
     }
 }

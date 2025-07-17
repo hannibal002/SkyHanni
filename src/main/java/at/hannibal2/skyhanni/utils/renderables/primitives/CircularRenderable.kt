@@ -1,17 +1,15 @@
-package at.hannibal2.skyhanni.utils.renderables
+package at.hannibal2.skyhanni.utils.renderables.primitives
 
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
-import kotlin.math.max
 
-open class CircularRenderable(
+open class CircularRenderable protected constructor(
     private val backgroundColor: ChromaColour,
     val radius: Int,
     private val smoothness: Float = 1f,
@@ -32,33 +30,20 @@ open class CircularRenderable(
             ShaderRenderUtils.drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness, baseAngle, endAngle)
             ShaderRenderUtils.drawFilledCircle(0, 0, unfilledColor.toColor(), radius, smoothness, endAngle, baseAngle)
         }
+
         else -> ShaderRenderUtils.drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness = smoothness)
+    }
+
+    companion object {
+        fun Renderable.Companion.circular(
+            backgroundColor: ChromaColour,
+            radius: Int,
+            smoothness: Float = 1f,
+            filledPercentage: Double = 100.0,
+            unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
+            horizontalAlignment: HorizontalAlignment = HorizontalAlignment.CENTER,
+            verticalAlignment: VerticalAlignment = VerticalAlignment.CENTER,
+        ) = CircularRenderable(backgroundColor, radius, smoothness, filledPercentage, unfilledColor, horizontalAlignment, verticalAlignment)
     }
 }
 
-class CircularContainerRenderable(
-    private val renderable: Renderable,
-    backgroundColor: ChromaColour,
-    smoothness: Float = 1f,
-    filledPercentage: Double = 100.0,
-    unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
-    horizontalAlignment: HorizontalAlignment = HorizontalAlignment.CENTER,
-    verticalAlignment: VerticalAlignment = VerticalAlignment.CENTER,
-    private val padding: Int = 2,
-) : CircularRenderable(
-    backgroundColor,
-    radius = (max(renderable.width, renderable.height) / 2) + padding,
-    smoothness,
-    filledPercentage,
-    unfilledColor,
-    horizontalAlignment,
-    verticalAlignment,
-) {
-    private val takenSpace = 2 * (radius - padding)
-    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        super.render(mouseOffsetX, mouseOffsetY)
-        DrawContextUtils.translated(padding.toFloat(), padding.toFloat(), 0f) {
-            renderable.renderXYAligned(mouseOffsetX + padding, mouseOffsetY + padding, takenSpace, takenSpace)
-        }
-    }
-}

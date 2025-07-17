@@ -39,7 +39,7 @@ object RiftAgaricusCap {
 
     private fun updateLocation(): LorenzVec? {
         if (InventoryUtils.getItemInHand()?.getInternalName() != RiftApi.farmingTool) return null
-        val currentLocation = BlockUtils.getBlockLookingAt() ?: return null
+        val currentLocation = BlockUtils.getTargetedBlock() ?: return null
 
         when (currentLocation.getBlockAt()) {
             Blocks.brown_mushroom -> {

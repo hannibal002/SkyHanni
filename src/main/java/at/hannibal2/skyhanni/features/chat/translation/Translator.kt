@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.compat.setClickRunCommand
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import com.google.gson.JsonArray
@@ -112,7 +112,7 @@ object Translator {
         val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=$encode"
 
         var messageToSend = ""
-        val jsonResponse = ApiUtils.getTypedJSONResponse<JsonArray>(url, "Google Translate API")
+        val (_, jsonResponse) = ApiUtils.getTypedJsonResponse<JsonArray>(url, "Google Translate API").assertSuccessWithData()
             ?: return null
         val fullResponse = jsonResponse.asJsonArray
         if (fullResponse.size() < 3) return null
