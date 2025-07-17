@@ -106,9 +106,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     // Will be invoked by the implementation of this class
     fun registerCommands(event: CommandRegistrationEvent) {
         if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
-            description = "Download the $commonName repo again"
+            description = "Remove and redownload the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback { updateRepo() }
+            simpleCallback { updateRepo(forceReset = true) }
         }
         if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
@@ -154,7 +154,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     // <editor-fold desc="Repo Management">
-    fun updateRepo() {
+    fun updateRepo(forceReset: Boolean = false) {
         shouldManuallyReload = true
         if (!config.location.valid) {
             ChatUtils.userError("Invalid $commonName Repo settings detected, resetting default settings.")
@@ -284,7 +284,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * @param command If true, will report the status of the repo to the user.
      * @param silentError If true, will not log errors to the console.
      */
-    private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true) = repoMutex.withLock {
+    private suspend fun fetchAndUnpackRepo(
+        command: Boolean,
+        silentError: Boolean = true,
+        forceReset: Boolean = false,
+    ) = repoMutex.withLock {
         localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
         val (currentSha, currentCommitTime) = localRepoCommit
 
@@ -293,16 +297,16 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         } ?: ((null to null).also { downloadFailed = true })
 
         val diffCheck = RepoComparison(currentSha, currentCommitTime, latestSha, latestCommitTime)
+        val outdated = !diffCheck.hashesMatch
 
-        if (repoDirectory.exists() && diffCheck.hashesMatch && unsuccessfulConstants.isEmpty()) {
+        if (!outdated && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
             if (command) {
                 diffCheck.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
             return
-        }
+        } else if (command && outdated) diffCheck.reportRepoOutdated()
 
-        if (command) diffCheck.reportRepoOutdated()
         prepCleanRepoFileSystem()
 
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {

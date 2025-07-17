@@ -910,7 +910,8 @@ object ItemUtils {
         showRepoWarning(name)
     }
 
-    val resetCommand get() = if (PlatformUtils.IS_LEGACY) "neuresetrepo"
+    // These two are matching right now, but we keep them separate for future-proofing
+    val resetCommand get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
     else EnoughUpdatesRepoManager.updateCommand
 
     private fun showRepoWarning(item: String) {

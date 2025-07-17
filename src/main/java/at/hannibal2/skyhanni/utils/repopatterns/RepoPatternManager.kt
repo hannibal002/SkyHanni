@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
-import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
@@ -80,7 +80,7 @@ object RepoPatternManager {
         }
 
     private val localLoading: Boolean
-        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.isUsingBackup
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || SkyHanniRepoManager.isUsingBackup
 
     private val logger = LogManager.getLogger("SkyHanni")
 
