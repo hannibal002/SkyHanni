@@ -186,6 +186,7 @@ object PetUtils {
                     "§cFailed to load pet levels from NEU repo. " +
                         "§cYou can try to fix this by running `§e/neuupdaterepo`§c."
                 )
+                lastRepoWarning = SimpleTimeMark.now()
             }
             return null
         }
