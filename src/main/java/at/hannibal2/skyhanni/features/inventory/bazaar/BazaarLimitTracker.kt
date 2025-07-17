@@ -11,7 +11,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
@@ -37,7 +38,12 @@ object BazaarLimitTracker {
     @HandleEvent
     fun onBazaarTransaction(event: BazaarTransactionEvent) {
         if (event.transactionType == BazaarTransactionEvent.TransactionType.FLIP_ORDER) return
-        coinsTowardsLimit += event.coinAmount
+        // Hypixel ignores coins in excess of the integer limit for individual orders
+        val coinsUpToIntLimit = when {
+            event.coinAmount >= Int.MAX_VALUE -> Int.MAX_VALUE.toDouble()
+            else -> event.coinAmount
+        }
+        coinsTowardsLimit += coinsUpToIntLimit
         if (coinsTowardsLimit >= DAILY_LIMIT) {
             ChatUtils.chat("You reached your daily trade limit in the bazaar!")
         }
@@ -66,15 +72,15 @@ object BazaarLimitTracker {
 
         val color = percentageColor(DAILY_LIMIT.toLong() - coinsTowardsLimit.toLong(), DAILY_LIMIT.toLong()).getChatColor()
 
-        val display = mutableListOf(
-            "§aBazaar Daily Limit:",
-            "$color${coinsTowardsLimit.toLong().addSeparators()}§7/${DAILY_LIMIT.formatCoin()} coins",
-        )
-        if (coinsTowardsLimit >= DAILY_LIMIT) {
-            display.add("§cLimit reached!")
+        val display = buildList {
+            addString("§aBazaar Daily Limit:")
+            addString("$color${coinsTowardsLimit.toLong().addSeparators()}§7/${DAILY_LIMIT.formatCoin()} coins")
+            if (coinsTowardsLimit >= DAILY_LIMIT) {
+                addString("§cLimit reached!")
+            }
         }
 
-        config.dailyLimitTrackerPosition.renderStrings(
+        config.dailyLimitTrackerPosition.renderRenderables(
             display,
             posLabel = "Bazaar Daily Limit Tracker",
         )
