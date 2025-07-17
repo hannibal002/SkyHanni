@@ -13,6 +13,7 @@ public class MixinEntity {
 
     @Inject(method = "getDisplayName", at = @At(value = "RETURN"), cancellable = true)
     public void getDisplayName(CallbackInfoReturnable<Text> cir) {
+
         cir.setReturnValue(
             EntityData.getDisplayName((Entity) (Object) this, cir.getReturnValue())
         );
