@@ -189,7 +189,7 @@ object PetUtils {
             }
             return null
         }
-        return levelTree.subList(rarityOffset, rarityOffset + level).sumOf { it.toDouble() }
+        return levelTree.subList(rarityOffset, rarityOffset + level - 1).sumOf { it.toDouble() }
     }.getOrElse {
         ErrorManager.logErrorWithData(
             it,
