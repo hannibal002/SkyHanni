@@ -46,7 +46,7 @@ class BazaarConfig {
 
     @Expose
     @ConfigLink(owner = BazaarConfig::class, field = "dailyLimitTracker")
-    var dailyLimitTrackerPosition: Position = Position(550, 150)
+    val dailyLimitTrackerPosition: Position = Position(550, 150)
 
     @Expose
     @ConfigOption(
