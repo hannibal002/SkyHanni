@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.BNPacketManager
+import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -21,9 +21,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
+import de.hype.bingonet.environment.packetconfig.InterceptPacketInfo
 import de.hype.bingonet.environment.packetconfig.PacketUtils
 import de.hype.bingonet.shared.constants.*
 import de.hype.bingonet.shared.objects.*
+import de.hype.bingonet.shared.packets.base.ExpectReplyPacket
 import de.hype.bingonet.shared.packets.function.*
 import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinionDataPacket
 import de.hype.bingonet.shared.packets.network.*
@@ -42,6 +44,7 @@ import java.time.Instant
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import kotlin.math.min
@@ -55,25 +58,20 @@ object BNConnection {
     var messageSenderThread: Thread? = null
 
     @JvmField
-    var packetIntercepts: MutableList<BNInterceptPacketInfo<*>> = ArrayList()
+    var packetIntercepts: MutableList<InterceptPacketInfo<*>> = ArrayList()
     private var socket: Socket? = null
     private var reader: BufferedReader? = null
     private var writer: PrintWriter? = null
     private lateinit var messageQueue: LinkedBlockingQueue<String>
-    private var BNPacketManager: BNPacketManager
     var authenticated: Boolean? = null
         private set
 
     //Viewing Packet Traffic can pose as a Unfair Advantage (Splashes).
     val roles = mutableSetOf<BNRole>(BNRole.DEBUG)
 
-    init {
-        BNPacketManager = BNPacketManager(this)
-    }
-
     private val config get() = SkyHanniMod.feature.event.bingo.bingoNet
 
-    val waypoints: MutableList<WaypointData> = ArrayList()
+    val waypoints: MutableMap<Int, WaypointData> = HashMap()
 
 
     private fun createSSLContext(): SSLContext {
@@ -167,12 +165,97 @@ object BNConnection {
 
 
     fun onMessageReceived(message: kotlin.String) {
-        if (!PacketUtils.handleIfPacket<AbstractPacket>(this, message.toString())) {
-            if (message.startsWith("H-")) {
-            } else {
-                Chat.sendPrivateMessageToSelfSuccess("BB: $message")
+        try {
+            val packet: Pair<Packet<out AbstractPacket>, AbstractPacket>? = PacketUtils.parsePacket(message)
+            if (packet == null) {
+                ChatUtils.chat("§cBN: Received unknown message: $message", prefix = false)
+                return
+            }
+            if (handleIntercept(packet.second)) {
+                if (SkyHanniMod.feature.event.bingo.bingoNet.showPacketTraffic && roles.contains(BNRole.DEBUG)) {
+                    val json = message.split(Regex("\\."),2)[1]
+                    ChatUtils.clickableChat("§b[BN-REC]: $json",{
+                        OSUtils.copyToClipboard(json)
+                    }, prefix = false)
+                }
+                val consumer : Consumer<AbstractPacket> = packet.first.consumer as Consumer<AbstractPacket>
+                consumer.accept(packet.second)
+            }
+        }catch (e: Exception){
+
+        }
+    }
+
+    /**
+     * return false if the packet should be thrown away due to being handled by an intercept.
+     */
+    @Synchronized
+    fun <T : AbstractPacket> handleIntercept(packet: T): Boolean {
+        val packetClass: Class<T>
+        try {
+            packetClass = packet.javaClass
+        } catch (e: Exception) {
+            return true
+        }
+        val intercepts: MutableList<InterceptPacketInfo<*>> = packetIntercepts
+        val indexes: MutableList<Int> = ArrayList<Int>()
+        var cancelIntercept = false
+        var cancelMainExec = false
+        var found = false
+        for (i in intercepts.indices) {
+            val intercept: InterceptPacketInfo<*> = intercepts[i]
+            if (intercept.matches(packetClass)) {
+                if (packet is ExpectReplyPacket.ReplyPacket && packet.replyDate == intercept.replyId) {
+                    if (!intercept.ignoreIfIntercepted || !found) {
+                        found = true
+                        if (intercept.cancelPacket) {
+                            cancelMainExec = true
+                        }
+                        if (intercept.blockIntercepts) {
+                            cancelIntercept = true
+                        }
+                        if (intercept.blockExecutionForCompletion) {
+                            intercepts.remove(intercept)
+                            intercept.parseAndRun(packet)
+                        } else {
+                            intercepts.remove(intercept)
+                            SkyHanniMod.launchCoroutine {
+                                intercept.parseAndRun(packet)
+                            }
+                        }
+                    }
+                    if (cancelIntercept) break
+                } else {
+                    indexes.add(i)
+                }
             }
         }
+        if (!cancelIntercept) {
+            for (index in indexes) {
+                val intercept: InterceptPacketInfo<*> = intercepts.get(index)
+                if (intercept.matches(packetClass)) {
+                    if (!intercept.ignoreIfIntercepted || !found) {
+                        found = true
+                        if (intercept.cancelPacket) {
+                            cancelMainExec = true
+                        }
+                        if (intercept.blockIntercepts) {
+                            cancelIntercept = true
+                        }
+                        if (intercept.blockExecutionForCompletion) {
+                            intercept.parseAndRun(packet)
+                        } else {
+                            SkyHanniMod.launchCoroutine {
+                                intercept.parseAndRun(packet)
+                            }
+                        }
+                    }
+                    if (cancelIntercept) break
+                }
+            }
+        }
+
+        return !cancelMainExec
     }
 
     fun <T : AbstractPacket> dummy(o: T?) {
@@ -185,7 +268,7 @@ object BNConnection {
         if (this.isConnected && writer != null) {
             if (!blockLog) {
                 ChatUtils.clickableChat(
-                    "[BN-Send]: $rawjson",
+                    "§b[BN-Send]: $rawjson",
                     {
                         OSUtils.copyToClipboard(rawjson)
                     },
@@ -292,7 +375,7 @@ object BNConnection {
     }
 
     fun onPartyPacket(packet: PartyPacket) {
-        if (config.allow_bn_server_party) {
+        if (config.allowBNServerPartyManagement) {
             val isInParty = PartyApi.isInParty()
             if (!isInParty && !(packet.type == PartyConstants.JOIN || packet.type == PartyConstants.ACCEPT || packet.type == PartyConstants.INVITE)) return
             val leader = PartyApi.isPartyLeader()
@@ -303,7 +386,7 @@ object BNConnection {
                 ChatUtils.clickableChat(
                     "BN: Joining party requested by Bingo Net Server. Click to disable this Permission!",
                     {
-                        config.allow_bn_server_party = false
+                        config.allowBNServerPartyManagement = false
                     },
                 )
                 PartyApi.joinParty(packet.users.first())
@@ -312,7 +395,7 @@ object BNConnection {
                 ChatUtils.clickableChat(
                     "BN: Joining party requested by Bingo Net Server. Click to disable this Permission!",
                     {
-                        config.allow_bn_server_party = false
+                        config.allowBNServerPartyManagement = false
                     },
                 )
                 PartyApi.acceptParty(packet.users.first())
@@ -320,7 +403,7 @@ object BNConnection {
                 ChatUtils.clickableChat(
                     "BN: Party Disband requested by Bingo Net Server. Click to disable this Permission!",
                     {
-                        config.allow_bn_server_party = false
+                        config.allowBNServerPartyManagement = false
                     },
                 )
                 if (!PartyApi.disband()) {
@@ -337,7 +420,7 @@ object BNConnection {
                     ChatUtils.clickableChat(
                         "BN: Party Disband requested by Bingo Net Server. Click to disable this Permission!",
                         {
-                            config.allow_bn_server_party = false
+                            config.allowBNServerPartyManagement = false
                         },
                     )
                 }
@@ -346,7 +429,7 @@ object BNConnection {
                     ChatUtils.clickableChat(
                         "BN: Party kicks requested by Bingo Net Server. Click to disable this Permission!",
                         {
-                            config.allow_bn_server_party = false
+                            config.allowBNServerPartyManagement = false
                         },
                     )
                 }
@@ -390,7 +473,7 @@ object BNConnection {
 
         val serverId = clientRandom + packet.serverIdSuffix
 
-        if (config.bn_api_key.isEmpty()) {
+        if (config.BNApiKey.isEmpty()) {
             MojangUtils.authServer(serverId)
             val connectPacket = RequestConnectPacket(
                 PlayerUtils.getRawUuid(),
@@ -405,7 +488,7 @@ object BNConnection {
             sendPacket(
                 RequestConnectPacket(
                     PlayerUtils.getRawUuid(),
-                    config.bn_api_key,
+                    config.BNApiKey,
                     EnvironmentCore.utils.getGameVersion(),
                     EnvironmentCore.utils.getModVersion(),
                     "SkyHanni",
@@ -462,25 +545,18 @@ object BNConnection {
 
     fun onWaypointPacket(packet: WaypointPacket) {
         if (packet.operation == WaypointPacket.Operation.ADD) {
-            packet.waypoint
+            waypoints[packet.waypointId] = packet.waypoint
         } else if (packet.operation == WaypointPacket.Operation.REMOVE) {
-            try {
-                Waypoints.waypoints.get(packet.waypointId)!!.removeFromPool()
-            } catch (ignored: Exception) {
-            }
+            waypoints.remove(packet.waypointId)
         } else if (packet.operation == WaypointPacket.Operation.EDIT) {
-            try {
-                val oldWaypoint: Waypoints = Waypoints.waypoints.get(packet.waypointId)!!
-                oldWaypoint.replaceWithNewWaypoint(packet.waypoint, packet.waypointId)
-            } catch (ignored: Exception) {
-            }
+            waypoints[packet.waypointId] = packet.waypoint
         }
     }
 
     fun onGetWaypointsPacket(packet: GetWaypointsPacket) {
         sendPacket(
             GetWaypointsPacket(
-                waypoints,
+                waypoints.values.toList(),
             ),
         )
     }
@@ -489,7 +565,7 @@ object BNConnection {
         if (!config.showCardCompletions && packet.completionType == CompletedGoalPacket.CompletionType.CARD)
             ChatUtils.hoverableChat("§6${packet.username}§7 just completed the Bingo!", packet.lore.split("\n"))
         else if (!config.showGoalCompletions && packet.completionType == CompletedGoalPacket.CompletionType.GOAL)
-            ChatUtils.hoverableChat("§6${packet.username}§7 just completed the Goal §6${packet.name}§7!", packet.lore.split("\n")))
+            ChatUtils.hoverableChat("§6${packet.username}§7 just completed the Goal §6${packet.name}§7!", packet.lore.split("\n"))
     }
 
     fun onPlaySoundPacket(packet: PlaySoundPacket) {
@@ -562,7 +638,7 @@ object BNConnection {
 
     @HandleEvent
     fun rendering(event: SkyHanniRenderWorldEvent) {
-        for (data in waypoints.filter { it.visible }) {
+        for (data in waypoints.values.filter { it.visible }) {
             val position = data.position.toLorenz()
             val distance = position.distanceToPlayer()
             if (distance > data.renderDistance) continue

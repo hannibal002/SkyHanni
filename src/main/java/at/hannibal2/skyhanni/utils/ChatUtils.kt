@@ -180,7 +180,7 @@ object ChatUtils {
      * Sends the message in chat.
      * Show the lines when on hover.
      * Offer option to click on the chat message to copy the lines to clipboard.
-     * Sseful for quick debug infos
+     * Useful for quick debug infos
      */
     fun clickToClipboard(message: String, lines: List<String>) {
         val text = lines.joinToString("\n") { "§7$it" }

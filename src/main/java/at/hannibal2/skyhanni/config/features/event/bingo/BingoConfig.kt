@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.event.bingo
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.BingoNetConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -13,9 +12,6 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
 class BingoConfig {
-
-
-
     @Expose
     @ConfigOption(name = "Bingo Card", desc = "")
     @Accordion

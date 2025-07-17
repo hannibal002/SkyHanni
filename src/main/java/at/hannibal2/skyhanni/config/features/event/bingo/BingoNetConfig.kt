@@ -26,17 +26,17 @@ class BingoNetConfig {
     @Expose
     @ConfigOption(name = "Enable Bingo Net", desc = "Bingo Net is based on a closed Source Project by Hype_the_Time")
     @ConfigEditorBoolean
-    var show_splashes: Boolean = true
+    var showSplashes: Boolean = true
 
     @Expose
     @ConfigOption(name = "Enable Bingo Net", desc = "Bingo Net is based on a closed Source Project by Hype_the_Time")
     @ConfigEditorBoolean
-    var chest_waypoints: Boolean = true
+    var chestWaypoints: Boolean = true
 
     @Expose
     @ConfigOption(name = "Allow Server Invite", desc = "Allows the BingoNet Server to Manage your parties. This is required for some Features.")
     @ConfigEditorBoolean
-    var allow_bn_server_party: Boolean = true
+    var allowBNServerPartyManagement: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show Bingo Chat", desc = "Bingo Chat is a Chat every Bingo Net ")
@@ -46,7 +46,7 @@ class BingoNetConfig {
     @Expose
     @ConfigOption(name = "Bingo Net API/Legacy Key", desc = "API/Legacy Key can be used instead of Mojang Auth. This prevents the possible restart your client message when the Mojang Tokens expired. Leave empty to use Mojang Auth.")
     @ConfigEditorBoolean
-    var bn_api_key: String = ""
+    var BNApiKey: String = ""
 
     val showGoalCompletions: Boolean = false
     val showCardCompletions: Boolean = false

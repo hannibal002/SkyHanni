@@ -29,15 +29,12 @@ import de.hype.bingonet.shared.packets.network.SystemMessagePacket
 import de.hype.bingonet.shared.packets.network.WantedSearchPacket
 import de.hype.bingonet.shared.packets.network.WelcomeClientPacket
 
-class BNPacketManager(// Define a map to store packet classes and their associated actions
-    var connection: BNConnection?
-) {
+object BNPacketManager{
     var packets: MutableList<Packet<out AbstractPacket>> = ArrayList<Packet<out AbstractPacket>>()
 
     // Method to initialize packet actions
     init {
-        initializePacketActions(connection)
-        lastBNPacketManager = this
+        initializePacketActions()
     }
 
     fun getPackets(): MutableList<Packet<out AbstractPacket>> {
@@ -45,80 +42,80 @@ class BNPacketManager(// Define a map to store packet classes and their associat
     }
 
     // Method to handle a received packet
-    fun initializePacketActions(connection: BNConnection?) {
+    fun initializePacketActions() {
         packets.add(
             Packet<BingoChatMessagePacket>(
                 BingoChatMessagePacket::class.java,
-                connection::onBingoChatMessagePacket,
+                BNConnection::onBingoChatMessagePacket,
             ),
         )
         packets.add(
             Packet<BroadcastMessagePacket>(
                 BroadcastMessagePacket::class.java,
-                connection::onBroadcastMessagePacket,
+                BNConnection::onBroadcastMessagePacket,
             ),
         )
         packets.add(
             Packet<DisconnectPacket>(
                 DisconnectPacket::class.java,
-                connection::onDisconnectPacket,
+                BNConnection::onDisconnectPacket,
             ),
         )
         packets.add(
             Packet<InternalCommandPacket>(
                 InternalCommandPacket::class.java,
-                connection::onInternalCommandPacket,
+                BNConnection::onInternalCommandPacket,
             ),
         )
         packets.add(
             Packet<InvalidCommandFeedbackPacket>(
                 InvalidCommandFeedbackPacket::class.java,
-                connection::onInvalidCommandFeedbackPacket,
+                BNConnection::onInvalidCommandFeedbackPacket,
             ),
         )
-        packets.add(Packet<MiningEventPacket>(MiningEventPacket::class.java, connection::onMiningEventPacket))
-        packets.add(Packet<PartyPacket>(PartyPacket::class.java, connection::onPartyPacket))
-        //        packets.add(new Packet<>(RequestConnectPacket.class, connection::dummy));
-        packets.add(Packet<SplashNotifyPacket>(SplashNotifyPacket::class.java, connection::onSplashNotifyPacket))
-        packets.add(Packet<SystemMessagePacket>(SystemMessagePacket::class.java, connection::onSystemMessagePacket))
-        packets.add(Packet<WelcomeClientPacket>(WelcomeClientPacket::class.java, connection::onWelcomePacket))
+        packets.add(Packet<MiningEventPacket>(MiningEventPacket::class.java, BNConnection::onMiningEventPacket))
+        packets.add(Packet<PartyPacket>(PartyPacket::class.java, BNConnection::onPartyPacket))
+        //        packets.add(new Packet<>(RequestConnectPacket.class, BNConnection::dummy));
+        packets.add(Packet<SplashNotifyPacket>(SplashNotifyPacket::class.java, BNConnection::onSplashNotifyPacket))
+        packets.add(Packet<SystemMessagePacket>(SystemMessagePacket::class.java, BNConnection::onSystemMessagePacket))
+        packets.add(Packet<WelcomeClientPacket>(WelcomeClientPacket::class.java, BNConnection::onWelcomePacket))
         packets.add(
             Packet<RequestAuthentication>(
                 RequestAuthentication::class.java,
-                connection::onRequestAuthentication,
+                BNConnection::onRequestAuthentication,
             ),
         )
         packets.add(Packet<SplashUpdatePacket>(SplashUpdatePacket::class.java, SplashManager::updateSplash))
         packets.add(
             Packet<GetWaypointsPacket>(
                 GetWaypointsPacket::class.java,
-                connection::onGetWaypointsPacket,
+                BNConnection::onGetWaypointsPacket,
             ),
         )
-        packets.add(Packet<WaypointPacket>(WaypointPacket::class.java, connection::onWaypointPacket))
-        packets.add(Packet<CompletedGoalPacket>(CompletedGoalPacket::class.java, connection::onCompletedGoalPacket))
-        packets.add(Packet<WantedSearchPacket>(WantedSearchPacket::class.java, connection::onWantedSearchPacket))
+        packets.add(Packet<WaypointPacket>(WaypointPacket::class.java, BNConnection::onWaypointPacket))
+        packets.add(Packet<CompletedGoalPacket>(CompletedGoalPacket::class.java, BNConnection::onCompletedGoalPacket))
+        packets.add(Packet<WantedSearchPacket>(WantedSearchPacket::class.java, BNConnection::onWantedSearchPacket))
         packets.add(
             Packet<CommandChatPromptPacket>(
                 CommandChatPromptPacket::class.java,
-                connection::onCommandChatPromptPacket,
+                BNConnection::onCommandChatPromptPacket,
             ),
         )
         packets.add(
             Packet<PacketChatPromptPacket>(
                 PacketChatPromptPacket::class.java,
-                connection::onPacketChatPromptPacket,
+                BNConnection::onPacketChatPromptPacket,
             ),
         )
-        packets.add(Packet<PunishedPacket>(PunishedPacket::class.java, connection::onPunishedPacket))
-        packets.add(Packet<PlaySoundPacket>(PlaySoundPacket::class.java, connection::onPlaySoundPacket))
+        packets.add(Packet<PunishedPacket>(PunishedPacket::class.java, BNConnection::onPunishedPacket))
+        packets.add(Packet<PlaySoundPacket>(PlaySoundPacket::class.java, BNConnection::onPlaySoundPacket))
         packets.add(
             Packet<MinionDataResponse.RequestMinionDataPacket>(
                 MinionDataResponse.RequestMinionDataPacket::class.java,
-                connection::onRequestMinionDataPacket,
+                BNConnection::onRequestMinionDataPacket,
             ),
         )
-        packets.add(Packet<MinionDataResponse>(MinionDataResponse::class.java, connection::dummy))
+        packets.add(Packet<MinionDataResponse>(MinionDataResponse::class.java, BNConnection::dummy))
         packets.add(
             Packet<RequestPartyStatePacket>(
                 RequestPartyStatePacket::class.java,
@@ -137,22 +134,5 @@ class BNPacketManager(// Define a map to store packet classes and their associat
                 (UpdateListenerManager::onChLobbyDataReceived),
             ),
         )
-    }
-
-    companion object {
-        private var lastBNPacketManager: BNPacketManager? = null
-        val allPacketClasses: MutableList<Class<out AbstractPacket>>
-            //   method to get a list of all packets
-            get() {
-                if (lastBNPacketManager == null) {
-                    lastBNPacketManager = BNPacketManager(null)
-                }
-                val allPackets: MutableList<Class<out AbstractPacket>> =
-                    ArrayList<Class<out AbstractPacket>>()
-                for (i in lastBNPacketManager!!.packets.indices) {
-                    allPackets.add(lastBNPacketManager!!.packets.get(i)!!.clazz)
-                }
-                return allPackets
-            }
     }
 }
