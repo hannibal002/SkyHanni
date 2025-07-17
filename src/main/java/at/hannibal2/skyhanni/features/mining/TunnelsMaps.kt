@@ -51,8 +51,10 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -287,14 +289,13 @@ object TunnelsMaps {
         } ?: return display
 
         if (active.isEmpty()) return buildList {
-            addString("")
-            addString("")
+            add(Renderable.placeholder(0, 20))
             addAll(locationDisplay)
         }
 
         return buildList {
             if (goal == campfire && active != campfire.name) {
-                add(StringRenderable("§6Override for ${campfire.name}"))
+                addString("§6Override for ${campfire.name}")
                 add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
             } else {
                 add(
@@ -305,7 +306,7 @@ object TunnelsMaps {
                     ),
                 )
                 if (hasNext()) add(Renderable.clickable("§eNext Spot", onLeftClick = ::setNextGoal))
-                else addString("")
+                else Renderable.emptyText()
             }
             addAll(locationDisplay)
         }
@@ -323,7 +324,7 @@ object TunnelsMaps {
 
     private fun generateLocationsDisplay() = buildList {
         val campfireName = campfire.name ?: return@buildList
-        add(StringRenderable("§6Locations:"))
+        addString("§6Locations:")
         add(
             Renderable.clickable(
                 campfireName,
@@ -340,13 +341,13 @@ object TunnelsMaps {
         if (!config.excludeFairy.get()) {
             add(
                 Renderable.hoverable(
-                    HorizontalContainerRenderable(
-                        listOf(StringRenderable("§dFairy Souls")) + fairySouls.map {
+                    Renderable.horizontal(
+                        listOf(Renderable.text("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(StringRenderable("§d[$name]"), onLeftClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.text("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
-                    StringRenderable("§dFairy Souls"),
+                    Renderable.text("§dFairy Souls"),
                 ),
             )
         }
@@ -359,13 +360,13 @@ object TunnelsMaps {
 
     private fun Map<String, List<GraphNode>>.toRenderables() = map {
         Renderable.clickable(
-            StringRenderable(it.key),
-            onLeftClick = guiSetActive(it.key)
+            Renderable.text(it.key),
+            onLeftClick = guiSetActive(it.key),
         )
     }
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickable(
-        StringRenderable(
+        Renderable.text(
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),

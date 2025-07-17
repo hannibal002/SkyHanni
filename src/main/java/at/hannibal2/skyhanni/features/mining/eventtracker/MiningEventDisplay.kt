@@ -12,14 +12,14 @@ import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Compan
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object MiningEventDisplay {
@@ -46,8 +46,8 @@ object MiningEventDisplay {
     private fun updateEvents() = buildList {
         if (MiningEventTracker.apiError) {
             val count = MiningEventTracker.apiErrorCount
-            add(StringRenderable("§cMining Event API Error! ($count)"))
-            add(StringRenderable("§cSwap servers to try again!"))
+            addString("§cMining Event API Error! ($count)")
+            addString("§cSwap servers to try again!")
         }
 
         val sortedIslandEventData = islandEventData.entries
@@ -77,27 +77,27 @@ object MiningEventDisplay {
             if (!shouldShow) continue
             val upcomingEvents = formatUpcomingEvents(eventDetails.islandEvents, eventDetails.lastEvent)
             val islandName = if (config.islandAsIcon) {
-                HorizontalContainerRenderable(getIslandIcon(islandType))
+                Renderable.horizontal(getIslandIcon(islandType))
             } else {
-                StringRenderable("§a${islandType.displayName}§8:")
+                Renderable.text("§a${islandType.displayName}§8:")
             }
-            add(HorizontalContainerRenderable(listOf(islandName) + upcomingEvents, 3))
+            add(Renderable.horizontal(listOf(islandName) + upcomingEvents, 3))
         }
     }
 
-    private val mithrilOreItem by lazy { "MITHRIL_ORE".toInternalName().getItemStack() }
-    private val perfRubyItem by lazy { "PERFECT_RUBY_GEM".toInternalName().getItemStack() }
+    private val mithrilOre = "MITHRIL_ORE".toInternalName()
+    private val perfRuby = "PERFECT_RUBY_GEM".toInternalName()
     private fun getIslandIcon(islandType: IslandType) = listOf(
         when (islandType) {
-            IslandType.DWARVEN_MINES -> ItemStackRenderable(mithrilOreItem)
-            IslandType.CRYSTAL_HOLLOWS -> ItemStackRenderable(perfRubyItem)
+            IslandType.DWARVEN_MINES -> Renderable.item(mithrilOre)
+            IslandType.CRYSTAL_HOLLOWS -> Renderable.item(perfRuby)
             else -> unknownDisplay
         },
-        StringRenderable("§8:"),
+        Renderable.text("§8:"),
     )
 
-    private val unknownDisplay = StringRenderable("§7???")
-    private val transitionDisplay = StringRenderable("§8->")
+    private val unknownDisplay = Renderable.text("§7???")
+    private val transitionDisplay = Renderable.text("§8->")
 
     private fun formatUpcomingEvents(events: List<RunningEventType>, lastEvent: MiningEventType?): Array<Renderable> {
         val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }

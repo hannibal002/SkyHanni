@@ -31,9 +31,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.EntityLivingBase
@@ -80,7 +80,7 @@ object PunchcardHighlight {
 
     private val PUNCHCARD_ARTIFACT = "PUNCHCARD_ARTIFACT".toInternalName()
     private val displayIcon by lazy { PUNCHCARD_ARTIFACT.getItemStack() }
-    private var display: Renderable = StringRenderable("hello")
+    private var display: Renderable = Renderable.text("hello")
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
@@ -232,11 +232,9 @@ object PunchcardHighlight {
         string += "§d" + if (!config.reverseGUI.get()) playerList.size
         else 20 - playerList.size
 
-        return HorizontalContainerRenderable(
-            listOf(
-                ItemStackRenderable(displayIcon),
-                StringRenderable(string),
-            ),
+        return Renderable.horizontal(
+            Renderable.item(displayIcon),
+            Renderable.text(string),
             spacing = 1,
         )
     }

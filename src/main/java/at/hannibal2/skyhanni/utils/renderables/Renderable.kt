@@ -7,11 +7,6 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
-//#if TODO
-import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
-import at.hannibal2.skyhanni.features.chroma.ChromaType
-import at.hannibal2.skyhanni.features.misc.DarkenShader
-//#endif
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -37,21 +32,14 @@ import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
-//#if TODO
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
-//#endif
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
-//#if MC < 1.21
-import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
-//#else
-//$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
-//#endif
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
@@ -59,7 +47,16 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
-//#if MC > 1.21
+//#if TODO
+import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
+import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.features.misc.DarkenShader
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
+//#endif
+//#if MC < 1.21
+import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+//#else
+//$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 //#endif
@@ -97,10 +94,10 @@ interface Renderable {
         val logger = LorenzLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
 
-        fun <T> withMousePosition(mouseOffsetX: Int, mouseOffsetY: Int, block: () -> T): T {
+        fun <T> withMousePosition(mousePositionX: Int, mousePositionY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition
             try {
-                currentRenderPassMousePosition = Pair(mouseOffsetX, mouseOffsetY)
+                currentRenderPassMousePosition = Pair(mousePositionX, mousePositionY)
                 return block()
             } finally {
                 currentRenderPassMousePosition = last
@@ -110,13 +107,13 @@ interface Renderable {
         fun fromAny(any: Any?, itemScale: Double = NeuItems.ITEM_FONT_SIZE): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
-            is String -> StringRenderable(any)
-            is ItemStack -> ItemStackRenderable(any, itemScale)
+            is String -> text(any)
+            is ItemStack -> item(any, itemScale)
             else -> null
         }
 
         fun link(text: String, bypassChecks: Boolean = false, onLeftClick: () -> Unit): Renderable =
-            link(StringRenderable(text), onLeftClick, bypassChecks = bypassChecks)
+            link(text(text), onLeftClick, bypassChecks = bypassChecks)
 
         fun optionalLink(
             text: String,
@@ -125,7 +122,7 @@ interface Renderable {
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
         ): Renderable = link(
-            StringRenderable(text),
+            text(text),
             onLeftClick,
             bypassChecks,
             highlightsOnHoverSlots = highlightsOnHoverSlots,
@@ -157,7 +154,7 @@ interface Renderable {
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(StringRenderable(text), onLeftClick, bypassChecks, condition, tips, onHover)
+        ) = clickable(text(text), onLeftClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
             render: Renderable,
@@ -180,7 +177,7 @@ interface Renderable {
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(StringRenderable(text), onAnyClick, bypassChecks, condition, tips, onHover)
+        ) = clickable(text(text), onAnyClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
             render: Renderable,
@@ -281,7 +278,7 @@ interface Renderable {
             onHover: () -> Unit = {},
         ): Renderable {
 
-            val render = fromAny(content) ?: StringRenderable("Error")
+            val render = fromAny(content) ?: text("Error")
             return object : Renderable {
                 override val width = render.width
                 override val height = render.height
@@ -457,15 +454,6 @@ interface Renderable {
                 ShaderManager.disableShader()
                 //#endif
             }
-        }
-
-        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
-            override val width = width
-            override val height = height
-            override val horizontalAlign = HorizontalAlignment.LEFT
-            override val verticalAlign = VerticalAlignment.TOP
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {}
         }
 
         fun searchableTable(
@@ -962,16 +950,6 @@ interface Renderable {
             }
         }
 
-        // todo rename to horizontal
-        fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
-            return HorizontalContainerRenderable(buildList { builderAction() })
-        }
-
-        // todo add spacing as a parameter here, or remove this function (hardcoded = 2?)
-        fun vertical(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
-            return VerticalContainerRenderable(buildList { builderAction() }, spacing = 2)
-        }
-
         fun scrollList(
             list: List<Renderable>,
             height: Int,
@@ -983,8 +961,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
             showScrollableTipsInList: Boolean = false,
         ) = object : Renderable {
-            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
-            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
+            private val scrollUpTip = text("§7§oMore items above (scroll)")
+            private val scrollDownTip = text("§7§oMore items below (scroll)")
 
             override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width)
             override val height = height
@@ -1035,8 +1013,8 @@ interface Renderable {
         ) = object : Renderable {
             private var list: Set<Renderable> = filterList(content, textInput.textBox)
 
-            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
-            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
+            private val scrollUpTip = text("§7§oMore items above (scroll)")
+            private val scrollDownTip = text("§7§oMore items below (scroll)")
 
             override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollUpTip.width, scrollDownTip.width)
             override val height = height
@@ -1144,10 +1122,10 @@ interface Renderable {
         }
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =
-            filterListBase(content, textBox, StringRenderable("§cNo search results!"))
+            filterListBase(content, textBox, text("§cNo search results!"))
 
         private fun filterListMap(content: Map<List<Renderable>, String?>, textBox: String) =
-            filterListBase(content, textBox, listOf(StringRenderable("§cNo search results!")))
+            filterListBase(content, textBox, listOf(text("§cNo search results!")))
 
         private fun <T> filterListBase(content: Map<T, String?>, textBox: String, empty: T): Set<T> {
             val map = content.filter { it.value?.contains(textBox, ignoreCase = true) != false }
@@ -1184,7 +1162,7 @@ interface Renderable {
                 )
             } else {
                 @Suppress("USELESS_CAST")
-                val content = table.mapKeys { HorizontalContainerRenderable(it.key) as Renderable }
+                val content = table.mapKeys { horizontal(it.key) as Renderable }
                 val height = content.maxOf { it.key.height }
                 searchableScrollList(
                     content,
@@ -1215,8 +1193,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            private val scrollUpTip = StringRenderable("§7§oMore items above (scroll)")
-            private val scrollDownTip = StringRenderable("§7§oMore items below (scroll)")
+            private val scrollUpTip = text("§7§oMore items above (scroll)")
+            private val scrollDownTip = text("§7§oMore items below (scroll)")
 
             private var list = filterListMap(content, textInput.textBox).toList()
 

@@ -12,8 +12,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -138,13 +139,13 @@ object GuiRenderUtils {
         val current = currentValue.toDouble().coerceAtLeast(0.0)
         val percent = current.fractionOf(maxValue)
         val scale = textScale.toDouble()
-        return Renderable.hoverTips(
-            VerticalContainerRenderable(
-                listOf(
-                    StringRenderable(label, scale = scale),
-                    Renderable.fixedSizeLine(
+        return with(Renderable) {
+            hoverTips(
+                vertical(
+                    text(label, scale = scale),
+                    fixedSizeLine(
                         listOf(
-                            StringRenderable(
+                            text(
                                 "§2${DecimalFormat("0.##").format(current)} / ${
                                     DecimalFormat(
                                         "0.##",
@@ -152,7 +153,7 @@ object GuiRenderUtils {
                                 }☘",
                                 scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
                             ),
-                            StringRenderable(
+                            text(
                                 "§2${(percent * 100).roundTo(1)}%",
                                 scale = scale,
                                 horizontalAlign = HorizontalAlignment.RIGHT,
@@ -160,11 +161,11 @@ object GuiRenderUtils {
                         ),
                         width,
                     ),
-                    Renderable.progressBar(percent, width = width),
+                    progressBar(percent, width = width),
                 ),
-            ),
-            tooltip.split('\n').map(StringRenderable::from),
-        )
+                tooltip.split('\n').map(StringRenderable::from),
+            )
+        }
     }
 
     fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
