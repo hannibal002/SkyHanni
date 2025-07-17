@@ -482,7 +482,7 @@ object CustomWardrobe {
             horizontalAlign = HorizontalAlignment.CENTER,
         )
 
-        val total = Renderable.vertical(
+        val total = Renderable.horizontal(
             row,
             editButton,
             spacing = verticalSpacing.toInt(),
