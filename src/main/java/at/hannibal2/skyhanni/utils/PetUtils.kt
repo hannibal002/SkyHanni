@@ -178,19 +178,18 @@ object PetUtils {
     fun levelToXp(level: Int, petInternalName: NeuInternalName): Double? = runCatching {
         val rarityOffset = getRarityOffset(petInternalName) ?: return null
         if (level < 0 || level > getMaxLevel(petInternalName)) return null
-        val indicesSlice = 0 + rarityOffset..<level + rarityOffset - 1
         val levelTree = getFullLevelingTree(petInternalName)
-        if (indicesSlice.first < 0 || indicesSlice.last >= levelTree.size) {
+        if (rarityOffset + level > levelTree.size) {
             if (lastRepoWarning.passedSince() > 5.minutes) {
                 ChatUtils.userError(
                     "§cFailed to load pet levels from NEU repo. " +
-                        "§cYou can try to fix this by running `§e/neuupdaterepo`§c."
+                        "§cYou can try to fix this by running `§e/${ItemUtils.resetCommand}`§c."
                 )
                 lastRepoWarning = SimpleTimeMark.now()
             }
             return null
         }
-        return levelTree.slice(indicesSlice).sumOf { it.toDouble() }
+        return levelTree.subList(rarityOffset, rarityOffset + level).sumOf { it.toDouble() }
     }.getOrElse {
         ErrorManager.logErrorWithData(
             it,
