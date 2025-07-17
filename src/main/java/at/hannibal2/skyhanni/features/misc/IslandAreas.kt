@@ -63,11 +63,7 @@ object IslandAreas {
         updateArea("no_area", onlyInternal = true)
     }
 
-    fun nodeMoved() {
-        SkyHanniMod.coroutineScope.launch {
-            updateNodes()
-        }
-    }
+    fun nodeMoved() = SkyHanniMod.launchCoroutine(::updateNodes)
 
     private fun updateNodes() {
         if (!isEnabled()) return

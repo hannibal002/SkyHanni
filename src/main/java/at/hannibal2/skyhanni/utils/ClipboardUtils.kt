@@ -44,7 +44,7 @@ object ClipboardUtils {
     //#endif
 
     fun copyToClipboard(text: String, step: Int = 0) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             try {
                 //#if MC < 1.21
                 getClipboard()?.setContents(StringSelection(text), null)

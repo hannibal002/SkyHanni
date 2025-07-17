@@ -54,8 +54,8 @@ object AllBurrowsList {
     }
 
     private fun addFromClipboard() {
-        SkyHanniMod.coroutineScope.launch {
-            val text = OSUtils.readFromClipboard() ?: return@launch
+        SkyHanniMod.launchIOCoroutine {
+            val text = OSUtils.readFromClipboard() ?: return@launchIOCoroutine
 
             var new = 0
             var duplicate = 0

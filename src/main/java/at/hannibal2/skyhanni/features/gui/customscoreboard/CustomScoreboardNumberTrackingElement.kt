@@ -29,7 +29,7 @@ interface CustomScoreboardNumberTrackingElement {
             " §7($numberColor${formatNumber(changeAmount)}§7)$numberColor"
         }
 
-        currentJob = SkyHanniMod.coroutineScope.launch {
+        currentJob = SkyHanniMod.launchCoroutine {
             delay(durationMillis)
             temporaryChangeDisplay = null
             currentJob = null

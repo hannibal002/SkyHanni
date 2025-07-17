@@ -429,7 +429,7 @@ object GardenNextJacobContest {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
         if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
-            SkyHanniMod.coroutineScope.launch {
+            SkyHanniMod.launchIOCoroutine {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
                     message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",

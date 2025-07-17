@@ -353,7 +353,7 @@ object CropMoneyDisplay {
         if (loaded) return
         loaded = true
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             val map = mutableMapOf<NeuInternalName, Int>()
             for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
                 if (rawInternalName == "ENCHANTED_PAPER") continue

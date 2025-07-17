@@ -60,9 +60,7 @@ object TabListData {
                     add(" '$line'")
                 }
             }
-        } ?: run {
-            event.addIrrelevant("not active.")
-        }
+        } ?: event.addIrrelevant("not active.")
     }
 
     private fun toggleDebug() {
@@ -71,8 +69,8 @@ object TabListData {
             debugCache = null
             return
         }
-        SkyHanniMod.coroutineScope.launch {
-            val clipboard = OSUtils.readFromClipboard() ?: return@launch
+        SkyHanniMod.launchCoroutine {
+            val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             debugCache = clipboard.lines()
             ChatUtils.chat("Enabled tab list debug with your clipboard.")
         }

@@ -51,7 +51,7 @@ object NavigationHelper {
             }
         }
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             doCommandAsync(args)
         }
     }

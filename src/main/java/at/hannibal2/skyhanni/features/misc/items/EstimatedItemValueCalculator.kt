@@ -674,7 +674,7 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
+            if (rawName in EstimatedItemValue.stackingEnchants.keys) level = 1
 
             val enchantmentName = "$rawName;$level".toInternalName()
 
