@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
@@ -40,7 +39,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.util.ChatComponentText
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -147,7 +145,6 @@ object IslandGraphs {
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
     private var inGlaciteTunnels: Boolean? = null
-    private var nextMessageComponent: ChatComponentText? = null
 
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
@@ -287,20 +284,6 @@ object IslandGraphs {
         closestNode = null
     }
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        if (currentIslandGraph == null) return
-        if (event.isMod(2)) {
-            update()
-        }
-        updateChat()
-        nextMessageComponent?.let {
-            if (NavigationFeedback.sendPathFindMessage(it)) {
-                nextMessageComponent = null
-            }
-        }
-    }
-
     fun update(force: Boolean = false) {
         if (force) {
             pathfindClosestNode = null
@@ -384,7 +367,7 @@ object IslandGraphs {
     private fun Graph.totalLength(): Double = nodes.zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
 
     private fun handlePositionChange() {
-        updateChat()
+        updateFeedback()
     }
 
     private var hasMoved = false
@@ -422,7 +405,7 @@ object IslandGraphs {
         if (setPath) {
             this.fastestPath = skipIfCloser(Graph(cutByMaxDistance(nodes, 2.0)))
         }
-        updateChat()
+        updateFeedback()
     }
 
     private fun onNewNode() {
@@ -519,10 +502,10 @@ object IslandGraphs {
         this.condition = condition
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
-        updateChat()
+        updateFeedback()
     }
 
-    private fun updateChat() {
+    private fun updateFeedback() {
         if (label == "") return
         val path = fastestPath ?: return
         var distance = 0.0
@@ -555,7 +538,7 @@ object IslandGraphs {
             },
         )
         component.hover = "§eClick to stop navigating!".asComponent()
-        nextMessageComponent = component
+        NavigationFeedback.sendPathFindMessage(component)
     }
 
     @HandleEvent
