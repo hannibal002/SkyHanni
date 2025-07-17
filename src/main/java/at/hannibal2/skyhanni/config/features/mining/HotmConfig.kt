@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.PowderSpentDesign
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HotmConfig {
     @Expose
@@ -16,6 +19,17 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightEnabledPerks: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Sky Mall Display", desc = "Display your current Sky Mall perk in a GUI element.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("skymall")
+    var skyMallDisplay: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = HotmConfig::class, field = "skyMallDisplay")
+    val skyMallPosition: Position = Position(100, 100)
 
     @Expose
     @ConfigOption(name = "Level Stack", desc = "Show the level of a perk as item stacks.")

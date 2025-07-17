@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFor
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -27,6 +26,7 @@ object ToolTooltipTweaks {
     private val config get() = GardenApi.config.tooltipTweak
 
     /**
+     * REGEX-TEST: §7Farming Fortune: §a+88.5 §9(+8)
      * REGEX-TEST: §7Farming Fortune: §a+73 §9(+30) §d(+8)
      */
     private val farmingFortunePattern by RepoPattern.pattern(
@@ -34,10 +34,10 @@ object ToolTooltipTweaks {
         "§7Farming Fortune: §a",
     )
 
-    private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
-    private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
-    private const val ABILITY_DESCRIPTION_START = "§5§o§7These boots gain §a+2❈ Defense"
-    private const val ABILITY_DESCRIPTION_END = "§5§o§7Skill level."
+    private val counterStartLine = setOf("§6Logarithmic Counter", "§6Collection Analysis")
+    private val reforgeEndLine = setOf("", "§7chance for multiple crops.")
+    private const val ABILITY_DESCRIPTION_START = "§7These boots gain §a+2❈ Defense"
+    private const val ABILITY_DESCRIPTION_END = "§7Skill level."
 
     private val statFormatter = DecimalFormat("0.##")
 
@@ -70,7 +70,8 @@ object ToolTooltipTweaks {
         var removingReforgeDescription = false
         var removingAbilityDescription = false
 
-        for (line in iterator) {
+        for (originalLine in iterator) {
+            val line = originalLine.removePrefix("§5§o")
             if (farmingFortunePattern.find(line)) {
                 val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
 
@@ -121,23 +122,23 @@ object ToolTooltipTweaks {
             }
             // Beware, dubious control flow beyond these lines
             if (config.compactToolTooltips || FFGuideGui.isInGui()) {
-                if (line.startsWith("§5§o§7§8Bonus ")) removingFarmhandDescription = true
+                if (line.startsWith("§7§8Bonus ")) removingFarmhandDescription = true
                 if (removingFarmhandDescription) {
                     iterator.remove()
-                    removingFarmhandDescription = line != "§5§o"
-                } else if (removingCounterDescription && !line.startsWith("§5§o§7You have")) {
+                    removingFarmhandDescription = line != ""
+                } else if (removingCounterDescription && !line.startsWith("§7You have")) {
                     iterator.remove()
                 } else {
                     removingCounterDescription = false
                 }
                 if (counterStartLine.contains(line)) removingCounterDescription = true
 
-                if (line == "§5§o§9Blessed Bonus") removingReforgeDescription = true
+                if (line == "§9Blessed Bonus") removingReforgeDescription = true
                 if (removingReforgeDescription) {
                     iterator.remove()
                     removingReforgeDescription = !reforgeEndLine.contains(line)
                 }
-                if (line == "§5§o§9Bountiful Bonus") removingReforgeDescription = true
+                if (line == "§9Bountiful Bonus") removingReforgeDescription = true
 
                 if (FFGuideGui.isInGui()) {
                     if (line.contains("Click to ") || line.contains("§7§8This item can be reforged!") || line.contains("Dyed")) {
@@ -171,9 +172,5 @@ object ToolTooltipTweaks {
         event.move(3, "garden.compactToolTooltips", "garden.tooltipTweak.compactToolTooltips")
         event.move(3, "garden.fortuneTooltipKeybind", "garden.tooltipTweak.fortuneTooltipKeybind")
         event.move(3, "garden.cropTooltipFortune", "garden.tooltipTweak.cropTooltipFortune")
-
-        event.transform(15, "garden.tooltipTweak.cropTooltipFortune") { element ->
-            ConfigUtils.migrateIntToEnum(element, CropTooltipFortuneEntry::class.java)
-        }
     }
 }

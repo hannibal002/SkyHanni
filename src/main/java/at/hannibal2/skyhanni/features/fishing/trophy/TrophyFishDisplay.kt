@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.HideCaught
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TextPart
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TrophySorting
@@ -34,6 +35,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.milliseconds
@@ -86,6 +89,7 @@ object TrophyFishDisplay {
                 showCheckmark,
                 onlyShowMissing,
                 showCaughtHigher,
+                requireArmor,
             ) {
                 update()
             }
@@ -138,14 +142,17 @@ object TrophyFishDisplay {
         }
         val hover = TrophyFishApi.hoverInfo(rawName)
         fun string(string: String): Renderable = hover?.let {
-            Renderable.hoverTips(Renderable.string(string), tips = it.split("\n"))
-        } ?: Renderable.string(string)
+            Renderable.hoverTips(
+                StringRenderable(string),
+                tips = it.split("\n"),
+            )
+        } ?: StringRenderable(string)
 
         val row = mutableMapOf<TextPart, Renderable>()
         row[TextPart.NAME] = string(getItemName(rawName))
 
         val internalName = getInternalName(rawName)
-        row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
+        row[TextPart.ICON] = ItemStackRenderable(internalName.getItemStack())
 
         val recentlyDroppedRarity = recentlyDroppedTrophies[internalName]?.takeIf { config.highlightNew.get() }
 
@@ -257,12 +264,9 @@ object TrophyFishDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!canRender()) return
+        if (!isEnabled() || !canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
-
-        if (FishingApi.hasTreasureHook) return
-        if (config.requireHunterArmor.get() && !FishingApi.wearingTrophyArmor) return
+        if (FishingApi.hasTreasureHook || !matchesArmorRequirement()) return
 
         config.position.renderRenderables(
             display,
@@ -271,7 +275,11 @@ object TrophyFishDisplay {
         )
     }
 
-    fun canRender(): Boolean = when (config.whenToShow.get()!!) {
+    private fun matchesArmorRequirement() = if (config.requireArmor.get()) {
+        FishingApi.wearingTrophyArmor || FishingApi.wearingEmberArmor
+    } else true
+
+    private fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
         WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getMinecraft().currentScreen is GuiInventory
         WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
@@ -279,4 +287,10 @@ object TrophyFishDisplay {
     }
 
     fun isEnabled() = (IslandType.CRIMSON_ISLE.isCurrent() || SkyBlockUtils.isStrandedProfile) && config.enabled.get()
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val base = "fishing.trophyFishing.display"
+        event.move(94, "$base.requireHunterArmor", "$base.requireArmor")
+    }
 }

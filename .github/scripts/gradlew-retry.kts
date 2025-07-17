@@ -20,11 +20,12 @@ val cmd = listOf("./gradlew") + gradleArgs
  * REGEX-TEST: Could not GET 'https://repo.spongepowered.org/repository/maven-public/org/spongepowered/mixin/0.7.11-SNAPSHOT/mixin-0.7.11-20180703.121122-1.jar'
  * REGEX-TEST: Could not GET 'https://maven.minecraftforge.net/org/apache/logging/log4j/log4j-core/'. Received status code 502 from server: Bad Gateway
  * REGEX-TEST: Could not resolve all files for configuration ':1.16.5-forge:compileClasspath'.
+ * REGEX-TEST: > Could not resolve all files for configuration ':1.8.9:compileClasspath'.
+ * REGEX-TEST:          > Could not GET 'https://maven.shedaniel.me/dev/architectury/architectury-naming-service/2.0.9/architectury-naming-service-2.0.9.jar'.
  */
 val retryableErrorRegex = Regex(
     // language=RegExp
-    "Could not (?:GET '?(?<url>https?:\\/\\/[^']+)(?:'\\.?)?(?: (?<error>.*))?|determine|resolve)(?: (?:all files for configuration|the dependencies of task) '(?<task>:[^']+)')?",
-    RegexOption.COMMENTS
+    "(?:(?: +)?\\> +)?Could not (?:GET '?(?<url>https?:\\/\\/[^']+)(?:'\\.?)?(?: (?<error>.*))?|determine|resolve)(?: (?:all files for configuration|the dependencies of task) '(?<task>:[^']+)')?",
 )
 
 for (i in 1..maxAttempts) {

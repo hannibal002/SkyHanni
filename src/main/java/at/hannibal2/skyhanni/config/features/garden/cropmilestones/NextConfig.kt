@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.cropmilestones
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -26,15 +25,11 @@ class NextConfig {
     @ConfigEditorDropdown
     val bestType: Property<BestTypeEntry> = Property.of(BestTypeEntry.GARDEN_EXP)
 
-    enum class BestTypeEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        GARDEN_EXP("Garden Exp", 0),
-        SKYBLOCK_EXP("SkyBlock Exp", 1),
+    enum class BestTypeEntry(private val displayName: String) {
+        GARDEN_EXP("Garden Exp"),
+        SKYBLOCK_EXP("SkyBlock Exp"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

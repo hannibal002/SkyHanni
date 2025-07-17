@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
@@ -41,7 +42,8 @@ object ChatManager {
     private val loggerAllowed = LorenzLogger("chat/allowed")
     private val loggerModified = LorenzLogger("chat/modified")
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
-    private val messageHistory =
+
+    private val backingMessageHistory =
         object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
             override fun removeEldestEntry(
                 eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
@@ -49,6 +51,23 @@ object ChatManager {
                 return size > config.chatHistoryLength.coerceAtLeast(0)
             }
         }
+
+    private val messageHistory = CollectionUtils.ObservableMutableMap(
+        backingMessageHistory,
+        postUpdate = { key, value ->
+            if (value == null) replacementReasonMap.remove(key)
+        }
+    )
+
+    private val replacementReasonMap: MutableMap<IdentityCharacteristics<IChatComponent>, String> = mutableMapOf()
+
+    fun addReplacementContext(
+        chatComponent: IChatComponent,
+        reason: String,
+    ) = replacementReasonMap.put(
+        IdentityCharacteristics(chatComponent),
+        reason,
+    )
 
     private fun getRecentMessageHistory(): List<MessageFilteringResult> = messageHistory.toList().map { it.second }
 
@@ -81,6 +100,7 @@ object ChatManager {
         var actionKind: ActionKind,
         var actionReason: String?,
         var modified: IChatComponent?,
+        var modifiedReason: String?,
         val hoverInfo: List<String> = listOf(),
         val hoverExtraInfo: List<String> = listOf(),
     )
@@ -102,7 +122,7 @@ object ChatManager {
                     if (it.fileName == null) "" else "(§b${it.fileName}§7:§3${it.lineNumber}§7)"
             }
         val result = MessageFilteringResult(
-            component, ActionKind.OUTGOING, null, null,
+            component, ActionKind.OUTGOING, null, null, null,
             hoverInfo = hoverInfo,
             hoverExtraInfo = hoverInfo + listOf("") + stackTrace,
         )
@@ -150,13 +170,13 @@ object ChatManager {
         val chatEvent = SkyHanniChatEvent(message, component)
         chatEvent.post()
 
-        val blockReason = chatEvent.blockedReason.uppercase()
+        val blockReason = chatEvent.blockedReason.orEmpty().uppercase()
         if (blockReason != "") {
             loggerFiltered.log("[$blockReason] $message")
             loggerAll.log("[$blockReason] $message")
             loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.BLOCKED, blockReason, null)
+            messageHistory[key] = MessageFilteringResult(component, ActionKind.BLOCKED, blockReason, null, null)
             return null to true
         }
 
@@ -165,14 +185,15 @@ object ChatManager {
         loggerAllowed.log("[allowed] $message")
         loggerAll.log("[allowed] $message")
         if (modifiedComponent.formattedText != component.formattedText) {
+            val reason = replacementReasonMap[key].orEmpty().uppercase()
             modified = true
             loggerModified.log(" ")
             loggerModified.log("[original] " + component.formattedText)
             loggerModified.log("[modified] " + modifiedComponent.formattedText)
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent)
+            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent, reason)
             component = modifiedComponent
         } else {
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null)
+            messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null, null)
         }
 
         // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?

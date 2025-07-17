@@ -15,9 +15,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -29,7 +26,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
@@ -102,10 +103,10 @@ object FlareDisplay {
             if (newDisplay == null) {
                 newDisplay = buildList {
                     val displayTime = if (remainingTime.isNegative()) "§eSoon" else "§b${remainingTime.format()}"
-                    add(Renderable.string("$name: $displayTime"))
+                    add(StringRenderable("$name: $displayTime"))
                     if (config.showManaBuff) {
                         type.manaBuff?.let {
-                            add(Renderable.string(" §b$it §7mana regen"))
+                            add(StringRenderable(" §b$it §7mana regen"))
                         }
                     }
                 }
@@ -166,8 +167,8 @@ object FlareDisplay {
                 val location = flare.location.add(-0.5, 0.0, -0.5)
                 val name = flare.type.displayName
                 val time = "§b${getRemainingTime(flare).format()}"
-                event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
-                event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
+                event.drawDynamicText(location, name, 1.5, seeThroughBlocks = false)
+                event.drawDynamicText(location, time, 1.5, yOff = 10f, seeThroughBlocks = false)
             }
         }
 

@@ -27,6 +27,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -50,7 +53,7 @@ object FrogMaskFeatures {
     )
 
     private val FROG_MASK = "FROG_MASK".toInternalName()
-    private val frogMaskRenderable by lazy { Renderable.itemStack(FROG_MASK.getItemStack()) }
+    private val frogMaskRenderable by lazy { ItemStackRenderable(FROG_MASK.getItemStack()) }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.THE_PARK)
     fun onRenderOverlay() {
@@ -112,10 +115,10 @@ object FrogMaskFeatures {
     private fun updateDisplay(helmetRegion: String, nextDay: SimpleTimeMark) {
         val timeRemaining = nextDay.timeUntil()
 
-        display = Renderable.horizontalContainer(
+        display = HorizontalContainerRenderable(
             listOf(
                 frogMaskRenderable,
-                Renderable.string("§5Frog Mask§6 - $helmetRegion §6for §b${timeRemaining.format()}"),
+                StringRenderable("§5Frog Mask§6 - $helmetRegion §6for §b${timeRemaining.format()}"),
             ),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,

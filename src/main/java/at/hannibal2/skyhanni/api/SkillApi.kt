@@ -150,7 +150,7 @@ object SkillApi {
 
     @HandleEvent
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.readConstant<NeuSkillLevelJson>("leveling")
+        val data = event.getConstant<NeuSkillLevelJson>("leveling")
 
         levelArray = data.levelingXP
         levelingMap = levelArray.withIndex().associate { (index, xp) -> (index + 1) to xp }

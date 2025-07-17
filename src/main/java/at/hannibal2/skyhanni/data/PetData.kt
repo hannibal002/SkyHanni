@@ -1,16 +1,21 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import com.google.gson.annotations.Expose
+import net.minecraft.item.ItemStack
 import java.util.UUID
 
 data class PetDataStorage(
@@ -62,6 +67,26 @@ data class PetData(
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, fauxInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
     val rarity: LorenzRarity get() = if (tierBoosted) { specifiedRarity.oneAbove() ?: specifiedRarity } else specifiedRarity
+    val levelProgressionPercentage: Double get() = when {
+        exp == null || exp == 0.0 -> 0.0
+        PetUtils.getMaxLevel(fauxInternalName) <= level -> 100.0
+        else -> {
+            val xpDifference = nextLevelXp - currentLevelXp
+            val xpProgress = (exp ?: 0.0) - currentLevelXp
+            xpProgress / xpDifference * 100
+        }
+    }
+
+    val currentLevelXp get() = PetUtils.levelToXp(level, fauxInternalName) ?: 0.0
+    val nextLevelXp get() = PetUtils.levelToXp(level + 1, fauxInternalName) ?: 0.0
+    val overflowXp get() = when {
+        level == PetUtils.getMaxLevel(fauxInternalName) -> {
+            val currentTotalXp = exp ?: 0.0
+            val levelXp = PetUtils.levelToXp(level, fauxInternalName) ?: 0.0
+            (currentTotalXp - levelXp).takeIf { it >= 0.0 } ?: 0.0
+        }
+        else -> 0.0
+    }
 
     fun getUserFriendlyName(
         includeLevel: Boolean = true,
@@ -70,6 +95,44 @@ data class PetData(
         if (includeLevel) append("§7[Lvl $level] ")
         append(coloredName)
         if (includeSkinTag && skinTag != null) append(" $skinTag")
+    }
+
+    fun getItemStackOrNull(frameIndex: Int = 0): ItemStack? =
+        getSkinItemStackOrNull(frameIndex) ?: petInternalName.getItemStackOrNull()
+
+    fun getAnimatedItemStackSequence(firstFrameOnly: Boolean = false): List<ItemStackAnimationFrame>? {
+        val baseStack = getSkinItemStackOrNull(0) ?: run {
+            return null
+        }
+        val firstFrame = ItemStackAnimationFrame(baseStack)
+        val animationJson = getAnimatedJsonOrNull()
+        if (firstFrameOnly || animationJson == null) {
+            return listOf(firstFrame)
+        }
+        return animationJson.textures.map {
+            ItemStackAnimationFrame(
+                it.buildTextureItemStack(),
+                ticks = animationJson.ticks,
+            )
+        }
+    }
+
+    private fun String.buildTextureItemStack(): ItemStack {
+        val (uuid, texture) = this.split(":")
+        return ItemUtils.createSkull("Pet Skin", uuid, texture)
+    }
+
+    private fun getAnimatedJsonOrNull(): AnimatedSkinJson? {
+        val skinInternalName = skinInternalName ?: return null
+        return PetUtils.getAnimatedJsonOrNull(skinInternalName, skinVariantIndex)
+    }
+
+    private fun getSkinItemStackOrNull(frameIndex: Int = 0): ItemStack? {
+        val skinInternalName = skinInternalName ?: return null
+        val baseItemStack = skinInternalName.getItemStackOrNull() ?: return null
+        val animatedSkinJson = getAnimatedJsonOrNull()?.takeIf { it.textures.any() } ?: return baseItemStack
+        val boundedFrameIndex = frameIndex.takeIf { it > 0 && it < animatedSkinJson.textures.size } ?: 0
+        return animatedSkinJson.textures[boundedFrameIndex].buildTextureItemStack()
     }
 
     companion object {
@@ -84,6 +147,7 @@ data class PetData(
         appendLine("    hasValidHigherTier: '${petInternalName.hasValidHigherTier()}'")
         appendLine("  skinInternalName: '${skinInternalName?.asString()}'")
         appendLine("  skinVariantIndex: '$skinVariantIndex'")
+        appendLine("    knownAnimationJson?: '${getAnimatedJsonOrNull() != null}'")
         appendLine("  heldItemInternalName: '${heldItemInternalName?.asString()}'")
         appendLine("  exp: '${exp?.addSeparators() ?: 0.0}'")
         appendLine("  uuid: '$uuid'")
