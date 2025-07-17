@@ -37,6 +37,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -130,12 +132,26 @@ object SkyHanniMod {
         CoroutineName("SkyHanni") + SupervisorJob(globalJob),
     )
 
-    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job {
-        return launchCoroutine {
-            withContext(Dispatchers.IO) {
-                block()
-            }
+    /**
+     * Launch an IO coroutine with a lock on the provided mutex.
+     * @param mutex The mutex to lock during the execution of the block.
+     * @param block The suspend function to execute within the IO context.
+     */
+    fun launchIOCoroutineWithMutex(
+        mutex: Mutex,
+        block: suspend CoroutineScope.() -> Unit
+    ): Job = launchCoroutine {
+        mutex.withLock {
+            withContext(Dispatchers.IO, block)
         }
+    }
+
+    /**
+     * Launch an IO coroutine.
+     * @param block The suspend function to execute within the IO context.
+     */
+    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job = launchCoroutine {
+        withContext(Dispatchers.IO, block)
     }
 
     var screenToOpen: GuiScreen? = null

@@ -223,6 +223,15 @@ class ConfigManager {
             file.parentFile.mkdirs()
             StringFileHandler(file).save(gson.toJson(data))
             logger.log("Saved $fileName file successfully")
+        } catch (e: ClassCastException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Could not save $fileName file to $file",
+                "file" to file,
+                "data" to data,
+                "dataClass" to data.javaClass,
+                "fileName" to fileName,
+            )
         } catch (e: IOException) {
             logger.log("Could not save $fileName file to $file")
             logger.log(e.stackTraceToString())

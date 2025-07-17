@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteAuctionsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteBazaarResponse
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsRequest
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteItemResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.api.ApiStaticPath
 import at.hannibal2.skyhanni.utils.api.ApiStaticPostPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.skyhanni.utils.api.JsonApiResponse
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonObject
 
@@ -56,19 +57,21 @@ object EliteDevApi {
         }
     }
 
-    private suspend fun fetchResourceCommand(resourceType: EliteResourceType) {
+    private suspend fun fetchResourceCommand(resourceType: EliteResourceType) = runCatching {
         val startTime = SimpleTimeMark.now()
         val resourcesFetched = when (resourceType) {
-            EliteResourceType.ITEM -> fetchItemResources()?.items?.size
-            EliteResourceType.AUCTION -> fetchAuctionResources()?.items?.size
-            EliteResourceType.BAZAAR -> fetchBazaarResources()?.products?.size
+            EliteResourceType.ITEM -> fetchItemResources().items.size
+            EliteResourceType.AUCTION -> fetchAuctionResources().items.size
+            EliteResourceType.BAZAAR -> fetchBazaarResources().products.size
         }
         val elapsedFormat = startTime.passedSince().format()
-        if (resourcesFetched == null || resourcesFetched == 0) {
+        if (resourcesFetched == 0) {
             ChatUtils.chat("§cFailed to fetch §e$resourceType §cresources!")
-            return
+            return@runCatching
         }
         ChatUtils.chat("Fetched $resourcesFetched $resourceType resources in $elapsedFormat.")
+    }.onFailure {
+        ChatUtils.chat("Failed to fetch $resourceType resources!")
     }
 
     private const val ELITEBOT_API_URL = "https://api.elitebot.dev"
@@ -92,56 +95,34 @@ object EliteDevApi {
     private const val RESOURCE_API_URL = "$ELITEBOT_API_URL/resources"
 
     // <editor-fold desc="Upcoming Contests">
-    var contestsApiResponse: JsonObject? = null
-    suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
-        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(contestStatic.toGet()).assertSuccessWithData()
-            ?: throw IllegalStateException("Response was null")
-        contestsApiResponse = apiData
-        val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(apiData)
-        contestResponse.responseContests
-    } catch (e: Exception) {
-        ErrorManager.logErrorWithData(
-            e,
+    suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? {
+        val apiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(contestStatic.toGet())
+        val (_, apiData) = apiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
             "Failed to fetch upcoming contests. Please report this error if it continues to occur",
-            "contestApiResponse" to contestsApiResponse,
+            "apiResponse" to apiResponse,
         )
-        null
+        val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(apiData)
+        return contestResponse.responseContests
     }
 
-    suspend fun submitContests(contests: List<EliteFarmingContest>): Boolean = try {
-        val body = ConfigManager.Companion.gson.toJson(
-            contests.associate { contest ->
-                contest.startTime.toMillis() / 1000 to contest.crops.map { crop -> crop.cropName }
-            },
-        )
-        val response = ApiUtils.postJson(contestStatic, body)
-        response.success
-    } catch (e: Exception) {
-        ErrorManager.logErrorWithData(
-            e,
-            "Failed to submit upcoming contests. Please report this error if it continues to occur.",
-            "contests" to contests,
-        )
-        false
+    suspend fun submitContests(contests: List<EliteFarmingContest>): Boolean {
+        val body = EliteContestsRequest(contests).getBody()
+        return ApiUtils.postJson(contestStatic, body).success
     }
     // </editor-fold>
 
     // <editor-fold desc="Farming Weight">
     private var weightUrl = ""
-    private var weightProfileApiResponse: JsonObject? = null
+    private var weightProfileApiResponse: JsonApiResponse<JsonObject>? = null
     suspend fun fetchWeightProfile(localProfile: String): WeightProfile? = try {
         require(localProfile.isNotBlank()) { "Local profile cannot be blank" }
 
-        val uuid = PlayerUtils.getUuid()
-        weightUrl = "$FARMING_WEIGHT_URL/$uuid"
+        weightUrl = "$FARMING_WEIGHT_URL/${PlayerUtils.getUuid()}"
+        weightProfileApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(weightUrl, apiName = FARMING_WEIGHT_API_NAME)
+        val (_, apiData) = weightProfileApiResponse?.assertSuccessWithData()
+            ?: throw IllegalStateException("Response was not successful, or data was null")
 
-        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(
-            weightUrl,
-            apiName = FARMING_WEIGHT_API_NAME
-        ).assertSuccessWithData() ?: throw IllegalStateException("Response was null")
-        weightProfileApiResponse = apiData
         val weightData = ConfigManager.gson.fromJson<ElitePlayerWeightJson>(apiData)
-
         val selectedProfileId = weightData.selectedProfileId
         val selectedProfileEntry = weightData.profiles.firstOrNull {
             val idMatch = it.profileId == selectedProfileId
@@ -167,30 +148,23 @@ object EliteDevApi {
         null
     }
 
-    private var apiWeightsResponse: JsonObject? = null
-    suspend fun fetchApiWeights(): EliteWeightsJson? = try {
-        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(apiWeightsStatic.toGet()).assertSuccessWithData()
-            ?: throw IllegalStateException("Response was null")
-        apiWeightsResponse = apiData
-        ConfigManager.gson.fromJson<EliteWeightsJson>(apiData)
-    } catch (e: Exception) {
-        ErrorManager.logErrorWithData(
-            e, "Error getting crop weights from elitebot.dev",
+    suspend fun fetchApiWeights(): EliteWeightsJson? {
+        val apiWeightsResponse = ApiUtils.getTypedJsonResponse<JsonObject>(apiWeightsStatic.toGet())
+        val (_, apiData) = apiWeightsResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
+            "Error getting crop weights from elitebot.dev",
             "apiWeightsResponse" to apiWeightsResponse,
         )
-        null
+        return ConfigManager.gson.fromJson<EliteWeightsJson>(apiData)
     }
     // </editor-fold>
 
     // <editor-fold desc="Weight Leaderboard">
-    private var lbUrl = ""
-    private var lbApiResponse: JsonObject? = null
     suspend fun fetchLeaderboardPositions(
         profileId: String,
         lbType: EliteLeaderboardType,
         upcomingCount: Int? = null,
         atRank: Int? = null,
-    ): EliteLeaderboard? = try {
+    ): EliteLeaderboard? {
         require(profileId.isNotBlank()) { "Profile ID cannot be blank" }
         val uuid = PlayerUtils.getUuid()
 
@@ -201,43 +175,28 @@ object EliteDevApi {
             "?" + params.joinToString("&")
         }
         val lbSuffix = lbType.suffix
-        lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
+        val lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
 
-        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(
-            lbUrl,
-            apiName = WEIGHT_LEADERBOARD_API_NAME
-        ).assertSuccessWithData() ?: throw IllegalStateException("Response was null")
-        lbApiResponse = apiData
-        val lbData = ConfigManager.gson.fromJson<EliteLeaderboardJson>(apiData)
-        lbData.data
-    } catch (e: Exception) {
-        ErrorManager.logErrorWithData(
-            e, "Error getting weight leaderboard position",
+        val lbApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME)
+        val (_, apiData) = lbApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
+            "Error getting weight leaderboard position",
             "url" to lbUrl,
             "apiResponse" to lbApiResponse,
         )
-        null
+        return ConfigManager.gson.fromJson<EliteLeaderboard>(apiData)
     }
     // </editor-fold>
 
     // <editor-fold desc="Resources">
-    private var resourceUrl = ""
-    private var resourceApiResponse: JsonObject? = null
-    private suspend inline fun <reified T : Any> fetchResources(subUrl: String): T? = try {
-        resourceUrl = "$RESOURCE_API_URL/$subUrl"
-        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(
-            resourceUrl,
-            apiName = RESOURCE_API_NAME
-        ).assertSuccessWithData() ?: throw IllegalStateException("Response was null")
-        resourceApiResponse = apiData
-        ConfigManager.gson.fromJson<T>(apiData)
-    } catch (e: Exception) {
-        ErrorManager.logErrorWithData(
-            e, "Error getting resources from elitebot.dev",
+    private suspend inline fun <reified T : Any> fetchResources(subUrl: String): T {
+        val resourceUrl = "$RESOURCE_API_URL/$subUrl"
+        val resourceApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(resourceUrl, apiName = RESOURCE_API_NAME)
+        val (_, apiData) = resourceApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
+            "Error getting resources from elitebot.dev",
             "resourceUrl" to resourceUrl,
             "resourceApiResponse" to resourceApiResponse,
         )
-        null
+        return ConfigManager.gson.fromJson<T>(apiData)
     }
 
     private suspend fun fetchItemResources() = fetchResources<EliteItemResponse>("items")

@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -47,13 +46,14 @@ import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
+import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -75,15 +75,16 @@ object GardenNextJacobContest {
         }.minByOrNull { it.endTime }
 
     private var display: Renderable? = null
-    private var simpleDisplay = emptyList<String>()
+    private var simpleDisplay: Renderable? = null
     private var knownContests: List<EliteFarmingContest> = listOf()
     private var nextContestsAvailableAt = SimpleTimeMark.farPast()
     private var lastFetchAttempted = SimpleTimeMark.farPast()
     private var lastWarningTime = SimpleTimeMark.farPast()
     private var loadedContestsYear = -1
-    private var isFetchingContests = false
     private var fetchedFromElite = false
-    private var isSendingContests = false
+
+    private val fetchingContestsMutex = Mutex()
+    private val sendingContestsMutex = Mutex()
 
     fun isNextCrop(cropName: CropType) = nextContest?.let { contest ->
         contest.crops.contains(cropName) && config.otherGuis
@@ -189,13 +190,12 @@ object GardenNextJacobContest {
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
-        simpleDisplay = buildList {
-            addAll(event.lines)
-            if (isCloseToNewYear()) {
-                add(CLOSE_TO_NEW_YEAR_TEXT)
-            } else {
-                add("§cOpen calendar for")
-                add("§cmore exact data!")
+        simpleDisplay = Renderable.vertical {
+            event.lines.forEach { addString(it) }
+            if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
+            else {
+                addString("§cOpen calendar for")
+                addString("§cmore exact data!")
             }
         }
         event.tryUpdateBoostedCrop()
@@ -349,7 +349,7 @@ object GardenNextJacobContest {
             }
         }
 
-        display = if (isFetchingContests) {
+        display = if (fetchingContestsMutex.isLocked) {
             Renderable.text("§cFetching this years jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
@@ -394,7 +394,7 @@ object GardenNextJacobContest {
 
             else -> {
                 addString("§eNext: ")
-                warn(contest.startTime.timeUntil(), contest.crops, contest.boostedCrop)
+                contest.warnAbout()
                 contest.startTime.timeUntil()
             }
         }
@@ -413,8 +413,9 @@ object GardenNextJacobContest {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    private fun warn(duration: Duration, crops: List<CropType>, boostedCrop: CropType?) {
-        if (!config.warn || config.warnTime.seconds <= duration) return
+    private fun EliteFarmingContest.warnAbout() {
+        val timeUntil = startTime.timeUntil()
+        if (!config.warn || config.warnTime.seconds <= timeUntil) return
         val nextContest = nextContest ?: return
         if (nextContest.crops.none { it in config.warnFor }) return
 
@@ -443,20 +444,15 @@ object GardenNextJacobContest {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        with(config.pos) {
-            if (display == null) renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
-            else renderRenderable(display, posLabel = "Next Jacob Contest")
-        }
+        val display = display ?: simpleDisplay ?: return
+        config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display || !calendarDetector.isInside()) return
-
-        SkyHanniMod.feature.misc.inventoryLoadPos.renderRenderable(
-            display ?: return,
-            posLabel = "Load SkyBlock Calendar",
-        )
+        val display = display ?: return
+        config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
     }
 
     private fun sbEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
@@ -466,17 +462,15 @@ object GardenNextJacobContest {
     private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
 
     private fun fetchContestsIfAble() {
-        if (haveAllContests || isFetchingContests || !isFetchEnabled()) return
+        if (haveAllContests || !isFetchEnabled()) return
 
         // Allows retries every 10 minutes when it's after 1 day into the new year
         if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInFuture()) return
 
-        isFetchingContests = true
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutineWithMutex(fetchingContestsMutex) {
             knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
             handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
-            isFetchingContests = false
         }
     }
 
@@ -486,6 +480,7 @@ object GardenNextJacobContest {
             fetchedFromElite = true
             nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
             loadedContestsYear = SkyBlockTime.now().year
+            saveKnownContests()
         } else {
             ChatUtils.chat(
                 "This year's contests aren't available to fetch automatically yet, " +
@@ -500,16 +495,14 @@ object GardenNextJacobContest {
     }
 
     private fun sendContestsIfAble() {
-        if (isSendingContests || !haveAllContests || isCloseToNewYear()) return
-        isSendingContests = true
-        SkyHanniMod.launchIOCoroutine {
+        if (!haveAllContests || isCloseToNewYear()) return
+        SkyHanniMod.launchIOCoroutineWithMutex(sendingContestsMutex) {
             if (EliteDevApi.submitContests(knownContests)) {
                 ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
             } else ErrorManager.logErrorStateWithData(
                 "Something went wrong submitting upcoming contests!",
                 "submitContestsToElite not successful",
             )
-            isSendingContests = false
         }
     }
 
@@ -534,5 +527,8 @@ object GardenNextJacobContest {
                 if (setting.asString == "NEXT_JACOB_CONTEXT") JsonPrimitive("NEXT_JACOB_CONTEST") else setting
             }.toJsonArray()
         }
+        val base = "garden.jacobContest.nextContest"
+        event.move(99, "misc.inventoryLoadPos", "$base.inventoryPosition")
+        event.move(99, "$base.pos", "$base.position")
     }
 }

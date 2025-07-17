@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.data.jsonobjects.elitedev
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.util.UUID
 
 data class ElitePlayerWeightJson(
     @Expose val selectedProfileId: String,
@@ -31,10 +33,6 @@ enum class EliteLeaderboardType(private val displayName: String, val suffix: Str
     override fun toString() = displayName
 }
 
-data class EliteLeaderboardJson(
-    @Expose val data: EliteLeaderboard,
-)
-
 data class EliteLeaderboard(
     @Expose val rank: Int,
     @Expose val amount: Double,
@@ -46,7 +44,11 @@ data class EliteLeaderboard(
 
 data class UpcomingLeaderboardPlayer(
     @Expose @SerializedName("ign") val name: String,
+    @Expose val profile: String,
+    @Expose val uuid: UUID,
     @Expose @SerializedName("amount") val weight: Double,
+    @Expose val mode: String? = null,
+    @Expose val meta: JsonObject? = null,
 )
 
 data class EliteWeightsJson(

@@ -39,6 +39,9 @@ import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -88,36 +91,17 @@ object FarmingWeightDisplay {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        update()
 
         SkyHanniMod.launchIOCoroutine {
+            update()
             getCropWeights()
         }
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
-        event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")
-        event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
-        event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
-        event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
-        event.move(
-            3,
-            "garden.eliteFarmingWeightOffScreenDropMessage",
-            "garden.eliteFarmingWeights.offScreenDropMessage",
-        )
-        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
-        event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
-        event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
-        event.move(14, "garden.eliteFarmingWeight.offScreenDropMessage", "garden.eliteFarmingWeights.showLbChange")
-        event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
-    }
-
-    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         if (!isEtaEnabled()) return
-        if (lastupdate.passedSince() < 10.seconds) return
+        if (lastUpdate.passedSince() < 10.seconds) return
 
         ConditionalUtils.onToggle(config.eliteLBType) {
             // Reset api weight as different lb type will have a different score
@@ -135,11 +119,12 @@ object FarmingWeightDisplay {
         rankGoal = -1
         getRankGoal()
         loadLeaderboardIfAble()
-        lastupdate = SimpleTimeMark.now()
+        lastUpdate = SimpleTimeMark.now()
     }
 
     private val config get() = GardenApi.config.eliteFarmingWeights
     private val storage get() = GardenApi.storage?.farmingWeight
+    private val lbName get() = config.eliteLBType.get().leaderboardName
     private val localCounter = mutableMapOf<CropType, Long>()
 
     private var display = emptyList<Renderable>()
@@ -151,11 +136,12 @@ object FarmingWeightDisplay {
     private var localWeight = 0.0
     private var weightPerSecond = -1.0
     private var weightNeedsRecalculating = false
-    private var isLoadingWeight = false
-    private var isLoadingLeaderboard = false
     private var rankGoal = -1
     private var minAmount = 0.0
-    private var lastupdate: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
+
+    private val loadingLeaderboardMutex = Mutex()
+    private val loadingWeightMutex = Mutex()
 
     // Used to get the difference in weight to subtract for monthly lb
     // Caused by various inaccuracies, including pest calc
@@ -185,38 +171,29 @@ object FarmingWeightDisplay {
 
     private var lastOpenWebsite = SimpleTimeMark.farPast()
 
-    private fun update() {
+    private suspend fun update() {
         if (!isEnabled()) return
         if (apiError) {
             display = errorMessage
             return
         }
 
-        if (weight == -1.0) {
-            if (!isLoadingWeight) {
-                val localProfile = HypixelData.profileName
-
-                isLoadingWeight = true
-                if (display.isEmpty()) {
-                    display = listOf(Renderable.text("§6${lbName()}§7: §eLoading.."))
-                }
-                SkyHanniMod.launchIOCoroutine {
-                    loadWeight(localProfile)
-                    isLoadingWeight = false
-                }
-            }
+        if (weight == -1.0) loadingWeightMutex.withLock {
+            val localProfile = HypixelData.profileName
+            if (display.isEmpty()) display = listOf(Renderable.text("§6$lbName§7: §eLoading.."))
+            loadWeight(localProfile)
             return
         }
 
         val weight = getWeight()
 
         if (rankGoal == -1) rankGoal = getRankGoal()
-        val leaderboard = getLeaderboard()
+        val leaderboard = getLeaderboardFormat()
 
         val list = mutableListOf<Renderable>()
         list.add(
             Renderable.clickable(
-                "§6${lbName()}§7: $weight$leaderboard",
+                "§6$lbName§7: $weight$leaderboard",
                 tips = listOf("§eClick to open your Farming Profile."),
                 onLeftClick = { openWebsite(PlayerUtils.getName()) },
             ),
@@ -230,7 +207,7 @@ object FarmingWeightDisplay {
         display = list
     }
 
-    private fun getLeaderboard(): String {
+    private fun getLeaderboardFormat(): String {
         if (!config.leaderboard) return ""
 
         // Fetching new leaderboard position every 10.5 minutes
@@ -242,7 +219,7 @@ object FarmingWeightDisplay {
             val format = leaderboardPosition.addSeparators()
             " §7[§b#$format§7]"
         } else {
-            if (isLoadingLeaderboard) " §7[§b#?§7]" else ""
+            if (loadingLeaderboardMutex.isLocked) " §7[§b#?§7]" else ""
         }
     }
 
@@ -304,7 +281,7 @@ object FarmingWeightDisplay {
 
         if (weightUntilOvertake < 0) {
             if (weightPerSecond > 0) {
-                farmingChatMessage("You passed §b$nextName §ein the §6${lbName()} §eLeaderboard!")
+                farmingChatMessage("You passed §b$nextName §ein the §6$lbName §eLeaderboard!")
             }
 
             // Lower leaderboard position
@@ -313,7 +290,7 @@ object FarmingWeightDisplay {
             } else {
                 leaderboardPosition--
             }
-            storage?.lastFarmingWeightLeaderboard = leaderboardPosition
+            storage?.lastLeaderboard = leaderboardPosition
 
             // Remove passed player to present the next one
             nextPlayers.removeFirst()
@@ -425,46 +402,33 @@ object FarmingWeightDisplay {
     }
 
     private fun loadLeaderboardIfAble() {
-        if (isLoadingLeaderboard) return
-        isLoadingLeaderboard = true
-
+        if (loadingLeaderboardMutex.isLocked) return
         SkyHanniMod.launchIOCoroutine {
-            val wasNotLoaded = leaderboardPosition == -1
-            leaderboardPosition = loadLeaderboardPosition()
-            if (wasNotLoaded && config.showLbChange) {
-                checkOffScreenLeaderboardChanges()
+            loadingLeaderboardMutex.withLock {
+                val wasNotLoaded = leaderboardPosition == -1
+                leaderboardPosition = loadLeaderboardPosition()
+                if (wasNotLoaded) checkOffScreenLeaderboardChanges()
+                storage?.lastLeaderboard = leaderboardPosition
+                lastLeaderboardUpdate = SimpleTimeMark.now()
             }
-            storage?.lastFarmingWeightLeaderboard = leaderboardPosition
-            lastLeaderboardUpdate = SimpleTimeMark.now()
-            isLoadingLeaderboard = false
         }
     }
 
     private fun checkOffScreenLeaderboardChanges() {
-        val oldPosition = storage?.lastFarmingWeightLeaderboard ?: return
-
-        if (oldPosition <= 0) return
-        if (leaderboardPosition <= 0) return
+        if (!config.showLbChange) return
+        val oldPosition = storage?.lastLeaderboard ?: return
+        if (oldPosition <= 0 || leaderboardPosition <= 0) return
 
         val diff = leaderboardPosition - oldPosition
         if (diff == 0) return
-
-        if (diff > 0) {
-            showLbChange("§cdropped ${StringUtils.pluralize(diff, "place", withNumber = true)}", oldPosition)
-        } else {
-            showLbChange("§arisen ${StringUtils.pluralize(-diff, "place", withNumber = true)}", oldPosition)
-        }
-    }
-
-    private fun showLbChange(direction: String, oldPosition: Int) {
+        val verbFormat = if (diff > 0) "§cdropped" else "§arisen"
+        val placesFormat = StringUtils.pluralize(abs(diff), "place", withNumber = true)
         farmingChatMessage(
             "§7Since your last visit to the §aGarden§7, " +
-                "you have $direction §7on the §d${lbName()} Leaderboard§7. " +
+                "you have $verbFormat $placesFormat §7on the §d$lbName Leaderboard§7. " +
                 "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)",
         )
     }
-
-    private fun lbName() = "${if (isMonthlyLB()) "Monthly " else ""}Farming Weight"
 
     private suspend fun loadLeaderboardPosition(): Int {
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
@@ -521,7 +485,10 @@ object FarmingWeightDisplay {
     }
 
     private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine {
-        val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: return@launchIOCoroutine
+        val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: run {
+            apiError = true
+            return@launchIOCoroutine
+        }
         profileId = apiData.profileId
         weight = apiData.totalWeight
         localCounter.clear()
@@ -618,5 +585,27 @@ object FarmingWeightDisplay {
             category = CommandCategory.USERS_ACTIVE
             callback { lookUpCommand(it) }
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")
+        event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
+        event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
+        event.move(
+            3,
+            "garden.eliteFarmingWeightOffScreenDropMessage",
+            "garden.eliteFarmingWeights.offScreenDropMessage",
+        )
+        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
+        event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
+        event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
+        event.move(14, "garden.eliteFarmingWeight.offScreenDropMessage", "garden.eliteFarmingWeights.showLbChange")
+        event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
+
+        val base = "#garden.farmingWeight"
+        event.move(99, "$base.lastFarmingWeightLeaderboard", "$base.lastLeaderboard")
     }
 }
