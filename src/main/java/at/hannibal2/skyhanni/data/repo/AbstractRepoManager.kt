@@ -162,7 +162,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         SkyHanniMod.launchIOCoroutine {
-            fetchAndUnpackRepo(command = true)
+            fetchAndUnpackRepo(command = true, forceReset = forceReset)
             reloadRepository("$commonName Repo updated successfully.")
             if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launchIOCoroutine
             val informed = logger.logErrorStateWithData(
