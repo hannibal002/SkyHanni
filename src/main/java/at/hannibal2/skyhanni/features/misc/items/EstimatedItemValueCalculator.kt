@@ -76,7 +76,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
