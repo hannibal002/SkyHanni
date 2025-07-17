@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -13,10 +14,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
@@ -46,15 +47,27 @@ object HuntingBoxValue {
             processAttributeShardSlot(slotNumber, stack, table)
         }
 
-        val newList = mutableListOf<Renderable>()
+        display = buildList {
+            addString("§eHunting Box Value")
 
-        newList.add(StringRenderable("§eHunting Box Value"))
-        newList.add(RenderableUtils.fillScrollTable(table, padding = 5, itemScale = 0.7, height = 225, velocity = 5.0))
+            if (table.isNotEmpty()) {
+                add(RenderableUtils.fillScrollTable(table, padding = 5, itemScale = 0.7, height = 225, velocity = 5.0))
+            } else {
+                possiblyAddWarning()
+            }
 
-        newList.add(StringRenderable("§7Total Attribute Shards: §a$totalShards"))
-        newList.add(StringRenderable("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}"))
-        newList.add(StringRenderable("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}"))
-        display = newList
+            addString("§7Total Attribute Shards: §a$totalShards")
+            addString("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}")
+            addString("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}")
+        }
+    }
+
+    private fun MutableList<Renderable>.possiblyAddWarning() {
+        InventoryUtils.getItemAtSlotIndex(10).orNull() ?: return
+
+        addString("§cError detected!")
+        addString("§cPlease run §e/shdebug repo§c to get debug information.")
+        addString("§cThen send the data on discord.")
     }
 
     private fun processAttributeShardSlot(slotNumber: Int, stack: ItemStack, table: MutableList<DisplayTableEntry>) {

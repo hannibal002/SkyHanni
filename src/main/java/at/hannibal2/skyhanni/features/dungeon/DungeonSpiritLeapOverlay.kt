@@ -20,11 +20,12 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -111,8 +112,8 @@ object DungeonSpiritLeapOverlay {
             yPadding = 18,
             horizontalAlign = HorizontalAlignment.CENTER,
             verticalAlign = VerticalAlignment.CENTER,
-        ) else WrappedStringRenderable(
-            width = (containerWidth * 0.8).toInt(),
+        ) else Renderable.wrappedText(
+            setWidth = (containerWidth * 0.8).toInt(),
             text = "No targets available for leap.",
             scale = scaleFactor * 3,
         )
@@ -130,68 +131,64 @@ object DungeonSpiritLeapOverlay {
 
         val backgroundColor = if (player.playerDead) deadTeammateColor else getClassColor(player.dungeonClass)
         val itemRenderable = Renderable.drawInsideRoundedRect(
-            ItemStackRenderable(playerStackInfo.stack, scale = scaleFactor * 0.9 + 2.7),
+            Renderable.item(playerStackInfo.stack, scale = scaleFactor * 0.9 + 2.7),
             color = Color(255, 255, 255, 100),
             radius = 5,
         )
 
-        val playerInfoRenderable = VerticalContainerRenderable(
-            listOf(
-                WrappedStringRenderable(
+        val playerInfoRenderable = with(Renderable) {
+            vertical(
+                wrappedText(
                     player.username,
-                    width = (containerWidth * 0.25).toInt(),
+                    setWidth = (containerWidth * 0.25).toInt(),
                     scale = scaleFactor + 1.5,
                 ),
-                Renderable.placeholder(0, (containerHeight * 0.03).toInt()),
-                WrappedStringRenderable(
+                placeholder(0, (containerHeight * 0.03).toInt()),
+                wrappedText(
                     classInfo,
-                    width = (containerWidth * 0.25).toInt(),
+                    setWidth = (containerWidth * 0.25).toInt(),
                     scale = (scaleFactor * 0.9) + 1.1,
                 ),
-            ),
-            horizontalAlign = HorizontalAlignment.CENTER,
-            verticalAlign = VerticalAlignment.CENTER,
-        )
+                horizontalAlign = HorizontalAlignment.CENTER,
+                verticalAlign = VerticalAlignment.CENTER,
+            )
+        }
 
-        val buttonLayout = HorizontalContainerRenderable(
-            listOf(
-                Renderable.placeholder((containerWidth * 0.01).toInt(), 0),
-                itemRenderable,
-                Renderable.placeholder((containerWidth * 0.01).toInt(), 0),
-                playerInfoRenderable,
-            ),
+        val buttonLayout = Renderable.horizontal(
+            Renderable.placeholder((containerWidth * 0.01).toInt(), 0),
+            itemRenderable,
+            Renderable.placeholder((containerWidth * 0.01).toInt(), 0),
+            playerInfoRenderable,
             verticalAlign = VerticalAlignment.CENTER,
         )
 
         return Renderable.clickable(
             Renderable.drawInsideRoundedRectWithOutline(
-                VerticalContainerRenderable(
-                    listOf(
-                        if (config.spiritLeapKeybindConfig.showKeybindHint && index in 0..<spiritLeapKeybinds.count()) {
-                            Renderable.drawInsideRoundedRectOutline(
-                                StringRenderable(
-                                    KeyboardManager.getKeyName(spiritLeapKeybinds[index]),
-                                    (scaleFactor * 0.9) + 0.7,
-                                    verticalAlign = VerticalAlignment.CENTER,
-                                ),
-                                topOutlineColor = 0xFFFFF,
-                                bottomOutlineColor = 0xFFFFF,
-                                borderOutlineThickness = 2,
-                                padding = 4,
-                                horizontalAlign = HorizontalAlignment.RIGHT,
-                            )
-                        } else {
-                            Renderable.placeholder(width = 10, height = (12 * scaleFactor).toInt())
-                        },
-                        Renderable.placeholder(0, height = (-15 * scaleFactor).toInt()),
-                        Renderable.fixedSizeColumn(
-                            Renderable.fixedSizeLine(
-                                buttonLayout,
-                                width = (containerWidth * 0.40).toInt(),
+                Renderable.vertical(
+                    if (config.spiritLeapKeybindConfig.showKeybindHint && index in 0..<spiritLeapKeybinds.count()) {
+                        Renderable.drawInsideRoundedRectOutline(
+                            Renderable.text(
+                                KeyboardManager.getKeyName(spiritLeapKeybinds[index]),
+                                (scaleFactor * 0.9) + 0.7,
                                 verticalAlign = VerticalAlignment.CENTER,
                             ),
-                            height = (containerHeight * 0.35).toInt(),
+                            topOutlineColor = 0xFFFFF,
+                            bottomOutlineColor = 0xFFFFF,
+                            borderOutlineThickness = 2,
+                            padding = 4,
+                            horizontalAlign = HorizontalAlignment.RIGHT,
+                        )
+                    } else {
+                        Renderable.placeholder(width = 10, height = (12 * scaleFactor).toInt())
+                    },
+                    Renderable.placeholder(0, height = (-15 * scaleFactor).toInt()),
+                    Renderable.fixedSizeColumn(
+                        Renderable.fixedSizeLine(
+                            buttonLayout,
+                            width = (containerWidth * 0.40).toInt(),
+                            verticalAlign = VerticalAlignment.CENTER,
                         ),
+                        height = (containerHeight * 0.35).toInt(),
                     ),
                 ),
                 verticalAlign = VerticalAlignment.CENTER,

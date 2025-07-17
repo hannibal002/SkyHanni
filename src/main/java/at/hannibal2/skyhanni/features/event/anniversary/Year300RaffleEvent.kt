@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
@@ -69,11 +69,9 @@ object Year300RaffleEvent {
             SoundUtils.centuryActiveTimerAlert.playSound()
             lastTimeAlerted = SimpleTimeMark.now()
         }
-        overlay = HorizontalContainerRenderable(
-            listOf(
-                ItemStackRenderable(displayItem),
-                StringRenderable("§eTime Left: ${timeLeft.format()}"),
-            ),
+        overlay = Renderable.horizontal(
+            Renderable.item(displayItem),
+            Renderable.text("§eTime Left: ${timeLeft.format()}"),
         )
     }
 }

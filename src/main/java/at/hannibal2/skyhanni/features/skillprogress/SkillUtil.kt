@@ -9,8 +9,7 @@ import com.google.common.base.Splitter
 object SkillUtil {
 
     val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
-    const val XP_NEEDED_FOR_60 = 111_672_425L
-    const val XP_NEEDED_FOR_50 = 55_172_425L
+    private const val XP_NEEDED_FOR_60 = 111_672_425L
 
     fun getSkillInfo(skill: SkillType): SkillApi.SkillInfo? {
         return SkillApi.storage?.get(skill)
@@ -53,6 +52,17 @@ object SkillUtil {
         return SkillApi.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
     }
 
+    fun calculateXPForCurrentLevel(level: Int): Long {
+        return SkillApi.levelArray.getOrNull(level)?.toLong() ?: 4000000L
+    }
+
+    fun calculateXPToNextLevel(currentLevel: Int): Long {
+        val xpForCurrentLevel = SkillApi.levelArray.getOrNull(currentLevel)?.toLong() ?: 4000000L
+        val xpForNextLevel = SkillApi.levelArray.getOrNull(currentLevel + 1)?.toLong() ?: 4300000L
+
+        return xpForNextLevel - xpForCurrentLevel
+    }
+
     fun calculateSkillLevel(currentXP: Long, maxSkillCap: Int): SkillLevel {
         var xpCurrent = currentXP
         var level = 0
@@ -68,20 +78,20 @@ object SkillUtil {
         var overflowXP = 0L
 
         if (level >= maxLevel) {
-            val xpNeeded = if (maxSkillCap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
+            val xpNeeded = xpRequiredForLevel(maxLevel)
 
             if (currentXP >= xpNeeded) {
                 overflowXP = currentXP - xpNeeded
 
                 xpCurrent = overflowXP
-                var slope = 300000L
-                var xpForCurr = 4000000L + slope
+                var slope = calculateXPToNextLevel(maxLevel)
+                var xpForCurr = calculateXPForCurrentLevel(maxLevel) + slope
 
                 while (xpCurrent >= xpForCurr && level < 60) {
                     level++
                     xpCurrent -= xpForCurr
+                    slope = calculateXPToNextLevel(level)
                     xpForCurr += slope
-                    if (level % 10 == 0) slope *= 2
                 }
 
                 if (level >= 60) {

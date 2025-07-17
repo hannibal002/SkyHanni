@@ -25,7 +25,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -93,9 +94,11 @@ object InstanceChestProfit {
             DungeonApi.DungeonChest.getByInventoryName(name) != null -> {
                 inDungeonChest = true
             }
+
             KuudraApi.KuudraChest.getByInventoryName(name) != null -> {
                 inKuudraChest = true
             }
+
             else -> return
         }
 
@@ -151,14 +154,14 @@ object InstanceChestProfit {
             val chestName = if (inDungeonChest) "Dungeon"
             else if (inKuudraChest) "Kuudra"
             else ""
-            add(listOf(StringRenderable("§d§l$chestName Chest Profit")))
-            add(listOf(StringRenderable("")))
+            add(listOf(Renderable.text("§d§l$chestName Chest Profit")))
+            add(listOf(Renderable.emptyText()))
 
             var total = 0.0
             var displayedCost = false
 
             val revenue = itemsWithCost.values.filter { it > 0 }.sum()
-            add(listOf(StringRenderable("§a§lTotal Revenue"), StringRenderable("§a${revenue.formatCoin()}")))
+            add(listOf(Renderable.text("§a§lTotal Revenue"), Renderable.text("§a${revenue.formatCoin()}")))
 
             itemsWithCost.forEach {
                 val coinsColor = if (it.value < 0) "§c"
@@ -166,22 +169,22 @@ object InstanceChestProfit {
 
                 if (!displayedCost && it.value < 0) {
                     val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
-                    add(listOf(StringRenderable("")))
-                    add(listOf(StringRenderable("§c§lTotal Cost"), StringRenderable("§c${cost.formatCoin()}")))
+                    add(listOf(Renderable.emptyText()))
+                    add(listOf(Renderable.text("§c§lTotal Cost"), Renderable.text("§c${cost.formatCoin()}")))
                     displayedCost = true
                 }
 
                 val coins = "$coinsColor${it.value.formatCoin()}"
 
                 total += it.value
-                add(listOf(StringRenderable(it.key), StringRenderable(coins)))
+                add(listOf(Renderable.text(it.key), Renderable.text(coins)))
             }
 
             val color = if (total < 0) "§c"
             else "§a"
 
-            add(listOf(StringRenderable("")))
-            add(listOf(StringRenderable("$color§lProfit"), StringRenderable("$color ${total.formatCoin()}")))
+            add(listOf(Renderable.emptyText()))
+            add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color ${total.formatCoin()}")))
         }
 
         display = Renderable.table(newDisplay, yPadding = 1)

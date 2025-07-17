@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration.Companion.seconds
 
@@ -193,7 +193,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         val cutoff = SimpleTimeMark.now() - recencyWindow.seconds
         val trackedToDisplay = tracked.takeWhile { it.time > cutoff }
         display = trackedToDisplay.take(maxListLength).reversed().map { (event) ->
-            StringRenderable(event.formatForDisplay())
+            Renderable.text(event.formatForDisplay())
         }
         worldTracked = trackedToDisplay.map { it.event }.groupBy { it.location }
 

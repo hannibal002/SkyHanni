@@ -50,6 +50,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -314,7 +315,7 @@ object DailyQuestHelper {
 
         val categoryName = category.displayName
 
-        return Renderable.line {
+        return Renderable.horizontal {
             addString("  $stateText$categoryName: ")
             addItemStack(item)
             addString("§f$displayName$progressText$sacksText")

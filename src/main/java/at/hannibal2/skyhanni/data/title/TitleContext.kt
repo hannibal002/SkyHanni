@@ -7,12 +7,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -45,9 +46,11 @@ open class TitleContext(
             endTime = now() + duration
         }
     }
+
     open fun stop() {
         endTime = farPast()
     }
+
     open fun processRequeue(): Boolean {
         if (hasBeenReQueued) return false
         hasBeenReQueued = true
@@ -81,14 +84,14 @@ open class TitleContext(
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         DrawContextUtils.pushPop {
-            val mainTextRenderable = StringRenderable(
+            val mainTextRenderable = Renderable.text(
                 getTitleText(),
                 scale = mainScalar,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
 
             val subtitleRenderable: Renderable? = getSubtitleText()?.let {
-                StringRenderable(
+                Renderable.text(
                     it,
                     scale = subScalar,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -96,8 +99,9 @@ open class TitleContext(
             }
 
             val targetRenderable = if (subtitleRenderable == null) mainTextRenderable
-            else VerticalContainerRenderable(
-                listOf(mainTextRenderable, subtitleRenderable),
+            else Renderable.vertical(
+                mainTextRenderable,
+                subtitleRenderable,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
@@ -129,24 +133,24 @@ open class TitleContext(
     fun tryRenderInventoryTitle() {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
-        val stringRenderable = VerticalContainerRenderable(
-            listOfNotNull(
-                StringRenderable(
+        val stringRenderable = with(Renderable) {
+            vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
+                addString(
                     getTitleText(),
                     1.5,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                ),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                )
                 getSubtitleText()?.let {
-                    StringRenderable(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+                    addString(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
                 }
-            ),
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-        )
+            }
+        }
 
         val translation = stringRenderable.height.toFloat() + 125f
 
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(0f, -translation, 500f)
+            // TODO use Renderable.withMousePosition
             Renderable.drawInsideRoundedRect(
                 stringRenderable,
                 ColorUtils.TRANSPARENT_COLOR,

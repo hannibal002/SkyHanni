@@ -19,11 +19,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.WeightProfile
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.api.ApiStaticPath
+import at.hannibal2.skyhanni.utils.api.ApiStaticPostPath
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonObject
 
@@ -73,12 +75,12 @@ object EliteDevApi {
     private const val FARMING_WEIGHT_API_NAME = "Elitebot Farming Weight"
     private const val FARMING_WEIGHT_URL = "$ELITEBOT_API_URL/weight"
 
-    private val contestStatic = ApiUtils.StaticApiPath(
+    private val contestStatic = ApiStaticPostPath(
         "$ELITEBOT_API_URL/contests/at/now",
         "Elitebot Farming Contests"
     )
 
-    private val apiWeightsStatic = ApiUtils.StaticApiPath(
+    private val apiWeightsStatic = ApiStaticPath(
         "$ELITEBOT_API_URL/weights/all",
         FARMING_WEIGHT_API_NAME
     )
@@ -92,9 +94,10 @@ object EliteDevApi {
     // <editor-fold desc="Upcoming Contests">
     var contestsApiResponse: JsonObject? = null
     suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? = try {
-        contestsApiResponse = ApiUtils.getTypedJSONResponse(contestStatic)
-        val contestsApiResponse = contestsApiResponse ?: throw IllegalStateException("Response was null")
-        val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(contestsApiResponse)
+        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(contestStatic.toGet()).assertSuccessWithData()
+            ?: throw IllegalStateException("Response was null")
+        contestsApiResponse = apiData
+        val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(apiData)
         contestResponse.responseContests
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
@@ -111,7 +114,7 @@ object EliteDevApi {
                 contest.startTime.toMillis() / 1000 to contest.crops.map { crop -> crop.cropName }
             },
         )
-        val response = ApiUtils.postJSON(contestStatic, body)
+        val response = ApiUtils.postJson(contestStatic, body)
         response.success
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
@@ -132,9 +135,12 @@ object EliteDevApi {
         val uuid = PlayerUtils.getUuid()
         weightUrl = "$FARMING_WEIGHT_URL/$uuid"
 
-        weightProfileApiResponse = ApiUtils.getTypedJSONResponse(weightUrl, apiName = FARMING_WEIGHT_API_NAME)
-        val weightApiResponse = weightProfileApiResponse ?: throw IllegalStateException("Response was null")
-        val weightData = ConfigManager.gson.fromJson<ElitePlayerWeightJson>(weightApiResponse)
+        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(
+            weightUrl,
+            apiName = FARMING_WEIGHT_API_NAME
+        ).assertSuccessWithData() ?: throw IllegalStateException("Response was null")
+        weightProfileApiResponse = apiData
+        val weightData = ConfigManager.gson.fromJson<ElitePlayerWeightJson>(apiData)
 
         val selectedProfileId = weightData.selectedProfileId
         val selectedProfileEntry = weightData.profiles.firstOrNull {
@@ -163,9 +169,10 @@ object EliteDevApi {
 
     private var apiWeightsResponse: JsonObject? = null
     suspend fun fetchApiWeights(): EliteWeightsJson? = try {
-        apiWeightsResponse = ApiUtils.getTypedJSONResponse(apiWeightsStatic)
-        val apiWeightsResponse = apiWeightsResponse ?: throw IllegalStateException("Response was null")
-        ConfigManager.gson.fromJson<EliteWeightsJson>(apiWeightsResponse)
+        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(apiWeightsStatic.toGet()).assertSuccessWithData()
+            ?: throw IllegalStateException("Response was null")
+        apiWeightsResponse = apiData
+        ConfigManager.gson.fromJson<EliteWeightsJson>(apiData)
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
             e, "Error getting crop weights from elitebot.dev",
@@ -196,9 +203,12 @@ object EliteDevApi {
         val lbSuffix = lbType.suffix
         lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
 
-        lbApiResponse = ApiUtils.getTypedJSONResponse(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME)
-        val lbApiResponse = lbApiResponse ?: throw IllegalStateException("Response was null")
-        val lbData = ConfigManager.gson.fromJson<EliteLeaderboardJson>(lbApiResponse)
+        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(
+            lbUrl,
+            apiName = WEIGHT_LEADERBOARD_API_NAME
+        ).assertSuccessWithData() ?: throw IllegalStateException("Response was null")
+        lbApiResponse = apiData
+        val lbData = ConfigManager.gson.fromJson<EliteLeaderboardJson>(apiData)
         lbData.data
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
@@ -213,13 +223,14 @@ object EliteDevApi {
     // <editor-fold desc="Resources">
     private var resourceUrl = ""
     private var resourceApiResponse: JsonObject? = null
-    private suspend inline fun <reified T> fetchResources(
-        subUrl: String,
-    ): T? = try {
+    private suspend inline fun <reified T : Any> fetchResources(subUrl: String): T? = try {
         resourceUrl = "$RESOURCE_API_URL/$subUrl"
-        resourceApiResponse = ApiUtils.getTypedJSONResponse(resourceUrl, apiName = RESOURCE_API_NAME)
-        val resourceApiResponse = resourceApiResponse ?: throw IllegalStateException("Response was null")
-        ConfigManager.gson.fromJson(resourceApiResponse, T::class.java)
+        val (_, apiData) = ApiUtils.getTypedJsonResponse<JsonObject>(
+            resourceUrl,
+            apiName = RESOURCE_API_NAME
+        ).assertSuccessWithData() ?: throw IllegalStateException("Response was null")
+        resourceApiResponse = apiData
+        ConfigManager.gson.fromJson<T>(apiData)
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
             e, "Error getting resources from elitebot.dev",

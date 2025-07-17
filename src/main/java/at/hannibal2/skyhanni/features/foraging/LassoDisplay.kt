@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
@@ -62,9 +62,9 @@ object LassoDisplay {
             }
         }
         display = if (isReel) {
-            StringRenderable("§e§l          REEL          ")
+            Renderable.text("§e§l          REEL          ")
         } else if (progressBar.isNotEmpty()) {
-            StringRenderable(progressBar)
+            Renderable.text(progressBar)
         } else null
     }
 
