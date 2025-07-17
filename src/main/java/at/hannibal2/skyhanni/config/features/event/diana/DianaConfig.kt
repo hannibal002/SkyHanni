@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -23,7 +24,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(name = "Inquisitor Highlight", desc = "Color in which Inquisitors will be highlighted.")
     @ConfigEditorColour
-    var color: String = "0:127:85:255:255"
+    var color: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 255, 127)
 
     @Expose
     @ConfigOption(

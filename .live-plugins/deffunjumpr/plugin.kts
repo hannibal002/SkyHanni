@@ -1,6 +1,7 @@
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -21,7 +22,7 @@ val primaryAnnotationName = "PrimaryFunction"
 registerInspection(EventLinkingInspection())
 
 class EventLinkingInspection : AbstractKotlinInspection() {
-    override fun buildVisitor(holder: com.intellij.codeInspection.ProblemsHolder, isOnTheFly: Boolean) =
+    override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean) =
         object : KtVisitorVoid() {
             override fun visitNamedFunction(function: KtNamedFunction) {
                 val functionName = function.name ?: return

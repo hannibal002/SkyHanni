@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -17,5 +18,5 @@ class VerminHighlightConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Change Vermin highlight color.")
     @ConfigEditorColour
-    val color: Property<String> = Property.of("0:60:0:0:255")
+    val color: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(0, 0, 255, 60))
 }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -11,9 +12,9 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -36,7 +37,7 @@ object DungeonMobManager {
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             starredConfig.highlight,
-            starredConfig.colour,
+            starredConfig.color,
         ) {
             val color = if (starredConfig.highlight.get()) getStarColor() else null
             MobData.skyblockMobs.filter { it.hasStar }.forEach {
@@ -114,7 +115,7 @@ object DungeonMobManager {
         }
     }
 
-    private fun getFelColor() = fel.colour.get().toSpecialColor()
+    private fun getFelColor() = fel.color.get().toColor()
 
     private fun handleStar(mob: Mob) {
         if (!starredConfig.highlight.get()) return
@@ -133,7 +134,7 @@ object DungeonMobManager {
         }
     }
 
-    private fun getStarColor(): Color = starredConfig.colour.get().toSpecialColor()
+    private fun getStarColor(): Color = starredConfig.color.get().toColor()
 
     private fun handleStar0(mob: Mob, colour: Color?) {
         if (mob.name == "Fels") {
@@ -160,5 +161,12 @@ object DungeonMobManager {
     private fun handleFelDespawn(mob: Mob) {
         felOnTheGround.remove(mob)
         felMoving.remove(mob)
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val base = "dungeon.objectHighlighter"
+        event.move(99, "$base.starred.colour", "$base.starred.color")
+        event.move(99, "$base.fel.colour", "$base.fel.color")
     }
 }

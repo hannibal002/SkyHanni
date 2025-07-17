@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -21,9 +22,9 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import java.awt.Color
@@ -183,12 +184,12 @@ object Year400Features {
         lastPlayer.setColor(wrongColor(), colorInHand)
     }
 
-    private fun wrongColor() = config.colors.wrong.get().toSpecialColor()
+    private fun wrongColor() = config.colors.wrong.get().toColor()
 
     enum class CakeColor(
         id: String,
         val lorenzColor: LorenzColor,
-        private val colorConfig: (AnniversaryTeamFinderColorConfig) -> Property<String>,
+        private val colorConfig: (AnniversaryTeamFinderColorConfig) -> Property<ChromaColour>,
     ) {
         PINK("SLICE_OF_STRAWBERRY_SHORTCAKE", LorenzColor.LIGHT_PURPLE, { it.pink }),
         BLUE("SLICE_OF_BLUEBERRY_CAKE", LorenzColor.BLUE, { it.blue }),
@@ -197,7 +198,7 @@ object Year400Features {
         RED("SLICE_OF_RED_VELVET_CAKE", LorenzColor.RED, { it.red }),
         ;
 
-        val color: Color get() = colorConfig(config.colors).get().toSpecialColor()
+        val color: Color get() = colorConfig(config.colors).get().toColor()
 
         val internalName = id.toInternalName()
     }
