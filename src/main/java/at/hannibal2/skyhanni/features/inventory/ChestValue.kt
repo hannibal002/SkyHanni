@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -201,11 +200,9 @@ object ChestValue {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
             val list = mutableListOf<String>()
-            var total = EstimatedItemValueCalculator.calculate(stack, list).first
-
+            val total = EstimatedItemValueCalculator.calculate(stack, list).first
             val key = "$internalName+$total"
-            if (stack.item == Items.enchanted_book)
-                total /= 2
+
             list.add("§aTotal: §6§l${total.formatPrice()} coins")
             if (total == 0.0) continue
             val item = getOrPut(key) {

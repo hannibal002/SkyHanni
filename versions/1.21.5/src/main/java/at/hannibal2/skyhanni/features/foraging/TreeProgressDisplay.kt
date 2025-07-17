@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,7 +14,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
@@ -43,9 +42,9 @@ object TreeProgressDisplay {
             val name = entity.displayName.formattedTextCompat()
             ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
                 if (config.compact) {
-                    display = StringRenderable("${group("treeType")} §b§l${group("percent")}%")
+                    display = Renderable.text("${group("treeType")} §b§l${group("percent")}%")
                 } else {
-                    display = StringRenderable(name)
+                    display = Renderable.text(name)
                 }
                 return
 

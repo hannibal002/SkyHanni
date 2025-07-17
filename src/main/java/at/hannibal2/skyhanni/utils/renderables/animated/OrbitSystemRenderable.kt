@@ -1,17 +1,22 @@
-package at.hannibal2.skyhanni.utils.renderables
+package at.hannibal2.skyhanni.utils.renderables.animated
 
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.time.Duration
 
-enum class OrbitDirection { CLOCKWISE, COUNTER_CLOCKWISE }
+enum class OrbitDirection {
+    CLOCKWISE,
+    COUNTER_CLOCKWISE
+}
 
 // A renderable that has other renderables orbiting it, configurable.
-class OrbitSystemRenderable(
+class OrbitSystemRenderable private constructor(
     private val mainBody: Renderable,
     /**
      * Spacing between the main body and sub bodies.
@@ -24,7 +29,7 @@ class OrbitSystemRenderable(
     private val orbitSpeed: Int = 10,
     private val orbitDirection: OrbitDirection = OrbitDirection.CLOCKWISE,
     val subBodies: Collection<Renderable>,
-) : Renderable {
+) : TimeDependentRenderable {
 
     private val subBodyW = (subBodies.maxOfOrNull { it.width } ?: 0)
     private val subBodyH = (subBodies.maxOfOrNull { it.height } ?: 0)
@@ -37,16 +42,13 @@ class OrbitSystemRenderable(
     override val horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
     override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-    private var lastTime = SimpleTimeMark.now()
+    override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
     private var currentAngle = 0f
 
-    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        val now = SimpleTimeMark.now()
-        val deltaSeconds = (now - lastTime).inPartialSeconds
-        lastTime = now
+    override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
 
         val dirFactor = if (orbitDirection == OrbitDirection.CLOCKWISE) 1 else -1
-        currentAngle = (currentAngle + orbitSpeed * deltaSeconds * dirFactor).toFloat() % 360f
+        currentAngle = (currentAngle + orbitSpeed * deltaTime.inPartialSeconds * dirFactor).toFloat() % 360f
         mainBody.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
 
         if (subBodies.isEmpty()) return
@@ -77,5 +79,22 @@ class OrbitSystemRenderable(
                 subBody.render(fPosX, fPosY)
             }
         }
+    }
+
+    companion object {
+        fun Renderable.Companion.orbitalSystem(
+            mainBody: Renderable,
+            /**
+             * Spacing between the main body and sub bodies.
+             */
+            subBodySpacing: Int = 1,
+            /**
+             * How fast along the orbit path sub, in degrees, bodies should move per cycle.
+             * Set to 0 to keep orbits stationary.
+             */
+            orbitSpeed: Int = 10,
+            orbitDirection: OrbitDirection = OrbitDirection.CLOCKWISE,
+            subBodies: Collection<Renderable>,
+        ) = OrbitSystemRenderable(mainBody, subBodySpacing, orbitSpeed, orbitDirection, subBodies)
     }
 }

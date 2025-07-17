@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -31,9 +30,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.Objects
@@ -47,16 +47,15 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                StringRenderable("$prefix$formattedAmount")
+                Renderable.text("$prefix$formattedAmount")
             },
         ),
         ICON(
             "§e✎",
             { entry, _ ->
                 val entryInternalName = entry.neuInternalName ?: ItemNameResolver.getInternalNameOrNull(entry.name)
-                val itemIcon = entryInternalName?.getItemStackOrNull()
-                if (itemIcon != null) ItemStackRenderable(itemIcon)
-                else StringRenderable("§c?")
+                if (entryInternalName != null) Renderable.item(entryInternalName)
+                else Renderable.text("§c?")
             },
         ),
         ITEM_NAME(
@@ -66,7 +65,7 @@ object ItemPickupLog {
                 if (entry.name == "Air") {
                     name = entry.neuInternalName?.repoItemName ?: "?"
                 }
-                StringRenderable(name)
+                Renderable.text(name)
             },
         ),
         ;
@@ -213,7 +212,7 @@ object ItemPickupLog {
         dirty = true
     }
 
-    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.line {
+    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontal {
         val displayLayout: List<DisplayLayout> = config.displayLayout
         for (item in displayLayout) {
             add(item.renderable(entry, prefix))
@@ -280,7 +279,7 @@ object ItemPickupLog {
         if (display.isEmpty()) {
             this.display = null
         } else {
-            val renderable = VerticalContainerRenderable(display, verticalAlign = config.alignment)
+            val renderable = Renderable.vertical(display, verticalAlign = config.alignment)
             this.display = Renderable.fixedSizeColumn(renderable, 30)
         }
     }

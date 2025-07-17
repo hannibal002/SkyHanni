@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import kotlin.time.Duration
@@ -191,7 +191,7 @@ object CFStats {
     }
 
     private fun createDisplay(text: List<String>) = Renderable.clickable(
-        VerticalContainerRenderable(text.map(::StringRenderable)),
+        Renderable.vertical(text.map(StringRenderable::from)),
         tips = listOf("§bCopy to Clipboard!"),
         onLeftClick = {
             val list = text.toMutableList()

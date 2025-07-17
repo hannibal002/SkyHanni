@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -75,7 +76,7 @@ object JyrreTimer {
     fun drawDisplay(): Renderable {
         duration -= 1.seconds
 
-        return Renderable.line {
+        return Renderable.horizontal {
             addItemStack(displayIcon)
             addString("§aJyrre Boost: ")
 

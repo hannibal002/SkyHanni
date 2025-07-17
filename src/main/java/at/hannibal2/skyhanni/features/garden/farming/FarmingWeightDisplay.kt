@@ -39,7 +39,7 @@ import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonObject
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
@@ -163,6 +163,7 @@ object FarmingWeightDisplay {
     // Caused by various inaccuracies, including pest calc
     private var shWeightDiff = 0.0
     private var apiWeight = 0.0
+
     // Calculated weight number to display
     private val displayWeight get() = localWeight + weight - shWeightDiff
 
@@ -206,7 +207,7 @@ object FarmingWeightDisplay {
 
                 isLoadingWeight = true
                 if (display.isEmpty()) {
-                    display = listOf(StringRenderable("§6${lbName()}§7: §eLoading.."))
+                    display = listOf(Renderable.text("§6${lbName()}§7: §eLoading.."))
                 }
                 SkyHanniMod.launchIOCoroutine {
                     loadWeight(localProfile)
@@ -362,7 +363,7 @@ object FarmingWeightDisplay {
         val weightFormat = (weightUntilOvertake.roundTo(2) + 0.0).addSeparators()
         val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
         return if (showRankGoal) {
-            StringRenderable(text)
+            Renderable.text(text)
         } else {
             Renderable.clickable(
                 text,

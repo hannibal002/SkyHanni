@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
@@ -48,7 +48,7 @@ object HuntingBoxValue {
         }
 
         display = buildList {
-            add(StringRenderable("§eHunting Box Value"))
+            addString("§eHunting Box Value")
 
             if (table.isNotEmpty()) {
                 add(RenderableUtils.fillScrollTable(table, padding = 5, itemScale = 0.7, height = 225, velocity = 5.0))
@@ -56,17 +56,18 @@ object HuntingBoxValue {
                 possiblyAddWarning()
             }
 
-            add(StringRenderable("§7Total Attribute Shards: §a$totalShards"))
-            add(StringRenderable("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}"))
-            add(StringRenderable("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}"))
+            addString("§7Total Attribute Shards: §a$totalShards")
+            addString("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}")
+            addString("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}")
         }
     }
 
     private fun MutableList<Renderable>.possiblyAddWarning() {
         InventoryUtils.getItemAtSlotIndex(10).orNull() ?: return
 
-        add(StringRenderable("§cError detected"))
-        add(StringRenderable("§cPlease run §e/shdebug repo§c to get debug information."))
+        addString("§cError detected!")
+        addString("§cPlease run §e/shdebug repo§c to get debug information.")
+        addString("§cThen send the data on discord.")
     }
 
     private fun processAttributeShardSlot(slotNumber: Int, stack: ItemStack, table: MutableList<DisplayTableEntry>) {
