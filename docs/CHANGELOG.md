@@ -128,6 +128,7 @@
 #### Chat
 
 + Added filter for Swoop's message. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4388)
++ Made copy chat work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4408)
 
 ### Fixes
 
@@ -153,6 +154,8 @@
 + Fixed an edge case where shiny orb tracker would show up when it isn't meant to. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4375)
 + Fixed deadlock issue with repo management. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4374)
 + Fixed gfs command not working on most items that were more than one word. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4367)
++ Fixed issue when submitting contests to EliteDev. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4398)
++ Fixed Skill Overflow For Hunting And Foraging. - nopo (https://github.com/hannibal002/SkyHanni/pull/4406)
 
 #### Chat
 
@@ -173,6 +176,10 @@
 + Fixed estimated item value tooltip pricing enchanted books at twice their value. - SuperCl4sh (https://github.com/hannibal002/SkyHanni/pull/4247)
 + Fixed True Defense in Colour Item Stat Numbers being the wrong colour. - nopo (https://github.com/hannibal002/SkyHanni/pull/4366)
 + Fixed Crop Fortune Colours in Colourful Item Stats. - nopo (https://github.com/hannibal002/SkyHanni/pull/4391)
++ Fixed enchanted book items such as the experience artifact not showing in estimated item value. - nopo (https://github.com/hannibal002/SkyHanni/pull/4407)
++ Fixed estimated chest value displaying books at half their value. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4405)
++ Fixed Improved SB Menus replacing Potion items in the cookie menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4401)
++ Fixed visual errors in hunting box when no shards were detected. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4404)
 
 #### Fishing
 
@@ -260,6 +267,12 @@
 + Moved `LorenzVec.getBlockBelowPlayer()` to `LocationUtils` and fixed incorrect behavior when the player is standing on a non-full block. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
 + Removed unused deprecated functions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4381)
 + Renamed `LorenzVec.roundLocationToBlock()` to `roundToBlock()` and fixed incorrect rounding. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
++ Cleaned up and split up ApiUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4398)
++ Cleanup of core Renderables. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4387)
+    + That includes StringRenderable, ItemRenderable, ContainerRenderable and also some misc stuff.
++ Fixed Detekt workflows again. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4400)
++ Made attribute shard features silently error. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4404)
++ String.removeColor now removes the chroma color code. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4408)
 
 ## Version 4.0.0
 
