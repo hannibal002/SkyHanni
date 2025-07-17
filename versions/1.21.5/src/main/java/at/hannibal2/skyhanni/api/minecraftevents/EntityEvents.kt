@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.client.MinecraftClient
-import net.minecraft.entity.damage.DamageSources
 import net.minecraft.network.packet.s2c.play.DamageTiltS2CPacket
 
 @SkyHanniModule
