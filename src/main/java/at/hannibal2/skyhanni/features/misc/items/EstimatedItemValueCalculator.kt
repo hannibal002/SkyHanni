@@ -49,7 +49,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
@@ -76,6 +75,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
@@ -164,7 +164,7 @@ object EstimatedItemValueCalculator {
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
         // The value of enchantments will already be added in ::addEnchantments, so set to 0 to avoid double counting
-        val foldValue = if (stack.getItemId() == "ENCHANTED_BOOK") 0.0
+        val foldValue = if (stack.item == Items.enchanted_book) 0.0
         else basePrice
         val totalPrice = additionalCostFunctions.fold(foldValue) { total, function -> total + function(stack, list) }
         return totalPrice to basePrice
