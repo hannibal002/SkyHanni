@@ -57,8 +57,6 @@ import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 //#else
 //$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
-//#endif
-//#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 //#endif
