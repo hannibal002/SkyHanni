@@ -37,6 +37,7 @@ object CopyChat {
     }
 
     private fun processCopyChat(mouseX: Int, mouseY: Int) {
+        // On 1.8 we use our own code to find the chat lines which uses our mouse methods, on 1.21 we use the vanilla methods
         val chatLine = if (PlatformUtils.IS_LEGACY) {
             getChatLine(MouseCompat.getX(), MouseCompat.getY()) ?: return
         } else {
