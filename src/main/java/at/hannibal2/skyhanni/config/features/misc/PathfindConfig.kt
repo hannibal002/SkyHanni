@@ -16,7 +16,7 @@ class PathfindConfig {
     @Expose
     @ConfigOption(name = "Feedback Mode", desc = "How pathfinding progress/feedback should be displayed.")
     @ConfigEditorDropdown
-    @SearchTag("navigation, pathfind")
+    @SearchTag("navigation navigate pathfind")
     val feedbackMode: Property<FeedbackMode> = Property.of(FeedbackMode.GUI)
 
     enum class FeedbackMode(private val displayName: String) {
