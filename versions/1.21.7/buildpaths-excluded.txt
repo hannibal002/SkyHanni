@@ -17,6 +17,7 @@ at.hannibal2.skyhanni.tweaker.TweakerUtils.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
+at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRender.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket.java
@@ -25,7 +26,6 @@ at.hannibal2.skyhanni.mixins.transformers.MixinBlockLiquid.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityAgeable.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityHorse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinFontRenderer.java
-at.hannibal2.skyhanni.mixins.transformers.MixinGuiChat.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngameForge.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetHandlerPlayClient.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java

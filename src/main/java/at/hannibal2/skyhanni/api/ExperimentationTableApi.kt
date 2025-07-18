@@ -31,8 +31,8 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -328,7 +328,7 @@ object ExperimentationTableApi {
     }
 
     fun inDistanceToTable(max: Double): Boolean {
-        val vec = LorenzVec.getBlockBelowPlayer()
+        val vec = LocationUtils.getBlockBelowPlayer()
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
     }
 

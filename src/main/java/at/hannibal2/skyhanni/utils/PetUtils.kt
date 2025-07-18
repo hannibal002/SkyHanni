@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object PetUtils {
@@ -40,6 +41,7 @@ object PetUtils {
     private var seasonalVariants: Set<NeuInternalName> = setOf()
     private var dayNightVariants: Set<NeuInternalName> = setOf()
     private var ciFactionVariants: Set<NeuInternalName> = setOf()
+    private var lastRepoWarning: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private fun getSeasonalVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val variantId = SkyblockSeason.currentSeason?.name ?: "SPRING"
@@ -173,12 +175,27 @@ object PetUtils {
     fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity) =
         "${petName.uppercase().replace(" ", "_")};${rarity.id}".toInternalName()
 
-    fun levelToXp(level: Int, petInternalName: NeuInternalName): Double? {
+    fun levelToXp(level: Int, petInternalName: NeuInternalName): Double? = runCatching {
         val rarityOffset = getRarityOffset(petInternalName) ?: return null
         if (level < 0 || level > getMaxLevel(petInternalName)) return null
-        return getFullLevelingTree(petInternalName)
-            .slice(0 + rarityOffset..<level + rarityOffset - 1)
-            .sumOf { it.toDouble() }
+        val levelTree = getFullLevelingTree(petInternalName)
+        if (rarityOffset + level > levelTree.size) {
+            if (lastRepoWarning.passedSince() > 5.minutes) {
+                ChatUtils.userError(
+                    "§cFailed to load pet levels from NEU repo. " +
+                        "§cYou can try to fix this by running `§e/${ItemUtils.resetCommand}`§c."
+                )
+                lastRepoWarning = SimpleTimeMark.now()
+            }
+            return null
+        }
+        return levelTree.subList(rarityOffset, rarityOffset + level).sumOf { it.toDouble() }
+    }.getOrElse {
+        ErrorManager.logErrorWithData(
+            it,
+            "Failed to calculate XP for pet level $level with internal name $petInternalName",
+        )
+        null
     }
 
     fun xpToLevel(petInfo: SkyBlockItemModifierUtils.PetInfo): Int = PetData(petInfo).level
@@ -190,9 +207,9 @@ object PetUtils {
      * @param petInternalName The internal name of the pet, reflecting tier boost properly.
      * @param coerceToMax Whether to floor the calculated level to the maximum level of the pet. (Default: true)
      */
-    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName, coerceToMax: Boolean = true): Int {
-        var xp = totalXp.takeIf { it > 0 } ?: return 1
-        val rarityOffset = getRarityOffset(petInternalName) ?: return 1
+    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName, coerceToMax: Boolean = true): Int = runCatching {
+        var xp = totalXp.takeIf { it > 0 } ?: return 0
+        val rarityOffset = getRarityOffset(petInternalName) ?: return 0
         val xpList = getFullLevelingTree(petInternalName)
 
         var level = 1
@@ -206,6 +223,12 @@ object PetUtils {
         }
 
         return if (coerceToMax) level.coerceAtMost(maxLevel) else level
+    }.getOrElse {
+        ErrorManager.logErrorWithData(
+            it,
+            "Failed to calculate level for total XP $totalXp with internal name $petInternalName",
+        )
+        0
     }
 
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {

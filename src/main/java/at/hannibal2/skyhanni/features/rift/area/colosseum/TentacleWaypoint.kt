@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.compat.DamageSourceCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -46,7 +47,8 @@ object TentacleWaypoint {
         val entity = event.mob.baseEntity as? EntitySlime ?: return
 
         // Fixes Wall Damage counting as tentacle damage
-        if (event.source.damageType != "generic") return
+        if (event.source.damageType != DamageSourceCompat.generic.damageType) return
+
         tentacleHits[entity]?.let { tentacleHits[entity] = it + 1 }
     }
 

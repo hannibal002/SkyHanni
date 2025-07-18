@@ -30,8 +30,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.Text
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.TextRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.init.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -231,8 +231,8 @@ object FlowstateHelper {
     }
 }
 
-enum class FlowstateElements(val label: String, var renderable: Renderable = StringRenderable("")) {
-    TITLE("§d§lFlowstate Helper", StringRenderable("§d§lFlowstate Helper")),
+enum class FlowstateElements(val label: String, var renderable: Renderable = Renderable.empty()) {
+    TITLE("§d§lFlowstate Helper", Renderable.text("§d§lFlowstate Helper")),
     TIMER("§fTime Remaining: §b9.71"),
     STREAK("§7Streak: §f123/200"),
     SPEED("§6+600⸕"),
@@ -249,23 +249,23 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Str
             TIMER -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                TextRenderable(Text.of("§7Time Remaining: ").append(timeRemaining.formatTime()))
+                Renderable.text(Text.of("§7Time Remaining: ").append(timeRemaining.formatTime()))
             }
 
             STREAK -> {
                 val textColor = getStreakColor()
                 val string = "§7Streak: $textColor$blockBreakStreak"
-                StringRenderable(string + if (blockBreakStreak < 200) "§8/200" else "")
+                Renderable.text(string + if (blockBreakStreak < 200) "§8/200" else "")
             }
 
             SPEED -> {
-                StringRenderable("§6+${getSpeedBonus()}⸕")
+                Renderable.text("§6+${getSpeedBonus()}⸕")
             }
 
             COMPACT -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                TextRenderable(
+                Renderable.text(
                     Text.of(
                         "§7x${getStreakColor()}$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ ",
                     ).append(
@@ -276,11 +276,11 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Str
 
             PERSONAL_BEST -> {
                 if (blockBreakStreak <= personalBest) {
-                    StringRenderable(
+                    Renderable.text(
                         "§7Personal Best: §7${getStreakColor()}$blockBreakStreak§8/§d$personalBest",
                     )
                 } else {
-                    StringRenderable("§d§lNew Personal Best ${getStreakColor()}$blockBreakStreak")
+                    Renderable.text("§d§lNew Personal Best ${getStreakColor()}$blockBreakStreak")
                 }
             }
 

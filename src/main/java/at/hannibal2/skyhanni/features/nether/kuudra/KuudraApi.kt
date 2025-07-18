@@ -67,6 +67,16 @@ object KuudraApi {
 
     val inKuudra get() = SkyBlockUtils.inSkyBlock && kuudraTier != null
 
+    enum class KuudraChest(val inventory: String) {
+        FREE("Free Chest"),
+        PAID("Paid Chest"),
+        ;
+
+        companion object {
+            fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
+        }
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (kuudraTier != null) return

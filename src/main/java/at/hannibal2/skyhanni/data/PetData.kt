@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
+import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.util.UUID

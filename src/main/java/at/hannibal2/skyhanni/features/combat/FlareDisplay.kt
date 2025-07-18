@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
@@ -103,10 +103,10 @@ object FlareDisplay {
             if (newDisplay == null) {
                 newDisplay = buildList {
                     val displayTime = if (remainingTime.isNegative()) "§eSoon" else "§b${remainingTime.format()}"
-                    add(StringRenderable("$name: $displayTime"))
+                    addString("$name: $displayTime")
                     if (config.showManaBuff) {
                         type.manaBuff?.let {
-                            add(StringRenderable(" §b$it §7mana regen"))
+                            addString(" §b$it §7mana regen")
                         }
                     }
                 }

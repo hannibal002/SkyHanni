@@ -38,7 +38,7 @@ object JacobContestStatsSummary {
     fun onFarmingContest(event: FarmingContestEvent) {
         if (!config.enabled) return
         val cropsBroken = blocksBroken[event.crop] ?: 0
-        if (config.hideZeroCropStats && cropsBroken == 0) return
+        if (event.phase == FarmingContestPhase.STOP && config.hideZeroCropStats && cropsBroken == 0) return
 
         when (event.phase) {
             FarmingContestPhase.START -> {

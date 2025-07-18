@@ -45,10 +45,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFreeWill
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
@@ -102,6 +104,7 @@ object EstimatedItemValueCalculator {
         ::addEnrichment,
         ::addDivanPowderCoating,
         ::addMithrilInfusion,
+        ::addFreeWill,
 
         // counted
         ::addCrimsonPrestige,
@@ -151,6 +154,7 @@ object EstimatedItemValueCalculator {
     private val BOOKWORM_BOOK = "BOOKWORM_BOOK".toInternalName()
     private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
     private val MITHRIL_INFUSION = "MITHRIL_INFUSION".toInternalName()
+    private val FREE_WILL = "FREE_WILL".toInternalName()
 
     fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
         val (totalPrice, basePrice) = calculate(stack, mutableListOf())
@@ -162,7 +166,10 @@ object EstimatedItemValueCalculator {
 
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
-        val totalPrice = additionalCostFunctions.fold(basePrice) { total, function -> total + function(stack, list) }
+        // The value of enchantments will already be added in ::addEnchantments, so set to 0 to avoid double counting
+        val foldValue = if (stack.getItemId() == "ENCHANTED_BOOK") 0.0
+        else basePrice
+        val totalPrice = additionalCostFunctions.fold(foldValue) { total, function -> total + function(stack, list) }
         return totalPrice to basePrice
     }
 
@@ -255,6 +262,11 @@ object EstimatedItemValueCalculator {
     private fun addMithrilInfusion(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.getMithrilInfusion()) return 0.0
         return list.formatHaving("Mithril Infusion", MITHRIL_INFUSION)
+    }
+
+    private fun addFreeWill(stack: ItemStack, list: MutableList<String>): Double {
+        if (!stack.getFreeWill()) return 0.0
+        return list.formatHaving("Free Will", FREE_WILL)
     }
 
     private fun addArtOfWar(stack: ItemStack, list: MutableList<String>): Double {
