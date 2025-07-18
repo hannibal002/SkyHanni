@@ -45,7 +45,6 @@ import kotlin.math.floor
 //$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 //#else
 import net.minecraft.nbt.NBTTagString
-import net.minecraft.nbt.NBTException
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
@@ -97,7 +96,7 @@ object EnoughUpdatesManager {
             val internalName = name.removeSuffix(".json")
             val parsed = parseItem(
                 internalName = internalName,
-                json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
+                json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
             ) ?: return@mapNotNullAsync null
             internalName to parsed
         }.forEach { (internalName, item) ->
@@ -203,12 +202,16 @@ object EnoughUpdatesManager {
 
         json["count"]?.asInt?.let { stack.stackSize = it }
         json["damage"]?.asInt?.let { stack.itemDamage = it }
-        json["nbttag"]?.asString?.let { nbt ->
-            try {
-                val tag = JsonToNBT.getTagFromJson(nbt)
-                stack.tagCompound = tag
-            } catch (_: NBTException) {
+        try {
+            val nbtString = json["nbttag"]?.let { rawJsonNbt ->
+                if (rawJsonNbt.isJsonObject) rawJsonNbt.toString()
+                else rawJsonNbt.asString
             }
+            val tag = JsonToNBT.getTagFromJson(nbtString)
+            stack.tagCompound = tag
+        } catch (_: Exception) {
+            println("json was malformed: ${json["nbttag"]}")
+            println("whole json: $json")
         }
 
         var replacements = mapOf<String, String>()
