@@ -19,7 +19,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -122,13 +124,15 @@ object DicerRngDropTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<Searchable> {
+    private fun drawDisplay(data: Data) = buildList {
         val cropInHand = cropInHand ?: return@buildList
 
-        val topLine = mutableListOf<Renderable>()
-        topLine.add(Renderable.itemStack(cropInHand.icon))
-        topLine.add(Renderable.string("§7Dicer Tracker:"))
-        add(Renderable.horizontalContainer(topLine).toSearchable())
+        add(
+            Renderable.horizontal(
+                Renderable.item(cropInHand.icon),
+                Renderable.text("§7Dicer Tracker:"),
+            ).toSearchable(),
+        )
 
         val items = data.drops[cropInHand] ?: return@buildList
         if (config.compact.get()) {

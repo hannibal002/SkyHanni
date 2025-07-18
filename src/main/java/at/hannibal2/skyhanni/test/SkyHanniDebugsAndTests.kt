@@ -29,7 +29,9 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -48,32 +50,21 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
-import at.hannibal2.skyhanni.utils.renderables.DragNDrop
-import at.hannibal2.skyhanni.utils.renderables.Droppable
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.addLine
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.toDragItem
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
@@ -331,14 +322,7 @@ object SkyHanniDebugsAndTests {
         }
         lastManualContestDataUpdate = SimpleTimeMark.now()
 
-        GardenNextJacobContest.contests.clear()
-        GardenNextJacobContest.fetchedFromElite = false
-        GardenNextJacobContest.isFetchingContests = true
-        SkyHanniMod.coroutineScope.launch {
-            GardenNextJacobContest.fetchUpcomingContests()
-            GardenNextJacobContest.lastFetchAttempted = SimpleTimeMark.now()
-            GardenNextJacobContest.isFetchingContests = false
-        }
+        GardenNextJacobContest.resetContestData()
     }
 
     private fun copyLocation(args: Array<String>) {
@@ -360,8 +344,7 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(GuiKeyPressEvent::class)
     fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val focussedSlot = slotUnderCursor() ?: return
-        val stack = focussedSlot.stack ?: return
+        val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
@@ -433,11 +416,22 @@ object SkyHanniDebugsAndTests {
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val data = internalName.getBazaarData() ?: return
+        val instantSellPrice = data.instantSellPrice
         val instantBuyPrice = data.instantBuyPrice
-        val sellOfferPrice = data.sellOfferPrice
 
+        event.toolTip.add("§7BZ instantSellPrice: ${instantSellPrice.addSeparators()}")
         event.toolTip.add("§7BZ instantBuyPrice: ${instantBuyPrice.addSeparators()}")
-        event.toolTip.add("§7BZ sellOfferPrice: ${sellOfferPrice.addSeparators()}")
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowBinPrice(event: ToolTipEvent) {
+        if (!debugConfig.showBinPrice) return
+        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+        if (!internalName.isAuctionHouseItem()) return
+
+        val binPrice = internalName.getPrice()
+
+        event.toolTip.add("§7Bin Price: ${binPrice.addSeparators()}")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -459,12 +453,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    @Suppress("ConstantConditionIf")
     fun onRenderOverlay() {
-        if (false) {
-            itemRenderDebug()
-        }
-
         if (MinecraftCompat.showDebugHud) {
             if (debugConfig.currentAreaDebug) {
                 config.debugLocationPos.renderString(
@@ -474,7 +463,7 @@ object SkyHanniDebugsAndTests {
             }
 
             if (debugConfig.raytracedOreblock) {
-                BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
+                BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
                             "Looking at: ${ore.name} (${pos.toCleanString()})",
@@ -492,76 +481,6 @@ object SkyHanniDebugsAndTests {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
-    }
-
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    @Suppress("ConstantConditionIf")
-    fun onBackgroundDraw() {
-        if (false) {
-            dragAbleTest()
-        }
-    }
-
-    private fun dragAbleTest() {
-        val bone = ItemStack(Items.bone, 1).toDragItem()
-        val leaf = ItemStack(BlockCompat.getAllLogs().first(), 1).toDragItem()
-
-        config.debugItemPos.renderRenderables(
-            listOf(
-                DragNDrop.draggable(RenderableString("A Bone"), { bone }),
-                Renderable.placeholder(0, 30),
-                DragNDrop.draggable(RenderableString("A Leaf"), { leaf }),
-                Renderable.placeholder(0, 30),
-                DragNDrop.droppable(
-                    RenderableString("Feed Dog"),
-                    object : Droppable {
-                        override fun handle(drop: Any?) {
-                            val unit = drop as ItemStack
-                            if (unit.item == Items.bone) {
-                                LorenzDebug.chatAndLog("Oh, a bone!")
-                            } else {
-                                LorenzDebug.chatAndLog("Disgusting that is not a bone!")
-                            }
-                        }
-
-                        override fun validTarget(item: Any?) = item is ItemStack
-
-                    },
-                ),
-            ),
-            posLabel = "Item Debug",
-        )
-    }
-
-    private fun itemRenderDebug() {
-        val scale = 0.1
-        val renderables = listOf(
-            ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
-            ItemStack(Blocks.melon_block),
-        ).map { item ->
-            generateSequence(scale) { it + 0.1 }.take(25).map {
-                Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
-            }.toList()
-        }.editCopy {
-            this.add(
-                0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { RenderableString(it.roundTo(1).toString()) }.toList(),
-            )
-        }
-        config.debugItemPos.renderRenderables(
-            listOf(
-                Renderable.table(renderables),
-                HorizontalContainerRenderable(
-                    listOf(
-                        RenderableString("Test:").renderBounds(),
-                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
-                    ),
-                    1,
-                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
-                ),
-            ),
-            posLabel = "Item Debug",
-        )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -629,7 +548,7 @@ object SkyHanniDebugsAndTests {
             description = "Prints the SkyHanni version in the chat"
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
-                val name1 = "SkyHanni ${SkyHanniMod.VERSION}"
+                val name1 = "SkyHanni ${SkyHanniMod.VERSION} on Minecraft ${PlatformUtils.MC_VERSION}"
                 ChatUtils.chat("§eYou are using $name1")
                 OSUtils.copyToClipboard(name1)
             }

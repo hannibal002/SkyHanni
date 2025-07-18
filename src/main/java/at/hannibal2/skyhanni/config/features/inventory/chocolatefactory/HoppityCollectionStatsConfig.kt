@@ -18,7 +18,7 @@ class HoppityCollectionStatsConfig {
 
     @Expose
     @ConfigLink(owner = HoppityCollectionStatsConfig::class, field = "enabled")
-    var position: Position = Position(163, 160)
+    val position: Position = Position(163, 160)
 
     @Expose
     @ConfigOption(name = "Highlight Found Rabbits", desc = "Highlight rabbits that have already been found.")
@@ -29,7 +29,7 @@ class HoppityCollectionStatsConfig {
     @Expose
     @ConfigOption(name = "Highlight Rabbits", desc = "Highlight specific rabbit types in Hoppity's Collection.")
     @ConfigEditorDraggableList
-    var highlightRabbits: MutableList<HighlightRabbitTypes> = mutableListOf(
+    val highlightRabbits: MutableList<HighlightRabbitTypes> = mutableListOf(
         HighlightRabbitTypes.ABI,
         HighlightRabbitTypes.FACTORY,
         HighlightRabbitTypes.MET,
@@ -45,6 +45,14 @@ class HoppityCollectionStatsConfig {
     )
     @ConfigEditorBoolean
     var rarityDyeRecolor: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Descriptive Milestones",
+        desc = "Show a more detailed description of how to unlock a milestone rabbit in Hoppity's Collection."
+    )
+    @ConfigEditorBoolean
+    var descriptiveMilestones: Boolean = true
 
     @Expose
     @ConfigOption(

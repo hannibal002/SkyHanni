@@ -176,8 +176,7 @@ object ShaderHelper {
         )
     }
 
-    //#if MC < 1.21
-    //#else
+    //#if MC > 1.21
     //$$ fun glUniformMatrix4f(location: Int, transpose: Boolean, matrix: Matrix4f) {
     //$$    val matrixArray = FloatArray(16)
     //$$    matrix.get(matrixArray)

@@ -4,8 +4,7 @@ import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 
-class GuiOptionEditorBlocked(base: GuiOptionEditor) : GuiOptionEditor(base.getOption()) {
-    private val base: GuiOptionEditor = base
+class GuiOptionEditorBlocked(private val base: GuiOptionEditor, private val extraMessage: String) : GuiOptionEditor(base.getOption()) {
 
     override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
         // No super. We delegate and overlay ourselves instead.
@@ -14,20 +13,25 @@ class GuiOptionEditorBlocked(base: GuiOptionEditor) : GuiOptionEditor(base.getOp
         // Depress original option
         context.drawColoredRect(x.toFloat(), y.toFloat(), (x + width).toFloat(), (y + height).toFloat(), -0x80000000)
 
-        context.color(1f, 1f, 1f, 1f)
-        context.bindTexture(blockedTexture)
-
         val iconWidth: Float = height * 96f / 64
-        context.drawTexturedRect(x.toFloat(), y.toFloat(), iconWidth, height.toFloat())
+        context.drawTexturedRect(blockedTexture, x.toFloat(), y.toFloat(), iconWidth, height.toFloat())
 
         val fontRenderer = context.minecraft.defaultFontRenderer
+
+        val oneThird: Float = height / 3f
+
         context.drawStringScaledMaxWidth(
             "This option is currently not available.",
             fontRenderer,
-            (x + iconWidth).toInt(), (y + height / 2f - fontRenderer.height / 2f).toInt(),
-            true, (width - iconWidth).toInt(), -0xbbbc
+            (x + iconWidth).toInt(), (y + oneThird - fontRenderer.height / 2f).toInt(),
+            true, (width - iconWidth).toInt(), -0xbbbc,
         )
-        context.color(1f, 1f, 1f, 1f)
+        context.drawStringScaledMaxWidth(
+            extraMessage,
+            fontRenderer,
+            (x + iconWidth).toInt(), (y + (oneThird * 2) - fontRenderer.height / 2f).toInt(),
+            true, (width - iconWidth).toInt(), -0xbbbc,
+        )
     }
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
@@ -44,7 +48,7 @@ class GuiOptionEditorBlocked(base: GuiOptionEditor) : GuiOptionEditor(base.getOp
 
     companion object {
         val blockedTexture: MyResourceLocation = MyResourceLocation(
-            "skyhanni", "config_blocked.png"
+            "skyhanni", "config_blocked.png",
         )
     }
 }

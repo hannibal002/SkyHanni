@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -58,7 +58,7 @@ class NextJacobContestConfig {
         desc = "Set the color of the highlight for the current boosted crop.",
     )
     @ConfigEditorColour
-    var additionalBoostedHighlightColor: String = "0:80:0:255:0"
+    var additionalBoostedHighlightColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, a = 80)
 
     @Expose
     @ConfigOption(
@@ -68,16 +68,12 @@ class NextJacobContestConfig {
     @ConfigEditorDropdown
     var shareAutomatically: ShareContestsEntry = ShareContestsEntry.ASK
 
-    enum class ShareContestsEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        ASK("Ask When Needed", 0),
-        AUTO("Share Automatically", 1),
-        DISABLED("Disabled", 2),
+    enum class ShareContestsEntry(private val displayName: String) {
+        ASK("Ask When Needed"),
+        AUTO("Share Automatically"),
+        DISABLED("Disabled"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -102,9 +98,10 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(name = "Warn For", desc = "Only warn for these crops.")
     @ConfigEditorDraggableList
-    var warnFor: MutableList<CropType> = CropType.entries.toMutableList()
+    val warnFor: MutableList<CropType> = CropType.entries.toMutableList()
 
+    // Todo rename to position
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
-    var pos: Position = Position(-200, 10)
+    val pos: Position = Position(-200, 10)
 }

@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -27,6 +27,9 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -52,7 +55,7 @@ object ComposterDisplay {
 
         val pattern = rawPattern.toPattern()
 
-        fun label(label: String) = Renderable.line {
+        fun label(label: String) = Renderable.horizontal {
             addItemStack(displayItem)
             addString(label)
         }
@@ -94,11 +97,11 @@ object ComposterDisplay {
         return if (emptyTime != null) {
             GardenApi.storage?.composterEmptyTime = emptyTime.fromNow()
             val format = emptyTime.format()
-            Renderable.line {
+            Renderable.horizontal {
                 addItemStack(bucket)
                 addString("§b$format")
             }
-        } else Renderable.string("§cOpen Composter Upgrades!")
+        } else Renderable.text("§cOpen Composter Upgrades!")
     }
 
     private fun readData(tabList: List<String>) {
@@ -177,7 +180,7 @@ object ComposterDisplay {
         val inSB = SkyBlockUtils.inSkyBlock && config.displayOutsideGarden
         val outsideSB = !SkyBlockUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
         if (!GardenApi.inGarden() && (inSB || outsideSB)) {
-            val outsideGardenDisplay = Renderable.line {
+            val outsideGardenDisplay = Renderable.horizontal {
                 addItemStack(bucket)
                 addString("§b$format")
             }

@@ -20,7 +20,7 @@ class GhostProfitTrackerConfig {
     @Expose
     @ConfigOption(name = "Display Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var ghostTrackerText: MutableList<GhostTrackerLines> = mutableListOf(
+    val ghostTrackerText: MutableList<GhostTrackerLines> = mutableListOf(
         GhostTrackerLines.KILLS,
         GhostTrackerLines.GHOSTS_SINCE_SORROW,
         GhostTrackerLines.MAX_KILL_COMBO,
@@ -38,5 +38,5 @@ class GhostProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = GhostProfitTrackerConfig::class, field = "enabled")
-    var position: Position = Position(50, 50)
+    val position: Position = Position(50, 50)
 }

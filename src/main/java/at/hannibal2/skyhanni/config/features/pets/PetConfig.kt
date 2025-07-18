@@ -12,6 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class PetConfig {
     @Expose
@@ -35,6 +36,12 @@ class PetConfig {
     val nametag: PetNametagConfig = PetNametagConfig()
 
     @Expose
+    @ConfigOption(name = "Taming 60 Helper", desc = "")
+    @SearchTag("George")
+    @Accordion
+    val tamingSixty: TamingSixtyConfig = TamingSixtyConfig()
+
+    @Expose
     @ConfigOption(name = "Highlight Current Pet", desc = "")
     @Accordion
     val highlightInMenu: MenuHighlightConfig = MenuHighlightConfig()
@@ -43,12 +50,12 @@ class PetConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Highlight your current pet in the §e/pets §7menu.")
         @ConfigEditorBoolean
-        val enabled: Boolean = true
+        var enabled: Boolean = true
 
         @Expose
         @ConfigOption(name = "Highlight Color", desc = "What color the slot should be highlighted.")
         @ConfigEditorColour
-        val color: ChromaColour = LorenzColor.GREEN.toChromaColor(alpha = 128)
+        var color: ChromaColour = LorenzColor.GREEN.toChromaColor(alpha = 128)
     }
 
     @Expose
@@ -66,7 +73,7 @@ class PetConfig {
         desc = "Specify the pet items for which icons should be displayed next to pets."
     )
     @ConfigEditorDraggableList
-    var petItemDisplay: MutableList<PetItemsDisplay> = mutableListOf(
+    val petItemDisplay: MutableList<PetItemsDisplay> = mutableListOf(
         PetItemsDisplay.XP_SHARE,
         PetItemsDisplay.TIER_BOOST
     )
@@ -75,7 +82,6 @@ class PetConfig {
     @ConfigOption(name = "Pet Item Scale", desc = "The scale at which the Pet Item will be displayed.")
     @ConfigEditorSlider(minValue = 0.7f, maxValue = 1.5f, minStep = 0.05f)
     var petItemDisplayScale: Float = 0.9f
-
 
     enum class PetItemsDisplay(
         val icon: String,
@@ -87,7 +93,6 @@ class PetConfig {
         ;
 
         private val displayName: String = "$icon §ffor $itemDisplayName"
-
-        override fun toString() = displayName
+        override fun toString() = "$icon §ffor $displayName"
     }
 }

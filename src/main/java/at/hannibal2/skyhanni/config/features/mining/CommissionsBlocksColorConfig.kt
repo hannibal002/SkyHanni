@@ -21,10 +21,10 @@ class CommissionsBlocksColorConfig {
     @Expose
     @ConfigOption(name = "Sneak Toggle", desc = "Quickly disable or enable this feature via sneaking.")
     @ConfigEditorBoolean
-    var sneakQuickToggle: Property<Boolean> = Property.of(false)
+    val sneakQuickToggle: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Color", desc = "Change the highlight color.")
     @ConfigEditorDropdown
-    var color: Property<LorenzColor> = Property.of(LorenzColor.GREEN)
+    val color: Property<LorenzColor> = Property.of(LorenzColor.GREEN)
 }

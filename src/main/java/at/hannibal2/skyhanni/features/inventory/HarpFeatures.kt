@@ -28,6 +28,9 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
+//#endif
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 @SkyHanniModule
@@ -44,10 +47,11 @@ object HarpFeatures {
 
     /**
      * REGEX-TEST: Harp - Amazing Grace
+     * REGEX-FAIL: Harpy ➜ Instant Buy
      */
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventory",
-        "Harp.*",
+        "Harp -.*",
     )
     private val menuTitlePattern by patternGroup.pattern(
         "menu",
@@ -118,6 +122,7 @@ object HarpFeatures {
         val height = GuiScreenUtils.scaledWindowHeight
         minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
         //#else
+        //$$ RenderSystem.assertOnRenderThread()
         //$$ minecraft.window.calculateScaleFactor(minecraft.options.guiScale.value, minecraft.forcesUnicodeFont())
         //#endif
     }
@@ -132,7 +137,6 @@ object HarpFeatures {
     fun onDisconnect(event: ClientDisconnectEvent) {
         if (!config.guiScale) return
         unSetGuiScale()
-
     }
 
     @HandleEvent
@@ -145,16 +149,28 @@ object HarpFeatures {
     private var isGuiScaled = false
 
     private fun setGuiScale() {
+        //#if MC > 1.21
+        //$$ MinecraftClient.getInstance().execute {
+        //#endif
         guiSetting = getMinecraftGuiScale()
         setMinecraftGuiScale(0)
         isGuiScaled = true
         updateScale()
+        //#if MC > 1.21
+        //$$ }
+        //#endif
     }
 
     private fun unSetGuiScale() {
         if (!isGuiScaled) return
+        //#if MC > 1.21
+        //$$ MinecraftClient.getInstance().execute {
+        //#endif
         setMinecraftGuiScale(guiSetting)
         isGuiScaled = false
+        //#if MC > 1.21
+        //$$ }
+        //#endif
     }
 
     private fun getMinecraftGuiScale(): Int {
@@ -162,6 +178,7 @@ object HarpFeatures {
         //#if MC < 1.21
         return gameSettings.guiScale
         //#else
+        //$$ RenderSystem.assertOnRenderThread()
         //$$ return gameSettings.guiScale.value
         //#endif
     }
@@ -171,6 +188,7 @@ object HarpFeatures {
         //#if MC < 1.21
         gameSettings.guiScale = scale
         //#else
+        //$$ RenderSystem.assertOnRenderThread()
         //$$ gameSettings.guiScale.value = scale
         //#endif
     }

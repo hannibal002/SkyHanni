@@ -9,9 +9,10 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
@@ -28,12 +29,10 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -43,7 +42,9 @@ import at.hannibal2.skyhanni.utils.compat.addLeaves
 import at.hannibal2.skyhanni.utils.compat.addLeaves2
 import at.hannibal2.skyhanni.utils.compat.addRedFlower
 import at.hannibal2.skyhanni.utils.compat.addTallGrass
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import org.lwjgl.input.Keyboard
@@ -120,7 +121,7 @@ object GriffinBurrowHelper {
 
     private fun loadTestGriffinSpots() {
         if (!testGriffinSpots) return
-        val center = LocationUtils.playerLocation().toBlockPos().toLorenzVec()
+        val center = LocationUtils.playerLocation().roundToBlock()
         val list = mutableListOf<LorenzVec>()
         for (x in -5 until 5) {
             for (z in -5 until 5) {
@@ -247,6 +248,17 @@ object GriffinBurrowHelper {
         // talking to Diana NPC
         if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
             resetAllData()
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onUseAbility(event: ItemClickEvent) {
+        if (!isEnabled()) return
+        val item = event.itemInHand ?: return
+        if (!item.isDianaSpade) return
+
+        additionalGuesses.removeIf {
+            it.getLocation().distanceToPlayerIgnoreY() < 10
         }
     }
 

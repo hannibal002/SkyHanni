@@ -16,40 +16,40 @@ class RiftAreasConfig {
     @ConfigOption(name = "Wyld Woods", desc = "")
     @Accordion
     @Expose
-    var wyldWoods: WyldWoodsConfig = WyldWoodsConfig()
+    val wyldWoods: WyldWoodsConfig = WyldWoodsConfig()
 
     @ConfigOption(name = "West Village", desc = "")
     @Accordion
     @Expose
-    var westVillage: WestVillageConfig = WestVillageConfig()
+    val westVillage: WestVillageConfig = WestVillageConfig()
 
     @Expose
     @ConfigOption(name = "Dreadfarm", desc = "")
     @Accordion
-    var dreadfarm: DreadfarmConfig = DreadfarmConfig()
+    val dreadfarm: DreadfarmConfig = DreadfarmConfig()
 
     @ConfigOption(name = "Mirrorverse", desc = "")
     @Accordion
     @Expose
-    var mirrorverse: MirrorVerseConfig = MirrorVerseConfig()
+    val mirrorverse: MirrorVerseConfig = MirrorVerseConfig()
 
     @Expose
     @ConfigOption(name = "Living Metal Cave", desc = "")
     @Accordion
-    var livingCave: LivingCaveConfig = LivingCaveConfig()
+    val livingCave: LivingCaveConfig = LivingCaveConfig()
 
     @Expose
     @ConfigOption(name = "Colosseum", desc = "")
     @Accordion
-    var colosseum: ColosseumConfig = ColosseumConfig()
+    val colosseum: ColosseumConfig = ColosseumConfig()
 
     @Expose
     @ConfigOption(name = "Stillgore Chateau", desc = "")
     @Accordion
-    var stillgoreChateau: StillgoreChateauConfig = StillgoreChateauConfig()
+    val stillgoreChateau: StillgoreChateauConfig = StillgoreChateauConfig()
 
     @Expose
     @ConfigOption(name = "Mountaintop", desc = "")
     @Accordion
-    var mountaintop: MountaintopConfig = MountaintopConfig()
+    val mountaintop: MountaintopConfig = MountaintopConfig()
 }

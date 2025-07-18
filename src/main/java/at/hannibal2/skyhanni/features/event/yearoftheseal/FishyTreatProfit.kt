@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -69,7 +70,7 @@ object FishyTreatProfit {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eProfit per Fishy Treat"))
+        newList.addString("§eProfit per Fishy Treat")
         newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
         return

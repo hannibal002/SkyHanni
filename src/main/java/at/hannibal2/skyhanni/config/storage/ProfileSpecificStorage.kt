@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
-import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
@@ -20,10 +20,12 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.LocationRabbit
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
+import at.hannibal2.skyhanni.features.event.yearofthepig.ShinyOrbTracker
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
@@ -43,10 +45,12 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
@@ -75,6 +79,9 @@ class ProfileSpecificStorage(
 
     @Expose
     var totalSkyBlockXP: Int? = null
+
+    @Expose
+    var crimsonIsleFaction: FactionType? = null
 
     // features
     // - combat
@@ -184,6 +191,10 @@ class ProfileSpecificStorage(
 
     @Expose
     var giftProfitTracker: GiftProfitTracker.Data = GiftProfitTracker.Data()
+
+    // -- year of the [___]
+    @Expose
+    var shinyOrbTracker: ShinyOrbTracker.ShinyOrbData = ShinyOrbTracker.ShinyOrbData()
 
     // -- hoppity
     @Expose
@@ -615,7 +626,7 @@ class ProfileSpecificStorage(
             var attemptsSince: Int = 0
 
             @Expose
-            var xpSince: Int = 0
+            var xpSince: Long = 0
         }
 
         @Expose
@@ -652,9 +663,39 @@ class ProfileSpecificStorage(
         var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
     }
 
+    // - foraging
+    @Expose
+    val foraging: ForagingStorage = ForagingStorage()
+
+    class ForagingStorage {
+        @Expose
+        var hotFTree: HotxTree = HotxTree()
+
+        @Expose
+        var tokens: Int = 0
+
+        @Expose
+        var availableTokens: Int = 0
+
+        @Expose
+        var whispers: PowderStorage = PowderStorage()
+
+        // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
+        @Expose
+        var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
+    }
+
     // - mining
     @Expose
     var mining: MiningStorage = MiningStorage()
+
+    class PowderStorage {
+        @Expose
+        var available: Long? = null
+
+        @Expose
+        var total: Long? = null
+    }
 
     class MiningStorage {
         @Expose
@@ -664,18 +705,10 @@ class ProfileSpecificStorage(
         var fossilExcavatorProfitTracker: ExcavatorProfitTracker.Data = ExcavatorProfitTracker.Data()
 
         @Expose
-        var hotmTree: HotmTree = HotmTree()
+        var hotmTree: HotxTree = HotxTree()
 
         @Expose
         var powder: MutableMap<PowderType, PowderStorage> = enumMapOf()
-
-        class PowderStorage {
-            @Expose
-            var available: Long? = null
-
-            @Expose
-            var total: Long? = null
-        }
 
         @Expose
         var tokens: Int = 0
@@ -698,10 +731,19 @@ class ProfileSpecificStorage(
 
             @Expose
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
+
+            @Expose
+            var mineshaftsEnteredSince: MutableMap<MineshaftDetection.MineshaftTypes, Int> = mutableMapOf()
+
+            @Expose
+            var lastMineshaftTime: MutableMap<MineshaftDetection.MineshaftTypes, SimpleTimeMark> = mutableMapOf()
         }
 
         @Expose
         var crystalNucleusTracker: CrystalNucleusTracker.Data = CrystalNucleusTracker.Data()
+
+        @Expose
+        var flowstatePersonalBest = 0
     }
 
     @Expose
@@ -877,4 +919,15 @@ class ProfileSpecificStorage(
         @Expose var cakesEaten: Int? = -1,
         @Expose var soulsFound: Int = 0,
     )
+
+    @Expose
+    var attributeShards: MutableMap<String, AttributeShardData> = mutableMapOf()
+
+    data class AttributeShardData(
+        @Expose var amountSyphoned: Int = 0,
+        @Expose var amountInBox: Int = 0,
+    )
+
+    @Expose
+    var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
 }

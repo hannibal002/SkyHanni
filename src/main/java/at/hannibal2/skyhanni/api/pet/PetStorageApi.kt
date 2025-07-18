@@ -3,15 +3,21 @@ package at.hannibal2.skyhanni.api.pet
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.PetData
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -27,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstUniqueByOrNull
@@ -39,6 +46,7 @@ import java.util.regex.Matcher
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PetStorageApi {
@@ -50,6 +58,8 @@ object PetStorageApi {
     private const val SB_MENU_CURRENT_PET_SLOT = 30
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
     private val EXP_SHARE_SLOTS = listOf(30, 31, 32)
+    private var jsonNeedsSave: Boolean = false
+    private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
 
     // <editor-fold desc="Patterns">
     /**
@@ -90,7 +100,7 @@ object PetStorageApi {
     @Suppress("MaxLineLength")
     private val petTabWidgetXpPattern by patternGroup.pattern(
         "tab.xp",
-        " (?:§.)+(?:(?<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:§.|\\/)*(?<next>[\\d,.kM]*) XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)",
+        " (?:§.)+(?:(?<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:(?:§.|\\/)*(?<next>[\\d,.kM]+))? XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)",
     )
 
     /**
@@ -153,12 +163,18 @@ object PetStorageApi {
 
     private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName): NeuItemJson? {
         val skin = groupOrNull("skin") ?: groupOrNull("altskin") ?: return null
-        return PetUtils.getPetSkinOrNull(petInternalName, skin)
+        return PetUtils.findPetSkinOrNull(petInternalName, skin)
     }
 
     private fun Matcher.getRarityOrNull() = LorenzRarity.getByColorCode(group("rarity")[0])
 
-    private fun saveConfig() = SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+    @HandleEvent
+    fun onSecondPassed() {
+        if (!jsonNeedsSave || lastSaved.passedSince() < 30.seconds) return
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+        jsonNeedsSave = false
+        lastSaved = SimpleTimeMark.now()
+    }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -168,9 +184,7 @@ object PetStorageApi {
             val level = group("level").toInt()
             val rarity = getRarityOrNull() ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                val trimmed = line.trim().removeResets()
-                PetUtils.petItemResolution[trimmed]
-                    ?: NeuInternalName.fromItemNameOrNull(trimmed)?.takeIf { !it.isPet }
+                PetUtils.resolvePetItemOrNull(line.trim().removeResets())
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{
@@ -198,11 +212,11 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.TAB)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent) {
         autoPetMessagePattern.matchMatcher(event.message) {
             if (config.hideAutopet) event.blockedReason = "autopet"
@@ -219,7 +233,7 @@ object PetStorageApi {
             }?.split("\n") ?: return
 
             val petHeldItem = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo) {
-                PetUtils.petItemResolution[group("item").removeResets()]
+                PetUtils.resolvePetItemOrNull(group("item").removeResets())
             }
 
             val resolvedPet = resolvePetDataOrNull(
@@ -237,7 +251,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.AUTOPET)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 
@@ -265,7 +279,7 @@ object PetStorageApi {
 
             else -> return
         }
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
@@ -290,6 +304,7 @@ object PetStorageApi {
                 heldItemInternalName = petInfo.heldItem,
                 exp = petInfo.exp,
                 uuid = petInfo.uniqueId,
+                skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
             )
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
@@ -298,8 +313,7 @@ object PetStorageApi {
                 petStorage.pets[it] = data
             } ?: petStorage.pets.add(data)
         }
-
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
@@ -316,6 +330,7 @@ object PetStorageApi {
             heldItemInternalName = petInfo.heldItem,
             exp = petInfo.exp,
             uuid = petInfo.uniqueId,
+            skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
         )
 
         petStorage.pets.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {
@@ -323,7 +338,7 @@ object PetStorageApi {
         } ?: petStorage.pets.add(data)
 
         CurrentPetApi.assertFoundCurrentData(data, CurrentPetApi.PetDataAssertionSource.MENU)
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
@@ -374,7 +389,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.MENU)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 
@@ -410,4 +425,38 @@ object PetStorageApi {
         { level == null || it.level == level },
         { exp == null || abs((it.exp ?: 0.0) - exp) < (exp * expErrorFactor) },
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetpetstorage") {
+            description = "Removes all pets from SkyHanni's storage"
+            category = CommandCategory.USERS_RESET
+            callback {
+                ProfileStorageData.petProfiles = PetDataStorage.ProfileSpecific()
+                ChatUtils.clickableChat(
+                    "Cleared all pets from storage. Re-open the §b/pet §emenu to re-populate it.",
+                    onClick = { HypixelCommands.pet() },
+                    hover = "Click to re-open the pet menu",
+                )
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        fun PetData.formatForDebug() = fauxInternalName.asString() + ":<lvl$level>:" + uuid.toString()
+        event.title("Pet Storage API")
+        event.addIrrelevant {
+            val petStorage = petStorage ?: run {
+                add("petStorage is null")
+                return@addIrrelevant
+            }
+            LorenzRarity.entries.reversed().forEach { rarity ->
+                val pets = petStorage.pets.filter { it.rarity == rarity }.takeIfNotEmpty() ?: return@forEach
+                add("pets (${rarity.name}):\n" + pets.joinToString(", ", transform = PetData::formatForDebug))
+                add("")
+            }
+            add("expSharePets: " + petStorage.expSharePets.joinToString(", ") { it?.toString() ?: "<empty>" })
+        }
+    }
 }

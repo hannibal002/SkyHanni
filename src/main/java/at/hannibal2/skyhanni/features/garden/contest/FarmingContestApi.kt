@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -114,11 +114,13 @@ object FarmingContestApi {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (event.inventoryName != "Your Contests") return
+        if (inInventory) return
         val bulkClaimStack = event.inventoryItems[50] ?: return
-        if (!bulkClaimFarmingPattern.matches(bulkClaimStack.getLore().first())) return
+        val firstLine = bulkClaimStack.getLore().firstOrNull() ?: return
+        if (!bulkClaimFarmingPattern.matches(firstLine)) return
         inInventory = true
     }
 

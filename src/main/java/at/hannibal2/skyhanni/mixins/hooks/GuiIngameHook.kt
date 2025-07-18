@@ -6,14 +6,14 @@ import net.minecraft.client.gui.FontRenderer
 //#if MC > 1.21
 //$$ import net.minecraft.text.Text
 //$$ import net.minecraft.client.gui.DrawContext
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //#endif
 
 object GuiIngameHook {
 
     @JvmStatic
     fun drawString(
-        fr: FontRenderer,
+        renderer: FontRenderer,
         //#if MC < 1.21
         text: String,
         //#else
@@ -26,12 +26,12 @@ object GuiIngameHook {
 //#if MC < 1.21
     ) = ScoreboardData.tryToReplaceScoreboardLine(text)?.let {
         //#else
-        //$$ ) = ScoreboardData.tryToReplaceScoreboardLine(text.formattedTextCompat())?.let {
+        //$$ ) = ScoreboardData.tryToReplaceScoreboardLine(text.formattedTextCompatLessResets())?.let {
         //#endif
         //#if MC < 1.21
-        fr.drawString(it, x, y, color)
+        renderer.drawString(it, x, y, color)
         //#else
-        //$$ drawContext.drawText(fr, it, x, y, color, false)
+        //$$ drawContext.drawText(renderer, it, x, y, color, false)
         //#endif
     } ?: 0
 

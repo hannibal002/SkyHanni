@@ -18,6 +18,7 @@ import java.awt.Color
 import kotlin.math.max
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
+//$$ import org.joml.Matrix3x2f
 //$$ import org.joml.Matrix4f
 //#endif
 
@@ -26,7 +27,7 @@ object ShaderRenderUtils {
     /**
      * Returns a float array representation of the [ChromaColour].
      */
-    fun ChromaColour.destructToFloatArray(): FloatArray = floatArrayOf(
+    private fun ChromaColour.destructToFloatArray(): FloatArray = floatArrayOf(
         this.toColor().red.toFloat() / 255f,
         this.toColor().green.toFloat() / 255f,
         this.toColor().blue.toFloat() / 255f,
@@ -55,7 +56,15 @@ object ShaderRenderUtils {
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
         //#if MC > 1.21
+        //#if MC < 1.21.6
         //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
+        //#endif
+        //#endif
+        //#if MC > 1.21.6
+        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.matrices)
+        //$$ this.modelViewMatrix = Matrix4f()
+        //$$     .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
+        //$$     .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
         //#endif
     }.also { extraApplies?.invoke(this) }
 
@@ -243,10 +252,11 @@ object ShaderRenderUtils {
         angle1: Float = 7.0f,
         angle2: Float = 7.0f
     ) {
+        // todo all of these diameters might need to be calced from radiusIn instead of radius?
         val radiusIn = radius * GuiScreenUtils.scaleFactor
-        val diameterIn = radiusIn * 2
+        val diameter = radius * 2
 
-        CircleShader.applyBaseSettings(radiusIn, diameterIn, diameterIn, x, y, smoothness) {
+        CircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
             this.angle1 = angle1 - Math.PI.toFloat()
             this.angle2 = angle2 - Math.PI.toFloat()
         }
@@ -305,10 +315,8 @@ object ShaderRenderUtils {
             this.reverse = if (reverse) 1 else 0
             this.progress = progress
             this.phaseOffset = phaseOffset
-            //#if MC < 1.21
             this.startColor = startColor.destructToFloatArray()
             this.endColor = endColor.destructToFloatArray()
-            //#endif
         }
 
         val left = x - 5

@@ -396,5 +396,6 @@ object DungeonFinderFeatures {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
 
+    // todo use graph area
     fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.scoreboardArea == "Dungeon Hub"
 }

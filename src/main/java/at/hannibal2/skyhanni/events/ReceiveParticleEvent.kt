@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -16,13 +15,13 @@ class ReceiveParticleEvent(
     //#else
     //$$ val type: ParticleType<*>,
     //#endif
-    val location: LorenzVec,
+    override val location: LorenzVec,
     val count: Int,
     val speed: Float,
     val offset: LorenzVec,
     private val longDistance: Boolean,
     private val particleArgs: IntArray? = null,
-) : CancellableSkyHanniEvent() {
+) : CancellableWorldEvent() {
 
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 

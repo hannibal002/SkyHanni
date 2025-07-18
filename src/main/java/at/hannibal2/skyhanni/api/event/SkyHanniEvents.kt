@@ -124,9 +124,8 @@ object SkyHanniEvents {
             }
         }
         //#if MC > 1.21
-        //$$ } catch (e: Exception) {
-        //$$ println("Error while processing event invoke logs:")
-        //$$     e.printStackTrace()
+        //$$ } catch (_: Exception) {
+        //$$ // ignore this error on 1.21 for now
         //$$ }
         //#endif
     }
