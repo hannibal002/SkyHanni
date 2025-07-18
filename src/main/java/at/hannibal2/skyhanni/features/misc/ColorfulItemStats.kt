@@ -22,7 +22,7 @@ object ColorfulItemStats {
      * REGEX-FAIL: §7Health: §c+1000❤
      */
     private val genericStat by group.pattern(
-        "generic",
+        "generic-stats",
         "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.,%s]+)(?:\\s|$)",
     )
 
@@ -38,9 +38,9 @@ object ColorfulItemStats {
 
                 val skyblockStat = SkyblockStat.getValueOrNull(
                     stat.uppercase().replace(" ", "_")
-                )
+                ) ?: return@replace this.group()
 
-                val bonusGroup = group("bonus").replace(",", ".")
+                val bonusGroup = group("bonus")
                 val bonus = when {
                     config.replacePercentages && config.statIcons && bonusGroup.endsWith("%") -> bonusGroup.removeSuffix("%")
                     config.replaceRiftSeconds && config.statIcons && bonusGroup.endsWith("s") -> bonusGroup.removeSuffix("s")
@@ -49,15 +49,10 @@ object ColorfulItemStats {
 
                 buildString {
                     append("§7$stat: ")
-                    append(
-                        SkyblockStat.getValueOrNull(
-                            stat.uppercase().replace(" ", "_")
-                        )?.icon?.take(2) ?: oldColor
-                    )
-                    append(skyblockStat?.icon?.take(2) ?: oldColor)
+                    append(skyblockStat.icon.take(2))
                     append(bonus)
                     if (config.statIcons) {
-                        skyblockStat?.icon?.lastOrNull()?.let { append(it) }
+                        skyblockStat.icon.lastOrNull()?.let { append(it) }
                     }
                     append(oldColor)
                     append(" ")
