@@ -56,29 +56,29 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
         }
 
         // build info for every real constructor parameter
-        val infos = ctor.parameters.filter { it.findAnnotation<ExtraData>() == null }.map { param ->
-            // find the matching Kotlin property
-            val memberProp = kClass.memberProperties.find { it.name == param.name } ?: return null
-            val prop = memberProp.also { it.isAccessible = true } as KProperty1<Any, Any?>
+        val infos = ctor.parameters
+            .filter { it.findAnnotation<ExtraData>() == null }
+            .map { param ->
+                val memberProp = kClass.memberProperties.find { it.name == param.name } ?: return null
+                val prop = (memberProp.also { it.isAccessible = true }) as KProperty1<Any, Any?>
 
-            // determine JSON name (@SerializedName on param, prop, field or getter, fallback to param name)
-            val name = param.findAnnotation<SerializedName>()?.value
-                ?: prop.findAnnotation<SerializedName>()?.value
-                ?: prop.javaField?.getAnnotation(SerializedName::class.java)?.value
-                ?: prop.javaGetter?.getAnnotation(SerializedName::class.java)?.value
-                ?: param.name
-                ?: error("Could not determine JSON name for parameter '${param.name}' in class '${kClass.simpleName}'")
+                // determine JSON name (only @SerializedName on the parameter, otherwise use the exact param name)
+                val name = param.findAnnotation<SerializedName>()?.value
+                    ?: prop.findAnnotation<SerializedName>()?.value
+                    ?: prop.javaField?.getAnnotation(SerializedName::class.java)?.value
+                    ?: prop.javaGetter?.getAnnotation(SerializedName::class.java)?.value
+                    ?: param.name!!
 
-            // figure out the runtime type to ask GSON for
-            val javaType = prop.javaField?.genericType
-                ?: prop.javaGetter?.genericReturnType
-                ?: param.type.javaType
-            val resolved = InternalGsonTypes.resolve(typeToken.type, typeToken.rawType, javaType)
-                ?: error("Could not resolve type for parameter '${param.name}' in class '${kClass.simpleName}'")
-            val adapter = gson.getAdapter(TypeToken.get(resolved)) as TypeAdapter<Any?>
+                // resolve the exact constructor-parameter type
+                val resolved = InternalGsonTypes.resolve(
+                    typeToken.type,
+                    typeToken.rawType,
+                    param.type.javaType,
+                ) ?: error("Could not resolve type for '${param.name}'")
+                val adapter = gson.getAdapter(TypeToken.get(resolved)) as TypeAdapter<Any?>
 
-            ParamInfo(param, name, adapter, prop)
-        }
+                ParamInfo(param, name, adapter, prop)
+            }
 
         val infosByName = infos.associateBy { it.name }
 
@@ -88,7 +88,8 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
         return object : TypeAdapter<T>() {
             override fun write(out: JsonWriter, value: T?) {
                 if (value == null) {
-                    out.nullValue(); return
+                    out.nullValue()
+                    return
                 }
                 out.beginObject()
                 for (info in infos) {
@@ -130,6 +131,6 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 // call the Kotlin ctor (will honor defaults)
                 return ctor.callBy(args)
             }
-        }.nullSafe()
+        }
     }
 }
