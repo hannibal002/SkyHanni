@@ -33,6 +33,7 @@ data class EliteContestsRequest(
     fun getBody(): String = ConfigManager.gson.toJson(this as Map<Long, List<String>>)
 }
 
+@KSerializable
 data class EliteFarmingContest(
     @Expose val startTime: SimpleTimeMark,
     @Expose val crops: List<CropType>,
@@ -40,5 +41,5 @@ data class EliteFarmingContest(
 ) {
     // If hypixel changes the length of a SkyBlock day, we'll have
     // bigger problems than this being hardcoded.
-    val endTime by lazy { startTime + 20.minutes }
+    val endTime = startTime + 20.minutes
 }
