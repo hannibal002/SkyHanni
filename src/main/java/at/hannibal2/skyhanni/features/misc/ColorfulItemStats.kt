@@ -50,7 +50,6 @@ object ColorfulItemStats {
                 buildString {
                     append("§7$stat: ")
                     append(skyblockStat.icon.take(2))
-                    append(skyblockStat.icon.take(2))
                     append(bonus)
                     if (config.statIcons) {
                         skyblockStat.icon.lastOrNull()?.let { append(it) }
