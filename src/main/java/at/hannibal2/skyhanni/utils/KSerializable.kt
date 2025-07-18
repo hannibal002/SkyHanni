@@ -17,7 +17,7 @@ import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
-import kotlin.reflect.jvm.javaConstructor
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaGetter
 import kotlin.reflect.typeOf
@@ -28,73 +28,80 @@ import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
 annotation class KSerializable
 
 @Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.VALUE_PARAMETER)
 annotation class ExtraData
 
 class KotlinTypeAdapterFactory : TypeAdapterFactory {
 
-    internal data class ParameterInfo(
+    private data class ParamInfo(
         val param: KParameter,
-        val adapter: TypeAdapter<Any?>,
         val name: String,
-        val field: KProperty1<Any, Any?>,
+        val adapter: TypeAdapter<Any?>,
+        val prop: KProperty1<Any, Any?>,
     )
 
     @OptIn(ExperimentalStdlibApi::class)
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
-        val kotlinClass = type.rawType.kotlin as KClass<T>
-        if (kotlinClass.findAnnotation<KSerializable>() == null) return null
-        if (!kotlinClass.isData) return null
-        val primaryConstructor = kotlinClass.primaryConstructor ?: return null
-        val params = primaryConstructor.parameters.filter { it.findAnnotation<ExtraData>() == null }
-        val extraDataParam = primaryConstructor.parameters
-            .find { it.findAnnotation<ExtraData>() != null && typeOf<MutableMap<String, JsonElement>>().isSubtypeOf(it.type) }
-            ?.let { param ->
-                param to kotlinClass.memberProperties.find {
-                    it.name == param.name && it.returnType.isSubtypeOf(typeOf<Map<String, JsonElement>>())
-                } as KProperty1<Any, Map<String, JsonElement>>
-            }
-        val parameterInfos = params.map { param ->
-            val property = kotlinClass.memberProperties.find { it.name == param.name }!!
-            val fromParam = param.findAnnotation<SerializedName>()?.value
-            val fromProp = property.findAnnotation<SerializedName>()?.value
-            val fromField = property.javaField
-                ?.getAnnotation(SerializedName::class.java)
-                ?.value
-            val fromGetter = property.javaGetter
-                ?.getAnnotation(SerializedName::class.java)
-                ?.value
-            val jsonName = fromParam
-                ?: fromProp
-                ?: fromField
-                ?: fromGetter
-                ?: param.name!!
-            val javaType = property.javaField?.genericType
-                ?: property.javaGetter?.genericReturnType
+    override fun <T : Any> create(gson: Gson, typeToken: TypeToken<T>): TypeAdapter<T>? {
+        val kClass = typeToken.rawType.kotlin as KClass<T>
+
+        // only data‐classes annotated @KSerializable
+        if (!kClass.isData || kClass.findAnnotation<KSerializable>() == null) return null
+        val ctor = kClass.primaryConstructor ?: return null
+
+        // pick off any @ExtraData param (must be a Map<String,JsonElement>)
+        val extraParam = ctor.parameters.find {
+            it.findAnnotation<ExtraData>() != null
+                && typeOf<Map<String, JsonElement>>().isSubtypeOf(it.type)
+        }
+
+        // build info for every real constructor parameter
+        val infos = ctor.parameters.filter { it.findAnnotation<ExtraData>() == null }.map { param ->
+            // find the matching Kotlin property
+            val memberProp = kClass.memberProperties.find { it.name == param.name } ?: return null
+            val prop = memberProp.also { it.isAccessible = true } as KProperty1<Any, Any?>
+
+            // determine JSON name (@SerializedName on param, prop, field or getter, fallback to param name)
+            val name = param.findAnnotation<SerializedName>()?.value
+                ?: prop.findAnnotation<SerializedName>()?.value
+                ?: prop.javaField?.getAnnotation(SerializedName::class.java)?.value
+                ?: prop.javaGetter?.getAnnotation(SerializedName::class.java)?.value
+                ?: param.name
+                ?: error("Could not determine JSON name for parameter '${param.name}' in class '${kClass.simpleName}'")
+
+            // figure out the runtime type to ask GSON for
+            val javaType = prop.javaField?.genericType
+                ?: prop.javaGetter?.genericReturnType
                 ?: param.type.javaType
-            val internalType = InternalGsonTypes.resolve(type.type, type.rawType, javaType)
-            val typeToken = TypeToken.get(internalType)
-            val adapter = gson.getAdapter(typeToken) as TypeAdapter<Any?>
-            val castedProperty = property as KProperty1<Any, Any?>
-            ParameterInfo(param, adapter, jsonName, castedProperty)
-        }.associateBy { it.name }
+            val resolved = InternalGsonTypes.resolve(typeToken.type, typeToken.rawType, javaType)
+                ?: error("Could not resolve type for parameter '${param.name}' in class '${kClass.simpleName}'")
+            val adapter = gson.getAdapter(TypeToken.get(resolved)) as TypeAdapter<Any?>
+
+            ParamInfo(param, name, adapter, prop)
+        }
+
+        val infosByName = infos.associateBy { it.name }
+
+        // and a JsonElement adapter for any extra fields
         val jsonElementAdapter = gson.getAdapter(JsonElement::class.java)
 
         return object : TypeAdapter<T>() {
             override fun write(out: JsonWriter, value: T?) {
                 if (value == null) {
-                    out.nullValue()
-                    return
+                    out.nullValue(); return
                 }
                 out.beginObject()
-                for ((name, paramInfo) in parameterInfos) {
-                    out.name(name)
-                    paramInfo.adapter.write(out, paramInfo.field.get(value))
+                for (info in infos) {
+                    out.name(info.name)
+                    info.adapter.write(out, info.prop.get(value))
                 }
-                if (extraDataParam != null) {
-                    val extraData = extraDataParam.second.get(value)
-                    for ((extraName, extraValue) in extraData) {
+                if (extraParam != null) {
+                    val map = value::class
+                        .memberProperties
+                        .find { it.name == extraParam.name }
+                        ?.getter?.call(value) as? Map<String, JsonElement>
+                        ?: error("ExtraData parameter must be a Map<String, JsonElement>")
+                    for ((extraName, extraValue) in map) {
                         out.name(extraName)
                         jsonElementAdapter.write(out, extraValue)
                     }
@@ -112,32 +119,17 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 val extraData = mutableMapOf<String, JsonElement>()
                 while (reader.peek() != JsonToken.END_OBJECT) {
                     val name = reader.nextName()
-                    val paramData = parameterInfos[name]
-                    if (paramData == null) {
-                        extraData[name] = jsonElementAdapter.read(reader)
-                        continue
-                    }
-                    val value = paramData.adapter.read(reader)
-                    args[paramData.param] = value
+                    val paramData = infosByName[name]
+                    if (paramData != null) args[paramData.param] = paramData.adapter.read(reader)
+                    else extraData[name] = jsonElementAdapter.read(reader)
                 }
                 reader.endObject()
-                if (extraDataParam != null) {
-                    args[extraDataParam.first] = extraData
-                }
-                return try { primaryConstructor.callBy(args) } catch(e: IllegalArgumentException) {
-                    // detect the "object is not an instance of declaring class" reflection bug
-                    if (e.message?.contains("object is not an instance of declaring class") == true) {
-                        // fall back to the plain Java constructor
-                        val javaCtor = primaryConstructor.javaConstructor
-                            ?: throw IllegalStateException("No Java constructor for ${type.rawType}")
-                        // Build an ordered array of parameter values
-                        val ordered = primaryConstructor.parameters.map { args[it] /* maybe null ? */ }.toTypedArray()
-                        javaCtor.newInstance(*ordered) as T
-                    } else { // some other bad-arg situation; rethrow
-                        throw e
-                    }
-                }
+
+                // stash unknowns into the @ExtraData parameter, if requested
+                if (extraParam != null) args[extraParam] = extraData
+                // call the Kotlin ctor (will honor defaults)
+                return ctor.callBy(args)
             }
-        }
+        }.nullSafe()
     }
 }
