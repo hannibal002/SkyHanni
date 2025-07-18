@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object PetUtils {
@@ -40,6 +41,7 @@ object PetUtils {
     private var seasonalVariants: Set<NeuInternalName> = setOf()
     private var dayNightVariants: Set<NeuInternalName> = setOf()
     private var ciFactionVariants: Set<NeuInternalName> = setOf()
+    private var lastRepoWarning: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private fun getSeasonalVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val variantId = SkyblockSeason.currentSeason?.name ?: "SPRING"
@@ -176,9 +178,18 @@ object PetUtils {
     fun levelToXp(level: Int, petInternalName: NeuInternalName): Double? = runCatching {
         val rarityOffset = getRarityOffset(petInternalName) ?: return null
         if (level < 0 || level > getMaxLevel(petInternalName)) return null
-        return getFullLevelingTree(petInternalName)
-            .slice(0 + rarityOffset..<level + rarityOffset - 1)
-            .sumOf { it.toDouble() }
+        val levelTree = getFullLevelingTree(petInternalName)
+        if (rarityOffset + level > levelTree.size) {
+            if (lastRepoWarning.passedSince() > 5.minutes) {
+                ChatUtils.userError(
+                    "§cFailed to load pet levels from NEU repo. " +
+                        "§cYou can try to fix this by running `§e/${ItemUtils.resetCommand}`§c."
+                )
+                lastRepoWarning = SimpleTimeMark.now()
+            }
+            return null
+        }
+        return levelTree.subList(rarityOffset, rarityOffset + level).sumOf { it.toDouble() }
     }.getOrElse {
         ErrorManager.logErrorWithData(
             it,

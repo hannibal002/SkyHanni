@@ -474,7 +474,7 @@ object CustomWardrobe {
             },
         )
 
-        val row = Renderable.vertical(
+        val row = Renderable.horizontal(
             backButton,
             exitButton,
             onlyFavoriteButton,
