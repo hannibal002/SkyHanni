@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -9,7 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.util.*
 
 class DiscordRPCConfig {
     @Expose
@@ -48,18 +46,14 @@ class DiscordRPCConfig {
         PriorityEntry.AFK
     )
 
-    enum class PriorityEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        CROP_MILESTONES("Crop Milestones", 0),
-        SLAYER("Slayer", 1),
-        STACKING_ENCHANT("Stacking Enchantment", 2),
-        DUNGEONS("Dungeon", 3),
-        AFK("AFK Indicator", 4),
+    enum class PriorityEntry(private val displayName: String) {
+        CROP_MILESTONES("Crop Milestones"),
+        SLAYER("Slayer"),
+        STACKING_ENCHANT("Stacking Enchantment"),
+        DUNGEONS("Dungeon"),
+        AFK("AFK Indicator"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -81,26 +75,22 @@ class DiscordRPCConfig {
     @ConfigEditorBoolean
     val showEliteBotButton: Property<Boolean> = Property.of(true)
 
-    enum class LineEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        NOTHING("Nothing", 0),
-        LOCATION("Location", 1),
-        PURSE("Purse", 2),
-        BITS("Bits", 3),
-        STATS("Stats", 4),
-        HELD_ITEM("Held Item", 5),
-        SKYBLOCK_DATE("SkyBlock Date", 6),
-        PROFILE("Profile", 7),
-        SLAYER("Slayer", 8),
-        CUSTOM("Custom", 9),
-        DYNAMIC("Dynamic", 10),
-        CROP_MILESTONE("Crop Milestone", 11),
-        CURRENT_PET("Current Pet", 12),
+    enum class LineEntry(private val displayName: String) {
+        NOTHING("Nothing"),
+        LOCATION("Location"),
+        PURSE("Purse"),
+        BITS("Bits"),
+        STATS("Stats"),
+        HELD_ITEM("Held Item"),
+        SKYBLOCK_DATE("SkyBlock Date"),
+        PROFILE("Profile"),
+        SLAYER("Slayer"),
+        CUSTOM("Custom"),
+        DYNAMIC("Dynamic"),
+        CROP_MILESTONE("Crop Milestone"),
+        CURRENT_PET("Current Pet"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 }

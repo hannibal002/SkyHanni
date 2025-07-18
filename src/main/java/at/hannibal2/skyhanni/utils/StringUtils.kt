@@ -23,6 +23,7 @@ import java.util.NavigableMap
 import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#else
@@ -37,7 +38,7 @@ object StringUtils {
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
-    private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
+    private val asciiWithColorCodePattern = "[^\\x00-\\x7F§]".toPattern()
     private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
     fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
@@ -47,7 +48,7 @@ object StringUtils {
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
     fun String.removeSFormattingCode(): String = sFormattingPattern.matcher(this).replaceAll("")
-    fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
+    fun String.removeNonAsciiNonColorCode(): String = asciiWithColorCodePattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
         return this.lowercase(Locale.getDefault())
@@ -55,7 +56,7 @@ object StringUtils {
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
-    private val colorChars = "abcdefABCDEF0123456789".toSet()
+    private val colorChars = "abcdefABCDEF0123456789zZ".toSet()
 
     /**
      * Removes color and optionally formatting codes from the given string, leaving plain text.
@@ -586,5 +587,13 @@ object StringUtils {
 
     private fun isFormatSpecial(formatChar: Char): Boolean {
         return formatChar in 'k'..'o' || formatChar in 'K'..'O' || formatChar in "rR"
+    }
+
+    fun String.removePrefix(prefixPattern: Pattern): String {
+        val matcher = prefixPattern.matcher(this)
+        // Only remove the prefix if it matches at the start of the string
+        return if (matcher.find() && matcher.start() == 0) {
+            this.substring(matcher.end())
+        } else this
     }
 }

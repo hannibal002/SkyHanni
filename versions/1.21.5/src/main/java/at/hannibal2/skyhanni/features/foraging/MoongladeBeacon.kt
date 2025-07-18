@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.NotificationManager
+import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -18,19 +20,21 @@ import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconSpeed.Compa
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ModernPatterns
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import net.minecraft.item.Item
 import net.minecraft.registry.Registries
 import net.minecraft.screen.slot.Slot
@@ -40,6 +44,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.times
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MoongladeBeacon {
@@ -222,6 +227,15 @@ object MoongladeBeacon {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!solverEnabled()) return
         currentServerTicks = 0
+        checkPants()
+    }
+
+    private val STEREO_PANTS = "MUSIC_PANTS".toInternalName()
+
+    private fun checkPants() {
+        if (InventoryUtils.getLeggings()?.getInternalName() != STEREO_PANTS) return
+        val text = "The solver may not work properly if you are wearing Stereo Pants!"
+        NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)

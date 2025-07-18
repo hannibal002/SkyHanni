@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -29,7 +30,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.Objects
@@ -43,16 +47,15 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                Renderable.string("$prefix$formattedAmount")
+                Renderable.text("$prefix$formattedAmount")
             },
         ),
         ICON(
             "§e✎",
             { entry, _ ->
                 val entryInternalName = entry.neuInternalName ?: ItemNameResolver.getInternalNameOrNull(entry.name)
-                val itemIcon = entryInternalName?.getItemStackOrNull()
-                if (itemIcon != null) ItemStackRenderable(itemIcon)
-                else Renderable.string("§c?")
+                if (entryInternalName != null) Renderable.item(entryInternalName)
+                else Renderable.text("§c?")
             },
         ),
         ITEM_NAME(
@@ -62,7 +65,7 @@ object ItemPickupLog {
                 if (entry.name == "Air") {
                     name = entry.neuInternalName?.repoItemName ?: "?"
                 }
-                Renderable.string(name)
+                Renderable.text(name)
             },
         ),
         ;
@@ -81,7 +84,7 @@ object ItemPickupLog {
         fun isExpired() = timeUntilExpiry.passedSince() > config.expireAfter.seconds
     }
 
-    private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
+    private val config get() = SkyHanniMod.feature.inventory.itemPickupLog
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
     private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
@@ -104,7 +107,7 @@ object ItemPickupLog {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        display?.let { config.pos.renderRenderable(it, posLabel = "Item Pickup Log Display") }
+        display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
 
     @HandleEvent
@@ -125,6 +128,16 @@ object ItemPickupLog {
 
             updateItem(itemStack.hash(), item, it.delta < 0)
         }
+    }
+
+    @HandleEvent
+    fun onShardGain(event: ShardGainEvent) {
+        if (!isEnabled() || !config.shards) return
+
+        val itemStack = event.shardInternalName.getItemStack()
+        val item = PickupEntry(itemStack.dynamicName(), event.amount.absoluteValue.toLong(), event.shardInternalName)
+
+        updateItem(itemStack.hash(), item, event.amount < 0)
     }
 
     @HandleEvent
@@ -199,7 +212,7 @@ object ItemPickupLog {
         dirty = true
     }
 
-    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.line {
+    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontal {
         val displayLayout: List<DisplayLayout> = config.displayLayout
         for (item in displayLayout) {
             add(item.renderable(entry, prefix))
@@ -266,7 +279,7 @@ object ItemPickupLog {
         if (display.isEmpty()) {
             this.display = null
         } else {
-            val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
+            val renderable = Renderable.vertical(display, verticalAlign = config.alignment)
             this.display = Renderable.fixedSizeColumn(renderable, 30)
         }
     }
@@ -326,4 +339,10 @@ object ItemPickupLog {
     private fun worldChangeCooldown(): Boolean = SkyBlockUtils.lastWorldSwitch.passedSince() > 2.seconds
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(97, "inventory.itemPickupLogConfig", "inventory.itemPickupLog")
+        event.move(97, "inventory.itemPickupLog.pos", "inventory.itemPickupLog.position")
+    }
 }

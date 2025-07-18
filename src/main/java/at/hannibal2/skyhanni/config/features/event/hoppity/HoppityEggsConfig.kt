@@ -83,7 +83,8 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Prevent Missing Rabbit the Fish",
-        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.",
+        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.\n" +
+            "§eHold §cShift §eto bypass.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

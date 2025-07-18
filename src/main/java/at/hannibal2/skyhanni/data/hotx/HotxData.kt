@@ -24,7 +24,7 @@ interface HotxData<Reward> {
     /**
      * Userfacing name of the Perk
      *
-     * ``name.allLettersFirstUppercase()``
+     * `name.allLettersFirstUppercase()`
      */
     val printName: String
 
@@ -74,7 +74,7 @@ interface HotxData<Reward> {
     fun calculateTotalCost(desiredLevel: Int) = (2..desiredLevel).sumOf { level -> costFun(level)?.toInt() ?: 0 }
 
     /**
-     * ``calculateTotalCost(maxLevel)``
+     * `calculateTotalCost(maxLevel)`
      */
     val totalCostMaxLevel: Int
 }

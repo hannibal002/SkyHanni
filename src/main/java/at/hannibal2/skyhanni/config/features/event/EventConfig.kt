@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.features.event.gifting.GiftingConfig
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig
 import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig
+import at.hannibal2.skyhanni.config.features.event.yearofthepig.YearOfThePigConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -67,6 +68,11 @@ class EventConfig {
     @Accordion
     @Expose
     val yearOfTheSeal: YearOfTheSealConfig = YearOfTheSealConfig()
+
+    @ConfigOption(name = "Year of the Pig", desc = "Features for Year of the Pig.")
+    @Accordion
+    @Expose
+    val yearOfThePig: YearOfThePigConfig = YearOfThePigConfig()
 
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose

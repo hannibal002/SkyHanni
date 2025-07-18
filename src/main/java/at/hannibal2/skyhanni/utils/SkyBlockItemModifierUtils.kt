@@ -95,13 +95,7 @@ object SkyBlockItemModifierUtils {
         @Deprecated("Do not use, does not reflect Tier Boost, use PetData(petInfo).fauxInternalName instead")
         val _internalName = "$type;${tier.id}".toInternalName()
         val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
-        fun getSkinVariantIndex() = skin?.let {
-            extraData?.entrySet()?.firstOrNull { json ->
-                val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == properSkinItem }
-                val expectedKey = PetUtils.petSkinNbtNames.getOrNull(repoVariantIndex) ?: return@firstOrNull false
-                json.key == expectedKey
-            }?.value?.asJsonPrimitive?.asNumber?.toInt()
-        }
+        fun getSkinVariantIndex() = properSkinItem?.let { PetUtils.getVariantIndexOrNull(it) }
     }
 
     fun ItemStack.getPetCandyUsed(): Int? {
