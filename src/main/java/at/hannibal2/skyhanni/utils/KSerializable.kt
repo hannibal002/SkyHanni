@@ -50,9 +50,9 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
         val ctor = kClass.primaryConstructor ?: return null
 
         // pick off any @ExtraData param (must be a Map<String,JsonElement>)
-        val extraParam = ctor.parameters.find {
-            it.findAnnotation<ExtraData>() != null
-                && typeOf<Map<String, JsonElement>>().isSubtypeOf(it.type)
+        val extraParam = ctor.parameters.find { param ->
+            param.findAnnotation<ExtraData>() != null
+            && param.type.isSubtypeOf(typeOf<Map<String, JsonElement>>())
         }
 
         // build info for every real constructor parameter
