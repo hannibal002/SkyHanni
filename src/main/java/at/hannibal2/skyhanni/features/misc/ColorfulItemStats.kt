@@ -40,7 +40,7 @@ object ColorfulItemStats {
                     stat.uppercase().replace(" ", "_")
                 )
 
-                val bonusGroup = group("bonus").replace(",", ".")
+                val bonusGroup = group("bonus")
                 val bonus = when {
                     config.replacePercentages && config.statIcons && bonusGroup.endsWith("%") -> bonusGroup.removeSuffix("%")
                     config.replaceRiftSeconds && config.statIcons && bonusGroup.endsWith("s") -> bonusGroup.removeSuffix("s")
