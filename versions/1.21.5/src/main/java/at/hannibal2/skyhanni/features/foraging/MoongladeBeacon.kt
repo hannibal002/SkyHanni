@@ -492,8 +492,7 @@ object MoongladeBeacon {
 
         fun tryHighlightSlot(slot: Slot): Boolean {
             if (isEnchanted && !upgradingStrength) return false
-            val offset = getOffsetBySlot(slot.index) ?: return false
-            if (offset == 0) return false
+            getOffsetBySlot(slot.index).takeIf { it == 0 } ?: return false
             slot.highlight(LorenzColor.GREEN.addOpacity(200))
             return true
         }
