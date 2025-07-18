@@ -24,7 +24,6 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
         paddingX,
         paddingY,
         marginY = 10,
-        hasHeader = true,
     ) {
 
     val crop get() = crop0()
@@ -37,15 +36,13 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
         }
 
         FarmingItemType.resetClickState()
+        val upgradeList = if (crop == null)
+            FortuneUpgrades.genericUpgrades
+        else
+            FortuneUpgrades.cropSpecificUpgrades
         update(
-            content = buildList {
-                add(header())
-                val upgradeList = if (crop == null)
-                    FortuneUpgrades.genericUpgrades
-                else
-                    FortuneUpgrades.cropSpecificUpgrades
-                addAll(upgradeList.map { upgrade -> upgrade.print() })
-            },
+            content = upgradeList.map { upgrade -> upgrade.print() },
+            header = header()
         )
     }
 

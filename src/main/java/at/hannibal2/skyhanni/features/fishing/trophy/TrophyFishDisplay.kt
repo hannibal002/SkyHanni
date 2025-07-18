@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
@@ -100,7 +101,7 @@ object TrophyFishDisplay {
         if (!isEnabled()) return
         val list = mutableListOf<Renderable>()
         list.addString("§e§lTrophy Fish Display")
-        list.add(Renderable.table(createTable(), yPadding = config.extraSpace.get()))
+        list.add(Renderable.table(createTable(), ySpacing = config.extraSpace.get()))
         display = list
     }
 

@@ -8,7 +8,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.container.table.ScrollTable.Companion.scrollTable
+import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollTable.Companion.searchableScrollTable
+import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableTable.Companion.searchableTable
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.awt.Color
@@ -114,15 +119,15 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
         val tables = mapOf(
             "Normal" to table(
                 content = inputWithHeader,
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
             ),
             "Normal with use Space" to table(
                 content = inputWithHeader,
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
                 useEmptySpace = true,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
@@ -132,34 +137,34 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                 content = input,
                 textInput = textInput,
                 key = 1,
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
             ),
             "Searchable with use Space" to searchableTable(
                 header = header,
                 content = input,
                 textInput = textInput,
                 key = 2,
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
                 useEmptySpace = true,
             ),
             "Scroll without Header" to scrollTable(
                 content = input.keys.toList(),
                 height = 50,
                 scrollValue = scrollValues.getOrPut(1) { ScrollValue() },
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
             ),
             "Scroll with Header" to scrollTable(
-                content = inputWithHeader,
+                content = input.keys.toList(),
                 height = 50,
                 scrollValue = scrollValues.getOrPut(2) { ScrollValue() },
-                hasHeader = true,
-                xPadding = 8,
-                yPadding = 2,
+                header = header,
+                xSpacing = 8,
+                ySpacing = 2,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
             ),
@@ -169,8 +174,8 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                 scrollValue = scrollValues.getOrPut(3) { ScrollValue() },
                 key = 3,
                 textInput = textInput,
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
             ),
             "Searchable Scroll with Header" to searchableScrollTable(
                 content = input,
@@ -179,8 +184,8 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                 key = 4,
                 textInput = textInput,
                 header = header,
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
             ),
             "Searchable Scroll and hints" to searchableScrollTable(
                 content = input,
@@ -188,8 +193,8 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                 scrollValue = scrollValues.getOrPut(5) { ScrollValue() },
                 key = 5,
                 textInput = textInput,
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
                 showScrollableTipsInList = true
             ),
             "Searchable Scroll with Header and hints" to searchableScrollTable(
@@ -199,8 +204,8 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                 key = 6,
                 textInput = textInput,
                 header = header,
-                xPadding = 8,
-                yPadding = 2,
+                xSpacing = 8,
+                ySpacing = 2,
                 showScrollableTipsInList = true
             ),
         )
