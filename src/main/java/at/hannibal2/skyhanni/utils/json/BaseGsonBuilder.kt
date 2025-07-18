@@ -15,7 +15,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
 import net.minecraft.item.ItemStack
-import java.awt.Color
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -43,7 +42,6 @@ object BaseGsonBuilder {
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
-        .registerTypeAdapter(Color::class.java, SkyHanniTypeAdapters.COLOR)
         .enableComplexMapKeySerialization()
 
     fun lenientGson(): GsonBuilder = gson()
