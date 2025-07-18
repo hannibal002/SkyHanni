@@ -17,6 +17,8 @@ import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
+import kotlin.reflect.jvm.javaField
+import kotlin.reflect.jvm.javaGetter
 import kotlin.reflect.typeOf
 import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
 
@@ -52,14 +54,25 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 } as KProperty1<Any, Map<String, JsonElement>>
             }
         val parameterInfos = params.map { param ->
-            ParameterInfo(
-                param,
-                gson.getAdapter(
-                    TypeToken.get(InternalGsonTypes.resolve(type.type, type.rawType, param.type.javaType))
-                ) as TypeAdapter<Any?>,
-                param.findAnnotation<SerializedName>()?.value ?: param.name!!,
-                kotlinClass.memberProperties.find { it.name == param.name }!! as KProperty1<Any, Any?>
-            )
+            val property = kotlinClass.memberProperties.find { it.name == param.name }!!
+            val fromParam = param.findAnnotation<SerializedName>()?.value
+            val fromProp = property.findAnnotation<SerializedName>()?.value
+            val fromField = property.javaField
+                ?.getAnnotation(SerializedName::class.java)
+                ?.value
+            val fromGetter = property.javaGetter
+                ?.getAnnotation(SerializedName::class.java)
+                ?.value
+            val jsonName = fromParam
+                ?: fromProp
+                ?: fromField
+                ?: fromGetter
+                ?: param.name!!
+            val internalType = InternalGsonTypes.resolve(type.type, type.rawType, param.type.javaType)
+            val typeToken = TypeToken.get(internalType)
+            val adapter = gson.getAdapter(typeToken) as TypeAdapter<Any?>
+            val castedProperty = property as KProperty1<Any, Any?>
+            ParameterInfo(param, adapter, jsonName, castedProperty)
         }.associateBy { it.name }
         val jsonElementAdapter = gson.getAdapter(JsonElement::class.java)
 
