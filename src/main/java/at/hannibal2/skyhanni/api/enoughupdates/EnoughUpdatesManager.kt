@@ -51,6 +51,7 @@ import kotlin.math.floor
 //$$ import at.hannibal2.skyhanni.utils.ComponentUtils
 //$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 //#else
+import net.minecraft.nbt.NBTTagString
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
@@ -109,7 +110,7 @@ object EnoughUpdatesManager {
             val internalName = name.removeSuffix(".json")
             val parsed = parseItem(
                 internalName = internalName,
-                json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
+                json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
             ) ?: return@mapNotNullAsync null
             internalName.toInternalName() to parsed
         }.forEach { (internalName, item) ->
@@ -226,6 +227,22 @@ object EnoughUpdatesManager {
             //#else
             //$$ stack.count = it
             //#endif
+        // todo modern doesnt have the "meta" number
+        val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255))
+        stack.item ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
+
+        json["count"]?.asInt?.let { stack.stackSize = it }
+        json["damage"]?.asInt?.let { stack.itemDamage = it }
+        try {
+            val nbtString = json["nbttag"]?.let { rawJsonNbt ->
+                if (rawJsonNbt.isJsonObject) rawJsonNbt.toString()
+                else rawJsonNbt.asString
+            }
+            val tag = JsonToNBT.getTagFromJson(nbtString)
+            stack.tagCompound = tag
+        } catch (_: Exception) {
+            println("json was malformed: ${json["nbttag"]}")
+            println("whole json: $json")
         }
 
         //#if MC < 1.21
