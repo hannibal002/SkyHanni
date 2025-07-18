@@ -47,11 +47,9 @@ object EliteDevApi {
         event.registerBrigadier("shfetcheliteresource") {
             description = "Fetches the specified Elite resource from elitebot.dev"
             category = CommandCategory.DEVELOPER_DEBUG
-            arg("resource", EnumArgumentType.name<EliteResourceType>()) { resource ->
-                callback {
-                    SkyHanniMod.launchIOCoroutine {
-                        fetchResourceCommand(getArg(resource))
-                    }
+            argCallback("resource", EnumArgumentType.lowercase<EliteResourceType>()) { resource ->
+                SkyHanniMod.launchIOCoroutine {
+                    fetchResourceCommand(resource)
                 }
             }
         }
@@ -80,12 +78,12 @@ object EliteDevApi {
 
     private val contestStatic = ApiStaticPostPath(
         "$ELITEBOT_API_URL/contests/at/now",
-        "Elitebot Farming Contests"
+        "Elitebot Farming Contests",
     )
 
     private val apiWeightsStatic = ApiStaticPath(
         "$ELITEBOT_API_URL/weights/all",
-        FARMING_WEIGHT_API_NAME
+        FARMING_WEIGHT_API_NAME,
     )
 
     private const val WEIGHT_LEADERBOARD_API_NAME = "Elitebot Farming Weight Leaderboard"
