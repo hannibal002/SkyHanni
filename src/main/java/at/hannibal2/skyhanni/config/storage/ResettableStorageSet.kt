@@ -29,7 +29,8 @@ abstract class ResettableStorageSet {
             MutableCollection::class,
             MutableMap::class,
             MutableIterator::class,
-            Property::class
+            Property::class,
+            ResettableStorageSet::class
         ).flatMap { type ->
             this::class.memberProperties.filter {
                 it.returnType.jvmErasure.isSubclassOf(type)
@@ -88,6 +89,7 @@ abstract class ResettableStorageSet {
             val propCurrent = current as Property<Any?>
             propCurrent.set(defaultProp.get())
         }
+        current is ResettableStorageSet -> current.reset()
         current is MutableCollection<*> -> current.clear()
         current is MutableMap<*, *> -> current.clear()
         current is MutableIterator<*> -> current.removeIf { true }

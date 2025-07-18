@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
@@ -22,27 +20,31 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotEmptyString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.registry.Registries
 import net.minecraft.screen.slot.Slot
 import net.minecraft.util.Identifier
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.times
 import kotlin.time.Duration.Companion.seconds
 
@@ -160,36 +162,21 @@ object MoongladeBeacon {
     enum class BeaconSlotRange(
         private val displayName: String,
         val range: IntRange,
+        val target: BeaconPieceTarget,
     ) {
-        MATCH("Match Slots", 10..16) {
-            override fun Pair<BeaconColor, BeaconTuneData>.slotMod(slot: Slot) {
-                second.targetColor = first
-                second.updateMatchSlot(slot.index)
-            }
-        },
-        CHANGE("Change Slots", 28..34){
-            override fun Pair<BeaconColor, BeaconTuneData>.slotMod(slot: Slot) {
-                second.currentColor = first
-            }
-        },
+        MATCH("Match Slots", 10..16, BeaconPieceTarget.REFERENCE),
+        CHANGE("Change Slots", 28..34, BeaconPieceTarget.OURS),
         ;
 
-        fun handleSlot(slot: Slot): Boolean {
-            return if (slot.index !in range) false
-            else slot.performColorApplicableSet { it.slotMod(slot) }
+        companion object {
+            fun getByIndexOrNull(index: Int): BeaconSlotRange? = entries.find { index in it.range }
         }
 
-        protected abstract fun Pair<BeaconColor, BeaconTuneData>.slotMod(slot: Slot)
         override fun toString(): String = displayName
     }
 
     private fun Enum<*>?.formatOrDefault(default: String = "§eUnknown"): String {
         return this?.toString() ?: default
-    }
-
-    private inline fun <reified E : Enum<E>> E.getOffset(other: E): Int {
-        val raw = this.ordinal - other.ordinal
-        return if (raw < 0) raw + enumValues<E>().size else raw
     }
     // </editor-fold>
 
@@ -198,14 +185,18 @@ object MoongladeBeacon {
     private const val PITCH_SELECT_SLOT = 50
     private const val PAUSE_SELECT_SLOT = 52
 
-    private val acceptablePitchMargin = 25.milliseconds
+    private val acceptablePitchMargin = 150.milliseconds
 
     private val colorMinigameInventory = InventoryDetector(
-        openInventory = {
+        openInventory = openInventory@{
+            if (!solverEnabled()) return@openInventory
+            currentServerTicks = 0
+            checkPants()
             normalTuning = BeaconTuneData()
             enchantedTuning = BeaconTuneData(isEnchanted = true)
         },
-        closeInventory = {
+        closeInventory = closeInventory@{
+            if (!solverEnabled()) return@closeInventory
             normalTuning.reset()
             enchantedTuning.reset()
             display = emptyList()
@@ -220,15 +211,9 @@ object MoongladeBeacon {
     private var normalTuning = BeaconTuneData()
     private var enchantedTuning = BeaconTuneData(isEnchanted = true)
     private var display = emptyList<Renderable>()
+    private var nextDevUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private fun solverEnabled(): Boolean = colorMinigameInventory.isInside() && config.enabled
-
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!solverEnabled()) return
-        currentServerTicks = 0
-        checkPants()
-    }
 
     private val STEREO_PANTS = "MUSIC_PANTS".toInternalName()
 
@@ -236,6 +221,17 @@ object MoongladeBeacon {
         if (InventoryUtils.getLeggings()?.getInternalName() != STEREO_PANTS) return
         val text = "The solver may not work properly if you are wearing Stereo Pants!"
         NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
+    }
+
+    private fun ItemStack.isPaused(): Boolean {
+        return this.item == Items.RED_TERRACOTTA
+    }
+
+    @HandleEvent
+    fun onTick() {
+        if (!debugConfig.moongladeBeacon || nextDevUpdate.isInFuture()) return
+        display = drawDisplay()
+        nextDevUpdate = SimpleTimeMark.now() + 100.milliseconds
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
@@ -269,30 +265,30 @@ object MoongladeBeacon {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!colorMinigameInventory.isInside() || event.soundName != "note.bassattack") return
         val pitch = BeaconPitch.getByPitch(event.pitch) ?: return
-        val targetTuneData = listOf(
-            normalTuning, enchantedTuning
-        ).minByOrNull {
-            it.reportPitchTimeVariance(pitch) ?: Duration.INFINITE
+
+        val varianceSets = listOfNotNull(normalTuning, enchantedTuning.takeIf { upgradingStrength }).mapNotNull { set ->
+            set.getLowestVariance()?.let { (target, duration) -> Triple(set, target, duration) }
+        }
+
+        val (bestSet, target, _) = varianceSets.filter { it.third <= acceptablePitchMargin }.minByOrNull {
+            it.third.inWholeMilliseconds
         } ?: return
 
-        // Check if the other tuning data could be to 'blame' for this pitch
-        if (targetTuneData.currentPitch == pitch && targetTuneData.targetPitch == pitch) return
-        val otherTuneData = if (targetTuneData.isEnchanted) normalTuning else enchantedTuning
-        val conflictExists = targetTuneData.targetPitch !in listOf(null, pitch)
-        val shouldIgnore = conflictExists && otherTuneData.currentPitch == pitch && targetTuneData.ignoredPitches < 5
-        if (shouldIgnore) return
-
-        targetTuneData.ignoredPitches = 0
-        targetTuneData.targetPitch = pitch
+        bestSet.handlePitch(pitch, target)
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!solverEnabled()) return
-        config.displayPosition.renderRenderables(display, posLabel = "Moonglade Beacon")
+    init {
+        RenderDisplayHelper(
+            outsideInventory = false,
+            inOwnInventory = false,
+            inventory = colorMinigameInventory,
+            condition = { config.enabled },
+            onlyOnIsland = IslandType.GALATEA,
+            onRender = {
+                config.displayPosition.renderRenderables(display, posLabel = "Moonglade Beacon")
+            }
+        )
     }
-
-    private val highlightGreen = LorenzColor.GREEN.addOpacity(200)
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -310,28 +306,21 @@ object MoongladeBeacon {
         enchantedTuning.tryLabelIfAble(event)
     }
 
-    private fun RenderInventoryItemTipEvent.labelIfAble(label: Int) {
-        if (label <= 0) return
-        stackTip = "§a$label"
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    @HandleEvent(InventoryUpdatedEvent::class, onlyOnIsland = IslandType.GALATEA)
+    fun onInventoryUpdated() {
         if (!solverEnabled()) return
 
-        for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (normalTuning.readFromSlotLore(slot)) continue
-            else if (enchantedTuning.readFromSlotLore(slot)) continue
-            else if (BeaconSlotRange.MATCH.handleSlot(slot)) continue
-            else if (BeaconSlotRange.CHANGE.handleSlot(slot)) continue
+        for (slot in InventoryUtils.getItemsInOpenChest().filter { it.hasStack() && it.stack.isNotEmpty() }) {
+            val tuningData = if (slot.stack.isEnchanted()) enchantedTuning else normalTuning
+            tuningData.readSlot(slot)
         }
         display = drawDisplay()
     }
 
-    private fun Slot.performColorApplicableSet(block: (Pair<BeaconColor, BeaconTuneData>) -> Unit): Boolean {
-        val stackColor = this.stack?.item?.getColorOrNull() ?: return false
+    private fun Slot.performColorApplicableSet(block: (Pair<BeaconTuneData, BeaconColor>) -> Unit): Boolean {
         val tuningData = if (this.stack.isEnchanted()) enchantedTuning else normalTuning
-        block.invoke(stackColor to tuningData)
+        val stackColor = this.stack?.item?.getColorOrNull() ?: return false
+        block.invoke(tuningData to stackColor)
         return true
     }
 
@@ -342,6 +331,47 @@ object MoongladeBeacon {
         }
     }
 
+    enum class BeaconPieceTarget {
+        REFERENCE,
+        OURS,
+    }
+
+    open class DataPair<T : Any>(
+        open var reference: T? = null,
+        open var ours: T? = null,
+    ): ResettableStorageSet() {
+        open operator fun set(target: BeaconPieceTarget, value: T?) = when (target) {
+            BeaconPieceTarget.REFERENCE -> reference = value
+            BeaconPieceTarget.OURS -> ours = value
+        }
+
+        operator fun get(target: BeaconPieceTarget): T? = when (target) {
+            BeaconPieceTarget.REFERENCE -> reference
+            BeaconPieceTarget.OURS -> ours
+        }
+
+        val asMap: Map<BeaconPieceTarget, T?> get() = mapOf(
+            BeaconPieceTarget.REFERENCE to reference,
+            BeaconPieceTarget.OURS to ours,
+        )
+    }
+
+    class BeaconDataPair<T : Enum<T>>(
+        override var reference: T? = null,
+        override var ours: T? = null,
+    ) : DataPair<T>(reference, ours)
+
+    inline fun <reified E : Enum<E>> E.internalGetOffset(other: E): Int {
+        val raw = this.ordinal - other.ordinal
+        return if (raw < 0) raw + enumValues<E>().size else raw
+    }
+
+    inline fun <reified T : Enum<T>> BeaconDataPair<T>.getOffset(): Int? {
+        val r = reference ?: return null
+        val o = ours ?: return null
+        return r.internalGetOffset(o)
+    }
+
     data class BeaconTuneData(
         val isEnchanted: Boolean = false,
     ) : ResettableStorageSet() {
@@ -349,81 +379,140 @@ object MoongladeBeacon {
         private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
         private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
 
-        var targetColor: BeaconColor? = null
-        var targetSpeed: BeaconSpeed? = null
-        var targetPitch: BeaconPitch? = null
-        var currentColor: BeaconColor? = null
-        var currentSpeed: BeaconSpeed? = null
-        var currentPitch: BeaconPitch? = null
-        var nextExpectedPitch: SimpleTimeMark? = null
-        var ignoredPitches = 0
+        private val colorPair = BeaconDataPair<BeaconColor>()
+        private val speedPair = BeaconDataPair<BeaconSpeed>()
+        private val pitchPair = BeaconDataPair<BeaconPitch>()
 
-        private var lastServerTickCount = 0
-        private var recentTicks: MutableList<Int> = mutableListOf()
-        private var currentMatchSlot: Int = BeaconSlotRange.MATCH.range.first
-
-        val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
-        val speedSelectSlot = SPEED_SELECT_SLOT + slotOffset
-        val pitchSelectSlot = PITCH_SELECT_SLOT + slotOffset
-        val pauseSelectSlot = PAUSE_SELECT_SLOT + slotOffset
-
-        val colorOffset: Int? get() = currentColor?.let { targetColor?.getOffset(it) }
-        val speedOffset: Int? get() = currentSpeed?.let { targetSpeed?.getOffset(it) }
-        val pitchOffset: Int? get() = currentPitch?.let { targetPitch?.getOffset(it) }
-
-        fun allCorrect(): Boolean = colorOffset == 0 && speedOffset == 0 && pitchOffset == 0
-
-        fun reportPitchTimeVariance(pitch: BeaconPitch): Duration? {
-            if (isEnchanted && !upgradingStrength) return null
-            val timeUntil = nextExpectedPitch?.timeUntil() ?: 10.minutes
-            val timeSince = nextExpectedPitch?.passedSince() ?: 10.minutes
-            return minOf(timeSince, timeUntil).takeIf { it < acceptablePitchMargin }
+        private val nextPitchPair = DataPair<SimpleTimeMark>()
+        private val bufferPair = object : DataPair<MutableList<BeaconPitch>>(
+            reference = mutableListOf(),
+            ours = mutableListOf(),
+        ) {
+            override fun reset() {
+                reference?.clear()
+                ours?.clear()
+            }
+        }
+        private val slotPair = object : DataPair<Int>() {
+            override fun set(target: BeaconPieceTarget, value: Int?) {
+                if (target == BeaconPieceTarget.REFERENCE) value?.let { updateMatchSlot(it) }
+                super.set(target, value)
+            }
         }
 
-        fun readFromSlotLore(slot: Slot): Boolean {
-            val stack = slot.stack
-            if (stack == null || (isEnchanted && !upgradingStrength)) return false
-            when (slot.index) {
-                colorSelectSlot -> currentColor = slot.getLoreColorOrNull()
-                speedSelectSlot -> currentSpeed = slot.getBeaconSpeedOrNull()
-                pitchSelectSlot -> currentPitch = slot.getBeaconPitchOrNull()
-                else -> return false
+        private val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
+        private val speedSelectSlot = SPEED_SELECT_SLOT + slotOffset
+        private val pitchSelectSlot = PITCH_SELECT_SLOT + slotOffset
+        private val pauseSelectSlot = PAUSE_SELECT_SLOT + slotOffset
+
+        private var paused = false
+        private var lastServerTickCount = 0
+        private var recentTicks: MutableList<Int> = mutableListOf()
+        private var currentRefSlot: Int = BeaconSlotRange.MATCH.range.first
+
+        fun getLowestVariance(): Pair<BeaconPieceTarget, Duration>? = nextPitchPair.asMap.map { (target, mark) ->
+            val duration = mark?.absoluteDifference(SimpleTimeMark.now()) ?: Duration.INFINITE
+            target to duration
+        }.minByOrNull { it.second.inWholeMilliseconds }
+
+        fun handlePitch(pitch: BeaconPitch, target: BeaconPieceTarget) {
+            recordPitch(pitch, forReference = target == BeaconPieceTarget.REFERENCE)
+            pitchPair[BeaconPieceTarget.REFERENCE] = getAveragePitch(forReference = true)
+            pitchPair[BeaconPieceTarget.OURS] = getAveragePitch(forReference = false)
+            nextPitchPair[target] = null
+        }
+
+        private fun recordPitch(pitch: BeaconPitch, forReference: Boolean) {
+            val targetBuf = if (forReference) bufferPair.reference else {
+                bufferPair.ours.takeIf { !paused } ?: return
             }
+            val buf = targetBuf ?: return
+            if (buf.size >= 20) buf.removeAt(0)
+            buf.add(pitch)
+            if (buf.distinct().size > 3) buf.clear()
+        }
+
+        private fun getAveragePitch(forReference: Boolean): BeaconPitch? {
+            val targetBuf = if (forReference) bufferPair.reference else bufferPair.ours
+            val buf = targetBuf?.takeIf { it.size >= 3 }
+            return buf?.groupingBy { it }?.eachCount()?.maxByOrNull { it.value }?.key
+        }
+
+        fun allCorrect(): Boolean {
+            val colorOffset = colorPair.getOffset<BeaconColor>()
+            val speedOffset = speedPair.getOffset<BeaconSpeed>()
+            val pitchOffset = pitchPair.getOffset<BeaconPitch>()
+            return listOf(colorOffset, speedOffset, pitchOffset).all { it == 0 }
+        }
+
+        fun readSlot(slot: Slot) {
+            if (readColorFromSlot(slot)) {
+                readSlotFromSlot(slot)
+            }
+
+            readCurrentFromSlot(slot)
+        }
+
+        private fun readSlotFromSlot(slot: Slot): Boolean {
+            val target = BeaconSlotRange.getByIndexOrNull(slot.index)?.target ?: return false
+            if (slotPair[target] == slot.index) return false
+            slotPair[target] = slot.index
             return true
         }
 
-        fun updateMatchSlot(slot: Int) {
-            currentMatchSlot = slot.takeIf { it != currentMatchSlot } ?: return
+        private fun readColorFromSlot(slot: Slot): Boolean {
+            val target = BeaconSlotRange.getByIndexOrNull(slot.index)?.target ?: return false
+            return slot.performColorApplicableSet { (tuningData, color) ->
+                tuningData.colorPair[target] = color
+            }
+        }
+
+        private fun readCurrentFromSlot(slot: Slot) {
+            val stack = slot.stack
+            if (stack == null || (isEnchanted && !upgradingStrength)) return
+            when (slot.index) {
+                colorSelectSlot -> colorPair[BeaconPieceTarget.OURS] = slot.getLoreColorOrNull()
+                speedSelectSlot -> {
+                    speedPair[BeaconPieceTarget.OURS] = slot.getBeaconSpeedOrNull()
+                    nextPitchPair[BeaconPieceTarget.OURS] = speedPair[BeaconPieceTarget.OURS]?.getOffsetFromNow()
+                }
+                pitchSelectSlot -> pitchPair[BeaconPieceTarget.OURS] = slot.getBeaconPitchOrNull()
+                pauseSelectSlot -> paused = stack.isPaused()
+            }
+        }
+
+        private fun updateMatchSlot(slot: Int) {
+            currentRefSlot = slot.takeIf { it != currentRefSlot } ?: return
             val tickDifference = (currentServerTicks - lastServerTickCount).takeIf { it > 0 } ?: return
             recentTicks.add(tickDifference)
             lastServerTickCount = currentServerTicks
             if (upgradingStrength && recentTicks.size < 3) return
-            checkTargetSpeed()
+            checkReferenceSpeed()
         }
 
         fun tryHighlightSlot(slot: Slot): Boolean {
             if (isEnchanted && !upgradingStrength) return false
             val offset = getOffsetBySlot(slot.index) ?: return false
             if (offset == 0) return false
-            slot.highlight(highlightGreen)
+            slot.highlight(LorenzColor.GREEN.addOpacity(200))
             return true
         }
 
+        @Suppress("HandleEventInspection")
         fun tryLabelIfAble(event: RenderInventoryItemTipEvent) {
             if (isEnchanted && !upgradingStrength) return
-            val offset = getOffsetBySlot(event.slot.index) ?: return
-            if (offset == 0) return
-            event.labelIfAble(offset)
+            val offset = getOffsetBySlot(event.slot.index)?.takeIf { it > 0 } ?: return
+            event.stackTip = "§a$offset"
         }
 
         fun getOffsetBySlot(slot: Int): Int? = when (slot) {
-            colorSelectSlot -> colorOffset
-            speedSelectSlot -> speedOffset
-            pitchSelectSlot -> pitchOffset
+            colorSelectSlot -> colorPair.getOffset()
+            speedSelectSlot -> speedPair.getOffset()
+            pitchSelectSlot -> pitchPair.getOffset()
             else -> null
         }
 
-        fun checkTargetSpeed() {
+        private fun checkReferenceSpeed() {
             if (recentTicks.isEmpty()) return
             val recent = recentTicks.takeLast(10)
             val sorted = recent.sorted()
@@ -438,31 +527,30 @@ object MoongladeBeacon {
             }.takeIfNotEmpty() ?: return
             val calculatedSpeed = newTicks.average()
 
-            targetSpeed = BeaconSpeed.byClosestTickSpeed(calculatedSpeed) ?: return
-            val targetSpeed = this.targetSpeed ?: return
-            nextExpectedPitch = targetSpeed.getOffsetFromNow()
+            val referenceSpeed = BeaconSpeed.byClosestTickSpeed(calculatedSpeed) ?: return
+            speedPair[BeaconPieceTarget.REFERENCE] = referenceSpeed
+            nextPitchPair[BeaconPieceTarget.REFERENCE] = referenceSpeed.getOffsetFromNow()
         }
 
         override fun toString() = buildString {
             if (isEnchanted) appendLine(" ")
             appendLine(title)
-            appendLine(" §7Target Color: ${targetColor.formatOrDefault()}")
-            appendLine(" §7Target Speed: §a${targetSpeed.formatOrDefault("§eCalculating..")}")
-            appendLine(" §7Target Pitch: §a${targetPitch.formatOrDefault()}")
+            appendLine(" §7Ref Color: ${colorPair.reference.formatOrDefault()}")
+            appendLine(" §7Ref Speed: §a${speedPair.reference.formatOrDefault("§eCalculating..")}")
+            appendLine(" §7Ref Pitch: §a${pitchPair.reference.formatOrDefault()}")
 
             if (debugConfig.moongladeBeacon) {
-                appendLine("  §8Current Color: ${currentColor.formatOrDefault()}")
-                appendLine("  §8Current Speed: §a${currentSpeed.formatOrDefault()}")
-                appendLine("  §8Current Pitch: §a${currentPitch.formatOrDefault()}")
-                appendLine("  §8Color Offset: §a${colorOffset ?: "§cUnknown"}")
-                appendLine("  §8Speed Offset: §a${speedOffset ?: "§cUnknown"}")
-                appendLine("  §8Pitch Offset: §a${pitchOffset ?: "§cUnknown"}")
-                appendLine("  §8Next Expected Pitch: §a${nextExpectedPitch?.timeUntil()?.format() ?: "§cUnknown"}")
+                appendLine("  §8Our Color: ${colorPair.ours.formatOrDefault()}")
+                appendLine("  §8Our Speed: §a${speedPair.ours.formatOrDefault()}")
+                appendLine("  §8Our Pitch: §a${pitchPair.ours.formatOrDefault()}")
+                appendLine("  §8Off Color: §a${colorPair.getOffset() ?: "§cUnknown"}")
+                appendLine("  §8Off Speed: §a${speedPair.getOffset() ?: "§cUnknown"}")
+                appendLine("  §8Off Pitch: §a${pitchPair.getOffset() ?: "§cUnknown"}")
+                appendLine("  §8Next Ref Pitch: §a${nextPitchPair.reference?.timeUntil()?.format() ?: "§cUnknown"}")
+                appendLine("  §8Next Our Pitch: §a${nextPitchPair.ours?.timeUntil()?.format() ?: "§cUnknown"}")
             }
         }
 
-        fun getRenderables() = toString().split("\n").filter {
-          it.isNotEmpty()
-        }.map(::StringRenderable)
+        fun getRenderables() = toString().split("\n").filterNotEmptyString().map(::StringRenderable)
     }
 }
