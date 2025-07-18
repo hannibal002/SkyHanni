@@ -38,7 +38,7 @@ object ColorfulItemStats {
 
                 val skyblockStat = SkyblockStat.getValueOrNull(
                     stat.uppercase().replace(" ", "_")
-                )
+                ) ?: return@replace this.group()
 
                 val bonusGroup = group("bonus")
                 val bonus = when {
@@ -49,15 +49,11 @@ object ColorfulItemStats {
 
                 buildString {
                     append("§7$stat: ")
-                    append(
-                        SkyblockStat.getValueOrNull(
-                            stat.uppercase().replace(" ", "_")
-                        )?.icon?.take(2) ?: oldColor
-                    )
-                    append(skyblockStat?.icon?.take(2) ?: oldColor)
+                    append(skyblockStat.icon.take(2))
+                    append(skyblockStat.icon.take(2))
                     append(bonus)
                     if (config.statIcons) {
-                        skyblockStat?.icon?.lastOrNull()?.let { append(it) }
+                        skyblockStat.icon.lastOrNull()?.let { append(it) }
                     }
                     append(oldColor)
                     append(" ")
