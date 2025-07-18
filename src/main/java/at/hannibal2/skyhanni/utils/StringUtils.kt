@@ -56,7 +56,7 @@ object StringUtils {
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
-    private val colorChars = "abcdefABCDEF0123456789".toSet()
+    private val colorChars = "abcdefABCDEF0123456789zZ".toSet()
 
     /**
      * Removes color and optionally formatting codes from the given string, leaving plain text.

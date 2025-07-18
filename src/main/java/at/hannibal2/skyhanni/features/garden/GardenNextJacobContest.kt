@@ -43,8 +43,9 @@ import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
@@ -66,9 +67,10 @@ object GardenNextJacobContest {
     private val patternGroup = RepoPattern.group("garden.nextcontest")
     private val calendarDetector by lazy { InventoryDetector(monthPattern) }
     private val haveAllContests get() = knownContests.size == MAX_CONTESTS_PER_YEAR
-    private val nextContest get() = knownContests.filterNot {
-        it.endTime.isInPast()
-    }.minByOrNull { it.endTime }
+    private val nextContest
+        get() = knownContests.filterNot {
+            it.endTime.isInPast()
+        }.minByOrNull { it.endTime }
 
     private var display: Renderable? = null
     private var simpleDisplay = emptyList<String>()
@@ -131,7 +133,7 @@ object GardenNextJacobContest {
      */
     private val timeLeftPattern by patternGroup.pattern(
         "time-left",
-        "(?:§.)+Jacob's Contest: (?:§.)+(?<timeleft>\\d+[smh]+) left"
+        "(?:§.)+Jacob's Contest: (?:§.)+(?<timeleft>\\d+[smh]+) left",
     )
 
     @HandleEvent
@@ -346,18 +348,18 @@ object GardenNextJacobContest {
         }
 
         display = if (isFetchingContests) {
-            StringRenderable("§cFetching this years jacob contests...")
+            Renderable.text("§cFetching this years jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
         }
     }
 
-    private fun drawDisplay() = Renderable.line {
+    private fun drawDisplay() = Renderable.horizontal {
         val nextContest = nextContest
-        if (calendarDetector.isInside()) return@line drawCalendarDisplay()
-        else if (knownContests.isEmpty()) return@line drawNoContestsDisplay()
-        else if (nextContest != null) return@line drawNextContest(nextContest)
+        if (calendarDetector.isInside()) return@horizontal drawCalendarDisplay()
+        else if (knownContests.isEmpty()) return@horizontal drawNoContestsDisplay()
+        else if (nextContest != null) return@horizontal drawNextContest(nextContest)
 
         // We only reach here if there are no contests available
         if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
@@ -400,7 +402,7 @@ object GardenNextJacobContest {
             val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest").apply {
                 if (isBoosted) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
             }
-            val stack = ItemStackRenderable(cropStack, 1.0)
+            val stack = Renderable.item(cropStack, 1.0)
             if (config.additionalBoostedHighlight && isBoosted) {
                 add(stack.renderBounds(config.additionalBoostedHighlightColor.toColor()))
             } else add(stack)

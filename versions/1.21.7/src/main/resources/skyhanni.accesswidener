@@ -36,6 +36,9 @@ accessible method net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen 
 accessible field net/minecraft/text/TextColor name Ljava/lang/String;
 accessible field net/minecraft/entity/Entity CUSTOM_NAME Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/LivingEntity HEALTH Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/client/gui/hud/ChatHud scrolledLines I
+accessible method net/minecraft/client/gui/hud/ChatHud toChatLineX (D)D
+accessible method net/minecraft/client/gui/hud/ChatHud toChatLineY (D)D
 
 # 1.21.7 stuff
 accessible field net/minecraft/client/render/RenderLayer$MultiPhase pipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;

@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -115,7 +115,7 @@ class GuiPositionEditor(
     }
 
     private fun renderHover(text: List<String>) {
-        RenderableTooltips.setTooltipForRender(text.map { StringRenderable(it) })
+        RenderableTooltips.setTooltipForRender(text.map(StringRenderable::from))
     }
 
     private fun renderRectangles(): Int {
