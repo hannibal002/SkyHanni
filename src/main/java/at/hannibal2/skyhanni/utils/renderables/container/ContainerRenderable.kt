@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.utils.renderables.container
 
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 abstract class ContainerRenderable : Renderable {

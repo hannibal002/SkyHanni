@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollT
 import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableTable.Companion.searchableTable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.awt.Color
@@ -24,6 +23,7 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
     private val scrollValues = mutableMapOf<Int, ScrollValue>()
     private val textInput = TextInput()
 
+    @Suppress("LongMethod")
     override fun renderable(): Renderable = with(Renderable) {
         val header = listOf(
             text("I'm a Header", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER).renderBounds(),

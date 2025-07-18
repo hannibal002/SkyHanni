@@ -14,18 +14,20 @@ interface TabularRenderable<C : Collection<Renderable>, R : Collection<C>> : Ren
 }
 
 interface TabularRenderableWithRowRender<C : Collection<Renderable>, R : Collection<C>> : TabularRenderable<C, R> {
+
     fun renderRow(mouseOffsetX: Int, mouseOffsetY: Int, rowIndex: Int, row: C)
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        content.forEachIndexed { index, it -> renderRow(mouseOffsetX, mouseOffsetY, index, it) }
+        content.forEachIndexed { index, row -> renderRow(mouseOffsetX, mouseOffsetY, index, row) }
     }
 }
 
 interface TabularRenderableWithCellRender<C : Collection<Renderable>, R : Collection<C>> : TabularRenderableWithRowRender<C, R> {
+
     fun renderCell(mouseOffsetX: Int, mouseOffsetY: Int, rowIndex: Int, columnIndex: Int, renderable: Renderable)
 
     override fun renderRow(mouseOffsetX: Int, mouseOffsetY: Int, rowIndex: Int, row: C) {
-        row.forEachIndexed { index, it -> renderCell(mouseOffsetX, mouseOffsetY, rowIndex, index, it) }
+        row.forEachIndexed { index, cell -> renderCell(mouseOffsetX, mouseOffsetY, rowIndex, index, cell) }
     }
 }
 

@@ -13,8 +13,8 @@ class TableRenderable private constructor(
     override val ySpacing: Int = 0,
     useEmptySpace: Boolean = false,
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-    override val  verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-) : TabularRenderableWithCellRender<List<Renderable>,List<List<Renderable>>> {
+    override val verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+) : TabularRenderableWithCellRender<List<Renderable>, List<List<Renderable>>> {
 
     private val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xSpacing)
     private val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, ySpacing)
@@ -37,7 +37,7 @@ class TableRenderable private constructor(
         }
     }
 
-    companion object{
+    companion object {
         /**
          * @property content Collection of rows of Renderables
          * @property xSpacing Space between rows
@@ -50,6 +50,6 @@ class TableRenderable private constructor(
             useEmptySpace: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = TableRenderable(content,xSpacing,ySpacing,useEmptySpace,horizontalAlign,verticalAlign)
+        ) = TableRenderable(content, xSpacing, ySpacing, useEmptySpace, horizontalAlign, verticalAlign)
     }
 }

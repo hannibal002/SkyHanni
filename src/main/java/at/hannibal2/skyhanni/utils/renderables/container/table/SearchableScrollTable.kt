@@ -11,14 +11,9 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.ScrollInput
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import at.hannibal2.skyhanni.utils.renderables.container.SlidingWindow
-import at.hannibal2.skyhanni.utils.renderables.container.absoluteProvider
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import java.awt.Color
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.drawInsideRoundedRect
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.searchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.container.SlidingWindowWithScrollHints
+import at.hannibal2.skyhanni.utils.renderables.container.absoluteProvider
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 class SearchableScrollTable private constructor(
     rawContent: Map<List<Renderable>, String?>,
