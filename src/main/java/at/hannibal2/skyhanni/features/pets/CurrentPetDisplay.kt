@@ -41,11 +41,11 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.EnumFacing
 import java.util.UUID
 
-typealias TElement = TextPetDisplayConfig.TextElement
-typealias TLO = TextPetDisplayConfig.TextLocationOption
-typealias NFE = TextPetDisplayConfig.NumberFormatEntry
-typealias EXPSharePlace = ExpSharePetConfig.ExpShareLocationOption
-typealias EXPShareGO = ExpSharePetDisplayConfig.GroupOrientation
+private typealias TElement = TextPetDisplayConfig.TextElement
+private typealias TLO = TextPetDisplayConfig.TextLocationOption
+private typealias NFE = TextPetDisplayConfig.NumberFormatEntry
+private typealias EXPSharePlace = ExpSharePetConfig.ExpShareLocationOption
+private typealias EXPShareGO = ExpSharePetDisplayConfig.GroupOrientation
 
 @SkyHanniModule
 object CurrentPetDisplay {
@@ -351,7 +351,7 @@ object CurrentPetDisplay {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
         event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")
-        event.move(88, "misc.pets.display", "misc.pets.display.enabled")
-        event.move(88, "misc.pets.displayPos", "misc.pets.display.pos")
+        event.move(100, "misc.pets.display", "misc.pets.display.enabled")
+        event.move(100, "misc.pets.displayPos", "misc.pets.display.position")
     }
 }
