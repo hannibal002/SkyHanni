@@ -134,7 +134,7 @@ val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
 val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "NotEnoughUpdates"
     this.repo = "NotEnoughUpdates-Repo"
-    this.branch = "main"
+    this.branch = "master"
     this.resourcePath = "assets/skyhanni/neu-repo.zip"
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
