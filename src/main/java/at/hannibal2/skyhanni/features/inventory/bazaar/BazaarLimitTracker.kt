@@ -67,7 +67,7 @@ object BazaarLimitTracker {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.dailyLimitTracker) return
         if (!BazaarApi.inBazaarInventory) return
 
         val color = percentageColor(DAILY_LIMIT.toLong() - coinsTowardsLimit.toLong(), DAILY_LIMIT.toLong()).getChatColor()
@@ -85,6 +85,4 @@ object BazaarLimitTracker {
             posLabel = "Bazaar Daily Limit Tracker",
         )
     }
-
-    private fun isEnabled() = config.dailyLimitTracker
 }

@@ -7,11 +7,16 @@ class BazaarTransactionEvent(
     val coinAmount: Double,
     val coinAmountAfterTax: Double,
 ) : SkyHanniEvent() {
-    enum class TransactionType {
-        INSTANT_BUY,
-        BUY_ORDER,
-        INSTANT_SELL,
-        SELL_OFFER,
-        FLIP_ORDER
+    enum class TransactionType(private val message: String) {
+        INSTANT_BUY("Bought"),
+        BUY_ORDER("Buy Order Setup!"),
+        INSTANT_SELL("Sold"),
+        SELL_OFFER("Sell Offer Setup!"),
+        FLIP_ORDER("Order Flipped!"),
+        ;
+
+        companion object {
+            fun getByMessageOrNull(message: String) = entries.firstOrNull { it.message == message }
+        }
     }
 }

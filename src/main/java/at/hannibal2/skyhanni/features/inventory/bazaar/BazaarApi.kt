@@ -30,7 +30,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -108,7 +110,7 @@ object BazaarApi {
      */
     private val taxPattern by patternGroup.pattern(
         "instantsell.tax",
-        "§8Current tax: (?<tax>[\\d,.]+)%",
+        "§8Current tax: (?<tax>[\\d.]+)%",
     )
 
     private var taxRate: Double
@@ -144,7 +146,7 @@ object BazaarApi {
         currentSearchedItem = displayName.removeColor()
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
         if (inBazaarInventory) {
@@ -199,10 +201,8 @@ object BazaarApi {
         val sellInstantly = inventoryItems[11] ?: return
 
         if (sellInstantly.displayName != "§6Sell Instantly") return
-        for (line in sellInstantly.getLore()) {
-            taxPattern.matchMatcher(line) {
-                taxRate = group("tax").formatDouble()
-            }
+        taxPattern.firstMatcher(sellInstantly.getLore()) {
+            taxRate = group("tax").formatDouble()
         }
     }
 
@@ -242,20 +242,15 @@ object BazaarApi {
         val message = event.message.removeColor()
         transactionPattern.matchMatcher(message) {
             val item = group("item")
-            val coins = group("coins").replace(",", "").toDoubleOrNull() ?: return
+            val coins = group("coins").formatDoubleOrNull() ?: return
             val coinsAfterTax = when (group("type")) {
                 "Sold" -> coins * (1 - taxRate / 100)
                 else -> coins
             }
-            val transactionType = when (group("type")) {
-                "Bought" -> TransactionType.INSTANT_BUY
-                "Buy Order Setup!" -> TransactionType.BUY_ORDER
-                "Sold" -> TransactionType.INSTANT_SELL
-                "Sell Offer Setup!" -> TransactionType.SELL_OFFER
-                "Order Flipped!" -> TransactionType.FLIP_ORDER
-                else -> return
+            val transactionType = TransactionType.getByMessageOrNull(group("type"))
+            if (transactionType != null) {
+                BazaarTransactionEvent(transactionType, coins, coinsAfterTax).post()
             }
-            BazaarTransactionEvent(transactionType, coins, coinsAfterTax).post()
             if (currentSearchedItem == item) {
                 currentSearchedItem = ""
             }
