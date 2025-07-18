@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -30,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotEmptyString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -102,11 +105,11 @@ object MoongladeBeacon {
      * @param guiSpeed The speed level as displayed in the GUI (1-5).
      */
     enum class BeaconSpeed(val tickSpeed: Int, val guiSpeed: Int) {
-        SPEED_1(12, 5),
-        SPEED_2(22, 4),
-        SPEED_3(32, 3),
-        SPEED_4(42, 2),
         SPEED_5(52, 1),
+        SPEED_4(42, 2),
+        SPEED_3(32, 3),
+        SPEED_2(22, 4),
+        SPEED_1(12, 5),
         ;
 
         override fun toString() = "§aSpeed $guiSpeed"
@@ -237,7 +240,16 @@ object MoongladeBeacon {
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!solverEnabled()) return
-        if (event.blockOverClick()) return event.cancel()
+        if (event.blockOverClick()) {
+            SoundUtils.playErrorSound()
+            TitleManager.sendTitle(
+                "§cOver-click Prevented",
+                subtitleText = "§7Hold §eShift §7to bypass",
+                duration = 1.seconds,
+                location = TitleManager.TitleLocation.INVENTORY,
+            )
+            return event.cancel()
+        }
         if (!config.useMiddleClick) return
 
         if (event.clickedButton != 0) return
@@ -246,6 +258,7 @@ object MoongladeBeacon {
 
     private fun GuiContainerEvent.SlotClickEvent.blockOverClick(): Boolean {
         if (!config.preventOverClicking) return false
+        if (KeyboardManager.isShiftKeyDown()) return false
         val slotIndex = this.slot?.index ?: return false
         val neededClickOffset = normalTuning.getOffsetBySlot(slotIndex)
             ?: enchantedTuning.getOffsetBySlot(slotIndex)?.takeUnless { !upgradingStrength }
@@ -417,8 +430,8 @@ object MoongladeBeacon {
 
         fun handlePitch(pitch: BeaconPitch, target: BeaconPieceTarget) {
             recordPitch(pitch, forReference = target == BeaconPieceTarget.REFERENCE)
-            pitchPair[BeaconPieceTarget.REFERENCE] = getAveragePitch(forReference = true)
-            pitchPair[BeaconPieceTarget.OURS] = getAveragePitch(forReference = false)
+            pitchPair[BeaconPieceTarget.REFERENCE] = getAveragePitch(forReference = true) ?: pitchPair[BeaconPieceTarget.REFERENCE]
+            pitchPair[BeaconPieceTarget.OURS] = getAveragePitch(forReference = false) ?: pitchPair[BeaconPieceTarget.OURS]
             nextPitchPair[target] = null
         }
 
@@ -492,6 +505,16 @@ object MoongladeBeacon {
 
         fun tryHighlightSlot(slot: Slot): Boolean {
             if (isEnchanted && !upgradingStrength) return false
+
+            if (slot.index == pitchSelectSlot) {
+                val uiPitch = slot.getBeaconPitchOrNull() ?: return false
+                if (uiPitch == pitchPair.reference) {
+                    slot.highlight(LorenzColor.GREEN.addOpacity(200))
+                    return true
+                }
+                return false
+            }
+
             getOffsetBySlot(slot.index).takeIf { it == 0 } ?: return false
             slot.highlight(LorenzColor.GREEN.addOpacity(200))
             return true
