@@ -37,7 +37,6 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
-import net.minecraft.nbt.NBTTagString
 import java.io.File
 import java.util.TreeMap
 import kotlin.collections.set
@@ -59,7 +58,7 @@ import net.minecraft.nbt.NBTTagString
 object EnoughUpdatesManager {
 
     val configDirectory = File("config/notenoughupdates")
-    val repoDirectory = File(configDirectory, "repo")
+    private val repoDirectory = File(configDirectory, "repo")
     private val itemsFolder = File(repoDirectory, "items")
 
     private val loadingMutex = Mutex()
@@ -227,22 +226,6 @@ object EnoughUpdatesManager {
             //#else
             //$$ stack.count = it
             //#endif
-        // todo modern doesnt have the "meta" number
-        val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255))
-        stack.item ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
-
-        json["count"]?.asInt?.let { stack.stackSize = it }
-        json["damage"]?.asInt?.let { stack.itemDamage = it }
-        try {
-            val nbtString = json["nbttag"]?.let { rawJsonNbt ->
-                if (rawJsonNbt.isJsonObject) rawJsonNbt.toString()
-                else rawJsonNbt.asString
-            }
-            val tag = JsonToNBT.getTagFromJson(nbtString)
-            stack.tagCompound = tag
-        } catch (_: Exception) {
-            println("json was malformed: ${json["nbttag"]}")
-            println("whole json: $json")
         }
 
         //#if MC < 1.21
@@ -341,7 +324,7 @@ object EnoughUpdatesManager {
 
         val minMix = (maxStatLevel - (minStatLevel - (if (statLevellingType == -1) 0 else 1)) - statsLevel) / 99f
         val maxMix = (statsLevel - 1) / 99f
-        for (i in 0 until otherNumsMax.size) {
+        for (i in otherNumsMax.indices) {
             val num = otherNumsMin[i] * minMix + otherNumsMax[i] * maxMix
             this[i.toString()] = if (statLevellingType == 1 && level < minStatLevel) "0"
             else (floor(num * 10) / 10f).removeUnusedDecimal()
@@ -361,12 +344,11 @@ object EnoughUpdatesManager {
     private fun processLore(lore: List<String>, replacements: Map<String, String>): NBTTagList {
         val loreList = NBTTagList()
         for (line in lore) {
-            val loreLine = line
             for ((key, value) in replacements) {
-                loreLine.replace("{$key}", value)
+                line.replace("{$key}", value)
             }
             //#if MC < 1.21
-            loreList.appendTag(NBTTagString(loreLine))
+            loreList.appendTag(NBTTagString(line))
             //#else
             //$$ loreList.add(NbtString.of(loreLine))
             //#endif
