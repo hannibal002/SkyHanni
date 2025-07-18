@@ -17,9 +17,6 @@ import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
-import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaField
-import kotlin.reflect.jvm.javaGetter
 import kotlin.reflect.typeOf
 import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
 
@@ -28,61 +25,42 @@ import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
 annotation class KSerializable
 
 @Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.VALUE_PARAMETER)
+@Target(AnnotationTarget.CLASS)
 annotation class ExtraData
 
 class KotlinTypeAdapterFactory : TypeAdapterFactory {
 
-    private data class ParamInfo(
+    internal data class ParameterInfo(
         val param: KParameter,
-        val name: String,
         val adapter: TypeAdapter<Any?>,
-        val prop: KProperty1<Any, Any?>,
+        val name: String,
+        val field: KProperty1<Any, Any?>,
     )
 
     @OptIn(ExperimentalStdlibApi::class)
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> create(gson: Gson, typeToken: TypeToken<T>): TypeAdapter<T>? {
-        val kClass = typeToken.rawType.kotlin as KClass<T>
-
-        // only data‐classes annotated @KSerializable
-        if (!kClass.isData || kClass.findAnnotation<KSerializable>() == null) return null
-        val ctor = kClass.primaryConstructor ?: return null
-
-        // pick off any @ExtraData param (must be a Map<String,JsonElement>)
-        val extraParam = ctor.parameters.find { param ->
-            param.findAnnotation<ExtraData>() != null
-            && param.type.isSubtypeOf(typeOf<Map<String, JsonElement>>())
-        }
-
-        // build info for every real constructor parameter
-        val infos = ctor.parameters
-            .filter { it.findAnnotation<ExtraData>() == null }
-            .map { param ->
-                val memberProp = kClass.memberProperties.find { it.name == param.name } ?: return null
-                val prop = (memberProp.also { it.isAccessible = true }) as KProperty1<Any, Any?>
-
-                // determine JSON name (only @SerializedName on the parameter, otherwise use the exact param name)
-                val name = param.findAnnotation<SerializedName>()?.value
-                    ?: prop.findAnnotation<SerializedName>()?.value
-                    ?: prop.javaField?.getAnnotation(SerializedName::class.java)?.value
-                    ?: prop.javaGetter?.getAnnotation(SerializedName::class.java)?.value
-                    ?: param.name!!
-
-                // resolve the exact constructor-parameter type
-                val resolved = InternalGsonTypes.resolve(
-                    typeToken.type,
-                    typeToken.rawType,
-                    param.type.javaType,
-                ) ?: error("Could not resolve type for '${param.name}'")
-                val adapter = gson.getAdapter(TypeToken.get(resolved)) as TypeAdapter<Any?>
-
-                ParamInfo(param, name, adapter, prop)
+    override fun <T : Any> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
+        val kotlinClass = type.rawType.kotlin as KClass<T>
+        if (kotlinClass.findAnnotation<KSerializable>() == null) return null
+        if (!kotlinClass.isData) return null
+        val primaryConstructor = kotlinClass.primaryConstructor ?: return null
+        val params = primaryConstructor.parameters.filter { it.findAnnotation<ExtraData>() == null }
+        val extraDataParam = primaryConstructor.parameters
+            .find { it.findAnnotation<ExtraData>() != null && typeOf<MutableMap<String, JsonElement>>().isSubtypeOf(it.type) }
+            ?.let { param ->
+                param to kotlinClass.memberProperties.find {
+                    it.name == param.name && it.returnType.isSubtypeOf(typeOf<Map<String, JsonElement>>())
+                } as KProperty1<Any, Map<String, JsonElement>>
             }
-
-        val infosByName = infos.associateBy { it.name }
-
-        // and a JsonElement adapter for any extra fields
+        val parameterInfos = params.map { param ->
+            ParameterInfo(
+                param,
+                gson.getAdapter(
+                    TypeToken.get(InternalGsonTypes.resolve(type.type, type.rawType, param.type.javaType))
+                ) as TypeAdapter<Any?>,
+                param.findAnnotation<SerializedName>()?.value ?: param.name!!,
+                kotlinClass.memberProperties.find { it.name == param.name }!! as KProperty1<Any, Any?>
+            )
+        }.associateBy { it.name }
         val jsonElementAdapter = gson.getAdapter(JsonElement::class.java)
 
         return object : TypeAdapter<T>() {
@@ -92,17 +70,13 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                     return
                 }
                 out.beginObject()
-                for (info in infos) {
-                    out.name(info.name)
-                    info.adapter.write(out, info.prop.get(value))
+                for ((name, paramInfo) in parameterInfos) {
+                    out.name(name)
+                    paramInfo.adapter.write(out, paramInfo.field.get(value))
                 }
-                if (extraParam != null) {
-                    val map = value::class
-                        .memberProperties
-                        .find { it.name == extraParam.name }
-                        ?.getter?.call(value) as? Map<String, JsonElement>
-                        ?: error("ExtraData parameter must be a Map<String, JsonElement>")
-                    for ((extraName, extraValue) in map) {
+                if (extraDataParam != null) {
+                    val extraData = extraDataParam.second.get(value)
+                    for ((extraName, extraValue) in extraData) {
                         out.name(extraName)
                         jsonElementAdapter.write(out, extraValue)
                     }
@@ -120,7 +94,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 val extraData = mutableMapOf<String, JsonElement>()
                 while (reader.peek() != JsonToken.END_OBJECT) {
                     val name = reader.nextName()
-                    val paramData = infosByName[name]
+                    val paramData = parameterInfos[name]
                     if (paramData == null) {
                         extraData[name] = jsonElementAdapter.read(reader)
                         continue
@@ -129,10 +103,10 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                     args[paramData.param] = value
                 }
                 reader.endObject()
-                if (extraParam != null) {
-                    args[extraParam] = extraData
+                if (extraDataParam != null) {
+                    args[extraDataParam.first] = extraData
                 }
-                return ctor.callBy(args)
+                return primaryConstructor.callBy(args)
             }
         }
     }
