@@ -70,7 +70,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 ?: param.name!!
             val internalType = InternalGsonTypes.resolve(type.type, type.rawType, param.type.javaType)
             val typeToken = TypeToken.get(internalType)
-            val adapter = gson.getAdapter(typeToken) as TypeAdapter<Any?>
+            val adapter = gson.getDelegateAdapter(this@KotlinTypeAdapterFactory, typeToken) as TypeAdapter<Any?>
             val castedProperty = property as KProperty1<Any, Any?>
             ParameterInfo(param, adapter, jsonName, castedProperty)
         }.associateBy { it.name }
