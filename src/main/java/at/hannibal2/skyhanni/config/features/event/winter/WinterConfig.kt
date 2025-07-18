@@ -9,10 +9,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class WinterConfig {
+
     @Expose
     @ConfigOption(name = "Frozen Treasure Tracker", desc = "")
     @Accordion
     val frozenTreasureTracker: FrozenTreasureConfig = FrozenTreasureConfig()
+
+    @Expose
+    @ConfigOption(name = "Frozen Treasure Highlighter", desc = "")
+    @Accordion
+    val frozenTreasureHighlighter: FrozenTreasureHighlighterConfig = FrozenTreasureHighlighterConfig()
 
     @Accordion
     @Expose
@@ -22,7 +28,7 @@ class WinterConfig {
     @Expose
     @ConfigOption(
         name = "Island Close Time",
-        desc = "While on the Winter Island, show a timer until Jerry's Workshop closes."
+        desc = "While on the Winter Island, show a timer until Jerry's Workshop closes.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -35,7 +41,7 @@ class WinterConfig {
     @Expose
     @ConfigOption(
         name = "New Year Cake Reminder",
-        desc = "Send a reminder while the New Year Cake can be collected in the hub."
+        desc = "Send a reminder while the New Year Cake can be collected in the hub.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -44,7 +50,7 @@ class WinterConfig {
     @Expose
     @ConfigOption(
         name = "Reindrake Warp Helper",
-        desc = "Sends a clickable message in chat to warp to the Winter Island spawn when a Reindrake spawns."
+        desc = "Sends a clickable message in chat to warp to the Winter Island spawn when a Reindrake spawns.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

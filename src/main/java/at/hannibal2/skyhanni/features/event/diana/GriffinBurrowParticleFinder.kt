@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes
@@ -67,8 +66,9 @@ object GriffinBurrowParticleFinder {
 
         val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
-        // TODO remove the workaround once we know what is going on exactly and can fix this properly
-        val location = workaround(event.location)
+        // TODO the rounding is a workaround, may need to be removed once we know what is going on exactly and can fix this properly
+        val location = event.location.roundToBlock().down()
+
         val burrow = burrows.getOrPut(location) { Burrow(location) }
         val oldBurrowType = burrow.type
 
@@ -92,10 +92,8 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    private fun workaround(location: LorenzVec) = location.toBlockPos().down().toLorenzVec()
-
-    // TODO this funciton needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
-    //  and instead of ticks alive, should use found time stamp and use passed since > 1.min
+    // TODO this function needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
+    // and instead of ticks alive, should use found timestamp and use passed since > 1.min
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
@@ -113,7 +111,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    // todo move to ParticleUtils or similar
+    // TODO move to ParticleUtils or similar
     // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(

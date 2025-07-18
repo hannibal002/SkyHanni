@@ -53,10 +53,9 @@ net.minecraft.screen.slot.Slot hasStack() hasItem()
 
 net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.ServerPlayer
 
-net.minecraft.text.Text at.hannibal2.skyhanni.utils.compat.Text
-
 net.minecraft.text.MutableText net.minecraft.network.chat.MutableComponent
 net.minecraft.text.Style net.minecraft.network.chat.Style
+net.minecraft.text.Text at.hannibal2.skyhanni.utils.compat.Text
 
 net.minecraft.text.MutableText setStyle() setStyle()
 

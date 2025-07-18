@@ -463,7 +463,7 @@ object SkyHanniDebugsAndTests {
             }
 
             if (debugConfig.raytracedOreblock) {
-                BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
+                BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
                             "Looking at: ${ore.name} (${pos.toCleanString()})",

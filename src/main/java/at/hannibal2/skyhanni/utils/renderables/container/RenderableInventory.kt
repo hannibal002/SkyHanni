@@ -1,11 +1,14 @@
-package at.hannibal2.skyhanni.utils.renderables
+package at.hannibal2.skyhanni.utils.renderables.container
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import net.minecraft.item.ItemStack
 import kotlin.math.ceil
 
@@ -77,36 +80,26 @@ object RenderableInventory {
         }
     }
 
-    fun fakeInventory(
+    fun Renderable.Companion.fakeInventory(
         items: List<ItemStack?>,
         maxRowSize: Int,
         scale: Double,
         horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
         verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-    ): Renderable {
+    ): Renderable = with(Renderable) {
         val uvList = createUvList(items.size, maxRowSize)
         var index = 0
+        val emptySlot = Renderable.placeholder(
+            (16 * scale).toInt(),
+            (16 * scale).toInt(),
+        )
         val finalList = uvList.map { uvRow ->
             uvRow.map { uv ->
                 val uvArray = uv.getUvCoords()
-                val renderable = if (uv == SlotsUv.CENTER) {
-                    (
-                        items[index]?.let { item ->
-                            ItemStackRenderable(
-                                item,
-                                scale,
-                                0,
-                                0,
-                                false,
-                            )
-                        } ?: Renderable.placeholder(
-                            (16 * scale).toInt(),
-                            (16 * scale).toInt()
-                        )
-                        ).also { index++ }
-                } else Renderable.placeholder(0, 0)
-                Renderable.drawInsideFixedSizedImage(
-                    renderable,
+                drawInsideFixedSizedImage(
+                    if (uv == SlotsUv.CENTER)
+                        items[index++]?.let { item(it, scale, 0, 0, false) } ?: emptySlot
+                    else Renderable.empty(),
                     inventoryTextures,
                     (uv.width() * scale).toInt(),
                     (uv.height() * scale).toInt(),
@@ -119,8 +112,8 @@ object RenderableInventory {
             }
         }
 
-        return VerticalContainerRenderable(
-            finalList.map { HorizontalContainerRenderable(it, 0) },
+        return vertical(
+            finalList.map { horizontal(it, 0) },
             0,
             horizontalAlign = horizontalAlign,
             verticalAlign = verticalAlign,

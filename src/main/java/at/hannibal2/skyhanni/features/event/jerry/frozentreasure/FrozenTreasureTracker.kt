@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -73,10 +73,8 @@ object FrozenTreasureTracker {
         tracker.update()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.WINTER)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!onJerryWorkshop()) return
-
         val difference = estimatedIce - lastEstimatedIce
         lastEstimatedIce = estimatedIce
 
@@ -112,10 +110,9 @@ object FrozenTreasureTracker {
         return newList
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.WINTER)
     fun onChat(event: SkyHanniChatEvent) {
         if (!ProfileStorageData.loaded) return
-        if (!onJerryWorkshop()) return
 
         val message = event.message.removeColor().trim()
 
@@ -171,8 +168,8 @@ object FrozenTreasureTracker {
 
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
-        if (!onJerryWorkshop()) return false
-        if (config.onlyInCave && !inGlacialCave()) return false
+        if (!WinterApi.inWorkshop()) return false
+        if (config.onlyInCave && !WinterApi.inGlacialCave()) return false
 
         return true
     }
@@ -181,11 +178,6 @@ object FrozenTreasureTracker {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.frozenTreasureTracker", "event.winter.frozenTreasureTracker")
     }
-
-    private fun onJerryWorkshop() = IslandType.WINTER.isCurrent()
-
-    private fun inGlacialCave() =
-        onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

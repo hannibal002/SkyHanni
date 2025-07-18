@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -37,7 +36,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import net.minecraft.text.Text
@@ -61,6 +60,7 @@ object ForagingTracker {
 
     private fun heldItemEnabled() = !config.onlyHoldingAxe ||
         (isHoldingAxe() || lastAxeHeldTime.passedSince() < config.disappearingDelay.seconds)
+
     private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE || hasHeldAxe
 
     private var lastAxeHeldTime: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -91,7 +91,7 @@ object ForagingTracker {
         if (config.showWholeTrees && wholeTreesFelled > 0.0) {
             val preambleFormat = "Whole $baseFormat"
             val wholeRenderable = Renderable.hoverTips(
-                StringRenderable("§e$preambleFormat ${wholeTreesFelled.addSeparators()}"),
+                Renderable.text("§e$preambleFormat ${wholeTreesFelled.addSeparators()}"),
                 tips = bucketData.wholeTreesCut.mapNotNull { (treeType, count) ->
                     if (count <= 0.0) return@mapNotNull null
                     "§7Whole $treeType Trees cut: §a${count.addSeparators()}"
@@ -101,7 +101,7 @@ object ForagingTracker {
         }
 
         val totalRenderable = Renderable.hoverTips(
-            StringRenderable("§e$baseFormat ${treesContributedTo.addSeparators()}"),
+            Renderable.text("§e$baseFormat ${treesContributedTo.addSeparators()}"),
             tips = bucketData.treesCut.mapNotNull { (treeType, count) ->
                 if (count <= 0) return@mapNotNull null
                 "$treeType Tree contributions: §a${count.addSeparators()}"
