@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -71,7 +72,7 @@ class SkyblockGuideHighlightFeature private constructor(
     @SkyHanniModule
     companion object {
 
-        private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuideConfig
+        private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuide
 
         private val objectList = mutableListOf<SkyblockGuideHighlightFeature>()
 
@@ -157,7 +158,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
         init {
             SkyblockGuideHighlightFeature(
-                { SkyHanniMod.feature.inventory.highlightMissingSkyBlockLevelGuide },
+                { SkyHanniMod.feature.inventory.skyblockGuide.missingTasks },
                 "level.guide",
                 ".*Guide ➜.*",
                 xPattern,
@@ -271,6 +272,19 @@ class SkyblockGuideHighlightFeature private constructor(
                 "Attribute Menu",
                 "§7Enabled: §cNo",
             )
+        }
+    }
+
+    private val massMigrations = mapOf(
+        "inventory.skyblockGuideConfig" to "inventory.skyblockGuide",
+        "inventory.highlightMissingSkyBlockLevelGuide" to "inventory.skyblockGuide.missingTasks",
+        "inventory.powerStoneGuide" to "inventory.skyblockGuide.powerStone",
+    )
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        massMigrations.forEach { (oldPath, newPath) ->
+            event.move(97, oldPath, newPath)
         }
     }
 }

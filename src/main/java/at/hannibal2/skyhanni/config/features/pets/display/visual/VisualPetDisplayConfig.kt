@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.renderables.OrbitDirection
+import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion

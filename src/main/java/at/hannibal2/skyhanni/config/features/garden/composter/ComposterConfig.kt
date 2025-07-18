@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.composter
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import com.google.gson.annotations.Expose
@@ -47,15 +46,11 @@ class ComposterConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 20_000f, minStep = 1000f)
     val minimumOrganicMatter: Property<Double> = Property.of(1_000.0)
 
-    enum class RetrieveFromEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1
-    ) : HasLegacyId {
-        BAZAAR("Bazaar", 0),
-        SACKS("Sacks", 1),
+    enum class RetrieveFromEntry(private val displayName: String) {
+        BAZAAR("Bazaar"),
+        SACKS("Sacks"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

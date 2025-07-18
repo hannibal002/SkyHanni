@@ -4,12 +4,18 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.compat.Text
 import java.awt.Color
+//#if MC > 1.21
+//$$ import net.minecraft.text.MutableText
+//#endif
 
 class ExtendedChatColor(
     val rgb: Int,
     val hasAlpha: Boolean = false,
 ) {
+    constructor(hex: String, hasAlpha: Boolean = false) : this(ColorUtils.getColorFromHex(hex), hasAlpha)
+
     override fun toString(): String {
         val stringBuilder = StringBuilder()
         val hexCode = rgb.toUInt().toString(16)
@@ -21,6 +27,14 @@ class ExtendedChatColor(
         }
         stringBuilder.append("§/")
         return stringBuilder.toString()
+    }
+
+    fun asText(): Text {
+        //#if MC < 1.21
+        return Text.of(this.toString())
+        //#else
+        //$$ return (Text.of("") as MutableText).withColor(rgb)
+        //#endif
     }
 
     @SkyHanniModule

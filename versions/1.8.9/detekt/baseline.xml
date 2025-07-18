@@ -26,7 +26,6 @@
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
-    <ID>InjectDispatcher:ChangelogViewer.kt$ChangelogViewer$IO</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
     <ID>LargeClass:WorldRenderUtils.kt$WorldRenderUtils</ID>
@@ -34,13 +33,13 @@
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
-    <ID>LongMethod:RepoManager.kt$RepoManager$private fun doTheFetching(command: Boolean)</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
     <ID>LoopWithTooManyJumpStatements:DataWatcherApi.kt$DataWatcherApi$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenComposterInventoryFeatures.kt$GardenComposterInventoryFeatures$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenVisitorFeatures.kt$GardenVisitorFeatures$for</ID>
+    <ID>LoopWithTooManyJumpStatements:HighlightMissingRepoItems.kt$HighlightMissingRepoItems$for</ID>
     <ID>LoopWithTooManyJumpStatements:IslandAreas.kt$IslandAreas$for</ID>
     <ID>LoopWithTooManyJumpStatements:ItemResolutionQuery.kt$ItemResolutionQuery.Companion$for</ID>
     <ID>LoopWithTooManyJumpStatements:RiftBloodEffigies.kt$RiftBloodEffigies$for</ID>
@@ -63,7 +62,6 @@
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
     <ID>NoNameShadowing:RenderableUtils.kt$RenderableUtils${ it != null }</ID>
     <ID>NoNameShadowing:ReplaceRomanNumerals.kt$ReplaceRomanNumerals${ it.isValidRomanNumeral() &amp;&amp; it.removeFormatting().romanToDecimal() != 2000 }</ID>
-    <ID>NoNameShadowing:RepoManager.kt$RepoManager${ unsuccessfulConstants.add(it) }</ID>
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
@@ -129,8 +127,6 @@
     <ID>RepoPatternRegexTestMissing:HalloweenBasketWaypoints.kt$HalloweenBasketWaypoints$by patternGroup.pattern( "main.scoreboard.halloween", "^§6Halloween \\d+$", )</ID>
     <ID>RepoPatternRegexTestMissing:HighlightPlaceableNpcs.kt$HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
     <ID>RepoPatternRegexTestMissing:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "mayhem", "§b§lMAYHEM! §r§7(?&lt;perk&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTestMissing:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "perk.notunlocked", "(?:§.)*Requires.*|.*Mountain!|(?:§.)*Click to unlock!|", )</ID>
-    <ID>RepoPatternRegexTestMissing:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "skymall", "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?&lt;perk&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:HypixelData.kt$HypixelData$by patternGroup.pattern( "lobbytype", "(?&lt;lobbyType&gt;.*lobby)\\d+", )</ID>
     <ID>RepoPatternRegexTestMissing:HypixelData.kt$HypixelData$by patternGroup.pattern( "servername.connection", "(?&lt;prefix&gt;.+\\.)?hypixel\\.net", )</ID>
     <ID>RepoPatternRegexTestMissing:InquisitorWaypointShare.kt$InquisitorWaypointShare$by patternGroup.pattern( "died", "(?&lt;party&gt;§9Party §8&gt; )?(?&lt;playerName&gt;.*)§f: §rInquisitor dead!", )</ID>
@@ -200,7 +196,6 @@
     <ID>RepoPatternRegexTestMissing:UpgradeReminder.kt$UpgradeReminder$by patternGroup.pattern( "started", "§eYou started the §r§a(?&lt;upgrade&gt;.+) §r§eupgrade!", )</ID>
     <ID>RepoPatternRegexTestMissing:UtilsPatterns.kt$UtilsPatterns$by RepoPattern.pattern( "string.isroman", "^M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})", )</ID>
     <ID>RepoPatternRegexTestMissing:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.amount.behind", "(?&lt;name&gt;(?:§.)*(?:[^§] ?)+)(?:§8x(?&lt;amount&gt;[\\d,]+))?", )</ID>
-    <ID>RepoPatternRegexTestMissing:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.amount.front", "(?: +§8(?:\\+§.)?(?&lt;amount&gt;[\\d.,]+[km]?)x? )?(?&lt;name&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.name.potion", ".*Potion", )</ID>
     <ID>RepoPatternRegexTestMissing:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.neuitems.enchantmentname", "^(?&lt;format&gt;(?:§.)*)(?&lt;name&gt;[^§]+) (?&lt;level&gt;[IVXL]+)(?: Book)?$", )</ID>
     <ID>RepoPatternRegexTestMissing:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "string.playerchat", "(?&lt;important&gt;.*?)(?:§[f7r])*: .*", )</ID>
@@ -304,7 +299,6 @@
     <ID>UnsafeCallOnNullableType:RenderEntityOutlineEvent.kt$RenderEntityOutlineEvent$entitiesToChooseFrom!!</ID>
     <ID>UnsafeCallOnNullableType:RenderEntityOutlineEvent.kt$RenderEntityOutlineEvent$entitiesToOutline!!</ID>
     <ID>UnsafeCallOnNullableType:RenderGlobalHook.kt$RenderGlobalHook$camera!!</ID>
-    <ID>UnsafeCallOnNullableType:RepoUtils.kt$RepoUtils$file!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[2]!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[3]!!</ID>

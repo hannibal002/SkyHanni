@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
@@ -41,7 +40,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.line
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlinx.coroutines.launch
 
 @SkyHanniModule
@@ -195,9 +196,9 @@ object CropMoneyDisplay {
                 ChatUtils.debug(message)
                 ready = false
                 loaded = false
-                return Renderable.string("§eStill Loading...")
+                return Renderable.text("§eStill Loading...")
             }
-            return Renderable.string("§cFarm crops to add them to this list!")
+            return Renderable.text("§cFarm crops to add them to this list!")
         }
         val cropList = createDescendingCropList(moneyPerHour)
         return Renderable.vertical {
@@ -238,7 +239,7 @@ object CropMoneyDisplay {
         val isCurrent = crop == GardenApi.getCurrentlyFarmedCrop()
         if (number > config.showOnlyBest && (!config.showCurrent || !isCurrent)) return null
 
-        return line {
+        return Renderable.horizontal {
             if (!config.compact) {
                 addString("§7$number# ")
             }
@@ -396,9 +397,6 @@ object CropMoneyDisplay {
         event.move(3, "garden.moneyPerHourDicer", "garden.moneyPerHours.dicer")
         event.move(3, "garden.moneyPerHourHideTitle", "garden.moneyPerHours.hideTitle")
         event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHours.pos")
-        event.transform(11, "garden.moneyPerHours.customFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, CustomFormatEntry::class.java)
-        }
     }
 
     private fun CropMoneyData.toPrices(): List<Double> {

@@ -266,6 +266,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
     PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
+    STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
@@ -294,8 +295,9 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
             UpdateKeybinds.keybinds.add(extraPath)
         }
         //#endif
-        if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
-            return GuiOptionEditorBlocked(default)
+
+        EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
+            return GuiOptionEditorBlocked(default, extraMessage)
         }
 
         if (PlatformUtils.IS_LEGACY) {

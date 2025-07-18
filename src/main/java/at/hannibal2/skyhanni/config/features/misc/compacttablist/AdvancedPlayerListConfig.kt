@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.misc.compacttablist
 
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -12,19 +11,15 @@ class AdvancedPlayerListConfig {
     @ConfigEditorDropdown
     var playerSortOrder: PlayerSortEntry = PlayerSortEntry.RANK
 
-    enum class PlayerSortEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        RANK("Rank (Default)", 0),
-        SB_LEVEL("SB Level", 1),
-        NAME("Name (Abc)", 2),
-        PROFILE_TYPE("Ironman/Bingo", 3),
-        SOCIAL_STATUS("Party/Friends/Guild", 4),
-        RANDOM("Random", 5),
+    enum class PlayerSortEntry(private val displayName: String) {
+        RANK("Rank (Default)"),
+        SB_LEVEL("SB Level"),
+        NAME("Name (Abc)"),
+        PROFILE_TYPE("Ironman/Bingo"),
+        SOCIAL_STATUS("Party/Friends/Guild"),
+        RANDOM("Random"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

@@ -26,17 +26,17 @@ import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.renderables.CircularContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.OrbitDirection
-import at.hannibal2.skyhanni.utils.renderables.OrbitSystemRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
+import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
+import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
+import at.hannibal2.skyhanni.utils.renderables.animated.OrbitSystemRenderable.Companion.orbitalSystem
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.decorators.CircularContainerRenderable.Companion.circularContainer
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.EnumFacing
 import java.util.UUID
@@ -102,7 +102,7 @@ object CurrentPetDisplay {
         )
 
         val shouldUseXpRing = backgroundEnabled && xpRingEnabled
-        val xpRingWrappedRenderable = if (!shouldUseXpRing) separatorWrappedRenderable else CircularContainerRenderable(
+        val xpRingWrappedRenderable = if (!shouldUseXpRing) separatorWrappedRenderable else Renderable.circularContainer(
             separatorWrappedRenderable,
             backgroundColor = config.visual.xpRingCustomization.filledColor.get(),
             unfilledColor = config.visual.xpRingCustomization.unfilledColor.get(),
@@ -127,7 +127,7 @@ object CurrentPetDisplay {
                     OrbitDirection.NONE -> 0
                     else -> expShareConfig.subOrbit.orbitSpeed.get().toInt()
                 }
-                OrbitSystemRenderable(
+                Renderable.orbitalSystem(
                     this,
                     subBodySpacing = expShareConfig.subOrbit.orbitDistance.get(),
                     orbitSpeed = orbitSpeed,
@@ -138,13 +138,13 @@ object CurrentPetDisplay {
             else -> {
                 val expShareOrientation: EXPShareGO = expShareConfig.displayCustomization.groupOrientation.get()
                 val expShareContainer = when (expShareOrientation) {
-                    EXPShareGO.VERTICAL -> VerticalContainerRenderable(
+                    EXPShareGO.VERTICAL -> Renderable.vertical(
                         expShareRenderables,
                         spacing = expShareConfig.displayCustomization.iconSpacing.get(),
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                     )
-                    EXPShareGO.HORIZONTAL -> HorizontalContainerRenderable(
+                    EXPShareGO.HORIZONTAL -> Renderable.horizontal(
                         expShareRenderables,
                         spacing = expShareConfig.displayCustomization.iconSpacing.get(),
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -159,8 +159,8 @@ object CurrentPetDisplay {
                 }
 
                 when (placement) {
-                    EXPSharePlace.TOP, EXPSharePlace.BOTTOM -> VerticalContainerRenderable(orderedList, spacing = 2)
-                    EXPSharePlace.LEFT, EXPSharePlace.RIGHT -> HorizontalContainerRenderable(orderedList, spacing = 2)
+                    EXPSharePlace.TOP, EXPSharePlace.BOTTOM -> Renderable.vertical(orderedList, spacing = 2)
+                    EXPSharePlace.LEFT, EXPSharePlace.RIGHT -> Renderable.horizontal(orderedList, spacing = 2)
                     else -> this
                 }
             }
@@ -195,7 +195,7 @@ object CurrentPetDisplay {
         enabled: Boolean,
         backgroundConfig: RarityBackgroundConfig,
         rarity: LorenzRarity,
-    ): Renderable = if (!enabled) this else CircularContainerRenderable(
+    ): Renderable = if (!enabled) this else Renderable.circularContainer(
         this,
         rarity.getRarityBackgroundColor(backgroundConfig),
         padding = backgroundConfig.padding.get(),
@@ -204,7 +204,7 @@ object CurrentPetDisplay {
     private fun Renderable.wrapInRingOrSelf(
         enabled: Boolean,
         ringConfig: VisualPetDisplayConfig.RingConfig,
-    ): Renderable = if (!enabled) this else CircularContainerRenderable(
+    ): Renderable = if (!enabled) this else Renderable.circularContainer(
         this,
         ringConfig.color.get(),
         padding = ringConfig.padding.get(),
@@ -216,7 +216,7 @@ object CurrentPetDisplay {
         petItemConfig: VisualPetDisplayConfig.PetItemConfig,
     ): Renderable {
         if (!enabled) return this
-        val petItemRenderable = ItemStackRenderable(
+        val petItemRenderable = Renderable.item(
             petData.heldItemInternalName?.getItemStackOrNull() ?: return this,
             scale = petItemConfig.scale.get().toDouble(),
             horizontalAlign = petItemConfig.placement.get().horizontal,
@@ -235,7 +235,7 @@ object CurrentPetDisplay {
         val degreesPerSecond = if (spinDirection != OrbitDirection.NONE) ((360 / spinFrequency) * spinMultiplier) else 0.0f
         val itemStack = getItemStackOrNull()
             ?: ErrorManager.skyHanniError("Could not generate an item stack for pet!")
-        return AnimatedItemStackRenderable(
+        return Renderable.animatedItemStack(
             frames = getAnimatedItemStackSequence(
                 firstFrameOnly = !skinAnimation
             ) ?: listOf(ItemStackAnimationFrame(itemStack)),
@@ -247,7 +247,7 @@ object CurrentPetDisplay {
         )
     }
 
-    private fun PetData.buildTextRenderableOrNull(): Renderable? = VerticalContainerRenderable(
+    private fun PetData.buildTextRenderableOrNull(): Renderable? = Renderable.vertical(
         buildList {
             val enabledTexts = config.text.enabledTexts.get().takeIfNotEmpty() ?: return null
             enabledTexts.mapNotNull {
@@ -321,8 +321,8 @@ object CurrentPetDisplay {
                 TLO.BOTTOM, TLO.RIGHT -> listOf(itemRenderable, textRenderable)
             }
             when (textLocation) {
-                TLO.TOP, TLO.BOTTOM -> VerticalContainerRenderable(orderedList, spacing = 2)
-                TLO.LEFT, TLO.RIGHT -> HorizontalContainerRenderable(orderedList, spacing = 2)
+                TLO.TOP, TLO.BOTTOM -> Renderable.vertical(orderedList, spacing = 2)
+                TLO.LEFT, TLO.RIGHT -> Renderable.horizontal(orderedList, spacing = 2)
             }
         } else listOf(textRenderable, itemRenderable).firstOrNull { it != null }
     }
@@ -334,8 +334,8 @@ object CurrentPetDisplay {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
+    fun onRenderOverlay() {
         if (RiftApi.inRift() || !config.enabled.get()) return
         val currentPet = CurrentPetApi.currentPet ?: run {
             lastPetHash = 0

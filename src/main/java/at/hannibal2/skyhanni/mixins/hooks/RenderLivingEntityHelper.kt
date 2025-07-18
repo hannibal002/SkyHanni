@@ -42,8 +42,9 @@ object RenderLivingEntityHelper {
 
     fun check() {
         areMobsHighlighted = false
-        for (entry in entityColorCondition) {
-            if (entry.value.invoke()) {
+        val conditions = entityColorCondition.values
+        for (entry in conditions) {
+            if (entry.invoke()) {
                 areMobsHighlighted = true
                 return
             }

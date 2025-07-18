@@ -31,12 +31,11 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 //#if MC > 1.21
-//$$ import net.minecraft.entity.attribute.EntityAttributes
-//$$ import net.minecraft.entity.player.PlayerInventory
 //$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.EquipmentSlot
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
-
 //#endif
 
 @SkyHanniModule
@@ -171,11 +170,12 @@ object EntityUtils {
     //#else
     //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
     //$$     if (this !is PlayerEntity) return null
-    //$$     val list = mutableListOf<ItemStack?>()
-    //$$     for (equipmentSlot in PlayerInventory.EQUIPMENT_SLOTS.values) {
-    //$$         list.add(inventory.equipment.get(equipmentSlot).orNull())
-    //$$     }
-    //$$     return list.normalizeAsArray()
+    //$$     return buildList {
+    //$$         add(inventory.equipment.get(EquipmentSlot.FEET).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.LEGS).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.CHEST).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.HEAD).orNull())
+    //$$     }.normalizeAsArray()
     //$$ }
     //#endif
 
