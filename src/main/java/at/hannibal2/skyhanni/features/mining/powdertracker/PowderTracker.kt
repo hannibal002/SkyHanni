@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -17,8 +16,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -156,7 +153,7 @@ object PowderTracker {
         @Expose
         var totalHardStoneCompacted = 0
 
-        // TODO remove this field and transform this in to a ItemProfitTracker
+        // TODO remove this field and transform this into a ItemProfitTracker
         @Expose
         var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
     }
@@ -262,9 +259,6 @@ object PowderTracker {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.powderTrackerConfig", "mining.powderTracker")
         event.transform(8, "#profile.powderTracker") { old -> old.asJsonObject.get("0") }
-        event.transform(11, "mining.powderTracker.textFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, PowderDisplayEntry::class.java)
-        }
 
         event.transform(20, "mining.powderTracker.textFormat") { element ->
             val newList = JsonArray()
@@ -461,7 +455,7 @@ object PowderTracker {
         val perMin: MutableList<Long>,
     )
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isCurrent() && config.enabled
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

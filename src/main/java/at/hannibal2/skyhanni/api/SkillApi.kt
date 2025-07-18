@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSkillLevelJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
@@ -13,8 +15,6 @@ import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_50
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateLevelXP
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevelExact
@@ -49,7 +49,7 @@ object SkillApi {
      */
     private val skillPercentPattern by patternGroup.pattern(
         "skill.percent",
-        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.]+)%\\)",
+        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.,]+)%\\)",
     )
 
     /**
@@ -92,8 +92,8 @@ object SkillApi {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
@@ -148,7 +148,7 @@ object SkillApi {
 
     @HandleEvent
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.readConstant<NeuSkillLevelJson>("leveling")
+        val data = event.getConstant<NeuSkillLevelJson>("leveling")
 
         levelArray = data.levelingXP
         levelingMap = levelArray.withIndex().associate { (index, xp) -> (index + 1) to xp }
@@ -185,7 +185,7 @@ object SkillApi {
     private fun onUpdateMax(progress: String, skill: SkillType, skillInfo: SkillInfo, skillLevel: Int) {
         val totalXP = progress.formatLong()
         val cap = skill.maxLevel
-        val maxXP = if (cap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
+        val maxXP = xpRequiredForLevel(cap)
         val currentXP = totalXP - maxXP
         val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = calculateSkillLevel(totalXP, cap)
 
@@ -323,11 +323,7 @@ object SkillApi {
     private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXP: Long, maxXP: Long, totalXP: Long, gained: String) {
         val cap = activeSkill?.maxLevel
         val add = cap?.takeIf { level >= it }?.let {
-            when (it) {
-                50 -> XP_NEEDED_FOR_50
-                60 -> XP_NEEDED_FOR_60
-                else -> 0
-            }
+            xpRequiredForLevel(it)
         } ?: 0
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) =
@@ -380,7 +376,8 @@ object SkillApi {
         storage?.set(skillType, skillInfo)
     }
 
-    fun onCommand(it: Array<String>) {
+    @Suppress("ReturnCount")
+    private fun onCommand(it: Array<String>) {
         if (it.isEmpty()) {
             commandHelp()
             return
@@ -474,18 +471,6 @@ object SkillApi {
         commandHelp()
     }
 
-    fun onComplete(strings: Array<String>): List<String> {
-        return when (strings.size) {
-            1 -> listOf("levelwithxp", "xpforlevel", "goal")
-            2 -> if (strings[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
-                strings,
-                SkillType.entries.map { it.displayName },
-            ) else listOf()
-
-            else -> listOf()
-        }
-    }
-
     private fun commandHelp() {
         ChatUtils.chat(
             listOf(
@@ -524,4 +509,24 @@ object SkillApi {
         var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
         var timeActive: Long = 0L,
     )
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shskills") {
+            description = "Skills XP/Level related command"
+            category = CommandCategory.USERS_ACTIVE
+            callback { onCommand(it) }
+            autoComplete { args ->
+                when (args.size) {
+                    1 -> listOf("levelwithxp", "xpforlevel", "goal")
+                    2 -> if (args[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
+                        args,
+                        SkillType.entries.map { it.displayName },
+                    ) else listOf()
+
+                    else -> listOf()
+                }
+            }
+        }
+    }
 }

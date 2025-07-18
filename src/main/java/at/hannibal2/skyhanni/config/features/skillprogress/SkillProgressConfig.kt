@@ -16,12 +16,12 @@ class SkillProgressConfig {
     @ConfigOption(name = "Enabled", desc = "Show the Skill Progress Display.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Text Alignment", desc = "Align the display text with the progress bar.")
     @ConfigEditorDropdown
-    var textAlignmentProperty: Property<TextAlignment> = Property.of(
+    val textAlignmentProperty: Property<TextAlignment> = Property.of(
         TextAlignment.CENTERED
     )
 
@@ -43,66 +43,66 @@ class SkillProgressConfig {
     @Expose
     @ConfigOption(name = "Always Show", desc = "Always show the skill progress.")
     @ConfigEditorBoolean
-    var alwaysShow: Property<Boolean> = Property.of(false)
+    val alwaysShow: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Show Action left", desc = "Show action left until you reach the next level.")
     @ConfigEditorBoolean
-    var showActionLeft: Property<Boolean> = Property.of(false)
+    val showActionLeft: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Use percentage", desc = "Use percentage instead of XP.")
     @ConfigEditorBoolean
-    var usePercentage: Property<Boolean> = Property.of(false)
+    val usePercentage: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Use Icon", desc = "Show the skill icon in the display.")
     @ConfigEditorBoolean
-    var useIcon: Property<Boolean> = Property.of(true)
+    val useIcon: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Use Skill Name", desc = "Show the skill name in the display.")
     @ConfigEditorBoolean
-    var useSkillName: Property<Boolean> = Property.of(false)
+    val useSkillName: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Show Level", desc = "Show your current level in the display.")
     @ConfigEditorBoolean
-    var showLevel: Property<Boolean> = Property.of(true)
+    val showLevel: Property<Boolean> = Property.of(true)
 
     @Expose
     @Category(name = "Progress Bar", desc = "Progress Bar Config.")
-    var skillProgressBarConfig: SkillProgressBarConfig = SkillProgressBarConfig()
+    val skillProgressBarConfig: SkillProgressBarConfig = SkillProgressBarConfig()
 
     @Expose
     @Category(name = "Overflow", desc = "Overflow Config.")
-    var overflowConfig: SkillOverflowConfig = SkillOverflowConfig()
+    val overflowConfig: SkillOverflowConfig = SkillOverflowConfig()
 
     @Expose
     @Category(name = "Custom Goal", desc = "Define a custom goal for each skills.")
-    var customGoalConfig: CustomGoalConfig = CustomGoalConfig()
+    val customGoalConfig: CustomGoalConfig = CustomGoalConfig()
 
     @Expose
     @Category(name = "All Skill Display", desc = "All Skill Display Config.")
-    var allSkillDisplayConfig: AllSkillDisplayConfig = AllSkillDisplayConfig()
+    val allSkillDisplayConfig: AllSkillDisplayConfig = AllSkillDisplayConfig()
 
     @Expose
     @Category(name = "ETA Display", desc = "ETA Display Config.")
-    var skillETADisplayConfig: SkillETADisplayConfig = SkillETADisplayConfig()
+    val skillETADisplayConfig: SkillETADisplayConfig = SkillETADisplayConfig()
 
     @Expose
     @ConfigLink(owner = SkillProgressConfig::class, field = "enabled")
-    var displayPosition: Position = Position(384, -105)
+    val displayPosition: Position = Position(384, -105)
 
     @Expose
     @ConfigLink(owner = SkillProgressBarConfig::class, field = "enabled")
-    var barPosition: Position = Position(384, -87)
+    val barPosition: Position = Position(384, -87)
 
     @Expose
     @ConfigLink(owner = AllSkillDisplayConfig::class, field = "enabled")
-    var allSkillPosition: Position = Position(5, 209)
+    val allSkillPosition: Position = Position(5, 209)
 
     @Expose
     @ConfigLink(owner = SkillETADisplayConfig::class, field = "enabled")
-    var etaPosition: Position = Position(5, 155)
+    val etaPosition: Position = Position(5, 155)
 }

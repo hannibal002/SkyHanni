@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.utils.guide
 
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import net.minecraft.client.gui.Gui
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import net.minecraft.item.ItemStack
 
 class GuideTab(
@@ -49,13 +50,13 @@ class GuideTab(
             override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT
             override val verticalAlign: VerticalAlignment = VerticalAlignment.TOP
 
-            val itemRender = Renderable.itemStack(
+            val itemRender = Renderable.item(
                 item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER
             )
 
-            override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, selectColor)
-                itemRender.renderXYAligned(posX, posY, width, height)
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                GuiRenderUtils.drawRect(0, 0, width, height, selectColor)
+                itemRender.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
             }
         },
         tips = listOf(tip),
@@ -65,7 +66,7 @@ class GuideTab(
         }
     )
 
-    fun render(posX: Int, posY: Int) {
-        renderable.render(posX, posY)
+    fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+        renderable.render(mouseOffsetX, mouseOffsetY)
     }
 }

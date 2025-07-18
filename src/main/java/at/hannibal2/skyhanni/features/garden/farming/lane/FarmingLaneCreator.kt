@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -11,8 +13,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
@@ -120,6 +122,15 @@ object FarmingLaneCreator {
         potentialEnd?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor(), beacon = true)
             event.drawDynamicText(it, "potentialEnd", 1.5)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shlanedetection") {
+            description = "Detect a farming lane in the Garden"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { commandLaneDetection() }
         }
     }
 

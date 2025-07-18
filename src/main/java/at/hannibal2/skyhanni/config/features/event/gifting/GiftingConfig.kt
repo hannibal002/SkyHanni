@@ -10,15 +10,15 @@ class GiftingConfig {
     @Expose
     @ConfigOption(name = "Gift Profit Tracker", desc = "")
     @Accordion
-    var giftProfitTracker: GiftTrackerConfig = GiftTrackerConfig()
+    val giftProfitTracker: GiftTrackerConfig = GiftTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Unique Gifting Opportunities", desc = "Highlight players who you haven't given gifts to yet.")
     @Accordion
-    var giftingOpportunities: GiftingOpportunitiesConfig = GiftingOpportunitiesConfig()
+    val giftingOpportunities: GiftingOpportunitiesConfig = GiftingOpportunitiesConfig()
 
     @Expose
     @ConfigOption(name = "Unique Gift Counter", desc = "Keep track of how many unique players you have given gifts to.")
     @Accordion
-    var uniqueGiftCounter: UniqueGiftConfig = UniqueGiftConfig()
+    val uniqueGiftCounter: UniqueGiftConfig = UniqueGiftConfig()
 }

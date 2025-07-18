@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.config.features.garden.composter
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ComposterConfig {
     @Expose
@@ -37,25 +38,29 @@ class ComposterConfig {
     @ConfigEditorDropdown
     var retrieveFrom: RetrieveFromEntry = RetrieveFromEntry.SACKS
 
-    enum class RetrieveFromEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1
-    ) : HasLegacyId {
-        BAZAAR("Bazaar", 0),
-        SACKS("Sacks", 1),
+    @Expose
+    @ConfigOption(
+        name = "Minimum Item Organic Matter",
+        desc = "Change the minimum amount of organic matter items on the organic matter overlay have."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 20_000f, minStep = 1000f)
+    val minimumOrganicMatter: Property<Double> = Property.of(1_000.0)
+
+    enum class RetrieveFromEntry(private val displayName: String) {
+        BAZAAR("Bazaar"),
+        SACKS("Sacks"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    var overlayOrganicMatterPos: Position = Position(140, 152)
+    val overlayOrganicMatterPos: Position = Position(140, 152)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    var overlayFuelExtrasPos: Position = Position(-320, 152)
+    val overlayFuelExtrasPos: Position = Position(-320, 152)
 
     @Expose
     @ConfigOption(name = "Composter Display", desc = "Display the Composter data from the tab list as GUI element.")
@@ -109,13 +114,13 @@ class ComposterConfig {
     @Expose
     @ConfigOption(name = "Notification When Low Composter", desc = "")
     @Accordion
-    var notifyLow: NotifyLowConfig = NotifyLowConfig()
+    val notifyLow: NotifyLowConfig = NotifyLowConfig()
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "displayEnabled")
-    var displayPos: Position = Position(-390, 10)
+    val displayPos: Position = Position(-390, 10)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "displayEnabled")
-    var outsideGardenPos: Position = Position(-363, 13)
+    val outsideGardenPos: Position = Position(-363, 13)
 }

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
-import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.compat.createWitherSkeleton
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RendererLivingEntity
@@ -138,11 +138,11 @@ object HolographicEntities {
 
     private fun interpolateRotation(last: Float, next: Float, progress: Float): Float {
         var direction: Float = next - last
-        while (direction < -180.0f) {
-            direction += 360.0f
+        while (direction < -180f) {
+            direction += 360f
         }
-        while (direction >= 180.0f) {
-            direction -= 360.0f
+        while (direction >= 180f) {
+            direction -= 360f
         }
         return last + progress * direction
     }
@@ -168,7 +168,7 @@ object HolographicEntities {
         if (!renderer.bindEntityTexture_skyhanni(entity)) return
 
         GlStateManager.pushMatrix()
-        val viewerPosition = getViewerPos(partialTicks)
+        val viewerPosition = WorldRenderUtils.getViewerPos(partialTicks)
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
         val renderingOffset = mobPosition - viewerPosition
         GlStateManager.translate(renderingOffset.x.toFloat(), renderingOffset.y.toFloat(), renderingOffset.z.toFloat())
@@ -183,7 +183,7 @@ object HolographicEntities {
         val headPitch = 0F
         val scaleFactor = 0.0625f
         renderer.setBrightness_skyhanni(entity, 0f, true)
-        GlStateManager.color(1.0f, 1.0f, 1.0f, holographicness)
+        GlStateManager.color(1f, 1f, 1f, holographicness)
         GlStateManager.depthMask(false)
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)

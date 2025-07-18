@@ -1,15 +1,27 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.util.Vec3
+import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.item.ItemStack
+import java.nio.FloatBuffer
 //#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
+//$$ import org.joml.Matrix4f
+//$$ import org.joml.Quaternionf
 //#endif
 
 /**
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
  */
 object DrawContextUtils {
+
+    // GL11.GL_MODELVIEW_MATRIX
+    const val GL_MODELVIEW_MATRIX = 2982
+    // GL11.GL_PROJECTION_MATRIX
+    const val GL_PROJECTION_MATRIX = 2983
+    // GL11.GL_CURRENT_COLOR
+    const val GL_CURRENT_COLOR = 2816
 
     private var _drawContext: DrawContext? = null
 
@@ -24,8 +36,15 @@ object DrawContextUtils {
     val drawContext: DrawContext
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
-            ErrorManager.skyHanniError("drawContext is null")
+            //#if MC < 1.21
+            ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
+            DrawContext()
+            //#else
+            //$$ ErrorManager.skyHanniError("drawContext is null")
+            //#endif
         }
+
+    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.drawItem(item, x, y)
 
     fun setContext(context: DrawContext) {
         renderDepth++
@@ -34,6 +53,7 @@ object DrawContextUtils {
         }
         _drawContext = context
     }
+
     fun clearContext() {
         if (renderDepth == 1) {
             _drawContext = null
@@ -41,31 +61,110 @@ object DrawContextUtils {
         } else if (renderDepth > 1) {
             renderDepth--
         } else {
-            ErrorManager.skyHanniError("Render depth is negative, something went wrong")
+            ErrorManager.logErrorStateWithData("Error rendering", "Render depth is negative, something went wrong")
         }
     }
 
     fun translate(x: Double, y: Double, z: Double) {
+        //#if MC < 1.21.6
         drawContext.matrices.translate(x, y, z)
+        //#else
+        //$$ drawContext.matrices.translate(x.toFloat(), y.toFloat())
+        //#endif
     }
 
     fun translate(x: Float, y: Float, z: Float) {
+        //#if MC < 1.21.6
         drawContext.matrices.translate(x, y, z)
+        //#else
+        //$$ drawContext.matrices.translate(x, y)
+        //#endif
     }
 
-    fun translate(vec: Vec3) {
-        drawContext.matrices.translate(vec)
+    fun rotate(angle: Float, x: Number, y: Number, z: Number) {
+        val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
+        //#if MC < 1.21
+        GlStateManager.rotate(angle, xf, yf, zf)
+        //#elseif MC < 1.21.6
+        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
+        //#endif
     }
+
+    fun multMatrix(buffer: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.multMatrix(buffer)
+        //#elseif MC < 1.21.6
+        //$$ multMatrix(Matrix4f(buffer))
+        //#endif
+    }
+
+    //#if MC > 1.21
+    //#if MC < 1.21.6
+    //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    //#endif
+    //#endif
 
     fun scale(x: Float, y: Float, z: Float) {
+        //#if MC < 1.21.6
         drawContext.matrices.scale(x, y, z)
+        //#else
+        //$$ drawContext.matrices.scale(x, y)
+        //#endif
     }
 
+    @Deprecated("Use pushPop instead")
     fun pushMatrix() {
+        //#if MC < 1.21.6
         drawContext.matrices.pushMatrix()
+        //#else
+        //$$ drawContext.matrices.pushMatrix()
+        //#endif
     }
 
+    @Deprecated("Use pushPop instead")
     fun popMatrix() {
+        //#if MC < 1.21.6
         drawContext.matrices.popMatrix()
+        //#else
+        //$$ drawContext.matrices.popMatrix()
+        //#endif
+    }
+
+    /**
+     * Push and pop the matrix stack, run the action in between.
+     */
+    @Suppress("DEPRECATION")
+    inline fun pushPop(action: () -> Unit) {
+        pushMatrix()
+        action()
+        popMatrix()
+    }
+
+    /**
+     * Run operations inside a DrawContext translation
+     */
+    inline fun translated(x: Number = 0, y: Number = 0, z: Number = 0, action: () -> Unit) {
+        // TODO: when fully modern, use pushPop instead
+        translate(x.toFloat(), y.toFloat(), z.toFloat())
+        action()
+        translate(-x.toFloat(), -y.toFloat(), -z.toFloat())
+    }
+
+    /**
+     * Run operations inside a DrawContext scale
+     */
+    inline fun scaled(x: Number = 1, y: Number = 1, z: Number = 1, action: () -> Unit) {
+        // TODO: when fully modern, use pushPop instead
+        scale(x.toFloat(), y.toFloat(), z.toFloat())
+        action()
+        scale(1 / x.toFloat(), 1 / y.toFloat(), 1 / z.toFloat())
+    }
+
+    fun loadIdentity() {
+        //#if MC < 1.21.6
+        drawContext.matrices.loadIdentity()
+        //#else
+        //$$ drawContext.matrices.identity()
+        //#endif
     }
 }

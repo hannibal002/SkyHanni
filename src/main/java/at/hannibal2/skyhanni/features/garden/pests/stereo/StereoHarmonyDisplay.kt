@@ -12,13 +12,17 @@ import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -70,17 +74,22 @@ object StereoHarmonyDisplay {
         val vinyl = activeVinyl ?: return@buildList
         val pest = vinyl.getPest()
 
-        val itemStack = pest?.internalName?.getItemStack() ?: questionMarkSkull
-        if (config.showHead.get()) add(Renderable.itemStack(itemStack, 1.67))
-        val list = mutableListOf<Renderable>()
-        val vinylName = vinyl.displayName
-        val pestName = pest?.displayName ?: "None"
-        list.add(Renderable.string("§ePlaying: §a$vinylName"))
-        val pestLine = mutableListOf<Renderable>()
-        pestLine.add(Renderable.string("§ePest: §c$pestName "))
-        if (pest?.crop != null && config.showCrop.get()) pestLine.add(Renderable.itemStack(pest.crop.icon))
-        list.add(Renderable.horizontalContainer(pestLine))
-        add(Renderable.verticalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
+
+        if (config.showHead.get()) {
+            val itemScale = 1.67
+            add(pest?.internalName?.let { Renderable.item(it, itemScale) } ?: Renderable.item(questionMarkSkull))
+        }
+        val displayList = buildList {
+            val vinylName = vinyl.displayName
+            val pestName = pest?.displayName ?: "None"
+            addString("§ePlaying: §a$vinylName")
+            val pestLine = buildList {
+                addString("§ePest: §c$pestName ")
+                if (pest?.crop != null && config.showCrop.get()) addItemStack(pest.crop.icon)
+            }
+            add(Renderable.horizontal(pestLine))
+        }
+        add(Renderable.vertical(displayList, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -103,7 +112,7 @@ object StereoHarmonyDisplay {
         if (activeVinyl == VinylType.NONE && config.hideWhenNone) return
         else if (display.isEmpty()) update()
         if (display.isEmpty()) return
-        val content = Renderable.horizontalContainer(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
+        val content = Renderable.horizontal(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
         val renderables = listOf(content)
         config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
     }

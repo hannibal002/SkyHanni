@@ -19,9 +19,9 @@ class TradeConfig {
 
     @Expose
     @ConfigLink(owner = TradeConfig::class, field = "enabled")
-    var otherPosition: Position = Position(-300, 140)
+    val otherPosition: Position = Position(-300, 140)
 
     @Expose
     @ConfigLink(owner = TradeConfig::class, field = "enabled")
-    var yourPosition: Position = Position(212, 140)
+    val yourPosition: Position = Position(212, 140)
 }

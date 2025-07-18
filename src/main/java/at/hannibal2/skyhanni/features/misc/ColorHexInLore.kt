@@ -4,13 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -57,7 +56,7 @@ object ColorHexInLore {
 
     private fun String.replaceColor(hexCode: String) = replace(hexCode, addColor(hexCode))
 
-    private fun addColor(hexFirst: String): String = ExtendedChatColor(ColorUtils.getColorFromHex(hexFirst), false).toString() + hexFirst
+    private fun addColor(hexFirst: String): String = ExtendedChatColor(hexFirst, false).toString() + hexFirst
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.hexAsColorInLore
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.hexAsColorInLore
 }

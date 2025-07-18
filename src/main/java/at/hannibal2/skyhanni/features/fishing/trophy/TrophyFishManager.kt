@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.event.HoverEvent
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.util.ChatStyle
 
 @SkyHanniModule
@@ -78,8 +78,11 @@ object TrophyFishManager {
             }
         }
         if (changed) {
+            val message = if (PlatformUtils.IS_LEGACY) "Click here to load Trophy Fishing data from NEU PV!"
+            else "Click here to load Trophy Fishing data from SkyBlock Profile Viewer!"
+
             ChatUtils.clickableChat(
-                "Click here to load Trophy Fishing data from NEU PV!",
+                message,
                 onClick = {
                     updateFromNeuPv(savedFishes, neuData)
                 },
@@ -146,11 +149,15 @@ object TrophyFishManager {
             val current = saved[rarity] ?: 0
             if (newValue > current) {
                 saved[rarity] = newValue
-                ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue")
+                val message = if (PlatformUtils.IS_LEGACY) "Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue"
+                else "Updated trophy fishing data from SkyBlock Profile Viewer:  $name $rarity: $current -> $newValue"
+                ChatUtils.debug(message)
             }
         }
         TrophyFishDisplay.update()
-        ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
+        val message = if (PlatformUtils.IS_LEGACY) "Updated Trophy Fishing data via NEU PV!"
+        else "Updated Trophy Fishing data via SkyBlock Profile Viewer!"
+        ChatUtils.chat(message)
     }
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
@@ -165,8 +172,6 @@ object TrophyFishManager {
 
     fun getTooltip(internalName: String): ChatStyle? {
         val display = TrophyFishApi.hoverInfo(internalName) ?: return null
-        return defaultStyleConstructor.setChatHoverEvent(
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, display.asComponent()),
-        )
+        return defaultStyleConstructor.setHoverShowText(display)
     }
 }

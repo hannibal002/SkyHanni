@@ -13,11 +13,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.entity.EntityLivingBase
 import java.awt.Color
 
@@ -29,6 +28,7 @@ object DungeonMobManager {
     private val fel get() = config.fel
 
     private val staredInvisible = mutableSetOf<Mob>()
+    val starredVisibleMobs = mutableSetOf<Mob>()
     private val felOnTheGround = mutableSetOf<Mob>()
     private val felMoving = mutableSetOf<Mob>()
 
@@ -62,6 +62,7 @@ object DungeonMobManager {
             staredInvisible.remove(event.mob)
         }
         handleFelDespawn(event.mob)
+        starredVisibleMobs.remove(event.mob)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
@@ -85,9 +86,8 @@ object DungeonMobManager {
         if (fel.line) {
             val color = getFelColor()
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {
-                event.draw3DLine(
+                event.drawLineToEye(
                     it.baseEntity.getLorenzVec().add(y = 0.15),
-                    event.exactPlayerEyeLocation(),
                     color,
                     3,
                     true,
@@ -147,6 +147,7 @@ object DungeonMobManager {
             return
         }
         mob.highlight(colour)
+        starredVisibleMobs.add(mob)
     }
 
     private fun handleFel(mob: Mob) {

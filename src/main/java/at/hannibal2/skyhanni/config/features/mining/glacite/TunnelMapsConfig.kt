@@ -24,7 +24,7 @@ class TunnelMapsConfig {
 
     @Expose
     @ConfigLink(owner = TunnelMapsConfig::class, field = "enable")
-    var position: Position = Position(20, 20)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
@@ -77,12 +77,12 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(name = "Text Size", desc = "Size of the waypoint texts.")
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.5f, minStep = 0.1f)
-    var textSize: Float = 1.0f
+    var textSize: Float = 1f
 
     @Expose
     @ConfigOption(name = "Path width", desc = "Size of the path lines.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 15f, minStep = 1f)
-    var pathWidth: Float = 4.0f
+    var pathWidth: Float = 4f
 
     @Expose
     @ConfigOption(name = "Distance at First", desc = "Show the distance at the first edge instead of the end.")
@@ -92,10 +92,10 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(name = "Compact Gemstone", desc = "Only show the icon for gemstones in the selection list.")
     @ConfigEditorBoolean
-    var compactGemstone: Property<Boolean> = Property.of(false)
+    val compactGemstone: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Exclude Fairy", desc = "Exclude the fairy soul spots from the selection list.")
     @ConfigEditorBoolean
-    var excludeFairy: Property<Boolean> = Property.of(false)
+    val excludeFairy: Property<Boolean> = Property.of(false)
 }

@@ -16,5 +16,5 @@ class PesthunterShopConfig {
 
     @Expose
     @ConfigLink(owner = PesthunterShopConfig::class, field = "profitEnabled")
-    var profitPosition: Position = Position(160, 120)
+    val profitPosition: Position = Position(160, 120)
 }

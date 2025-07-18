@@ -16,12 +16,12 @@ class LowHealthAlertSoundConfig {
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the alert sound.")
-    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
-    var pitch: Float = 1.0f
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2f, minStep = 0.1f)
+    var pitch: Float = 1f
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    var testSound: Runnable = Runnable(LowHealthAlert::playTestSound)
+    val testSound: Runnable = Runnable(LowHealthAlert::playTestSound)
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")
@@ -30,5 +30,5 @@ class LowHealthAlertSoundConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    var sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 }

@@ -45,7 +45,7 @@ object CrystalNucleusProfitPer {
         }
 
         val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
-        val partsCost = CrystalNucleusApi.getPrecursorRunPrice()
+        val partsCost = CrystalNucleusApi.getPrecursorRunPrice { it.getPrice() }
         totalProfit -= (jungleKeyCost + partsCost)
 
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -14,17 +14,18 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -91,7 +92,7 @@ object GardenVisitorTimer {
         timePattern.firstMatcher(TabListData.getTabList()) {
             val timeInfo = group("info").removeColor()
             if (timeInfo == "Not Unlocked!") {
-                display = Renderable.string("§cVisitors not unlocked!")
+                display = Renderable.text("§cVisitors not unlocked!")
                 return
             }
             if (timeInfo == "Queue Full!") {
@@ -176,7 +177,7 @@ object GardenVisitorTimer {
 
     private fun warn6thVisitor() {
         // do not warn immediately on world switch
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
         if (lastSixthVisitorWarning.passedSince() < 2.minutes) return
         lastSixthVisitorWarning = SimpleTimeMark.now()
@@ -196,7 +197,7 @@ object GardenVisitorTimer {
             outsideInventory = true,
             inOwnInventory = true,
         ) {
-            config.pos.renderRenderable(display, posLabel = "Garden Visitor Timer")
+            config.position.renderRenderable(display, posLabel = "Garden Visitor Timer")
         }
     }
 
@@ -246,5 +247,7 @@ object GardenVisitorTimer {
         event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")
         event.move(3, "garden.visitorTimerSixthVisitorWarning", "garden.visitors.timer.sixthVisitorWarning")
         event.move(3, "garden.visitorTimerPos", "garden.visitors.timer.pos")
+
+        event.move(87, "garden.visitors.timer.pos", "garden.visitors.timer.position")
     }
 }

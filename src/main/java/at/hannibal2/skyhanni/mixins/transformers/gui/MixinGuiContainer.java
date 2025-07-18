@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import at.hannibal2.skyhanni.utils.compat.DrawContext;
+import at.hannibal2.skyhanni.utils.KeyboardManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GuiContainer.class)
+// Changed priority to fix compatibity issues with e.g. Skytils' Middle click GUI Items feature
+@Mixin(value = GuiContainer.class, priority = 499)
 public abstract class MixinGuiContainer extends GuiScreen {
 
     @Unique
@@ -30,7 +31,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
 
     @Inject(method = "keyTyped", at = @At("HEAD"), cancellable = true)
     private void onKeyTyped(char typedChar, int keyCode, CallbackInfo ci) {
-        if (!HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode)) {
+        if (KeyboardManager.checkIsInventoryClosure(keyCode)) {
             ci.cancel();
         }
     }
@@ -65,8 +66,9 @@ public abstract class MixinGuiContainer extends GuiScreen {
         skyHanni$hook.onDrawSlotPost(slot);
     }
 
-    @Inject(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    @Inject(method = "handleMouseClick", at = @At(value = "HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
+        if (slot == null) return;
         skyHanni$hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
     }
 

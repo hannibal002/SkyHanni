@@ -10,11 +10,11 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
@@ -56,7 +56,7 @@ object LogBookStats {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (IslandType.GARDEN_GUEST.isInIsland()) return
+        if (IslandType.GARDEN_GUEST.isCurrent()) return
         val inventoryName = event.inventoryName
         if (inventoryName != "Visitor's Logbook") return
 
@@ -85,15 +85,15 @@ object LogBookStats {
             val accepted = loggedVisitors.values.sumOf { it.sumOf { visitor -> visitor.timesAccepted } }
             val visitingNow = VisitorApi.getVisitors().size
             val denied = visited - accepted - visitingNow
-            add(Renderable.string("§6Times Visited: §b${visited.addSeparators()}"))
-            add(Renderable.string("§6Times Accepted: §a${accepted.addSeparators()}"))
-            add(Renderable.string("§6Times Denied: §c${denied.addSeparators()}"))
+            addString("§6Times Visited: §b${visited.addSeparators()}")
+            addString("§6Times Accepted: §a${accepted.addSeparators()}")
+            addString("§6Times Denied: §c${denied.addSeparators()}")
         }
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (IslandType.GARDEN_GUEST.isInIsland()) return
+        if (IslandType.GARDEN_GUEST.isCurrent()) return
         if (inInventory && config.showLogBookStats) {
             config.logBookStatsPos.renderRenderables(
                 display,

@@ -80,7 +80,7 @@ object RepoPatternManager {
         }
 
     private val localLoading: Boolean
-        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.isUsingBackup
 
     private val logger = LogManager.getLogger("SkyHanni")
 
@@ -271,6 +271,8 @@ object RepoPatternManager {
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
         wasPreInitialized = true
+        // no reason to do this on 1.21
+        //#if FORGE
         val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
         if (dumpDirective.isNullOrBlank()) return
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
@@ -279,6 +281,7 @@ object RepoPatternManager {
             logger.info("Exiting after dumping RepoPattern regex patterns to $path")
             FMLCommonHandler.instance().exitJava(0, false)
         }
+        //#endif
     }
 
     fun of(key: String, fallback: String, parentKeyHolder: RepoPatternKeyOwner? = null): RepoPattern {

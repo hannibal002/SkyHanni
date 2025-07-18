@@ -32,7 +32,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
@@ -142,7 +146,7 @@ object FarmingFortuneDisplay {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return
-        config.pos.renderRenderables(display, posLabel = "True Farming Fortune")
+        config.position.renderRenderables(display, posLabel = "True Farming Fortune")
     }
 
     private fun update() {
@@ -155,9 +159,6 @@ object FarmingFortuneDisplay {
 
     private fun drawDisplay() = buildList {
         val displayCrop = GardenApi.cropInHand ?: currentCrop ?: return@buildList
-
-        val list = mutableListOf<Renderable>()
-        list.add(Renderable.itemStack(displayCrop.icon))
 
         var recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
         val wrongTabCrop = GardenApi.cropInHand != null && GardenApi.cropInHand != currentCrop
@@ -178,25 +179,27 @@ object FarmingFortuneDisplay {
         val latest = if (farmingFortune != -1.0) " latest" else ""
         val wrongTabCropText = "§cBreak §e${GardenApi.cropInHand?.cropName}§c to see" + latest + " fortune!"
 
-        if (!wrongTabCrop || !config.compactFormat) {
-            list.add(Renderable.string(farmingFortuneText + fortuneColorCode + fortuneAmount))
-        } else {
-            list.add(Renderable.hoverTips("$farmingFortuneText§c???", listOf(wrongTabCropText)))
-        }
-
-        add(Renderable.horizontalContainer(list))
+        add(
+            Renderable.horizontal(
+                Renderable.item(displayCrop.icon),
+                if (!wrongTabCrop || !config.compactFormat) {
+                    Renderable.text(farmingFortuneText + fortuneColorCode + fortuneAmount)
+                } else {
+                    Renderable.hoverTips("$farmingFortuneText§c???", listOf(wrongTabCropText))
+                },
+            ),
+        )
 
         if (ffReduction > 0) {
             if (config.compactFormat) {
-                add(Renderable.string("§cPests: §7-§e$ffReduction%"))
+                addString("§cPests: §7-§e$ffReduction%")
             } else {
-                add(Renderable.string("§cPests are reducing your fortune by §e$ffReduction%§c!"))
+                addString("§cPests are reducing your fortune by §e$ffReduction%§c!")
             }
-
         }
 
         if (wrongTabCrop && !config.hideMissingFortuneWarnings && !config.compactFormat) {
-            add(Renderable.string(wrongTabCropText))
+            addString(wrongTabCropText)
         }
     }
 
@@ -408,5 +411,7 @@ object FarmingFortuneDisplay {
         event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
         event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
+
+        event.move(87, "garden.farmingFortunes.pos", "garden.farmingFortunes.position")
     }
 }
