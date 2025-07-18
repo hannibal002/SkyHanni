@@ -42,7 +42,7 @@ class BazaarConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var dailyLimitTracker: Boolean = true
+    var dailyLimitTracker: Boolean = false
 
     @Expose
     @ConfigLink(owner = BazaarConfig::class, field = "dailyLimitTracker")
