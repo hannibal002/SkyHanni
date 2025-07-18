@@ -22,7 +22,7 @@ object ColorfulItemStats {
      * REGEX-FAIL: §7Health: §c+1000❤
      */
     private val genericStat by group.pattern(
-        "generic-new",
+        "generic-stats",
         "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.,%s]+)(?:\\s|$)",
     )
 
