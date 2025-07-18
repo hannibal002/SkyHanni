@@ -17,6 +17,7 @@ import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
+import kotlin.reflect.jvm.javaConstructor
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaGetter
 import kotlin.reflect.typeOf
@@ -40,6 +41,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
     )
 
     @OptIn(ExperimentalStdlibApi::class)
+    @Suppress("UNCHECKED_CAST")
     override fun <T : Any> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
         val kotlinClass = type.rawType.kotlin as KClass<T>
         if (kotlinClass.findAnnotation<KSerializable>() == null) return null
@@ -68,9 +70,12 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 ?: fromField
                 ?: fromGetter
                 ?: param.name!!
-            val internalType = InternalGsonTypes.resolve(type.type, type.rawType, param.type.javaType)
+            val javaType = property.javaField?.genericType
+                ?: property.javaGetter?.genericReturnType
+                ?: param.type.javaType
+            val internalType = InternalGsonTypes.resolve(type.type, type.rawType, javaType)
             val typeToken = TypeToken.get(internalType)
-            val adapter = gson.getDelegateAdapter(this@KotlinTypeAdapterFactory, typeToken) as TypeAdapter<Any?>
+            val adapter = gson.getAdapter(typeToken) as TypeAdapter<Any?>
             val castedProperty = property as KProperty1<Any, Any?>
             ParameterInfo(param, adapter, jsonName, castedProperty)
         }.associateBy { it.name }
@@ -119,7 +124,19 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 if (extraDataParam != null) {
                     args[extraDataParam.first] = extraData
                 }
-                return primaryConstructor.callBy(args)
+                return try { primaryConstructor.callBy(args) } catch(e: IllegalArgumentException) {
+                    // detect the "object is not an instance of declaring class" reflection bug
+                    if (e.message?.contains("object is not an instance of declaring class") == true) {
+                        // fall back to the plain Java constructor
+                        val javaCtor = primaryConstructor.javaConstructor
+                            ?: throw IllegalStateException("No Java constructor for ${type.rawType}")
+                        // Build an ordered array of parameter values
+                        val ordered = primaryConstructor.parameters.map { args[it] /* maybe null ? */ }.toTypedArray()
+                        javaCtor.newInstance(*ordered) as T
+                    } else { // some other bad-arg situation; rethrow
+                        throw e
+                    }
+                }
             }
         }
     }

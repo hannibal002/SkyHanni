@@ -24,7 +24,6 @@ object BaseGsonBuilder {
         .excludeFieldsWithoutExposeAnnotation()
         .serializeSpecialFloatingPointValues()
         .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
-        .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .registerTypeAdapter(UUID::class.java, SkyHanniTypeAdapters.UUID.nullSafe())
         .registerTypeAdapter(NbtBoolean::class.java, SkyHanniTypeAdapters.NBT_BOOLEAN.nullSafe())
         .registerTypeAdapter(LorenzVec::class.java, SkyHanniTypeAdapters.VEC_STRING.nullSafe())
@@ -42,6 +41,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
+        .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .enableComplexMapKeySerialization()
 
     fun lenientGson(): GsonBuilder = gson()
