@@ -23,6 +23,8 @@ object BaseGsonBuilder {
     fun gson(): GsonBuilder = GsonBuilder().setPrettyPrinting()
         .excludeFieldsWithoutExposeAnnotation()
         .serializeSpecialFloatingPointValues()
+        .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
+        .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .registerTypeAdapter(UUID::class.java, SkyHanniTypeAdapters.UUID.nullSafe())
         .registerTypeAdapter(NbtBoolean::class.java, SkyHanniTypeAdapters.NBT_BOOLEAN.nullSafe())
         .registerTypeAdapter(LorenzVec::class.java, SkyHanniTypeAdapters.VEC_STRING.nullSafe())
@@ -40,10 +42,6 @@ object BaseGsonBuilder {
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
-        // These should be placed after the other type adapters, so that when adapters are "queried" for a type token,
-        //  the more specific ones are found first, rather than these generic ones.
-        .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
-        .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .enableComplexMapKeySerialization()
 
     fun lenientGson(): GsonBuilder = gson()
