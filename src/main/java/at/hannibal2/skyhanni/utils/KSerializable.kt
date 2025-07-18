@@ -121,14 +121,17 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 while (reader.peek() != JsonToken.END_OBJECT) {
                     val name = reader.nextName()
                     val paramData = infosByName[name]
-                    if (paramData != null) args[paramData.param] = paramData.adapter.read(reader)
-                    else extraData[name] = jsonElementAdapter.read(reader)
+                    if (paramData == null) {
+                        extraData[name] = jsonElementAdapter.read(reader)
+                        continue
+                    }
+                    val value = paramData.adapter.read(reader)
+                    args[paramData.param] = value
                 }
                 reader.endObject()
-
-                // stash unknowns into the @ExtraData parameter, if requested
-                if (extraParam != null) args[extraParam] = extraData
-                // call the Kotlin ctor (will honor defaults)
+                if (extraParam != null) {
+                    args[extraParam] = extraData
+                }
                 return ctor.callBy(args)
             }
         }
