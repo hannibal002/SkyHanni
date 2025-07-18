@@ -26,11 +26,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -137,11 +136,11 @@ object GemstoneMoneyPerHour {
         val pausedText = if (paused) " §c(PAUSED)"
         else ""
 
-        add(StringRenderable("§d§lGemstone Money per Hour"))
-        add(StringRenderable("§aSelling $gemstoneName §afor §6${gemstonePrice.shortFormat()} §aeach"))
-        add(StringRenderable("§aCoins/hr: §6${moneyPerHour.toInt().shortFormat()}"))
-        add(StringRenderable("§aCoins made: §6${coins.shortFormat()}"))
-        add(StringRenderable("§aUptime: §b${uptime.format()}$pausedText"))
+        addString("§d§lGemstone Money per Hour")
+        addString("§aSelling $gemstoneName §afor §6${gemstonePrice.shortFormat()} §aeach")
+        addString("§aCoins/hr: §6${moneyPerHour.toInt().shortFormat()}")
+        addString("§aCoins made: §6${coins.shortFormat()}")
+        addString("§aUptime: §b${uptime.format()}$pausedText")
         addButtons()
     }
 
@@ -184,7 +183,8 @@ object GemstoneMoneyPerHour {
         display.ifEmpty { updateDisplay() }
         if (display.isNotEmpty()) {
             config.position.renderRenderables(
-                listOf(VerticalContainerRenderable(display, 2)),
+                display,
+                extraSpace = 2,
                 posLabel = "Gemstone Money per Hour Display",
             )
         }

@@ -35,8 +35,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.milliseconds
@@ -143,16 +143,16 @@ object TrophyFishDisplay {
         val hover = TrophyFishApi.hoverInfo(rawName)
         fun string(string: String): Renderable = hover?.let {
             Renderable.hoverTips(
-                StringRenderable(string),
+                Renderable.text(string),
                 tips = it.split("\n"),
             )
-        } ?: StringRenderable(string)
+        } ?: Renderable.text(string)
 
         val row = mutableMapOf<TextPart, Renderable>()
         row[TextPart.NAME] = string(getItemName(rawName))
 
         val internalName = getInternalName(rawName)
-        row[TextPart.ICON] = ItemStackRenderable(internalName.getItemStack())
+        row[TextPart.ICON] = Renderable.item(internalName)
 
         val recentlyDroppedRarity = recentlyDroppedTrophies[internalName]?.takeIf { config.highlightNew.get() }
 

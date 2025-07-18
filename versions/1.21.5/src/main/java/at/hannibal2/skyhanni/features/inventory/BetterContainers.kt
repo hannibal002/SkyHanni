@@ -219,8 +219,10 @@ object BetterContainers {
 
     fun isToggleOn(stack: ItemStack): Boolean = isToggleCommon(stack, "disable")
     fun isToggleOff(stack: ItemStack): Boolean = isToggleCommon(stack, "enable")
-    fun isToggleCommon(stack: ItemStack, verb: String): Boolean =
-        stack.getLore().takeIfNotEmpty()?.last()?.endsWith("Click to $verb!") ?: false
+    fun isToggleCommon(stack: ItemStack, verb: String): Boolean {
+        val hasText = stack.getLore().takeIfNotEmpty()?.last()?.endsWith("Click to $verb!") ?: false
+        return hasText && stack.isDye()
+    }
 
     fun getTextureIdentifier(original: Identifier): Identifier {
         if (!chestOpen) return original
