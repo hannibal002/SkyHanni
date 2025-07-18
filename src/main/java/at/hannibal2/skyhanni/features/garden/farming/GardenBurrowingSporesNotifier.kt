@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object GardenBurrowingSporesNotifier {
@@ -44,11 +44,9 @@ object GardenBurrowingSporesNotifier {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(99, "garden.burrowingSporesNotification", "garden.burrowingSporesNotificationType") {
-            val newProp = runCatching {
-                if (it.asBoolean) GardenConfig.BurrowingSporesNotificationType.BOTH
-                else GardenConfig.BurrowingSporesNotificationType.NONE
-            }.getOrNull() ?: GardenConfig.BurrowingSporesNotificationType.NONE
-            JsonPrimitive(newProp.name)
+            ConfigUtils.migrateBooleanToEnum(
+                it, GardenConfig.BurrowingSporesNotificationType.BOTH, GardenConfig.BurrowingSporesNotificationType.NONE,
+            )
         }
     }
 }
