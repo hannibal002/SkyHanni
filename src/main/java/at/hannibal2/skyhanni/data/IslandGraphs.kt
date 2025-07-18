@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
@@ -284,6 +285,15 @@ object IslandGraphs {
         closestNode = null
     }
 
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (currentIslandGraph == null) return
+        if (event.isMod(2)) {
+            update()
+        }
+        updateFeedback()
+    }
+
     fun update(force: Boolean = false) {
         if (force) {
             pathfindClosestNode = null
@@ -524,10 +534,7 @@ object IslandGraphs {
         if (totalDistance == 0.0 || distance > totalDistance) {
             totalDistance = distance
         }
-        generateNextMessage(distance)
-    }
 
-    private fun generateNextMessage(distance: Double) {
         val percentage = (1 - (distance / totalDistance)) * 100
         val component = "§e[SkyHanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
         component.onClick(
