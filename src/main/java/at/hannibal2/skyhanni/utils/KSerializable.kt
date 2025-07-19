@@ -19,6 +19,7 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaGetter
+import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
 
@@ -54,25 +55,17 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 } as KProperty1<Any, Map<String, JsonElement>>
             }
         val parameterInfos = params.map { param ->
-            val property = kotlinClass.memberProperties.find { it.name == param.name }!!
-            val fromParam = param.findAnnotation<SerializedName>()?.value
-            val fromProp = property.findAnnotation<SerializedName>()?.value
-            val fromField = property.javaField
-                ?.getAnnotation(SerializedName::class.java)
-                ?.value
-            val fromGetter = property.javaGetter
-                ?.getAnnotation(SerializedName::class.java)
-                ?.value
-            val jsonName = fromParam
-                ?: fromProp
-                ?: fromField
-                ?: fromGetter
-                ?: param.name!!
-            val internalType = InternalGsonTypes.resolve(type.type, type.rawType, param.type.javaType)
-            val typeToken = TypeToken.get(internalType)
-            val adapter = gson.getAdapter(typeToken) as TypeAdapter<Any?>
-            val castedProperty = property as KProperty1<Any, Any?>
-            ParameterInfo(param, adapter, jsonName, castedProperty)
+            val field = kotlinClass.memberProperties.single { it.name == param.name } as KProperty1<Any, Any?>
+            val kType = field.returnType
+            val name = param.findAnnotation<SerializedName>()?.value ?: param.name!!
+
+            val javaTypeForAdapter = if (kType.jvmErasure.java.isAnnotationPresent(JvmInline::class.java)) kType.jvmErasure.java
+            else InternalGsonTypes.resolve(type.type, type.rawType, kType.javaType)
+
+            val token = TypeToken.get(javaTypeForAdapter)
+            @Suppress("UNCHECKED_CAST")
+            val adapter = gson.getAdapter(token) as TypeAdapter<Any?>
+            ParameterInfo(param, adapter, name, field)
         }.associateBy { it.name }
         val jsonElementAdapter = gson.getAdapter(JsonElement::class.java)
 
