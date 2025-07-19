@@ -22,8 +22,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.minBox
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
@@ -34,6 +38,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumFacing
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 typealias PointSet = TimeLimitedSet<Pair<LorenzVec, Boolean>>
@@ -61,8 +66,11 @@ object TestCanSeeFace {
             vec2 = aabb.maxBox()
         }
 
-        fun buildSummaryRenderable() = Renderable.vertical(
-            renderables = buildList { pointSet.forEach { addFacePointDisplay(it) } }
+        fun buildSummaryRenderable(duration: Duration?) = Renderable.vertical(
+            renderables = buildList {
+                addString("§7Generated in §b${duration?.format() ?: "?"}§7.")
+                pointSet.forEach { addFacePointDisplay(it) }
+            }
         )
     }
 
@@ -217,9 +225,11 @@ object TestCanSeeFace {
     }
 
     private fun recalcContext(force: Boolean = false) {
+        val calculationStartTime = SimpleTimeMark.now()
         val vec1 = faceCheckContext.vec1 ?: return
         val vec2 = faceCheckContext.vec2 ?: return
         if (!force && faceCheckContext.finished) return
+        faceCheckContext.pointSet.clear()
         faceCheckContext.generallySeen = LocationUtils.canSeeAnyFace(
             min = vec1,
             max = vec2,
@@ -227,16 +237,17 @@ object TestCanSeeFace {
             stepDensity = config.stepDensity.get(),
             pointFill = faceCheckContext.pointSet,
         )
-        regenDebugRenderable()
+        val calculationEndTime = SimpleTimeMark.now()
+        regenDebugRenderable(calculationEndTime - calculationStartTime)
         faceCheckContext.finished = true
         DelayedRun.runDelayed(config.refreshInterval.get().seconds) {
             recalcContext(true)
         }
     }
 
-    private fun regenDebugRenderable() {
+    private fun regenDebugRenderable(duration: Duration? = null) {
         if (!enabled || !debugEnabled) return
-        faceCheckContext.debugRenderable = faceCheckContext.buildSummaryRenderable().wrapWithOtherToggles()
+        faceCheckContext.debugRenderable = faceCheckContext.buildSummaryRenderable(duration).wrapWithOtherToggles()
     }
 
     private fun Renderable.wrapWithOtherToggles() = Renderable.vertical(
