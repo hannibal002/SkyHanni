@@ -65,8 +65,13 @@ class VisualPetDisplayConfig {
             val horizontal: RenderUtils.HorizontalAlignment,
         ) {
             TOP_LEFT(RenderUtils.VerticalAlignment.TOP, RenderUtils.HorizontalAlignment.LEFT),
+            TOP_CENTER(RenderUtils.VerticalAlignment.TOP, RenderUtils.HorizontalAlignment.CENTER),
             TOP_RIGHT(RenderUtils.VerticalAlignment.TOP, RenderUtils.HorizontalAlignment.RIGHT),
+            CENTER_LEFT(RenderUtils.VerticalAlignment.CENTER, RenderUtils.HorizontalAlignment.LEFT),
+            CENTER(RenderUtils.VerticalAlignment.CENTER, RenderUtils.HorizontalAlignment.CENTER),
+            CENTER_RIGHT(RenderUtils.VerticalAlignment.CENTER, RenderUtils.HorizontalAlignment.RIGHT),
             BOTTOM_LEFT(RenderUtils.VerticalAlignment.BOTTOM, RenderUtils.HorizontalAlignment.LEFT),
+            BOTTOM_CENTER(RenderUtils.VerticalAlignment.BOTTOM, RenderUtils.HorizontalAlignment.CENTER),
             BOTTOM_RIGHT(RenderUtils.VerticalAlignment.BOTTOM, RenderUtils.HorizontalAlignment.RIGHT),
             ;
 
