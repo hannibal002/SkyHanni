@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
@@ -402,7 +402,7 @@ object MoongladeBeacon {
 
     data class BeaconTuneData(
         val isEnchanted: Boolean = false,
-    ) : ResettableStorageSet() {
+    ) : Resettable() {
         private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
         private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
         private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
