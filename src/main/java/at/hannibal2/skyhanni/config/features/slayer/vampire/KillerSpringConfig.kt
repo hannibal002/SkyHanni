@@ -37,7 +37,7 @@ class KillerSpringConfig {
     @Expose
     @ConfigOption(
         name = "Fix Sound Spam",
-        desc = "Fix Hypixel spamming sounds during Killer Spring and overloading the Minecraft sound engine.",
+        desc = "Fixes a Hypixel bug that overloads Minecraft's sound engine with Killer Spring sounds and results in no sounds for a few seconds.",
     )
     @SearchTag("mute wither")
     @ConfigEditorBoolean
