@@ -353,7 +353,7 @@ object MoongladeBeacon {
     open class DataPair<T : Any>(
         open var reference: T? = null,
         open var ours: T? = null,
-    ) : ResettableStorageSet() {
+    ) : Resettable() {
         open operator fun set(target: BeaconPieceTarget, value: T?) = when (target) {
             BeaconPieceTarget.REFERENCE -> reference = value
             BeaconPieceTarget.OURS -> ours = value
