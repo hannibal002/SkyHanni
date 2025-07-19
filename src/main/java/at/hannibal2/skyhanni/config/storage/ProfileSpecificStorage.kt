@@ -478,7 +478,7 @@ class ProfileSpecificStorage(
         var visitorDrops: VisitorDrops = VisitorDrops()
 
         // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
-        class VisitorDrops {
+        class VisitorDrops : Resettable() {
             @Expose
             var acceptedVisitors: Int = 0
 
