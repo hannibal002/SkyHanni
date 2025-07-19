@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.TypeAdapter
@@ -58,6 +57,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
         val parameterInfos = params.map { param ->
             val field = kotlinClass.memberProperties.single { it.name == param.name } as KProperty1<Any, Any?>
             val kType = field.returnType
+            val name = param.findAnnotation<SerializedName>()?.value ?: param.name!!
 
             val javaTypeForAdapter = if (kType.jvmErasure.java.isAnnotationPresent(JvmInline::class.java)) kType.jvmErasure.java
             else InternalGsonTypes.resolve(type.type, type.rawType, kType.javaType)
@@ -65,12 +65,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
             val token = TypeToken.get(javaTypeForAdapter)
             @Suppress("UNCHECKED_CAST")
             val adapter = gson.getAdapter(token) as TypeAdapter<Any?>
-            ParameterInfo(
-                param,
-                adapter,
-                param.findAnnotation<SerializedName>()?.value ?: param.name!!,
-                field
-            )
+            ParameterInfo(param, adapter, name, field)
         }.associateBy { it.name }
         val jsonElementAdapter = gson.getAdapter(JsonElement::class.java)
 
@@ -83,17 +78,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 out.beginObject()
                 for ((name, paramInfo) in parameterInfos) {
                     out.name(name)
-                    try {
-                        paramInfo.adapter.write(out, paramInfo.field.get(value))
-                    } catch (c : ClassCastException) {
-                        SkyHanniMod.logger.warn(
-                            "❗ Failed to write property '${paramInfo.name}' for ${kotlinClass.qualifiedName}: ${c.message}\n" +
-                                "   • Expected type: ${paramInfo.param.type}  Actual type: ${paramInfo.field.get(value)?.javaClass}\n" +
-                                "   • Value: ${paramInfo.field.get(value)}\n" +
-                                "   • Adapter: ${paramInfo.adapter.javaClass.name}"
-                        )
-                        out.nullValue()
-                    }
+                    paramInfo.adapter.write(out, paramInfo.field.get(value))
                 }
                 if (extraDataParam != null) {
                     val extraData = extraDataParam.second.get(value)
