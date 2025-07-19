@@ -141,6 +141,7 @@ object ComputerTimeOffset {
                 "§eClick here for instructions on how to fix your clock.",
             offsetFixLinks ?: return,
             prefixColor = "§c",
+            replaceSameMessage = true,
         )
     }
 
