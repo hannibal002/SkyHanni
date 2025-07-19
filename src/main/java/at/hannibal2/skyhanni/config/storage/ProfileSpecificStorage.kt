@@ -315,7 +315,7 @@ class ProfileSpecificStorage(
             @Expose var singleSlotCooldownMark: SimpleTimeMark? = null,
             @Expose var allSlotsCooldownMark: SimpleTimeMark? = null,
             @Expose var purchasedHitmanSlots: Int = 0,
-        ) : ResettableStorageSet()
+        ) : Resettable()
 
         @Expose
         var hitmanStats: HitmanStatsStorage = HitmanStatsStorage()
