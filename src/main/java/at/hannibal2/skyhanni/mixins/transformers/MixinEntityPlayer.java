@@ -26,10 +26,5 @@ public class MixinEntityPlayer {
     //$$         EntityData.getDisplayName((PlayerEntity) (Object) this, cir.getReturnValue())
     //$$     );
     //$$ }
-    //$$
-    //$$ @org.spongepowered.asm.mixin.injection.Inject(method = "applyDamage", at = @At("HEAD"))
-    //$$ public void applyDamage(net.minecraft.server.world.ServerWorld world, net.minecraft.entity.damage.DamageSource source, float amount, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
-    //$$     at.hannibal2.skyhanni.api.minecraftevents.EntityEvents.postEntityHurt((PlayerEntity) (Object) this, source, amount);
-    //$$ }
     //#endif
 }

@@ -46,6 +46,7 @@ public class MixinGuiIngame {
         }
     }
 
+    //#if MC < 1.21.6
     @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
     public void renderExperienceBar(DrawContext context, int x, CallbackInfo ci) {
         if (RenderEvents.postExperienceBarLayerEventPre(context)) {
@@ -53,7 +54,6 @@ public class MixinGuiIngame {
         }
     }
 
-    //#if MC < 1.21.6
     @Inject(method = "renderExperienceBar", at = @At("TAIL"))
     public void renderExperienceBarTail(DrawContext context, int x, CallbackInfo ci) {
         RenderEvents.postExperienceBarLayerEventPost(context);

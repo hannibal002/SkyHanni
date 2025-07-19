@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import at.hannibal2.skyhanni.utils.compat.DrawContext;
+import at.hannibal2.skyhanni.utils.KeyboardManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
@@ -31,7 +31,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
 
     @Inject(method = "keyTyped", at = @At("HEAD"), cancellable = true)
     private void onKeyTyped(char typedChar, int keyCode, CallbackInfo ci) {
-        if (!HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode)) {
+        if (KeyboardManager.checkIsInventoryClosure(keyCode)) {
             ci.cancel();
         }
     }

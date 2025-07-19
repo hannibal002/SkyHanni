@@ -172,7 +172,7 @@ var IChatComponent.hover: IChatComponent?
         //#if MC < 1.16
         this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
         //#else
-        //$$ (this as MutableText).styled {it.withHoverEvent(HoverEvent.ShowText(value))}
+        //$$ value?.let { value -> (this as MutableText).styled { it.withHoverEvent(HoverEvent.ShowText(value)) } }
         //#endif
     }
 
@@ -214,7 +214,7 @@ var IChatComponent.url: String?
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
         //#else
-        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value)))) }
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
         //#endif
     }
 
@@ -363,3 +363,27 @@ fun IChatComponent.convertToJsonString(): String {
     //$$ return net.minecraft.text.TextCodecs.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
     //#endif
 }
+
+//#if MC > 1.21
+//$$ fun Text.append(newText: Text): Text {
+//$$     return (this as MutableText).append(newText)
+//$$ }
+//$$
+//$$ val formattingPattern = Regex("§.(?:§.)?")
+//$$
+//$$ fun Text.append(newText: String): Text {
+//$$     val mutableText = this as MutableText
+//$$     if (mutableText.string.matches(formattingPattern)) {
+//$$         return Text.of(mutableText.string + newText)
+//$$     }
+//$$     return mutableText.append(newText)
+//$$ }
+//#else
+fun at.hannibal2.skyhanni.utils.compat.Text.append(string: String): at.hannibal2.skyhanni.utils.compat.Text {
+    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + string)
+}
+
+fun at.hannibal2.skyhanni.utils.compat.Text.append(newText: Text): at.hannibal2.skyhanni.utils.compat.Text {
+    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + newText.text)
+}
+//#endif

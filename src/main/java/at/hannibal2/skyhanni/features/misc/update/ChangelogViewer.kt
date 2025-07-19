@@ -8,27 +8,21 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
 
 @SkyHanniModule
 object ChangelogViewer {
-
-    private val dispatcher = Dispatchers.IO
-
     internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
     internal var openTime = SimpleTimeMark.farPast()
@@ -60,7 +54,7 @@ object ChangelogViewer {
         startVersion = currentVersion
         endVersion = targetVersion
         if (!cache.containsKeys(startVersion, endVersion)) {
-            SkyHanniMod.coroutineScope.launch { getChangelog() }
+            SkyHanniMod.launchIOCoroutine { getChangelog() }
         }
         openChangelog()
     }
@@ -70,29 +64,23 @@ object ChangelogViewer {
     }
 
     private suspend fun getChangelog() {
-        try {
-            val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
-            val data = mutableListOf<ChangelogJson>()
-            var pageNumber = 1
-            while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
-                val jsonObject = withContext(dispatcher) {
-                    ApiUtils.getJSONResponseAsElement(
-                        url + pageNumber, apiName = "github",
-                    )
-                }
-                val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
-                data.addAll(page)
-                pageNumber++
-            }
-            val neededData = data.filter {
-                val sub = ModVersion.fromString(it.tagName)
-                sub.isInBetween(startVersion, endVersion)
-            }
-            neededData.forEach { entry ->
-                cache[ModVersion.fromString(entry.tagName)] = formatData(formatString(getBasic(entry.body)))
-            }
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Changelog Loading Failed")
+        val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
+        val data = mutableListOf<ChangelogJson>()
+        var pageNumber = 1
+        while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
+            val pagedUrl = "$url$pageNumber"
+            val (_, jsonObject) = ApiUtils.getJsonResponse(pagedUrl, apiName = "github").assertSuccessWithData()
+                ?: ErrorManager.skyHanniError("Changelog Loading Failed")
+            val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
+            data.addAll(page)
+            pageNumber++
+        }
+        val neededData = data.filter {
+            val sub = ModVersion.fromString(it.tagName)
+            sub.isInBetween(startVersion, endVersion)
+        }
+        neededData.forEach { entry ->
+            cache[ModVersion.fromString(entry.tagName)] = formatData(formatString(getBasic(entry.body)))
         }
     }
 

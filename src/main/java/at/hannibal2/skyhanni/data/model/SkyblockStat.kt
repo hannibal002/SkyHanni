@@ -65,7 +65,7 @@ enum class SkyblockStat(
     ),
     VITALITY("§4♨", " *Vitality: §r§4♨$VALUE_PATTERN", " *§4♨ Vitality §f$VALUE_PATTERN"),
     MENDING("§a☄", " *Mending: §r§a☄$VALUE_PATTERN", " *§a☄ Mending §f$VALUE_PATTERN"),
-    TRUE_DEFENSE("§7❂", " *True Defense: §r§f❂$VALUE_PATTERN", " *§f❂ True Defense §f$VALUE_PATTERN"),
+    TRUE_DEFENSE("§f❂", " *True Defense: §r§f❂$VALUE_PATTERN", " *§f❂ True Defense §f$VALUE_PATTERN"),
     SWING_RANGE("§eⓈ", " *Swing Range: §r§eⓈ$VALUE_PATTERN", " *§eⓈ Swing Range §f$VALUE_PATTERN"),
 
     // TODO add the way sba did get it (be careful with 500+ Speed)
@@ -77,7 +77,7 @@ enum class SkyblockStat(
     MAGIC_FIND("§b✯", " *Magic Find: §r§b✯$VALUE_PATTERN", " *§b✯ Magic Find §f$VALUE_PATTERN"),
     PET_LUCK("§d♣", " *Pet Luck: §r§d♣$VALUE_PATTERN", " *§d♣ Pet Luck §f$VALUE_PATTERN"),
     FISHING_SPEED("§b☂", " *Fishing Speed: §r§b☂$VALUE_PATTERN", " *§b☂ Fishing Speed §f$VALUE_PATTERN"),
-    TROPHY_FISH_CHANCE("§b☂", "Trophy Fish Chance: §r§6♔$VALUE_PATTERN", " *§6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
+    TROPHY_FISH_CHANCE("§b♔", "Trophy Fish Chance: §r§6♔$VALUE_PATTERN", " *§6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
     DOUBLE_HOOK_CHANCE(
         "§9⚓",
         " *Double Hook Chance: §r§9⚓$VALUE_PATTERN",
@@ -114,16 +114,16 @@ enum class SkyblockStat(
     MINING_FORTUNE("§6☘", " *Mining Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mining Fortune §f$VALUE_PATTERN"),
     FEAR("§5☠", " *Fear: §r§5☠$VALUE_PATTERN", " *§5☠ Fear §f$VALUE_PATTERN"),
     COLD_RESISTANCE("§b❄", " *Cold Resistance: §r§b❄$VALUE_PATTERN", ""),
-    WHEAT_FORTUNE("§7☘", "", " *§7§m☘ Wheat Fortune $VALUE_PATTERN"),
-    CARROT_FORTUNE("§7☘", "", " *§7§m☘ Carrot Fortune $VALUE_PATTERN"),
-    POTATO_FORTUNE("§7☘", "", " *§7§m☘ Potato Fortune $VALUE_PATTERN"),
-    PUMPKIN_FORTUNE("§7☘", "", " *§7§m☘ Pumpkin Fortune $VALUE_PATTERN"),
-    MELON_FORTUNE("§7☘", "", " *§7§m☘ Melon Fortune $VALUE_PATTERN"),
-    MUSHROOM_FORTUNE("§7☘", "", " *§7§m☘ Mushroom Fortune $VALUE_PATTERN"),
-    CACTUS_FORTUNE("§7☘", "", " *§7§m☘ Cactus Fortune $VALUE_PATTERN"),
-    NETHER_WART_FORTUNE("§7☘", "", " *§7§m☘ Nether Wart Fortune $VALUE_PATTERN"),
-    COCOA_BEANS_FORTUNE("§7☘", "", " *§7§m☘ Cocoa Beans Fortune $VALUE_PATTERN"),
-    SUGAR_CANE_FORTUNE("§7☘", "", " *§7§m☘ Sugar Cane Fortune $VALUE_PATTERN"),
+    WHEAT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wheat Fortune $VALUE_PATTERN"),
+    CARROT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Carrot Fortune $VALUE_PATTERN"),
+    POTATO_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Potato Fortune $VALUE_PATTERN"),
+    PUMPKIN_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Pumpkin Fortune $VALUE_PATTERN"),
+    MELON_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Melon Fortune $VALUE_PATTERN"),
+    MUSHROOM_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Mushroom Fortune $VALUE_PATTERN"),
+    CACTUS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cactus Fortune $VALUE_PATTERN"),
+    NETHER_WART_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
+    COCOA_BEANS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cocoa Beans Fortune $VALUE_PATTERN"),
+    SUGAR_CANE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sugar Cane Fortune $VALUE_PATTERN"),
 
     MINING_SPREAD(
         "§e▚",
@@ -152,6 +152,11 @@ enum class SkyblockStat(
     HUNTER_FORTUNE("§d☘", " *Hunter Fortune: §r§d☘$VALUE_PATTERN", " *§d☘ Hunter Fortune §f$VALUE_PATTERN"),
     FIG_FORTUNE("§6☘", " *Fig Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Fig Fortune §f$VALUE_PATTERN"),
     MANGROVE_FORTUNE("§6☘", " *Mangrove Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mangrove Fortune §f$VALUE_PATTERN"),
+
+    RIFT_TIME("§aф", " *Rift Time: §r§aф$VALUE_PATTERN", " *§aф Rift Time §f$VALUE_PATTERN"),
+    RIFT_DAMAGE("§5❁", " *Rift Damage: §r§5❁$VALUE_PATTERN", " *§5❁ Rift Damage §f$VALUE_PATTERN"),
+    MANA_REGEN("§b⚡", " *Mana Regen: §r§b⚡$VALUE_PATTERN", " *§b⚡ Mana Regen §f$VALUE_PATTERN"),
+    HEARTS("§c♥", " *Hearts: §r§c♥$VALUE_PATTERN", " *§c♥ Hearts §f$VALUE_PATTERN"),
 
     UNKNOWN("§c?", "", "")
     ;

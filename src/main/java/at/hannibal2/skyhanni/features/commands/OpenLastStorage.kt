@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 @SkyHanniModule
 object OpenLastStorage {
 
+    // TODO use [StorageApi]
+
     private val config get() = SkyHanniMod.feature.misc.lastStorage
     private val storage get() = ProfileStorageData.profileSpecific?.lastStorage
 

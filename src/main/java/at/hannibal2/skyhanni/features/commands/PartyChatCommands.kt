@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -110,7 +111,7 @@ object PartyChatCommands {
     private fun isTrustedUser(name: String): Boolean {
         if (name == PlayerUtils.getName()) return true
         val friend = FriendApi.getAllFriends().find { it.name == name }
-        return when (config.defaultRequiredTrustLevel) {
+        return when (config.requiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
             PartyCommandsConfig.TrustedUser.BEST_FRIENDS -> friend?.bestFriend == true
             PartyCommandsConfig.TrustedUser.ANYONE -> true
@@ -257,5 +258,10 @@ object PartyChatCommands {
         } else {
             ChatUtils.chat("$player §cisn't §eignored.")
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(95, "misc.partyCommands.defaultRequiredTrustLevel", "misc.partyCommands.requiredTrustLevel")
     }
 }
