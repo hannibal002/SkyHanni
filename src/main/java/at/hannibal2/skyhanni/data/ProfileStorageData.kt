@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -34,6 +35,9 @@ object ProfileStorageData {
 
     private var hypixelDataLoaded = false
 
+    private var storagePlayer: StorageData.PlayerSpecific? = null
+    var storageProfiles: StorageData.ProfileSpecific? = null
+
     private var petPlayers: PetDataStorage.PlayerSpecific? = null
     var petProfiles: PetDataStorage.ProfileSpecific? = null
 
@@ -41,6 +45,7 @@ object ProfileStorageData {
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val storagePlayer = storagePlayer
         val petPlayers = petPlayers
         val profileName = event.name
         if (playerSpecific == null) {
@@ -52,11 +57,14 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
+        if (storagePlayer == null) {
+            ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
+        }
         if (petPlayers == null) {
             ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
         }
 
-        loadProfileSpecific(playerSpecific, sackPlayers, petPlayers, profileName)
+        loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
         ConfigLoadEvent.post()
     }
 
@@ -64,6 +72,7 @@ object ProfileStorageData {
         println("workaroundIn10SecondsProfileStorage")
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val storagePlayer = storagePlayer
         val petPlayers = petPlayers
 
         if (playerSpecific == null) {
@@ -78,11 +87,15 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
+        if (storagePlayer == null) {
+            ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
+        }
+
         if (petPlayers == null) {
             ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
         }
 
-        loadProfileSpecific(playerSpecific, sackPlayers, petPlayers, profileName)
+        loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
         ConfigLoadEvent.post()
     }
 
@@ -125,13 +138,15 @@ object ProfileStorageData {
 
     private fun loadProfileSpecific(
         playerSpecific: PlayerSpecificStorage,
-        sackPlayer: SackData.PlayerSpecific,
+        sackProfile: SackData.PlayerSpecific,
+        storagePlayer: StorageData.PlayerSpecific,
         petPlayer: PetDataStorage.PlayerSpecific,
         profileName: String,
     ) {
         noTabListTime = SimpleTimeMark.farPast()
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
-        sackProfiles = sackPlayer.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
+        sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
+        storageProfiles = storagePlayer.profiles.getOrPut(profileName) { StorageData.ProfileSpecific() }
         petProfiles = petPlayer.profiles.getOrPut(profileName) { PetDataStorage.ProfileSpecific() }
         loaded = true
         ConfigLoadEvent.post()
@@ -142,6 +157,7 @@ object ProfileStorageData {
         val playerUuid = PlayerUtils.getRawUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
+        storagePlayer = SkyHanniMod.storageData.players.getOrPut(playerUuid) { StorageData.PlayerSpecific() }
         petPlayers = SkyHanniMod.petData.players.getOrPut(playerUuid) { PetDataStorage.PlayerSpecific() }
         ConfigLoadEvent.post()
     }

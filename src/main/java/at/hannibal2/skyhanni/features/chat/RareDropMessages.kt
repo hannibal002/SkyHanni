@@ -148,7 +148,7 @@ object RareDropMessages {
 
         if (!anyRecentMessage && config.enchantedBookMissingMessage) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
-            if (SkyHanniMod.feature.misc.userluckEnabled) {
+            if (SkyHanniMod.feature.misc.userLuck) {
                 userLuck.takeIf { it != 0f }?.let { luck ->
                     var luckString = luck.roundTo(2).addSeparators()
                     if (luck > 0) luckString = "+$luckString"

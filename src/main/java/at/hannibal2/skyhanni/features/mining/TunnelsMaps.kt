@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -50,7 +49,12 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -285,14 +289,13 @@ object TunnelsMaps {
         } ?: return display
 
         if (active.isEmpty()) return buildList {
-            addString("")
-            addString("")
+            add(Renderable.placeholder(0, 20))
             addAll(locationDisplay)
         }
 
         return buildList {
             if (goal == campfire && active != campfire.name) {
-                add(Renderable.string("§6Override for ${campfire.name}"))
+                addString("§6Override for ${campfire.name}")
                 add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
             } else {
                 add(
@@ -303,7 +306,7 @@ object TunnelsMaps {
                     ),
                 )
                 if (hasNext()) add(Renderable.clickable("§eNext Spot", onLeftClick = ::setNextGoal))
-                else addString("")
+                else Renderable.emptyText()
             }
             addAll(locationDisplay)
         }
@@ -321,7 +324,7 @@ object TunnelsMaps {
 
     private fun generateLocationsDisplay() = buildList {
         val campfireName = campfire.name ?: return@buildList
-        add(Renderable.string("§6Locations:"))
+        addString("§6Locations:")
         add(
             Renderable.clickable(
                 campfireName,
@@ -338,13 +341,13 @@ object TunnelsMaps {
         if (!config.excludeFairy.get()) {
             add(
                 Renderable.hoverable(
-                    Renderable.horizontalContainer(
-                        listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                    Renderable.horizontal(
+                        listOf(Renderable.text("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.text("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
-                    Renderable.string("§dFairy Souls"),
+                    Renderable.text("§dFairy Souls"),
                 ),
             )
         }
@@ -356,11 +359,14 @@ object TunnelsMaps {
     }
 
     private fun Map<String, List<GraphNode>>.toRenderables() = map {
-        Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
+        Renderable.clickable(
+            Renderable.text(it.key),
+            onLeftClick = guiSetActive(it.key),
+        )
     }
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickable(
-        Renderable.string(
+        Renderable.text(
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),

@@ -114,7 +114,7 @@ object CarnivalShopHelper {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val repoTokenShops = event.readConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
+        val repoTokenShops = event.getConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
         repoEventShops = repoTokenShops.map { (key, value) ->
             EventShop(key.replace("_", " "), value.values.toMutableList())
         }.toMutableList()

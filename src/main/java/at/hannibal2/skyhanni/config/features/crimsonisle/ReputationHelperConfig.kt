@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -49,12 +48,11 @@ class ReputationHelperConfig {
     @Accordion
     val rescueMission: RescueMissionConfig = RescueMissionConfig()
 
-    enum class ShowLocationEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        ALWAYS("Always", 0),
-        ONLY_HOTKEY("Only With Hotkey", 1),
-        NEVER("Never", 2);
+    enum class ShowLocationEntry(private val displayName: String) {
+        ALWAYS("Always"),
+        ONLY_HOTKEY("Only With Hotkey"),
+        NEVER("Never");
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 }

@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
-import kotlin.concurrent.thread
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 @SkyHanniModule
 object ComputerTimeOffset {
@@ -24,10 +24,10 @@ object ComputerTimeOffset {
 
     private var state = State.NORMAL
 
-    enum class State {
-        NORMAL,
-        SLOW,
-        TOTALLY_OFF,
+    enum class State(val duration: Duration) {
+        NORMAL(1.seconds),
+        SLOW(10.seconds),
+        TOTALLY_OFF(Duration.INFINITE),
     }
 
     private var currentlyChecking = false
@@ -44,12 +44,10 @@ object ComputerTimeOffset {
         }
     }
 
-    private val distanceBetweenTrials get() = if (state == State.NORMAL) 1000L else 10_0000L
-
     init {
-        thread {
+        SkyHanniMod.launchIOCoroutine {
             while (state != State.TOTALLY_OFF) {
-                Thread.sleep(distanceBetweenTrials)
+                delay(state.duration)
                 detectTimeChange()
             }
         }
@@ -73,7 +71,7 @@ object ComputerTimeOffset {
         }
         currentlyChecking = true
         val wasOffsetBefore = (offsetMillis?.absoluteValue ?: 0.seconds) > 5.seconds
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             offsetMillis = getNtpOffset(SkyHanniMod.feature.dev.ntpServer)
             currentlyChecking = false
             offsetMillis?.let {
@@ -82,25 +80,28 @@ object ComputerTimeOffset {
         }
     }
 
-    private fun getNtpOffset(ntpServer: String): Duration? = try {
-        val timeInfo = NTPUDPClient().use { client ->
-            val address = InetAddress.getByName(ntpServer)
-            client.getTime(address)
-        }
-
-        timeInfo.computeDetails()
-        timeInfo.offset.milliseconds
-    } catch (e: Exception) {
-        if (SkyBlockUtils.inSkyBlock && config.warnAboutPcTimeOffset) ErrorManager.logErrorWithData(
-            e, "Failed to get NTP offset",
-            "server" to ntpServer,
-        )
-        else {
-            @Suppress("PrintStackTrace")
-            e.printStackTrace()
-        }
-        null
-    }
+    private val clientTimeout = 10.seconds
+    private fun getNtpOffset(ntpServer: String): Duration? =
+        runCatching {
+            NTPUDPClient().use { client ->
+                client.setDefaultTimeout(clientTimeout.toJavaDuration())
+                val address = InetAddress.getByName(ntpServer)
+                val timeInfo = client.getTime(address)
+                timeInfo.computeDetails()
+                timeInfo.offset.milliseconds
+            }
+        }.onFailure { e ->
+            if (SkyBlockUtils.inSkyBlock && config.warnAboutPcTimeOffset) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to get NTP offset",
+                    "server" to ntpServer,
+                )
+            } else {
+                @Suppress("PrintStackTrace")
+                e.printStackTrace()
+            }
+        }.getOrNull()
 
     private var lastSystemTime = System.currentTimeMillis()
 
