@@ -371,6 +371,19 @@ object MoongladeBeacon {
             )
     }
 
+    class ObservedPair<T : Any>(
+        override var reference: T? = null,
+        override var ours: T? = null,
+        onSet: ((target: BeaconPieceTarget, value: T?) -> Unit)? = null,
+    ) : DataPair<T>(reference, ours) {
+        private val onSetCallback = onSet ?: { _, _ -> }
+
+        override fun set(target: BeaconPieceTarget, value: T?) {
+            onSetCallback(target, value)
+            super.set(target, value)
+        }
+    }
+
     class BeaconDataPair<T : Enum<T>>(
         override var reference: T? = null,
         override var ours: T? = null,
@@ -399,20 +412,9 @@ object MoongladeBeacon {
         private val pitchPair = BeaconDataPair<BeaconPitch>()
 
         private val nextPitchPair = DataPair<SimpleTimeMark>()
-        private val bufferPair = object : DataPair<MutableList<BeaconPitch>>(
-            reference = mutableListOf(),
-            ours = mutableListOf(),
-        ) {
-            override fun reset() {
-                reference?.clear()
-                ours?.clear()
-            }
-        }
-        private val slotPair = object : DataPair<Int>() {
-            override fun set(target: BeaconPieceTarget, value: Int?) {
-                if (target == BeaconPieceTarget.REFERENCE) value?.let { updateMatchSlot(it) }
-                super.set(target, value)
-            }
+        private val bufferPair = DataPair<MutableList<BeaconPitch>>(mutableListOf(), mutableListOf())
+        private val slotPair = ObservedPair<Int> { target, slot ->
+            if (target == BeaconPieceTarget.REFERENCE) slot?.let { updateMatchSlot(it) }
         }
 
         private val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
