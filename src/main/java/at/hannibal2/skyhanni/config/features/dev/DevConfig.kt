@@ -74,7 +74,6 @@ class DevConfig {
     @Expose
     val waypoint: WaypointsConfig = WaypointsConfig()
 
-    // Todo move these into debug config
     @Expose
     @NoConfigLink
     val debugPos: Position = Position(10, 10)
@@ -91,7 +90,6 @@ class DevConfig {
     @ConfigLink(owner = DebugConfig::class, field = "raytracedOreblock")
     val debugOrePos: Position = Position(1, 200)
 
-    // Todo move [these] to a ContributorAppearanceConfig, or something similar
     @Expose
     @ConfigOption(
         name = "Fancy Contributors",
@@ -168,7 +166,6 @@ class DevConfig {
     @Category(name = "Dev Tools", desc = "Tooling for devs")
     val devTool: DevToolConfig = DevToolConfig()
 
-    // Todo move into Debug Config?
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
     val mobDebug: DebugMobConfig = DebugMobConfig()

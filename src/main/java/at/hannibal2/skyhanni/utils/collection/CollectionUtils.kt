@@ -405,12 +405,6 @@ object CollectionUtils {
         return zipWithNext3 { a, b, c -> Triple(a, b, c) }
     }
 
-    inline fun <reified C : Collection<String>> C.filterNotEmptyString(): C =
-        filter { it.isNotEmpty() } as C
-
-    inline fun <reified C : Collection<T>, T : Collection<T2>, T2> C.filterNotEmpty(): C =
-        filter { it.isNotEmpty() } as C
-
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
         @Suppress("UNCHECKED_CAST")
         return filterKeys { it != null } as Map<K, V>

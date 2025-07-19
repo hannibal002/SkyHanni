@@ -56,10 +56,6 @@ class TextRenderable internal constructor(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) : Renderable {
 
-    companion object {
-        operator fun Renderable.invoke(string: String): TextRenderable = TextRenderable(Text.of(string))
-    }
-
     override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(fixStupid(text)) * scale).toInt() + 1 }
     override val height = (9 * scale).toInt() + 1
 
