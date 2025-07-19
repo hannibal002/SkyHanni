@@ -105,11 +105,11 @@ object MoongladeBeacon {
      * @param guiSpeed The speed level as displayed in the GUI (1-5).
      */
     enum class BeaconSpeed(val tickSpeed: Int, val guiSpeed: Int) {
-        SPEED_5(52, 1),
-        SPEED_4(42, 2),
+        SPEED_1(52, 1),
+        SPEED_2(42, 2),
         SPEED_3(32, 3),
-        SPEED_2(22, 4),
-        SPEED_1(12, 5),
+        SPEED_4(22, 4),
+        SPEED_5(12, 5),
         ;
 
         override fun toString() = "§aSpeed $guiSpeed"
