@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -23,7 +23,7 @@ class ResettableStorageSetTest {
         var nullInt: Int? = null,
         @Transient var transientString: String = "transient",
         val defaultBool: Boolean = false,
-    ) : ResettableStorageSet() {
+    ) : Resettable() {
         val list: MutableList<String> = mutableListOf()
         val map: MutableMap<String, Int> = mutableMapOf()
         @Transient val transientList: MutableList<String> = mutableListOf("transientListItem")

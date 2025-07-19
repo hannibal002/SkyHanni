@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -299,13 +299,13 @@ object ExperimentationTableApi {
         @Transient var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long = 0L,
         var rareFoundFired: Boolean = false,
-    ) : ResettableStorageSet() {
+    ) : Resettable() {
         @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
         override fun reset() {
             super.reset()
             // todo at some point make resettable storage set deal with this stuff
-            //  ResettableStorageSet doesn't deal with nulls or clearing mutables
+            //  Resettable doesn't deal with nulls or clearing mutables
             //  It does (^ that) after #4244 gets merged, so I'll do that eventually -David
             otherRewards.clear()
             type = null
