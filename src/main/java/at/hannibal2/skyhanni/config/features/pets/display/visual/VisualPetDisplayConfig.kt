@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
+import at.hannibal2.skyhanni.config.storage.NoReset
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -92,8 +95,9 @@ class VisualPetDisplayConfig {
     @Accordion
     val xpRingCustomization: XpRingConfig = XpRingConfig()
 
-    class XpRingConfig {
+    class XpRingConfig : Resettable() {
         @Expose
+        @NoReset
         @ConfigOption(
             name = "Ring Padding",
             desc = "How much thicker the XP Ring should be compared to the smaller circles."
@@ -118,6 +122,10 @@ class VisualPetDisplayConfig {
         )
         @ConfigEditorColour
         val unfilledColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(192, 192, 192, 0, 255))
+
+        @ConfigOption(name = "Reset Colors", desc = "Reset the colors to the default values.")
+        @ConfigEditorButton(buttonText = "Reset")
+        val reset: Runnable = Runnable(::reset)
     }
 
     @Expose

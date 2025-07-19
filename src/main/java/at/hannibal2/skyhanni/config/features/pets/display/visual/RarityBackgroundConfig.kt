@@ -1,14 +1,18 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
+import at.hannibal2.skyhanni.config.storage.NoReset
+import at.hannibal2.skyhanni.config.storage.Resettable
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class RarityBackgroundConfig {
+class RarityBackgroundConfig : Resettable() {
     @Expose
+    @NoReset
     @ConfigOption(
         name = "Background Padding",
         desc = "How much extra padding should be added to the background circle."
@@ -63,4 +67,8 @@ class RarityBackgroundConfig {
     )
     @ConfigEditorColour
     val mythicColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 85, 255, 0, 255))
+
+    @ConfigOption(name = "Reset Colors", desc = "Reset the colors to the default values.")
+    @ConfigEditorButton(buttonText = "Reset")
+    val reset: Runnable = Runnable(::reset)
 }
