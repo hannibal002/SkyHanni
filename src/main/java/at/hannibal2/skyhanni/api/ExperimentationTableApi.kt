@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.storage.NoReset
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
@@ -298,8 +297,8 @@ object ExperimentationTableApi {
     data class ExperimentationDataSet(
         var type: ExperimentationTaskType? = null,
         var tier: ExperimentationTier? = null,
-        @NoReset var enchantingXpGained: Long = 0L,
-        @NoReset var rareFoundFired: Boolean = false,
+        var enchantingXpGained: Long = 0L,
+        var rareFoundFired: Boolean = false,
     ) : Resettable() {
         private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
