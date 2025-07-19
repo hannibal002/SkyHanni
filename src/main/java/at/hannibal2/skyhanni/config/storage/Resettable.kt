@@ -37,8 +37,8 @@ abstract class Resettable {
         }
         (vars + others).filter { prop ->
             val ignoreOnProp = prop.hasAnnotation<Transient>() || prop.hasAnnotation<NoReset>()
-            val ignoreOnField = prop.javaField?.let {
-                f -> f.isAnnotationPresent(NoReset::class.java) || Modifier.isTransient(f.modifiers)
+            val ignoreOnField = prop.javaField?.let { f ->
+                f.isAnnotationPresent(NoReset::class.java) || Modifier.isTransient(f.modifiers)
             } ?: false
             !(ignoreOnProp || ignoreOnField)
         }
