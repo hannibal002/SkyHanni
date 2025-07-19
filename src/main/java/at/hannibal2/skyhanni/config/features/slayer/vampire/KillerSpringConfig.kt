@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.config.features.slayer.vampire
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class KillerSpringConfig {
     @Expose
@@ -31,4 +33,15 @@ class KillerSpringConfig {
     @ConfigOption(name = "Lines Start Color", desc = "Starting color of the lines.")
     @ConfigEditorColour
     var linesColor: String = "0:255:255:13:0"
+
+    @Expose
+    @ConfigOption(
+        name = "Fix Sound Spam",
+        desc = "Fix Hypixel spamming sounds during Killer Spring and overloading the Minecraft sound engine.",
+    )
+    @SearchTag("mute wither")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var fixSoundSpam: Boolean = true
 }
