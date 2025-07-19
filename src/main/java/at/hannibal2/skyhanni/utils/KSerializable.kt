@@ -38,6 +38,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
         val field: KProperty1<Any, Any?>,
     )
 
+    @Suppress("UNCHECKED_CAST")
     @OptIn(ExperimentalStdlibApi::class)
     override fun <T : Any> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
         val kotlinClass = type.rawType.kotlin as KClass<T>
