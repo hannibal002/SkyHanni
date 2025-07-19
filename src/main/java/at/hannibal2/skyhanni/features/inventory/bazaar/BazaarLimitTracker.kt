@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BazaarJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarTransactionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -18,7 +20,8 @@ import java.time.ZonedDateTime
 
 @SkyHanniModule
 object BazaarLimitTracker {
-    private const val DAILY_LIMIT = 15_000_000_000.0
+    private var dailyLimit: Double = 15_000_000_000.0
+    private var capOrdersAtIntLimit: Boolean = true
 
     private val config get() = SkyHanniMod.feature.inventory.bazaar
     private val storage get() = ProfileStorageData.playerSpecific?.bazaar
@@ -40,11 +43,11 @@ object BazaarLimitTracker {
         if (event.transactionType == BazaarTransactionEvent.TransactionType.FLIP_ORDER) return
         // Hypixel ignores coins in excess of the integer limit for individual orders
         val coinsUpToIntLimit = when {
-            event.coinAmount >= Int.MAX_VALUE -> Int.MAX_VALUE.toDouble()
+            capOrdersAtIntLimit && event.coinAmount >= Int.MAX_VALUE -> Int.MAX_VALUE.toDouble()
             else -> event.coinAmount
         }
         coinsTowardsLimit += coinsUpToIntLimit
-        if (coinsTowardsLimit >= DAILY_LIMIT) {
+        if (coinsTowardsLimit >= dailyLimit) {
             ChatUtils.chat("You reached your daily trade limit in the bazaar!")
         }
     }
@@ -70,12 +73,12 @@ object BazaarLimitTracker {
         if (!config.dailyLimitTracker) return
         if (!BazaarApi.inBazaarInventory) return
 
-        val color = percentageColor(DAILY_LIMIT.toLong() - coinsTowardsLimit.toLong(), DAILY_LIMIT.toLong()).getChatColor()
+        val color = percentageColor(dailyLimit.toLong() - coinsTowardsLimit.toLong(), dailyLimit.toLong()).getChatColor()
 
         val display = buildList {
             addString("§aBazaar Daily Limit:")
-            addString("$color${coinsTowardsLimit.toLong().addSeparators()}§7/${DAILY_LIMIT.formatCoin()} coins")
-            if (coinsTowardsLimit >= DAILY_LIMIT) {
+            addString("$color${coinsTowardsLimit.toLong().addSeparators()}§7/${dailyLimit.formatCoin()} coins")
+            if (coinsTowardsLimit >= dailyLimit) {
                 addString("§cLimit reached!")
             }
         }
@@ -84,5 +87,12 @@ object BazaarLimitTracker {
             display,
             posLabel = "Bazaar Daily Limit Tracker",
         )
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<BazaarJson>("Bazaar")
+        dailyLimit = data.dailyLimit
+        capOrdersAtIntLimit = data.capOrdersAtIntLimit
     }
 }
