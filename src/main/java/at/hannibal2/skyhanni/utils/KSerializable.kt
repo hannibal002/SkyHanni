@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.TypeAdapter
@@ -19,6 +20,7 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaGetter
+import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
 
@@ -54,25 +56,21 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 } as KProperty1<Any, Map<String, JsonElement>>
             }
         val parameterInfos = params.map { param ->
-            val property = kotlinClass.memberProperties.find { it.name == param.name }!!
-            val fromParam = param.findAnnotation<SerializedName>()?.value
-            val fromProp = property.findAnnotation<SerializedName>()?.value
-            val fromField = property.javaField
-                ?.getAnnotation(SerializedName::class.java)
-                ?.value
-            val fromGetter = property.javaGetter
-                ?.getAnnotation(SerializedName::class.java)
-                ?.value
-            val jsonName = fromParam
-                ?: fromProp
-                ?: fromField
-                ?: fromGetter
-                ?: param.name!!
-            val internalType = InternalGsonTypes.resolve(type.type, type.rawType, param.type.javaType)
-            val typeToken = TypeToken.get(internalType)
-            val adapter = gson.getAdapter(typeToken) as TypeAdapter<Any?>
-            val castedProperty = property as KProperty1<Any, Any?>
-            ParameterInfo(param, adapter, jsonName, castedProperty)
+            val field = kotlinClass.memberProperties.single { it.name == param.name } as KProperty1<Any, Any?>
+            val kType = field.returnType
+
+            val javaTypeForAdapter = if (kType.jvmErasure.java.isAnnotationPresent(JvmInline::class.java)) kType.jvmErasure.java
+            else InternalGsonTypes.resolve(type.type, type.rawType, kType.javaType)
+
+            val token = TypeToken.get(javaTypeForAdapter)
+            @Suppress("UNCHECKED_CAST")
+            val adapter = gson.getAdapter(token) as TypeAdapter<Any?>
+            ParameterInfo(
+                param,
+                adapter,
+                param.findAnnotation<SerializedName>()?.value ?: param.name!!,
+                field
+            )
         }.associateBy { it.name }
         val jsonElementAdapter = gson.getAdapter(JsonElement::class.java)
 
@@ -85,7 +83,17 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 out.beginObject()
                 for ((name, paramInfo) in parameterInfos) {
                     out.name(name)
-                    paramInfo.adapter.write(out, paramInfo.field.get(value))
+                    try {
+                        paramInfo.adapter.write(out, paramInfo.field.get(value))
+                    } catch (c : ClassCastException) {
+                        SkyHanniMod.logger.warn(
+                            "❗ Failed to write property '${paramInfo.name}' for ${kotlinClass.qualifiedName}: ${c.message}\n" +
+                                "   • Expected type: ${paramInfo.param.type}  Actual type: ${paramInfo.field.get(value)?.javaClass}\n" +
+                                "   • Value: ${paramInfo.field.get(value)}\n" +
+                                "   • Adapter: ${paramInfo.adapter.javaClass.name}"
+                        )
+                        out.nullValue()
+                    }
                 }
                 if (extraDataParam != null) {
                     val extraData = extraDataParam.second.get(value)
