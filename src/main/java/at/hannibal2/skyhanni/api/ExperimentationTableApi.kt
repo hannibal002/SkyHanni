@@ -295,22 +295,12 @@ object ExperimentationTableApi {
     }
 
     data class ExperimentationDataSet(
-        @Transient var type: ExperimentationTaskType? = null,
-        @Transient var tier: ExperimentationTier? = null,
+        var type: ExperimentationTaskType? = null,
+        var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long = 0L,
         var rareFoundFired: Boolean = false,
     ) : Resettable() {
-        @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
-
-        override fun reset() {
-            super.reset()
-            // todo at some point make resettable storage set deal with this stuff
-            //  ResettableStorageSet doesn't deal with nulls or clearing mutables
-            //  It does (^ that) after #4244 gets merged, so I'll do that eventually -David
-            otherRewards.clear()
-            type = null
-            tier = null
-        }
+        private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
         fun addReward(internalName: NeuInternalName, amount: Int = 1) {
             otherRewards.addOrPut(internalName, amount)

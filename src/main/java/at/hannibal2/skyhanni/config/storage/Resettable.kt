@@ -29,7 +29,8 @@ abstract class Resettable {
             MutableCollection::class,
             MutableMap::class,
             MutableIterator::class,
-            Property::class
+            Property::class,
+            Resettable::class,
         ).flatMap { type ->
             this::class.memberProperties.filter {
                 it.returnType.jvmErasure.isSubclassOf(type)
@@ -90,11 +91,12 @@ abstract class Resettable {
             val propCurrent = current as Property<Any?>
             propCurrent.set(defaultProp.get())
         }
+        current is Resettable -> current.reset()
         current is MutableCollection<*> -> current.clear()
         current is MutableMap<*, *> -> current.clear()
         current is MutableIterator<*> -> current.removeIf { true }
         else -> ChatUtils.debug(
-            message = "ResettableStorageSet $classSimpleName tried to reset property '${this.name}' " +
+            message = "Resettable $classSimpleName tried to reset property '${this.name}' " +
                 "but it is of type ${current?.javaClass?.simpleName}, which is not handled.",
             replaceSameMessage = true,
         )
