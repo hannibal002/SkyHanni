@@ -63,9 +63,9 @@ object LassoDisplay {
             }
         }
         display = if (isReel) {
-            Renderable.Companion.text("§e§l          REEL          ")
+            Renderable.text("§e§l          REEL          ")
         } else if (progressBar.isNotEmpty()) {
-            Renderable.Companion.text(progressBar)
+            Renderable.text(progressBar)
         } else null
     }
 
