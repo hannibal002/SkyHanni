@@ -1,7 +1,8 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.skyhanni.features.hunting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,7 +22,7 @@ import net.minecraft.entity.item.EntityArmorStand
 @SkyHanniModule
 object LassoDisplay {
 
-    private val config get() = SkyHanniMod.feature.foraging
+    private val config get() = SkyHanniMod.feature.hunting
     private var display: Renderable? = null
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -62,10 +63,15 @@ object LassoDisplay {
             }
         }
         display = if (isReel) {
-            Renderable.text("§e§l          REEL          ")
+            Renderable.Companion.text("§e§l          REEL          ")
         } else if (progressBar.isNotEmpty()) {
-            Renderable.text(progressBar)
+            Renderable.Companion.text(progressBar)
         } else null
     }
 
+    @HandleEvent
+    fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(99, "foraging.lassoDisplay", "hunting.lassoDisplay")
+        event.move(99, "foraging.lassoDisplayPosition", "hunting.lassoDisplayPosition")
+    }
 }

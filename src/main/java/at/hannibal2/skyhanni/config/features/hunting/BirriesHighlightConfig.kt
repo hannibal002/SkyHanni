@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.foraging
+package at.hannibal2.skyhanni.config.features.hunting
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyModern
@@ -11,21 +11,21 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import java.awt.Color
 
-class HideonleafHighlightConfig {
+class BirriesHighlightConfig {
 
     @Expose
-    @ConfigOption(name = "Highlight Hideonleaf", desc = "Highlights nearby Hideonleaf.")
+    @ConfigOption(name = "Highlight Birries", desc = "Highlights nearby Birries.")
     @FeatureToggle
     @ConfigEditorBoolean
     @OnlyModern
-    @SearchTag("shulker")
+    @SearchTag("tadpole tad pole poll")
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color for the Hideonleaf highlight")
+    @ConfigOption(name = "Color", desc = "Color for the Birries highlight")
     @ConfigEditorColour
     @OnlyModern
-    @SearchTag("shulker")
-    var color: ChromaColour = Color.MAGENTA.toChromaColor()
+    @SearchTag("tadpole tad pole poll")
+    var color: ChromaColour = Color.GREEN.toChromaColor()
 
 }
