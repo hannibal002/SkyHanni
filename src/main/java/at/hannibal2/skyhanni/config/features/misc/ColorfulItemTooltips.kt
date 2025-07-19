@@ -33,4 +33,13 @@ class ColorfulItemTooltips {
     @ConfigEditorBoolean
     var replacePercentages: Boolean = false
 
+    @Expose
+    @ConfigOption(
+        name = "Replace rift seconds",
+        desc = "Replaces the 's' after the rift time stat.\n" +
+            "§eRequires add stat icons to be enabled.",
+    )
+    @ConfigEditorBoolean
+    var replaceRiftSeconds: Boolean = true
+
 }

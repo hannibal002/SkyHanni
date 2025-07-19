@@ -853,6 +853,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Pest Spawn Time Message. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3343)
     + Sends a chat message showing how long it took for a pest to spawn.
 + Added option to mute Vacuum in the Garden. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4051)
++ Added Pest Trap tab widgets to Tab Widget Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
++ Added warnings for Pest Traps being full or out of bait. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 
 </details>
 <details open><summary>
