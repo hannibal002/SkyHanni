@@ -48,8 +48,8 @@ import net.minecraft.util.Identifier
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.times
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.times
 
 @SkyHanniModule
 object MoongladeBeacon {
@@ -121,6 +121,7 @@ object MoongladeBeacon {
             fun byClosestTickSpeed(measuredTickSpeed: Number) = entries.minByOrNull { speed ->
                 abs(speed.tickSpeed - measuredTickSpeed.toInt())
             }
+
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
                 val stack = this.stack ?: return null
                 return ModernPatterns.beaconCurrentSpeedPattern.firstMatcher(stack.getLore()) {
@@ -244,7 +245,7 @@ object MoongladeBeacon {
             SoundUtils.playErrorSound()
             TitleManager.sendTitle(
                 "§cOver-click Prevented",
-                subtitleText = "§7Hold §eShift §7to bypass",
+                subtitleText = "§7Hold §eContol §7to bypass",
                 duration = 1.seconds,
                 location = TitleManager.TitleLocation.INVENTORY,
             )
@@ -258,7 +259,7 @@ object MoongladeBeacon {
 
     private fun GuiContainerEvent.SlotClickEvent.blockOverClick(): Boolean {
         if (!config.preventOverClicking) return false
-        if (KeyboardManager.isShiftKeyDown()) return false
+        if (KeyboardManager.isControlKeyDown()) return false
         val slotIndex = this.slot?.index ?: return false
         val neededClickOffset = normalTuning.getOffsetBySlot(slotIndex)
             ?: enchantedTuning.getOffsetBySlot(slotIndex)?.takeUnless { !upgradingStrength }
@@ -299,7 +300,7 @@ object MoongladeBeacon {
             onlyOnIsland = IslandType.GALATEA,
             onRender = {
                 config.displayPosition.renderRenderables(display, posLabel = "Moonglade Beacon")
-            }
+            },
         )
     }
 
@@ -352,7 +353,7 @@ object MoongladeBeacon {
     open class DataPair<T : Any>(
         open var reference: T? = null,
         open var ours: T? = null,
-    ): ResettableStorageSet() {
+    ) : ResettableStorageSet() {
         open operator fun set(target: BeaconPieceTarget, value: T?) = when (target) {
             BeaconPieceTarget.REFERENCE -> reference = value
             BeaconPieceTarget.OURS -> ours = value
@@ -363,10 +364,11 @@ object MoongladeBeacon {
             BeaconPieceTarget.OURS -> ours
         }
 
-        val asMap: Map<BeaconPieceTarget, T?> get() = mapOf(
-            BeaconPieceTarget.REFERENCE to reference,
-            BeaconPieceTarget.OURS to ours,
-        )
+        val asMap: Map<BeaconPieceTarget, T?>
+            get() = mapOf(
+                BeaconPieceTarget.REFERENCE to reference,
+                BeaconPieceTarget.OURS to ours,
+            )
     }
 
     class BeaconDataPair<T : Enum<T>>(
@@ -489,6 +491,7 @@ object MoongladeBeacon {
                     speedPair[BeaconPieceTarget.OURS] = slot.getBeaconSpeedOrNull()
                     nextPitchPair[BeaconPieceTarget.OURS] = speedPair[BeaconPieceTarget.OURS]?.getOffsetFromNow()
                 }
+
                 pitchSelectSlot -> pitchPair[BeaconPieceTarget.OURS] = slot.getBeaconPitchOrNull()
                 pauseSelectSlot -> paused = stack.isPaused()
             }
