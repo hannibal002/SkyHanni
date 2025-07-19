@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
@@ -119,7 +119,7 @@ object PartyCommands {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.reversePT.clickable) return
         if (!transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) return
-        if (partyLeader != LorenzUtils.getPlayerName()) return
+        if (partyLeader != PlayerUtils.getName()) return
 
         val prevPartyLeader = PartyApi.prevPartyLeader ?: return
         event.blockedReason = "replacing"

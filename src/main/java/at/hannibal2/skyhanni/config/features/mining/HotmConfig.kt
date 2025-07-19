@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if TODO
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.PowderSpentDesign
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
-// todo 1.21 impl needed
 class HotmConfig {
     @Expose
     @ConfigOption(
@@ -19,6 +19,17 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightEnabledPerks: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Sky Mall Display", desc = "Display your current Sky Mall perk in a GUI element.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("skymall")
+    var skyMallDisplay: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = HotmConfig::class, field = "skyMallDisplay")
+    val skyMallPosition: Position = Position(100, 100)
 
     @Expose
     @ConfigOption(name = "Level Stack", desc = "Show the level of a perk as item stacks.")
@@ -38,12 +49,10 @@ class HotmConfig {
     @FeatureToggle
     var powderSpent: Boolean = true
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Powder Spent Design", desc = "Change the design of the powder spent display.")
     @ConfigEditorDropdown
     var powderSpentDesign: PowderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE
-    //#endif
 
     @Expose
     @ConfigOption(
@@ -53,4 +62,13 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var powderFor10Levels: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Current Powder",
+        desc = "Displays the current amount of powder available for the specific perk when viewing its tooltip."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var currentPowder: Boolean = true
 }

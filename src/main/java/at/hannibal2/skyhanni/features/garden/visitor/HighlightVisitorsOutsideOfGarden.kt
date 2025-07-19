@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -54,7 +54,7 @@ object HighlightVisitorsOutsideOfGarden {
     }
 
     private fun isVisitor(entity: Entity): Boolean {
-        val island = LorenzUtils.skyBlockIsland.islandData?.apiName ?: return false
+        val island = SkyBlockUtils.currentIsland.islandData?.apiName ?: return false
         val possibleJsons = visitorJson[island] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
@@ -78,8 +78,7 @@ object HighlightVisitorsOutsideOfGarden {
         get() = when (config.blockInteracting) {
             VisitorBlockBehaviour.DONT -> false
             VisitorBlockBehaviour.ALWAYS -> true
-            VisitorBlockBehaviour.ONLY_ON_BINGO -> LorenzUtils.isBingoProfile
-            null -> false
+            VisitorBlockBehaviour.ONLY_ON_BINGO -> SkyBlockUtils.isBingoProfile
         }
 
     private fun isVisitorNearby(location: LorenzVec) =
@@ -89,7 +88,7 @@ object HighlightVisitorsOutsideOfGarden {
     fun onClickEntity(event: EntityClickEvent) {
         if (!shouldBlock) return
         if (MinecraftCompat.localPlayer.isSneaking) return
-        val entity = event.clickedEntity ?: return
+        val entity = event.clickedEntity
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             if (event.action != Action.INTERACT_AT) {
                 ChatUtils.chatAndOpenConfig(

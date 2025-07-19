@@ -13,17 +13,22 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class CrimsonIsleConfig {
     @Category(name = "Ashfang", desc = "Ashfang settings")
     @Expose
-    var ashfang: AshfangConfig = AshfangConfig()
+    val ashfang: AshfangConfig = AshfangConfig()
 
     @ConfigOption(name = "Reputation Helper", desc = "")
     @Accordion
     @Expose
-    var reputationHelper: ReputationHelperConfig = ReputationHelperConfig()
+    val reputationHelper: ReputationHelperConfig = ReputationHelperConfig()
 
     @Expose
     @ConfigOption(name = "Matriarch Helper", desc = "Helper for Heavy Pearls")
     @Accordion
-    var matriarchHelper: MatriarchHelperConfig = MatriarchHelperConfig()
+    val matriarchHelper: MatriarchHelperConfig = MatriarchHelperConfig()
+
+    @Expose
+    @ConfigOption(name = "Atoms HitBox", desc = "")
+    @Accordion
+    val atomHitBox: AtomHitBoxConfig = AtomHitBoxConfig()
 
     @Expose
     @ConfigOption(
@@ -42,7 +47,7 @@ class CrimsonIsleConfig {
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig::class, field = "minibossRespawnTimer")
-    var minibossTimerPosition: Position = Position(20, 50)
+    val minibossTimerPosition: Position = Position(20, 50)
 
     @Expose
     @ConfigOption(
@@ -51,7 +56,16 @@ class CrimsonIsleConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var pabloHelper: Boolean = false
+    var pabloHelper: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Sirih NPC Helper",
+        desc = "Show a clickable message that grabs sulphur from your sacks."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var sirihHelper: Boolean = true
 
     @Expose
     @ConfigOption(name = "Volcano Explosivity", desc = "Show a HUD of the current volcano explosivity level.")
@@ -60,7 +74,7 @@ class CrimsonIsleConfig {
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig::class, field = "volcanoExplosivity")
-    var positionVolcano: Position = Position(20, 20)
+    val positionVolcano: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
@@ -74,5 +88,5 @@ class CrimsonIsleConfig {
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig::class, field = "showDojoRankDisplay")
-    var dojoRankDisplayPosition: Position = Position(-378, 206)
+    val dojoRankDisplayPosition: Position = Position(-378, 206)
 }

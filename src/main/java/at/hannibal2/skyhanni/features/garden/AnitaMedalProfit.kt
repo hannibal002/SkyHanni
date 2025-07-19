@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
@@ -83,7 +84,7 @@ object AnitaMedalProfit {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eProfit per Bronze Medal"))
+        newList.addString("§eProfit per Bronze Medal")
         newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }

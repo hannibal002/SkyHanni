@@ -39,9 +39,10 @@ object ShortenCoins {
 
         val originalComponent = event.chatComponent.siblings.firstOrNull() ?: event.chatComponent
 
-        event.chatComponent = modifiedMessage.asComponent {
+        val newComponent = modifiedMessage.asComponent {
             chatStyle = originalComponent.chatStyle
         }
+        event.replaceComponent(newComponent, "shortened_coins")
     }
 
     fun Number.formatChatCoins(): String {

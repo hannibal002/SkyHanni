@@ -11,11 +11,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object OpenLastStorage {
+
+    // TODO use [StorageApi]
 
     private val config get() = SkyHanniMod.feature.misc.lastStorage
     private val storage get() = ProfileStorageData.profileSpecific?.lastStorage
@@ -66,7 +68,7 @@ object OpenLastStorage {
             aliases = listOf("shlo")
             callback {
                 val storage = storage ?: return@callback
-                if (isEnabled() && LorenzUtils.inSkyBlock) {
+                if (isEnabled() && SkyBlockUtils.inSkyBlock) {
                     openLastStoragePage(storage.type)
                 } else {
                     ChatUtils.chatAndOpenConfig(

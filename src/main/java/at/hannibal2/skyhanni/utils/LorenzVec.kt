@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import com.google.gson.annotations.Expose
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -138,14 +139,9 @@ data class LorenzVec(
 
     fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
-    fun roundLocationToBlock(): LorenzVec {
-        val x = (x - .499999).roundTo(0)
-        val y = (y - .499999).roundTo(0)
-        val z = (z - .499999).roundTo(0)
-        return LorenzVec(x, y, z)
-    }
+    fun roundToBlock() = LorenzVec(floor(x), floor(y), floor(z))
 
-    fun blockCenter() = roundLocationToBlock().add(0.5, 0.5, 0.5)
+    fun blockCenter() = roundToBlock().add(0.5, 0.5, 0.5)
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
@@ -269,8 +265,6 @@ data class LorenzVec(
             return LorenzVec(this[0], this[1], this[2])
         }
 
-        fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().down()
-
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }
 }
@@ -279,8 +273,29 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
+fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(serverPosX, serverPosY, serverPosZ)
 
 fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
+
+fun Entity.getPositionLog() = PositionLog(
+    tick = ticksExisted,
+    position = getLorenzVec(),
+    prev = getPrevLorenzVec(),
+    server = getServerLorenzVec(),
+    motion = getMotionLorenzVec(),
+    yaw = rotationYaw,
+    pitch = rotationPitch,
+)
+
+data class PositionLog(
+    @Expose val tick: Int,
+    @Expose val position: LorenzVec,
+    @Expose val prev: LorenzVec,
+    @Expose val server: LorenzVec,
+    @Expose val motion: LorenzVec,
+    @Expose val yaw: Float,
+    @Expose val pitch: Float,
+)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 

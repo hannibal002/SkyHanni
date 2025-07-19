@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -13,14 +13,13 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
@@ -28,6 +27,9 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -53,7 +55,7 @@ object ComposterDisplay {
 
         val pattern = rawPattern.toPattern()
 
-        fun label(label: String) = Renderable.line {
+        fun label(label: String) = Renderable.horizontal {
             addItemStack(displayItem)
             addString(label)
         }
@@ -95,11 +97,11 @@ object ComposterDisplay {
         return if (emptyTime != null) {
             GardenApi.storage?.composterEmptyTime = emptyTime.fromNow()
             val format = emptyTime.format()
-            Renderable.line {
+            Renderable.horizontal {
                 addItemStack(bucket)
                 addString("§b$format")
             }
-        } else Renderable.string("§cOpen Composter Upgrades!")
+        } else Renderable.text("§cOpen Composter Upgrades!")
     }
 
     private fun readData(tabList: List<String>) {
@@ -150,7 +152,7 @@ object ComposterDisplay {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
+        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenApi.inGarden() && config.displayEnabled) {
             config.displayPos.renderRenderable(display, posLabel = "Composter Display")
@@ -175,10 +177,10 @@ object ComposterDisplay {
             } else "?"
         } ?: "§cJoin SkyBlock to show composter timer."
 
-        val inSB = LorenzUtils.inSkyBlock && config.displayOutsideGarden
-        val outsideSB = !LorenzUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
+        val inSB = SkyBlockUtils.inSkyBlock && config.displayOutsideGarden
+        val outsideSB = !SkyBlockUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
         if (!GardenApi.inGarden() && (inSB || outsideSB)) {
-            val outsideGardenDisplay = Renderable.line {
+            val outsideGardenDisplay = Renderable.horizontal {
                 addItemStack(bucket)
                 addString("§b$format")
             }
@@ -194,7 +196,7 @@ object ComposterDisplay {
 
         if (storage.lastComposterEmptyWarningTime.passedSince() < 2.0.minutes) return
         storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
-        if (IslandType.GARDEN.isInIsland()) {
+        if (IslandType.GARDEN.isCurrent()) {
             ChatUtils.chat(warningMessage, replaceSameMessage = true)
         } else {
             ChatUtils.clickToActionOrDisable(

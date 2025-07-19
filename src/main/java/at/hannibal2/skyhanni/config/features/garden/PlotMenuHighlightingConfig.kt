@@ -6,7 +6,6 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class PlotMenuHighlightingConfig {
     @Expose
@@ -18,7 +17,7 @@ class PlotMenuHighlightingConfig {
     @Expose
     @ConfigOption(name = "Statuses", desc = "Change which statuses are enabled, and the hierarchy of them.")
     @ConfigEditorDraggableList
-    var deskPlotStatusTypes: MutableList<PlotStatusType> = mutableListOf(
+    val deskPlotStatusTypes: MutableList<PlotStatusType> = mutableListOf(
         PlotStatusType.CURRENT,
         PlotStatusType.PESTS,
         PlotStatusType.SPRAYS,

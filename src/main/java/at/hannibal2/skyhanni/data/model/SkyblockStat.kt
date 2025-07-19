@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-//#if TODO
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-//#endif
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -24,7 +22,6 @@ import kotlin.math.roundToInt
 @Language("RegExp")
 private const val VALUE_PATTERN = "(?<value>[\\d,.]+)(?: .*)?"
 
-// todo 1.21 impl needed
 @Suppress("MaxLineLength")
 enum class SkyblockStat(
     val icon: String,
@@ -68,7 +65,7 @@ enum class SkyblockStat(
     ),
     VITALITY("§4♨", " *Vitality: §r§4♨$VALUE_PATTERN", " *§4♨ Vitality §f$VALUE_PATTERN"),
     MENDING("§a☄", " *Mending: §r§a☄$VALUE_PATTERN", " *§a☄ Mending §f$VALUE_PATTERN"),
-    TRUE_DEFENSE("§7❂", " *True Defense: §r§f❂$VALUE_PATTERN", " *§f❂ True Defense §f$VALUE_PATTERN"),
+    TRUE_DEFENSE("§f❂", " *True Defense: §r§f❂$VALUE_PATTERN", " *§f❂ True Defense §f$VALUE_PATTERN"),
     SWING_RANGE("§eⓈ", " *Swing Range: §r§eⓈ$VALUE_PATTERN", " *§eⓈ Swing Range §f$VALUE_PATTERN"),
 
     // TODO add the way sba did get it (be careful with 500+ Speed)
@@ -80,7 +77,7 @@ enum class SkyblockStat(
     MAGIC_FIND("§b✯", " *Magic Find: §r§b✯$VALUE_PATTERN", " *§b✯ Magic Find §f$VALUE_PATTERN"),
     PET_LUCK("§d♣", " *Pet Luck: §r§d♣$VALUE_PATTERN", " *§d♣ Pet Luck §f$VALUE_PATTERN"),
     FISHING_SPEED("§b☂", " *Fishing Speed: §r§b☂$VALUE_PATTERN", " *§b☂ Fishing Speed §f$VALUE_PATTERN"),
-    TROPHY_FISH_CHANCE("§b☂", "Trophy Fish Chance: §r§6♔$VALUE_PATTERN", " *§6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
+    TROPHY_FISH_CHANCE("§b♔", "Trophy Fish Chance: §r§6♔$VALUE_PATTERN", " *§6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
     DOUBLE_HOOK_CHANCE(
         "§9⚓",
         " *Double Hook Chance: §r§9⚓$VALUE_PATTERN",
@@ -103,6 +100,8 @@ enum class SkyblockStat(
     RUNECRAFTING_WISDOM("§3☯", " *Runecrafting Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Runecrafting Wisdom §f$VALUE_PATTERN"),
     SOCIAL_WISDOM("§3☯", " *Social Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Social Wisdom §f$VALUE_PATTERN"),
     TAMING_WISDOM("§3☯", " *Taming Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Taming Wisdom §f$VALUE_PATTERN"),
+    HUNTING_WISDOM("§3☯", " *Hunting Wisdom: §r§3☯$VALUE_PATTERN", " *§3☯ Hunting Wisdom §f$VALUE_PATTERN"),
+
     MINING_SPEED("§6⸕", " *Mining Speed: §r§6⸕$VALUE_PATTERN", " *§6⸕ Mining Speed §f$VALUE_PATTERN"),
     BREAKING_POWER("§2Ⓟ", "", " *§2Ⓟ Breaking Power §f$VALUE_PATTERN"),
     PRISTINE("§5✧", " *Pristine: §r§5✧$VALUE_PATTERN", " *§5✧ Pristine §f$VALUE_PATTERN"),
@@ -115,16 +114,16 @@ enum class SkyblockStat(
     MINING_FORTUNE("§6☘", " *Mining Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mining Fortune §f$VALUE_PATTERN"),
     FEAR("§5☠", " *Fear: §r§5☠$VALUE_PATTERN", " *§5☠ Fear §f$VALUE_PATTERN"),
     COLD_RESISTANCE("§b❄", " *Cold Resistance: §r§b❄$VALUE_PATTERN", ""),
-    WHEAT_FORTUNE("§7☘", "", " *§7§m☘ Wheat Fortune $VALUE_PATTERN"),
-    CARROT_FORTUNE("§7☘", "", " *§7§m☘ Carrot Fortune $VALUE_PATTERN"),
-    POTATO_FORTUNE("§7☘", "", " *§7§m☘ Potato Fortune $VALUE_PATTERN"),
-    PUMPKIN_FORTUNE("§7☘", "", " *§7§m☘ Pumpkin Fortune $VALUE_PATTERN"),
-    MELON_FORTUNE("§7☘", "", " *§7§m☘ Melon Fortune $VALUE_PATTERN"),
-    MUSHROOM_FORTUNE("§7☘", "", " *§7§m☘ Mushroom Fortune $VALUE_PATTERN"),
-    CACTUS_FORTUNE("§7☘", "", " *§7§m☘ Cactus Fortune $VALUE_PATTERN"),
-    NETHER_WART_FORTUNE("§7☘", "", " *§7§m☘ Nether Wart Fortune $VALUE_PATTERN"),
-    COCOA_BEANS_FORTUNE("§7☘", "", " *§7§m☘ Cocoa Beans Fortune $VALUE_PATTERN"),
-    SUGAR_CANE_FORTUNE("§7☘", "", " *§7§m☘ Sugar Cane Fortune $VALUE_PATTERN"),
+    WHEAT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wheat Fortune $VALUE_PATTERN"),
+    CARROT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Carrot Fortune $VALUE_PATTERN"),
+    POTATO_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Potato Fortune $VALUE_PATTERN"),
+    PUMPKIN_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Pumpkin Fortune $VALUE_PATTERN"),
+    MELON_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Melon Fortune $VALUE_PATTERN"),
+    MUSHROOM_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Mushroom Fortune $VALUE_PATTERN"),
+    CACTUS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cactus Fortune $VALUE_PATTERN"),
+    NETHER_WART_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
+    COCOA_BEANS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cocoa Beans Fortune $VALUE_PATTERN"),
+    SUGAR_CANE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sugar Cane Fortune $VALUE_PATTERN"),
 
     MINING_SPREAD(
         "§e▚",
@@ -146,16 +145,27 @@ enum class SkyblockStat(
     GEMSTONE_FORTUNE("§6☘", " *Gemstone Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Gemstone Fortune §f$VALUE_PATTERN"),
     HEAT_RESISTANCE("§c♨", " *Heat Resistance: §r§c♨$VALUE_PATTERN", " *§c♨ Heat Resistance §f$VALUE_PATTERN"),
 
+    SWEEP("§2∮", " *Sweep: §r§2∮$VALUE_PATTERN", " *§2∮ Sweep §f$VALUE_PATTERN"),
+    RESPIRATION("§3⚶", " *Respiration: §r§3⚶$VALUE_PATTERN", " *§3⚶ Respiration §f$VALUE_PATTERN"),
+    PRESSURE_RESISTANCE("§9❍", " *Pressure Resistance: §r§9❍$VALUE_PATTERN", " *§9❍ Pressure Resistance §f$VALUE_PATTERN"),
+    PULL("§bᛷ", " *Pull: §r§bᛷ$VALUE_PATTERN", " *§bᛷ Pull §f$VALUE_PATTERN"),
+    HUNTER_FORTUNE("§d☘", " *Hunter Fortune: §r§d☘$VALUE_PATTERN", " *§d☘ Hunter Fortune §f$VALUE_PATTERN"),
+    FIG_FORTUNE("§6☘", " *Fig Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Fig Fortune §f$VALUE_PATTERN"),
+    MANGROVE_FORTUNE("§6☘", " *Mangrove Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mangrove Fortune §f$VALUE_PATTERN"),
+
+    RIFT_TIME("§aф", " *Rift Time: §r§aф$VALUE_PATTERN", " *§aф Rift Time §f$VALUE_PATTERN"),
+    RIFT_DAMAGE("§5❁", " *Rift Damage: §r§5❁$VALUE_PATTERN", " *§5❁ Rift Damage §f$VALUE_PATTERN"),
+    MANA_REGEN("§b⚡", " *Mana Regen: §r§b⚡$VALUE_PATTERN", " *§b⚡ Mana Regen §f$VALUE_PATTERN"),
+    HEARTS("§c♥", " *Hearts: §r§c♥$VALUE_PATTERN", " *§c♥ Hearts §f$VALUE_PATTERN"),
+
     UNKNOWN("§c?", "", "")
     ;
 
-    //#if TODO
     var lastKnownValue: Double?
         get() = ProfileStorageData.profileSpecific?.stats?.get(this)
         set(value) {
             ProfileStorageData.profileSpecific?.stats?.set(this, value)
         }
-    //#endif
 
     var lastSource: StatSourceType = StatSourceType.UNKNOWN
 
@@ -167,9 +177,7 @@ enum class SkyblockStat(
 
     private val keyName = name.lowercase().replace('_', '.')
 
-    //#if TODO
     val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
-    //#endif
 
     val tablistPattern by RepoPattern.pattern("stats.tablist.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)
@@ -194,7 +202,6 @@ enum class SkyblockStat(
             }
         }
 
-        //#if TODO
         @HandleEvent(onlyOnSkyblock = true)
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             onSkyblockMenu(event)
@@ -221,7 +228,6 @@ enum class SkyblockStat(
                 assignEntry(list, StatSourceType.STATS_MENU) { it.menuPattern }
             }
         }
-        //#endif
 
         @HandleEvent
         fun onTabList(event: WidgetUpdateEvent) {
@@ -235,9 +241,7 @@ enum class SkyblockStat(
                 val matchResult = pattern(entry).matchMatcher(line) {
                     groupOrNull("value")?.replace("[,%]".toRegex(), "")?.toDouble()
                 } ?: continue
-                //#if TODO
                 entry.lastKnownValue = matchResult
-                //#endif
                 entry.lastSource = type
                 entry.lastAssignment = SimpleTimeMark.now()
                 break // Exit the inner loop once a match is found

@@ -21,10 +21,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockButtonWood
 import net.minecraft.init.Blocks
@@ -108,7 +108,12 @@ object WoodenButtonsHelper {
         if (!checkButtons()) return
 
         val location = event.position
-        if (location.getBlockAt() == Blocks.wooden_button && !hitButtons.contains(location)) {
+        //#if MC < 1.16
+        val oakButtonBlock = Blocks.wooden_button
+        //#else
+        //$$ val oakButtonBlock = Blocks.OAK_BUTTON
+        //#endif
+        if (location.getBlockAt() == oakButtonBlock && !hitButtons.contains(location)) {
             lastHitButton = event.position
         }
     }
@@ -154,7 +159,7 @@ object WoodenButtonsHelper {
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
         RiftApi.allButtonsHit = true
         hitButtons = buttonLocations.values.flatten().toMutableSet()
-        soulLocations["Buttons"]?.let {
+        soulLocations["Dreadfarm"]?.get("Buttons")?.let {
             IslandGraphs.pathFind(
                 it,
                 "Buttons Enigma Soul",

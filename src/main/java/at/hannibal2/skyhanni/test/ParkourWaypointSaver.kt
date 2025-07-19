@@ -5,17 +5,18 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -30,7 +31,7 @@ object ParkourWaypointSaver {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
+        if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
         if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
@@ -51,7 +52,7 @@ object ParkourWaypointSaver {
             }
 
             config.saveKey -> {
-                val newLocation = LorenzVec.getBlockBelowPlayer()
+                val newLocation = LocationUtils.getBlockBelowPlayer()
                 if (locations.isNotEmpty() && newLocation == locations.last()) return
                 locations.add(newLocation)
                 update()
@@ -99,7 +100,7 @@ object ParkourWaypointSaver {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
+        if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
 
         if (locations.size > 1) {
             parkourHelper?.render(event)

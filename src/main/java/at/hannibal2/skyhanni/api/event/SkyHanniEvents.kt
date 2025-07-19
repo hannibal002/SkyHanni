@@ -13,8 +13,8 @@ import java.lang.reflect.Method
 @SkyHanniModule
 object SkyHanniEvents {
 
-    private val listeners: MutableMap<Class<*>, EventListeners> = mutableMapOf()
-    private val handlers: MutableMap<Class<*>, EventHandler<*>> = mutableMapOf()
+    private val listeners: MutableMap<Class<out SkyHanniEvent>, EventListeners> = mutableMapOf()
+    private val handlers: MutableMap<Class<out SkyHanniEvent>, EventHandler<out SkyHanniEvent>> = mutableMapOf()
     private var disabledHandlers = emptySet<String>()
     private var disabledHandlerInvokers = emptySet<String>()
 
@@ -40,52 +40,53 @@ object SkyHanniEvents {
     fun isDisabledInvoker(invoker: String): Boolean = invoker in disabledHandlerInvokers
 
     private fun registerMethod(method: Method, instance: Any) {
-        val options = method.getAnnotation(HandleEvent::class.java) ?: return
-        registerNoEventType(options, method, instance)
-        registerSingleEventType(options, method, instance)
-        registerMultipleEventTypes(options, method, instance)
+        val (options, eventTypes) = getEventData(method) ?: return
+        eventTypes.forEach { eventType ->
+            listeners.getOrPut(eventType) { EventListeners(eventType) }
+                .addListener(method, instance, options)
+        }
     }
 
     @JvmStatic
     val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
         GeneratedEventPrimaryFunctionNames.map
 
-    private fun registerNoEventType(options: HandleEvent, method: Method, instance: Any) {
-        if (method.parameterTypes.any()) return
-        val eventType = eventPrimaryFunctionNames[method.name] ?: return
-        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
-        listeners.getOrPut(eventType) { EventListeners(eventType) }
-            .addListener(method, instance, options)
+    @Suppress("UNCHECKED_CAST")
+    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+        val options = method.getAnnotation(HandleEvent::class.java) ?: return null
+        when (method.parameterCount) {
+            1 -> {
+                val eventType = method.parameterTypes.first()
+                require(SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+                    "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
+                }
+                return options to listOf(eventType as Class<out SkyHanniEvent>)
+            }
+
+            0 -> {
+                val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
+                if (primaryFunctionEventType != null) {
+                    return options to listOf(primaryFunctionEventType)
+                }
+                if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
+                require(options.eventTypes.isNotEmpty()) {
+                    "Method ${method.name} must have at least one event type specified in @HandleEvent."
+                }
+                return options to options.eventTypes.map { it.java }
+            }
+        }
+        return null
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun registerSingleEventType(options: HandleEvent, method: Method, instance: Any) {
-        val eventType = method.parameterTypes.getOrNull(0) ?: options.eventType.java
-        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
-        listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
-            .addListener(method, instance, options)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun registerMultipleEventTypes(options: HandleEvent, method: Method, instance: Any) {
-        options.eventTypes.map { it.java }.forEach { eventType ->
-            if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
-            listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
-                .addListener(method, instance, options)
+    private fun unregisterMethod(method: Method) {
+        val (_, eventTypes) = getEventData(method) ?: return
+        eventTypes.forEach { event ->
+            unregisterHandler(event)
+            listeners.values.forEach { it.removeListener(method) }
         }
     }
 
-
-    private fun unregisterMethod(method: Method) {
-        if (method.parameterCount != 1) return
-        method.getAnnotation(HandleEvent::class.java) ?: return
-        val event = method.parameterTypes[0]
-        if (!SkyHanniEvent::class.java.isAssignableFrom(event)) return
-        unregisterHandler(event)
-        listeners.values.forEach { it.removeListener(method) }
-    }
-
-    private fun unregisterHandler(clazz: Class<*>) {
+    private fun unregisterHandler(clazz: Class<out SkyHanniEvent>) {
         this.handlers.removeIfKey { it.isAssignableFrom(clazz) }
     }
 
@@ -96,10 +97,13 @@ object SkyHanniEvents {
         disabledHandlerInvokers = data.disabledInvokers
     }
 
-    val seconds = setOf(10, 60, 60 * 5)
+    val seconds = listOf(10, 60, 60 * 5)
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        //#if MC > 1.21
+        //$$ try {
+        //#endif
         val list = handlers.values.toMutableList()
 
         for (second in seconds) {
@@ -119,7 +123,11 @@ object SkyHanniEvents {
                 }
             }
         }
-
+        //#if MC > 1.21
+        //$$ } catch (_: Exception) {
+        //$$ // ignore this error on 1.21 for now
+        //$$ }
+        //#endif
     }
 
     class EventInvokeData(var oldValue: Long, var diff: Long)

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary.getRabbitsFormat
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getRabbitsFormat
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +22,7 @@ import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-typealias RarityType = HoppityChatConfig.CompactRarityTypes
+private typealias RarityType = HoppityChatConfig.CompactRarityTypes
 
 @SkyHanniModule
 object HoppityEggsCompactChat {

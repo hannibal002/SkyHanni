@@ -3,6 +3,9 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -21,7 +24,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -32,7 +34,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
+import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -350,7 +352,7 @@ object SackApi {
         updateSacks(sackEvent)
         sackEvent.post()
         if (chatConfig.hideSacksChange) {
-            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isInIsland())) {
+            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isCurrent())) {
                 event.blockedReason = "sacks_change"
             }
         }
@@ -358,14 +360,14 @@ object SackApi {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
+        val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NeuInternalName>()
 
         sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
         sacks = sacksData.mapValues { it.value.contents }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
-        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
+        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase() }.toSet()
     }
 
     @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
@@ -475,14 +477,22 @@ object SackApi {
 
     fun NeuInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 
-    fun testSackApi(args: Array<String>) {
-        if (args.size == 1) {
-            if (sackListInternalNames.contains(args[0].uppercase())) {
-                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].toInternalName())}")
-            } else {
-                ChatUtils.userError("That item isn't a valid sack item.")
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestsackapi") {
+            description = "Get the amount of an item in sacks according to internal feature SackAPI"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("internalName", BrigadierArguments.string()) { internalName ->
+                callback {
+                    val arg = getArg(internalName)
+                    if (sackListInternalNames.contains(arg.uppercase())) {
+                        ChatUtils.chat("Sack data for $arg: ${fetchSackItem(arg.toInternalName())}")
+                    } else {
+                        ChatUtils.userError("That item isn't a valid sack item.")
+                    }
+                }
             }
-        } else ChatUtils.userError("/shtestsackapi <internal name>")
+        }
     }
 }
 

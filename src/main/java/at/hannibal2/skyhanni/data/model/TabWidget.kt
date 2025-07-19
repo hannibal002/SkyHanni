@@ -263,7 +263,27 @@ enum class TabWidget(
     ),
     PEST_TRAPS(
         // language=RegExp
-        "(?:§.)*Pest Traps: (?:§.)*(?<count>\\d+)/(?<max>\\d+)",
+        "(?:§.)*Pest Traps: (?:§.)*(?<count>\\d+)\\/(?<max>\\d+)",
+    ),
+    FULL_TRAPS(
+        /**
+         * REGEX-TEST: §r§fFull Traps: §r§a#1§r§7, §r§a#2§r§7, §r§a#3
+         * REGEX-TEST: §r§fFull Traps: §r§a#2§r§7, §r§a#3
+         * REGEX-TEST: §r§fFull Traps: §r§a#3
+         * REGEX-TEST: §r§fFull Traps: §r§7None
+         */
+        // language=RegExp
+        "(?:§.)*Full Traps: (?:§.)*(?:None|§r§a(?<traps>#\\d(?:§r§7, §r§a#\\d(?:§r§7, §r§a#\\d)?)?))",
+    ),
+    NO_BAIT(
+        /**
+         * REGEX-TEST: §r§fNo Bait: §r§c#1§r§7, §r§c#2§r§7, §r§c#3
+         * REGEX-TEST: §r§fNo Bait: §r§c#2§r§7, §r§c#3
+         * REGEX-TEST: §r§fNo Bait: §r§c#3
+         * REGEX-TEST: §r§fNo Bait: §r§7None
+         */
+        // language=RegExp
+        "(?:§.)*No Bait: (?:§.)*(?:None|§r§c(?<traps>#\\d(?:§r§7, §r§c#\\d(?:§r§7, §r§c#\\d)?)?))"
     ),
     VISITORS(
         // language=RegExp
@@ -322,6 +342,30 @@ enum class TabWidget(
     EVENT_TRACKERS(
         // language=RegExp
         "§e§lEvent Trackers:",
+    ),
+    AGATHA_CONTEST(
+        // language=RegExp
+        "(?:§.)*Agatha's Contest:.*",
+    ),
+    MOONGLADE_BEACON(
+        // language=RegExp
+        "(?:§.)*Moonglade Beacon: §r§b(?<stacks>\\d+) Stacks?",
+    ),
+    SALTS(
+        // language=RegExp
+        "(?:§.)*Salts:",
+    ),
+    FOREST_WHISPERS(
+        // language=RegExp
+        "(?:§.)*Forest Whispers: (?:§.)*(?<amount>.*)",
+    ),
+    SHARD_TRAPS(
+        // language=RegExp
+        "(?:§.)*Shard Traps"
+    ),
+    STARBORN_TEMPLE(
+        // language=RegExp
+        "§9§lStarborn Temple:",
     ),
     ;
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.markedplayer
 
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -21,11 +22,11 @@ class MarkedPlayerConfig {
     @Expose
     @ConfigOption(name = "Mark Own Name", desc = "Mark own player name.")
     @ConfigEditorBoolean
-    var markOwnName: Property<Boolean> = Property.of(false)
+    val markOwnName: Property<Boolean> = Property.of(false)
 
     @ConfigOption(
         name = "Marked Chat Color",
-        desc = "Marked Chat Color. §eIf Chroma is gray, enable Chroma in Chroma settings."
+        desc = "Marked Chat Color. §eIf Chroma is gray, enable Chroma in Chroma settings.",
     )
     @Expose
     @ConfigEditorDropdown
@@ -33,9 +34,14 @@ class MarkedPlayerConfig {
 
     @ConfigOption(
         name = "Marked Entity Color",
-        desc = "The color of the marked player in the world. §cDoes not yet support chroma."
+        desc = "The color of the marked player in the world. §cDoes not yet support chroma.",
     )
     @Expose
     @ConfigEditorDropdown
-    var entityColor: Property<LorenzColor> = Property.of(LorenzColor.YELLOW)
+    val entityColor: Property<LorenzColor> = Property.of(LorenzColor.YELLOW)
+
+    @Expose
+    @ConfigOption(name = "Join/Leave Message", desc = "")
+    @Accordion
+    val joinLeaveMessage: JoinLeaveMessageConfig = JoinLeaveMessageConfig()
 }
