@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.renderables
+package at.hannibal2.skyhanni.utils.renderables.interactables
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecoratorOnlyRender
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -19,7 +21,7 @@ object DragNDrop {
 
     private const val BUTTON_MAPPED = KeyboardManager.LEFT_MOUSE
 
-    private val invalidItem = ItemStackRenderable(ItemStack(Blocks.barrier), 1.0)
+    private val invalidItem = Renderable.item(ItemStack(Blocks.barrier), 1.0)
 
     @HandleEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
@@ -42,29 +44,30 @@ object DragNDrop {
         DrawContextUtils.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
     }
 
-    fun draggable(
+    fun Renderable.Companion.draggable(
         display: Renderable,
         item: () -> DragItem<*>,
         bypassChecks: Boolean = false,
         condition: () -> Boolean = { true },
-    ) = Renderable.clickable(
+    ) = clickable(
         display,
         onLeftClick = { currentDrag = item() },
         bypassChecks = bypassChecks,
         condition = condition,
     )
 
-    fun droppable(
+    fun Renderable.Companion.droppable(
         display: Renderable,
         drop: Droppable,
         bypassChecks: Boolean = false,
         condition: () -> Boolean = { true },
-    ): Renderable = object : RenderableWrapper(display) {
+    ): Renderable = object : RenderableDecoratorOnlyRender {
+        override val root = display
         override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-            if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
+            if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
                 handelDroppable(drop)
             }
-            content.render(mouseOffsetX, mouseOffsetY)
+            root.render(mouseOffsetX, mouseOffsetY)
         }
     }
 
@@ -84,7 +87,7 @@ object DragNDrop {
 
 fun ItemStack.toDragItem(scale: Double = 1.0) = object : DragItem<ItemStack> {
 
-    val render = ItemStackRenderable(this@toDragItem, scale, 0)
+    val render = Renderable.item(this@toDragItem, scale, 0)
 
     override fun get(): ItemStack = this@toDragItem
 

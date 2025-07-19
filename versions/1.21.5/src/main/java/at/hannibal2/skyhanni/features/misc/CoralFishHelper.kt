@@ -20,16 +20,16 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
 @SkyHanniModule
@@ -78,19 +78,19 @@ object CoralFishHelper {
         val sorted = displayLines.sortedBy { it.price }
 
         display = buildList {
-            add(StringRenderable("§dCoral Fish Helper"))
+            addString("§dCoral Fish Helper")
             if (found == total) {
-                add(StringRenderable("§a§lYou have found all the fish!"))
+                addString("§a§lYou have found all the fish!")
             } else {
-                add(StringRenderable("§7You've found §a$found§7 out of §a$total§7 fish!"))
-                add(StringRenderable("§7Click on a fish to search for it on the ah!"))
+                addString("§7You've found §a$found§7 out of §a$total§7 fish!")
+                addString("§7Click on a fish to search for it on the ah!")
                 add(sorted.map { it.searchable }.buildSearchableScrollable(height = 225, textInput, velocity = 25.0))
             }
         }
     }
 
     private fun createRenderableLine(internalName: NeuInternalName): CoralFishHelperLine {
-        val stack = ItemStackRenderable(internalName.getItemStack())
+        val stack = Renderable.item(internalName.getItemStack())
         val price = internalName.getPrice()
         val priceString = if (price > 0.0) "§6${price.shortFormat()} coins" else "§cNo Price Found"
         val itemName = internalName.repoItemName
@@ -110,9 +110,7 @@ object CoralFishHelper {
             },
         )
 
-        val container = HorizontalContainerRenderable(
-            listOf(stack, clickable),
-        ).toSearchable()
+        val container = Renderable.horizontal(stack, clickable).toSearchable()
 
         return CoralFishHelperLine(price, container)
     }

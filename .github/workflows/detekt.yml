@@ -47,13 +47,13 @@ jobs:
                     fi
 
             -   name: Add label if detekt fails
-                if: ${{ failure() && steps.check_sarif.outputs.exists == 'true' }}
+                if: ${{ steps.run_detekt.outcome == 'failure' && steps.check_sarif.outputs.exists == 'true' }}
                 uses: actions-ecosystem/action-add-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Detekt'
             -   name: Remove label if detekt passes
-                if: success()
+                if: ${{ steps.run_detekt.outcome != 'failure' }}
                 uses: actions-ecosystem/action-remove-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -104,7 +104,7 @@ jobs:
                     kotlinc -script .github/scripts/process-detekt-output.kts
             -   name: Check for duplicate comment
                 id: check_duplicate
-                uses: actions/github-script@v6
+                uses: actions/github-script@v7
                 with:
                     script: |
                         const fs = require('fs');
@@ -123,7 +123,7 @@ jobs:
                 run: echo "Duplicate comment found, skipping..."
 
             -   name: Add comment to PR
-                uses: actions/github-script@v6
+                uses: actions/github-script@v7
                 if: steps.check_duplicate.outputs.result != 'true'
                 with:
                     github-token: ${{ secrets.GITHUB_TOKEN }}

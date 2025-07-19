@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
@@ -164,7 +165,7 @@ object CollectionTracker {
             itemAmount.percentWithColorCode(goalAmount, 1)
         }§f)"
 
-        display = Renderable.line {
+        display = Renderable.horizontal {
             internalName?.let {
                 addItemStack(it.getItemStack())
             }

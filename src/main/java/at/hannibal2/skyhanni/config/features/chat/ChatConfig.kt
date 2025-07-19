@@ -202,6 +202,7 @@ class ChatConfig {
             "e.g. §65,100,000 Coins §7-> §65.1M Coins",
     )
     @ConfigEditorBoolean
+    @SearchTag("format")
     @FeatureToggle
     var shortenCoinAmounts: Boolean = false
 }

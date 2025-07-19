@@ -1,15 +1,18 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.shader.CircleShader
+import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
 import kotlin.math.max
@@ -20,6 +23,16 @@ import kotlin.math.max
 //#endif
 
 object ShaderRenderUtils {
+
+    /**
+     * Returns a float array representation of the [ChromaColour].
+     */
+    private fun ChromaColour.destructToFloatArray(): FloatArray = floatArrayOf(
+        this.toColor().red.toFloat() / 255f,
+        this.toColor().green.toFloat() / 255f,
+        this.toColor().blue.toFloat() / 255f,
+        this.alpha.toFloat() / 255f
+    )
 
     /**
      * Helper method to assist with setting up the shader for drawing rounded shapes.
@@ -41,6 +54,7 @@ object ShaderRenderUtils {
         this.smoothness = smoothness
         this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+
         //#if MC > 1.21
         //#if MC < 1.21.6
         //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
@@ -238,6 +252,7 @@ object ShaderRenderUtils {
         angle1: Float = 7.0f,
         angle2: Float = 7.0f
     ) {
+        // todo all of these diameters might need to be calced from radiusIn instead of radius?
         val radiusIn = radius * GuiScreenUtils.scaleFactor
         val diameter = radius * 2
 
@@ -245,9 +260,6 @@ object ShaderRenderUtils {
             this.angle1 = angle1 - Math.PI.toFloat()
             this.angle2 = angle2 - Math.PI.toFloat()
         }
-
-        // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
-        val circleColor = color.addAlpha(255).rgb
 
         val left = x - 5
         val top = y - 5
@@ -257,11 +269,69 @@ object ShaderRenderUtils {
         //#if MC < 1.21
         DrawContextUtils.pushPop {
             ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
-            GuiRenderUtils.drawRect(left, top, right, bottom, circleColor)
+            GuiRenderUtils.drawRect(left, top, right, bottom, color.rgb)
             ShaderManager.disableShader()
         }
         //#else
-        //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, circleColor)
+        //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, color.rgb)
+        //#endif
+    }
+
+    /**
+     * Method to draw a radial gradient circle.
+     *
+     * **NOTE:** If you are using [DrawContextUtils.translate] or [DrawContextUtils.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
+     * is called **BEFORE** [DrawContextUtils.scale], otherwise the rectangle will not be rendered correctly
+     *
+     * @param x The x-coordinate of the circle's center.
+     * @param y The y-coordinate of the circle's center.
+     * @param radius The circle's radius.
+     * @param startColor The start color of the gradient.
+     * @param endColor The end color of the gradient.
+     * @param angle defines the angle of the gradient.
+     * @param progress the progress of the gradient (0.0 to 1.0)
+     * @param phaseOffset the phase offset of the gradient (0.0 to 360.0)
+     * @param smoothness smooths out the edge. (In amount of blurred pixels)
+     * @param reverse if true, the gradient will be reversed
+     */
+    fun drawRadialGradientFilledCircle(
+        x: Int,
+        y: Int,
+        radius: Int = 10,
+        startColor: ChromaColour,
+        endColor: ChromaColour,
+        angle: Float = 180f,
+        progress: Float,
+        phaseOffset: Float,
+        smoothness: Float = 1.5f,
+        reverse: Boolean = false,
+    ) {
+        val radiusIn = radius * GuiScreenUtils.scaleFactor
+        val diameter = radius * 2
+
+        RadialGradientCircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
+            this.angle = angle - Math.PI.toFloat()
+            this.reverse = if (reverse) 1 else 0
+            this.progress = progress
+            this.phaseOffset = phaseOffset
+            this.startColor = startColor.destructToFloatArray()
+            this.endColor = endColor.destructToFloatArray()
+        }
+
+        val left = x - 5
+        val top = y - 5
+        val right = x + (radius * 2) + 5
+        val bottom = y + (radius * 2) + 5
+
+        //#if MC < 1.21
+        DrawContextUtils.pushPop {
+            ShaderManager.enableShader(ShaderManager.Shaders.RADIAL_GRADIENT_CIRCLE)
+            GuiRenderUtils.drawRect(left, top, right, bottom, LorenzColor.WHITE.toColor().rgb)
+            ShaderManager.disableShader()
+        }
+        //#else
+        //$$ RoundedShapeDrawer.drawGradientCircle(left, top, right, bottom, startColor, endColor)
         //#endif
     }
 }

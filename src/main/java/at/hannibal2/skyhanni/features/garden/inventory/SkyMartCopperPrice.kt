@@ -20,9 +20,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 
@@ -92,7 +92,7 @@ object SkyMartCopperPrice {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(StringRenderable("§eCoins per Copper§f:"))
+        newList.addString("§eCoins per Copper§f:")
         newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
         display = newList
     }

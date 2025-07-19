@@ -1,9 +1,11 @@
-package at.hannibal2.skyhanni.utils.renderables
+package at.hannibal2.skyhanni.utils.renderables.animated
 
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -20,7 +22,7 @@ import kotlin.time.Duration
  * @param onBounce A callback that is invoked when the logo bounces off an edge.
  * @param onCornerHit A callback that is invoked when the logo hits a corner of the screen.
  */
-class DVDLogoRenderable(
+class DVDLogoRenderable private constructor(
     private val renderable: Renderable,
     private val movementSpeed: Float = 4f,
     initialTrajectory: LogoTrajectory = LogoTrajectory.entries.random(),
@@ -28,12 +30,14 @@ class DVDLogoRenderable(
     override val verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
     private val onBounce: (Renderable) -> Unit = {},
     private val onCornerHit: (Renderable) -> Unit = {},
-) : TimeDependentRenderable() {
+) : TimeDependentRenderable {
     override val width: Int = renderable.width
     override val height: Int = renderable.height
 
     private var position: Position = renderable.generateRandomStartingPosition()
     private var trajectory: LogoTrajectory = initialTrajectory
+
+    override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
 
     private fun generateNextTrajectory(
         posXAtEdge: Boolean,
@@ -97,6 +101,21 @@ class DVDLogoRenderable(
             DrawContextUtils.translate(x.toFloat(), y.toFloat(), 0f)
             renderable.render(mouseOffsetX + x, mouseOffsetY + y)
         }
+    }
+
+    companion object {
+        /**
+         * Docs see: [DVDLogoRenderable]
+         */
+        fun Renderable.Companion.dvdLogo(
+            renderable: Renderable,
+            movementSpeed: Float = 4f,
+            initialTrajectory: LogoTrajectory = LogoTrajectory.entries.random(),
+            horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+            onBounce: (Renderable) -> Unit = {},
+            onCornerHit: (Renderable) -> Unit = {},
+        ) = DVDLogoRenderable(renderable, movementSpeed, initialTrajectory, horizontalAlign, verticalAlign, onBounce, onCornerHit)
     }
 }
 

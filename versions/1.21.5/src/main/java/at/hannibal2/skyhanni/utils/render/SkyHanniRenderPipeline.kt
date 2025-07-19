@@ -119,8 +119,28 @@ enum class SkyHanniRenderPipeline(
             "angle2" to UniformType.FLOAT,
         ),
         //#else
-        //$$ uniforms = getCommonRoundedUniforms() + mapOf(
+        //$$ uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
         //$$     "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
+        //$$ ),
+        //#endif
+    ),
+    RADIAL_GRADIENT_CIRCLE(
+        snippet = RenderPipelines.MATRICES_SNIPPET,
+        vFormat = VertexFormats.POSITION_COLOR,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "radial_gradient_circle",
+        //#if MC < 1.21.6
+        uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+            "angle" to UniformType.FLOAT,
+            "startColor" to UniformType.VEC4,
+            "endColor" to UniformType.VEC4,
+            "progress" to UniformType.FLOAT,
+            "phaseOffset" to UniformType.FLOAT,
+            "reverse" to UniformType.INT,
+        )
+        //#else
+        //$$ uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+        //$$     "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
         //$$ ),
         //#endif
     ),
