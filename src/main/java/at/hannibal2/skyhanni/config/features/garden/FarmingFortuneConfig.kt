@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
@@ -35,9 +34,9 @@ class FarmingFortuneConfig {
         desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff"
     )
     @ConfigEditorButton(buttonText = "Open")
-    var open: Runnable = Runnable(FFGuideGui::onCommand)
+    val open: Runnable = Runnable(FFGuideGui::onCommand)
 
     @Expose
     @ConfigLink(owner = FarmingFortuneConfig::class, field = "display")
-    var position: Position = Position(5, -180)
+    val position: Position = Position(5, -180)
 }

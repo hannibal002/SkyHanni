@@ -157,6 +157,8 @@ object SlayerApi {
 
         "Ruins",
         "Howling Cave",
+        "Soul Cave",
+        "Spirit Cave",
         -> SlayerType.SVEN
 
         "Void Sepulture",

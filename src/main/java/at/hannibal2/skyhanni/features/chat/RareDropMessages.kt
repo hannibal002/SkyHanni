@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
@@ -16,12 +16,12 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -95,7 +95,7 @@ object RareDropMessages {
         IslandType.KUUDRA_ARENA,
     )
 
-    private val userLuck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck
+    private val userLuck get() = UserLuckBreakdown.getTotalUserLuck()
 
     private val config get() = SkyHanniMod.feature.chat.rareDropMessages
 
@@ -106,7 +106,8 @@ object RareDropMessages {
         petPatterns.matchMatchers(event.message) {
             var start = group("start")
             val rarityColor = group("rarityColor")
-            val rarityName = LorenzRarity.colorCodeToRarity(rarityColor.first()).uppercase()
+            val rarity = LorenzRarity.getByColorCode(rarityColor.first()) ?: return@matchMatchers
+            val rarityName = rarity.formattedName.uppercase()
             val petName = group("petName")
             val end = group("end")
             if (start.endsWith("a ") && rarityName.first().isVowel())
@@ -123,7 +124,7 @@ object RareDropMessages {
         val internalName = event.internalName
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.ENCHANTED_BOOK) return
-        if (inAnyIsland(ignoredBookIslands)) return
+        if (SkyBlockUtils.inAnyIsland(ignoredBookIslands)) return
 
         val itemName = internalName.repoItemName
         var anyRecentMessage = false
@@ -147,8 +148,8 @@ object RareDropMessages {
 
         if (!anyRecentMessage && config.enchantedBookMissingMessage) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
-            if (SkyHanniMod.feature.misc.userluckEnabled) {
-                userLuck?.takeIf { it != 0f }?.let { luck ->
+            if (SkyHanniMod.feature.misc.userLuck) {
+                userLuck.takeIf { it != 0f }?.let { luck ->
                     var luckString = luck.roundTo(2).addSeparators()
                     if (luck > 0) luckString = "+$luckString"
                     message += " §a($luckString ✴ SkyHanni User Luck)"

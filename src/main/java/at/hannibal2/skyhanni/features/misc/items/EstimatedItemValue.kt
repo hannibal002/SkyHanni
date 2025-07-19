@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -33,16 +33,15 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object EstimatedItemValue {
 
@@ -63,7 +62,7 @@ object EstimatedItemValue {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
-            event.readConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+            event.getConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
     @HandleEvent
@@ -135,11 +134,7 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        //#if TODO
         if (SkyHanniDebugsAndTests.enabled) {
-            //#else
-            //$$ if (true) {
-            //#endif
             if (Keyboard.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
@@ -151,7 +146,7 @@ object EstimatedItemValue {
 
         try {
             // TODO this code needs to be changed around
-            config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
+            config.position.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
             // that tries to over-render the tooltip, and is not explicitly something we can solve here?
@@ -196,7 +191,6 @@ object EstimatedItemValue {
                 ignoreArmorDyes,
                 ignoreRunes,
                 priceSource,
-                useAttributeComposite,
             ) {
                 cache.clear()
             }
@@ -252,7 +246,7 @@ object EstimatedItemValue {
         this.getInternalNameOrNull()?.let { internalName ->
             val name = this.displayName
             return (
-                this.item == Items.enchanted_book ||
+                this.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK ||
                     name.contains("Salesperson") ||
                     name == "§6☘ Category: Item Ability (Passive)" ||
                     internalName.isRune() ||
@@ -287,11 +281,7 @@ object EstimatedItemValue {
         }
         list.add("§aTotal: §6§l$numberFormat coins")
 
-        val newDisplay = mutableListOf<Renderable>()
-        for (line in list) {
-            newDisplay.add(Renderable.string(line))
-        }
-        return newDisplay
+        return list.map(StringRenderable::from)
     }
 
     @HandleEvent
@@ -304,6 +294,8 @@ object EstimatedItemValue {
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
+
+        event.move(94, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
     }
 
     fun renderInNeuStorageOverlay() {

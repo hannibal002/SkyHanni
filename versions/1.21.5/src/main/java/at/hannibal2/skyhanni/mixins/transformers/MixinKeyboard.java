@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.compat.ReiCompat;
+import at.hannibal2.skyhanni.events.minecraft.CharEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +19,12 @@ public class MixinKeyboard {
     @Inject(method = "onKey", at = @At("HEAD"))
     private void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
         if (MinecraftClient.getInstance().player == null) return;
+        if (key == GLFW.GLFW_KEY_UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
+
+        // dont send key events if Rei search bar is selected
+        if (ReiCompat.searchHasFocus()) return;
+
         /*
             * action = 0: Key released
             * action = 1: Key pressed
@@ -40,5 +48,11 @@ public class MixinKeyboard {
             new KeyPressEvent(key).post();
         }
         if (action == 2) new KeyPressEvent(key).post();
+    }
+
+    @Inject(method = "onChar", at = @At("HEAD"))
+    private void onChar(long window, int codePoint, int modifiers, CallbackInfo ci) {
+        if (MinecraftClient.getInstance().player == null) return;
+        new CharEvent(codePoint).post();
     }
 }

@@ -33,10 +33,8 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-//#if TODO
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-//#endif
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -117,9 +115,7 @@ class GuiPositionEditor(
     }
 
     private fun renderHover(text: List<String>) {
-        //#if TODO
-        RenderableTooltips.setTooltipForRender(text.map { Renderable.string(it) })
-        //#endif
+        RenderableTooltips.setTooltipForRender(text.map(StringRenderable::from))
     }
 
     private fun renderRectangles(): Int {
@@ -207,7 +203,7 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char, keyCode: Int) {
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (clickedPos == -1) return
         val position = positions[clickedPos]
         if (position.clicked) return
@@ -267,4 +263,14 @@ class GuiPositionEditor(
         else
             hovered.scale += .1F
     }
+
+    //#if MC > 1.21
+    //$$ override fun close() {
+    //$$ if (oldScreen == null) {
+    //$$     super.close()
+    //$$ } else {
+    //$$     net.minecraft.client.MinecraftClient.getInstance().currentScreen = oldScreen
+    //$$ }
+    //$$ }
+    //#endif
 }

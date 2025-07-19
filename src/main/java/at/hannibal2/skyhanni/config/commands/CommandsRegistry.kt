@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
 import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.requireDevEnv
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrInsert
 import com.mojang.brigadier.CommandDispatcher
 //#if MC < 1.21
@@ -33,7 +34,7 @@ object CommandsRegistry {
     }
 
     private fun String.isUnique(builders: List<CommandData>) {
-        require(builders.all { this !in it.getAllNames() }) {
+        requireDevEnv(builders.all { this !in it.getAllNames() }) {
             "The command $this is already registered!"
         }
     }
@@ -49,8 +50,9 @@ object CommandsRegistry {
         ClientCommandHandler.instance.registerCommand(command)
         //#else
         //$$ val original = dispatcher.register(builder as LiteralArgumentBuilder<Any?>)
+        //$$ this.node = original
         //$$ aliases.forEach {
-        //$$     dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original))
+        //$$     dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original).executes(original.command))
         //$$ }
         //#endif
         addBuilder(builders)

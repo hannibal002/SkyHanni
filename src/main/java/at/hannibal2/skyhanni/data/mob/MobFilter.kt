@@ -122,7 +122,7 @@ object MobFilter {
 
     /**
      * REGEX-TEST: SHINY PIG
-     * */
+     */
     val shinyPig by patternGroup.pattern(
         "pattern.shiny",
         "SHINY PIG",
@@ -185,6 +185,8 @@ object MobFilter {
         "§e§lBLACKSMITH",
         "§e§lSHOP",
         "§e§lTREASURES",
+        "§c§lQUEST",
+        "§e§lQUEST",
     )
 
     fun Entity.isSkyBlockMob(): Boolean = when {

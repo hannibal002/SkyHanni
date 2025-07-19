@@ -6,8 +6,14 @@ import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
 import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.BlockPos
+import net.minecraft.util.MovingObjectPosition
+
+//#if MC > 1.21
+//$$ import net.minecraft.world.RaycastContext
+//#endif
 
 object BlockUtils {
 
@@ -42,28 +48,49 @@ object BlockUtils {
         return getValue(property) == 0
     }
 
-    //#if TODO
-    fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
+    private fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
         val target = start + direction.normalize() * distance
-        val result = world.rayTraceBlocks(start.toVec3(), target.toVec3())
+        val result = rayTrace(start, target)
 
         return result?.blockPos?.toLorenzVec()
     }
 
-    fun getBlockLookingAt(distance: Double = 10.0) = rayTrace(
+    //#if MC < 1.21
+    fun rayTrace(start: LorenzVec, end: LorenzVec): MovingObjectPosition? {
+        return world.rayTraceBlocks(start.toVec3(), end.toVec3())
+    }
+    //#else
+    //$$ fun rayTrace(start: LorenzVec, end: LorenzVec): net.minecraft.util.hit.BlockHitResult? {
+    //$$    return world.raycast(
+    //$$        RaycastContext(
+    //$$            start.toVec3(),
+    //$$            end.toVec3(),
+    //$$            RaycastContext.ShapeType.COLLIDER,
+    //$$            RaycastContext.FluidHandling.NONE,
+    //$$            MinecraftCompat.localPlayer,
+    //$$        ),
+    //$$    )
+    //$$ }
+    //#endif
+
+    fun getTargetedBlock(): LorenzVec? {
+        val mouseOverObject = Minecraft.getMinecraft().objectMouseOver ?: return null
+        if (mouseOverObject.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return null
+        return mouseOverObject.blockPos.toLorenzVec().roundToBlock()
+    }
+
+    fun getTargetedBlockAtDistance(distance: Double) = rayTrace(
         LocationUtils.playerEyeLocation(),
         MinecraftCompat.localPlayer.lookVec.toLorenzVec(),
         distance,
-    )
+    )?.roundToBlock()
 
-    fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
+    private fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
         val from = center.add(-distance, -distance, -distance).toBlockPos()
         val to = center.add(distance, distance, distance).toBlockPos()
         return BlockPos.getAllInBox(from, to)
     }
-    //#endif
 
-    //#if TODO
     fun nearbyBlocks(
         center: LorenzVec,
         distance: Int,
@@ -83,7 +110,6 @@ object BlockUtils {
         radius: Int = distance,
         filter: Block,
     ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
-    //#endif
 
     val redstoneOreBlocks = buildList { addRedstoneOres() }
 }

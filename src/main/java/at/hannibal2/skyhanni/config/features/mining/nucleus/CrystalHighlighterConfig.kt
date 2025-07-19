@@ -32,7 +32,7 @@ class CrystalHighlighterConfig {
     @Expose
     @Accordion
     @ConfigOption(name = "Highlight Colors", desc = "")
-    var colors: CrystalHighlighterColorConfig = CrystalHighlighterColorConfig()
+    val colors: CrystalHighlighterColorConfig = CrystalHighlighterColorConfig()
 
     @Expose
     @ConfigOption(name = "Only Show During Hoppity's", desc = "Only show the highlighted boxes during Hoppity's Hunt.")

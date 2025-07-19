@@ -1,30 +1,33 @@
 package at.hannibal2.skyhanni.features.misc
 
+
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.FakePlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
+
 
 @SkyHanniModule
 object HideArmor {
 
-    private val config get() = SkyHanniMod.feature.misc.hideArmor2
+    val config: HideArmorConfig get() = SkyHanniMod.feature.misc.hideArmor
     private var armor = mapOf<Int, ItemStack>()
 
-    private fun shouldHideArmor(entity: EntityPlayer): Boolean {
-        if (!LorenzUtils.inSkyBlock) return false
+    fun shouldHideArmor(entity: EntityPlayer): Boolean {
+        if (!SkyBlockUtils.inSkyBlock) return false
         if (entity is FakePlayer) return false
         if (entity.hasPotionEffect(EffectsCompat.INVISIBILITY)) return false
         if (entity.isNpc()) return false
@@ -70,8 +73,24 @@ object HideArmor {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(15, "misc.hideArmor2.mode") { element ->
-            ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)
-        }
+        event.move(91, "misc.hideArmor2", "misc.hideArmor")
+
+    }
+
+    private val CURRENT_RENDERED_ENTITY: ThreadLocal<Entity> = ThreadLocal<Entity>()
+
+    @JvmStatic
+    fun setCurrentEntity(entity: Entity) {
+        CURRENT_RENDERED_ENTITY.set(entity)
+    }
+
+    @JvmStatic
+    fun getCurrentEntity(): Entity? {
+        return CURRENT_RENDERED_ENTITY.get()
+    }
+
+    @JvmStatic
+    fun clearCurrentEntity() {
+        CURRENT_RENDERED_ENTITY.remove()
     }
 }

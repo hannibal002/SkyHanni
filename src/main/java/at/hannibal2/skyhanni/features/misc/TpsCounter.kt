@@ -10,17 +10,17 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object TpsCounter {
 
@@ -38,12 +38,10 @@ object TpsCounter {
     var tps: Double? = null
         private set
 
-    private var display: String? = null
+    private var display: Renderable? = null
 
     private val timeSinceWorldSwitch get() = SkyBlockUtils.lastWorldSwitch.passedSince()
-    private val tilCalculated: String
-        get() =
-            "§fCalculating... §7(${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)"
+    private var pendingTpsCommand = false
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -61,6 +59,11 @@ object TpsCounter {
         if (tpsList.size > 10) tpsList.removeAt(0)
 
         updateDisplay()
+
+        if (pendingTpsCommand) {
+            pendingTpsCommand = false
+            tpsCommand()
+        }
     }
 
     private fun updateDisplay() {
@@ -78,20 +81,24 @@ object TpsCounter {
                 "$legacyColor${fixTps(newTps)}"
             }
         }
-        display = "§eTPS: $text"
+        display = Renderable.text("§eTPS: $text")
     }
 
     private fun fixTps(tps: Double): Double {
-        //#if TODO
         return if (SkyHanniDebugsAndTests.isAprilFoolsDay) tps / 2 else tps
-        //#else
-        //$$ return tps
-        //#endif
     }
 
     private fun tpsCommand() {
-        val tpsMessage = tps?.let { "${format(it)}$it" } ?: tilCalculated
-        ChatUtils.chat("§eTPS: $tpsMessage")
+        val timeUntil = minimumSecondsDisplayDelay - timeSinceWorldSwitch
+        if (timeUntil.isPositive()) {
+            ChatUtils.chat("§eTPS: §fCalculating... §7(${timeUntil.inWholeSeconds}s)")
+            DelayedRun.runDelayed(timeUntil) {
+                pendingTpsCommand = true
+            }
+        } else {
+            val tpsMessage = tps?.let { "${format(fixTps(it))}$it" } ?: "§70 (Limbo?)"
+            ChatUtils.chat("§eTPS: $tpsMessage")
+        }
     }
 
     @HandleEvent
@@ -120,7 +127,7 @@ object TpsCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")
+        config.tpsDisplayPosition.renderRenderable(display, posLabel = "Tps Display")
     }
 
     @HandleEvent

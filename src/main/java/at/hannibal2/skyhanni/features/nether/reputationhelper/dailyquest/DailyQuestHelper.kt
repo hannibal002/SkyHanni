@@ -37,20 +37,20 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -108,7 +108,7 @@ object DailyQuestHelper {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
-            if (IslandType.CRIMSON_ISLE.isInIsland()) {
+            if (IslandType.CRIMSON_ISLE.isCurrent()) {
                 QuestLoader.loadFromTabList()
             }
         }
@@ -144,7 +144,7 @@ object DailyQuestHelper {
         val chestName = InventoryUtils.openInventoryName()
 
         if (chestName == "Challenges") {
-            if (LorenzUtils.skyBlockArea != "Dojo") return
+            if (SkyBlockUtils.graphArea != "Dojo") return
             val dojoQuest = getQuest<DojoQuest>() ?: return
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
@@ -246,7 +246,7 @@ object DailyQuestHelper {
         if (!quests.any { it.needsTownBoardLocation() }) return
 
         // we do not call getQuestBoardLocation in the first few seconds when faction type is null, since this will show an error
-        if (CrimsonIsleReputationHelper.factionType == null && LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
+        if (CrimsonIsleReputationHelper.factionType == null && SkyBlockUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         val location = getQuestBoardLocation()
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)
@@ -315,7 +315,7 @@ object DailyQuestHelper {
 
         val categoryName = category.displayName
 
-        return Renderable.line {
+        return Renderable.horizontal {
             addString("  $stateText$categoryName: ")
             addItemStack(item)
             addString("§f$displayName$progressText$sacksText")
@@ -397,5 +397,5 @@ object DailyQuestHelper {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.enabled.get()
 }

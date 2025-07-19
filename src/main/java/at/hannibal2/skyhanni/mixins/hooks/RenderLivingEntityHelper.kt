@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import java.awt.Color
 
@@ -15,6 +17,13 @@ object RenderLivingEntityHelper {
     private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
     private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+    var areMobsHighlighted = false
+    var renderingRealGlow = false
+    var currentGlowEvent: RenderEntityOutlineEvent? = null
+
+    fun isEntityInGlowEvent(entity: Entity): Int {
+        return currentGlowEvent?.entitiesToOutline?.get(entity) ?: 0
+    }
 
     @HandleEvent
     fun onWorldChange() {
@@ -24,12 +33,32 @@ object RenderLivingEntityHelper {
         entityNoHurtTimeCondition.clear()
     }
 
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
+        entityColorMap.removeIfKey { it.isDead }
+        entityColorCondition.removeIfKey { it.isDead }
+        entityNoHurtTimeCondition.removeIfKey { it.isDead }
+    }
+
+    fun check() {
+        areMobsHighlighted = false
+        val conditions = entityColorCondition.values
+        for (entry in conditions) {
+            if (entry.invoke()) {
+                areMobsHighlighted = true
+                return
+            }
+        }
+        if (currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true) areMobsHighlighted = true
+    }
+
     fun <T : EntityLivingBase> removeEntityColor(entity: T) {
         entityColorMap.remove(entity)
         entityColorCondition.remove(entity)
     }
 
     fun <T : EntityLivingBase> setEntityColor(entity: T, color: Int, condition: () -> Boolean) {
+        if (color == 0) return
         entityColorMap[entity] = color
         entityColorCondition[entity] = condition
     }
@@ -61,24 +90,20 @@ object RenderLivingEntityHelper {
     }
 
     @JvmStatic
-    fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T): Int {
-        //#if TODO
-        if (!SkyHanniDebugsAndTests.globalRender) return 0
-        //#endif
+    fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T, default: Int): Int {
+        if (!SkyHanniDebugsAndTests.globalRender) return default
         if (entityColorMap.containsKey(entity)) {
-            val condition = entityColorCondition[entity]!!
+            val condition = entityColorCondition[entity] ?: return default
             if (condition.invoke()) {
-                return entityColorMap[entity]!!
+                return entityColorMap[entity] ?: return default
             }
         }
-        return 0
+        return default
     }
 
     @JvmStatic
     fun <T : EntityLivingBase> internalChangeHurtTime(entity: T): Int {
-        //#if TODO
         if (!SkyHanniDebugsAndTests.globalRender) return entity.hurtTime
-        //#endif
         run {
             val condition = entityNoHurtTimeCondition[entity] ?: return@run
             if (condition.invoke()) {

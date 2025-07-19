@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -25,6 +26,10 @@ import com.google.gson.TypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
+//#if MC < 1.21
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybindL
+//#endif
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -101,23 +106,6 @@ class ConfigManager {
         OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
-    // Some position elements don't need config links as they don't have a config option.
-    private val ignoredMissingConfigLinks = listOf(
-        // commands
-        "features.garden.GardenConfig.cropSpeedMeterPos",
-        "features.misc.MiscConfig.collectionCounterPos",
-        "features.misc.MiscConfig.carryPosition",
-        "features.misc.MiscConfig.lockedMouseDisplay",
-        "features.gui.GuiConfig.titlePosition",
-
-        // debug features
-        "features.dev.DebugConfig.trackSoundPosition",
-        "features.dev.DebugConfig.trackParticlePosition",
-        "features.dev.DevConfig.debugPos",
-        "features.dev.DevConfig.debugLocationPos",
-        "features.dev.DevConfig.debugItemPos",
-    )
-
     private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
         if (obj == null) return
         if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
@@ -135,7 +123,8 @@ class ConfigManager {
                 if (PlatformUtils.isDevEnvironment) {
                     var name = "${field.declaringClass.name}.${field.name}"
                     name = name.replace("at.hannibal2.skyhanni.config.", "")
-                    if (name !in ignoredMissingConfigLinks) {
+                    val hasExplanatoryAnnotation = field.getAnnotation(NoConfigLink::class.java) != null
+                    if (!hasExplanatoryAnnotation) {
                         println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
                         missingConfigLink = true
                     }
@@ -160,7 +149,7 @@ class ConfigManager {
             println("Steps to fix:")
             println("1. Search for `WEE WOO WEE WOO` in the console output.")
             println("2. Either add the Config Link.")
-            println("3. Or add the name to ignoredMissingConfigLinks.")
+            println("3. Or add the @NoConfigLink annotation to the field.")
             println("")
             PlatformUtils.shutdownMinecraft("Missing Config Link")
         }
@@ -277,6 +266,8 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
+    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
+    STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
@@ -297,9 +288,17 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
             extraPath = categoryParent.split(".").last() + "."
         }
         extraPath += processedOption.getPath()
-        //#if TODO
-        if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
-            return GuiOptionEditorBlocked(default)
+        if (default is GuiOptionEditorKeybind) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#if MC < 1.21
+        if (default is GuiOptionEditorKeybindL) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#endif
+
+        EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
+            return GuiOptionEditorBlocked(default, extraMessage)
         }
 
         if (PlatformUtils.IS_LEGACY) {
@@ -311,7 +310,6 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
                 return GuiOptionEditorHidden(default)
             }
         }
-        //#endif
         return default
     }
 }

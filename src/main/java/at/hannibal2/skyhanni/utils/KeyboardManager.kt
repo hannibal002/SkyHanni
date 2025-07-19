@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
@@ -16,10 +18,8 @@ import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
 import at.hannibal2.skyhanni.data.model.TextInput
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import org.lwjgl.input.Mouse
 //#else
-//$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
 
@@ -60,7 +60,21 @@ object KeyboardManager {
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
-    fun isRightMouseClicked() = RIGHT_MOUSE.isKeyClicked()
+    @JvmStatic
+    fun checkIsInventoryClosure(keycode: Int): Boolean {
+        // Holding shift bypasses closure checks
+        if (isShiftKeyDown()) return false
+
+        val isClose =
+            //#if MC < 1.21
+            keycode == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || keycode == Keyboard.KEY_ESCAPE
+        //#else
+        //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
+        //#endif
+
+        if (!isClose) return false
+        return AttemptedInventoryCloseEvent().post()
+    }
 
     /**
      * TODO make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,
@@ -174,6 +188,7 @@ object KeyboardManager {
     fun KeyBinding.isActive(): Boolean {
         //#if MC < 1.16
         if (!Keyboard.isCreated()) return false
+        //#endif
         try {
             if (keyCode.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
@@ -184,7 +199,6 @@ object KeyboardManager {
             )
             return false
         }
-        //#endif
         return this.isKeyDown || this.isPressed
     }
 
@@ -199,9 +213,9 @@ object KeyboardManager {
 
         else -> Keyboard.isKeyDown(this)
         //#else
-        //$$ this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid", "keycode" to this)
+        //$$ this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid: $this")
         //$$ this == -1 -> false
-        //$$ this in 0..3 -> MouseCompat.isButtonDown(this)
+        //$$ this in 0..5 -> MouseCompat.isButtonDown(this)
         //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window.handle, this)
         //#endif
     }
@@ -224,7 +238,7 @@ object KeyboardManager {
         false
     }
 
-    fun getKeyName(keyCode: Int): String = KeybindHelper.getKeyName(keyCode)
+    fun getKeyName(keyCode: Int): String = IMinecraft.instance.getKeyName(keyCode)
 
     object WasdInputMatrix : Iterable<KeyBinding> {
         operator fun contains(keyBinding: KeyBinding) = when (keyBinding) {

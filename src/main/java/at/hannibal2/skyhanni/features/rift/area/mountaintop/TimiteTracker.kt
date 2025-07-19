@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object TimiteTracker {
 
@@ -71,11 +70,7 @@ object TimiteTracker {
                     }
                 }
             }
-            //#if TODO
             val motes = HIGHLITE.motesNpcPrice()?.times(craftableAmount)?.shortFormat() ?: "0"
-            //#else
-            //$$ val motes = "0"
-            //#endif
             if (craftableAmount > 0) {
                 addSearchString(" §7${craftableAmount.shortFormat()}x ${HIGHLITE.repoItemName} Craftable§7: §5$motes motes")
             }

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -41,12 +42,17 @@ class ItemResolutionQuery {
     private var guiContext: GuiScreen? = null
 
     companion object {
+
         private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
+
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
 
         fun transformHypixelBazaarToNeuItemId(hypixelId: String): String {
+            ItemUtils.bazaarOverrides[hypixelId]?.let {
+                return it
+            }
             val matcher = BAZAAR_ENCHANTMENT_PATTERN.matcher(hypixelId)
             if (matcher.matches()) {
                 return matcher.group(1) + ";" + matcher.group(2)
@@ -140,8 +146,23 @@ class ItemResolutionQuery {
             "Turbo-Cacti" -> "Turbo-Cactus"
             "Prismatic" -> "Pristine"
             "Dragon Tracer" -> "Aiming"
+            "Drain" -> "Syphon"
             else -> this
         }
+
+        fun attributeNameToInternalName(attributeName: String): String? {
+            var fixedAttributeName = attributeName.uppercase().replace(" ", "_")
+            fixedAttributeName = shardNameOverrides[fixedAttributeName] ?: fixedAttributeName
+            val shardName = "SHARD_$fixedAttributeName"
+            return ItemUtils.bazaarOverrides[shardName]
+        }
+
+        // TODO repo
+        private val shardNameOverrides = mapOf(
+            "STRIDERSURFER" to "STRIDER_SURFER",
+            "ABYSSAL_LANTERNFISH" to "ABYSSAL_LANTERN",
+            "CINDERBAT" to "CINDER_BAT",
+        )
     }
 
     fun withItemStack(stack: ItemStack): ItemResolutionQuery {
@@ -275,6 +296,17 @@ class ItemResolutionQuery {
         return null
     }
 
+    private fun resolveItemInAttributeMenu(lore: List<String>): String? {
+        UtilsPatterns.attributeSourcePattern.firstMatcher(lore) {
+            return attributeNameToInternalName(group("source"))
+        }
+        return null
+    }
+
+    private fun resolveItemInHuntingBoxMenu(displayName: String): String? {
+        return attributeNameToInternalName(displayName.removeColor())
+    }
+
     private fun resolveContextualName(): String? {
         val chest = guiContext as? GuiChest ?: return null
         val inventorySlots = chest.inventorySlots as ContainerChest
@@ -286,7 +318,7 @@ class ItemResolutionQuery {
             return resolveEnchantmentByName(displayName)
         }
         if (itemType === Items.skull && displayName.contains("Essence")) {
-            return findInternalNameByDisplayName(displayName, false)
+            findInternalNameByDisplayName(displayName, false)?.let { return it }
         }
         if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
             for (loreLine in compound.getLore()) {
@@ -304,6 +336,12 @@ class ItemResolutionQuery {
         if (guiName.endsWith("Experimentation Table RNG")) {
             return resolveEnchantmentByName(displayName)
         }
+        if (guiName == "Attribute Menu") {
+            return resolveItemInAttributeMenu(compound.getLore())
+        }
+        if (guiName == "Hunting Box" || guiName == "Fusion Box") {
+            return resolveItemInHuntingBoxMenu(displayName)
+        }
         return null
     }
 
@@ -320,11 +358,7 @@ class ItemResolutionQuery {
         return lore.contains("§7To Bazaar")
     }
 
-    private fun getExtraAttributes(): NBTTagCompound {
-        compound?.let {
-            return it.extraAttributes
-        } ?: return NBTTagCompound()
-    }
+    private fun getExtraAttributes(): NBTTagCompound = compound?.extraAttributes ?: NBTTagCompound()
 
     private fun resolveFromSkyblock(): String? {
         val internalName = getExtraAttributes().getString("id")

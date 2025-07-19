@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -38,7 +37,11 @@ object WorldRenderUtils {
      * @author Moulberry
      * @author Mojang
      */
-    private fun SkyHanniRenderWorldEvent.renderBeaconBeam(
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
+        this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
+    }
+
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
         z: Double,
@@ -118,17 +121,6 @@ object WorldRenderUtils {
         tessellator.draw()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawColor(
-        location: LorenzVec,
-        color: Color,
-        beacon: Boolean = false,
-        alpha: Float = -1f,
-        seeThroughBlocks: Boolean = true,
-    ) {
-        drawColor(location, color, beacon, alpha, seeThroughBlocks)
-    }
-
     fun SkyHanniRenderWorldEvent.drawColor(
         location: LorenzVec,
         color: LorenzColor,
@@ -176,31 +168,6 @@ object WorldRenderUtils {
         GlStateManager.enableCull()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawWaypointFilled(
-        location: LorenzVec,
-        color: Color,
-        seeThroughBlocks: Boolean = false,
-        beacon: Boolean = false,
-        extraSize: Double = 0.0,
-        extraSizeTopY: Double = extraSize,
-        extraSizeBottomY: Double = extraSize,
-        minimumAlpha: Float = 0.2f,
-        inverseAlphaScale: Boolean = false,
-    ) {
-        drawWaypointFilled(
-            location,
-            color,
-            seeThroughBlocks,
-            beacon,
-            extraSize,
-            extraSizeTopY,
-            extraSizeBottomY,
-            minimumAlpha,
-            inverseAlphaScale,
-        )
-    }
-
     fun SkyHanniRenderWorldEvent.drawWaypointFilled(
         location: LorenzVec,
         color: Color,
@@ -242,21 +209,6 @@ object WorldRenderUtils {
         if (seeThroughBlocks) {
             GlStateManager.enableDepth()
         }
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawFilledBoundingBox(
-        aabb: AxisAlignedBB,
-        c: Color,
-        alphaMultiplier: Float = 1f,
-        /**
-         * If set to `true`, renders the box relative to the camera instead of relative to the world.
-         * If set to `false`, will be relativized to [WorldRenderUtils.getViewerPos].
-         */
-        renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
-    ) {
-        drawFilledBoundingBox(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers)
     }
 
     fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
@@ -353,16 +305,6 @@ object WorldRenderUtils {
         GlStateManager.disableBlend()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawString(
-        location: LorenzVec,
-        text: String,
-        seeThroughBlocks: Boolean = false,
-        color: Color? = null,
-    ) {
-        drawString(location, text, seeThroughBlocks, color)
-    }
-
     fun SkyHanniRenderWorldEvent.drawString(
         location: LorenzVec,
         text: String,
@@ -448,36 +390,22 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawCircle(
-        entity: Entity,
-        rad: Double,
-        color: Color,
-    ) {
-        drawCircle(entity, rad, color)
-    }
-
     // modified from Autumn Client's TargetStrafe
-    fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
+    fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
 
-        GlStateManager.enableDepth()
         GlStateManager.enableBlend()
-        GlStateManager.depthFunc(GL11.GL_LEQUAL)
         GlStateManager.disableCull()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
-
         GlStateManager.disableDepth()
 
         var il = 0.0
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
         while (il < 0.05) {
-            GlStateManager.pushMatrix()
-            GlStateManager.disableTexture2D()
             GL11.glLineWidth(2F)
             worldRenderer.begin(1, DefaultVertexFormats.POSITION)
             val renderManager = Minecraft.getMinecraft().renderManager
@@ -493,12 +421,8 @@ object WorldRenderUtils {
                 worldRenderer.pos(x + rad * cos(i * pix2 / 45.0), y + il, z + rad * sin(i * pix2 / 45.0)).endVertex()
             }
             tessellator.draw()
-            GlStateManager.enableTexture2D()
-            GlStateManager.popMatrix()
             il += 0.0006
         }
-
-        GlStateManager.enableDepth()
 
         GlStateManager.enableCull()
         GlStateManager.enableTexture2D()
@@ -508,16 +432,62 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawCylinderInWorld(
+    fun SkyHanniRenderWorldEvent.drawCircleFilled(
+        entity: Entity,
+        rad: Double,
         color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-        height: Float,
+        depth: Boolean = true,
+        segments: Int = 32,
     ) {
-        drawCylinderInWorld(color, x, y, z, radius, height)
+        val exactLocation = exactLocation(entity)
+        drawCircleFilled(exactLocation.x, exactLocation.y, exactLocation.z, rad, color, depth, segments)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawCircleFilled(
+        locX: Double,
+        locY: Double,
+        locZ: Double,
+        rad: Double,
+        color: Color,
+        depth: Boolean = true,
+        segments: Int = 32,
+    ) {
+        GlStateManager.pushMatrix()
+        GL11.glNormal3f(0f, 1f, 0f)
+
+        GlStateManager.enableBlend()
+        GlStateManager.disableCull()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        GlStateManager.enableAlpha()
+        GlStateManager.disableTexture2D()
+        if (!depth) GlStateManager.disableDepth()
+
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+        val renderManager = Minecraft.getMinecraft().renderManager
+        val x: Double = locX - renderManager.viewerPosX
+        val y: Double = locY - renderManager.viewerPosY + 0.0020000000949949026
+        val z: Double = locZ - renderManager.viewerPosZ
+
+        worldRenderer.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION_COLOR)
+        for (i in 0 until segments) {
+            val angle1 = i * Math.PI * 2 / segments
+            val angle2 = (i + 1) * Math.PI * 2 / segments
+
+            worldRenderer.pos(x + rad * cos(angle1), y, z + rad * sin(angle1))
+                .color(color.red, color.green, color.blue, color.alpha).endVertex()
+            worldRenderer.pos(x + rad * cos(angle2), y, z + rad * sin(angle2))
+                .color(color.red, color.green, color.blue, color.alpha).endVertex()
+            worldRenderer.pos(x, y, z).color(color.red, color.green, color.blue, color.alpha).endVertex()
+        }
+        tessellator.draw()
+
+        GlStateManager.enableCull()
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableDepth()
+        GlStateManager.disableBlend()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.popMatrix()
     }
 
     fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
@@ -572,17 +542,6 @@ object WorldRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.popMatrix()
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawPyramid(
-        topPoint: LorenzVec,
-        baseCenterPoint: LorenzVec,
-        baseEdgePoint: LorenzVec,
-        color: Color,
-        depth: Boolean = true,
-    ) {
-        drawPyramid(topPoint, baseCenterPoint, baseEdgePoint, color, depth)
     }
 
     fun SkyHanniRenderWorldEvent.drawPyramid(
@@ -659,23 +618,13 @@ object WorldRenderUtils {
         }
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawSphereInWorld(
-        color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-    ) {
-        drawSphereInWorld(color, x, y, z, radius)
-    }
-
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereInWorld(color, location.x, location.y, location.z, radius)
+        drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
@@ -684,6 +633,7 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
@@ -702,8 +652,6 @@ object WorldRenderUtils {
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
 
-        val segments = 32
-
         for (phi in 0 until segments) {
             for (theta in 0 until segments * 2) {
                 val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
@@ -717,11 +665,9 @@ object WorldRenderUtils {
                 worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
 
-                val x3 =
-                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 =
-                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -742,23 +688,13 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawSphereWireframeInWorld(
-        color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-    ) {
-        drawSphereWireframeInWorld(color, x, y, z, radius)
-    }
-
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
+        drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
@@ -767,6 +703,7 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
@@ -779,8 +716,6 @@ object WorldRenderUtils {
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
 
-        val segments = 32
-
         for (phi in 0 until segments) {
             for (theta in 0 until segments * 2) {
                 val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
@@ -791,16 +726,13 @@ object WorldRenderUtils {
                 val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
                 val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
-                val x3 =
-                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 =
-                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
                 val z4 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
-
 
                 worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
@@ -823,21 +755,6 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawDynamicText(
-        location: LorenzVec,
-        text: String,
-        scaleMultiplier: Double,
-        yOff: Float = 0f,
-        hideTooCloseAt: Double = 4.5,
-        smallestDistanceVew: Double = 5.0,
-        ignoreBlocks: Boolean = true,
-        ignoreY: Boolean = false,
-        maxDistance: Int? = null,
-    ) {
-        drawDynamicText(location, text, scaleMultiplier, yOff, hideTooCloseAt, smallestDistanceVew, ignoreBlocks, ignoreY, maxDistance)
-    }
-
     fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
         text: String,
@@ -845,7 +762,7 @@ object WorldRenderUtils {
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceVew: Double = 5.0,
-        ignoreBlocks: Boolean = true,
+        seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
     ) {
@@ -871,7 +788,7 @@ object WorldRenderUtils {
 
         if (distToPlayer < hideTooCloseAt) return
         maxDistance?.let {
-            if (ignoreBlocks && distToPlayer > it) return
+            if (seeThroughBlocks && distToPlayer > it) return
         }
 
         val distRender = distToPlayer.coerceAtMost(50.0)
@@ -886,18 +803,18 @@ object WorldRenderUtils {
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        renderText(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
+        renderText(renderLocation, "§f$text", scale, !seeThroughBlocks, true, yOff)
     }
 
     private fun SkyHanniRenderWorldEvent.renderText(
         location: LorenzVec,
         text: String,
         scale: Double,
-        depthTest: Boolean,
+        seeThroughBlocks: Boolean,
         shadow: Boolean,
         yOff: Float,
     ) {
-        if (!depthTest) {
+        if (!seeThroughBlocks) {
             GL11.glDisable(GL11.GL_DEPTH_TEST)
             GL11.glDepthMask(false)
         }
@@ -919,125 +836,32 @@ object WorldRenderUtils {
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-scale / 25, -scale / 25, scale / 25)
         val stringWidth = fontRenderer.getStringWidth(text)
-        if (shadow) {
-            fontRenderer.drawStringWithShadow(
-                text,
-                (-stringWidth / 2).toFloat(),
-                yOff,
-                0,
-            )
-        } else {
-            fontRenderer.drawString(
-                text,
-                -stringWidth / 2,
-                0,
-                0,
-            )
-        }
+        fontRenderer.drawString(
+            text,
+            (-stringWidth / 2).toFloat(),
+            yOff,
+            0,
+            shadow,
+        )
         GlStateManager.color(1f, 1f, 1f)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
-        if (!depthTest) {
+        if (!seeThroughBlocks) {
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glDepthMask(true)
         }
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawWireframeBoundingBox(
-        aabb: AxisAlignedBB,
-        color: Color,
-    ) {
-        drawWireframeBoundingBox(aabb, color)
-    }
-
-    fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
-        aabb: AxisAlignedBB,
-        color: Color,
-    ) {
-        GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.disableTexture2D()
-        GlStateManager.disableCull()
-        val vp = getViewerPos(partialTicks)
-
-        val effectiveAABB = AxisAlignedBB(
-            aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
-            aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
-        )
-        val tessellator = Tessellator.getInstance()
-        val worldRenderer = tessellator.worldRenderer
-
-        with(color) {
-            GlStateManager.color(red / 255f, green / 255f, blue / 255f, alpha / 255f)
-        }
-        // Bottom face
-        worldRenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
-        with(effectiveAABB) {
-            worldRenderer.pos(minX, minY, minZ).endVertex()
-            worldRenderer.pos(maxX, minY, minZ).endVertex()
-            worldRenderer.pos(maxX, minY, maxZ).endVertex()
-            worldRenderer.pos(minX, minY, maxZ).endVertex()
-        }
-        tessellator.draw()
-
-        // Top face
-        worldRenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
-        with(effectiveAABB) {
-            worldRenderer.pos(minX, maxY, maxZ).endVertex()
-            worldRenderer.pos(maxX, maxY, maxZ).endVertex()
-            worldRenderer.pos(maxX, maxY, minZ).endVertex()
-            worldRenderer.pos(minX, maxY, minZ).endVertex()
-        }
-        tessellator.draw()
-
-
-        worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
-
-        with(effectiveAABB) {
-            worldRenderer.pos(minX, minY, minZ).endVertex()
-            worldRenderer.pos(minX, maxY, minZ).endVertex()
-
-            worldRenderer.pos(minX, minY, maxZ).endVertex()
-            worldRenderer.pos(minX, maxY, maxZ).endVertex()
-
-            worldRenderer.pos(maxX, minY, minZ).endVertex()
-            worldRenderer.pos(maxX, maxY, minZ).endVertex()
-
-            worldRenderer.pos(maxX, minY, maxZ).endVertex()
-            worldRenderer.pos(maxX, maxY, maxZ).endVertex()
-        }
-
-        tessellator.draw()
-
-        GlStateManager.enableTexture2D()
-        GlStateManager.enableCull()
-        GlStateManager.disableBlend()
-    }
-
-
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(partialTicks) {
-            drawEdges(location, color, lineWidth, depth)
+        LineDrawer.draw3D(this, lineWidth, depth) {
+            drawEdges(location, color)
         }
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(partialTicks) {
-            drawEdges(axisAlignedBB, color, lineWidth, depth)
+        LineDrawer.draw3D(this, lineWidth, depth) {
+            drawEdges(axisAlignedBB, color)
         }
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._draw3DLine(
-        p1: LorenzVec,
-        p2: LorenzVec,
-        color: Color,
-        lineWidth: Int,
-        depth: Boolean,
-    ) {
-        draw3DLine(p1, p2, color, lineWidth, depth)
     }
 
     fun SkyHanniRenderWorldEvent.draw3DLine(
@@ -1046,18 +870,8 @@ object WorldRenderUtils {
         color: Color,
         lineWidth: Int,
         depth: Boolean,
-    ) = LineDrawer.draw3D(partialTicks) {
-        draw3DLine(p1, p2, color, lineWidth, depth)
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._outlineTopFace(
-        boundingBox: AxisAlignedBB,
-        lineWidth: Int,
-        color: Color,
-        depth: Boolean,
-    ) {
-        outlineTopFace(boundingBox, lineWidth, color, depth)
+    ) = LineDrawer.draw3D(this, lineWidth, depth) {
+        draw3DLine(p1, p2, color)
     }
 
     fun SkyHanniRenderWorldEvent.outlineTopFace(
@@ -1073,21 +887,11 @@ object WorldRenderUtils {
         draw3DLine(cornerFour, cornerOne, color, lineWidth, depth)
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawHitbox(
-        boundingBox: AxisAlignedBB,
-        lineWidth: Int,
-        color: Color,
-        depth: Boolean,
-    ) {
-        drawHitbox(boundingBox, lineWidth, color, depth)
-    }
-
     fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
-        lineWidth: Int,
         color: Color,
-        depth: Boolean,
+        lineWidth: Int = 3,
+        depth: Boolean = true,
     ) {
         val cornersTop = boundingBox.getCornersAtHeight(boundingBox.maxY)
         val cornersBottom = boundingBox.getCornersAtHeight(boundingBox.minY)
@@ -1104,32 +908,8 @@ object WorldRenderUtils {
         }
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._draw3DPathWithWaypoint(
-        path: Graph,
-        colorLine: Color,
-        lineWidth: Int,
-        depth: Boolean,
-        startAtEye: Boolean = true,
-        textSize: Double = 1.0,
-        waypointColor: Color =
-            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
-        bezierPoint: Double = 1.0,
-        showNodeNames: Boolean = false,
-        markLastBlock: Boolean = true,
-    ) {
-        draw3DPathWithWaypoint(
-            path,
-            colorLine,
-            lineWidth,
-            depth,
-            startAtEye,
-            textSize,
-            waypointColor,
-            bezierPoint,
-            showNodeNames,
-            markLastBlock,
-        )
+    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
     }
 
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
@@ -1156,12 +936,10 @@ object WorldRenderUtils {
         } else {
             emptyList()
         } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
-        LineDrawer.draw3D(partialTicks) {
+        LineDrawer.draw3D(this, lineWidth, depth) {
             drawPath(
                 points,
                 colorLine,
-                lineWidth,
-                depth,
                 bezierPoint,
             )
         }
@@ -1195,7 +973,6 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
-        PatcherFixes.onPlayerEyeLine()
         return exactLocation(player).add(y = eyeHeight)
     }
 

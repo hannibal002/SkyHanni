@@ -1,5 +1,297 @@
 # SkyHanni - Change Log
 
+## Version 5.0.0
+
+### New Features
+
+#### Foraging
+
++ Added Compact messages for sweep details. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4259)
+
+#### Mining
+
++ Added Flowstate personal best. - nopo (https://github.com/hannibal002/SkyHanni/pull/4298)
++ Added Superprotectron highlighter. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3875)
++ Added HotM Sky Mall display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
++ Added metal detector solver, mute metal detector option, and all tools alert. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3589)
++ Added gemstone money per hour display when mining. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3586)
++ Added Mineshaft Detection. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4343)
+    + Ability to send entered Mineshaft to party chat.
+    + Tracks how many shafts you entered since each Mineshaft Type.
+
+#### Combat
+
++ Added Option to highlight runic mobs. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3467)
+
+#### Garden
+
++ Optimal Angles Overlay for Squeaky Mousemat. - nikijul (https://github.com/hannibal002/SkyHanni/pull/2999)
++ Added Pest Trap tab widgets to Tab Widget Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
++ Added warnings for Pest Traps being full or out of bait. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
+
+#### Commands
+
++ Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
+
+#### Misc
+
++ Added SkyBlock Profile Viewer support for updating data from Pv. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
++ Added support for 1.21.7. - Vixid & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4349)
++ Added Taming 60 helper. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4344)
+    + Shows which pets are cheapest to unlock the next taming level.
++ Added Frozen Treasure highlighter for the Glacial Caves. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4393)
++ Added Glowing Mushroom highlighter for the Glowing Mushroom Cave. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4392)
+
+#### Dungeons
+
++ Added Trinity helper. - Bugzilla + Daveed (https://github.com/hannibal002/SkyHanni/pull/4063)
+    + Notifies you when it is likely that there is a Trinity room in your dungeon.
++ Spirit Leap Keybinds. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/3844)
+    + Allows player to use keybinds to leap to specific player.
+    + Keybind hints added for easier keybind usage.
+
+#### Chat
+
++ Notify you in chat when a marked player joins/leaves your lobby. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2653)
++ Added filters for reward bundles reminders, redundant shard hunting messages, and unmineable trees. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4327)
+
+#### Events
+
++ Added Shiny orb helper. - Daveed & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4355)
+    + Shows lines between you, your pig and it's orb.
++ Added Shiny orb tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4355)
+
+#### Crimson
+
++ Added Sirih NPC Helper. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3525)
+    + Shows a clickable message that grabs sulphur from your sacks when talking to Sirih while he is a pig.
++ Show Exes, Wais and Zees hitbox. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2665)
+
+#### Inventory
+
++ Added "Old SB Menu" from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4271)
++ Added colors to stat numbers in tooltips. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4345)
++ Added chest profit calculator for dungeons and kuudra. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
++ Added Improved SB Menus. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4270)
+    + Allows you to smooth the look of glass panes in SkyBlock inventories.
+    + Functionality should be a near, if not perfect match to the NEU feature.
+    + Can only be used on Minecraft 1.21.
+
+#### Hoppity
+
++ Added option to mute sounds while Hoppity Eggs are "rolling". - Daveed (https://github.com/hannibal002/SkyHanni/pull/4281)
+    + Sub-option available to revert to "1.8 sounds" (eating sound).
+    + Will only apply to the "new" sounds that happen in 1.20 and above.
++ Added option to prevent closing CF when stray timer or strays are active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4067)
+
+### Improvements
+
+#### Inventory
+
++ Added Coin Support to Trade Value. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3899)
++ Added Fishing rod upgrades to estimated item value calculator. - hellcat (https://github.com/hannibal002/SkyHanni/pull/3975)
++ Allowed you to change the color of the highlights for the experiments addons helpers. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4338)
++ Added warning title when trying to use Old SB Menu buttons without cookie. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4346)
++ Added an option for item pickup log to show shard gains. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Added an option for the attribute shard overlay to account for shards you already own. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Made hunting box value overlay be scrollable. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Made hunting box value show the total value of shards in your hunting box. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Added Free Will to minion estimated item value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4421)
+
+#### Farming
+
++ Added option to not send Jacob contest summary stats if you haven't broken any crops. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4076)
+    + Mainly useful for pest farming.
++ Added options to make pest features display when holding lassos. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4372)
+    + Applies to the Pest Finder display + plot markers and Pest Timer display.
+
+#### Misc
+
++ Improved the changelog viewer's design to be more in-line with other SkyHanni guis. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4313)
++ Made some of the keybind features work with items in REI overlays. - nopo (https://github.com/hannibal002/SkyHanni/pull/4318)
++ Reduced memory usage with a large amount of text rendering. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4316)
++ Added new sounds to Sound Responses. - cato (https://github.com/hannibal002/SkyHanni/pull/3363)
++ Improved Sound Responses onomatopoeia recognition. - cato (https://github.com/hannibal002/SkyHanni/pull/3363)
++ Made `/shtps` automatically send the TPS after its calculating cooldown. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4412)
+
+#### Foraging
+
++ Made Moonglade beacon solver notify you if you are wearing stereo pants. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4348)
++ Added additional display options for the Frog Mask. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3522)
+
+#### Fishing
+
++ Added compact display mode for Golden Fish timer. - appable (https://github.com/hannibal002/SkyHanni/pull/3696)
++ Improved bait detection accuracy. - ninjaguardian (https://github.com/hannibal002/SkyHanni/pull/4379)
++ Allowed trophy fish display to show while wearing Ember Armor. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4064)
+
+#### Commands
+
++ Added /shresetkeybinds. - nopo (https://github.com/hannibal002/SkyHanni/pull/4340)
+
+#### Chat
+
++ Added filter for Swoop's message. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4388)
++ Made copy chat work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4408)
+
+### Fixes
+
+#### Rift
+
++ Fixed Enigma Soul tracker sometimes sending you to the wrong soul. - Luna (https://github.com/hannibal002/SkyHanni/pull/4320)
++ Fixed Berberis Highlight not working on 1.21 if Only on Farmland is enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/4373)
++ Fixed Vermin Tracker not counting Vermin Bin on Minecraft 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4371)
++ Fixed Agaricus Cap timer incorrectly resetting whenever you move your camera on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
++ Fixed Bacte Tentacle Waypoints not updating Tentacle HP on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
+
+#### Misc
+
++ Fixed Color month names not working on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4321)
++ Fixed Hide piggy not working on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4321)
++ Fixed Incompatibilities between Neu and SkyHanni experimentation addons helper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4322)
++ Fixed changelog viewer text sometimes being in the wrong spot. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3504)
++ Fixed rare lagging issue when checking clock time. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
++ Fixed rare crash when rendering entities on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4357)
++ Fixed most minion related features on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4356)
++ Fixed Crown of Avarice tracker sometimes not working on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4348)
++ Fixed issues with NEU items not loading correctly. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4314)
++ Fixed Keybind issuses maybe. - nopo (https://github.com/hannibal002/SkyHanni/pull/4360)
++ Fixed an edge case where shiny orb tracker would show up when it isn't meant to. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4375)
++ Fixed deadlock issue with repo management. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4374)
++ Fixed gfs command not working on most items that were more than one word. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4367)
++ Fixed issue when submitting contests to EliteDev. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4398)
++ Fixed Skill Overflow For Hunting And Foraging. - nopo (https://github.com/hannibal002/SkyHanni/pull/4406)
++ Fixed Custom Wadrobe buttons being wrongly vertical. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4413)
++ Fixed errors when calculating Pet XP. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4402)
++ Fixed rare error when converting config from 1.21 to 1.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4420)
+
+#### Chat
+
++ Fixed Hide lottery messages only hiding the buff message and not all lottery messages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4339)
++ Fixed rare crash when hovering over chat messages on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4369)
+    + Example: Compact Tree Gift with 0 rewards.
++ Fixed shorten coin amount behaving incorrectly on values < 1. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4417)
+
+#### Inventory
+
++ Fixed Next Click Helper for experiments requiring Prevent Misclicks to be on to function properly. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4338)
++ Fixed Ultrasequencer addon not using the custom color options. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4353)
++ Fixed Pet experience tooltip on Jade Dragons. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4361)
++ Fixed Old SB Menu buttons not handling clicks correctly. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4346)
++ Fixed crash with Old Skyblock Menus. - nopo (https://github.com/hannibal002/SkyHanni/pull/4352)
++ Fixed bazaar errors relating to Drain (Syphon) books. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4354)
++ Fixed CF-closing blockers being over-eager. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4347)
++ Fixed colorful stat number tooltips breaking when the stat is over 1,000. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4365)
++ Fixed estimated item value tooltip pricing enchanted books at twice their value. - SuperCl4sh (https://github.com/hannibal002/SkyHanni/pull/4247)
++ Fixed True Defense in Colour Item Stat Numbers being the wrong colour. - nopo (https://github.com/hannibal002/SkyHanni/pull/4366)
++ Fixed Crop Fortune Colours in Colourful Item Stats. - nopo (https://github.com/hannibal002/SkyHanni/pull/4391)
++ Fixed enchanted book items such as the experience artifact not showing in estimated item value. - nopo (https://github.com/hannibal002/SkyHanni/pull/4407)
++ Fixed estimated chest value displaying books at half their value. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4405)
++ Fixed Improved SB Menus replacing Potion items in the cookie menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4401)
++ Fixed visual errors in hunting box when no shards were detected. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4404)
++ Fixed a few minor issues with colorful item stats. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4419)
++ Fixed typo in composter menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4416)
+
+#### Fishing
+
++ Fixed grinch sea creature detection on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4394)
+
+#### Farming
+
++ Fixed Jacob Contests Saying they went for 55 years. - nopo (https://github.com/hannibal002/SkyHanni/pull/4383)
+
+### Technical Details
+
++ Added `NoConfigLink` annotation. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4306)
++ Added `onAnyToggled` to ConditionalUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4233)
+    + Allows you to `onToggle()` an entire config file at once.
++ Added ability to replace chat components on events with a reason. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4074)
+    + Basically the same thing as block reason.
+    + Made SkyHanniChatEvent extend SystemMessageEvent.
++ Added SkyBlockAPIEventWrappers, to fire NeuProfileDataLoadedEvent when SbPv gets opened. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
++ Begin preparations for 1.21.6/7. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4324)
+    + Currently, adds preprocessing for mixins to 1.21.7 and some of the more basic rendering changes.
+    + Shaders and some other more niche rendering doesn't work on 1.21.7 yet.
++ Changed `ChestItem` `Tips` to `List` from `MutableList`. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3899)
++ Fixed Mob.isRunic not working. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3467)
++ Made PabloHelper use RepoPattern. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3525)
++ Removed deprecated fun `Renderable.itemStack`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4262)
+    + Use `ItemStackRenderable` moving forward.
++ Renamed renderable params from posX/posY to mousePosX/mousePosY. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4215)
++ Started porting `misc` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4075)
++ Added .inMinesOfDivan to MiningAPI. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3589)
++ Added `GuiOnTopRenderEvent`. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3504)
+    + A GuiRenderEvent that renders as overlay outside inventory and inside an inventory as an ChestOverlay.
++ Added debug command for fetching moulberry lbin prices. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+    + `/shfetchmoulblbins`.
++ Added debug feature to show bin prices of items. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4341)
++ Added deprecation to `SkyHanniMod.coroutineScope`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+    + Should be using `.launchCoroutine` or `launchIOCoroutine`.
++ Added KDocs to most functions in `ApiUtils`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
++ Added more Brigadier Argument Types. - Empa (https://github.com/hannibal002/SkyHanni/pull/4304)
++ Added more structure to ApiUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+    + You can define static Api routes ahead of time as vals.
+    + You can specify explicit typing for ApiResponse.
+    + Functions will need to be `suspend` marked to use ApiUtils now.
++ Added Renderable Test Suite. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3504)
+    + A way to add tests for renderables. Which can be called activated with `/shrenderable`.
++ Added the ability to give more info on why a config option is disabled when people view it. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4334)
++ Finished porting `misc` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4087)
++ Refactored `KuudraTier` to an enum class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4328)
++ Removed deprecated functions: `Renderable.string` and `Renderable.wrappedString`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4264)
+    + Use `[Wrapped]StringRenderable` moving forward.
++ Removed deprecated functions: `Renderable.verticalContainer` and `Renderable.horizontalContainer`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4264)
+    + Use `[Vertical/Horizontal]ContainerRenderable` moving forward.
++ Removed unnecessary config migrations. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4335)
++ Silenced most errors related to `ApiUtils`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4265)
+    + If you need to debug, use the "ApiUtils never silent" debug option.
++ Abstracted SH + NEU Repo loading. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4314)
++ Added TextRenderables. - nopo (https://github.com/hannibal002/SkyHanni/pull/4351)
++ Made all repos load on a coroutine. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4314)
++ Moved Jacob contest related configs to a new package in garden. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4076)
++ Ported `config/features/inventory/customwardrobe` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4197)
++ Removed HasLegacyId class, and stripped legacy IDs from enum classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4071)
++ Shader support on 1.21.7. - Vixid (https://github.com/hannibal002/SkyHanni/pull/4349)
++ Abstracted code for tracking particles/sounds. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4307)
+    + Added config options for each in debug config.
+    + Both commands now use qualified args.
++ Added `KuudraChest` enum class to KuudraApi. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
++ Added `WRAPPED-REGEX-TEST`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4368)
+    + Ability to wrap regex tests in quotes.
++ Added animated pet skin loading to PetUtils and PetData. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4261)
++ Added ParticleUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4307)
++ Added Storage API. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4003)
++ Fixed .rawCraftCostOrNull() returning 0 craft cost for items dropped from mobs or minibosses. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4247)
+    + Caused all kuudra keys to have a raw craft cost of 0.
++ Made entity in EntityClickEvent no longer nullable . - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4375)
++ Ported `config/features/inventory/experimentationtable` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4199)
++ Ported the rest of misc. files in `config/features/inventory` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4199)
++ Ported ~1/2 of misc. files in `config/features/inventory` to kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4198)
++ Removed deprecated utils from RenderUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4362)
++ Added Renderable.fillScrollTable to create a filledTable that also can scroll. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Added ShardGainEvent for when shards go in and out of the hunting box. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Added the ability for sea creatures to have alternate messages that they match on. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4394)
++ Fixed /shtestmessage reporting that messages were blocked when they weren't. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4394)
++ Improved `BlockUtils.getBlockLookingAt()` and split it up into `getTargetedBlock()` and `getTargetedBlockAtDistance()`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
+    + Coordinates are now explicitly rounded to a full block to match 1.8 behavior.
+    + The former gets the targeted block directly from Minecraft using the default reach distance instead of 10, while the latter can still be used for custom distances.
++ Moved `LorenzVec.getBlockBelowPlayer()` to `LocationUtils` and fixed incorrect behavior when the player is standing on a non-full block. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
++ Removed unused deprecated functions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4381)
++ Renamed `LorenzVec.roundLocationToBlock()` to `roundToBlock()` and fixed incorrect rounding. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
++ Cleaned up and split up ApiUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4398)
++ Cleanup of core Renderables. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4387)
+    + That includes StringRenderable, ItemRenderable, ContainerRenderable and also some misc stuff.
++ Fixed Detekt workflows again. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4400)
++ Made attribute shard features silently error. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4404)
++ String.removeColor now removes the chroma color code. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4408)
++ Added `DamageSourceCompat` util class. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
++ Added live plugin for copying the 'path' to a config option. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4414)
++ Added PestTrapApi. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
++ Added RadialGradientCircularRenderable. - Daveed + next_g (https://github.com/hannibal002/SkyHanni/pull/4119)
++ Fixed `/shtps` showing your real TPS during April Fools. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4412)
++ Fixed EntityHurtEvent never triggering on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
++ Fixed occasional NoSuchFieldException in `/shtestpacket`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4410)
+
 ## Version 4.0.0
 
 ### New Features
@@ -24,10 +316,72 @@
     + Despawn timer below every chest, and as GUI display.
     + Chests color-coded to show despawn timer.
 + Added option to mute High Heat Sound in Magma Fields. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2573)
++ Added Current Powder line on HOTM perk hover. - munkuk (https://github.com/hannibal002/SkyHanni/pull/3956)
 
 #### GUI
 
 + Added option to widen Config GUI. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4033)
+
+#### Chat
+
++ Added party commands !ping and !tps. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4001)
+    + Customizable trigger permissions for party commands.
+
+#### Inventory
+
++ Added option to highlight Current Pet in menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
++ Added Fann Leveling Cost. - minhperry + Daveed (https://github.com/hannibal002/SkyHanni/pull/4061)
+    + Coins per XP and XP per Bit.
++ Added Disabled Attributes Highlighter. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4193)
+    + Highlight disabled attributes in /attributemenu.
++ Added Chronomatron and Ultrasequencer helpers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4081)
+    + Options to highlight next clicks and prevent misclicks.
++ Added option to keep clicked items visible within Superpairs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4081)
++ Added Coral Fish Helper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4243)
+    + Shows missing fishes for the NPC, sorted by price.
+
+#### Foraging
+
++ Added Foraging Quest Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4130)
+    + Shows paths to useful locations for unlocking the 1.21 Foraging island.
++ Added Moonglade Beacon Ready Alert. - nopo (https://github.com/hannibal002/SkyHanni/pull/4135)
++ Added Moonglade Beacon Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4135)
++ Highlight the small Birries in Galatea. - nopo (https://github.com/hannibal002/SkyHanni/pull/4137)
++ Added Heart Of The Forest features. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4040)
+    + Show Perk Levels and Enabled Perks in the menu.
++ Added Foraging Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4152)
+    + Tracks logs and enchanted logs sent to Sacks, and Tree Gifts.
+    + Option to hide or compact Tree Gift messages in chat.
++ Added Movable Lasso Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4161)
++ Added Hideonleaf Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4172)
++ Added Phantoms Muter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4174)
+    + Mutes Phantoms in Galatea.
++ Added Clean Tree View. - nopo (https://github.com/hannibal002/SkyHanni/pull/4200)
+    + Floating blocks hidden when mining trees.
++ Added Hide Lottery Messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4226)
+    + Lottery messages from HOTF hidden outside Foraging Islands.
++ Added Tree Progress Display HUD. - nopo (https://github.com/hannibal002/SkyHanni/pull/4191)
++ Added Attribute Shard Overlay to /am menu. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4203)
+    + Shows cheapest Skyblock XP for Shards.
+    + Opens the Bazaar when clicking an attribute name.
++ Added Attribute Tier as Stack Size. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4203)
+    + Displays Attribute Shard tier as stack size in Attribute Menu.
++ Added Invisibug Highlight. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4195)
++ Added Hunting Box Value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4251)
+    + Shows the value of the shards.
++ Added profit per Agatha Coupon in Agatha's Shop. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4250)
+
+#### Misc
+
++ Added Bouncy Beach Balls features. - Thunderblade73 + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3432)
+    + Predictive Line, Landing Spot and Current Counter.
+    + Works only with Bouncy Beach Balls, not with Giant Bouncy Beach Ball yet.
++ Added In-Game Changelog Viewer. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1636)
+    + Clickable chat option shows on new update or first join with new version.
+    + Works with `/shchangelog <old version> <new version>`.
++ Added support for Fabric 1.21.5. - nopo and CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4038)
++ Added Ex Co-op Member Hider. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3795)
+    + Hides Ex Co-op Members from Collections.
 
 ### Improvements
 
@@ -39,20 +393,30 @@
 + Added toggle for 'Inaccurate Soul Sand Speed' text in Lane Switch Distance Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3990)
 + Differentiates Plot Middle visually. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4042)
     + Distinguish Pest Guesses that point to plot middle from actual Pest locations in the Garden.
++ Made Garden Optimal Speed work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Disabled "Inaccurate Soul Sand Speed" warning in Minecraft 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4115)
+    + Soul Sand Speed is consistent on modern Minecraft versions.
 
 #### Commands
 
 + Added autocomplete for the `Shorten /warp` option. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3856)
++ Added Self-Trigger option for party commands !allinvite, !warp, !ping and !tps. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4001)
++ Added config option for self-triggered party commands. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4311)
 
 #### GUIs
 
 + Added option to remove the main background in Compact Tab. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3870)
 + Added compact item names to Sack Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4039)
++ Added Starborn Temple, Shard Traps, Forest Whispers, and Agatha's Contests to Tab Widget Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4155)
 
 #### Inventory
 
 + Added option to receive stash item reminders on world change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3836)
     + Only applicable if stash compact is on and duplicate counts are hidden.
++ Added Foraging Item Boosters to Estimated Item Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/4038)
++ Item Pickup Log and other features now show MC 1.21 display items when applicable. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Added option to fully disable REI item list in Custom Wardrobe. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4219)
++ Added option to track time spent on experiments. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4080)
 
 #### Mining
 
@@ -67,10 +431,31 @@
 #### Hoppity
 
 + Hide "total" Hoppity Stats from chat when no duplicates found in Compact Hitman Message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3998)
++ Added Meal Egg Breakdown on hover in Hoppity Live Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
++ Messages for EggLocator failures now replace previous message. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4109)
+    + "Next egg available in..." and "Hoppity's hunt is not active...".
++ Added Descriptive Milestones in hoppity settings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4283)
+    + Show a more detailed description of how to unlock a milestone rabbit in Hoppity's Collection.
 
 #### Combat
 
 + Added Gemstone tracking to Ghost Tracker for Gemstone Gauntlet kills. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3971)
++ Updated Blaze Daggers display instantly on 1.21. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4290)
+
+#### Crimson
+
++ Added more Matriarch Helper options. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4100)
+    + Exit path and sort Heavy Pearls by distance instead of height.
+
+#### Foraging
+
++ Added Moonglade beacon to tab widget display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4135)
++ Improved Foraging Tracker to remain on screen for configurable seconds after swapping off an axe. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4183)
+
+#### Event
+
++ Added Zombie Timer to Zombie Shootout QOL. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2508)
++ Prevented Wrong Diana Guesses from becoming unremovable. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4182)
 
 #### Misc
 
@@ -89,6 +474,18 @@
     + Only First Kick Counts for Rejoin cooldown so this makes rejoin notification more accurate.
 + Made non-God-Pot effects read from Tab List widget. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3986)
 + Added config search for "Item Warning" via "Tracker Title" or "Drop Title". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4046)
++ Added Salts to Non God Pot Effects. - nopo (https://github.com/hannibal002/SkyHanni/pull/4038)
++ Improved /gfs queuing on Alpha. - nopo (https://github.com/hannibal002/SkyHanni/pull/4122)
++ Added Chat Update Interval setting for navigation messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4145)
+    + Improves 1.21 performance and reduces chat flicker in 1.8.9.
++ Added support for multiple Stacking Enchants Progress lines per item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Added Visual Words (/shwords) support for 1.21. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4131)
++ Added Bazaar price support for new Attribute Shards. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4160)
++ Added Mod Menu button support, linking to SkyHanni Discord and Modrinth. - nopo (https://github.com/hannibal002/SkyHanni/pull/4173)
++ Changed Account Upgrade Reminder to warp directly to Elizabeth. - Luna (https://github.com/hannibal002/SkyHanni/pull/4224)
++ Made Hide Fire and Blaze Particles work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4209)
++ Updated Visual Words for supporting custom-font mods. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4210)
++ Added 5 SkyHanni User Luck for 1.21 players. - nopo (https://github.com/hannibal002/SkyHanni/pull/4285)
 
 ### Fixes
 
@@ -110,12 +507,26 @@
     + This replaces the Pest Particle Line feature, which was supposed to be a temporary fix when Pest Particle Waypoints was broken.
 + Fixed Custom Scoreboard error when visiting a garden. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3948)
 + Fixed Pest Spawn Timer displaying incorrectly. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4059)
++ Fixed Jacob Claim Rewards Menu error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4148)
++ Fixed Jacob’s Contests auto-load from EliteDev API. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4110)
++ Fixed visitor shopping list always marking visitors as new in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4146)
++ Fixed errors in Jacob's Contests participation. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4165)
++ Fixed missing message when fetching contests from EliteDev. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4153)
++ Fixed Custom Scoreboard error in Garden on 1.21. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4207)
++ Fixed Custom Scoreboard error in 1.8 Garden. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4255)
++ Fixed incorrect speed warning when farming on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4248)
++ Fixed SkyHanni failing to detect pumpkin farming on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4228)
++ Fixed Garden Level Display on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4301)
++ Fixed Medal Icons not showing in Jacob’s Contest inventory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4295)
 
 #### Chat
 
 + Fixed chat error after sharing Jacob contests. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3893)
 + Fixed rare error messages in compact chat features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3982)
 + Fixed chat display when guild chat is disabled. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4022)
++ Fixed Hypixel Lobby chat filter failing on pet consumable messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4104)
++ Fixed issue with temporary chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4128)
++ Fixed chat filters not hiding “autopet”, “you tipped” and “event level up” messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4256)
 
 #### Rift
 
@@ -123,36 +534,108 @@
 + Fixed Sun Gecko Helper sometimes not showing up. - Luna (https://github.com/hannibal002/SkyHanni/pull/3920)
 + Fixed Blood Ichor line sometimes not displaying during Rift Slayer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3976)
 + Fixed Rift Feature Enigma Rose's End Flowerpot showing its waypoint when disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4091)
++ Fixed Timite Helper showing incorrect info on all blocks. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4106)
 
 #### Inventory
 
 + Fixed Reforge Helper locking when nothing is selected. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3907)
 + Fixed display of Craftable Item List and Graph Node Editor. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3914)
 + Fixed Aquamarine Gemstone not showing in Sacks Overlay when a filter was selected. - jani (https://github.com/hannibal002/SkyHanni/pull/3989)
++ Fixed Hitman calculations in Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4111)
++ Fixed Pet-Level stack size display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4121)
++ Fixed extra tooltip rendering in custom wardrobe GUI. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4136)
++ Fixed fake player in custom wardrobe not looking towards your mouse. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4136)
++ Fixed Harp GUI scale option error in 1.21. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4127)
++ Fixed pet candy display error. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4127)
++ Fixed Custom Wardrobe color rendering in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Fixed Item Ability Cooldown on non-3-scroll Hyperions. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/3997)
++ Fixed pet data parsing issues. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4143)
++ Fixed placement of inventory titles to not overlap the inventory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4065)
++ Fixed vanilla inventory errors in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Fixed Hide Non Clickable Items and inventory highlighting not rendering properly in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4160)
++ Fixed empty inventory slots graying and unclickable in Sacks menu when Hide Non-Clickable Items enabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4176)
++ Fixed Harp GUI scale affecting other inventories (e.g., Harpy on Bazaar). - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4204)
++ Fixed item ability cooldown for Weirder Tuba on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4220)
++ Fixed REI item list overlapping Custom Wardrobe. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4219)
++ Fixed Bazaar Order Helper sometimes not showing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4252)
++ Fixed tooltips hiding when editing wardrobe sets on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4230)
++ Fixed Bazaar Best Sell Method often not showing up on 1.21. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4294)
++ Fixed inventory keybind not closing custom wardrobe on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4279)
++ Fixed mouse button wardrobe keybinds on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4279)
++ Fixed some Item Trackers sometimes not showing hidden items anymore. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4287)
++ Fixed wrongly named option in Attribute Shard Overlay. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4267)
++ Fixed Bits per Booster Cookie tooltip not showing on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4301)
++ Fixed Farming Tooltip Tweaks on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4301)
 
 #### Mining
 
 + Fixed Block Strength Guide blocking inventories in Rift, Kuudra, and Dungeons. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3934)
 + Fixed blocks mined by Pickobulus not being detected on non-Cold Islands. - Empa (https://github.com/hannibal002/SkyHanni/pull/3979)
 + Fixed HOTM Level Stacksize not working. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4043)
++ Fixed rare error in Powder Chest Timer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4105)
++ Fixed Powder Chest Timer error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4126)
++ Fixed some HOTM perks you haven't unlocked being incorrectly highlighted. - Luna (https://github.com/hannibal002/SkyHanni/pull/4274)
++ Fixed Custom Scoreboard error in the Mines. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4303)
 
 #### Fishing
 
 + Fixed other particles interfering with hotspot guesses. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3913)
 + Fixed Fishing Profit Tracker's times-fished count. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3980)
++ Fixed Sea Creature Highlight. - nopo (https://github.com/hannibal002/SkyHanni/pull/4185)
++ Fixed Fishing Item Name showing as Air on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4296)
++ Fixed Odger Total Caught Tooltip not showing on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4301)
 
 #### Hoppity
 
 + Fixed incorrect order for Unclaimed Eggs when set to Meal Order. - Luna (https://github.com/hannibal002/SkyHanni/pull/3958)
++ Fixed Hoppity Event Stats showing wrong data at event start. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
++ Fixed errors in Hoppity Collection Stats and Thaumaturgy Stats. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4133)
++ Fixed replacing found milestone rabbits with their dye color. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4283)
 
 #### Carnival
 
 + Fixed Carnival Zombie Shootout detection breaking with certain texture packs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4002)
 + Fixed incorrect next-egg-spawn message at end of Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3999)
++ Fixed Zombie Shootout Colored Lines requiring hitboxes enabled. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/4179)
 
 #### GUI
 
 + Fixed TabWidget Eyes Placed so it will show dragon spawned and egg respawning. - G0dwhitelight (https://github.com/hannibal002/SkyHanni/pull/3991)
++ Fixed changelog viewer crash on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4132)
++ Fixed Visual Words stripping non-Minecraft colors. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4159)
++ Fixed Visual Words removing emojis. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4178)
++ Fixed Edit GUI keybind in REI search. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4241)
++ Fixed movable XP bar not moving XP number on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4235)
++ Fixed potential Hide Armour crash. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4231)
++ Fixed rare GUI input bug. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4240)
+
+#### Slayer
+
++ Fixed rare error opening Slayer Menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4096)
++ Fixed Sven Slayer detection in new Slayer areas in Park. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4196)
++ Fixed Blaze Daggers display on 1.21. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4278)
+
+#### Event
+
++ Fixed Carnival Zombie Shootout lamps not highlighting in 1.21. - Skw972 (https://github.com/hannibal002/SkyHanni/pull/4149)
+
+#### Foraging
+
++ Fixed Tadgang highlighting in Birrie's Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/4158)
++ Fixed Custom Scoreboard Galatea lines not being auto-enabled. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4187)
++ Fixed Foraging Tracker not hiding when disabled in config. - nopo (https://github.com/hannibal002/SkyHanni/pull/4177)
++ Fixed Foraging Tracker sometimes not counting items that go in sacks. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4177)
++ Fixed Foraging Tracker sometimes not showing up on first entering Galatea. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4177)
++ Fixed sending compact tree gift message when disabled. - The_Deerman + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4181)
++ Fixed Signal Enhancer not tracking in Foraging Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4170)
+    + Blame Hypixel for including a percentage in Lore.
++ Fixed Custom Scoreboard error when gaining whispers outside Galatea. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4223)
++ Fixed Custom Scoreboard showing Galatea lines twice. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4194)
++ Fixed HotM/HotF errors. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4245)
++ Fixed Park and Galatea chat errors. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4227)
++ Fixed Tree Progress displaying on other islands. - nopo (https://github.com/hannibal002/SkyHanni/pull/4236)
++ Fixed Invisibug Highlighter offset. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4238)
++ Fixed Invisibug Highlighter on non-English Minecraft languages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4272)
 
 #### Misc
 
@@ -180,6 +663,49 @@
 + Fixed Custom Scoreboard Party Display persisting for 5 minutes after the leader disconnects from a two-player party. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4058)
 + Fixed Fairy Soul Pathfinder sometimes displaying paths from the previous island. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4056)
     + Switching islands during path calculation triggered the issue.
++ Fixed best-friend detection in chat messages. - FlyMode (https://github.com/hannibal002/SkyHanni/pull/4084)
++ Fixed Lobby Kick Timer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4107)
++ Fixed ParticleHider issue on initial world join. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4118)
++ Fixed custom scoreboard image in 1.21. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4129)
++ Fixed dungeon finder features. - nopo (https://github.com/hannibal002/SkyHanni/pull/4139)
++ Fixed size of skull-based items in 1.21. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4134)
++ Fixed Better Sign Editing errors in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Fixed Collection API contributions detection. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3795)
++ Fixed hard-to-clear 1.21 keybind migration popup. - nopo (https://github.com/hannibal002/SkyHanni/pull/4147)
++ Fixed player nametags occasionally appearing white in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Fixed rare SkyHanni GUI crashes in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Fixed additional pet errors in REI search. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4150)
++ Fixed Hide Armor in 1.21. - Skw972 (https://github.com/hannibal002/SkyHanni/pull/4166)
++ Fixed multiple config issues. - nopo (https://github.com/hannibal002/SkyHanni/pull/4154)
+    + Sliders now display their values and include text fields.
+    + Escape key can no longer be bound.
+    + Category scrolling now works as intended.
++ Fixed Trapper Solver alert for already-dying mobs. - Luna (https://github.com/hannibal002/SkyHanni/pull/4086)
++ Fixed Explosion Hider. - nopo (https://github.com/hannibal002/SkyHanni/pull/4175)
++ Fixed Hide Coop Members removing wrong lines. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/4180)
++ Fixed Party Highlight. - nopo (https://github.com/hannibal002/SkyHanni/pull/4185)
++ Fixed SkillApi not working with >1000% overflow. - nopo (https://github.com/hannibal002/SkyHanni/pull/4184)
++ Fixed errors with SkyMall and HOTF perk. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4226)
++ Fixed hide vanilla enchants applying outside SkyBlock on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4205)
++ Fixed lag related to Pet data. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4192)
++ Fixed Melons showing as melon blocks. - nopo (https://github.com/hannibal002/SkyHanni/pull/4190)
++ Fixed rare crash with highlighted entities. - nopo (https://github.com/hannibal002/SkyHanni/pull/4211)
++ Fixed SkyHanni GUIs rendering incorrectly when other mods moved the hotbar on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4217)
++ Fixed SkyHanni textured progress bars not working on 1.21. - Vixid (https://github.com/hannibal002/SkyHanni/pull/4189)
++ Fixed color editor preview in config. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4276)
++ Fixed memory leak in Visual Words feature. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4286)
++ Fixed minor performance issues. - nopo (https://github.com/hannibal002/SkyHanni/pull/4275)
++ Fixed mob highlight on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4273)
++ Fixed pets showing "[Lvl {LVL}]" in names in displays/trackers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4282)
++ Fixed rare potential crash on 1.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4288)
++ Fixed SkyHanni sounds volume on 1.21 being too loud. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4280)
++ Fixed some damage indicator issues on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4273)
++ Removed non-functional "Config Button" option on Minecraft 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4269)
+    + Use Mod Menu instead.
++ Fixed crashes caused by keybind migration. - nopo (https://github.com/hannibal002/SkyHanni/pull/4297)
+    + Invalid keybinds now reset.
++ Fixed Missing Enchanted Book Message showing wrong User Luck amount. - nopo (https://github.com/hannibal002/SkyHanni/pull/4285)
++ Fixed self-triggered party commands incorrectly checking friendship status when trust level was set. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4311)
 
 ### Technical Details
 
@@ -256,6 +782,104 @@
 + Reduced duplication in Heat Detection and Custom Scoreboard patterns. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4049)
 + Synchronized Bucket Tracker methods with base trackers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4072)
 + Updated Gradle to 8.14.2. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4088)
++ Added Galatea Lines to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4037)
++ Added per-profile pet storage. - martimavocado + Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
+    + Stored pets in pets.json instead of config to reduce JSON size.
++ Added requireDevEnv function. - Empa (https://github.com/hannibal002/SkyHanni/pull/4099)
++ Added spin and bounce for ItemStack Renderables. - Daveed + Thunderblade73 + nea (https://github.com/hannibal002/SkyHanni/pull/4073)
++ Cleaned up CF API, BingoApi, SkyhanniRenderWorldEvent and SkyhanniDebugsAndTests for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4017)
++ Continued 1.21 support. - nopo (https://github.com/hannibal002/SkyHanni/pull/4018)
++ Enabled GardenApi and miscellaneous files for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4014)
++ Fixed /gfs command processing inconsistency. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4006)
++ Fixed InventoryFullyOpenedEvent firing; item parsing and graph areas now work for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4016)
++ Fixed Multiple Event Types not working. - Empa (https://github.com/hannibal002/SkyHanni/pull/4103)
++ Improved Keybind Upgrader, additional commands and mouse compatibility. - nopo (https://github.com/hannibal002/SkyHanni/pull/4019)
++ Improved rendering for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3995)
++ Reduced Lorenz Utils, enabled more files for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4020)
++ Refined /shcopyitem format. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4098)
++ Removed and deprecated some Renderable functions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4073)
+    + `Renderable.itemStack()` replaced with `ItemStackRenderable`.
+    + Deprecation of `Renderable.itemStack()`.
+    + Replace Renderable.itemStackWithTip() with `.withTip()` on `ItemStackRenderable`.
++ Removed season border detection and other unused Season/Time code. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
++ Split HoppityStatsSummary and HoppityLiveDisplay into separate classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4078)
++ Started porting pets to their own config category. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
++ Updated Renderables for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4009)
++ Updated SackApi, GardenApi, PestApi, FishingApi and TitleManager for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4012)
++ Added debug logging for PetStorageApi. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4114)
++ Added EquipmentApi. - Empa (https://github.com/hannibal002/SkyHanni/pull/3842)
++ Added Pet Storage reset command. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4114)
++ Added rendering code for modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4113)
++ Cleaned up Hoppity-related classes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4108)
++ Enabled 3D rendering on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4030)
++ Improved 1.21 compatibility. - nopo (https://github.com/hannibal002/SkyHanni/pull/4028)
++ Improved 1.21 compatibility. - nopo (https://github.com/hannibal002/SkyHanni/pull/4030)
++ Made all `SkyhanniBaseScreen`s crash-proof. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4132)
++ Made item display names always include the white color code. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4133)
++ Switched to excluding the 9th hotbar slot in Item Pickup Log. - phoebe, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3851)
++ Added ability to send titles with intentions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4065)
+    + Allows relocating titles individually.
++ Added CircularRenderable and CircularContainerRenderable. - Daveed + Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4079)
++ Added detekt rule enforcing non-mutable config types as val. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4060)
++ Added OrbitalSystemRenderable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4082)
++ Added secondary constructor to InventoryDetector. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4141)
+    + Accepts a Pattern for name matching.
++ Added shard traps widget to TabWidget. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4144)
++ Added sodium to /shdebug. - nopo (https://github.com/hannibal002/SkyHanni/pull/4140)
++ Changed config-referencing helpers to use KProperty0 instead of Mutable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4060)
++ Extracted TitleManager, TitleContext, and CountdownTitleContext to their own class files. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4065)
++ Moved title classes to `data.title`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4065)
++ Refactored GardenNextJacobContest. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4110)
+    + Extracted outbound REST calls to EliteDevApi.
+    + Extracted Swing popup utils to DialogUtils.
++ Added glowing and frog variants to SH Copy Entities. - nopo (https://github.com/hannibal002/SkyHanni/pull/4158)
++ Added hover highlight to `shchathistory`. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3882)
++ Created TimeDependentRenderable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4120)
+    + Render function passes posX, posY, and deltaTime since last render.
++ Fixed mouse position in `shchathistory`. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3882)
++ Made ForegroundDrawnEvent render in the foreground on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4160)
++ Renamed RenderableString and WrappedRenderableString to match Renderable standards. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4066)
++ Updated MoulConfig to version 3.11.0. - nopo (https://github.com/hannibal002/SkyHanni/pull/4154)
++ Allowed changing NEU item repo download location. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4212)
+    + Works only when NEU isn't installed.
++ Configured exclusive content in Gradle. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4218)
++ Disabled Detekt on legacy build GitHub workflow. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4216)
++ Fixed checking for `LorenzUtils.inSkyBlock` in Detekt rule. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4222)
++ Fixed links given by Detekt when regex tests fail. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4222)
++ Refactored HotX classes around Rotating Perk enum. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4226)
++ Registered /sendcoords on client. - nopo (https://github.com/hannibal002/SkyHanni/pull/4208)
++ Removed direct use of hotbar layer for GUI rendering. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4217)
++ Added caching to BZ Order Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4253)
++ Cleaned up Attribute Shard item-resolution query and enabled Fusion Box support. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4203)
++ Made default text color white. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4232)
++ Used a mixin hook for Custom Wardrobe. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4254)
++ Added `inventoryClose` param to InventoryDetector. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4246)
++ Added SubtitleS2CPacket to TitleReceivedEvent on 1.21. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4278)
++ Changed Blaze Dagger helper to use `ItemClickEvent`. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4290)
++ Changed code for compatibility with 1.21.6. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4229)
++ Duplicate Detekt comments will no longer post. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4221)
++ Overhauled Detekt github comments. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4221)
+    + Will now put long comments into a details section.
+    + Added a summary of offending rules/files to the top.
+    + Offending rule name will now be included in error line.
++ Updated buildscript to support additional versions more easily. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4229)
++ Updated moulconfig to version 4.0.0. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4276)
++ Added automatic uploading to Modrinth. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4266)
++ Added Packet mappings for PacketTest. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4242)
++ Added Retry Mechanism for Gradle tasks in GitHub workflows. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4292)
++ Added User Luck Event for developers to add new sources. - nopo (https://github.com/hannibal002/SkyHanni/pull/4285)
++ Converted dependency-check GitHub workflow to script. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4293)
+    + Runs correctly when dependent PRs close.
++ Disabled IntelliJ’s MC Version/Legacy Prediction to avoid incorrect warnings and suggestions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4302)
++ Overhauled ResettableStorageSet. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4244)
+    + Can now reset Mutable Collections.
+    + Added JUnit Test.
++ Removed Z Translation in ChatHistoryGui. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4237)
+
+### Removed Features
+
++ Removed legacy Attribute Shards from Estimated Item Value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4160)
+    + Attribute Overlay remains available.
 
 ## Version 3.0.0
 

@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
-//#if TODO
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -12,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.keepOnlyIn
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
@@ -32,9 +31,9 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 //#if MC > 1.21
-//$$ import net.minecraft.entity.attribute.EntityAttributes
-//$$ import net.minecraft.entity.player.PlayerInventory
 //$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.EquipmentSlot
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
 //#endif
@@ -163,11 +162,7 @@ object EntityUtils {
     fun EntityArmorStand.wearingSkullTexture(skin: String) = getStandHelmet()?.getSkullTexture() == skin
     fun EntityArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
-    //#if TODO
     fun EntityPlayer.isNpc() = !isRealPlayer()
-    //#else
-    //$$ fun Player.isNpc() = false
-    //#endif
 
     //#if MC < 1.21
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
@@ -175,11 +170,12 @@ object EntityUtils {
     //#else
     //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
     //$$     if (this !is PlayerEntity) return null
-    //$$     val list = mutableListOf<ItemStack?>()
-    //$$     for (equipmentSlot in PlayerInventory.EQUIPMENT_SLOTS.values) {
-    //$$         list.add(inventory.equipment.get(equipmentSlot).orNull())
-    //$$     }
-    //$$     return list.normalizeAsArray()
+    //$$     return buildList {
+    //$$         add(inventory.equipment.get(EquipmentSlot.FEET).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.LEGS).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.CHEST).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.HEAD).orNull())
+    //$$     }.normalizeAsArray()
     //$$ }
     //#endif
 
@@ -201,11 +197,24 @@ object EntityUtils {
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
-    //#if TODO
+    //#if MC < 1.21
     fun getAllTileEntities(): Sequence<TileEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
+    //#else
+    //$$ fun getAllTileEntities(): Sequence<BlockEntity> {
+    //$$     if (!MinecraftCompat.localWorldExists) return emptySequence()
+    //$$     val blockEntityTickers = MinecraftCompat.localWorld.blockEntityTickers.let {
+    //$$         if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
+    //$$     }.asSequence().filterNotNull()
+    //$$
+    //$$     return blockEntityTickers.map { MinecraftCompat.localWorld.getBlockEntity(it.pos) }.filterNotNull()
+    //$$ }
     //#endif
+
+    inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
+        list.keepOnlyIn(getEntities<T>())
+    }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
         if (isDead) return false
@@ -227,6 +236,6 @@ object EntityUtils {
         //#if MC < 1.21
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
     //#else
-    //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
+    //$$ get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
 }
