@@ -23,8 +23,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.awt.Color;
-
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
 
@@ -53,9 +51,9 @@ public class MixinWorldRenderer {
     @WrapOperation(method = {"renderEntities", "getEntitiesToRender"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
     public boolean shouldAlsoGlow(MinecraftClient instance, Entity entity, Operation<Boolean> original) {
         if (entity instanceof LivingEntity livingEntity) {
-            Color color = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity, Color.BLACK);
-            if (color == Color.BLACK) {
-                if (RenderLivingEntityHelper.INSTANCE.isEntityInGlowEvent(entity) == Color.BLACK) {
+            int i = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity, 0);
+            if (i == 0) {
+                if (RenderLivingEntityHelper.INSTANCE.isEntityInGlowEvent(entity) == 0) {
                     return original.call(instance, entity);
                 }
             }
@@ -73,16 +71,16 @@ public class MixinWorldRenderer {
     @WrapOperation(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getTeamColorValue()I"))
     public int changeGlowColour(Entity entity, Operation<Integer> original) {
         if (entity instanceof LivingEntity livingEntity) {
-            Color color = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity, Color.BLACK);
-            if (color == Color.BLACK) {
-                Color otherColor = RenderLivingEntityHelper.INSTANCE.isEntityInGlowEvent(entity);
-                if (otherColor != Color.BLACK) {
-                    color = otherColor;
+            int i = RenderLivingEntityHelper.internalSetColorMultiplier(livingEntity, 0);
+            if (i == 0) {
+                int otherColor = RenderLivingEntityHelper.INSTANCE.isEntityInGlowEvent(entity);
+                if (otherColor != 0) {
+                    i = otherColor;
                 } else {
                     return original.call(entity);
                 }
             }
-            return color.getRGB();
+            return i;
         }
         return original.call(entity);
     }

@@ -163,7 +163,6 @@ object SkyHanniMod {
      * This coroutine will catch any exceptions thrown by the provided function.
      * @param function The suspend function to execute in the coroutine.
      */
-    @Suppress("DEPRECATION")
     fun launchCoroutine(function: suspend CoroutineScope.() -> Unit): Job = coroutineScope.launch {
         try {
             function()

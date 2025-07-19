@@ -21,8 +21,9 @@ object RenderLivingEntityHelper {
     var renderingRealGlow = false
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
-    fun isEntityInGlowEvent(entity: Entity): Color {
-        return currentGlowEvent?.entitiesToOutline?.get(entity) ?: Color.BLACK
+    fun isEntityInGlowEvent(entity: Entity): Int {
+        val color = currentGlowEvent?.entitiesToOutline?.get(entity) ?: Color.BLACK
+        return color.rgb
     }
 
     @HandleEvent
@@ -79,12 +80,12 @@ object RenderLivingEntityHelper {
     }
 
     @JvmStatic
-    fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T, default: Color): Color {
+    fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T, default: Int): Int {
         if (!SkyHanniDebugsAndTests.globalRender) return default
         if (entityColorMap.containsKey(entity)) {
             val condition = entityColorCondition[entity] ?: return default
             if (condition.invoke()) {
-                return entityColorMap[entity] ?: return default
+                return entityColorMap[entity]?.rgb ?: return default
             }
         }
         return default

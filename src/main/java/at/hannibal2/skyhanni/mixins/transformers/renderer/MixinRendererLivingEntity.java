@@ -14,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.awt.Color;
-
 @Mixin(value = RendererLivingEntity.class, priority = 1001)
 public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> extends Render<T> {
 
@@ -25,7 +23,7 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
 
     @Inject(method = "getColorMultiplier", at = @At("HEAD"), cancellable = true)
     private void setColorMultiplier(T entity, float lightBrightness, float partialTickTime, CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(RenderLivingEntityHelper.internalSetColorMultiplier(entity, Color.BLACK).getRGB());
+        cir.setReturnValue(RenderLivingEntityHelper.internalSetColorMultiplier(entity, 0));
     }
 
     @Redirect(method = "setBrightness", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;hurtTime:I", opcode = Opcodes.GETFIELD))
