@@ -91,10 +91,17 @@ object ConditionalUtils {
         current: Any,
         visited: MutableSet<Any>
     ): List<Property<*>> = buildList {
-        if (!visited.add(current)) return@buildList
+        if (current.javaClass.isArray) return@buildList
+        if (!visited.add(current)) return emptyList()
 
         for (prop in current::class.memberProperties) {
-            if (prop.javaField == null && prop.javaGetter == null || prop.hasAnnotation<Transient>()) continue
+            if (prop.hasAnnotation<Transient>()) continue
+            val getter = try {
+                prop.javaGetter
+            } catch (e: Throwable) {
+                null
+            }
+            if (prop.javaField == null && getter == null) continue
             if (runCatching { prop.isAccessible = true }.isFailure) continue
             val value = runCatching { prop.getter.call(current) }.getOrNull() ?: continue
             when (value) {
