@@ -14,49 +14,73 @@ import org.jetbrains.kotlin.psi.*
 
 registerIntention(NavigateToConfigIntention())
 
-val basePkg = "at.hannibal2.skyhanni.config"
-val baseClass = "at.hannibal2.skyhanni.config.Features"
+val baseConfigPkg = "at.hannibal2.skyhanni.config"
+val baseConfigClass = "at.hannibal2.skyhanni.config.Features"
+
+val baseStoragePkg = "$baseConfigPkg.storage"
+val profileStorageClass = "$baseStoragePkg.ProfileSpecificStorage"
+val playerStorageClass = "$baseStoragePkg.PlayerSpecificStorage"
 
 class NavigateToConfigIntention :
     SelfTargetingOffsetIndependentIntention<KtStringTemplateExpression>(
         KtStringTemplateExpression::class.java,
-        { "Go to config" }
+        { "Go to definition" }
     ) {
     override fun isApplicableTo(element: KtStringTemplateExpression): Boolean {
         val literal = element.text.removeSurrounding("\"")
-        if (literal.startsWith("#") || !literal.contains('.')) {
+        if (!literal.contains('.')) {
             return false
         }
 
         val call = PsiTreeUtil.getParentOfType(element, KtCallExpression::class.java) ?: return false
         val dot = call.parent as? KtDotQualifiedExpression ?: return false
-        if (dot.receiverExpression.text != "event" || call.calleeExpression?.text != "move") {
-            return false
-        }
-        return true
+        return !(dot.receiverExpression.text != "event" || call.calleeExpression?.text != "move")
     }
+
+    private fun searchProjectFor(
+        element: KtStringTemplateExpression,
+        className: String,
+    ) : KtClassOrObject? = JavaPsiFacade.getInstance(element.project).findClass(
+        className,
+        GlobalSearchScope.projectScope(element.project)
+    )?.navigationElement as? KtClassOrObject
 
     override fun applyTo(element: KtStringTemplateExpression, editor: Editor?) {
         val path = element.text.removeSurrounding("\"")
-        val segments = path.split('.')
+        val segments = path.split('.').takeIf { it.isNotEmpty() }?.toMutableList() ?: return
         val project = element.project
 
-        var current = JavaPsiFacade.getInstance(project).findClass(
-            baseClass,
-            GlobalSearchScope.projectScope(project)
-        )?.navigationElement as? KtClassOrObject ?: run {
+        val basePath = when (segments.first()) {
+            "#profile" -> {
+                segments.removeFirst()
+                profileStorageClass
+            }
+            "#player" -> {
+                segments.removeFirst()
+                playerStorageClass
+            }
+            else -> baseConfigClass
+        }
+
+        var current = searchProjectFor(element, basePath) ?: run {
             show("⚠️ Could not find root Features class for path '$path'")
             return
         }
 
         for ((i, name) in segments.withIndex()) {
-            val prop = current?.declarations.orEmpty().filterIsInstance<KtProperty>().firstOrNull { it.name == name } ?: run {
+            val prop = current.declarations.filterIsInstance<KtProperty>().firstOrNull { it.name == name } ?: run {
                 show("⚠️ Property '$name' not found in ${current.name} for path '$path'")
                 return
             }
 
             if (i == segments.lastIndex) {
-                show("Opening ${current.name} for path '$path'")
+                (prop.navigationElement as? NavigatablePsiElement)?.navigate(true)
+                return
+            }
+
+            val isPropMap = prop.typeReference?.text?.startsWith("MutableMap") == true ||
+                prop.typeReference?.text?.startsWith("Map") == true
+            if (i == segments.lastIndex - 1 && isPropMap) {
                 (prop.navigationElement as? NavigatablePsiElement)?.navigate(true)
                 return
             }
@@ -70,9 +94,9 @@ class NavigateToConfigIntention :
             val candidates = PsiShortNamesCache
                 .getInstance(project)
                 .getClassesByName(rawType, scope)
-                .filter { it.qualifiedName?.startsWith(basePkg) == true }
+                .filter { it.qualifiedName?.startsWith(baseConfigPkg) == true }
             val psiClass = candidates.firstOrNull() ?: run {
-                show("⚠️ Config class '$rawType' not found under '$basePkg' for path '$path'")
+                show("⚠️ Config class '$rawType' not found under '$baseConfigPkg' for path '$path'")
                 return
             }
 
