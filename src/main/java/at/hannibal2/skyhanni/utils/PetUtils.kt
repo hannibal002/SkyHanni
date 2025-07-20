@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
-import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object PetUtils {
@@ -38,11 +37,11 @@ object PetUtils {
     private var petInternalNames: Set<NeuInternalName> = setOf()
     private var petSkinNbtNames: List<String> = listOf()
     private var petItemResolution: Map<String, NeuInternalName> = mapOf()
+
     // Late load from SH repo
     private var seasonalVariants: Set<NeuInternalName> = setOf()
     private var dayNightVariants: Set<NeuInternalName> = setOf()
     private var ciFactionVariants: Set<NeuInternalName> = setOf()
-    private var lastRepoWarning: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private fun getSeasonalVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val variantId = SkyblockSeason.currentSeason?.name ?: "SPRING"
@@ -156,7 +155,9 @@ object PetUtils {
     fun getCleanPetName(petInternalName: NeuInternalName, colored: Boolean = true): String {
         val (properPetName, rarity) = splitInternalName(petInternalName) ?: return ""
         return buildString {
-            if (colored) { append(rarity.chatColorCode) }
+            if (colored) {
+                append(rarity.chatColorCode)
+            }
             displayNameMap.getOrElse(properPetName) {
                 properPetName.split('_').joinToString(" ") {
                     it.firstLetterUppercase()
@@ -181,14 +182,11 @@ object PetUtils {
         if (level < 0 || level > getMaxLevel(petInternalName)) return null
         val levelTree = getFullLevelingTree(petInternalName)
         if ((rarityOffset + level - 1) > levelTree.size) {
-            if (lastRepoWarning.passedSince() > 5.minutes) {
-                lastRepoWarning = SimpleTimeMark.now()
-                ErrorManager.logErrorWithData(
-                    IndexOutOfBoundsException("offset:$rarityOffset, level:$level, size:${levelTree.size}"),
-                    "§cFailed to load pet levels from NEU repo. " +
-                        "§cYou can try to fix this by running `§e/${ItemUtils.resetCommand}`§c."
-                )
-            }
+            ErrorManager.logErrorWithData(
+                IndexOutOfBoundsException("offset:$rarityOffset, level:$level, size:${levelTree.size}"),
+                "§cFailed to load pet levels from NEU repo. " +
+                    "§cYou can try to fix this by running `§e/${ItemUtils.resetCommand}`§c.",
+            )
             return null
         }
         return levelTree.sublistAfter(rarityOffset).sumOf { it.toDouble() }
