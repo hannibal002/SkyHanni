@@ -73,6 +73,7 @@ object BeachBallCatchHelper {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
+        if (predictors.isEmpty()) return
         val color = config.bouncyBallLineColor.toSpecialColor()
         LineDrawer.draw3D(event, 4, true) {
             predictors.forEach { (_, predict) ->
