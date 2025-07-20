@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 /**
  * Attention developers:
@@ -40,4 +41,11 @@ class HuntingConfig {
     @Expose
     @ConfigLink(owner = HuntingConfig::class, field = "lassoDisplay")
     val lassoDisplayPosition: Position = Position(380, 210)
+
+    @Expose
+    @OnlyModern
+    @Category(name = "Fusion Keybinds", desc = "Settings for fusion keybinds")
+    @SearchTag("hunting box")
+    var fusionKeybinds = FusionKeybindsConfig()
+
 }

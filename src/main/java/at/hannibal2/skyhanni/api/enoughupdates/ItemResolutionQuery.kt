@@ -340,7 +340,7 @@ class ItemResolutionQuery {
         if (guiName == "Attribute Menu") {
             return resolveItemInAttributeMenu(compound.getLore())
         }
-        if (guiName == "Hunting Box" || guiName == "Fusion Box") {
+        if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
             return resolveItemInHuntingBoxMenu(displayName)
         }
         return null

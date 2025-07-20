@@ -47,7 +47,7 @@ object IslandAreas {
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
 
-    @Deprecated("moved", ReplaceWith("LorenzUtils.graphArea"))
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.graphArea"))
     val currentAreaName get() = currentArea
 
     var currentArea = ""

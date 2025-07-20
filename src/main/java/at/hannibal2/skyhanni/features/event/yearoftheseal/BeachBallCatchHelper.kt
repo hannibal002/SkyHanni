@@ -73,6 +73,7 @@ object BeachBallCatchHelper {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
+        if (predictors.isEmpty()) return
         val color = config.bouncyBallLineColor.toColor()
         LineDrawer.draw3D(event, 4, true) {
             predictors.forEach { (_, predict) ->
@@ -125,13 +126,13 @@ object BeachBallCatchHelper {
         Variant.GIANT -> add(-0.9, -0.9, -0.9).boundingToOffset(1.8, 1.8, 1.8)
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(IslandChangeEvent::class, onlyOnSkyblock = true)
+    fun onIslandChange() {
         predictors.clear()
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.bouncyBallLine.onDisable { DelayedRun.runDelayed(3.ticks) { predictors.clear() } }
     }
 
