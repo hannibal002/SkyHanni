@@ -24,8 +24,9 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -178,11 +179,7 @@ object DarkMonolithFeatures {
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§5§lDark Monolith Tracker")
         val profit = tracker.drawItems(data, { true }, this)
-        add(
-            StringRenderable(
-                "§7Monoliths looted: §d${data.monolithsLooted}",
-            ).toSearchable(),
-        )
+        add(Renderable.text("§7Monoliths looted: §d${data.monolithsLooted}").toSearchable())
         add(tracker.addTotalProfit(profit, data.monolithsLooted, "loot"))
         tracker.addPriceFromButton(this)
     }
