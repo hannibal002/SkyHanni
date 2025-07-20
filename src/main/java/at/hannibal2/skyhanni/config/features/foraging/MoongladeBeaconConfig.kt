@@ -24,6 +24,12 @@ class MoongladeBeaconConfig {
     var useMiddleClick: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Prevent Over-Clicking", desc = "Prevents clicking on a slot that already is set correctly.")
+    @OnlyModern
+    @ConfigEditorBoolean
+    var preventOverClicking: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Alert when ready", desc = "Sends a title when the moonglade beacon is ready to be activated.")
     @OnlyModern
     @FeatureToggle
