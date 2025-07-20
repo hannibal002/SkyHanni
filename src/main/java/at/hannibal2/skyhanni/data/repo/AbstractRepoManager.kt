@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.minecraft.util.IChatComponent
@@ -106,9 +107,12 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     // Will be invoked by the implementation of this class
     fun registerCommands(event: CommandRegistrationEvent) {
         if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
-            description = "Remove and redownload the $commonName repo"
+            description = "Check for updates, and optionally, remove/redownload the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback { updateRepo(forceReset = true) }
+            simpleCallback(::updateRepo)
+            argCallback("force", BoolArgumentType.bool()) {
+                updateRepo(forceReset = it)
+            }
         }
         if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
@@ -123,6 +127,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
+    fun addUnsuccessfulConstant(fileName: String) = unsuccessfulConstants.add(fileName)
 
     @PublishedApi
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
@@ -238,11 +243,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
+            ChatUtils.chat("$commonName Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             reportExtraStatusInfo()
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
+        ChatUtils.chat("$commonName Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
@@ -262,7 +267,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         val text = mutableListOf<IChatComponent>()
         text.add(
             (
-                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7Repo Issue! Some features may not work. " +
+                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work. " +
                     "Please report this error on the Discord!"
                 ).asComponent(),
         )

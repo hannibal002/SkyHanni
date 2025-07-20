@@ -17,7 +17,7 @@ class BazaarConfig {
     @Expose
     @ConfigOption(
         name = "Order Helper",
-        desc = "Show visual hints inside the Bazaar Manage Order view when items are ready to pickup or outbid."
+        desc = "Show visual hints inside the Bazaar Manage Order view when items are ready to pickup or outbid.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -36,9 +36,23 @@ class BazaarConfig {
 
     @Expose
     @ConfigOption(
+        name = "Daily Limit Tracker",
+        desc = "Show your progress towards the daily 15 billion coin trade limit on the bazaar.\n" +
+            "Coins in excess of the integer limit on an individual order do not count towards the limit.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var dailyLimitTracker: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = BazaarConfig::class, field = "dailyLimitTracker")
+    val dailyLimitTrackerPosition: Position = Position(550, 150)
+
+    @Expose
+    @ConfigOption(
         name = "Cancelled Buy Order Clipboard",
         desc = "Send missing items from cancelled buy orders in chat.\n" +
-            "Click on the message to quickly order the same item and amount again."
+            "Click on the message to quickly order the same item and amount again.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -47,7 +61,7 @@ class BazaarConfig {
     @Expose
     @ConfigOption(
         name = "Price Website",
-        desc = "Add a button to the Bazaar product inventory that will open the item page in §cskyblock.bz§7."
+        desc = "Add a button to the Bazaar product inventory that will open the item page in §cskyblock.bz§7.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -56,7 +70,7 @@ class BazaarConfig {
     @Expose
     @ConfigOption(
         name = "Max Items With Purse",
-        desc = "Calculate the maximum amount of items that can be purchased from the Bazaar with the amount of coins in your purse."
+        desc = "Calculate the maximum amount of items that can be purchased from the Bazaar with the amount of coins in your purse.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -71,7 +85,7 @@ class BazaarConfig {
     @ConfigOption(
         name = "Craft Materials Bazaar",
         desc = "In the crafting view, offer a shopping list of required materials for the craft" +
-            " along with a shortcut for purchasing them from the Bazaar or Auction House."
+            " along with a shortcut for purchasing them from the Bazaar or Auction House.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
