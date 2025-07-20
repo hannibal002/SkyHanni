@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -125,7 +125,7 @@ object CompactStarlynSisters {
         var hadPreviousPB: Boolean = false,
         var lastScoreDisplay: String = "",
         var lastSister: String = "",
-    ) : ResettableStorageSet()
+    ) : Resettable()
 
     data class StarlynCollectionPersonalBests(
         var lastPBWoodType: String = "",
@@ -133,7 +133,7 @@ object CompactStarlynSisters {
         var lastPBCollectionIncreaseDuringContestDisplay: String = "",
         var lastPBPreviousBestDifferenceDisplay: String = "",
         var lastPBSweepIncreaseDisplay: String = "",
-    ) : ResettableStorageSet()
+    ) : Resettable()
 
     private var isInResults = false
     private var contestVariablesAreDirty = false
