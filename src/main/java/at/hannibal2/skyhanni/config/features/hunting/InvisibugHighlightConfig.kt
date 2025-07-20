@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.foraging
+package at.hannibal2.skyhanni.config.features.hunting
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyModern
@@ -8,24 +8,22 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import java.awt.Color
 
-class BirriesHighlightConfig {
-
+/**
+ * Code stolen from @NopoTheGamer (im lazy)
+ */
+class InvisibugHighlightConfig {
     @Expose
-    @ConfigOption(name = "Highlight Birries", desc = "Highlights nearby Birries.")
+    @ConfigOption(name = "Highlight Invisibugs", desc = "Highlights nearby Invisibugs.")
     @FeatureToggle
     @ConfigEditorBoolean
     @OnlyModern
-    @SearchTag("tadpole tad pole poll")
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color for the Birries highlight")
+    @ConfigOption(name = "Color", desc = "Color for the Invisibug highlight")
     @ConfigEditorColour
     @OnlyModern
-    @SearchTag("tadpole tad pole poll")
-    var color: ChromaColour = Color.GREEN.toChromaColor()
-
+    var color: ChromaColour = Color.CYAN.toChromaColor()
 }

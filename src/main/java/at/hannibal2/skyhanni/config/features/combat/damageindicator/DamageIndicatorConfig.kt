@@ -53,7 +53,7 @@ class DamageIndicatorConfig {
         BossCategory.THE_RIFT_BOSSES,
         BossCategory.RIFTSTALKER_BLOODFIEND,
         BossCategory.REINDRAKE,
-        BossCategory.GARDEN_PESTS
+        BossCategory.GARDEN_PESTS,
     )
 
     enum class BossCategory(private val displayName: String) {
@@ -116,7 +116,7 @@ class DamageIndicatorConfig {
     @ConfigOption(
         name = "Compact Status Effects",
         desc = "Use the icons of Extremely Real Shuriken and Twilight Arrow Poison " +
-            "instead of their names for the indicator."
+            "instead of their names for the indicator.",
     )
     @ConfigEditorBoolean
     var compactStatusEffects: Boolean = false
@@ -125,7 +125,7 @@ class DamageIndicatorConfig {
     @ConfigOption(
         name = "Time to Kill",
         desc = "Show the time it takes to kill the slayer boss.\n" +
-            "§eRequires Damage Indicator to be active."
+            "§eRequires Damage Indicator to be active.",
     )
     @ConfigEditorBoolean
     var timeToKillSlayer: Boolean = true
