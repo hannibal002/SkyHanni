@@ -5,8 +5,17 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class CrystalNucleusConfig {
+
+    @Expose
+    @ConfigOption(name = "Sky Mall Messages", desc = "Hide the Sky Mall messages outside of Mining Islands.")
+    @ConfigEditorBoolean
+    @SearchTag("Skymall")
+    @FeatureToggle
+    var hideSkyMall: Boolean = true
+
     @Expose
     @ConfigOption(
         name = "Enabled",

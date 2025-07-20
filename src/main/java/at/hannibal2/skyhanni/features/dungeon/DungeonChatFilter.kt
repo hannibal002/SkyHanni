@@ -2,19 +2,19 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.chat.ChatConfig
+import at.hannibal2.skyhanni.config.features.chat.DungeonFilterConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.util.regex.Pattern
 
-private typealias MessageTypes = ChatConfig.DungeonMessageTypes
+private typealias MessageTypes = DungeonFilterConfig.DungeonMessageTypes
 
 @SkyHanniModule
 object DungeonChatFilter {
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.filterType.dungeon
 
     // <editor-fold desc="Patterns, Messages, and Maps">
     // TODO USE SH-REPO

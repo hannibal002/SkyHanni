@@ -689,7 +689,7 @@ enum class HotmData(
     }
 }
 
-private val chatConfig get() = SkyHanniMod.feature.chat
+private val chatConfig get() = SkyHanniMod.feature.chat.filterType.crystalNucleus
 
 private val coreOfTheMountainPerks = mutableMapOf<Int, Map<HotmReward, Double>>()
 

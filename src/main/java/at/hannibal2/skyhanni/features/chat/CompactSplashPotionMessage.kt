@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 @SkyHanniModule
 object CompactSplashPotionMessage {
 
-    private val config get() = SkyHanniMod.feature.chat.compactPotionMessages
+    private val config get() = SkyHanniMod.feature.chat.compact.compactPotionMessages
 
     @Suppress("MaxLineLength")
     private val potionEffectPatternList = listOf(

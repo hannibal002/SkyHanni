@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object ArachneChatMessageHider {
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.filterType.combat
     private var hideArachneDeadMessage = false
 
     private val patternGroup = RepoPattern.group("chat.arachne")

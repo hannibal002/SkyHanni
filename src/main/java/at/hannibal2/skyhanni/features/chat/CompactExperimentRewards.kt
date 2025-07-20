@@ -19,7 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CompactExperimentRewards {
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.compact
 
     private val gainedRewards = mutableListOf<String>()
     private var lastTimeTableOpened = SimpleTimeMark.farPast()

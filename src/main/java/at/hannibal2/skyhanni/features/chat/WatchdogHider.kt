@@ -23,7 +23,7 @@ object WatchdogHider {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!SkyBlockUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
+        if (!SkyBlockUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.hypixelMessages.watchDog) return
 
         when (event.message) {
             START_LINE -> {
@@ -55,6 +55,6 @@ object WatchdogHider {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "chat.watchDog", "chat.filterType.watchDog")
+        event.move(3, "chat.filterType.watchDog", "chat.filterType.hypixelMessages.watchDog")
     }
 }

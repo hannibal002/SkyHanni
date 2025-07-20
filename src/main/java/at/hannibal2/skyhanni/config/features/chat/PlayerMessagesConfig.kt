@@ -45,11 +45,25 @@ class PlayerMessagesConfig {
 
     @Expose
     @ConfigOption(
+        name = "Chat Filter",
+        desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var chatFilter: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Hide Level Brackets",
         desc = "Hide the gray brackets in front of and behind the level numbers."
     )
     @ConfigEditorBoolean
     var hideLevelBrackets: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Ignore YouTube Rank", desc = "Do not remove the YouTube rank from chat.")
+    @ConfigEditorBoolean
+    var ignoreYouTube: Boolean = false
 
     @Expose
     @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
@@ -61,20 +75,6 @@ class PlayerMessagesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var playerRankHider: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Ignore YouTube Rank", desc = "Do not remove the YouTube rank from chat.")
-    @ConfigEditorBoolean
-    var ignoreYouTube: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Chat Filter",
-        desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var chatFilter: Boolean = false
 
     @Expose
     @ConfigOption(name = "Same Chat Color", desc = "Make all chat messages white regardless of rank.")

@@ -153,7 +153,7 @@ object DianaProfitTracker {
     }
 
     private fun tryHide(event: SkyHanniChatEvent) {
-        if (SkyHanniMod.feature.chat.filterType.diana) {
+        if (SkyHanniMod.feature.chat.filterType.eventsFilter.diana) {
             event.blockedReason = "diana_chain_or_drops"
         }
     }

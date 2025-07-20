@@ -95,11 +95,6 @@ class DungeonConfig {
     val objectHider: ObjectHiderConfig = ObjectHiderConfig()
 
     @Expose
-    @ConfigOption(name = "Message Filter", desc = "")
-    @Accordion
-    val messageFilter: MessageFilterConfig = MessageFilterConfig()
-
-    @Expose
     @ConfigOption(name = "Dungeon Copilot", desc = "")
     @Accordion
     val dungeonCopilot: DungeonCopilotConfig = DungeonCopilotConfig()

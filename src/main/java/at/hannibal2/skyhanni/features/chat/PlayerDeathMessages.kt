@@ -63,5 +63,6 @@ object PlayerDeathMessages {
     }
 
     private fun isHideFarDeathsEnabled(): Boolean =
-        SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !DungeonApi.inDungeon() && !KuudraApi.inKuudra
+        SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.chat.filterType.combat.hideFarDeathMessages &&
+            !DungeonApi.inDungeon() && !KuudraApi.inKuudra
 }

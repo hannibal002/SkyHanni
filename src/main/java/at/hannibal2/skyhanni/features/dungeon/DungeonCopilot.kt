@@ -87,7 +87,7 @@ object DungeonCopilot {
             foundKeyOrDoor = true
         }
 
-        if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilter.keysAndDoors) return "dungeon_keys_and_doors"
+        if (foundKeyOrDoor && SkyHanniMod.feature.chat.filterType.dungeon.keysAndDoors) return "dungeon_keys_and_doors"
 
         if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 
@@ -155,7 +155,7 @@ object DungeonCopilot {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
+        event.move(98, "dungeon.messageFilterKeysAndDoors", "chat.filterType.dungeon.keysAndDoors")
         event.move(3, "dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")
         event.move(3, "dungeon.copilotPos", "dungeon.dungeonCopilot.pos")
     }

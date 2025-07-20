@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object CompactJacobClaim {
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.compact
     private val patternGroup = RepoPattern.group("chat.jacobcompact")
 
     // <editor-fold desc="Patterns">

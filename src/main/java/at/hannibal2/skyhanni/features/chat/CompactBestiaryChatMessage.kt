@@ -26,7 +26,7 @@ object CompactBestiaryChatMessage {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!SkyHanniMod.feature.chat.compactBestiaryMessage) return
+        if (!SkyHanniMod.feature.chat.compact.compactBestiaryMessage) return
 
         val message = event.message
 

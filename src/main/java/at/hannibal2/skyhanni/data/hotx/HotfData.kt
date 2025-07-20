@@ -492,7 +492,7 @@ enum class HotfData(
     }
 }
 
-private val chatConfig get() = SkyHanniMod.feature.chat
+private val chatConfig get() = SkyHanniMod.feature.chat.filterType.foraging
 
 private val patternGroup = RepoPattern.group("foraging.hotf")
 

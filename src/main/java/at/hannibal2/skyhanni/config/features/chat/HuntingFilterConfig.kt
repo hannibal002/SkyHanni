@@ -8,8 +8,14 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class HuntingFilterConfig {
 
     @Expose
+    @ConfigOption(name = "Charm", desc = "Hides charm & salt messages from killing mobs")
+    @SearchTag("shard")
+    @ConfigEditorBoolean
+    var charm: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Redundant Comments", desc = "Hide redundant comments from successfully hunting shards.")
-    @SearchTag("panda mochibear invisibug")
+    @SearchTag("panda mochibear invisibug joydive cod")
     @ConfigEditorBoolean
     var redundantComments: Boolean = false
 

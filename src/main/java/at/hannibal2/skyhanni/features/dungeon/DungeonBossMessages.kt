@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 @SkyHanniModule
 object DungeonBossMessages {
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.filterType.dungeon
     private val bossPattern = "§([cd4])\\[BOSS] (.*)".toPattern()
 
     private val excludedMessages = listOf(

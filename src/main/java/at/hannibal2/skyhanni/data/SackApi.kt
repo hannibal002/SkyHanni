@@ -48,7 +48,7 @@ private typealias GemstoneType = SkyBlockItemModifierUtils.GemstoneType
 object SackApi {
 
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
-    private val chatConfig get() = SkyHanniMod.feature.chat
+    private val chatConfig get() = SkyHanniMod.feature.chat.filterType.garden
     private val patternGroup = RepoPattern.group("data.sacks")
     private var lastOpenedInventory = ""
 

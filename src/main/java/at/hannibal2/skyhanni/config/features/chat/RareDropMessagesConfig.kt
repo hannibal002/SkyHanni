@@ -6,15 +6,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class RareDropMessagesConfig {
-    @Expose
-    @ConfigOption(
-        name = "Pet Drop Rarity",
-        desc = "Shows what rarity the pet drop is in the pet drop message.\n" +
-            "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var petRarity: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -33,4 +24,15 @@ class RareDropMessagesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var enchantedBookMissingMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Pet Drop Rarity",
+        desc = "Shows what rarity the pet drop is in the pet drop message.\n" +
+            "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var petRarity: Boolean = true
+
 }
