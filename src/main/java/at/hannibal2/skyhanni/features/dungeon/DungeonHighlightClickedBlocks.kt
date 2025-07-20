@@ -8,15 +8,16 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -62,7 +63,7 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (lockedPattern.matches(event.message)) {
-            blocks.values.lastOrNull { it.displayText.contains("Chest") }?.color = config.lockedChestColor.toSpecialColor()
+            blocks.values.lastOrNull { it.displayText.contains("Chest") }?.color = config.lockedChestColor.toColor()
         }
     }
 
@@ -73,7 +74,7 @@ object DungeonHighlightClickedBlocks {
 
         val type = event.blockType
 
-        val color = if (config.randomColor) getRandomColor().toColor() else getBlockProperties(type).color.toSpecialColor()
+        val color = if (config.randomColor) getRandomColor().toColor() else getBlockProperties(type).color.toColor()
         val displayText = ExtendedChatColor(color.rgb, false).toString() + "Clicked " + getBlockProperties(type).name
         blocks[event.position] = ClickedBlock(displayText, color)
 
@@ -106,7 +107,7 @@ object DungeonHighlightClickedBlocks {
     }
 
     private data class ClickedBlock(val displayText: String, var color: Color)
-    private data class BlockProperties(val name: String, val color: String)
+    private data class BlockProperties(val name: String, val color: ChromaColour)
 
     private fun isEnabled() = !DungeonApi.inBossRoom && DungeonApi.inDungeon() && config.enabled
 

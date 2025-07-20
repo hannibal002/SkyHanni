@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.hoppity
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -25,7 +26,7 @@ class HoppityWaypointsConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Color of the waypoint.")
     @ConfigEditorColour
-    var color: String = "0:53:46:224:73"
+    var color: ChromaColour = ChromaColour.fromStaticRGB(46, 224, 73, 53)
 
     @Expose
     @ConfigOption(name = "Show Line", desc = "Show a line to the waypoint.")

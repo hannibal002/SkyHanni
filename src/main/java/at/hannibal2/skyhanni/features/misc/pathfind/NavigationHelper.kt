@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.compat.hover
-import kotlinx.coroutines.launch
 
 @SkyHanniModule
 object NavigationHelper {
@@ -51,7 +50,7 @@ object NavigationHelper {
             }
         }
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             doCommandAsync(args)
         }
     }

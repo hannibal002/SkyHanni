@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
@@ -682,7 +681,7 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
+            if (rawName in EstimatedItemValue.stackingEnchants.keys) level = 1
 
             val enchantmentName = "$rawName;$level".toInternalName()
 
