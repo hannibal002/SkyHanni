@@ -16,29 +16,32 @@ import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.jvmErasure
 
 /**
- * Defines a storage set that can be reset to its default values.
+ * Defines a class that can be reset to its default values.
  *  - vars will be set to their default value
  *  - mutable maps/collections will be cleared
  *  Params can be "ignored" from the reset by annotating them with [Transient].
  */
-abstract class ResettableStorageSet {
+abstract class Resettable {
     private val classSimpleName by lazy { this::class.simpleName ?: "UnknownClass" }
     private val props = run {
-        val vars = this::class.memberProperties.filterIsInstance<KMutableProperty1<out ResettableStorageSet, Any?>>()
+        val vars = this::class.memberProperties.filterIsInstance<KMutableProperty1<out Resettable, Any?>>()
         val others = listOf(
             MutableCollection::class,
             MutableMap::class,
             MutableIterator::class,
-            Property::class
+            Property::class,
+            Resettable::class,
         ).flatMap { type ->
             this::class.memberProperties.filter {
                 it.returnType.jvmErasure.isSubclassOf(type)
             }
         }
         (vars + others).filter { prop ->
-            val annotatedIgnore = prop.hasAnnotation<Transient>()
-            val modifiedIgnore = prop.javaField?.let { Modifier.isTransient(it.modifiers) } ?: false
-            !annotatedIgnore && !modifiedIgnore
+            val ignoreOnProp = prop.hasAnnotation<Transient>() || prop.hasAnnotation<NoReset>()
+            val ignoreOnField = prop.javaField?.let { f ->
+                f.isAnnotationPresent(NoReset::class.java) || Modifier.isTransient(f.modifiers)
+            } ?: false
+            !(ignoreOnProp || ignoreOnField)
         }
     }
 
@@ -50,8 +53,8 @@ abstract class ResettableStorageSet {
     }
 
     private fun tryResetProp(
-        prop: KProperty1<out ResettableStorageSet, *>,
-        defaults: ResettableStorageSet,
+        prop: KProperty1<out Resettable, *>,
+        defaults: Resettable,
     ) {
         val originalAccessibility = prop.isAccessible
         try {
@@ -70,29 +73,30 @@ abstract class ResettableStorageSet {
         }
     }
 
-    private fun KProperty1<out ResettableStorageSet, *>.resetFun(
+    private fun KProperty1<out Resettable, *>.resetFun(
         current: Any?,
-        defaults: ResettableStorageSet,
+        defaults: Resettable,
     ) = when {
         this is KMutableProperty1<*, *> -> {
             @Suppress("UNCHECKED_CAST")
             val mutableProp = this as KMutableProperty1<Any, Any?>
             val defaultValue = mutableProp.get(defaults)
-            mutableProp.set(this@ResettableStorageSet, defaultValue)
+            mutableProp.set(this@Resettable, defaultValue)
         }
         current is Property<*> -> {
             @Suppress("UNCHECKED_CAST")
-            val propRef = this as KProperty1<ResettableStorageSet, Property<Any?>>
+            val propRef = this as KProperty1<Resettable, Property<Any?>>
             val defaultProp = propRef.get(defaults)
             @Suppress("UNCHECKED_CAST")
             val propCurrent = current as Property<Any?>
             propCurrent.set(defaultProp.get())
         }
+        current is Resettable -> current.reset()
         current is MutableCollection<*> -> current.clear()
         current is MutableMap<*, *> -> current.clear()
         current is MutableIterator<*> -> current.removeIf { true }
         else -> ChatUtils.debug(
-            message = "ResettableStorageSet $classSimpleName tried to reset property '${this.name}' " +
+            message = "Resettable $classSimpleName tried to reset property '${this.name}' " +
                 "but it is of type ${current?.javaClass?.simpleName}, which is not handled.",
             replaceSameMessage = true,
         )

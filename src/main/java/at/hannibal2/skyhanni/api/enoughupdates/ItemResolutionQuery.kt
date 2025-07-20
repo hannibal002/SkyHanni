@@ -345,7 +345,7 @@ class ItemResolutionQuery {
             resolveEnchantmentByName(displayName)
         } else if (guiName == "Attribute Menu") {
             resolveItemInAttributeMenu(compound.getLore())
-        } else if (guiName == "Hunting Box" || guiName == "Fusion Box") {
+        } else if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
             resolveItemInHuntingBoxMenu(displayName)
         } else null
     }

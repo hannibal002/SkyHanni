@@ -108,12 +108,17 @@ object EnoughUpdatesManager {
     private suspend fun loadItemMap(tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         fileSystem.list("items").mapNotNullAsync { name ->
-            val internalName = name.removeSuffix(".json")
-            val parsed = parseItem(
-                internalName = internalName,
-                json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
-            ) ?: return@mapNotNullAsync null
-            internalName.toInternalName() to parsed
+            try {
+                val internalName = name.removeSuffix(".json")
+                val parsed = parseItem(
+                    internalName = internalName,
+                    json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
+                ) ?: return@mapNotNullAsync null
+                internalName.toInternalName() to parsed
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
+                null
+            }
         }.forEach { (internalName, item) ->
             tempItemMap[internalName] = item
         }
