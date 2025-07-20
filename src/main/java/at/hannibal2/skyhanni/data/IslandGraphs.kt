@@ -537,15 +537,15 @@ object IslandGraphs {
 
         val percentage = (1 - (distance / totalDistance)) * 100
         val component = "§e[SkyHanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
-        component.onClick(
-            onClick = {
-                stop()
-                onManualCancel()
-                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
-            },
-        )
+        component.onClick(onClick = ::cancelClick)
         component.hover = "§eClick to stop navigating!".asComponent()
         NavigationFeedback.sendPathFindMessage(component)
+    }
+
+    fun cancelClick() {
+        stop()
+        onManualCancel()
+        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
     }
 
     @HandleEvent
