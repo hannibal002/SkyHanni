@@ -71,7 +71,7 @@ object LassoDisplay {
 
     @HandleEvent
     fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(99, "foraging.lassoDisplay", "hunting.lassoDisplay")
-        event.move(99, "foraging.lassoDisplayPosition", "hunting.lassoDisplayPosition")
+        event.move(100, "foraging.lassoDisplay", "hunting.lassoDisplay")
+        event.move(100, "foraging.lassoDisplayPosition", "hunting.lassoDisplayPosition")
     }
 }
