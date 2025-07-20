@@ -25,8 +25,8 @@ class SkyHanniCircleUniform : AutoCloseable {
 
     data class UniformValue(
         val angle1: Float,
-        val angle2: Float
-    ): DynamicUniformStorage.Uploadable {
+        val angle2: Float,
+    ) : DynamicUniformStorage.Uploadable {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(angle1)

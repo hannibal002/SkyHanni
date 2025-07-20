@@ -315,7 +315,7 @@ class ProfileSpecificStorage(
             @Expose var singleSlotCooldownMark: SimpleTimeMark? = null,
             @Expose var allSlotsCooldownMark: SimpleTimeMark? = null,
             @Expose var purchasedHitmanSlots: Int = 0,
-        ) : ResettableStorageSet()
+        ) : Resettable()
 
         @Expose
         var hitmanStats: HitmanStatsStorage = HitmanStatsStorage()
@@ -478,7 +478,7 @@ class ProfileSpecificStorage(
         var visitorDrops: VisitorDrops = VisitorDrops()
 
         // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
-        class VisitorDrops {
+        class VisitorDrops : Resettable() {
             @Expose
             var acceptedVisitors: Int = 0
 

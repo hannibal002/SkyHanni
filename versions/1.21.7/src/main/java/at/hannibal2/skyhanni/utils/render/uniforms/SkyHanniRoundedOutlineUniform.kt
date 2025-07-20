@@ -25,8 +25,8 @@ class SkyHanniRoundedOutlineUniform : AutoCloseable {
 
     data class UniformValue(
         val borderThickness: Float,
-        val borderBlur: Float
-    ): DynamicUniformStorage.Uploadable {
+        val borderBlur: Float,
+    ) : DynamicUniformStorage.Uploadable {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(borderThickness)
