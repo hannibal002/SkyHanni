@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -127,7 +128,7 @@ object FastFairySoulsPathfinder {
             if (disabled) return
             if (route.isEmpty()) {
                 val message = "§e[SkyHanni] Found all §5$found Fairy Souls §ein ${SkyBlockUtils.currentIsland.displayName}!"
-                IslandGraphs.overrideChatMessage(message)
+                NavigationFeedback.sendPathFindMessage(message)
                 allFound("found last soul of ${SkyBlockUtils.currentIsland}")
             } else {
                 pathTo(route.first())
