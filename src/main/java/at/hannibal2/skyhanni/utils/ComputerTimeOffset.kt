@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
 import kotlin.time.Duration
@@ -30,7 +31,7 @@ object ComputerTimeOffset {
         TOTALLY_OFF(Duration.INFINITE),
     }
 
-    private var currentlyChecking = false
+    private val timeCheckMutex = Mutex()
 
     private val offsetFixLinks by lazy {
         when {
@@ -53,23 +54,20 @@ object ComputerTimeOffset {
         }
     }
 
-    private fun checkOffset() {
+    private fun tryCheckOffset() {
         // probably a problem when the response somehow took longer than 1s?
-        if (currentlyChecking) {
+        if (timeCheckMutex.isLocked) {
             state = state.next() ?: error("state is already TOTALLY_OFF")
             if (state == State.TOTALLY_OFF) {
                 ErrorManager.logErrorStateWithData(
                     "Error when checking Computer Time Offset",
                     "trying to check again even though the previous check is still not done",
                 )
-            }
-            if (state == State.SLOW) {
+            } else if (state == State.SLOW) {
                 ChatUtils.chat("Computer Time Offset calculation took longer than normal. Checking less often now.")
             }
-            currentlyChecking = false
             return
         }
-        currentlyChecking = true
         val wasOffsetBefore = (offsetMillis?.absoluteValue ?: 0.seconds) > 5.seconds
         SkyHanniMod.launchIOCoroutine {
             offsetMillis = getNtpOffset(SkyHanniMod.feature.dev.ntpServer)
@@ -81,7 +79,7 @@ object ComputerTimeOffset {
     }
 
     private val clientTimeout = 10.seconds
-    private fun getNtpOffset(ntpServer: String): Duration? =
+    private suspend fun getNtpOffset(ntpServer: String): Duration? =
         runCatching {
             NTPUDPClient().use { client ->
                 client.setDefaultTimeout(clientTimeout.toJavaDuration())
@@ -114,14 +112,14 @@ object ComputerTimeOffset {
         val deviation = timeDifference - expectedDuration
 
         if (deviation.absoluteValue > 1.seconds) {
-            checkOffset()
+            tryCheckOffset()
         }
     }
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         DelayedRun.runDelayed(5.seconds) {
-            checkOffset()
+            tryCheckOffset()
         }
     }
 
