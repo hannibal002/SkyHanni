@@ -33,6 +33,7 @@ object ComputerTimeOffset {
             OSUtils.isWindows -> "https://support.microsoft.com/en-us/windows/dfaa7122-479f-5b98-2a7b-fa0b6e01b261"
             OSUtils.isLinux -> "https://unix.stackexchange.com/a/79116"
             OSUtils.isMac -> "https://support.apple.com/guide/mac-help/mchlp2996/mac"
+            OSUtils.isSolaris -> "https://docs.oracle.com/cd/E53394_01/html/E54798/sysressysinfo-11048.html"
             else -> null
         }
     }
