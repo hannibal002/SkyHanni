@@ -8,6 +8,7 @@ class RepoLogger(private val loggingPrefix: String) {
     fun preDebug(message: String) = println("$loggingPrefix $message")
     fun warn(message: String) = SkyHanniMod.logger.warn("$loggingPrefix $message")
 
+    fun logNonDestructiveError(error: String) = SkyHanniMod.logger.error("$loggingPrefix $error")
     fun logError(error: String): Nothing = ErrorManager.skyHanniError("$loggingPrefix $error")
     fun logErrorWithData(cause: Throwable, error: String): Boolean =
         ErrorManager.logErrorWithData(cause, "$loggingPrefix $error")

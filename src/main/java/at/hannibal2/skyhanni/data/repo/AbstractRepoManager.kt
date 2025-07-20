@@ -104,6 +104,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
     // Will be invoked by the implementation of this class
+    @Suppress("HandleEventInspection")
     fun registerCommands(event: CommandRegistrationEvent) {
         if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
             description = "Download the $commonName repo again"
@@ -177,7 +178,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
+    private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
             if (manual) ChatUtils.chat("$commonShortNameCased Repo settings are already on default!")
             return
@@ -315,12 +316,12 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
             downloadFailed = true
             logger.logError("Failed to unpack the downloaded zip file.")
+        } else {
+            localRepoCommit = RepoCommit(latestSha, latestCommitTime)
+            commitStorage.writeToFile(localRepoCommit)
+            downloadFailed = false
+            isUsingBackup = false
         }
-
-        localRepoCommit = RepoCommit(latestSha, latestCommitTime)
-        commitStorage.writeToFile(localRepoCommit)
-        downloadFailed = false
-        isUsingBackup = false
     }
 
     private fun prepCleanRepoFileSystem() {
