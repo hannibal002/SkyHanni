@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -34,7 +33,7 @@ object DungeonMobManager {
     private val felMoving = mutableSetOf<Mob>()
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         onToggle(
             starredConfig.highlight,
             starredConfig.color,
@@ -167,7 +166,7 @@ object DungeonMobManager {
     @Suppress("AvoidBritishSpelling")
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val base = "dungeon.objectHighlighter"
-        event.move(99, "$base.starred.colour", "$base.starred.color")
-        event.move(99, "$base.fel.colour", "$base.fel.color")
+        event.move(101, "$base.starred.colour", "$base.starred.color")
+        event.move(101, "$base.fel.colour", "$base.fel.color")
     }
 }
