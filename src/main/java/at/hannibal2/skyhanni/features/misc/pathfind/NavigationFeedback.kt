@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,6 +45,7 @@ object NavigationFeedback {
             PathfindConfig.FeedbackMode.NONE -> false
             PathfindConfig.FeedbackMode.CHAT -> sendChatFeedback(component)
             PathfindConfig.FeedbackMode.GUI -> sendGuiFeedback(component)
+            else -> false
         }
     }
 
@@ -57,7 +58,7 @@ object NavigationFeedback {
 
     private fun sendGuiFeedback(component: ChatComponentText): Boolean {
         val guiFormattedText = component.formattedText.removePrefix("§e[SkyHanni] ")
-        guiRenderable = StringRenderable(guiFormattedText)
+        guiRenderable = Renderable.text(guiFormattedText)
         return true
     }
 
