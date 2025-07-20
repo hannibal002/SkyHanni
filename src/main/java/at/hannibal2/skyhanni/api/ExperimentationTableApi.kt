@@ -300,7 +300,8 @@ object ExperimentationTableApi {
         var enchantingXpGained: Long = 0L,
         var rareFoundFired: Boolean = false,
     ) : ResettableStorageSet() {
-        @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
+        @Transient
+        private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
         override fun reset() {
             super.reset()
@@ -485,6 +486,7 @@ object ExperimentationTableApi {
                 "currentType" to currentExperimentType,
                 "currentTier" to currentExperimentTier,
             )
+
             ExperimentationTaskType.SUPERPAIRS -> SUPERPAIRS_OVER_DATA_SLOT
             else -> ADDONS_OVER_DATA_SLOT
         }

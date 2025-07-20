@@ -1,7 +1,8 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.skyhanni.features.hunting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -21,7 +22,7 @@ import net.minecraft.particle.ParticleTypes
 
 @SkyHanniModule
 object InvisibugHighlighter {
-    private val config get() = SkyHanniMod.feature.foraging.mobHighlight.invisibug
+    private val config get() = SkyHanniMod.feature.hunting.mobHighlight.invisibug
 
     private val invisibugEntities = mutableListOf<LivingEntity>()
 
@@ -60,5 +61,10 @@ object InvisibugHighlighter {
         if (!config.enabled) return
 
         EntityUtils.removeInvalidEntities(invisibugEntities)
+    }
+
+    @HandleEvent
+    fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(100, "foraging.mobHighlight.invisibug", "hunting.mobHighlight.invisibug")
     }
 }

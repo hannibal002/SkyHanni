@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
@@ -370,7 +371,7 @@ object EnoughUpdatesManager {
         neuPetsJson = event.getConstant<NeuPetsJson>("pets")
         neuPetNums = event.getConstant<NeuPetNumsJson>("petnums")
         if (itemMap.isNotEmpty()) {
-            ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
+            ChatUtils.chat("Reloaded ${itemMap.size.addSeparators()} items in the NEU repo")
         }
     }
 

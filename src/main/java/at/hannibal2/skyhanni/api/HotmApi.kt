@@ -115,32 +115,32 @@ object HotmApi {
         MINING_SPEED(
             perkDescription = "§6+100⸕ Mining Speed",
             chatFallback = "Gain §r§6\\+100⸕ Mining Speed§r§f\\.",
-            itemFallback = "Gain §6\\+100⸕ Mining Speed§7\\."
+            itemFallback = "Gain §6\\+100⸕ Mining Speed§7\\.",
         ),
         MINING_FORTUNE(
             perkDescription = "§6+50☘ Mining Fortune",
             chatFallback = "Gain §r§6\\+50☘ Mining Fortune§r§f\\.",
-            itemFallback = "Gain §6\\+50☘ Mining Fortune§7\\."
+            itemFallback = "Gain §6\\+50☘ Mining Fortune§7\\.",
         ),
         EXTRA_POWDER(
             perkDescription = "§a+15% §7more Powder",
             chatFallback = "Gain §r§a\\+15% §r§fmore Powder while mining\\.",
-            itemFallback = "Gain §a\\+15% §7more Powder while mining\\."
+            itemFallback = "Gain §a\\+15% §7more Powder while mining\\.",
         ),
         ABILITY_COOLDOWN(
             perkDescription = "§a-20% §7Pickaxe Ability cooldowns",
             chatFallback = "§r§a-20%§r§f Pickaxe Ability cooldowns\\.",
-            itemFallback = "§a-20%§7 Pickaxe Ability cooldowns\\."
+            itemFallback = "§a-20%§7 Pickaxe Ability cooldowns\\.",
         ),
         GOBLIN_CHANCE(
             perkDescription = "§a10x §6Gold §7& §bDiamond §7Goblin chance",
             chatFallback = "§r§a10x §r§fchance to find Golden and Diamond Goblins\\.",
-            itemFallback = "§a10x §7chance to find Golden and"
+            itemFallback = "§a10x §7chance to find Golden and",
         ),
         TITANIUM(
             perkDescription = "§a5x §9Titanium §7drops",
             chatFallback = "Gain §r§a5x §r§9Titanium §r§fdrops",
-            itemFallback = "Gain §a5x §9Titanium §7drops\\."
+            itemFallback = "Gain §a5x §9Titanium §7drops\\.",
         ),
         ;
 
