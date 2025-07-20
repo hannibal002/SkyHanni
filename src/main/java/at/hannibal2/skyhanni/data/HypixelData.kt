@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
@@ -424,6 +425,7 @@ object HypixelData {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
                 RepoManager.displayRepoStatus(true)
+                EnoughUpdatesRepoManager.displayRepoStatus(true)
             }
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
