@@ -475,6 +475,7 @@ object ExperimentationTableApi {
                 "currentType" to currentExperimentType,
                 "currentTier" to currentExperimentTier,
             )
+
             ExperimentationTaskType.SUPERPAIRS -> SUPERPAIRS_OVER_DATA_SLOT
             else -> ADDONS_OVER_DATA_SLOT
         }
