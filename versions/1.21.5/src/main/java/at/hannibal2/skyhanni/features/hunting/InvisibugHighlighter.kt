@@ -65,6 +65,6 @@ object InvisibugHighlighter {
 
     @HandleEvent
     fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(99, "foraging.mobHighlight.invisibug", "hunting.mobHighlight.invisibug")
+        event.move(100, "foraging.mobHighlight.invisibug", "hunting.mobHighlight.invisibug")
     }
 }

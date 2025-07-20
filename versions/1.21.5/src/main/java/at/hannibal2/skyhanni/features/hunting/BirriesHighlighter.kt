@@ -28,6 +28,6 @@ object BirriesHighlighter {
     @HandleEvent
     fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(91, "foraging.birriesHighlight", "foraging.mobHighlight.birries")
-        event.move(99, "foraging.mobHighlight.birries", "hunting.mobHighlight.birries")
+        event.move(100, "foraging.mobHighlight.birries", "hunting.mobHighlight.birries")
     }
 }

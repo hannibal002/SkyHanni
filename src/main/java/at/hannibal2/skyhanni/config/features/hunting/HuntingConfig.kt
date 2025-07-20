@@ -47,4 +47,5 @@ class HuntingConfig {
     @Category(name = "Fusion Keybinds", desc = "Settings for fusion keybinds")
     @SearchTag("hunting box")
     var fusionKeybinds = FusionKeybindsConfig()
+
 }

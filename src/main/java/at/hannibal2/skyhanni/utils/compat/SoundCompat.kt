@@ -32,6 +32,7 @@ object SoundCompat {
         "mob.pig.say" to "entity.pig.ambient",
         "mob.sheep.say" to "entity.sheep.ambient",
         "mob.wither.shoot" to "entity.wither.shoot",
+        "mob.wither.spawn" to "entity.wither.spawn",
         "mob.wolf.bark" to "entity.wolf.ambient",
         "mob.wolf.death" to "entity.wolf.death",
         "mob.wolf.growl" to "entity.wolf.growl",
