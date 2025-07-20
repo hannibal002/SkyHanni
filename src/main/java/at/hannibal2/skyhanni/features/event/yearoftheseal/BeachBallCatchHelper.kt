@@ -126,7 +126,7 @@ object BeachBallCatchHelper {
         Variant.GIANT -> add(-0.9, -0.9, -0.9).boundingToOffset(1.8, 1.8, 1.8)
     }
 
-    @HandleEvent(IslandChangeEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onIslandChange() {
         predictors.clear()
     }

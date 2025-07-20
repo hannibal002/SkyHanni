@@ -59,15 +59,18 @@ object RenderLivingEntityHelper {
     }
 
     fun <T : EntityLivingBase> setEntityColor(entity: T, color: Color, condition: () -> Boolean) {
-        setEntityColor(entity, color, condition)
+        if (color == Color.BLACK) return
+        entityColorMap[entity] = color
+        entityColorCondition[entity] = condition
     }
 
-    fun <T : EntityLivingBase> setNoHurtTime(entity: T, condition: () -> Boolean) {
+    private fun <T : EntityLivingBase> setEntityNoHurtTime(entity: T, condition: () -> Boolean) {
         entityNoHurtTimeCondition[entity] = condition
     }
 
     fun <T : EntityLivingBase> setEntityColorWithNoHurtTime(entity: T, color: Color, condition: () -> Boolean) {
-        setEntityColorWithNoHurtTime(entity, color, condition)
+        setEntityColor(entity, color, condition)
+        setEntityNoHurtTime(entity, condition)
     }
 
     fun <T : EntityLivingBase> removeNoHurtTime(entity: T) {

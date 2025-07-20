@@ -58,11 +58,13 @@ object VoltHighlighter {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!(config.voltRange || config.voltMoodMeter)) return
         for (entity in getEntities<EntityLivingBase>()) {
-            val state = getVoltState(entity)
-            if (state == VoltState.NO_VOLT) continue
+            val state = getVoltState(entity).takeIf { it != VoltState.NO_VOLT } ?: continue
 
-            if (config.voltMoodMeter)
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, state.color.toColor()) { config.voltMoodMeter }
+            if (config.voltMoodMeter) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                entity,
+                state.color.toColor()
+            ) { config.voltMoodMeter }
+
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 event.drawCylinderInWorld(
                     config.voltColor.toColor(),
