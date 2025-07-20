@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.DisplayTypeEntry
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -11,14 +10,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -27,7 +24,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -107,10 +106,10 @@ object BestiaryData {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.stack.getLore()
             if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
             if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
-                slot highlight LorenzColor.RED
+                slot.highlight(LorenzColor.RED)
             }
         }
     }
@@ -140,13 +139,6 @@ object BestiaryData {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.bestiaryData", "combat.bestiary")
-
-        event.transform(15, "combat.bestiary.numberFormat") { element ->
-            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
-        }
-        event.transform(15, "combat.bestiary.displayType") { element ->
-            ConfigUtils.migrateIntToEnum(element, DisplayTypeEntry::class.java)
-        }
     }
 
     private fun update() {
@@ -366,24 +358,22 @@ object BestiaryData {
             },
         )
 
-        // TODO add function that expects a boolean
-        addRenderableButton<NumberType>(
+        addRenderableButton(
             label = "Number Type",
-            current = NumberType.entries[if (config.replaceRoman) 0 else 1],
-            getName = { it.type },
+            config = config::replaceRoman,
+            enabled = "Normal (1, 2, 3)",
+            disabled = "Roman (I, II, III)",
             onChange = {
-                config.replaceRoman = !config.replaceRoman
                 update()
             },
         )
 
-        // TODO add function that expects a boolean
-        addRenderableButton<HideMaxed>(
+        addRenderableButton(
             label = "Hide Maxed",
-            current = HideMaxed.entries[if (config.hideMaxed) 1 else 0],
-            getName = { it.type },
+            config = config::hideMaxed,
+            enabled = "Hide",
+            disabled = "Show",
             onChange = {
-                config.hideMaxed = !config.hideMaxed
                 update()
             },
         )
@@ -422,8 +412,7 @@ object BestiaryData {
         return true
     }
 
-    private fun isBestiaryGui(stack: ItemStack?, name: String): Boolean {
-        if (stack == null) return false
+    private fun isBestiaryGui(stack: ItemStack, name: String): Boolean {
         val bestiaryGuiTitleMatcher = titlePattern.matcher(name)
         if (bestiaryGuiTitleMatcher.matches()) {
             if ("Bestiary" != bestiaryGuiTitleMatcher.group("title")) {
@@ -451,19 +440,9 @@ object BestiaryData {
         return false
     }
 
-    enum class NumberType(val type: String) {
-        INT("Normal (1, 2, 3)"),
-        ROMAN("Roman (I, II, III)")
-    }
-
-    enum class HideMaxed(val type: String) {
-        NO("Show"),
-        YES("Hide")
-    }
-
     private fun Long.formatNumber(): String = when (config.numberFormat) {
-        BestiaryConfig.NumberFormatEntry.SHORT -> this.shortFormat()
-        BestiaryConfig.NumberFormatEntry.LONG -> this.addSeparators()
+        NumberFormatEntry.SHORT -> this.shortFormat()
+        NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }
 
@@ -494,12 +473,12 @@ object BestiaryData {
 
         fun percentToMax() = actualRealTotalKill.toDouble() / killToMax
 
-        fun percentToMaxFormatted() = LorenzUtils.formatPercentage(percentToMax())
+        fun percentToMaxFormatted() = percentToMax().formatPercentage()
 
         fun percentToTier() =
             if (killNeededForNextLevel == 0L) 1.0 else currentKillToNextLevel.toDouble() / killNeededForNextLevel
 
-        fun percentToTierFormatted() = LorenzUtils.formatPercentage(percentToTier())
+        fun percentToTierFormatted() = percentToTier().formatPercentage()
 
         fun getNextLevel() = level.getNextLevel()
     }
@@ -515,5 +494,5 @@ object BestiaryData {
         (intValue + 1).toRoman().romanOrInt()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ChatComponentText
@@ -55,9 +55,9 @@ object CarnivalQuickStart {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         // IDK what is wrong here, but it does not work with event.message
-        if (!chatPattern.matches((event.chatComponent as? ChatComponentText)?.chatComponentText_TextValue)) return
+        if (!chatPattern.matches((event.chatComponent as? ChatComponentText)?.unformattedTextForChat)) return
         lastChat = SimpleTimeMark.now()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config && Perk.CHIVALROUS_CARNIVAL.isActive && LorenzUtils.skyBlockArea == "Carnival"
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config && Perk.CHIVALROUS_CARNIVAL.isActive && SkyBlockUtils.graphArea == "Carnival"
 }

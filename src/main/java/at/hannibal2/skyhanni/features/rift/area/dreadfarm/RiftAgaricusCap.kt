@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -14,9 +12,9 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import net.minecraft.init.Blocks
 
 @SkyHanniModule
@@ -28,7 +26,7 @@ object RiftAgaricusCap {
     private var inArea: Boolean = false
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         location = updateLocation()
@@ -41,7 +39,7 @@ object RiftAgaricusCap {
 
     private fun updateLocation(): LorenzVec? {
         if (InventoryUtils.getItemInHand()?.getInternalName() != RiftApi.farmingTool) return null
-        val currentLocation = BlockUtils.getBlockLookingAt() ?: return null
+        val currentLocation = BlockUtils.getTargetedBlock() ?: return null
 
         when (currentLocation.getBlockAt()) {
             Blocks.brown_mushroom -> {
@@ -67,7 +65,7 @@ object RiftAgaricusCap {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         reset()
     }
 

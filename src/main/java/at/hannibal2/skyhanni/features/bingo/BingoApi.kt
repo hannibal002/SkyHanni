@@ -11,9 +11,10 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.time.LocalTime
@@ -43,7 +44,7 @@ object BingoApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Bingo Card")
 
-        if (!LorenzUtils.isBingoProfile) {
+        if (!SkyBlockUtils.isBingoProfile) {
             event.addIrrelevant("not on bingo")
             return
         }
@@ -111,7 +112,7 @@ object BingoApi {
         percentage < 0.25 -> "§6"
 
         else -> "§c"
-    } + LorenzUtils.formatPercentage(percentage)
+    } + percentage.formatPercentage()
 
     fun getBingoIcon(rank: Int): String {
         val rankIcon = getIcon(rank).orEmpty()

@@ -1,25 +1,24 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -54,23 +53,26 @@ object MobFilter {
 
     private val patternGroup = RepoPattern.group("mob.detection")
 
-    /** REGEX-TEST: Wither Husk 500M❤ */
+    /**
+     * REGEX-TEST: Wither Husk 500M❤
+     */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
     val slayerNameFilter by patternGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
 
-    /** REGEX-TEST: ﴾ Storm ﴿
-     *  REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv500] Magma Boss █████████████████████████ ﴿
-     *  REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
-     *  */
+    /**
+     * REGEX-TEST: ﴾ Storm ﴿
+     * REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv500] Magma Boss █████████████████████████ ﴿
+     * REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000❤ ﴿
+     * REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
+     * REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
+     */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
         "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
@@ -87,9 +89,15 @@ object MobFilter {
         "filter.dojo",
         "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$",
     )
+
+    /**
+     * REGEX-TEST: [Lv3] TheNewArrow's Purple Jerry 5 Hits
+     * REGEX-TEST: [Lv3] aheNewarrow's Purple Jerry 5 Hits
+     * REGEX-TEST: [Lv1] aThunderblade73's Green Jerrya 7 Hits
+     */
     val jerryPattern by patternGroup.pattern(
         "jerry",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits",
+        "(?:\\[\\w+(?<level>\\d+)\\] )?(?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
     )
     val petCareNamePattern by patternGroup.pattern(
         "pattern.petcare",
@@ -110,6 +118,14 @@ object MobFilter {
     val heavyPearlPattern by patternGroup.pattern(
         "pattern.heavypearl.collect",
         "§.§lCOLLECT!",
+    )
+
+    /**
+     * REGEX-TEST: SHINY PIG
+     */
+    val shinyPig by patternGroup.pattern(
+        "pattern.shiny",
+        "SHINY PIG",
     )
 
     /**
@@ -169,6 +185,8 @@ object MobFilter {
         "§e§lBLACKSMITH",
         "§e§lSHOP",
         "§e§lTREASURES",
+        "§c§lQUEST",
+        "§e§lQUEST",
     )
 
     fun Entity.isSkyBlockMob(): Boolean = when {
@@ -184,9 +202,10 @@ object MobFilter {
 
     fun EntityLivingBase.isDisplayNpc() =
         (this is EntityPlayer && isNpc() && displayNpcNameCheck(this.name)) ||
-            (this is EntityVillager && this.maxHealth == 20.0f) || // Villager NPCs in the Village
+            (this is EntityVillager && this.maxHealth == 20f) || // Villager NPCs in the Village
             (this is EntityWitch && this.entityId <= 500) || // Alchemist NPC
             (this is EntityCow && this.entityId <= 500) || // Shania NPC (in Rift and Outside)
+            (this is EntityPig && this.entityId <= 600) || // Pig Shop
             (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
     fun createDisplayNpc(entity: EntityLivingBase): Boolean {
@@ -251,7 +270,7 @@ object MobFilter {
         baseEntity is EntityBat -> createBat(baseEntity)
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
-        baseEntity is EntityDragon -> when (LorenzUtils.skyBlockIsland) {
+        baseEntity is EntityDragon -> when (SkyBlockUtils.currentIsland) {
             IslandType.CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
                 .makeMobResult {
                     MobFactories.boss(baseEntity, it.first(), it.drop(1))
@@ -329,7 +348,7 @@ object MobFilter {
                     extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
                 else -> null
             }
-        } else when (LorenzUtils.skyBlockIsland) {
+        } else when (SkyBlockUtils.currentIsland) {
             IslandType.CRIMSON_ISLE -> when {
                 else -> null
             }
@@ -354,7 +373,7 @@ object MobFilter {
 
     fun EntityLivingBase.isFarmMob() =
         this is EntityAnimal && this.baseMaxHealth.derpy()
-            .let { it == 50 || it == 20 || it == 130 } && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
+            .let { it == 50 || it == 20 || it == 130 } && SkyBlockUtils.currentIsland != IslandType.PRIVATE_ISLAND
 
     private fun createFarmMobs(baseEntity: EntityLivingBase): Mob? = when (baseEntity) {
         is EntityMooshroom -> MobFactories.basic(baseEntity, "Farm Mooshroom")
@@ -369,13 +388,13 @@ object MobFilter {
     private fun createBat(baseEntity: EntityLivingBase): MobResult? = when (baseEntity.baseMaxHealth.derpy()) {
         5_000_000 -> MobResult.found(MobFactories.basic(baseEntity, "Cinderbat"))
         75_000 -> MobResult.found(MobFactories.basic(baseEntity, "Thorn Bat"))
-        600 -> if (IslandType.GARDEN.isInIsland()) null else MobResult.notYetFound
+        600 -> if (IslandType.GARDEN.isCurrent()) null else MobResult.notYetFound
         100 -> MobResult.found(
             MobFactories.basic(
                 baseEntity,
                 when {
                     DungeonApi.inDungeon() -> "Dungeon Secret Bat"
-                    IslandType.PRIVATE_ISLAND.isInIsland() -> "Private Island Bat"
+                    IslandType.PRIVATE_ISLAND.isCurrent() -> "Private Island Bat"
                     else -> "Mega Bat"
                 },
             ),

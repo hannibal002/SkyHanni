@@ -4,21 +4,22 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -27,6 +28,13 @@ object ChatFilter {
     private val generalConfig get() = SkyHanniMod.feature.chat
     private val config get() = SkyHanniMod.feature.chat.filterType
     private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
+    private val foragingConfig get() = config.foraging
+    private val huntingConfig get() = config.hunting
+
+    private val chatFilterGroup = RepoPattern.group("chat-filter")
+    private val huntingPatternGroup = chatFilterGroup.group("hunting")
+    private val foragingPatternGroup = chatFilterGroup.group("foraging")
+    private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -49,7 +57,7 @@ object ChatFilter {
         "§b✦ §r§7You earned §r§b\\d+ §r§7Mystery Dust!".toPattern(),
 
         // pet consumables
-        "§b✦ §r§7You earned §r§a\\d+ §r§7Pet Consumables?!".toPattern(),
+        "§b§b✦ §r§7You earned §a\\d+ §7Pet Consumables items!".toPattern(),
     )
 
     private val lobbyMessages = listOf(
@@ -216,9 +224,16 @@ object ChatFilter {
         "§6§lRARE DROP! §r§5Crystal Fragment",
     )
 
+    // Legacy Items
+    @Suppress("MaxLineLength")
+    private val legacyItems = listOf(
+        "§cYou currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!".toPattern(),
+    )
+
+    // TODO update patterns for 1.21
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
-        "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
+        "(?:§a)?§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
     )
     private val uselessNotificationMessages = listOf(
         "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
@@ -274,6 +289,7 @@ object ChatFilter {
         "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§7Your Spirit Sceptre hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern(),
+        "§9§n\n§c§lYouTube Premier §eCelebrate Hypixel's 12th Anniversary with a special Minecraft Animation, live now §bhttps://youtu.be/ikT631vQd8A\n".toPattern(),
     )
     private val annoyingSpamMessages = listOf(
         "§cThere are blocks in the way!",
@@ -289,11 +305,17 @@ object ChatFilter {
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
+        "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
     )
 
     private val skymallMessages = listOf(
         "§bNew day! §r§eYour §r§2Sky Mall §r§ebuff changed!",
         "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
+    )
+
+    private val lotteryMessages = listOf(
+        "§bNew day! §r§eYour §r§2Lottery §r§ebuff changed!",
+        "§8§oYou can disable this messaging by toggling Lottery in your /hotf!",
     )
 
     /**
@@ -304,46 +326,20 @@ object ChatFilter {
         "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!",
     )
 
-    /**
-     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§6+50☘ Mining Fortune§r§f.
-     */
-    private val skymallPerkPattern by RepoPattern.pattern(
-        "chat.skymall.perk",
-        "§eNew buff§r§r§r:.*",
-    )
-
     // Winter Gift
-    private val winterGiftPatterns = listOf(
-        // winter gifts useless
-        "§f§lCOMMON! §r§3.* XP §r§egift with §r.*§r§e!".toPattern(),
-        "(§f§lCOMMON|§9§lRARE)! §r.* XP Boost .* Potion §r.*§r§e!".toPattern(),
-        "(§f§lCOMMON|§9§lRARE)! §r§6.* coins §r§egift with §r.*§r§e!".toPattern(),
-
-        // enchanted book
-        "§9§lRARE! §r§9Scavenger IV §r§egift with §r.*§r§e!".toPattern(),
-        "§9§lRARE! §r§9Looting IV §r§egift with §r.*§r§e!".toPattern(),
-        "§9§lRARE! §r§9Luck VI §r§egift with §r.*§r§e!".toPattern(),
-
-        // minion skin
-        "§e§lSWEET! §r§f(Grinch|Santa|Gingerbread Man) Minion Skin §r§egift with §r.*§r§e!".toPattern(),
-
-        // rune
-        "§9§lRARE! §r§f◆ Ice Rune §r§egift with §r.*§r§e!".toPattern(),
-
-        // furniture
-        "§e§lSWEET! §r§fTall Holiday Tree §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§fNutcracker §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§fPresent Stack §r§egift with §r.*§r§e!".toPattern(),
-
-        "§e§lSWEET! §r§9(Winter|Battle) Disc §r§egift with §r.*§r§e!".toPattern(),
-
-        // winter gifts a bit useful
-        "§e§lSWEET! §r§9Winter Sack §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§5Snow Suit .* §r§egift with §r.*§r§e!".toPattern(),
-
-        // winter gifts not your gifts
-        "§cThis gift is for §r.*§r§c, sorry!".toPattern(),
-    )
+    private val winterGiftPatterns = buildList {
+        GiftProfitTracker.run {
+            listOf(
+                xpGainedPattern,
+                coinsGainedPattern,
+                northStarsPattern,
+                boostPotionPattern,
+                enchantmentBookPattern,
+                genericRewardPattern,
+            ).forEach { add(it) }
+        }
+        addAll(GiftProfitTracker.spamPatterns)
+    }
 
     private val fireSalePattern by RepoPattern.pattern(
         "chat.firesale",
@@ -358,9 +354,9 @@ object ChatFilter {
         "§c {3}♨ §eAnd \\d+ more!".toPattern(),
     )
     private val eventPatterns = listOf(
-        "§f +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
-        "§f +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
-        "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
+        "(?:§f)? +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
+        "(?:§f)? +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
+        "(?:§f)? +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
     )
     private val factoryUpgradePatterns = listOf(
         "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
@@ -460,6 +456,47 @@ object ChatFilter {
         "§4This Teleport Pad does not have a destination set!",
     )
 
+    /**
+     ** REGEX-TEST: §eYou haven't claimed your §r§6Summer Rewards §r§eyet!
+     ** REGEX-TEST: §eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
+     ** REGEX-TEST: §eTalk to the §r§bRandom NPC §r§ein the §r§aForbidden Zone§r§e!
+     */
+    private val rewardBundlePatterns by miscPatternGroup.list(
+        "seasonal-bundles",
+        "(?:§.)*You haven't claimed your (?:§.)*\\w+ Rewards (?:§.)*yet!",
+        "(?:§.)*Talk to the (?:§.)*.+(?:§.)*in the (?:§.)*.+(?:§.)*!",
+    )
+
+    /**
+     ** REGEX-TEST: §cYou cannot damage a tree while it is regenerating!
+     ** REGEX-TEST: §c§oThe toughness of this tree is way too high!
+     */
+    private val unmineableTreePatterns by foragingPatternGroup.list(
+        "unmineable-tree",
+        "(?:§.)*You cannot damage a tree while it is regenerating!",
+        "(?:§.)*The toughness of this tree is way too high!",
+    )
+
+    /**
+     ** REGEX-TEST: §7§oMochibear ate too much and passed out! You caught it!
+     ** REGEX-TEST: §7§oYou caught yourself an invisibug! The shard was sent to your Hunting Box!
+     ** REGEX-TEST: §7§oThe Frog is exhausted...
+     */
+    private val redundantShardsPatterns by huntingPatternGroup.list(
+        "redundant-comments",
+        "(?:§.)*Mochibear ate too much and passed out! You caught it!",
+        "(?:§.)*You caught yourself an invisibug! The shard was sent to your Hunting Box!",
+        "(?:§.)*The Frog is exhausted\\.\\.\\.",
+    )
+
+    /**
+     * REGEX-TEST: §e[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!
+     */
+    private val swoopAxePattern by huntingPatternGroup.pattern(
+        "swoop-axe-message",
+        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!"
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -468,6 +505,7 @@ object ChatFilter {
         "slayer" to slayerPatterns,
         "slayer_drop" to slayerDropPatterns,
         "useless_drop" to uselessDropPatterns,
+        "legacy_items" to legacyItems,
         "useless_notification" to uselessNotificationPatterns,
         "money" to bazaarPatterns,
         "winter_island" to winterIslandPatterns,
@@ -484,6 +522,13 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
+    )
+
+    private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
+        "reward_bundles" to rewardBundlePatterns,
+        "redundant_hunting" to redundantShardsPatterns,
+        "unmineable_tree" to unmineableTreePatterns,
+        "swoop_axe" to listOf(swoopAxePattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -503,6 +548,7 @@ object ChatFilter {
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
         "skymall" to skymallMessages,
+        "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
     )
@@ -553,15 +599,21 @@ object ChatFilter {
         config.eventLevelUp && (message.isPresent("event")) -> "event"
 
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
+        config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
-        generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
+        generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"
+        generalConfig.hideLottery && !IslandTypeTags.FORAGING.inAny() && message.isPresent("lottery") -> "lottery"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
         dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
+        foragingConfig.unmineable && IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && message.isPresent("unmineable_tree") -> "unmineable_tree"
+        huntingConfig.redundantComments && IslandType.GALATEA.isCurrent() && message.isPresent("redundant_hunting") -> "redundant_hunting"
+        huntingConfig.swoopAxeMessage && message.isPresent("swoop_axe") -> "swoop_axe"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
+        config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
 
         else -> null
     }
@@ -581,7 +633,7 @@ object ChatFilter {
                 val amountFormat = groupOrNull("amount")?.let {
                     "§a+ §b$it§r"
                 } ?: "§a+§r"
-                event.chatComponent = ChatComponentText("$amountFormat $reward")
+                event.chatComponent = "$amountFormat $reward".asComponent()
             }
             return null
         }
@@ -597,7 +649,7 @@ object ChatFilter {
      */
     private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
         val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
-        newMessage?.let { event.chatComponent = ChatComponentText(it) }
+        newMessage?.let { event.chatComponent = it.asComponent() }
         blockCode?.let { return it }
         return null
     }
@@ -638,11 +690,13 @@ object ChatFilter {
      * @return True if the message is present in any of the maps
      * @see messagesMap
      * @see patternsMap
+     * @see repoPatternsMap
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
     private fun String.isPresent(key: String) = this in (messagesMap[key].orEmpty()) ||
         (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+        (repoPatternsMap[key].orEmpty()).any { it.matches(this) } ||
         (messagesContainsMap[key].orEmpty()).any { this.contains(it) } ||
         (messagesStartsWithMap[key].orEmpty()).any { this.startsWith(it) }
 

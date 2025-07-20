@@ -12,8 +12,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
@@ -29,11 +27,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -59,23 +60,17 @@ object PestApi {
         }
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
-    var lastTimeVacuumHold = SimpleTimeMark.farPast()
+    var lastPestSpawnTime = SimpleTimeMark.farPast()
+    var lastTimeVacuumHeld = SimpleTimeMark.farPast()
+    var lastTimeLassoHeld = SimpleTimeMark.farPast()
 
-    // TODO move into repo
-    val vacuumVariants = listOf(
-        "SKYMART_VACUUM".toInternalName(),
-        "SKYMART_TURBO_VACUUM".toInternalName(),
-        "SKYMART_HYPER_VACUUM".toInternalName(),
-        "INFINI_VACUUM".toInternalName(),
-        "INFINI_VACUUM_HOOVERIUS".toInternalName(),
-    )
-
-    fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
+    fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
+    fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
     fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
-    private val patternGroup = RepoPattern.group("garden.pestsapi")
+    val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
         " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",
@@ -135,10 +130,11 @@ object PestApi {
     /**
      * REGEX-TEST: §a§lPEST TRAP #3§r
      * REGEX-TEST: §9§lMOUSE TRAP #2§r
+     * REGEX-TEST: §9§lMOUSE TRAP #2
      */
-    private val pestTrapPattern by patternGroup.pattern(
+    val pestTrapPattern by patternGroup.pattern(
         "entity.pesttrap",
-        "(?:§.)+§l(?:PEST|MOUSE) TRAP(?: #\\d+)?(?:§.)+",
+        "(?:§.)+§l(?<type>PEST|MOUSE) TRAP(?: #(?<number>\\d+))?(?:§.)*",
     )
 
     private var gardenJoinTime = SimpleTimeMark.farPast()
@@ -184,7 +180,6 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestSpawn(event: PestSpawnEvent) {
-        PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plotNames = event.plotNames
         for (plotName in plotNames) {
             val plot = GardenPlotApi.getPlotByName(plotName)
@@ -265,7 +260,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
             checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
             firstScoreboardCheck = true
@@ -274,17 +269,22 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastPestKillTime = SimpleTimeMark.farPast()
-        lastTimeVacuumHold = SimpleTimeMark.farPast()
+        lastTimeVacuumHeld = SimpleTimeMark.farPast()
+        lastTimeLassoHeld = SimpleTimeMark.farPast()
         gardenJoinTime = SimpleTimeMark.now()
         firstScoreboardCheck = false
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (event.oldItem !in vacuumVariants) return
-        lastTimeVacuumHold = SimpleTimeMark.now()
+        if (event.oldItem.getItemStack().getItemCategoryOrNull() == ItemCategory.VACUUM) {
+            lastTimeVacuumHeld = SimpleTimeMark.now()
+        }
+        if (event.oldItem.getItemStack().getItemCategoryOrNull() == ItemCategory.LASSO) {
+            lastTimeLassoHeld = SimpleTimeMark.now()
+        }
     }
 
     private fun getPlotsWithAccuratePests() = GardenPlotApi.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }

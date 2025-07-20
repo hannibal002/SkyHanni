@@ -8,18 +8,16 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.loadEventWaypoints
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 // todo: create abstract class for this and BasketWaypoints
@@ -49,7 +47,7 @@ object PresentWaypoints {
     )
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         if (!isEnabled()) return
         closest = null
     }
@@ -90,7 +88,7 @@ object PresentWaypoints {
     // </editor-fold>
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled() && config.onlyClosest && HypixelData.locrawData != null && closest == null) return
         val notFoundPresents = presentSet?.filterNot { it.isFound }
         if (notFoundPresents?.isEmpty() == true) return
@@ -125,5 +123,5 @@ object PresentWaypoints {
     }
 
     private fun isEnabled(): Boolean =
-        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints) && WinterApi.isDecember()
+        SkyBlockUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints) && WinterApi.isDecember()
 }

@@ -1,69 +1,64 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.ExperimentationTableApi
+import at.hannibal2.skyhanni.api.ExperimentationTableApi.experienceBottlePattern
+import at.hannibal2.skyhanni.api.ExperimentationTableApi.experimentRenewPattern
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.claimMessagePattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.enchantingExpPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experienceBottleChatPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experienceBottlePattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentRenewPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentsDropPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.inventoriesPattern
+import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
+import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
 import kotlin.math.absoluteValue
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ExperimentsProfitTracker {
-
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
-
     private val tracker = SkyHanniItemTracker(
         "Experiments Profit Tracker",
         { Data() },
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
-    private val lastSplashes = mutableListOf<ItemStack>()
-    private var lastSplashTime = SimpleTimeMark.farPast()
-    private val lastBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
-    private val currentBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
+    // Warn once per session about tracking XP bottle usage
+    private var warnedAboutTracking = false
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -71,11 +66,12 @@ object ExperimentsProfitTracker {
             xpGained = 0L
             bitCost = 0L
             startCost = 0L
+            timeWasted = enumMapOf()
         }
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / experimentsDone
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
@@ -97,30 +93,21 @@ object ExperimentsProfitTracker {
 
         @Expose
         var startCost = 0L
+
+        @Expose
+        var timeWasted: MutableMap<ExperimentationTableApi.ExperimentationTaskType, Duration> = enumMapOf()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
-
+        if (!isEnabled() || !config.enabled || event.source != ItemAddManager.Source.COMMAND) return
         tracker.addItem(event.internalName, event.amount, command = true)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-
-        val message = event.message.removeColor()
-        if (claimMessagePattern.matches(message) && ExperimentMessages.DONE.isSelected()) {
-            event.blockedReason = "CLAIM_MESSAGE"
-        }
-
-        experimentsDropPattern.matchMatcher(message) {
-            event.handleDrop(group("reward"))
-            return
-        }
-
-        experimentRenewPattern.matchMatcher(message) {
+        experimentRenewPattern.matchMatcher(event.message.removeColor()) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
             tracker.modify {
                 it.bitCost += increments.getValue(group("current").toInt())
@@ -128,121 +115,135 @@ object ExperimentsProfitTracker {
         }
     }
 
-    private fun SkyHanniChatEvent.handleDrop(reward: String) {
-        blockedReason = when {
-            enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
-            experienceBottleChatPattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-            listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentMessages.MISC.isSelected() -> "MISC_DROP"
-            ExperimentMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
-            else -> ""
-        }
-
-        enchantingExpPattern.matchMatcher(reward) {
-            tracker.modify {
-                it.xpGained += group("amount").substringBefore(",").toInt() * 1000
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
+        tracker.modify {
+            if (event.type == ExperimentationTableApi.ExperimentationTaskType.SUPERPAIRS) {
+                it.experimentsDone++
             }
+            it.xpGained += event.enchantingXpGained ?: 0L
+        }
+        event.loot.forEach { (item, count) ->
+            tracker.addItem(item, count, command = false)
+        }
+    }
+
+    private val allowedSlots = listOf(11, 12, 14, 15)
+    private val bottlesInventory = InventoryDetector { name -> name == "Bottles of Enchanting" }
+
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!isEnabled() || !bottlesInventory.isInside() || !allowedSlots.contains(event.slotId)) return
+        val internalName = event.slot?.stack?.getInternalNameOrNull()?.takeIf {
+            experienceBottlePattern.matches(it.asString())
+        } ?: return
+
+        // If you click the button with a bottle of that type already in your inventory,
+        // hypixel uses that one instead of buying one from the bazaar.
+        val hasApplicableBottle = InventoryUtils.getItemsInOwnInventory().any {
+            it.getInternalNameOrNull() == internalName
+        }
+        if (hasApplicableBottle) return
+
+        tracker.modify {
+            it.startCost -= calculateBottlePrice(internalName)
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onTableXpBottleUsed(event: TableXPBottleUsedEvent) {
+        if (!isEnabled() || !config.trackUsedBottles) return
+        val bottlePrice = calculateBottlePrice(event.internalName)
+        tracker.modify {
+            it.startCost -= (bottlePrice * event.amount)
+        }
+        if (warnedAboutTracking || !config.bottleWarnings) return
+        warnedAboutTracking = true
+        ChatUtils.clickToActionOrDisable(
+            event.internalName.formatWarningString(event.amount),
+            config::trackUsedBottles,
+            actionName = "undo",
+            action = {
+                tracker.modify {
+                    it.startCost += (bottlePrice * event.amount)
+                    val bottleFormat = "bottle".pluralize(event.amount)
+                    ChatUtils.chat("Un-did the tracking of ${event.amount} $bottleFormat!")
+                }
+            },
+            oneTimeClick = true,
+        )
+    }
+
+    private var lastAddedTimeWasted: SimpleTimeMark = SimpleTimeMark.farPast()
+
+    @HandleEvent(SecondPassedEvent::class)
+    fun checkAddTimeWasted() {
+        if (ExperimentationTableApi.expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!ExperimentationTableApi.inTable || !config.trackTimeSpent) {
+            lastAddedTimeWasted = SimpleTimeMark.farPast()
             return
         }
-
-        val internalName = NeuInternalName.fromItemNameOrNull(reward) ?: return
-        if (!experienceBottleChatPattern.matches(reward)) tracker.addItem(internalName, 1, false)
-        else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
-    }
-
-    @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled() ||
-            InventoryUtils.openInventoryName() != "Bottles of Enchanting" ||
-            !listOf(11, 12, 14, 15).contains(event.slotId)
-        ) return
-        val stack = event.slot?.stack ?: return
-
-        val internalName = stack.getInternalName()
-        if (internalName.isExpBottle()) {
+        val currentType = ExperimentationTableApi.currentExperimentType ?: return
+        lastAddedTimeWasted.takeIfInitialized()?.let { lastAdded ->
             tracker.modify {
-                it.startCost -= calculateBottlePrice(internalName)
+                it.timeWasted.addOrPut(currentType, lastAdded.passedSince())
             }
         }
+        lastAddedTimeWasted = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onItemClick(event: ItemClickEvent) {
-        if (!isEnabled(checkDistanceToExperimentationTable = false)) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
-        val item = event.itemInHand ?: return
-        val internalName = item.getInternalName()
-        if (!internalName.isExpBottle()) return
-
-        lastSplashTime = SimpleTimeMark.now()
-
-        if (ExperimentationTableApi.inDistanceToTable(15.0)) {
-            tracker.modify {
-                it.startCost -= calculateBottlePrice(internalName)
-            }
-            DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(false) }
-        } else {
-            lastSplashes.add(item)
-        }
-    }
-
-    private fun NeuInternalName.isExpBottle() = experienceBottlePattern.matches(asString())
-
-    @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
-
-        if (inventoriesPattern.matches(event.inventoryName)) {
-            var startCostTemp = 0
-            for (item in lastSplashes) {
-                startCostTemp += calculateBottlePrice(item.getInternalName())
-            }
-            lastSplashes.clear()
-            tracker.modify {
-                it.startCost -= startCostTemp
-            }
-            lastSplashTime = SimpleTimeMark.farPast()
-        }
-
-        handleExpBottles(false)
+    private fun NeuInternalName.formatWarningString(amount: Int) = buildString {
+        val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
+        val amountFormat = "§8${amount}x ".takeIf { amount > 1 }.orEmpty()
+        appendLine("§aExperiments Tracker§7:")
+        appendLine("§eAutomatically tracked usage of $amountFormat$displayName §ewhile near the Experimentation Table§7.")
+        appendLine("§7This warning can also be disabled in the config.")
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
-        val price = internalName.getPrice()
+        val price = SkyHanniTracker.getPricePer(internalName)
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         return npcPrice.coerceAtLeast(price).toInt()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!isEnabled()) return
-
-        if (ExperimentationTableApi.currentExperiment != null) {
-            tracker.modify {
-                it.experimentsDone++
-            }
-        }
-    }
-
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this) + data.startCost
+        val startCost = when (SkyHanniMod.feature.misc.tracker.priceSource) {
+            ItemPriceSource.NPC_SELL -> 0
+            else -> data.startCost
+        }
+        val profit = tracker.drawItems(data, { true }, this) + startCost
+        addSearchString("§eExperiments Done: §a${data.experimentsDone.addSeparators()}")
 
-        val experimentsDone = data.experimentsDone
-        addSearchString("")
-        addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
-        val startCostFormat = data.startCost.absoluteValue.shortFormat()
-        val bitCostFormat = data.bitCost.shortFormat()
+        if (config.trackTimeSpent) {
+            val timeFormat = data.timeWasted.values.sumOf { it.inWholeSeconds }.seconds.format()
+            addSearchString("§eTime Spent: §b$timeFormat")
+        }
+
+        val startCostFormat = startCost.absoluteValue
+        val bitCostFormat = data.bitCost
         add(
             Renderable.hoverTips(
-                "§eTotal Cost: §c-$startCostFormat§e/§b-$bitCostFormat",
+                "§eTotal Cost: §c-${startCostFormat.shortFormat()}§e/§b-${bitCostFormat.shortFormat()}",
                 listOf(
-                    "§7You paid §c$startCostFormat §7coins and", "§b$bitCostFormat §7bits for starting",
+                    "§7You paid §c${startCostFormat.addSeparators()} §7coins and",
+                    "§b${bitCostFormat.addSeparators()} §7bits for starting",
                     "§7experiments.",
                 ),
             ).toSearchable(),
         )
         add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
-        addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
+
+        val enchantingXpGained = data.xpGained
+        add(
+            Renderable.hoverTips(
+                "§eTotal Enchanting Exp: §b${enchantingXpGained.shortFormat()}",
+                listOf(
+                    "§7You gained §b${enchantingXpGained.addSeparators()} §7Enchanting Exp",
+                    "§7from experiments.",
+                ),
+            ).toSearchable(),
+        )
 
         tracker.addPriceFromButton(this)
     }
@@ -250,15 +251,14 @@ object ExperimentsProfitTracker {
     init {
         tracker.initRenderer(
             { config.position },
-            ExperimentationTableApi.superpairInventory,
+            inventory = ExperimentationTableApi.experimentationTableInventory,
+            onlyOnIsland = IslandType.PRIVATE_ISLAND,
         ) { isEnabled() }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.PRIVATE_ISLAND) {
-            tracker.firstUpdate()
-        }
+        tracker.firstUpdate()
     }
 
     @HandleEvent
@@ -270,36 +270,5 @@ object ExperimentsProfitTracker {
         }
     }
 
-    private fun handleExpBottles(addToTracker: Boolean) {
-        for (item in InventoryUtils.getItemsInOwnInventory()) {
-            val internalName = item.getInternalNameOrNull() ?: continue
-            if (internalName.asString() !in listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE")) continue
-            currentBottlesInInventory.addOrPut(internalName, item.stackSize)
-        }
-
-        for ((internalName, amount) in currentBottlesInInventory) {
-            val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
-            if (lastInInv >= amount) {
-                lastBottlesInInventory[internalName] = amount
-                continue
-            }
-
-            if (lastInInv == 0) {
-                lastBottlesInInventory[internalName] = amount
-                if (addToTracker) tracker.addItem(internalName, amount, false)
-                continue
-            }
-
-            lastBottlesInInventory[internalName] = amount
-            if (addToTracker) tracker.addItem(internalName, amount - lastInInv, false)
-        }
-        currentBottlesInInventory.clear()
-    }
-
-    private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
-
-    private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
-        IslandType.PRIVATE_ISLAND.isInIsland() && config.enabled &&
-            (!checkDistanceToExperimentationTable || ExperimentationTableApi.inDistanceToTable(5.0))
-
+    private fun isEnabled() = config.enabled && ExperimentationTableApi.inDistanceToTable(5.0)
 }

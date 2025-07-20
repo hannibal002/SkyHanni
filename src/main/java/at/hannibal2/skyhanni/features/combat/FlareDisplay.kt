@@ -3,33 +3,34 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.FlareConfig
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
@@ -65,13 +66,12 @@ object FlareDisplay {
         if (!enabled) return
 
         if (config.flashScreen && activeWarning) {
-            val minecraft = Minecraft.getMinecraft()
-            val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-            Gui.drawRect(
+            val alpha = ((2 + sin(SimpleTimeMark.now().toMillis() / 1000.0)) * 255 / 4).toInt().coerceIn(0..255)
+            GuiRenderUtils.drawRect(
                 0,
                 0,
-                minecraft.displayWidth,
-                minecraft.displayHeight,
+                GuiScreenUtils.displayWidth,
+                GuiScreenUtils.displayHeight,
                 (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
             )
             GlStateManager.color(1F, 1F, 1F, 1F)
@@ -103,10 +103,10 @@ object FlareDisplay {
             if (newDisplay == null) {
                 newDisplay = buildList {
                     val displayTime = if (remainingTime.isNegative()) "§eSoon" else "§b${remainingTime.format()}"
-                    add(Renderable.string("$name: $displayTime"))
+                    addString("$name: $displayTime")
                     if (config.showManaBuff) {
                         type.manaBuff?.let {
-                            add(Renderable.string(" §b$it §7mana regen"))
+                            addString(" §b$it §7mana regen")
                         }
                     }
                 }
@@ -120,12 +120,12 @@ object FlareDisplay {
                 }
 
                 FlareConfig.AlertType.TITLE -> {
-                    LorenzUtils.sendTitle(message, 1.seconds)
+                    TitleManager.sendTitle(message, duration = 1.seconds)
                 }
 
                 FlareConfig.AlertType.CHAT_TITLE -> {
                     ChatUtils.chat(message)
-                    LorenzUtils.sendTitle(message, 1.seconds)
+                    TitleManager.sendTitle(message, duration = 1.seconds)
                 }
 
                 else -> {}
@@ -153,7 +153,7 @@ object FlareDisplay {
         flares.any { it.entity.entityId == entity.entityId }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         flares.clear()
         display = emptyList()
     }
@@ -167,8 +167,8 @@ object FlareDisplay {
                 val location = flare.location.add(-0.5, 0.0, -0.5)
                 val name = flare.type.displayName
                 val time = "§b${getRemainingTime(flare).format()}"
-                event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
-                event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
+                event.drawDynamicText(location, name, 1.5, seeThroughBlocks = false)
+                event.drawDynamicText(location, time, 1.5, yOff = 10f, seeThroughBlocks = false)
             }
         }
 
@@ -194,7 +194,7 @@ object FlareDisplay {
                 }
 
                 FlareConfig.OutlineType.CIRCLE -> {
-                    RenderUtils.drawCircle(entity, event.partialTicks, 40.0, color)
+                    event.drawCircleWireframe(entity, 40.0, color)
                 }
 
                 else -> {}

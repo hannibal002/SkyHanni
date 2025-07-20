@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object WarpTabComplete {
 
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
-    private var warps = listOf<String>()
+    private var warps = emptyList<String>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -27,5 +27,5 @@ object WarpTabComplete {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.warps
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.warps
 }

@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.ChatHoverEvent;
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent;
+import at.hannibal2.skyhanni.features.chat.CopyChat;
+import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay;
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
@@ -60,4 +62,16 @@ public class MixinGuiChat {
     public IChatComponent replaceWithNewComponent(IChatComponent originalComponent) {
         return GuiChatHook.INSTANCE.getReplacementAsIChatComponent();
     }
+
+    @Inject(method = "onGuiClosed", at = @At("HEAD"))
+    public void onGuiClosed(CallbackInfo ci) {
+        CurrentChatDisplay.onCloseChat();
+    }
+
+    @Inject(method = "mouseClicked", at = @At("HEAD"))
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton, CallbackInfo ci) {
+        if (mouseButton != 1) return;
+        CopyChat.handleCopyChat(mouseX, mouseY);
+    }
+
 }

@@ -7,15 +7,14 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -30,7 +29,7 @@ object MineshaftWaypoints {
     private var timeLastShared = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         waypoints.clear()
     }
 
@@ -38,14 +37,14 @@ object MineshaftWaypoints {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.MINESHAFT) return
 
-        val playerLocation = LorenzVec.getBlockBelowPlayer()
+        val playerLocation = LocationUtils.getBlockBelowPlayer()
 
         if (config.mineshaftWaypoints.entranceLocation) {
             waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = playerLocation))
         }
 
         if (config.mineshaftWaypoints.ladderLocation) {
-            val vec = Minecraft.getMinecraft().thePlayer.horizontalFacing.directionVec
+            val vec = MinecraftCompat.localPlayer.horizontalFacing.directionVec
             val location = playerLocation
                 // Move 7 blocks in front of the player to be in the ladder shaft
                 .add(x = vec.x * BLOCKS_FORWARD, z = vec.z * BLOCKS_FORWARD)
@@ -94,5 +93,5 @@ object MineshaftWaypoints {
             }
     }
 
-    fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.mineshaftWaypoints.enabled
+    fun isEnabled() = IslandType.MINESHAFT.isCurrent() && config.mineshaftWaypoints.enabled
 }

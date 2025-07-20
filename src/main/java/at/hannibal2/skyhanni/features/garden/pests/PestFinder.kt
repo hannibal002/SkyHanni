@@ -1,10 +1,16 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
+import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.WhenToShow
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -19,19 +25,20 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
@@ -55,7 +62,7 @@ object PestFinder {
     }
 
     private fun drawDisplay() = buildList {
-        add(Renderable.string("§6Total pests: §e${PestApi.scoreboardPests}§6/§e8"))
+        addString("§6Total pests: §e${PestApi.scoreboardPests}§6/§e8")
 
         for (plot in PestApi.getInfestedPlots()) {
             val pests = plot.pests
@@ -65,15 +72,15 @@ object PestFinder {
             val name = "§e" + if (isInaccurate) "1+?" else {
                 pests
             } + " §c$pestsName §7in §b$plotName"
-            val renderable = Renderable.clickAndHover(
+            val renderable = Renderable.clickable(
                 name,
-                listOf(
+                tips = listOf(
                     "§7Pests Found: §e" + if (isInaccurate) "Unknown" else pests,
                     "§7In plot §b$plotName",
                     "",
                     "§eClick here to warp!",
                 ),
-                onClick = {
+                onLeftClick = {
                     plot.sendTeleportTo()
                 },
             )
@@ -82,25 +89,25 @@ object PestFinder {
 
         if (PestApi.getInfestedPlots().isEmpty() && PestApi.scoreboardPests != 0) {
             remindInChat()
-            add(Renderable.string("§e${PestApi.scoreboardPests} §6Bugged pests!"))
+            addString("§e${PestApi.scoreboardPests} §6Bugged pests!")
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cTry opening your plots menu",
-                    listOf(
+                    tips = listOf(
                         "Runs /desk.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.gardenDesk()
                     },
                 ),
             )
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cor enable Pests Widget in §e/widget.",
-                    listOf(
+                    tips = listOf(
                         "Runs /widget.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.widget()
                     },
                 ),
@@ -129,9 +136,7 @@ object PestFinder {
             inOwnInventory = true,
             condition = { shouldShowDisplay() },
             onRender = {
-                if (GardenApi.inGarden() && config.showDisplay) {
-                    config.position.renderRenderables(display, posLabel = "Pest Finder")
-                }
+                config.position.renderRenderables(display, posLabel = "Pest Finder")
             },
         )
     }
@@ -139,20 +144,37 @@ object PestFinder {
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
         if (!config.showDisplay) return false
-        if (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) return false
+        if (!shouldShowBasedOnHeldItem()) return false
 
         return true
     }
 
-    private fun heldItemDisabled() = config.onlyWithVacuum && !PestApi.hasVacuumInHand()
-    private fun timePassedDisabled() = PestApi.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
+    private fun shouldShowBasedOnHeldItem(): Boolean {
+        return when (config.whenToShow) {
+            WhenToShow.ALWAYS -> true
+            WhenToShow.BOTH -> PestApi.hasVacuumInHand() || PestApi.hasLassoInHand()
+            WhenToShow.ONLY_WITH_VACUUM_IN_HAND -> PestApi.hasVacuumInHand()
+            WhenToShow.ONLY_WITH_LASSO_IN_HAND -> PestApi.hasLassoInHand()
+        }
+    }
+
+    private fun timePassedDisabled(): Boolean {
+        val vacuumPassed = PestApi.lastTimeVacuumHeld.passedSince() > config.showBorderForSeconds.seconds
+        val lassoPassed = PestApi.lastTimeLassoHeld.passedSince() > config.showBorderForSeconds.seconds
+        return when (config.whenToShow) {
+            WhenToShow.ALWAYS -> false
+            WhenToShow.ONLY_WITH_VACUUM_IN_HAND -> vacuumPassed
+            WhenToShow.ONLY_WITH_LASSO_IN_HAND -> lassoPassed
+            WhenToShow.BOTH -> vacuumPassed && lassoPassed
+        }
+    }
 
     // priority to low so that this happens after other renderPlot calls.
     @HandleEvent(priority = HandleEvent.LOW)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
-        if (heldItemDisabled() && timePassedDisabled()) return
+        if (!shouldShowBasedOnHeldItem() && timePassedDisabled()) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         val visibility = config.visibilityType
@@ -196,7 +218,7 @@ object PestFinder {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.noPestTitle) return
 
-        if (PestApi.noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
+        if (PestApi.noPestsChatPattern.matches(event.message)) TitleManager.sendTitle("§eNo pests!", duration = 2.seconds)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -211,7 +233,14 @@ object PestFinder {
         teleportNearestInfestedPlot()
     }
 
-    fun teleportNearestInfestedPlot() {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (PestApi.config.muteVacuum && event.soundName == "mob.wither.shoot") {
+            event.cancel()
+        }
+    }
+
+    private fun teleportNearestInfestedPlot() {
         // need to check again for the command
         if (!GardenApi.inGarden()) {
             ChatUtils.userError("This command only works while on the Garden!")
@@ -232,5 +261,22 @@ object PestFinder {
         plot.sendTeleportTo()
     }
 
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtpinfested") {
+            description = "Teleports you to the nearest infested plot"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { teleportNearestInfestedPlot() }
+        }
+    }
+
     fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(97, "garden.pests.pestFinder.muteVacuum", "garden.pests.muteVacuum")
+        event.move(97, "garden.pests.pestFinder.onlyWithVacuum", "garden.pests.pestFinder.whenToShow") {
+            ConfigUtils.migrateBooleanToEnum(it, WhenToShow.BOTH, WhenToShow.ALWAYS)
+        }
+    }
 }

@@ -3,16 +3,16 @@ package at.hannibal2.skyhanni.features.combat.mobs
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -22,6 +22,7 @@ object AreaMiniBossFeatures {
     private var lastSpawnTime = SimpleTimeMark.farPast()
     private var miniBossType: AreaMiniBossType? = null
     private var respawnCooldown = 11.seconds
+    val currentMobs = mutableSetOf<Mob>()
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -36,6 +37,12 @@ object AreaMiniBossFeatures {
         if (config.areaBossHighlight) {
             event.mob.highlight(type.color.addOpacity(type.colorOpacity))
         }
+        currentMobs.add(event.mob)
+    }
+
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
+        currentMobs.remove(event.mob)
     }
 
     @HandleEvent
@@ -47,7 +54,7 @@ object AreaMiniBossFeatures {
 
         val time = miniBoss.getTime()
         miniBoss.spawnLocations.filter { it.distanceToPlayer() < 15 }
-            .forEach { event.drawDynamicText(it, time, 1.2, ignoreBlocks = false) }
+            .forEach { event.drawDynamicText(it, time, 1.2, seeThroughBlocks = false) }
     }
 
     private fun AreaMiniBossType.getTime(): String {
@@ -60,7 +67,7 @@ object AreaMiniBossFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         miniBossType = null
     }
 

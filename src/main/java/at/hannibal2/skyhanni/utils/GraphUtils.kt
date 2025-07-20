@@ -90,6 +90,10 @@ object GraphUtils {
 
         while (queue.isNotEmpty()) {
             val current = queue.poll()
+            if (!current.enabled) {
+                visited.add(current)
+                continue
+            }
             lastVisitedNode = current
             if (bailout(current)) break
 
@@ -140,4 +144,10 @@ object GraphUtils {
     fun findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> = findShortestPathAsGraph(start, end).toPositionsList()
 
     fun findShortestDistance(start: GraphNode, end: GraphNode): Double = findShortestPathAsGraphWithDistance(start, end).second
+
+    fun calculatePathLength(path: List<LorenzVec>): Double {
+        if (path.size < 2) return 0.0
+        val mappedNodes = path.map { nearestNodeOnCurrentIsland(it) }
+        return mappedNodes.zipWithNext { a, b -> findShortestDistance(a, b) }.sum()
+    }
 }

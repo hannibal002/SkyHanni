@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 
 // internal
@@ -12,29 +13,27 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 object ScoreboardElementPowder : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val powderTypes = HotmApi.PowderType.entries
-        if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) return@buildList
+        if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.total == 0L }) return@buildList
 
         add("§9§lPowder")
-
-        val displayNumbersFirst = displayConfig.displayNumbersFirst
 
         for (type in powderTypes) {
             val name = type.displayName
             val color = type.color
-            val current = formatNumber(type.getCurrent())
-            val total = formatNumber(type.getTotal())
+            val current = formatNumber(type.current)
+            val total = formatNumber(type.total)
 
             when (displayConfig.powderDisplay) {
                 PowderDisplay.AVAILABLE -> {
-                    add(" §7- ${if (displayNumbersFirst) "$color$current $name" else "§f$name: $color$current"}")
+                    add(" §7- ${CustomScoreboardUtils.formatNumberDisplay(name, current, color)}")
                 }
 
                 PowderDisplay.TOTAL -> {
-                    add(" §7- ${if (displayNumbersFirst) "$color$total $name" else "§f$name: $color$total"}")
+                    add(" §7- ${CustomScoreboardUtils.formatNumberDisplay(name, total, color)}")
                 }
 
                 PowderDisplay.BOTH -> {
-                    add(" §7- ${if (displayNumbersFirst) "$color$current/$total $name" else "§f$name: $color$current/$total"}")
+                    add(" §7- ${CustomScoreboardUtils.formatNumberDisplay(name, "$current/$total", color)}")
                 }
 
                 null -> {}

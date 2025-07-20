@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -57,7 +57,7 @@ object MobFactories {
                 hasStar = this.group("star")?.isNotEmpty() ?: false,
                 attribute = this.group("attribute")?.takeIf { it.isNotEmpty() }
                     ?.let {
-                        LorenzUtils.enumValueOfOrNull<MobFilter.DungeonAttribute>(it)
+                        EnumUtils.enumValueOfOrNull<MobFilter.DungeonAttribute>(it)
                     }
             )
         }

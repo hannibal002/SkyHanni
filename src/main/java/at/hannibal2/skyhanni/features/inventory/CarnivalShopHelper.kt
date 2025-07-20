@@ -11,14 +11,14 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EssenceUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -65,6 +65,11 @@ object CarnivalShopHelper {
         "(?:§.)*(?:Souvenir Shop|Carnival Perks)",
     )
 
+    private val overviewInventory = InventoryDetector(overviewInventoryNamesPattern)
+    private val knownShops = InventoryDetector { name ->
+        repoEventShops.any { it.shopName.equals(name, ignoreCase = true) }
+    }
+
     data class EventShop(val shopName: String, val upgrades: List<NeuCarnivalTokenCostJson>)
     data class EventShopUpgradeStatus(
         val upgradeName: String,
@@ -97,23 +102,19 @@ object CarnivalShopHelper {
         tryReplaceOverviewStack(event)
     }
 
-    private fun ReplaceItemEvent.isUnknownShop() = repoEventShops.none {
-        it.shopName.equals(this.inventory.name, ignoreCase = true)
-    }
-
     private fun tryReplaceShopSpecificStack(event: ReplaceItemEvent) {
-        if (currentProgress == null || event.isUnknownShop()) return
+        if (currentProgress == null || !knownShops.isInside()) return
         shopSpecificInfoItemStack?.let { event.replace(it) }
     }
 
     private fun tryReplaceOverviewStack(event: ReplaceItemEvent) {
-        if (!overviewInventoryNamesPattern.matches(event.inventory.name)) return
+        if (!overviewInventory.isInside()) return
         overviewInfoItemStack?.let { event.replace(it) }
     }
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val repoTokenShops = event.readConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
+        val repoTokenShops = event.getConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
         repoEventShops = repoTokenShops.map { (key, value) ->
             EventShop(key.replace("_", " "), value.values.toMutableList())
         }.toMutableList()
@@ -222,22 +223,21 @@ object CarnivalShopHelper {
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled() || repoEventShops.isEmpty()) return
-        var shouldUpdate = processTokenShopFooter(event)
-        repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) }?.let { matchingShop ->
-            currentEventType = matchingShop.shopName
-            processEventShopUpgrades(event.inventoryItems)
-            shouldUpdate = true
-        }
 
-        if (!shouldUpdate) return
+        val matchedShop = repoEventShops.firstOrNull { it.shopName.equals(event.inventoryName, ignoreCase = true) } ?: return
+        currentEventType = matchedShop.shopName
+
+        processEventShopUpgrades(event.inventoryItems)
+        if (!processTokenShopFooter(event)) return
+
         regenerateShopSpecificItemStack()
         regenerateOverviewItemStack()
         saveProgress()
     }
 
     private fun processTokenShopFooter(event: InventoryOpenEvent): Boolean {
-        val tokenFooterStack = event.inventoryItems[32]
-        if (tokenFooterStack === null || tokenFooterStack.displayName != "§eCarnival Tokens") return false
+        val tokenFooterStack = event.inventoryItems.getOrElse(32) { return false }
+        if (tokenFooterStack.displayName != "§eCarnival Tokens") return false
         currentTokenCountPattern.firstMatcher(tokenFooterStack.getLore()) {
             val new = groupOrNull("tokens")?.formatInt() ?: 0
             val changed = new != tokensOwned
@@ -253,5 +253,5 @@ object CarnivalShopHelper {
         currentProgress = EventShopProgress(currentEventType, purchasedUpgrades)
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.event.carnival.tokenShopHelper
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.event.carnival.tokenShopHelper
 }

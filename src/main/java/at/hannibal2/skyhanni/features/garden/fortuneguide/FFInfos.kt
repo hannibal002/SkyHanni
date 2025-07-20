@@ -10,13 +10,13 @@ internal enum class FFInfos(
     UNIVERSAL(
         null, { FFStats.totalBaseFF }, FFTypes.TOTAL,
         {
-            val backupArmor = FarmingItems.currentArmor
-            val backupEquip = FarmingItems.currentEquip
-            FarmingItems.currentArmor = null
-            FarmingItems.currentEquip = null
+            val backupArmor = FarmingItemType.currentArmor
+            val backupEquip = FarmingItemType.currentEquip
+            FarmingItemType.currentArmor = null
+            FarmingItemType.currentEquip = null
             val total = maxSumToThis(it)
-            FarmingItems.currentArmor = backupArmor
-            FarmingItems.currentEquip = backupEquip
+            FarmingItemType.currentArmor = backupArmor
+            FarmingItemType.currentEquip = backupEquip
             total
         },
     ),
@@ -26,101 +26,106 @@ internal enum class FFInfos(
     ANITA_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.ANITA, 60),
     COMMUNITY_SHOP(UNIVERSAL, { FFStats.baseFF }, FFTypes.COMMUNITY_SHOP, 40),
     CAKE_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.CAKE, 5),
-    TOTAL_ARMOR(UNIVERSAL, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.TOTAL),
+    TOTAL_ARMOR(UNIVERSAL, { FarmingItemType.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.TOTAL),
     BASE_ARMOR(
-        TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.BASE,
+        TOTAL_ARMOR, { FarmingItemType.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.BASE,
         {
-            when (FarmingItems.currentArmor) {
-                FarmingItems.HELMET -> 30
-                FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 35
-                FarmingItems.BOOTS -> if (FFStats.usingSpeedBoots) 60 else 30
+            when (FarmingItemType.currentArmor) {
+                FarmingItemType.HELMET -> 30
+                FarmingItemType.CHESTPLATE, FarmingItemType.LEGGINGS -> 35
+                FarmingItemType.BOOTS -> if (FFStats.usingSpeedBoots) 60 else 30
                 else -> if (FFStats.usingSpeedBoots) 160 else 130
             }
         },
     ),
     ABILITY_ARMOR(
-        TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.ABILITY,
+        TOTAL_ARMOR, { FarmingItemType.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.ABILITY,
         {
-            when (FarmingItems.currentArmor) {
-                FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> if (FFStats.usingSpeedBoots) 16.667 else 18.75
-                FarmingItems.BOOTS -> if (FFStats.usingSpeedBoots) 0 else 18.75
+            when (FarmingItemType.currentArmor) {
+                FarmingItemType.HELMET,
+                FarmingItemType.CHESTPLATE,
+                FarmingItemType.LEGGINGS,
+                ->
+                    if (FFStats.usingSpeedBoots) 16.667 else 18.75
+
+                FarmingItemType.BOOTS -> if (FFStats.usingSpeedBoots) 0 else 18.75
                 else -> if (FFStats.usingSpeedBoots) 50 else 75
             }
         },
     ),
     REFORGE_ARMOR(
-        TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.REFORGE,
+        TOTAL_ARMOR, { FarmingItemType.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.REFORGE,
         {
-            when (FarmingItems.currentArmor) {
-                FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 30
-                FarmingItems.BOOTS -> if (FFStats.usingSpeedBoots) 25 else 30
+            when (FarmingItemType.currentArmor) {
+                FarmingItemType.HELMET, FarmingItemType.CHESTPLATE, FarmingItemType.LEGGINGS -> 30
+                FarmingItemType.BOOTS -> if (FFStats.usingSpeedBoots) 25 else 30
                 else -> if (FFStats.usingSpeedBoots) 115 else 120
             }
         },
     ),
     ENCHANT_ARMOR(
         sumTo = TOTAL_ARMOR,
-        from = { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF },
+        from = { FarmingItemType.currentArmor?.getFFData() ?: FFStats.armorTotalFF },
         what = FFTypes.ENCHANT,
-        x4 = { FarmingItems.currentArmor == null },
+        x4 = { FarmingItemType.currentArmor == null },
         max = 12,
     ),
     GEMSTONE_ARMOR(
-        TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.GEMSTONE,
+        TOTAL_ARMOR, { FarmingItemType.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.GEMSTONE,
         {
-            when (FarmingItems.currentArmor) {
-                FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 20
-                FarmingItems.BOOTS -> if (FFStats.usingSpeedBoots) 16 else 20
+            when (FarmingItemType.currentArmor) {
+                FarmingItemType.HELMET, FarmingItemType.CHESTPLATE, FarmingItemType.LEGGINGS -> 20
+                FarmingItemType.BOOTS -> if (FFStats.usingSpeedBoots) 16 else 20
                 else -> if (FFStats.usingSpeedBoots) 76 else 80
             }
         },
     ),
-    TOTAL_PET(UNIVERSAL, { FarmingItems.currentPet.getFFData() }, FFTypes.TOTAL),
+    TOTAL_PET(UNIVERSAL, { FarmingItemType.currentPet.getFFData() }, FFTypes.TOTAL),
     PET_BASE(
-        TOTAL_PET, { FarmingItems.currentPet.getFFData() }, FFTypes.BASE,
+        TOTAL_PET, { FarmingItemType.currentPet.getFFData() }, FFTypes.BASE,
         {
-            when (FarmingItems.currentPet) {
-                FarmingItems.ELEPHANT -> 150
-                FarmingItems.MOOSHROOM_COW -> 158
-                FarmingItems.BEE -> 30
-                FarmingItems.SLUG -> 100
-                FarmingItems.HEDGEHOG -> 45 * 3
+            when (FarmingItemType.currentPet) {
+                FarmingItemType.ELEPHANT -> 150
+                FarmingItemType.MOOSHROOM_COW -> 158
+                FarmingItemType.BEE -> 30
+                FarmingItemType.SLUG -> 100
+                FarmingItemType.HEDGEHOG -> 45 * 3
                 else -> 0
             }
         },
     ),
-    PET_ITEM(TOTAL_PET, { FarmingItems.currentPet.getFFData() }, FFTypes.PET_ITEM, 60),
+    PET_ITEM(TOTAL_PET, { FarmingItemType.currentPet.getFFData() }, FFTypes.PET_ITEM, 60),
     TOTAL_EQUIP(
         sumTo = UNIVERSAL,
-        from = { FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
+        from = { FarmingItemType.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
         what = FFTypes.TOTAL,
     ),
     BASE_EQUIP(
         sumTo = TOTAL_EQUIP,
-        from = { FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
+        from = { FarmingItemType.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
         what = FFTypes.BASE,
-        x4 = { FarmingItems.currentEquip == null },
+        x4 = { FarmingItemType.currentEquip == null },
         max = 5.0,
     ),
     ABILITY_EQUIP(
         sumTo = TOTAL_EQUIP,
-        from = { FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
+        from = { FarmingItemType.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
         what = FFTypes.ABILITY,
-        x4 = { FarmingItems.currentEquip == null },
+        x4 = { FarmingItemType.currentEquip == null },
         max = 15.0,
     ),
     REFORGE_EQUIP(
         sumTo = TOTAL_EQUIP,
-        from = { FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
+        from = { FarmingItemType.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
         what = FFTypes.REFORGE,
-        x4 = { FarmingItems.currentEquip == null },
+        x4 = { FarmingItemType.currentEquip == null },
         max = 15.0,
     ),
     ENCHANT_EQUIP(
         sumTo = TOTAL_EQUIP,
-        from = { FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
+        from = { FarmingItemType.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
         what = FFTypes.ENCHANT,
-        x4 = { FarmingItems.currentEquip == null },
+        x4 = { FarmingItemType.currentEquip == null },
         max = { at.hannibal2.skyhanni.features.garden.GardenApi.totalAmountVisitorsExisting.toDouble() / 4.0 },
     ),
     ;

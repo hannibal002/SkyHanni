@@ -12,16 +12,17 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 
@@ -64,7 +65,7 @@ object SkyMartCopperPrice {
                 val factor = profit / copper
                 val perFormat = factor.shortFormat()
 
-                val itemName = item.itemName
+                val itemName = item.repoItemName
                 val hover = buildList {
                     add(itemName)
                     add("")
@@ -91,8 +92,8 @@ object SkyMartCopperPrice {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eCoins per Copper§f:"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
+        newList.addString("§eCoins per Copper§f:")
+        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
         display = newList
     }
 

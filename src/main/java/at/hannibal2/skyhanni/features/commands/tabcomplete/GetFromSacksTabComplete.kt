@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.ChatUtils.eventWithNewMessage
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 object GetFromSacksTabComplete {
 
@@ -34,5 +34,5 @@ object GetFromSacksTabComplete {
         return event.eventWithNewMessage(event.message.replace(rawName, realName))
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.gfsSack
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.gfsSack
 }
