@@ -182,12 +182,12 @@ object PetUtils {
         val levelTree = getFullLevelingTree(petInternalName)
         if ((rarityOffset + level - 1) > levelTree.size) {
             if (lastRepoWarning.passedSince() > 5.minutes) {
-                ChatUtils.userError(
+                lastRepoWarning = SimpleTimeMark.now()
+                ErrorManager.logErrorWithData(
+                    IndexOutOfBoundsException("offset:$rarityOffset, level:$level, size:${levelTree.size}"),
                     "§cFailed to load pet levels from NEU repo. " +
                         "§cYou can try to fix this by running `§e/${ItemUtils.resetCommand}`§c."
                 )
-                ChatUtils.debug("Rarity offset: $rarityOffset, level: $level, levelTree size: ${levelTree.size}")
-                lastRepoWarning = SimpleTimeMark.now()
             }
             return null
         }
