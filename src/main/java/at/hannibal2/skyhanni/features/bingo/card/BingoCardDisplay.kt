@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
@@ -19,8 +17,8 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -28,32 +26,28 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
-import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
 object BingoCardDisplay {
 
-
-    /**
-     *
-     */
-
     private const val MAX_PERSONAL_GOALS = 20
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private val patternGroup = RepoPattern.group("bingo.card.display")
     private val bingoCardInventoryPattern by patternGroup.pattern("inventory", "Bingo Card")
-    private val bingoCardInventoryDetector = InventoryDetector(bingoCardInventoryPattern)
+    private val bingoCardInventoryDetector = InventoryDetector(bingoCardInventoryPattern) { dirty = true }
 
     private var hasHiddenPersonalGoals = false
     private var displayCache: List<Renderable> = emptyList()
     private var dirty = true
 
-    private var displayMode = 0 // todo enum
+    // Todo use an enum for the display modes, what does 0 mean?
+    private var displayMode = 0
 
     private fun command() {
         reload()
@@ -82,28 +76,24 @@ object BingoCardDisplay {
         }
     }
 
+    private fun isEnabled() = config.enabled && SkyBlockUtils.isBingoProfile
+
     @HandleEvent
     fun onSecondPassed() {
+        if (!isEnabled()) return
         if (hasHiddenPersonalGoals) dirty = true
     }
 
     @HandleEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
-        if (!config.enabled) return
-        if (!SkyBlockUtils.isBingoProfile) return
-        update()
+        if (!isEnabled()) return
+        dirty = true
     }
 
     @HandleEvent
     fun onConfigLoad() {
-        config.hideCommunityGoals.onToggle { update() }
-        config.nextTipDuration.onToggle { update() }
-        update()
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(2, "bingo", "event.bingo")
+        config.hideCommunityGoals.onToggle { dirty = true }
+        config.nextTipDuration.onToggle { dirty = true }
     }
 
     @HandleEvent
@@ -122,15 +112,14 @@ object BingoCardDisplay {
         }
     }
 
+    // todo use RenderDisplayHelper
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!SkyBlockUtils.isBingoProfile) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
-        val currentlyOpen = canEditDisplay()
-        if (inventoryOpen != currentlyOpen) {
-            inventoryOpen = currentlyOpen
-            update()
+        if (dirty) {
+            displayCache = drawDisplay()
+            dirty = false
         }
 
         if (config.quickToggle && ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
@@ -142,28 +131,21 @@ object BingoCardDisplay {
                 }
             }
         }
-        if (!config.stepHelper && displayMode == 1) {
-            displayMode = 2
-        }
-        if (displayMode == 0) {
-            if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
-                config.bingoCardPos.renderRenderables(display, posLabel = "Bingo Card")
-            }
+        if (!config.stepHelper && displayMode == 1) displayMode = 2
+        if (displayMode == 0 && Minecraft.getMinecraft().currentScreen !is GuiChat) {
+            config.bingoCardPos.renderRenderables(displayCache, posLabel = "Bingo Card")
         } else if (displayMode == 1) {
-            config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp, posLabel = "Bingo Card")
+            val helpRenderable = Renderable.vertical(
+                BingoNextStepHelper.currentHelp.map { Renderable.text(it) }
+            )
+            config.bingoCardPos.renderRenderable(helpRenderable, posLabel = "Bingo Card")
         }
     }
 
-    private fun update() {
-        display = drawDisplay()
-    }
-
-    private fun drawDisplay(): MutableList<Renderable> {
-        val newList = mutableListOf<Renderable>()
-
+    private fun drawDisplay(): List<Renderable> = buildList {
         if (BingoApi.bingoGoals.isEmpty()) {
-            newList.addString("§6Bingo Goals:")
-            newList.add(
+            addString("§6Bingo Goals:")
+            add(
                 Renderable.clickable(
                     "§cOpen the §e/bingo §ccard.",
                     tips = listOf("Click to run §e/bingo"),
@@ -173,12 +155,9 @@ object BingoCardDisplay {
                 ),
             )
         } else {
-            if (!config.hideCommunityGoals.get()) {
-                newList.addCommunityGoals()
-            }
-            newList.addPersonalGoals()
+            if (!config.hideCommunityGoals.get()) addCommunityGoals()
+            addPersonalGoals()
         }
-        return newList
     }
 
     private fun MutableList<Renderable>.addCommunityGoals() {
@@ -249,7 +228,7 @@ object BingoCardDisplay {
     }
 
     private fun MutableList<Renderable>.addGoals(goals: MutableList<BingoGoal>, format: (BingoGoal) -> String) {
-        val editDisplay = canEditDisplay()
+        val editDisplay = bingoCardInventoryDetector.isInside()
         val showOnlyHighlighted = goals.count { it.highlight } > 0
 
         val filter = showOnlyHighlighted && !editDisplay
@@ -277,7 +256,7 @@ object BingoCardDisplay {
                     onLeftClick = {
                         it.highlight = !currentlyHighlighted
                         it.displayName
-                        update()
+                        dirty = true
                     },
                 )
             } else {
@@ -291,8 +270,8 @@ object BingoCardDisplay {
     }
 
     private var lastSneak = false
-    private var inventoryOpen = false
-
-    private fun canEditDisplay() =
-        Minecraft.getMinecraft().currentScreen is GuiInventory || InventoryUtils.openInventoryName() == "Bingo Card"
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "bingo", "event.bingo")
+    }
 }
