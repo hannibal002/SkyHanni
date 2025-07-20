@@ -20,14 +20,17 @@ object FusionKeybinds {
     val config get() = SkyHanniMod.feature.hunting.fusionKeybinds
 
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
+    private var hasDuplicateKeybinds = false
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onKeybind(event: GuiKeyPressEvent) {
+        if (hasDuplicateKeybinds) return
         when (InventoryUtils.openInventoryName()) {
             "Fusion Box" -> {
                 if (!config.repeatFusionKeybind.isKeyHeld() || config.confirmFusionKeybind.isKeyHeld()) return
                 InventoryUtils.clickSlot(47, mouseButton = 2, mode = 3)
             }
+
             "Confirm Fusion" -> {
                 if (!config.confirmFusionKeybind.isKeyHeld() || config.repeatFusionKeybind.isKeyHeld()) return
                 InventoryUtils.clickSlot(33, mouseButton = 2, mode = 3)
@@ -35,21 +38,17 @@ object FusionKeybinds {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-
-        val isDuplicate = config.repeatFusionKeybind != GLFW.GLFW_KEY_UNKNOWN &&
+        hasDuplicateKeybinds = config.repeatFusionKeybind != GLFW.GLFW_KEY_UNKNOWN &&
             config.confirmFusionKeybind != GLFW.GLFW_KEY_UNKNOWN &&
             config.repeatFusionKeybind == config.confirmFusionKeybind
 
-        if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
+        if (!hasDuplicateKeybinds || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
         ChatUtils.chatAndOpenConfig(
             "Repeat Fusion and Confirm Fusion keybinds cannot be the same!",
             config::repeatFusionKeybind,
         )
         lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
     }
-
-    fun isEnabled() = IslandType.GALATEA.isCurrent()
 }
