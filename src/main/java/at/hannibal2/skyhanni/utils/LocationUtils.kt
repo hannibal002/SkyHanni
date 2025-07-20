@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.FacePointSet
-import at.hannibal2.skyhanni.test.PointSet
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.Entity
