@@ -169,6 +169,7 @@ object ChatUtils {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
+
         if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(rawText))
         } else {
@@ -251,14 +252,19 @@ object ChatUtils {
         autoOpen: Boolean = false,
         prefix: Boolean = true,
         prefixColor: String = "§e",
+        replaceSameMessage: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(
-            TextHelper.text(msgPrefix + message) {
-                this.url = url
-                this.hover = "$prefixColor$hover".asComponent()
-            },
-        )
+        val text = TextHelper.text(msgPrefix + message) {
+            this.url = url
+            this.hover = "$prefixColor$hover".asComponent()
+        }
+        if (replaceSameMessage) {
+            text.send(getUniqueMessageIdForString(message))
+        } else {
+            chat(text)
+        }
+
         if (autoOpen) OSUtils.openBrowser(url)
     }
 

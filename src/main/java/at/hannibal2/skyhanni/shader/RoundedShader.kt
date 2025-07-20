@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
 //#if MC > 1.21
+//$$ import java.nio.FloatBuffer
 //$$ import org.joml.Matrix4f
 //#endif
 
@@ -32,6 +33,9 @@ abstract class RoundedShader<Self : RoundedShader<Self>>(vertex: String, fragmen
         if (hasSmoothness) registerUniform(Uniform.UniformType.FLOAT, "smoothness") { smoothness }
         if (hasHalfSize) registerUniform(Uniform.UniformType.VEC2, "halfSize") { halfSize }
         registerUniform(Uniform.UniformType.VEC2, "centerPos") { centerPos }
+        //#if MC > 1.21
+        //$$ registerUniform(Uniform.UniformType.MAT4, "modelViewMatrix") { modelViewMatrix }
+        //#endif
     }
 
     override fun registerUniforms() = applyBaseUniforms()
@@ -60,5 +64,26 @@ object CircleShader : RoundedShader<CircleShader>("circle", "circle") {
         super.applyBaseUniforms(hasSmoothness = true, hasHalfSize = false)
         registerUniform(Uniform.UniformType.FLOAT, "angle1") { angle1 }
         registerUniform(Uniform.UniformType.FLOAT, "angle2") { angle2 }
+    }
+}
+object RadialGradientCircleShader : RoundedShader<RadialGradientCircleShader>(
+    "radial_gradient_circle",
+    "radial_gradient_circle"
+) {
+    var angle: Float = 0f
+    var startColor: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)
+    var endColor: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)
+    var progress: Float = 0f
+    var phaseOffset: Float = 0f
+    var reverse: Int = 0
+
+    override fun registerUniforms() {
+        super.applyBaseUniforms(hasSmoothness = true, hasHalfSize = false)
+        registerUniform(Uniform.UniformType.FLOAT, "angle") { angle }
+        registerUniform(Uniform.UniformType.VEC4, "startColor") { startColor }
+        registerUniform(Uniform.UniformType.VEC4, "endColor") { endColor }
+        registerUniform(Uniform.UniformType.FLOAT, "progress") { progress }
+        registerUniform(Uniform.UniformType.FLOAT, "phaseOffset") { phaseOffset }
+        registerUniform(Uniform.UniformType.INT, "reverse") { reverse }
     }
 }

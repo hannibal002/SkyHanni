@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.NoReset
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -12,7 +13,7 @@ import io.mockk.mockkObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class ResettableStorageSetTest {
+class ResettableTest {
 
     data class TestStorage(
         var string: String = "default",
@@ -23,10 +24,15 @@ class ResettableStorageSetTest {
         var nullInt: Int? = null,
         @Transient var transientString: String = "transient",
         val defaultBool: Boolean = false,
-    ) : ResettableStorageSet() {
+    ) : Resettable() {
         val list: MutableList<String> = mutableListOf()
+        private val privateList: MutableList<String> = mutableListOf("privateListItem")
         val map: MutableMap<String, Int> = mutableMapOf()
-        @Transient val transientList: MutableList<String> = mutableListOf("transientListItem")
+        private val privateMap: MutableMap<String, Int> = mutableMapOf("privateKey" to 1)
+        @NoReset val noResetList: MutableList<String> = mutableListOf("noResetListItem")
+
+        fun getPrivateListSize(): Int = privateList.size
+        fun getPrivateMapSize(): Int = privateMap.size
 
         val intGetter: Int get() = staticInt + 1
     }
@@ -100,12 +106,22 @@ class ResettableStorageSetTest {
         )
 
         Assertions.assertTrue(
+            storage.getPrivateListSize() == 0,
+            "Private list should be cleared"
+        )
+
+        Assertions.assertTrue(
             storage.map.isEmpty(),
             "Map property should be cleared"
         )
 
         Assertions.assertTrue(
-            storage.transientList.isNotEmpty(),
+            storage.getPrivateMapSize() == 0,
+            "Private map should be cleared"
+        )
+
+        Assertions.assertTrue(
+            storage.noResetList.isNotEmpty(),
             "Transient list should not be cleared"
         )
 

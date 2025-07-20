@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -53,7 +53,7 @@ object FannCost {
         var expEarned: Double? = null,
         var expDaily: Double? = null,
         var duration: Duration = Duration.ZERO,
-    ) : ResettableStorageSet()
+    ) : Resettable()
 
     private const val TRAINING_DURATION_SLOT_NUM = 15
     private const val BEGIN_TRAINING_SLOT_NUM = 22

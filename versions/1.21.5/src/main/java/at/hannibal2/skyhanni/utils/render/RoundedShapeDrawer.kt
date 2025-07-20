@@ -1,18 +1,22 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.shader.CircleShader
+import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BufferBuilder
 import net.minecraft.util.Identifier
 //#if MC > 1.21.6
 //$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
+//$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
 //$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
 //$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
 //$$ import com.mojang.blaze3d.buffers.GpuBufferSlice
@@ -29,9 +33,11 @@ object RoundedShapeDrawer {
     //$$ var roundedUniform = SkyHanniRoundedUniform()
     //$$ var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
     //$$ var circleUniform = SkyHanniCircleUniform()
+    //$$ var radialGradientCircleUniform = SkyHanniRadialGradientCircleUniform()
     //$$ var roundedBufferSlice: GpuBufferSlice? = null
     //$$ var roundedOutlineBufferSlice: GpuBufferSlice? = null
     //$$ var circleBufferSlice: GpuBufferSlice? = null
+    //$$ var radialGradientCircleBufferSlice: GpuBufferSlice? = null
     //#endif
 
     private fun <T: RoundedShader<T>> T.performBaseUniforms(
@@ -204,6 +210,47 @@ object RoundedShapeDrawer {
             //$$ setUniform("SkyHanniCircleUniforms", circleBufferSlice)
             //#endif
         }
+
+    fun drawGradientCircle(left: Int, top: Int, right: Int, bottom: Int, startColor: ChromaColour, endColor: ChromaColour) =
+        RadialGradientCircleShader.performVQuadAndUniforms(
+            SkyHanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(),
+            x1 = left, y1 = top, x2 = right, y2 = bottom,
+            postVertexOps = listOf(
+                { color(startColor.toColor().rgb ) },
+                { color(endColor.toColor().rgb) },
+            ),
+            //#if MC > 1.21.6
+            //$$ { radialGradientCircleBufferSlice = radialGradientCircleUniform.writeWith(
+            //$$     RadialGradientCircleShader.angle,
+            //$$     Vector4f(startColor.destructToFloatArray()),
+            //$$     Vector4f(endColor.destructToFloatArray()),
+            //$$     RadialGradientCircleShader.progress,
+            //$$     RadialGradientCircleShader.phaseOffset,
+            //$$     RadialGradientCircleShader.reverse
+            //$$ ) },
+            //#endif
+        ) {
+            //#if MC < 1.21.6
+            val sc = startColor.destructToFloatArray()
+            val ec = endColor.destructToFloatArray()
+            setUniform("startColor", sc[0], sc[1], sc[2], sc[3])
+            setUniform("endColor", ec[0], ec[1], ec[2], ec[3])
+            setUniform("angle", RadialGradientCircleShader.angle)
+            setUniform("progress", RadialGradientCircleShader.progress)
+            setUniform("phaseOffset", RadialGradientCircleShader.phaseOffset)
+            //#else
+            //$$ setUniform("SkyHanniRadialGradientCircleUniforms", radialGradientCircleBufferSlice)
+            //#endif
+        }
+
+    private fun ChromaColour.destructToFloatArray(): FloatArray {
+        return floatArrayOf(
+            this.toColor().red.toFloat() / 255f,
+            this.toColor().green.toFloat() / 255f,
+            this.toColor().blue.toFloat() / 255f,
+            this.alpha.toFloat() / 255f
+        )
+    }
 
     //#if MC > 1.21.6
     //$$ fun clearUniforms() {

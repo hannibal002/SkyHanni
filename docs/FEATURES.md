@@ -294,6 +294,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Allows you to smooth the look of glass panes in SkyBlock inventories.
     + Functionality should be a near, if not perfect match to the NEU feature.
     + Can only be used on Minecraft 1.21.
++ Added Bazaar Daily Limit Tracker. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4308)
+    + Tracks the amount of coins you have put towards the daily 15 billion trade limit.
+    + Coins in excess of the integer limit on an individual order do not count towards the daily limit.
+    + Resets at midnight UTC.
 
 </details>
 <details open><summary>
@@ -853,6 +857,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Pest Spawn Time Message. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3343)
     + Sends a chat message showing how long it took for a pest to spawn.
 + Added option to mute Vacuum in the Garden. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4051)
++ Added Pest Trap tab widgets to Tab Widget Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
++ Added warnings for Pest Traps being full or out of bait. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 
 </details>
 <details open><summary>
@@ -957,6 +963,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Timite Tracker for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
     + Shows collected ores, time gained from mining, profit for raw ores, and Highlite profit.
 + Added drop location for Rose'End Flowerpot Enigma Soul on second moving platform. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4004)
++ Added a workaround for a Hypixel bug that results in no sounds for a few seconds after the Vampire Slayer's Killer Spring spawns on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4434)
 
 </details>
 <details open><summary>
@@ -1079,6 +1086,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added profit per Agatha Coupon in Agatha's Shop. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4250)
 + Added Compact messages for sweep details. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4259)
 + Added HotF Lottery display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
+
+</details>
+<details open><summary>
+
+## Hunting
+
+</summary>
+
++ Added customizable keybinds to easily repeat and confirm fusions. - Luna (https://github.com/hannibal002/SkyHanni/pull/4440)
 
 </details>
 <details open><summary>

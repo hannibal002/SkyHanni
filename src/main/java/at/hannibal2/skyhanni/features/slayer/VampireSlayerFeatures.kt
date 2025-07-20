@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -27,8 +29,10 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -37,6 +41,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
@@ -67,7 +72,9 @@ object VampireSlayerFeatures {
 
     private val BLOOD_ICHOR_TEXTURE by lazy { SkullTextureHolder.getTexture("BLOOD_ICHOR") }
     private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
+
     private var nextClawSend = 0L
+    private var lastWitherSpawnSound = ServerTimeMark.FAR_PAST
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -339,6 +346,21 @@ object VampireSlayerFeatures {
                     standList = standList.editCopy { this[ichor] = boss }
                 }
             }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (PlatformUtils.IS_LEGACY) return
+        if (!isEnabled()) return
+        if (!configKillerSpring.fixSoundSpam) return
+
+        if (event.soundName == "mob.wither.spawn") {
+            if (lastWitherSpawnSound.passedSince() < 1.ticks) {
+                ChatUtils.debug("Cancelling duplicate wither spawn sound sent within the same tick")
+                return event.cancel()
+            }
+            lastWitherSpawnSound = ServerTimeMark.now()
         }
     }
 
