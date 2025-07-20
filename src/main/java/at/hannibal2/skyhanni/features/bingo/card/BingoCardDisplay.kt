@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -28,6 +29,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -36,14 +38,22 @@ import kotlin.time.Duration.Companion.days
 @SkyHanniModule
 object BingoCardDisplay {
 
-    private var display = emptyList<Renderable>()
 
-    private var hasHiddenPersonalGoals = false
+    /**
+     *
+     */
 
     private const val MAX_PERSONAL_GOALS = 20
-
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
-    private var displayMode = 0
+    private val patternGroup = RepoPattern.group("bingo.card.display")
+    private val bingoCardInventoryPattern by patternGroup.pattern("inventory", "Bingo Card")
+    private val bingoCardInventoryDetector = InventoryDetector(bingoCardInventoryPattern)
+
+    private var hasHiddenPersonalGoals = false
+    private var displayCache: List<Renderable> = emptyList()
+    private var dirty = true
+
+    private var displayMode = 0 // todo enum
 
     private fun command() {
         reload()
@@ -73,9 +83,74 @@ object BingoCardDisplay {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (hasHiddenPersonalGoals) {
+    fun onSecondPassed() {
+        if (hasHiddenPersonalGoals) dirty = true
+    }
+
+    @HandleEvent
+    fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
+        if (!config.enabled) return
+        if (!SkyBlockUtils.isBingoProfile) return
+        update()
+    }
+
+    @HandleEvent
+    fun onConfigLoad() {
+        config.hideCommunityGoals.onToggle { update() }
+        config.nextTipDuration.onToggle { update() }
+        update()
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "bingo", "event.bingo")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shbingotoggle") {
+            description = "Toggle the bingo card display mode"
+            category = CommandCategory.USERS_ACTIVE
+            callback { toggleCommand() }
+        }
+        event.registerBrigadier("shreloadbingodata") {
+            description = "Reloads the bingo card data"
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                reload()
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
+        if (!SkyBlockUtils.isBingoProfile) return
+        if (!config.enabled) return
+
+        val currentlyOpen = canEditDisplay()
+        if (inventoryOpen != currentlyOpen) {
+            inventoryOpen = currentlyOpen
             update()
+        }
+
+        if (config.quickToggle && ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
+            val sneaking = MinecraftCompat.localPlayer.isSneaking
+            if (lastSneak != sneaking) {
+                lastSneak = sneaking
+                if (sneaking) {
+                    toggleMode()
+                }
+            }
+        }
+        if (!config.stepHelper && displayMode == 1) {
+            displayMode = 2
+        }
+        if (displayMode == 0) {
+            if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
+                config.bingoCardPos.renderRenderables(display, posLabel = "Bingo Card")
+            }
+        } else if (displayMode == 1) {
+            config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp, posLabel = "Bingo Card")
         }
     }
 
@@ -218,73 +293,6 @@ object BingoCardDisplay {
     private var lastSneak = false
     private var inventoryOpen = false
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!SkyBlockUtils.isBingoProfile) return
-        if (!config.enabled) return
-
-        val currentlyOpen = canEditDisplay()
-        if (inventoryOpen != currentlyOpen) {
-            inventoryOpen = currentlyOpen
-            update()
-        }
-
-        if (config.quickToggle && ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
-            val sneaking = MinecraftCompat.localPlayer.isSneaking
-            if (lastSneak != sneaking) {
-                lastSneak = sneaking
-                if (sneaking) {
-                    toggleMode()
-                }
-            }
-        }
-        if (!config.stepHelper && displayMode == 1) {
-            displayMode = 2
-        }
-        if (displayMode == 0) {
-            if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
-                config.bingoCardPos.renderRenderables(display, posLabel = "Bingo Card")
-            }
-        } else if (displayMode == 1) {
-            config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp, posLabel = "Bingo Card")
-        }
-    }
-
     private fun canEditDisplay() =
         Minecraft.getMinecraft().currentScreen is GuiInventory || InventoryUtils.openInventoryName() == "Bingo Card"
-
-    @HandleEvent
-    fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
-        if (!config.enabled) return
-        if (!SkyBlockUtils.isBingoProfile) return
-        update()
-    }
-
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        config.hideCommunityGoals.onToggle { update() }
-        config.nextTipDuration.onToggle { update() }
-        update()
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(2, "bingo", "event.bingo")
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shbingotoggle") {
-            description = "Toggle the bingo card display mode"
-            category = CommandCategory.USERS_ACTIVE
-            callback { toggleCommand() }
-        }
-        event.registerBrigadier("shreloadbingodata") {
-            description = "Reloads the bingo card data"
-            category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback {
-                reload()
-            }
-        }
-    }
 }
