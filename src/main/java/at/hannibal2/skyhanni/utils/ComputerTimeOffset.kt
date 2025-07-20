@@ -139,8 +139,9 @@ object ComputerTimeOffset {
             "Your computer's clock is off by ${offsetMillis.absoluteValue.format()}.\n" +
                 "§ePlease update your time settings. Many features may not function correctly until you do.\n" +
                 "§eClick here for instructions on how to fix your clock.",
-            offsetFixLinks ?: return,
+            url = offsetFixLinks ?: return,
             prefixColor = "§c",
+            replaceSameMessage = true,
         )
     }
 
