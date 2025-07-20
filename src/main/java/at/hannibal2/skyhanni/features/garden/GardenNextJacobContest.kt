@@ -528,7 +528,7 @@ object GardenNextJacobContest {
             }.toJsonArray()
         }
         val base = "garden.jacobContest.nextContest"
-        event.move(99, "misc.inventoryLoadPos", "$base.inventoryPosition")
-        event.move(99, "$base.pos", "$base.position")
+        event.move(101, "misc.inventoryLoadPos", "$base.inventoryPosition")
+        event.move(101, "$base.pos", "$base.position")
     }
 }
