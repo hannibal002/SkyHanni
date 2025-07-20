@@ -94,16 +94,17 @@ object ConditionalUtils {
         if (current.javaClass.isArray) return@buildList
         if (!visited.add(current)) return emptyList()
 
-        for (prop in current::class.memberProperties) {
-            if (prop.hasAnnotation<Transient>()) continue
+        val nonTransientProps = current::class.memberProperties.filter { !it.hasAnnotation<Transient>() }
+        for (prop in nonTransientProps) {
             val getter = try {
                 prop.javaGetter
             } catch (e: Throwable) {
                 null
             }
-            if (prop.javaField == null && getter == null) continue
-            if (runCatching { prop.isAccessible = true }.isFailure) continue
-            val value = runCatching { prop.getter.call(current) }.getOrNull() ?: continue
+            val failedAccessible = runCatching { prop.isAccessible = true }.isFailure
+            val getterNull = (prop.javaField == null && getter == null)
+            val value = runCatching { prop.getter.call(current) }.getOrNull()
+            if (getterNull || failedAccessible || value == null) continue
             when (value) {
                 is Property<*> -> add(value)
                 else -> addAll(
