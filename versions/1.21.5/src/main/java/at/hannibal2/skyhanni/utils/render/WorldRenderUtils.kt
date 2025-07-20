@@ -667,21 +667,32 @@ object WorldRenderUtils {
         }
     }
 
+    /**
+     * Draws a filled face of a box in the world.
+     * @param box The bounding box to fill.
+     * @param face The face of the box to fill.
+     * @param color The color to fill the face with.
+     * @param alpha The alpha value for the color, default is 1f (fully opaque).
+     * @param renderRelativeToCamera If true, the face will be rendered relative to the camera position.
+     * @param seeThroughBlocks If true, the face will be rendered through blocks.
+     * @param epsilon A small value to adjust the face position slightly to avoid z-fighting, default is 0.05.
+     */
     fun SkyHanniRenderWorldEvent.fillFace(
         box: Box,
         face: Direction,
         color: Color,
         alpha: Float = 1f,
         renderRelativeToCamera: Boolean = false,
-        seeThroughBlocks: Boolean = false
+        seeThroughBlocks: Boolean = false,
+        epsilon: Double = 0.05,
     ) {
         val faceBox = when (face) {
-            Direction.UP -> Box(box.minX, box.maxY, box.minZ, box.maxX, box.maxY, box.maxZ)
-            Direction.DOWN -> Box(box.minX, box.minY, box.minZ, box.maxX, box.minY, box.maxZ)
-            Direction.NORTH -> Box(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.minZ)
-            Direction.SOUTH -> Box(box.minX, box.minY, box.maxZ, box.maxX, box.maxY, box.maxZ)
-            Direction.WEST -> Box(box.minX, box.minY, box.minZ, box.minX, box.maxY, box.maxZ)
-            Direction.EAST -> Box(box.maxX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ)
+            Direction.UP -> Box(box.minX, box.maxY + epsilon, box.minZ, box.maxX, box.maxY + epsilon, box.maxZ)
+            Direction.DOWN -> Box(box.minX, box.minY - epsilon, box.minZ, box.maxX, box.minY - epsilon, box.maxZ)
+            Direction.NORTH -> Box(box.minX, box.minY, box.minZ - epsilon, box.maxX, box.maxY, box.minZ - epsilon)
+            Direction.SOUTH -> Box(box.minX, box.minY, box.maxZ + epsilon, box.maxX, box.maxY, box.maxZ + epsilon)
+            Direction.WEST -> Box(box.minX - epsilon, box.minY, box.minZ, box.minX - epsilon, box.maxY, box.maxZ)
+            Direction.EAST -> Box(box.maxX + epsilon, box.minY, box.minZ, box.maxX + epsilon, box.maxY, box.maxZ)
         }
 
         drawFilledBoundingBox(

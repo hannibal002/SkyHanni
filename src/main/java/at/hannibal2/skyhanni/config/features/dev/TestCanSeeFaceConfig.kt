@@ -31,13 +31,13 @@ class TestCanSeeFaceConfig {
 
     @Expose
     @ConfigOption(name = "Step Count", desc = "§c(§4§l!§r§c) Large values may cause issues.")
-    @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
-    val stepCount: Property<Int> = Property.of(0)
+    @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+    val stepCount: Property<Int> = Property.of(1)
 
     @Expose
     @ConfigOption(name = "Step Density", desc = "§c(§4§l!§r§c) Large values may cause issues.")
-    @ConfigEditorSlider(minValue = 4f, maxValue = 60f, minStep = 1f)
-    val stepDensity: Property<Int> = Property.of(4)
+    @ConfigEditorSlider(minValue = 2f, maxValue = 10f, minStep = 1f)
+    val stepDensity: Property<Int> = Property.of(3)
 
     @Expose
     @ConfigOption(name = "Rays", desc = "")

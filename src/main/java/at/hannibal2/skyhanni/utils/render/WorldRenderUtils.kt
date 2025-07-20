@@ -998,6 +998,7 @@ object WorldRenderUtils {
         color: Color,
         alpha: Float = 1f,
         renderRelativeToCamera: Boolean = false,
+        epsilon: Double = 0.05,
     ) {
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
@@ -1007,8 +1008,8 @@ object WorldRenderUtils {
         val effectiveAABB = if (!renderRelativeToCamera) {
             val vp = getViewerPos(partialTicks)
             AxisAlignedBB(
-                aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
-                aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
+                aabb.minX - vp.x - epsilon, aabb.minY - vp.y - epsilon, aabb.minZ - vp.z - epsilon,
+                aabb.maxX - vp.x + epsilon, aabb.maxY - vp.y + epsilon, aabb.maxZ - vp.z + epsilon,
             )
         } else aabb
 

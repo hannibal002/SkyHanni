@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
@@ -23,18 +24,20 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumFacing
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 typealias PointSet = TimeLimitedSet<Pair<LorenzVec, Boolean>>
@@ -62,15 +65,18 @@ object TestCanSeeFace {
             vec2 = aabb.maxBox()
         }
 
-        fun buildSummaryRenderable() = VerticalContainerRenderable(
-            renderables = buildList { pointSet.forEach { addFacePointDisplay(it) } }
+        fun buildSummaryRenderable(duration: Duration?) = Renderable.vertical(
+            renderables = buildList {
+                addString("§7Generated in §b${duration?.format() ?: "?"}§7.")
+                pointSet.forEach { addFacePointDisplay(it) }
+            }
         )
     }
 
     private fun MutableList<Renderable>.addFacePointDisplay(fpe: FacePointEntry) {
         val (face, points) = fpe
-        add(StringRenderable(""))
-        add(StringRenderable("Face: ${face.toString().firstLetterUppercase()}"))
+        add(Renderable.text(""))
+        add(Renderable.text("Face: ${face.toString().firstLetterUppercase()}"))
         addRenderableButton(
             label = "Toggle",
             current = faceStates[face] ?: FaceState.VISIBLE,
@@ -78,7 +84,7 @@ object TestCanSeeFace {
             onChange = { toggleFaceVisibility(face) },
         )
         if (faceStates[face] == FaceState.HIDDEN) {
-            add(StringRenderable("§7§oFace is hidden - vectors collapsed."))
+            add(Renderable.text("§7§oFace is hidden - vectors collapsed."))
             return
         }
 
@@ -88,12 +94,12 @@ object TestCanSeeFace {
             val hiddenFormat = "§c${points.size - points.count { it.second }}"
             append(" §7( $visibleFormat §7/ $hiddenFormat §7)")
         }
-        add(StringRenderable(pointsFormat))
+        add(Renderable.text(pointsFormat))
         addAll(
             points.take(config.vectorsPerFace.get()).mapIndexed { index, (point, isSeen) ->
                 val format = if (isSeen) "§a§l✓§r" else "§c§l✗§r"
                 val vecFormat = point.shortFormatVec()
-                StringRenderable(" Point $index: $vecFormat $format")
+                Renderable.text(" Point $index: $vecFormat $format")
             }
         )
     }
@@ -134,7 +140,6 @@ object TestCanSeeFace {
     }
 
     private var currentVisibilityState: RayVisibilityState = RayVisibilityState.ALL
-    private var nextMoveRegen: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastRenderable: Renderable? = null
     private val config get() = SkyHanniMod.feature.dev.devTool.canSeeFace
     private val rayConfig get() = config.rays
@@ -153,9 +158,8 @@ object TestCanSeeFace {
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
         if (!enabled || !event.isLocalPlayer) return
-        if (!config.refreshOnMove.get() || nextMoveRegen.isInFuture()) return
+        if (!config.refreshOnMove.get()) return
         recalcContext(true)
-        nextMoveRegen = SimpleTimeMark.now() + 500.milliseconds
     }
 
     @HandleEvent
@@ -165,8 +169,12 @@ object TestCanSeeFace {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
                 if (!enabled) {
-                    ChatUtils.chat(
-                        "The /shtestcanseeface command is disabled. Enable it in the dev tool config.",
+                    ChatUtils.clickableChat(
+                        "The /shtestcanseeface command is disabled. Click here to enable it in the dev tool config!",
+                        onClick = {
+                            config::enabled.jumpToEditor()
+                        },
+                        hover = "Click to open the dev tool config",
                         replaceSameMessage = true
                     )
                     return@simpleCallback
@@ -216,9 +224,11 @@ object TestCanSeeFace {
     }
 
     private fun recalcContext(force: Boolean = false) {
+        val calculationStartTime = SimpleTimeMark.now()
         val vec1 = faceCheckContext.vec1 ?: return
         val vec2 = faceCheckContext.vec2 ?: return
         if (!force && faceCheckContext.finished) return
+        faceCheckContext.pointSet.clear()
         faceCheckContext.generallySeen = LocationUtils.canSeeAnyFace(
             min = vec1,
             max = vec2,
@@ -226,19 +236,20 @@ object TestCanSeeFace {
             stepDensity = config.stepDensity.get(),
             pointFill = faceCheckContext.pointSet,
         )
-        regenDebugRenderable()
+        val calculationEndTime = SimpleTimeMark.now()
+        regenDebugRenderable(calculationEndTime - calculationStartTime)
         faceCheckContext.finished = true
         DelayedRun.runDelayed(config.refreshInterval.get().seconds) {
             recalcContext(true)
         }
     }
 
-    private fun regenDebugRenderable() {
+    private fun regenDebugRenderable(duration: Duration? = null) {
         if (!enabled || !debugEnabled) return
-        faceCheckContext.debugRenderable = faceCheckContext.buildSummaryRenderable().wrapWithOtherToggles()
+        faceCheckContext.debugRenderable = faceCheckContext.buildSummaryRenderable(duration).wrapWithOtherToggles()
     }
 
-    private fun Renderable.wrapWithOtherToggles() = VerticalContainerRenderable(
+    private fun Renderable.wrapWithOtherToggles() = Renderable.vertical(
         buildList {
             addRenderableButton(
                 label = "Ray Visibility",
