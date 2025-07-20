@@ -543,9 +543,9 @@ object IslandGraphs {
     }
 
     fun cancelClick() {
+        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
         stop()
         onManualCancel()
-        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
     }
 
     @HandleEvent
