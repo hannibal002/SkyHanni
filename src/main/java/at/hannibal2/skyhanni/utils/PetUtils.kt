@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -190,7 +191,7 @@ object PetUtils {
             }
             return null
         }
-        return levelTree.subList(rarityOffset, rarityOffset + level).sumOf { it.toDouble() }
+        return levelTree.sublistAfter(rarityOffset).sumOf { it.toDouble() }
     }.getOrElse {
         ErrorManager.logErrorWithData(
             it,
