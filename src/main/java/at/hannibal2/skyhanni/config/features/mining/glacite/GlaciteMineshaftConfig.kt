@@ -30,4 +30,9 @@ class GlaciteMineshaftConfig {
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var shareWaypointLocation: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(name = "Mineshaft Detection", desc = "")
+    @Accordion
+    val mineshaftDetectionConfig: MineshaftDetectionConfig = MineshaftDetectionConfig()
 }

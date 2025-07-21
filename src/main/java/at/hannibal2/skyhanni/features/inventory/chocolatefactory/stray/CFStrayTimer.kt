@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -21,8 +22,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -100,20 +102,22 @@ object CFStrayTimer {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !config.blockClosing) return
         if (KeyboardManager.isShiftKeyDown()) return
-        if (event.slotId in destructiveSlots) {
-            event.cancel()
-            preventCloseTitle()
-        }
+        if (event.slotId !in destructiveSlots) return
+        event.sendPreventCloseTitle()
     }
 
-    private fun getTimerRenderable() = VerticalContainerRenderable(
-        listOf(
-            "§eStray Timer",
-            "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s",
-        ).map(StringRenderable::from),
+    @HandleEvent
+    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+        if (!config.blockClosing || !isEnabled()) return
+        event.sendPreventCloseTitle()
+    }
+
+    private fun getTimerRenderable() = Renderable.vertical(
+        Renderable.text("§eStray Timer"),
+        Renderable.text("§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"),
     )
 
-    private fun preventCloseTitle() {
+    private fun SkyHanniEvent.Cancellable.sendPreventCloseTitle() {
         TitleManager.sendTitle(
             "§cStray Timer Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",
@@ -121,13 +125,7 @@ object CFStrayTimer {
             location = TitleManager.TitleLocation.INVENTORY,
         )
         SoundUtils.playErrorSound()
-    }
-
-    @HandleEvent
-    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
-        if (!config.blockClosing || !isEnabled()) return
-        preventCloseTitle()
-        event.cancel()
+        cancel()
     }
 
     private fun isEnabled() = config.enabled && InventoryUtils.openInventoryName() == "Chocolate Factory" && timer > Duration.ZERO

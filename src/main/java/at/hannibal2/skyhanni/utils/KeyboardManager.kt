@@ -60,8 +60,6 @@ object KeyboardManager {
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
-    fun isRightMouseClicked() = RIGHT_MOUSE.isKeyClicked()
-
     @JvmStatic
     fun checkIsInventoryClosure(keycode: Int): Boolean {
         // Holding shift bypasses closure checks

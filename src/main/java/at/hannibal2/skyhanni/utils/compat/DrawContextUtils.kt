@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import java.nio.FloatBuffer
 //#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
@@ -14,6 +15,13 @@ import java.nio.FloatBuffer
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
  */
 object DrawContextUtils {
+
+    // GL11.GL_MODELVIEW_MATRIX
+    const val GL_MODELVIEW_MATRIX = 2982
+    // GL11.GL_PROJECTION_MATRIX
+    const val GL_PROJECTION_MATRIX = 2983
+    // GL11.GL_CURRENT_COLOR
+    const val GL_CURRENT_COLOR = 2816
 
     private var _drawContext: DrawContext? = null
 
@@ -77,7 +85,7 @@ object DrawContextUtils {
         val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
         //#if MC < 1.21
         GlStateManager.rotate(angle, xf, yf, zf)
-        //#else
+        //#elseif MC < 1.21.6
         //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
         //#endif
     }
@@ -85,13 +93,15 @@ object DrawContextUtils {
     fun multMatrix(buffer: FloatBuffer) {
         //#if MC < 1.21
         GlStateManager.multMatrix(buffer)
-        //#else
+        //#elseif MC < 1.21.6
         //$$ multMatrix(Matrix4f(buffer))
         //#endif
     }
 
     //#if MC > 1.21
+    //#if MC < 1.21.6
     //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    //#endif
     //#endif
 
     fun scale(x: Float, y: Float, z: Float) {

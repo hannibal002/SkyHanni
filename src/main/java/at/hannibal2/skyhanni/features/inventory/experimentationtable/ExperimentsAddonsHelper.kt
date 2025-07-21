@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -24,7 +25,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 
@@ -135,8 +138,13 @@ object ExperimentsAddonsHelper {
     }.sortedBy {
         hypixelUltrasequencerData.indexOf(it.slotNumber)
     }.forEachIndexed { slotIndex, slot ->
-        val alphaValue = (255 / (1 + slotIndex))
-        val slotColor = LorenzColor.GREEN.addOpacity(alphaValue)
+        if (slotIndex == 1) config.nextColor
+        val slotColor = if (slotIndex == 0) {
+            config.nextColor.getEffectiveColour()
+        } else {
+            val alphaValue = (255 / (slotIndex))
+            config.secondColor.getEffectiveColour().addAlpha(alphaValue)
+        }
         slot.highlight(slotColor)
     }
 
@@ -328,30 +336,27 @@ object ExperimentsAddonsHelper {
             condition = { ExperimentationTableApi.inAddon && debugConfig.addonsDebug },
             onlyOnIsland = IslandType.PRIVATE_ISLAND,
             onRender = {
-                val renderable = VerticalContainerRenderable(
-                    buildList {
-                        addString("Current Addon Phase: $currentAddonPhase")
-                        if (ExperimentationTableApi.inChronomatron) {
-                            addString("Current Round: $currentChronomatronRound")
-                            addString("Current Sequence Index: $chronomatronSequenceIndex")
-                            addString("")
-                            addString("Hypixel Data:")
-                            addString(formatColorSet(hypixelChronomatronData))
-                            addString("")
-                            addString("User Progress:")
-                            addString(formatColorSet(userChronomatronProgress))
-                            addString("")
-                            addString("Last Sound: $lastChronomatronSound")
-                        } else if (ExperimentationTableApi.inUltrasequencer) {
-                            addString("Current Round: $currentUltraSequencerRound")
-                            addString("")
-                            addString("Hypixel Data: $hypixelUltrasequencerData")
-                            addString("User Progress: $userUltrasequencerProgress")
-                            addString("Dye Map: $ultrasequencerDyeMap")
-                        } else return@buildList
-                    },
-                )
-
+                val renderable = Renderable.vertical {
+                    addString("Current Addon Phase: $currentAddonPhase")
+                    if (ExperimentationTableApi.inChronomatron) {
+                        addString("Current Round: $currentChronomatronRound")
+                        addString("Current Sequence Index: $chronomatronSequenceIndex")
+                        add(Renderable.emptyText())
+                        addString("Hypixel Data:")
+                        addString(formatColorSet(hypixelChronomatronData))
+                        add(Renderable.emptyText())
+                        addString("User Progress:")
+                        addString(formatColorSet(userChronomatronProgress))
+                        add(Renderable.emptyText())
+                        addString("Last Sound: $lastChronomatronSound")
+                    } else if (ExperimentationTableApi.inUltrasequencer) {
+                        addString("Current Round: $currentUltraSequencerRound")
+                        add(Renderable.emptyText())
+                        addString("Hypixel Data: $hypixelUltrasequencerData")
+                        addString("User Progress: $userUltrasequencerProgress")
+                        addString("Dye Map: $ultrasequencerDyeMap")
+                    } else return@vertical
+                }
                 debugConfig.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")
             },
         )

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -31,8 +31,8 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -295,22 +295,12 @@ object ExperimentationTableApi {
     }
 
     data class ExperimentationDataSet(
-        @Transient var type: ExperimentationTaskType? = null,
-        @Transient var tier: ExperimentationTier? = null,
+        var type: ExperimentationTaskType? = null,
+        var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long = 0L,
         var rareFoundFired: Boolean = false,
-    ) : ResettableStorageSet() {
-        @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
-
-        override fun reset() {
-            super.reset()
-            // todo at some point make resettable storage set deal with this stuff
-            //  ResettableStorageSet doesn't deal with nulls or clearing mutables
-            //  It does (^ that) after #4244 gets merged, so I'll do that eventually -David
-            otherRewards.clear()
-            type = null
-            tier = null
-        }
+    ) : Resettable() {
+        private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
         fun addReward(internalName: NeuInternalName, amount: Int = 1) {
             otherRewards.addOrPut(internalName, amount)
@@ -328,7 +318,7 @@ object ExperimentationTableApi {
     }
 
     fun inDistanceToTable(max: Double): Boolean {
-        val vec = LorenzVec.getBlockBelowPlayer()
+        val vec = LocationUtils.getBlockBelowPlayer()
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
     }
 
@@ -485,6 +475,7 @@ object ExperimentationTableApi {
                 "currentType" to currentExperimentType,
                 "currentTier" to currentExperimentTier,
             )
+
             ExperimentationTaskType.SUPERPAIRS -> SUPERPAIRS_OVER_DATA_SLOT
             else -> ADDONS_OVER_DATA_SLOT
         }

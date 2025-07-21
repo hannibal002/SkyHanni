@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -17,12 +19,12 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
-import at.hannibal2.skyhanni.features.garden.contest.EliteDevApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.DialogUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -32,7 +34,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -40,17 +41,19 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -62,24 +65,26 @@ object GardenNextJacobContest {
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
     private const val MAX_CONTESTS_PER_YEAR = 124
     private val profileStorage get() = SkyHanniMod.feature.storage
-    private val config get() = GardenApi.config.nextJacobContests
+    private val config get() = GardenApi.config.jacobContest.nextContest
     private val patternGroup = RepoPattern.group("garden.nextcontest")
     private val calendarDetector by lazy { InventoryDetector(monthPattern) }
     private val haveAllContests get() = knownContests.size == MAX_CONTESTS_PER_YEAR
-    private val nextContest get() = knownContests.filterNot {
-        it.endTime.isInPast()
-    }.minByOrNull { it.endTime }
+    private val nextContest
+        get() = knownContests.filterNot {
+            it.endTime.isInPast()
+        }.minByOrNull { it.endTime }
 
     private var display: Renderable? = null
-    private var simpleDisplay = emptyList<String>()
-    private var knownContests: List<EliteDevApi.EliteFarmingContest> = listOf()
+    private var simpleDisplay: Renderable? = null
+    private var knownContests: List<EliteFarmingContest> = listOf()
     private var nextContestsAvailableAt = SimpleTimeMark.farPast()
     private var lastFetchAttempted = SimpleTimeMark.farPast()
     private var lastWarningTime = SimpleTimeMark.farPast()
     private var loadedContestsYear = -1
-    private var isFetchingContests = false
     private var fetchedFromElite = false
-    private var isSendingContests = false
+
+    private val fetchingContestsMutex = Mutex()
+    private val sendingContestsMutex = Mutex()
 
     fun isNextCrop(cropName: CropType) = nextContest?.let { contest ->
         contest.crops.contains(cropName) && config.otherGuis
@@ -131,7 +136,7 @@ object GardenNextJacobContest {
      */
     private val timeLeftPattern by patternGroup.pattern(
         "time-left",
-        "(?:§.)+Jacob's Contest: (?:§.)+(?<timeleft>\\d+[smh]+) left"
+        "(?:§.)+Jacob's Contest: (?:§.)+(?<timeleft>\\d+[smh]+) left",
     )
 
     @HandleEvent
@@ -185,13 +190,12 @@ object GardenNextJacobContest {
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
-        simpleDisplay = buildList {
-            addAll(event.lines)
-            if (isCloseToNewYear()) {
-                add(CLOSE_TO_NEW_YEAR_TEXT)
-            } else {
-                add("§cOpen calendar for")
-                add("§cmore exact data!")
+        simpleDisplay = Renderable.vertical {
+            event.lines.forEach { addString(it) }
+            if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
+            else {
+                addString("§cOpen calendar for")
+                addString("§cmore exact data!")
             }
         }
         event.tryUpdateBoostedCrop()
@@ -267,7 +271,7 @@ object GardenNextJacobContest {
                 }
             }.takeIfNotEmpty() ?: return@mapNotNull null
 
-            EliteDevApi.EliteFarmingContest(startTime, crops, boostedCrop)
+            EliteFarmingContest(startTime, crops, boostedCrop)
         }
 
         knownContests = knownContests + contestsOnPage.filter {
@@ -345,19 +349,19 @@ object GardenNextJacobContest {
             }
         }
 
-        display = if (isFetchingContests) {
-            StringRenderable("§cFetching this years jacob contests...")
+        display = if (fetchingContestsMutex.isLocked) {
+            Renderable.text("§cFetching this years jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
         }
     }
 
-    private fun drawDisplay() = Renderable.line {
+    private fun drawDisplay() = Renderable.horizontal {
         val nextContest = nextContest
-        if (calendarDetector.isInside()) return@line drawCalendarDisplay()
-        else if (knownContests.isEmpty()) return@line drawNoContestsDisplay()
-        else if (nextContest != null) return@line drawNextContest(nextContest)
+        if (calendarDetector.isInside()) return@horizontal drawCalendarDisplay()
+        else if (knownContests.isEmpty()) return@horizontal drawNoContestsDisplay()
+        else if (nextContest != null) return@horizontal drawNextContest(nextContest)
 
         // We only reach here if there are no contests available
         if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
@@ -375,7 +379,7 @@ object GardenNextJacobContest {
         if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
         else addString("§cOpen calendar to read Jacob contest times!")
 
-    private fun MutableList<Renderable>.drawNextContest(contest: EliteDevApi.EliteFarmingContest) {
+    private fun MutableList<Renderable>.drawNextContest(contest: EliteFarmingContest) {
         val activeContest = contest.startTime.isInPast() && contest.endTime.isInFuture()
         val untilEnd = contest.endTime.timeUntil()
         val duration = when {
@@ -390,15 +394,17 @@ object GardenNextJacobContest {
 
             else -> {
                 addString("§eNext: ")
-                warn(contest.startTime.timeUntil(), contest.crops, contest.boostedCrop)
+                contest.warnAbout()
                 contest.startTime.timeUntil()
             }
         }
 
         for (crop in contest.crops) {
             val isBoosted = crop == contest.boostedCrop
-            val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest")
-            val stack = ItemStackRenderable(cropStack, 1.0, highlight = isBoosted)
+            val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest").apply {
+                if (isBoosted) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+            }
+            val stack = Renderable.item(cropStack, 1.0)
             if (config.additionalBoostedHighlight && isBoosted) {
                 add(stack.renderBounds(config.additionalBoostedHighlightColor.toColor()))
             } else add(stack)
@@ -407,8 +413,9 @@ object GardenNextJacobContest {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    private fun warn(duration: Duration, crops: List<CropType>, boostedCrop: CropType?) {
-        if (!config.warn || config.warnTime.seconds <= duration) return
+    private fun EliteFarmingContest.warnAbout() {
+        val timeUntil = startTime.timeUntil()
+        if (!config.warn || config.warnTime.seconds <= timeUntil) return
         val nextContest = nextContest ?: return
         if (nextContest.crops.none { it in config.warnFor }) return
 
@@ -425,7 +432,7 @@ object GardenNextJacobContest {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
         if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
-            SkyHanniMod.coroutineScope.launch {
+            SkyHanniMod.launchIOCoroutine {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
                     message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
@@ -437,20 +444,15 @@ object GardenNextJacobContest {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        with(config.pos) {
-            if (display == null) renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
-            else renderRenderable(display, posLabel = "Next Jacob Contest")
-        }
+        val display = display ?: simpleDisplay ?: return
+        config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display || !calendarDetector.isInside()) return
-
-        SkyHanniMod.feature.misc.inventoryLoadPos.renderRenderable(
-            display ?: return,
-            posLabel = "Load SkyBlock Calendar",
-        )
+        val display = display ?: return
+        config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
     }
 
     private fun sbEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
@@ -460,31 +462,47 @@ object GardenNextJacobContest {
     private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
 
     private fun fetchContestsIfAble() {
-        if (haveAllContests || isFetchingContests || !isFetchEnabled()) return
+        if (haveAllContests || !isFetchEnabled()) return
 
         // Allows retries every 10 minutes when it's after 1 day into the new year
         if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInFuture()) return
 
-        isFetchingContests = true
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutineWithMutex(fetchingContestsMutex) {
             knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
-            if (haveAllContests) {
-                ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
-                fetchedFromElite = true
-                nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
-                loadedContestsYear = SkyBlockTime.now().year
-            }
+            handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
-            isFetchingContests = false
+        }
+    }
+
+    private fun handleFetchedContests() {
+        if (haveAllContests) {
+            ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
+            fetchedFromElite = true
+            nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
+            loadedContestsYear = SkyBlockTime.now().year
+            saveKnownContests()
+        } else {
+            ChatUtils.chat(
+                "This year's contests aren't available to fetch automatically yet, " +
+                    "please load them from your calendar or wait 10 minutes.",
+            )
+            ChatUtils.clickableChat(
+                "Click here to open your calendar!",
+                onClick = { HypixelCommands.calendar() },
+                "§eClick to run /calendar!",
+            )
         }
     }
 
     private fun sendContestsIfAble() {
-        if (isSendingContests || !haveAllContests || isCloseToNewYear()) return
-        isSendingContests = true
-        SkyHanniMod.launchIOCoroutine {
-            EliteDevApi.submitContests(knownContests)
-            isSendingContests = false
+        if (!haveAllContests || isCloseToNewYear()) return
+        SkyHanniMod.launchIOCoroutineWithMutex(sendingContestsMutex) {
+            if (EliteDevApi.submitContests(knownContests)) {
+                ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+            } else ErrorManager.logErrorStateWithData(
+                "Something went wrong submitting upcoming contests!",
+                "submitContestsToElite not successful",
+            )
         }
     }
 
@@ -500,9 +518,6 @@ object GardenNextJacobContest {
         event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
         event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
 
-        event.transform(15, "garden.nextJacobContests.shareAutomatically") { element ->
-            ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
-        }
         event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
         event.move(33, "garden.jacobContextTimesPos", "garden.jacobContestTimesPosition")
         event.move(33, "garden.jacobContextTimes", "garden.jacobContestTimes")
@@ -512,5 +527,8 @@ object GardenNextJacobContest {
                 if (setting.asString == "NEXT_JACOB_CONTEXT") JsonPrimitive("NEXT_JACOB_CONTEST") else setting
             }.toJsonArray()
         }
+        val base = "garden.jacobContest.nextContest"
+        event.move(101, "misc.inventoryLoadPos", "$base.inventoryPosition")
+        event.move(101, "$base.pos", "$base.position")
     }
 }

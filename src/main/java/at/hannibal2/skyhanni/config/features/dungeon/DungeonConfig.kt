@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.dungeon
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -169,6 +170,11 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var terminalWaypoints: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Creation Cooldown", desc = "")
+    @Accordion
+    val creationCooldown: CreationCooldownConfig = CreationCooldownConfig()
 
     @Expose
     @ConfigOption(name = "Low Health Alert", desc = "")

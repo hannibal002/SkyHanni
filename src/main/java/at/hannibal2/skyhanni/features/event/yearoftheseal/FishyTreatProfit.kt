@@ -23,9 +23,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import net.minecraft.item.ItemStack
@@ -70,7 +70,7 @@ object FishyTreatProfit {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(StringRenderable("§eProfit per Fishy Treat"))
+        newList.addString("§eProfit per Fishy Treat")
         newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
         return

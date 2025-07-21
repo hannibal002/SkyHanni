@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -25,10 +26,10 @@ class BackgroundOutlineConfig {
     @Expose
     @ConfigOption(name = "Color Top", desc = "Color of the top of the outline.")
     @ConfigEditorColour
-    var colorTop: String = "0:255:175:89:255"
+    var colorTop: ChromaColour = ChromaColour.fromStaticRGB(175, 89, 255, 255)
 
     @Expose
     @ConfigOption(name = "Color Bottom", desc = "Color of the bottom of the outline.")
     @ConfigEditorColour
-    var colorBottom: String = "0:255:127:237:255"
+    var colorBottom: ChromaColour = ChromaColour.fromStaticRGB(127, 237, 255, 255)
 }

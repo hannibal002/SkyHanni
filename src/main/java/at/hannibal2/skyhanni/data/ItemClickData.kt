@@ -77,9 +77,6 @@ object ItemClickData {
                 //#if MC < 1.21
                 val clickedEntity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
                 //#else
-                //$$ if (packet.type is PlayerInteractEntityC2SPacket.InteractAtHandler) {
-                //$$     return
-                //$$ }
                 //$$ if (packet.type is PlayerInteractEntityC2SPacket.InteractHandler) {
                 //$$     if ((packet.type as PlayerInteractEntityC2SPacket.InteractHandler).hand == Hand.OFF_HAND) return
                 //$$ }

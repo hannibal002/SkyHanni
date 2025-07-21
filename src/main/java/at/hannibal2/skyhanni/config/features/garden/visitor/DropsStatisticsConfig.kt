@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -44,36 +43,33 @@ class DropsStatisticsConfig {
     /**
      * Generic non VisitorReward stuff belongs in front of the first VisitorReward.
      */
-    enum class DropsStatisticsTextEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1
-    ) : HasLegacyId {
+    enum class DropsStatisticsTextEntry(private val displayName: String) {
         // generic stuff
-        TITLE("§e§lVisitor Statistics", 0),
-        TOTAL_VISITORS("§e1,636 Total", 1),
-        VISITORS_BY_RARITY("§a1,172§f-§9382§f-§681§f-§d2§f-§c1", 2),
-        ACCEPTED("§21,382 Accepted", 3),
-        DENIED("§c254 Denied", 4),
-        SPACER_1(" ", 5),
-        COPPER("§c62,072 Copper", 6),
-        FARMING_EXP("§33.2m Farming EXP", 7),
-        COINS_SPENT("§647.2m Coins Spent", 8),
-        SPACER_2(" ", 17),
-        GARDEN_EXP("§212,600 Garden EXP", 18),
-        BITS("§b4.2k Bits", 19),
-        MITHRIL_POWDER("§220k Mithril Powder", 20),
-        GEMSTONE_POWDER("§d18k Gemstone Powder", 21),
+        TITLE("§e§lVisitor Statistics"),
+        TOTAL_VISITORS("§e1,636 Total"),
+        VISITORS_BY_RARITY("§a1,172§f-§9382§f-§681§f-§d2§f-§c1"),
+        ACCEPTED("§21,382 Accepted"),
+        DENIED("§c254 Denied"),
+        SPACER_1(" "),
+        COPPER("§c62,072 Copper"),
+        FARMING_EXP("§33.2m Farming EXP"),
+        COINS_SPENT("§647.2m Coins Spent"),
+        SPACER_2(" "),
+        GARDEN_EXP("§212,600 Garden EXP"),
+        BITS("§b4.2k Bits"),
+        MITHRIL_POWDER("§220k Mithril Powder"),
+        GEMSTONE_POWDER("§d18k Gemstone Powder"),
 
         // VisitorReward items
         // Todo: Make these names actually in sync with the VisitorReward enum entries
-        FLOWERING_BOUQUET("§b23 §9Flowering Bouquet", 9),
-        OVERGROWN_GRASS("§b4 §9Overgrown Grass", 10),
-        GREEN_BANDANA("§b2 §5Green Bandana", 11),
-        DEDICATION_IV("§b1 §9Dedication IV", 12),
-        MUSIC_RUNE_I("§b6 §b◆ Music Rune I", 13),
-        SPACE_HELMET("§b1 §cSpace Helmet", 14),
-        CULTIVATING_I("§b1 §9Cultivating I", 15),
-        REPLENISH_I("§b1 §9Replenish I", 16),
+        FLOWERING_BOUQUET("§b23 §9Flowering Bouquet"),
+        OVERGROWN_GRASS("§b4 §9Overgrown Grass"),
+        GREEN_BANDANA("§b2 §5Green Bandana"),
+        DEDICATION_IV("§b1 §9Dedication IV"),
+        MUSIC_RUNE_I("§b6 §b◆ Music Rune I"),
+        SPACE_HELMET("§b1 §cSpace Helmet"),
+        CULTIVATING_I("§b1 §9Cultivating I"),
+        REPLENISH_I("§b1 §9Replenish I"),
         DELICATE("§b1 §9Delicate V"),
         COPPER_DYE("§b1 §8Copper Dye"),
         JUNGLE_KEY("§b1 §5Jungle Key"),
@@ -81,7 +77,6 @@ class DropsStatisticsConfig {
         HARVEST_HARBINGER("§b1 §9Harvest Harbinger V"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

@@ -223,6 +223,15 @@ class ConfigManager {
             file.parentFile.mkdirs()
             StringFileHandler(file).save(gson.toJson(data))
             logger.log("Saved $fileName file successfully")
+        } catch (e: ClassCastException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Could not save $fileName file to $file",
+                "file" to file,
+                "data" to data,
+                "dataClass" to data.javaClass,
+                "fileName" to fileName,
+            )
         } catch (e: IOException) {
             logger.log("Could not save $fileName file to $file")
             logger.log(e.stackTraceToString())
@@ -266,6 +275,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
     PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
+    STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

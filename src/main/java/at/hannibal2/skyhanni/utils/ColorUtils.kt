@@ -41,6 +41,8 @@ object ColorUtils {
         (start.blue * (1 - percent) + end.blue * percent).toInt(),
     )
 
+    val ChromaColour.rgb get() = this.toColor().rgb
+
     fun Color.getExtendedColorCode(hasAlpha: Boolean = false): String = ExtendedChatColor(rgb, hasAlpha).toString()
 
     /** Darkens a color by a [factor]. The lower the [factor], the darker the color. */
