@@ -25,7 +25,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val animationFrames = listOf(ItemStackAnimationFrame(boxOfSeedsProvider, ticks = 0))
 
-    private val animatedItemStackRenderable by lazy {
+    val animatedItemStackRenderable by lazy {
         Renderable.animatedItemStack(
             animationFrames,
             rotation = ItemStackRotationDefinition(

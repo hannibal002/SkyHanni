@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -8,11 +9,16 @@ import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
+import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.reportData
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -33,6 +39,7 @@ import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
@@ -56,7 +63,7 @@ import java.nio.FloatBuffer
 //$$ import org.joml.Vector4f
 //$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugZt
 //$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugHz
-//$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugHs
+//$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugZs
 //#endif
 
 // todo 1.21 impl needed
@@ -404,12 +411,43 @@ object GuiRenderUtils {
         )
     }
 
+    data class ReportData(
+        val originY: Float,
+        val translateY: Float,
+        val finalScale: Float,
+    ) {
+        fun getRenderable() = Renderable.vertical {
+            addString("Origin Y: $originY")
+            addString("Translate Y: $translateY")
+            addString("Final Scale: $finalScale")
+        }
+    }
+
     class DebugItemRendering {
         @SkyHanniModule
         companion object {
-            var debugZt = -100f
+            var debugZt = -1000f
             var debugHz = 8f
-            var debugHs = 1f
+            var debugZs: Float? = null
+            var data: ReportData? = null
+
+            fun reportData(originY: Float, translateY: Float, finalScale: Float) {
+                data = ReportData(originY, translateY, finalScale)
+            }
+
+            init {
+                RenderDisplayHelper(
+                    outsideInventory = true,
+                    inOwnInventory = true,
+                    condition = { data != null },
+                    onRender = {
+                        SkyHanniMod.feature.dev.debug.daveedPosition.renderRenderable(
+                            data?.getRenderable() ?: return@RenderDisplayHelper,
+                            posLabel = "Debug Item Rendering",
+                        )
+                    }
+                )
+            }
 
             @HandleEvent
             fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -431,13 +469,18 @@ object GuiRenderUtils {
                         ChatUtils.chat("Set debugHz to $debugHz")
                     }
                 }
-                event.registerBrigadier("setdebughs") {
-                    description = "Set debugHs"
+                event.registerBrigadier("setdebugzs") {
+                    description = "Set debugZs"
                     category = CommandCategory.DEVELOPER_DEBUG
                     legacyCallbackArgs { args ->
+                        if (args.isEmpty()) {
+                            debugZs = null
+                            ChatUtils.chat("Set debugZs to null")
+                            return@legacyCallbackArgs
+                        }
                         val newHs = args.getOrNull(0)?.toFloatOrNull() ?: return@legacyCallbackArgs
-                        debugHs = newHs
-                        ChatUtils.chat("Set debugHs to $debugHs")
+                        debugZs = newHs
+                        ChatUtils.chat("Set debugZs to $debugZs")
                     }
                 }
             }
@@ -445,8 +488,11 @@ object GuiRenderUtils {
     }
 
     //#if MC > 1.21.6
-    //$$ val projectionMatrix = ProjectionMatrix2("SkyHanni Item Rendering", 100.0f, 200.0f, true)
+    //$$ val projectionMatrix = ProjectionMatrix2("SkyHanni Item Rendering", 1000f, 11000f, false)
     //#endif
+
+    private val debugMessageId = ChatUtils.getUniqueMessageId()
+    private var lastDebugMessage: SimpleTimeMark = SimpleTimeMark.farPast()
 
     fun ItemStack.renderOnScreen(
         x: Float,
@@ -482,7 +528,7 @@ object GuiRenderUtils {
         //$$ val (zT, zS) = listOf(-95f, 1f)
         //#else
         //$$ val (hx, hy, hz) = listOf(8f, 8f, debugHz)
-        //$$ val (zT, zS) = listOf(debugZt, debugHs)
+        //$$ val (zT, zS) = listOf(debugZt, debugZs ?: finalScale)
         //#endif
 
         //#if MC < 1.21.6
@@ -549,27 +595,37 @@ object GuiRenderUtils {
         }
         //#else
         //$$ RenderSystem.assertOnRenderThread()
+        //$$ // Because on modern versions the matrices are not directly accessible, and we have to make our own MatrixStack,
+        //$$ // we need to use the DrawContext matrices to fetch the current origin instead of relying on 0,0 being pre-translated.
+        //$$ val matrices2D = DrawContextUtils.drawContext.matrices
+        //$$ val originX = matrices2D.m20
+        //$$ val originY = matrices2D.m21
         //$$ val client = MinecraftClient.getInstance()
         //$$ val window = client.window
+        //$$ reportData(originY, translateY, finalScale)
         //$$ RenderSystem.backupProjectionMatrix()
-        //$$ val screenWidth = window.framebufferWidth.toFloat()  / window.scaleFactor.toFloat()
-        //$$ val screenHeight = window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()
-        //$$ val slice = projectionMatrix.set(screenWidth, screenHeight)
+        //$$ val guiWidth = window.framebufferWidth.toFloat()  / window.scaleFactor.toFloat()
+        //$$ val guiHeight = window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()
+        //$$ val slice = projectionMatrix.set(guiWidth, guiHeight)
         //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
         //$$ val consumers = client.bufferBuilders.entityVertexConsumers
+        //$$ val screenX = originX + translateX
+        //$$ val screenY = originY + translateY
         //$$ val matrices = MatrixStack()
         //$$ matrices.push()
-        //$$ val newTranslateX = translateX - 8f * finalScale
-        //$$ val newTranslateY = (screenHeight - translateY) - 8f * finalScale
-        //$$ matrices.translate(newTranslateX, newTranslateY, zT)
-        //$$ matrices.scale(finalScale, finalScale, zS)
+        //$$ if (lastDebugMessage.passedSince() > 20.milliseconds) {
+        //$$    "screenX: $screenX, screenY: $screenY, zT: $zT".asComponent().send(debugMessageId)
+        //$$    lastDebugMessage = SimpleTimeMark.now()
+        //$$ }
+        //$$ matrices.translate(screenX, screenY, zT)
+        //$$ matrices.scale(finalScale, finalScale, finalScale)
         //$$ matrices.translate(hx, hy, hz)
-        //$$ matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
-        //$$ matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
-        //$$ matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
+        //$$ if (rotX != 0f) matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
+        //$$ if (rotY != 0f) matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
+        //$$ if (rotZ != 0f) matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
         //$$ matrices.translate(-hx, -hy, -hz)
         //$$ client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-        //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.GUI, 15728880, OverlayTexture.DEFAULT_UV, matrices, consumers, client.world, 0)
+        //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.FIXED, 15728880, OverlayTexture.DEFAULT_UV, matrices, consumers, client.world, 0)
         //$$ consumers.draw()
         //$$ matrices.pop()
         //$$ RenderSystem.restoreProjectionMatrix()

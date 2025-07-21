@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
@@ -17,6 +18,10 @@ class DebugConfig {
     @ConfigOption(name = "Enable Debug", desc = "Enable Test logic")
     @ConfigEditorBoolean
     var enabled: Boolean = false
+
+    @Expose
+    @NoConfigLink
+    val daveedPosition = Position(100, 100)
 
     @Expose
     @ConfigOption(
