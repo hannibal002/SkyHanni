@@ -8,10 +8,11 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -39,7 +40,7 @@ object DungeonCreationCooldown {
     fun onChat(event: SkyHanniChatEvent) {
         join.matchMatcher(event.message) {
             val player = group("player").cleanPlayerName()
-            if (player == LorenzUtils.getPlayerName()) {
+            if (player == PlayerUtils.getName()) {
                 cooldown = SimpleTimeMark.now() + 30.seconds
             }
             hasWarned = false
@@ -88,7 +89,7 @@ object DungeonCreationCooldown {
         return if (DungeonApi.inDungeon()) {
             if (config.entranceOnly) isEntrance(DungeonApi.roomId) else true
         } else {
-            LorenzUtils.inSkyBlock && config.showOutside
+            SkyBlockUtils.inSkyBlock && config.showOutside
         }
     }
 
