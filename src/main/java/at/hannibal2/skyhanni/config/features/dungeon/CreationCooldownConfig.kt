@@ -8,11 +8,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class CreationCooldownConfig {
+
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show the time until another dungeon instance can be created.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show Outside of Dungeons", desc = "Show on other skyblock islands.")
@@ -22,7 +23,7 @@ class CreationCooldownConfig {
     @Expose
     @ConfigOption(
         name = "Only Show In Entrance Room",
-        desc = "Only show the display when in the entrance room of a dungeon."
+        desc = "Only show the display when in the entrance room of a dungeon.",
     )
     @ConfigEditorBoolean
     var entranceOnly: Boolean = true
@@ -35,7 +36,7 @@ class CreationCooldownConfig {
     @Expose
     @ConfigOption(
         name = "Block Command Send",
-        desc = "Block sending the /joininstance command during creation cooldown."
+        desc = "Block sending the /joininstance command during creation cooldown.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -43,5 +44,5 @@ class CreationCooldownConfig {
 
     @Expose
     @ConfigLink(owner = CreationCooldownConfig::class, field = "enabled")
-    var position: Position = Position(383, 93, false, true)
+    val position: Position = Position(383, 93)
 }

@@ -174,7 +174,7 @@ class DungeonConfig {
     @Expose
     @ConfigOption(name = "Creation Cooldown", desc = "")
     @Accordion
-    var creationCooldown: CreationCooldownConfig = CreationCooldownConfig()
+    val creationCooldown: CreationCooldownConfig = CreationCooldownConfig()
 
     @Expose
     @ConfigOption(name = "Low Health Alert", desc = "")

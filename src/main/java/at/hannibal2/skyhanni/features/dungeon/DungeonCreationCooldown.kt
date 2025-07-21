@@ -10,11 +10,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -28,7 +30,7 @@ object DungeonCreationCooldown {
      */
     private val join by RepoPattern.group("dungeon.join").pattern(
         "dungeon.join",
-        ".*\n§r(?<player>.*)§r§f §r§eentered §r(?:.*)?The Catacombs§r§e,.*\n.*"
+        ".*\n§r(?<player>.*)§r§f §r§eentered §r(?:.*)?The Catacombs§r§e,.*\n.*",
     )
     private const val ENTRANCE_ID = "102,66"
 
@@ -54,7 +56,7 @@ object DungeonCreationCooldown {
             event.cancel()
             ChatUtils.chat(
                 "Blocked instance creation due to cooldown! Cooldown: §b${cooldown.timeUntil().format()}",
-                replaceSameMessage = true
+                replaceSameMessage = true,
             )
         }
     }
@@ -62,10 +64,9 @@ object DungeonCreationCooldown {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        val display = "§eDungeon Creation Cooldown: §b${cooldown.timeUntil().format()}"
-        if (cooldown.isInFuture()) {
-            config.position.renderString(display, posLabel = "Dungeon Cooldown Timer")
-        }
+        if (!cooldown.isInFuture()) return
+        val display = Renderable.text("§eDungeon Creation Cooldown: §b${cooldown.timeUntil().format()}")
+        config.position.renderRenderable(display, posLabel = "Dungeon Cooldown Timer")
     }
 
     @HandleEvent
@@ -75,7 +76,6 @@ object DungeonCreationCooldown {
             ChatUtils.chat("Dungeon creation cooldown is over!")
             hasWarned = true
         }
-
     }
 
     private fun isEntrance(roomID: String?): Boolean {
