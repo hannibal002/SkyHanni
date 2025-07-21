@@ -4,12 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.StringUtils
+import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
+import java.util.concurrent.CompletableFuture
 
 @SkyHanniModule
 object DefaultConfigFeatures {
@@ -53,13 +57,6 @@ object DefaultConfigFeatures {
                 },
             )
         }
-    }
-
-    private fun onCommand(args: Array<String>) {
-        onCommand(
-            args.getOrNull(0) ?: "null",
-            args.getOrNull(1) ?: "null",
-        )
     }
 
     fun onCommand(old: String, new: String) {
@@ -113,21 +110,38 @@ object DefaultConfigFeatures {
         }
     }
 
-    private fun onComplete(strings: Array<String>): List<String> {
-        if (strings.size <= 2)
-            return StringUtils.getListOfStringsMatchingLastWord(
-                strings,
-                SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null"),
-            )
-        return listOf()
+    private val autocomplete get() = SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
+
+    @Suppress("UnusedParameter")
+    private fun getAutocompleteSuggestions(
+        context: CommandContext<Any?>,
+        builder: SuggestionsBuilder,
+    ): CompletableFuture<Suggestions> {
+        for (version in autocomplete) {
+            if (version.startsWith(builder.remainingLowerCase)) {
+                builder.suggest(version)
+            }
+        }
+        return builder.buildFuture()
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shdefaultoptions") {
+        event.registerBrigadier("shdefaultoptions") {
             description = "Select default options"
-            callback { onCommand(it) }
-            autoComplete { onComplete(it) }
+            arg("oldVersion", BrigadierArguments.string(), ::getAutocompleteSuggestions) { oldVersion ->
+                arg("newVersion", BrigadierArguments.string(), ::getAutocompleteSuggestions) { newVersion ->
+                    callback {
+                        onCommand(getArg(oldVersion), getArg(newVersion))
+                    }
+                }
+                callback {
+                    onCommand(getArg(oldVersion), "null")
+                }
+            }
+            simpleCallback {
+                onCommand("null", "null")
+            }
         }
     }
 }
