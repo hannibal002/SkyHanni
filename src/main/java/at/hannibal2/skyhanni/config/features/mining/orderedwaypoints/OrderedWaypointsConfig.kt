@@ -39,7 +39,7 @@ class OrderedWaypointsConfig {
     @Expose
     @ConfigOption(name = "Next Waypoints", desc = "How many waypoints in front of the current waypoint should be rendered.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 5f, minStep = 1f)
-    var nextCount: Float = 1f
+    var nextCount: Float = 2f
 
     @Expose
     @ConfigOption(name = "Block Outline Thickness", desc = "Thickness of the block outline.")
