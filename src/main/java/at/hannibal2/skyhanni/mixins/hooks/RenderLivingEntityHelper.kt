@@ -22,8 +22,7 @@ object RenderLivingEntityHelper {
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
     fun isEntityInGlowEvent(entity: Entity): Int {
-        val color = currentGlowEvent?.entitiesToOutline?.get(entity) ?: Color.BLACK
-        return color.rgb
+        return currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb ?: 0
     }
 
     @HandleEvent
