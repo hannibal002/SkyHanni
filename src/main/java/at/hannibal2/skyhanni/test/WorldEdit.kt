@@ -48,10 +48,10 @@ object WorldEdit {
         ChatUtils.chat("Copied text to clipboard.")
     }
 
-    private val legacyBlockPos = "net.minecraft.util.BlockPos"
-    private val modernBlockPos = "net.minecraft.util.math.BlockPos"
-    private val legacyAABB = "net.minecraft.util.AxisAlignedBB"
-    private val modernAABB = "net.minecraft.util.math.Box"
+    private const val legacyBlockPos = "net.minecraft.util.BlockPos"
+    private const val modernBlockPos = "net.minecraft.util.math.BlockPos"
+    private const val legacyAABB = "net.minecraft.util.AxisAlignedBB"
+    private const val modernAABB = "net.minecraft.util.math.Box"
 
     private fun generateCodeSnippet(useModern: Boolean): String {
         val blockPosText = if (useModern) modernBlockPos else legacyBlockPos

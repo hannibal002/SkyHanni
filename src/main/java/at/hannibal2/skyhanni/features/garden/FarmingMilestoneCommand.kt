@@ -115,7 +115,9 @@ object FarmingMilestoneCommand {
                         val counter = crop.getCounter()
                         val level = GardenCropMilestones.getTierForCropCount(counter, crop)
                         if (targetLevel <= level && targetLevel != 0) {
-                            ChatUtils.userError("Custom goal milestone ($targetLevel) must be greater than your current milestone ($level).")
+                            ChatUtils.userError(
+                                "Custom goal milestone ($targetLevel) must be greater than your current milestone ($level)."
+                            )
                             return@callback
                         }
                         storage[crop] = targetLevel
