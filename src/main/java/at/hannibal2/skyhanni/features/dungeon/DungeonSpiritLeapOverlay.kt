@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -192,7 +193,7 @@ object DungeonSpiritLeapOverlay {
                     ),
                 ),
                 verticalAlign = VerticalAlignment.CENTER,
-                color = backgroundColor.toSpecialColor(),
+                color = backgroundColor.toColor(),
                 topOutlineColor = 0xFFFFF,
                 bottomOutlineColor = 0xFFFFF,
                 borderOutlineThickness = 2,
@@ -215,15 +216,13 @@ object DungeonSpiritLeapOverlay {
 
     private val deadTeammateColor = colorConfig.deadTeammateColor
 
-    private fun getClassColor(dungeonClass: DungeonApi.DungeonClass?): String {
-        return when (dungeonClass) {
-            DungeonApi.DungeonClass.ARCHER -> colorConfig.archerClassColor
-            DungeonApi.DungeonClass.MAGE -> colorConfig.mageClassColor
-            DungeonApi.DungeonClass.BERSERK -> colorConfig.berserkClassColor
-            DungeonApi.DungeonClass.TANK -> colorConfig.tankClassColor
-            DungeonApi.DungeonClass.HEALER -> colorConfig.healerClassColor
-            else -> SpiritLeapColorConfig.DEFAULT_COLOR
-        }
+    private fun getClassColor(dungeonClass: DungeonApi.DungeonClass?): ChromaColour = when (dungeonClass) {
+        DungeonApi.DungeonClass.ARCHER -> colorConfig.archerClassColor
+        DungeonApi.DungeonClass.MAGE -> colorConfig.mageClassColor
+        DungeonApi.DungeonClass.BERSERK -> colorConfig.berserkClassColor
+        DungeonApi.DungeonClass.TANK -> colorConfig.tankClassColor
+        DungeonApi.DungeonClass.HEALER -> colorConfig.healerClassColor
+        else -> SpiritLeapColorConfig.defaultColor
     }
 
     private fun isEnabled() = config.enabled && DungeonApi.inDungeon() && DungeonApi.started && !DungeonApi.completed

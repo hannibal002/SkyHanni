@@ -51,6 +51,9 @@ enum class SlayerType(
 
     companion object {
         fun getByName(name: String): SlayerType? = entries.firstOrNull { name.contains(it.displayName) }
+        fun getByClazzName(name: String): SlayerType? = entries.firstOrNull {
+            it.clazz.simpleName.removePrefix("Entity").equals(name, ignoreCase = true)
+        }
     }
 }
 

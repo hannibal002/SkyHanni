@@ -29,8 +29,8 @@ object SkillUtil {
             totalXP += xpNeeded
 
             var level = 60
-            var xpForNext = 7000000L + 600000L
-            var slope = 600000L
+            var xpForNext = 7_000_000L + 600_000L
+            var slope = 600_000L
 
             while (level < desiredLevel) {
                 totalXP += xpForNext

@@ -26,10 +26,16 @@
 #### Garden
 
 + Optimal Angles Overlay for Squeaky Mousemat. - nikijul (https://github.com/hannibal002/SkyHanni/pull/2999)
++ Added Pest Trap tab widgets to Tab Widget Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
++ Added warnings for Pest Traps being full or out of bait. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 
 #### Commands
 
 + Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
+
+#### Rift
+
++ Added a workaround for a Hypixel bug that results in no sounds for a few seconds after the Vampire Slayer's Killer Spring spawns on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4434)
 
 #### Misc
 
@@ -74,6 +80,10 @@
     + Allows you to smooth the look of glass panes in SkyBlock inventories.
     + Functionality should be a near, if not perfect match to the NEU feature.
     + Can only be used on Minecraft 1.21.
++ Added Bazaar Daily Limit Tracker. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4308)
+    + Tracks the amount of coins you have put towards the daily 15 billion trade limit.
+    + Coins in excess of the integer limit on an individual order do not count towards the daily limit.
+    + Resets at midnight UTC.
 
 #### Hoppity
 
@@ -81,6 +91,10 @@
     + Sub-option available to revert to "1.8 sounds" (eating sound).
     + Will only apply to the "new" sounds that happen in 1.20 and above.
 + Added option to prevent closing CF when stray timer or strays are active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4067)
+
+#### Hunting
+
++ Added customizable keybinds to easily repeat and confirm fusions. - Luna (https://github.com/hannibal002/SkyHanni/pull/4440)
 
 ### Improvements
 
@@ -94,6 +108,9 @@
 + Added an option for the attribute shard overlay to account for shards you already own. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
 + Made hunting box value overlay be scrollable. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
 + Made hunting box value show the total value of shards in your hunting box. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4389)
++ Added Free Will to minion estimated item value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4421)
++ Added option to prevent over-clicking in Beacon solver. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4432)
++ Beacon solver will now work with Signal Enhancer upgrade minigame as well. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4432)
 
 #### Farming
 
@@ -109,6 +126,9 @@
 + Reduced memory usage with a large amount of text rendering. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4316)
 + Added new sounds to Sound Responses. - cato (https://github.com/hannibal002/SkyHanni/pull/3363)
 + Improved Sound Responses onomatopoeia recognition. - cato (https://github.com/hannibal002/SkyHanni/pull/3363)
++ Made `/shtps` automatically send the TPS after its calculating cooldown. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4412)
++ Added option to show `/shnavigate` feedback in a UI element instead of chat. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4399)
++ Separated Foraging and Hunting features in the config. - Luna (https://github.com/hannibal002/SkyHanni/pull/4437)
 
 #### Foraging
 
@@ -120,6 +140,10 @@
 + Added compact display mode for Golden Fish timer. - appable (https://github.com/hannibal002/SkyHanni/pull/3696)
 + Improved bait detection accuracy. - ninjaguardian (https://github.com/hannibal002/SkyHanni/pull/4379)
 + Allowed trophy fish display to show while wearing Ember Armor. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4064)
+
+#### Rift
+
++ Made Rift Blood Effigies features searchable by typing effigy. - Luna (https://github.com/hannibal002/SkyHanni/pull/4436)
 
 #### Commands
 
@@ -138,6 +162,8 @@
 + Fixed Berberis Highlight not working on 1.21 if Only on Farmland is enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/4373)
 + Fixed Vermin Tracker not counting Vermin Bin on Minecraft 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4371)
 + Fixed Agaricus Cap timer incorrectly resetting whenever you move your camera on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
++ Fixed Bacte Tentacle Waypoints not updating Tentacle HP on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
++ Fixed Sun Gecko Helper's Highlight Real Boss incorrectly highlighting the clones in green if Highlight Clones is disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/4431)
 
 #### Misc
 
@@ -156,12 +182,18 @@
 + Fixed gfs command not working on most items that were more than one word. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4367)
 + Fixed issue when submitting contests to EliteDev. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4398)
 + Fixed Skill Overflow For Hunting And Foraging. - nopo (https://github.com/hannibal002/SkyHanni/pull/4406)
++ Fixed Custom Wadrobe buttons being wrongly vertical. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4413)
++ Fixed errors when calculating Pet XP. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4402)
++ Fixed rare error when converting config from 1.21 to 1.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4420)
++ Fixed errors with Pet XP calculations. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4438)
 
 #### Chat
 
 + Fixed Hide lottery messages only hiding the buff message and not all lottery messages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4339)
 + Fixed rare crash when hovering over chat messages on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4369)
     + Example: Compact Tree Gift with 0 rewards.
++ Fixed shorten coin amount behaving incorrectly on values < 1. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4417)
++ Fixed Your computer's clock is off messages sometimes spamming the chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4435)
 
 #### Inventory
 
@@ -180,6 +212,9 @@
 + Fixed estimated chest value displaying books at half their value. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/4405)
 + Fixed Improved SB Menus replacing Potion items in the cookie menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4401)
 + Fixed visual errors in hunting box when no shards were detected. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4404)
++ Fixed a few minor issues with colorful item stats. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4419)
++ Fixed typo in composter menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4416)
++ Fixed colorful item tooltips replacing commas with dots. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4423)
 
 #### Fishing
 
@@ -273,6 +308,25 @@
 + Fixed Detekt workflows again. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4400)
 + Made attribute shard features silently error. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4404)
 + String.removeColor now removes the chroma color code. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4408)
++ Added `DamageSourceCompat` util class. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
++ Added live plugin for copying the 'path' to a config option. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4414)
++ Added PestTrapApi. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
++ Added RadialGradientCircularRenderable. - Daveed + next_g (https://github.com/hannibal002/SkyHanni/pull/4119)
++ Fixed `/shtps` showing your real TPS during April Fools. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4412)
++ Fixed EntityHurtEvent never triggering on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
++ Fixed occasional NoSuchFieldException in `/shtestpacket`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4410)
++ Actually add stuff to unsuccessful constants. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4444)
++ Added `BazaarTransactionEvent` for all transactions in the bazaar. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4308)
++ Added Ctrl + Shift +R Click as shortcut to jump to event definition from functions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4442)
++ ChatUtils.clickableLinkChat now supports parameter replaceSameMessage. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4435)
++ Fixed edge cases with `@KSerializable` not respecting `@SerializedName` annotations. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4426)
++ Fixed Living Snake debug messages not using the correct debug method. - Luna (https://github.com/hannibal002/SkyHanni/pull/4430)
++ Renamed ResettableStorageSet to Resettable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4428)
+    + Added NoReset annotation.
+    + Useful when you can't use Transient due to JVM implications.
++ Send neu repo status on Hypixel join if there is an unsuccesful constant. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4444)
++ Skip incorrect item files instead of hard failing. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4444)
++ Updated Live Templates. - Empa (https://github.com/hannibal002/SkyHanni/pull/3967)
 
 ## Version 4.0.0
 

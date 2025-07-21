@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -149,7 +149,7 @@ object FruitBowlFeatures {
         for (mob in MobData.players) {
 
             val color = if (mob.name !in clickedPlayers) correctColor else wrongColor
-            mob.setColor(color)
+            mob.setColor(color.toColor())
         }
 
         updateDisplay()
@@ -177,7 +177,7 @@ object FruitBowlFeatures {
 
         val alreadyClicked = mob.name in clickedPlayers
         val color = if (!alreadyClicked) correctColor() else wrongColor()
-        mob.setColor(color)
+        mob.setColor(color.toColor())
     }
 
     private var lastClick: PlayerWithProfile? = null
@@ -246,9 +246,9 @@ object FruitBowlFeatures {
         )
     }
 
-    private fun wrongColor() = config.canNotColor.get().toSpecialColor()
+    private fun wrongColor() = config.canNotColor.get()
 
-    private fun correctColor() = config.canColor.get().toSpecialColor()
+    private fun correctColor() = config.canColor.get()
 
     private fun Mob.setColor(color: Color) {
         highlight(color) { config.playerHighlighter && inHand }

@@ -104,6 +104,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
     // Will be invoked by the implementation of this class
+    @Suppress("HandleEventInspection")
     fun registerCommands(event: CommandRegistrationEvent) {
         if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
             description = "Download the $commonName repo again"
@@ -123,6 +124,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
+    fun addUnsuccessfulConstant(fileName: String) = unsuccessfulConstants.add(fileName)
 
     @PublishedApi
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
@@ -176,7 +178,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
+    private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
             if (manual) ChatUtils.chat("$commonShortNameCased Repo settings are already on default!")
             return
@@ -238,11 +240,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
+            ChatUtils.chat("$commonName Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             reportExtraStatusInfo()
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
+        ChatUtils.chat("$commonName Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
@@ -262,7 +264,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         val text = mutableListOf<IChatComponent>()
         text.add(
             (
-                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7Repo Issue! Some features may not work. " +
+                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work. " +
                     "Please report this error on the Discord!"
                 ).asComponent(),
         )
@@ -314,12 +316,12 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
             downloadFailed = true
             logger.logError("Failed to unpack the downloaded zip file.")
+        } else {
+            localRepoCommit = RepoCommit(latestSha, latestCommitTime)
+            commitStorage.writeToFile(localRepoCommit)
+            downloadFailed = false
+            isUsingBackup = false
         }
-
-        localRepoCommit = RepoCommit(latestSha, latestCommitTime)
-        commitStorage.writeToFile(localRepoCommit)
-        downloadFailed = false
-        isUsingBackup = false
     }
 
     private fun prepCleanRepoFileSystem() {

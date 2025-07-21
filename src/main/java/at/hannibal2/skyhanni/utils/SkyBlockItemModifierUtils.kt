@@ -54,6 +54,7 @@ object SkyBlockItemModifierUtils {
     }?.takeIf { it > 0 }
 
     fun ItemStack.getMithrilInfusion(): Boolean = getAttributeByte("mithril_infusion") == 1.toByte()
+    fun ItemStack.getFreeWill(): Boolean = getAttributeByte("free_will") == 1.toByte()
 
     private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.crimsonisle
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -51,7 +52,7 @@ class RescueMissionConfig {
     @Expose
     @ConfigOption(name = "Single Color", desc = "Make the waypoints an unchanging color for slow computers.")
     @ConfigEditorColour
-    val solidColor: Property<String> = Property.of("0:60:0:0:255")
+    val solidColor: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(0, 0, 255, 60))
 
     enum class PathVariant(val displayName: String) {
         ONE("1"),
