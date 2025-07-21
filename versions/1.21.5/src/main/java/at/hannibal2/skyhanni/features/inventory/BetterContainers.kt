@@ -85,9 +85,9 @@ object BetterContainers {
     private var textColor: Int = 4210752
 
     @JvmStatic
-    fun getTextColor(): Int {
-        return if (!isOverriding) 4210752
-        else textColor
+    fun getTextColor(original: Int): Int {
+        return if (!isOverriding) original
+        else textColor or 0xFF000000.toInt()
     }
 
     @JvmStatic
@@ -178,11 +178,11 @@ object BetterContainers {
         val backgroundStyle = config.menuBackgroundStyle
         val buttonStyle = config.buttonBackgroundStyle
 
-        textColor = readJsonResource(backgroundStyle.configId)?.use { reader ->
+        textColor = (readJsonResource(backgroundStyle.configId)?.use { reader ->
             val newJson = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
             val textColourS = newJson.get("text-colour").asString
             textColourS.toLong(16).toInt()
-        } ?: 4210752
+        } ?: 4210752) or 0xFF000000.toInt()
 
         bufferedImageOn = readImageResource(toggleOn)
         bufferedImageOff = readImageResource(toggleOff)
