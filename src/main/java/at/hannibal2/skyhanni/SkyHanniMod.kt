@@ -127,7 +127,7 @@ object SkyHanniMod {
     )
 
     /**
-     * Launch an IO coroutine in the SkyHanni scope, with a lock on the provided mutex.
+     * Launch an IO coroutine with a lock on the provided mutex.
      * This coroutine will catch any exceptions thrown by the provided function.
      * @param mutex The mutex to lock during the execution of the block.
      * @param block The suspend function to execute within the IO context.
