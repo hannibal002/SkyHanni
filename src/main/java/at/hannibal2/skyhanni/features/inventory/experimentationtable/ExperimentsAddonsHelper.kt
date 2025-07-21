@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -23,7 +25,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -119,6 +124,7 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Next click highlighting">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!config.enabled) return
         if (!config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
         if (!ExperimentationTableApi.inAddon) return
@@ -132,8 +138,13 @@ object ExperimentsAddonsHelper {
     }.sortedBy {
         hypixelUltrasequencerData.indexOf(it.slotNumber)
     }.forEachIndexed { slotIndex, slot ->
-        val alphaValue = (255 / (1 + slotIndex))
-        val slotColor = LorenzColor.GREEN.addOpacity(alphaValue)
+        if (slotIndex == 1) config.nextColor
+        val slotColor = if (slotIndex == 0) {
+            config.nextColor.getEffectiveColour()
+        } else {
+            val alphaValue = (255 / (slotIndex))
+            config.secondColor.getEffectiveColour().addAlpha(alphaValue)
+        }
         slot.highlight(slotColor)
     }
 
@@ -144,8 +155,7 @@ object ExperimentsAddonsHelper {
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
             val color = slot.stack.getLorenzColorOrNull() ?: return@forEach
             if (color !in listOf(nextColor, nextNextColor)) return@forEach
-            val alphaValue = if (color == nextColor) 255 else 128
-            val slotColor = LorenzColor.GREEN.addOpacity(alphaValue)
+            val slotColor = if (color == nextColor) config.nextColor else config.secondColor
             slot.highlight(slotColor)
         }
     }
@@ -154,8 +164,9 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Slot click stuff">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!config.enabled) return
         if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
-        if (!config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
+        if (currentAddonPhase != HelperPhase.REPLICATE) return
         event.handleChronomatronClick()
         event.handleUltrasequencerClick()
     }
@@ -165,7 +176,10 @@ object ExperimentsAddonsHelper {
         if (userChronomatronProgress.size == hypixelChronomatronData.size) return
         val clickedColor = item?.getLorenzColorOrNull()?.takeIf {
             it == hypixelChronomatronData[userChronomatronProgress.size]
-        } ?: return cancel()
+        } ?: run {
+            if (config.preventMisclicks) cancel()
+            return
+        }
         userChronomatronProgress.add(clickedColor)
         makePickblock()
     }
@@ -176,7 +190,10 @@ object ExperimentsAddonsHelper {
         val clickedSlot = slot.slotNumber.takeIf {
             val expectedSlot = hypixelUltrasequencerData[userUltrasequencerProgress.size]
             it == expectedSlot
-        } ?: return cancel()
+        } ?: run {
+            if (config.preventMisclicks) cancel()
+            return
+        }
         userUltrasequencerProgress.add(clickedSlot)
         makePickblock()
     }
@@ -185,6 +202,7 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Next click highlighting">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onReplaceItem(event: ReplaceItemEvent) {
+        if (!config.enabled) return
         if (!ExperimentationTableApi.inAddon || !config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
         if (ExperimentationTableApi.inChronomatron) event.replaceChronomatronItem()
@@ -318,33 +336,42 @@ object ExperimentsAddonsHelper {
             condition = { ExperimentationTableApi.inAddon && debugConfig.addonsDebug },
             onlyOnIsland = IslandType.PRIVATE_ISLAND,
             onRender = {
-                val renderable = VerticalContainerRenderable(
-                    buildList {
-                        addString("Current Addon Phase: $currentAddonPhase")
-                        if (ExperimentationTableApi.inChronomatron) {
-                            addString("Current Round: $currentChronomatronRound")
-                            addString("Current Sequence Index: $chronomatronSequenceIndex")
-                            addString("")
-                            addString("Hypixel Data:")
-                            addString(formatColorSet(hypixelChronomatronData))
-                            addString("")
-                            addString("User Progress:")
-                            addString(formatColorSet(userChronomatronProgress))
-                            addString("")
-                            addString("Last Sound: $lastChronomatronSound")
-                        } else if (ExperimentationTableApi.inUltrasequencer) {
-                            addString("Current Round: $currentUltraSequencerRound")
-                            addString("")
-                            addString("Hypixel Data: $hypixelUltrasequencerData")
-                            addString("User Progress: $userUltrasequencerProgress")
-                            addString("Dye Map: $ultrasequencerDyeMap")
-                        } else return@buildList
-                    },
-                )
-
+                val renderable = Renderable.vertical {
+                    addString("Current Addon Phase: $currentAddonPhase")
+                    if (ExperimentationTableApi.inChronomatron) {
+                        addString("Current Round: $currentChronomatronRound")
+                        addString("Current Sequence Index: $chronomatronSequenceIndex")
+                        add(Renderable.emptyText())
+                        addString("Hypixel Data:")
+                        addString(formatColorSet(hypixelChronomatronData))
+                        add(Renderable.emptyText())
+                        addString("User Progress:")
+                        addString(formatColorSet(userChronomatronProgress))
+                        add(Renderable.emptyText())
+                        addString("Last Sound: $lastChronomatronSound")
+                    } else if (ExperimentationTableApi.inUltrasequencer) {
+                        addString("Current Round: $currentUltraSequencerRound")
+                        add(Renderable.emptyText())
+                        addString("Hypixel Data: $hypixelUltrasequencerData")
+                        addString("User Progress: $userUltrasequencerProgress")
+                        addString("Dye Map: $ultrasequencerDyeMap")
+                    } else return@vertical
+                }
                 debugConfig.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")
             },
         )
     }
     // </editor-fold>
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val basePath = "inventory.experimentationTable.addons"
+        event.move(94, "$basePath.highlightNextClick", "$basePath.enabled")
+        event.transform(94, "$basePath.highlightNextClick") {
+            JsonPrimitive(true)
+        }
+        event.transform(94, "$basePath.preventMisclicks") {
+            JsonPrimitive(true)
+        }
+    }
 }

@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CircularList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -93,7 +94,7 @@ object TheGreatSpook {
         } else {
             "§5§lPrimal Fear Ready!"
         }
-        displayMobCooldown = Renderable.string(mobCooldownString)
+        displayMobCooldown = Renderable.text(mobCooldownString)
 
         if (config.primalFearNotification && mobCooldown.isInPast()) {
             SoundUtils.playPlingSound()
@@ -110,7 +111,7 @@ object TheGreatSpook {
         } else {
             "§5§lThe Great Spook has ended!"
         }
-        displayGreatSpookEnd = Renderable.string(timeLeftString)
+        displayGreatSpookEnd = Renderable.text(timeLeftString)
     }
 
     @HandleEvent

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.convertToJsonString
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
 
@@ -24,8 +24,11 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
     private val h = 300
     private val reasonMaxLength = history.maxOf { reasonLength(it) }
 
+    private fun ChatManager.MessageFilteringResult.getReason(): String? =
+        actionReason ?: modifiedReason
+
     private fun reasonLength(result: ChatManager.MessageFilteringResult): Int =
-        result.actionReason?.let { fontRenderer().getStringWidth(it) } ?: 0
+        result.getReason()?.let { fontRenderer().getStringWidth(it) } ?: 0
 
     private val historySize =
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
@@ -59,7 +62,9 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
             }
 
             GuiRenderUtils.drawString(msg.actionKind.renderedString, 0, 0, -1)
-            msg.actionReason?.let { GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1) }
+            msg.getReason()?.let {
+                GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1)
+            }
             drawMultipleTextLines(messageLines, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             msg.modified?.let {
                 GuiRenderUtils.drawString("§e§lNEW TEXT", 0, 0, -1)
@@ -84,7 +89,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         wasMouseButtonDown = isMouseButtonDown
         DrawContextUtils.popMatrix()
         queuedTooltip?.let { tooltip ->
-            RenderableTooltips.setTooltipForRender(tooltip.map { StringRenderable(it) })
+            RenderableTooltips.setTooltipForRender(tooltip.map(StringRenderable::from))
         }
     }
 

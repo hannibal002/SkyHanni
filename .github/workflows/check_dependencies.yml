@@ -2,7 +2,7 @@ name: Check PR Dependencies
 
 on:
     pull_request_target:
-        types: [ opened, edited, closed ]
+        types: [ opened, edited, synchronize, closed ]
 
 permissions:
     contents: read

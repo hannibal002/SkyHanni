@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.dungeon
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -117,6 +118,11 @@ class DungeonConfig {
     @ConfigOption(name = "Livid Finder", desc = "")
     @Accordion
     val lividFinder: LividFinderConfig = LividFinderConfig()
+
+    @Expose
+    @ConfigOption(name = "Trinity", desc = "")
+    @Accordion
+    val trinityHelper: TrinityConfig = TrinityConfig()
 
     @Expose
     @ConfigOption(name = "Terracotta Phase", desc = "")

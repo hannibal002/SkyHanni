@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.utils
+
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
@@ -11,6 +12,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -30,10 +34,10 @@ import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
 //#else
-//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
-//$$ import net.minecraft.client.render.RenderLayer
+//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.joml.Matrix4f
+//$$ import net.minecraft.text.Text
 //#endif
 
 // todo 1.21 impl needed
@@ -45,17 +49,31 @@ object GuiRenderUtils {
 
     private val fr: FontRenderer get() = Minecraft.getMinecraft().fontRendererObj
 
-    private fun drawStringCentered(str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
-        str ?: return
+    private fun drawStringCentered(str: String, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
         DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
-    fun drawStringCentered(str: String?, x: Int, y: Int) {
+    //#if MC > 1.21
+    //$$ private fun drawStringCentered(str: Text, x: Float, y: Float, shadow: Boolean, color: Int) {
+    //$$     val strLen = fr.getWidth(str)
+    //$$     val x2 = x - strLen / 2f
+    //$$     val y2 = y - fr.fontHeight / 2f
+    //$$     DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+    //$$ }
+    //#endif
+
+    fun drawStringCentered(str: String, x: Int, y: Int) {
         drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
+
+    //#if MC > 1.21
+    //$$ fun drawStringCentered(str: Text, x: Int, y: Int) {
+    //$$     drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
+    //$$ }
+    //#endif
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
         DrawContextUtils.pushMatrix()
@@ -75,6 +93,16 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
+    //#if MC > 1.21
+    //$$ fun drawString(str: Text, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
+    //$$     DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
+    //$$ }
+    //$$
+    //$$ fun drawString(str: Text, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+    //$$     DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
+    //$$ }
+    //#endif
+
     fun drawStrings(strings: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         drawStrings(strings.split("\n"), x, y, color, shadow)
     }
@@ -86,6 +114,16 @@ object GuiRenderUtils {
             newY += 9
         }
     }
+
+    //#if MC > 1.21
+    //$$ fun drawTexts(strings: List<Text>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+    //$$     var newY = y
+    //$$     for (string in strings) {
+    //$$         DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
+    //$$         newY += 9
+    //$$     }
+    //$$ }
+    //#endif
 
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
         left <= x && x < left + width && top <= y && y < top + height
@@ -101,13 +139,13 @@ object GuiRenderUtils {
         val current = currentValue.toDouble().coerceAtLeast(0.0)
         val percent = current.fractionOf(maxValue)
         val scale = textScale.toDouble()
-        return Renderable.hoverTips(
-            Renderable.verticalContainer(
-                listOf(
-                    Renderable.string(label, scale = scale),
-                    Renderable.fixedSizeLine(
+        return with(Renderable) {
+            hoverTips(
+                vertical(
+                    text(label, scale = scale),
+                    fixedSizeLine(
                         listOf(
-                            Renderable.string(
+                            text(
                                 "§2${DecimalFormat("0.##").format(current)} / ${
                                     DecimalFormat(
                                         "0.##",
@@ -115,7 +153,7 @@ object GuiRenderUtils {
                                 }☘",
                                 scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
                             ),
-                            Renderable.string(
+                            text(
                                 "§2${(percent * 100).roundTo(1)}%",
                                 scale = scale,
                                 horizontalAlign = HorizontalAlignment.RIGHT,
@@ -123,11 +161,11 @@ object GuiRenderUtils {
                         ),
                         width,
                     ),
-                    Renderable.progressBar(percent, width = width),
+                    progressBar(percent, width = width),
                 ),
-            ),
-            tooltip.split('\n').map { Renderable.string(it) },
-        )
+                tooltip.split('\n').map(StringRenderable::from),
+            )
+        }
     }
 
     fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
@@ -268,7 +306,7 @@ object GuiRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1f, 1f, 1f, 1f)
         //#else
-        //$$ DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        //$$ DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
         //#endif
     }
 
@@ -280,11 +318,13 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.disableScissor()
     }
 
-    fun drawFloatingRectDark(
+    private fun drawFloatingRect(
         x: Int,
         y: Int,
         width: Int,
         height: Int,
+        light: Int = -0xcfcfca,
+        dark: Int = -0xefefea,
         shadow: Boolean = true,
     ) {
         //#if MC < 1.21
@@ -298,8 +338,6 @@ object GuiRenderUtils {
         //#endif
 
         val main = alpha or 0x202026
-        val light = -0xcfcfca
-        val dark = -0xefefea
         drawRect(x, y, x + 1, y + height, light) // Left
         drawRect(x + 1, y, x + width, y + 1, light) // Top1
         drawRect(x + width - 1, y + 1, x + width, y + height, dark) // Right
@@ -310,6 +348,43 @@ object GuiRenderUtils {
             drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow
         }
     }
+
+    fun drawFloatingRectDark(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        drawFloatingRect(
+            x,
+            y,
+            width,
+            height,
+            -0xcfcfca,
+            -0xefefea,
+            shadow = shadow,
+        )
+    }
+
+    fun drawFloatingRectLight(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        drawFloatingRect(
+            x,
+            y,
+            width,
+            height,
+            light = -0xefefea,
+            dark = -0xcfcfca,
+            shadow = shadow,
+        )
+    }
+
 
     fun ItemStack.renderOnScreen(
         x: Float,
@@ -375,11 +450,13 @@ object GuiRenderUtils {
 
                 //#if MC < 1.21
                 GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
-                //#else
+                //#elseif MC < 1.21.6
                 //$$ savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
                 //#endif
             }
+            //#if MC < 1.21.6
             DrawContextUtils.multMatrix(savedMV)
+            //#endif
 
             //#if MC < 1.21
             GL11.glEnable(GL11.GL_NORMALIZE)
@@ -388,7 +465,11 @@ object GuiRenderUtils {
             //$$ RenderSystem.assertOnRenderThread()
             //#endif
 
+            //#if MC < 1.21.6
             RenderHelper.enableGUIStandardItemLighting()
+            //#else
+            //$$ MinecraftClient.getInstance().gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
+            //#endif
 
             //#if MC < 1.21
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
@@ -398,7 +479,7 @@ object GuiRenderUtils {
 
             //#if MC < 1.21
             RenderHelper.disableStandardItemLighting()
-            //#else
+            //#elseif MC < 1.21.6
             //$$ DiffuseLighting.disableGuiDepthLighting()
             //#endif
 

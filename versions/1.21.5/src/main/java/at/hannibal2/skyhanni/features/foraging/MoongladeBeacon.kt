@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.NotificationManager
+import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,19 +15,22 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ModernPatterns
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MoongladeBeacon {
@@ -111,6 +116,15 @@ object MoongladeBeacon {
             upgradingStrength = true
         }
         currentServerTicks = 0
+        checkPants()
+    }
+
+    private val STEREO_PANTS = "MUSIC_PANTS".toInternalName()
+
+    private fun checkPants() {
+        if (InventoryUtils.getLeggings()?.getInternalName() != STEREO_PANTS) return
+        val text = "The solver may not work properly if you are wearing Stereo Pants!"
+        NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
     }
 
     @HandleEvent
@@ -166,22 +180,27 @@ object MoongladeBeacon {
                     if (normalTuning.getColorOffset() != 0) continue
                     slot.highlight(LorenzColor.GREEN.addOpacity(200))
                 }
+
                 normalTuning.speedSelectSlot -> {
                     if (normalTuning.getSpeedOffset() != 0) continue
                     slot.highlight(LorenzColor.GREEN.addOpacity(200))
                 }
+
                 normalTuning.pitchSelectSlot -> {
                     if (normalTuning.getPitchOffset() != 0) continue
                     slot.highlight(LorenzColor.GREEN.addOpacity(200))
                 }
+
                 enchantedTuning.colorSelectSlot -> {
                     if (!upgradingStrength || enchantedTuning.getColorOffset() != 0) continue
                     slot.highlight(LorenzColor.GREEN.addOpacity(200))
                 }
+
                 enchantedTuning.speedSelectSlot -> {
                     if (!upgradingStrength || enchantedTuning.getSpeedOffset() != 0) continue
                     slot.highlight(LorenzColor.GREEN.addOpacity(200))
                 }
+
                 enchantedTuning.pitchSelectSlot -> {
                     if (!upgradingStrength || enchantedTuning.getPitchOffset() != 0) continue
                     slot.highlight(LorenzColor.GREEN.addOpacity(200))
@@ -299,17 +318,17 @@ object MoongladeBeacon {
     private fun updateDisplay() {
         val newList = mutableListOf<Renderable>()
 
-        newList.add(StringRenderable("§d§lMoonglade Beacon Solver"))
-        newList.add(StringRenderable("§7Target Color: ${formatTargetColor(normalTuning.targetColor)}"))
-        newList.add(StringRenderable("§7Target Speed: §a${formatTargetSpeed(normalTuning.targetSpeed)}"))
-        newList.add(StringRenderable("§7Target Pitch: §a${formatTargetPitch(normalTuning.targetPitch)}"))
+        newList.addString("§d§lMoonglade Beacon Solver")
+        newList.addString("§7Target Color: ${formatTargetColor(normalTuning.targetColor)}")
+        newList.addString("§7Target Speed: §a${formatTargetSpeed(normalTuning.targetSpeed)}")
+        newList.addString("§7Target Pitch: §a${formatTargetPitch(normalTuning.targetPitch)}")
 
         if (upgradingStrength) {
-            newList.add(StringRenderable(""))
-            newList.add(StringRenderable("§aEnchanted Tuning"))
-            newList.add(StringRenderable("§7Target Color: ${formatTargetColor(enchantedTuning.targetColor)}"))
-            newList.add(StringRenderable("§7Target Speed: §a${formatTargetSpeed(enchantedTuning.targetSpeed)}"))
-            newList.add(StringRenderable("§7Target Pitch: §a${formatTargetPitch(enchantedTuning.targetPitch)}"))
+            newList.add(Renderable.emptyText())
+            newList.addString("§aEnchanted Tuning")
+            newList.addString("§7Target Color: ${formatTargetColor(enchantedTuning.targetColor)}")
+            newList.addString("§7Target Speed: §a${formatTargetSpeed(enchantedTuning.targetSpeed)}")
+            newList.addString("§7Target Pitch: §a${formatTargetPitch(enchantedTuning.targetPitch)}")
         }
 
         display = newList

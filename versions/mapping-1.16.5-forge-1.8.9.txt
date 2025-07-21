@@ -324,6 +324,7 @@ net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
 net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
 
+net.minecraft.world.entity.Entity blockPosition() getPosition()
 net.minecraft.world.entity.Entity customName setCustomNameTag()
 net.minecraft.world.entity.Entity deltaMovement.x motionX
 net.minecraft.world.entity.Entity deltaMovement.y motionY

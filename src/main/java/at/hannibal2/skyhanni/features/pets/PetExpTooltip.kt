@@ -6,14 +6,17 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -53,7 +56,8 @@ object PetExpTooltip {
                 index
             }
 
-            val (maxLevel, maxXP) = getMaxValues(name, petExperience)
+            val internalName = itemStack.getInternalNameOrNull() ?: return
+            val (maxLevel, maxXP) = getMaxValues(name, petExperience, internalName)
 
             val percentage = petExperience / maxXP
             val percentageFormat = percentage.formatPercentage()
@@ -109,14 +113,14 @@ object PetExpTooltip {
         objectNeuTooltipTweaks.javaClass.getDeclaredField("petExtendExp").makeAccessible()
     }
 
-    private fun getMaxValues(petName: String, petExperience: Double): Pair<Int, Int> {
-        val useGoldenDragonLevels =
-            petName.contains("Golden Dragon") && (!config.showGoldenDragonEgg || petExperience >= LEVEL_100_LEGENDARY)
+    private fun getMaxValues(petName: String, petExperience: Double, internalName: NeuInternalName): Pair<Int, Int> {
+        val isLevel200Pet = PetUtils.getMaxLevel(internalName) == 200
+        val useLevel200PetLevelling = isLevel200Pet && (!config.showDragonEgg || petExperience >= LEVEL_100_LEGENDARY)
 
-        val maxLevel = if (useGoldenDragonLevels) 200 else 100
+        val maxLevel = if (useLevel200PetLevelling) 200 else 100
 
         val maxXP = when {
-            useGoldenDragonLevels -> LEVEL_200_LEGENDARY
+            useLevel200PetLevelling -> LEVEL_200_LEGENDARY
             petName.contains("Bingo") -> LEVEL_100_COMMON
 
             else -> LEVEL_100_LEGENDARY
@@ -129,10 +133,7 @@ object PetExpTooltip {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petExperienceToolTip.petDisplay", "misc.pets.petExperienceToolTip.petDisplay")
         event.move(3, "misc.petExperienceToolTip.showAlways", "misc.pets.petExperienceToolTip.showAlways")
-        event.move(
-            3,
-            "misc.petExperienceToolTip.showGoldenDragonEgg",
-            "misc.pets.petExperienceToolTip.showGoldenDragonEgg",
-        )
+        event.move(3, "misc.petExperienceToolTip.showGoldenDragonEgg", "misc.pets.petExperienceToolTip.showGoldenDragonEgg")
+        event.move(96, "misc.pets.petExperienceToolTip.showGoldenDragonEgg", "misc.pets.petExperienceToolTip.showDragonEgg")
     }
 }

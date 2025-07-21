@@ -13,10 +13,10 @@ at.hannibal2.skyhanni.tweaker.SkyHanniTweaker.java
 at.hannibal2.skyhanni.tweaker.ModLoadingTweaker.java
 at.hannibal2.skyhanni.tweaker.TweakerUtils.java
 
-at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHook.kt
 at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
+at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRender.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket.java
@@ -25,7 +25,6 @@ at.hannibal2.skyhanni.mixins.transformers.MixinBlockLiquid.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityAgeable.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityHorse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinFontRenderer.java
-at.hannibal2.skyhanni.mixins.transformers.MixinGuiChat.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngameForge.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetHandlerPlayClient.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
@@ -44,7 +43,6 @@ at.hannibal2.skyhanni.mixins.transformers.neu.MixinEquipmentOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.neu.MixinFairySouls.java
 at.hannibal2.skyhanni.mixins.transformers.neu.MixinNEUOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.neu.MixinStorageOverlay.java
-at.hannibal2.skyhanni.mixins.transformers.renderer.MixinBlockRendererDispatcher.java
 at.hannibal2.skyhanni.mixins.transformers.renderer.MixinContributorRendererEntityLiving.java
 
 # these files do not work yet but should be made to work in the future

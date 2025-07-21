@@ -57,7 +57,7 @@ object CraftMaterialCollector {
         val neededMaterials = mutableListOf<PrimitiveItemStack>()
         display = buildList {
             val totalPrice = calculateTotalPrice(recipeMaterials, 1)
-            add(Renderable.string("§7Craft $recipeName §7(§6${totalPrice.shortFormat()}§7)"))
+            addString("§7Craft $recipeName §7(§6${totalPrice.shortFormat()}§7)")
             for (item in recipeMaterials) {
                 val material = item.internalName
                 val amount = item.amount
@@ -66,7 +66,7 @@ object CraftMaterialCollector {
                     neededMaterials.add(item)
                     text += " §6${(material.getPrice() * amount).shortFormat()}"
                 }
-                add(Renderable.string(text))
+                addString(text)
             }
             if (neededMaterials.isNotEmpty()) {
                 add(
@@ -101,7 +101,7 @@ object CraftMaterialCollector {
 
     private fun updateDisplay() {
         display = buildList {
-            add(Renderable.string("§7Buy items:"))
+            addString("§7Buy items:")
             for ((material, amount) in neededMaterials) {
                 val priceMultiplier = amount * multiplier
                 val itemName = material.repoItemName
