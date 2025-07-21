@@ -551,13 +551,16 @@ object GuiRenderUtils {
         //$$ val client = MinecraftClient.getInstance()
         //$$ val window = client.window
         //$$ RenderSystem.backupProjectionMatrix()
-        //$$ val screenWidth = window.framebufferWidth.toFloat() / window.scaleFactor.toFloat()
+        //$$ val screenWidth = window.framebufferWidth.toFloat()  / window.scaleFactor.toFloat()
         //$$ val screenHeight = window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()
         //$$ val slice = projectionMatrix.set(screenWidth, screenHeight)
         //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
+        //$$ val consumers = client.bufferBuilders.entityVertexConsumers
         //$$ val matrices = MatrixStack()
         //$$ matrices.push()
-        //$$ matrices.translate(translateX, translateY, zT)
+        //$$ val newTranslateX = translateX - 8f * finalScale
+        //$$ val newTranslateY = (screenHeight - translateY) - 8f * finalScale
+        //$$ matrices.translate(newTranslateX, newTranslateY, zT)
         //$$ matrices.scale(finalScale, finalScale, zS)
         //$$ matrices.translate(hx, hy, hz)
         //$$ matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
@@ -565,7 +568,8 @@ object GuiRenderUtils {
         //$$ matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
         //$$ matrices.translate(-hx, -hy, -hz)
         //$$ client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-        //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.FIXED, 15728880, OverlayTexture.DEFAULT_UV, matrices, client.bufferBuilders.entityVertexConsumers, client.world, 0)
+        //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.GUI, 15728880, OverlayTexture.DEFAULT_UV, matrices, consumers, client.world, 0)
+        //$$ consumers.draw()
         //$$ matrices.pop()
         //$$ RenderSystem.restoreProjectionMatrix()
         //#endif
