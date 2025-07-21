@@ -211,4 +211,16 @@ object BrigadierUtils {
         if (isGreedy) builder.addUnescaped(items) else builder.addOptionalEscaped(items)
         return builder.buildFuture()
     }
+
+    fun dynamicSuggestionProvider(supplier: () -> Collection<String>): SuggestionProvider<Any?> {
+        return SuggestionProvider { _, builder ->
+            val remaining = builder.remainingLowerCase
+            for (option in supplier()) {
+                if (option.startsWith(remaining)) {
+                    builder.suggest(option)
+                }
+            }
+            builder.buildFuture()
+        }
+    }
 }

@@ -5,15 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import com.mojang.brigadier.context.CommandContext
-import com.mojang.brigadier.suggestion.Suggestions
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
-import java.util.concurrent.CompletableFuture
 
 @SkyHanniModule
 object DefaultConfigFeatures {
@@ -112,25 +109,12 @@ object DefaultConfigFeatures {
 
     private val autocomplete get() = SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
 
-    @Suppress("UnusedParameter")
-    private fun getAutocompleteSuggestions(
-        context: CommandContext<Any?>,
-        builder: SuggestionsBuilder,
-    ): CompletableFuture<Suggestions> {
-        for (version in autocomplete) {
-            if (version.startsWith(builder.remainingLowerCase)) {
-                builder.suggest(version)
-            }
-        }
-        return builder.buildFuture()
-    }
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdefaultoptions") {
             description = "Select default options"
-            arg("oldVersion", BrigadierArguments.string(), ::getAutocompleteSuggestions) { oldVersion ->
-                arg("newVersion", BrigadierArguments.string(), ::getAutocompleteSuggestions) { newVersion ->
+            arg("oldVersion", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { autocomplete }) { oldVersion ->
+                arg("newVersion", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { autocomplete }) { newVersion ->
                     callback {
                         onCommand(getArg(oldVersion), getArg(newVersion))
                     }
