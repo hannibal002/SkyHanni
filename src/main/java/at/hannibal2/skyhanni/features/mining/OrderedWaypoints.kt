@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
@@ -28,12 +29,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import com.mojang.brigadier.context.CommandContext
-import com.mojang.brigadier.suggestion.Suggestions
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import java.util.Locale
 import java.util.ServiceLoader
-import java.util.concurrent.CompletableFuture
 
 @SkyHanniModule
 object OrderedWaypoints {
@@ -81,11 +78,12 @@ object OrderedWaypoints {
                     wpColor,
                     true,
                 )
+
                 else -> event.drawEdges(
                     orderedWaypointsList[renderWaypoints[i]].location,
                     wpColor,
                     config.blockOutlineThickness.toInt(),
-                    false
+                    false,
                 )
             }
 
@@ -153,7 +151,7 @@ object OrderedWaypoints {
             literal("load", "import") {
                 description = "Loads ordered waypoints from your clipboard or config."
                 arg(
-                    "name", BrigadierArguments.string(), ::genRouteSuggestions,
+                    "name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getRouteNames() },
                 ) { name ->
                     callback { load(getArg(name)) }
                 }
@@ -175,7 +173,7 @@ object OrderedWaypoints {
                 arg("number", BrigadierArguments.integer()) { number ->
                     callback { skipto(getArg(number)) }
                 }
-                simpleCallback { skip(1) }
+                simpleCallback { skipto(1) }
             }
             literal("unskip") {
                 description = "Goes back by the number inputted many waypoints."
@@ -198,7 +196,7 @@ object OrderedWaypoints {
             }
             literal("export") {
                 description = "Exports the loaded ordered waypoints to clipboard."
-                arg("format", BrigadierArguments.string(), ::getFormatSuggestions) { format ->
+                arg("format", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getWaypointFormats() }) { format ->
                     callback { export(getArg(format)) }
                 }
                 simpleCallback { export("coleweight") }
@@ -211,40 +209,14 @@ object OrderedWaypoints {
             }
             literal("erase", "delete-route") {
                 description = "Erases the route with the specified name."
-                arg("name", BrigadierArguments.string(), ::genRouteSuggestions) { name ->
+                arg("name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getRouteNames() }) { name ->
                     callback { erase(getArg(name)) }
                 }
             }
         }
     }
 
-    @Suppress("UnusedParameter")
-    private fun genRouteSuggestions(
-        context: CommandContext<Any?>,
-        builder: SuggestionsBuilder,
-    ): CompletableFuture<Suggestions> {
-        val routes = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys
-        for (route in routes.orEmpty()) {
-            if (route.startsWith(builder.remainingLowerCase)) {
-                builder.suggest(route)
-            }
-        }
-        return builder.buildFuture()
-    }
-
-    @Suppress("UnusedParameter")
-    private fun getFormatSuggestions(
-        context: CommandContext<Any?>,
-        builder: SuggestionsBuilder,
-    ): CompletableFuture<Suggestions> {
-        val formats = getWaypointFormats()
-        for (format in formats) {
-            if (format.startsWith(builder.remainingLowerCase)) {
-                builder.suggest(format)
-            }
-        }
-        return builder.buildFuture()
-    }
+    private fun getRouteNames() = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys.orEmpty()
 
     private fun load(name: String) {
         SkyHanniMod.launchIOCoroutine {
@@ -370,7 +342,7 @@ object OrderedWaypoints {
             } ?: run {
                 ChatUtils.userError(
                     "Invalid waypoint format specified.\n" +
-                        "§cFormats: ${getWaypointFormats().joinToString { ", " }}"
+                        "§cFormats: ${getWaypointFormats().joinToString { ", " }}",
                 )
             }
         }
