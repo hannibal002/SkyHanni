@@ -15,7 +15,7 @@ data class DiscordEmbed(
     val color: Int? = null,
     val footer: EmbedFooter? = null,
     val image: EmbedImage? = null,
-    val thumbnail: EmbedThumbnail? = EmbedThumbnail(config.embedThumbnail.get().getUrl().orEmpty()),
+    val thumbnail: EmbedThumbnail? = EmbedThumbnail(config.embedThumbnail.getUrl().orEmpty()),
     val video: EmbedVideo? = null,
     val provider: EmbedProvider? = null,
     val author: EmbedAuthor? = EmbedAuthor(
