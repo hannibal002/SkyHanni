@@ -44,10 +44,10 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -203,7 +203,7 @@ object GoldenFishTimer {
     }
 
     private fun buildCompactDisplay(): Renderable {
-        return Renderable.line {
+        return Renderable.horizontal {
             addItemStack(goldenFishSkullItem)
             addHorizontalSpacer()
             addString(
@@ -218,56 +218,54 @@ object GoldenFishTimer {
         }
     }
 
-    private fun buildDisplay(icon: Boolean): Renderable = HorizontalContainerRenderable(
-        buildList {
-            if (icon) {
-                add(
-                    ItemStackRenderable(
-                        goldenFishSkullItem,
-                        2.5,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                    ),
-                )
-            }
-            val text = buildList {
-                Renderable.vertical {
-                    add("§6§lGolden Fish Timer")
-                    if (!isGoldenFishActive()) {
-                        if (lastGoldenFishTime.isFarPast()) {
-                            add("§7Last Golden Fish: §cNone this session")
-                        } else {
-                            add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
-                        }
-                        if (lastRodThrowTime.isFarPast()) {
-                            add("§7Last Rod Throw: §cNone yet")
-                        } else {
-                            add(
-                                "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().formatTime()} " +
-                                    "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().formatTime()})",
-                            )
-                        }
-                        if (timePossibleSpawn.isFarFuture()) add("§7Can spawn in: §cUnknown")
-                        else if (timePossibleSpawn.isInFuture()) {
-                            add(formattedTimeUntilSpawn())
-                        } else {
-                            add(formattedTimeSinceAvailable())
-                            add("§7Chance: ${formattedChance()}")
-                        }
-                    } else {
-                        add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
-                        add(formattedTimeUntilDespawn())
-                    }
-                }
-            }
+    private fun buildDisplay(icon: Boolean): Renderable = Renderable.horizontal {
+        if (icon) {
+            // TODO use MutableList<Renderable>.addItemStack once it allows for align
             add(
-                VerticalContainerRenderable(
-                    text.map { StringRenderable(it) },
-                    spacing = 1,
+                Renderable.item(
+                    goldenFishSkullItem,
+                    2.5,
                     verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 ),
             )
-        },
-    )
+        }
+        val text = buildList {
+            add("§6§lGolden Fish Timer")
+            if (!isGoldenFishActive()) {
+                if (lastGoldenFishTime.isFarPast()) {
+                    add("§7Last Golden Fish: §cNone this session")
+                } else {
+                    add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
+                }
+                if (lastRodThrowTime.isFarPast()) {
+                    add("§7Last Rod Throw: §cNone yet")
+                } else {
+                    add(
+                        "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().formatTime()} " +
+                            "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().formatTime()})",
+                    )
+                }
+                if (timePossibleSpawn.isFarFuture()) add("§7Can spawn in: §cUnknown")
+                else if (timePossibleSpawn.isInFuture()) {
+                    add(formattedTimeUntilSpawn())
+                } else {
+                    add(formattedTimeSinceAvailable())
+                    add("§7Chance: ${formattedChance()}")
+                }
+            } else {
+                add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
+                add(formattedTimeUntilDespawn())
+            }
+        }
+        add(
+            Renderable.vertical(
+                text.map(StringRenderable::from),
+                spacing = 1,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            ),
+        )
+    }
+
 
     private fun formattedTimeUntilDespawn(): String =
         "§7Despawns in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().formatTime()}"

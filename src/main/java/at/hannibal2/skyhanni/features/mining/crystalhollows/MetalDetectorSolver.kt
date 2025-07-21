@@ -189,12 +189,12 @@ object MetalDetectorSolver {
     private fun findBaseCoordinates() {
         if (lastSearchedForBase.passedSince() < 15.seconds) return
         lastSearchedForBase = SimpleTimeMark.now()
-        val player = LocationUtils.playerLocation().roundLocationToBlock()
+        val player = LocationUtils.playerLocation().roundToBlock()
 
         for (i in -50 until 50) {
             for (j in 30 downTo -30) {
                 for (k in -50 until 50) {
-                    val blockPosition = player.add(i, j, k).roundLocationToBlock()
+                    val blockPosition = player.add(i, j, k).roundToBlock()
                     val nextBlockPosition = blockPosition.add(0, 13, 0)
                     if (blockPosition.getBlockAt() == Blocks.quartz_stairs && nextBlockPosition.getBlockAt() == Blocks.barrier) {
                         baseCoordinates = getBaseCoordinates(nextBlockPosition)

@@ -97,8 +97,8 @@ public abstract class MixinHandledScreen {
     //#else
     //$$ @ModifyArg(method = "drawForeground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)V"), index = 4)
     //#endif
-    private int customForegroundTextColor(int x) {
-        return BetterContainers.getTextColor();
+    private int customForegroundTextColor(int colour) {
+        return BetterContainers.getTextColor(colour);
     }
 
     @Redirect(method = "drawSlotHighlightBack", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))

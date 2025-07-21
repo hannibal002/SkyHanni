@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNull
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -109,7 +109,7 @@ open class SkyHanniTracker<Data : TrackerData>(
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
                 if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
-                else buildFinalDisplay(VerticalContainerRenderable(searchables.toRenderable()))
+                else buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
             }.orEmpty()
             dirty = false
         }

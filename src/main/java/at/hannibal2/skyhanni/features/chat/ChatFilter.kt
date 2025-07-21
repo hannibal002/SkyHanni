@@ -489,6 +489,14 @@ object ChatFilter {
         "(?:§.)*The Frog is exhausted\\.\\.\\.",
     )
 
+    /**
+     * REGEX-TEST: §e[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!
+     */
+    private val swoopAxePattern by huntingPatternGroup.pattern(
+        "swoop-axe-message",
+        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!"
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -520,6 +528,7 @@ object ChatFilter {
         "reward_bundles" to rewardBundlePatterns,
         "redundant_hunting" to redundantShardsPatterns,
         "unmineable_tree" to unmineableTreePatterns,
+        "swoop_axe" to listOf(swoopAxePattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -602,6 +611,7 @@ object ChatFilter {
         dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
         foragingConfig.unmineable && IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && message.isPresent("unmineable_tree") -> "unmineable_tree"
         huntingConfig.redundantComments && IslandType.GALATEA.isCurrent() && message.isPresent("redundant_hunting") -> "redundant_hunting"
+        huntingConfig.swoopAxeMessage && message.isPresent("swoop_axe") -> "swoop_axe"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
         config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
 

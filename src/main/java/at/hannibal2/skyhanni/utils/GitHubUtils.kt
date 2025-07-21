@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.io.File
@@ -37,7 +38,7 @@ object GitHubUtils {
         private val commitApiUrl: String = "https://api.github.com/repos/$user/$repo/commits/$branch"
 
         suspend fun getLatestCommit(silentError: Boolean = true): CommitsApiResponse? {
-            val jsonResponse = ApiUtils.getJSONResponse(commitApiUrl, apiName, silentError) ?: run {
+            val (_, jsonResponse) = ApiUtils.getJsonResponse(commitApiUrl, apiName, silentError).assertSuccessWithData() ?: run {
                 SkyHanniMod.logger.error("Failed to fetch latest commits.")
                 return null
             }
@@ -54,7 +55,7 @@ object GitHubUtils {
                 if (shouldError) {
                     SkyHanniMod.logger.info("Downloading $shaToUse for $user/$repo/$branch\nUrl: $fullArchiveUrl")
                 }
-                ApiUtils.getZIPResponse(destinationZip, fullArchiveUrl, apiName, !shouldError)
+                ApiUtils.getZipResponse(destinationZip, fullArchiveUrl, apiName, !shouldError)
                 true
             } catch (e: Exception) {
                 SkyHanniMod.logger.error("Failed to download archive from $fullArchiveUrl", e)

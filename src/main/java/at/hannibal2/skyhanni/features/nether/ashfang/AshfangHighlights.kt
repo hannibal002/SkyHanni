@@ -9,13 +9,13 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.getExtendedColorCode
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -56,7 +56,7 @@ object AshfangHighlights {
         if (!AshfangManager.active) return
 
         if (config.blazingSouls.enabled) {
-            val color = config.blazingSouls.color.toSpecialColor()
+            val color = config.blazingSouls.color.toColor()
             blazingSouls.forEach {
                 val location = event.exactLocation(it)
                 event.drawWaypointFilled(location.add(-0.5, 1.25, -0.5), color, extraSize = -0.15)
@@ -65,7 +65,7 @@ object AshfangHighlights {
         }
 
         if (config.gravityOrbs.enabled) {
-            val color = config.gravityOrbs.color.toSpecialColor()
+            val color = config.gravityOrbs.color.toColor()
             gravityOrbs.forEach {
                 val location = event.exactLocation(it)
                 event.drawCylinderInWorld(color, location.add(-0.5, -2.0, -0.5), 3.5f, 4.5f)

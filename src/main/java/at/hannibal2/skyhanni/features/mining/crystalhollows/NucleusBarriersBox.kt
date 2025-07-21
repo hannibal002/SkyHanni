@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.util.AxisAlignedBB
 
@@ -25,7 +26,7 @@ object NucleusBarriersBox {
 
     private enum class Crystal(
         val boundingBox: AxisAlignedBB,
-        val configColorOption: Property<String>,
+        val configColorOption: Property<ChromaColour>,
     ) {
         AMBER(
             LorenzVec(474, 124, 524).axisAlignedTo(LorenzVec(485, 111, 535))
@@ -68,14 +69,14 @@ object NucleusBarriersBox {
                 BoundingBoxType.FILLED -> {
                     event.drawFilledBoundingBox(
                         crystal.boundingBox,
-                        crystal.configColorOption.get().toSpecialColor(),
+                        crystal.configColorOption.get().toColor(),
                     )
                 }
 
                 BoundingBoxType.OUTLINE -> {
                     event.drawHitbox(
                         crystal.boundingBox,
-                        crystal.configColorOption.get().toSpecialColor(),
+                        crystal.configColorOption.get().toColor(),
                     )
                 }
             }

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -71,7 +71,7 @@ object PatcherSendCoordinates {
             val formattedDistance = distance.toInt().addSeparators()
 
             event.drawColor(location, LorenzColor.DARK_GREEN, alpha = 1f)
-            event.drawWaypointFilled(location, config.color.toSpecialColor(), true, true)
+            event.drawWaypointFilled(location, config.color.toColor(), seeThroughBlocks = true, beacon = true)
             event.drawString(location.blockCenter(), beacon.name + " §e[${formattedDistance}m]", true, LorenzColor.DARK_BLUE.toColor())
         }
     }

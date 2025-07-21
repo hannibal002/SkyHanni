@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
+import at.hannibal2.skyhanni.utils.StringUtils.toUnDashedUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import java.util.UUID
@@ -63,7 +63,7 @@ object PlayerUtils {
         //#endif
     }
 
-    fun getUuid() = getRawUuid().toDashlessUUID()
+    fun getUuid() = getRawUuid().toUnDashedUUID()
 
     fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uniqueID
 
