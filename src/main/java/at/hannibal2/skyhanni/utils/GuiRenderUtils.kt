@@ -55,6 +55,7 @@ import java.nio.FloatBuffer
 //$$ import org.joml.Vector4f
 //$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugZt
 //$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugHz
+//$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugHs
 //#endif
 
 // todo 1.21 impl needed
@@ -407,6 +408,7 @@ object GuiRenderUtils {
         companion object {
             var debugZt = -100f
             var debugHz = 8f
+            var debugHs = 1f
 
             @HandleEvent
             fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -426,6 +428,15 @@ object GuiRenderUtils {
                         val newHz = args.getOrNull(0)?.toFloatOrNull() ?: return@legacyCallbackArgs
                         debugHz = newHz
                         ChatUtils.chat("Set debugHz to $debugHz")
+                    }
+                }
+                event.registerBrigadier("setdebughs") {
+                    description = "Set debugHs"
+                    category = CommandCategory.DEVELOPER_DEBUG
+                    legacyCallbackArgs { args ->
+                        val newHs = args.getOrNull(0)?.toFloatOrNull() ?: return@legacyCallbackArgs
+                        debugHs = newHs
+                        ChatUtils.chat("Set debugHs to $debugHs")
                     }
                 }
             }
@@ -470,7 +481,7 @@ object GuiRenderUtils {
         //$$ val (zT, zS) = listOf(-95f, 1f)
         //#else
         //$$ val (hx, hy, hz) = listOf(8f, 8f, debugHz)
-        //$$ val (zT, zS) = listOf(debugZt, finalScale)
+        //$$ val (zT, zS) = listOf(debugZt, debugHs)
         //#endif
 
         //#if MC < 1.21.6
@@ -544,21 +555,18 @@ object GuiRenderUtils {
         //$$ val screenHeight = window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()
         //$$ val slice = projectionMatrix.set(screenWidth, screenHeight)
         //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
-        //$$ val savedMV = MatrixStack()
-        //$$ savedMV.push()
-        //$$ val newTranslateX = translateX / window.scaleFactor.toFloat() / finalScale
-        //$$ val newTranslateY = translateY / window.scaleFactor.toFloat() / finalScale
-        //$$ savedMV.translate(newTranslateX, newTranslateY, zT)
-        //$$ savedMV.scale(finalScale, finalScale, finalScale)
-        //$$ savedMV.push()
-        //$$ savedMV.translate(hx, hy, hz)
-        //$$ savedMV.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
-        //$$ savedMV.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
-        //$$ savedMV.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
+        //$$ val matrices = MatrixStack()
+        //$$ matrices.push()
+        //$$ matrices.translate(translateX, translateY, zT)
+        //$$ matrices.scale(finalScale, finalScale, zS)
+        //$$ matrices.translate(hx, hy, hz)
+        //$$ matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
+        //$$ matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
+        //$$ matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
+        //$$ matrices.translate(-hx, -hy, -hz)
         //$$ client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-        //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.FIXED, 15728880, OverlayTexture.DEFAULT_UV, savedMV, client.bufferBuilders.entityVertexConsumers, client.world, 0)
-        //$$ savedMV.pop()
-        //$$ savedMV.pop()
+        //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.FIXED, 15728880, OverlayTexture.DEFAULT_UV, matrices, client.bufferBuilders.entityVertexConsumers, client.world, 0)
+        //$$ matrices.pop()
         //$$ RenderSystem.restoreProjectionMatrix()
         //#endif
     }
