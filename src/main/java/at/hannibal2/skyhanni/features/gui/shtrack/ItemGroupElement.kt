@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.CommandUtils
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 
 // TODO remove
 @Deprecated("Not needed anymore")
@@ -43,7 +44,7 @@ class ItemGroupElement(
         }
     }
 
-    override val icon: Renderable get() = Renderable.itemStack(group.icon.getItemStack())
+    override val icon: Renderable get() = Renderable.item(group.icon.getItemStack())
 
     override fun itemChange(item: PrimitiveItemStack) {
         val multiple = group.items[item.internalName] ?: throw IllegalStateException("You should not be here!")

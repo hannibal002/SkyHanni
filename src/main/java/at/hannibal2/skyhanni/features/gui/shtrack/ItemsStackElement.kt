@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonElement
 
 class ItemsStackElement(
@@ -56,9 +58,9 @@ class ItemsStackElement(
         }
     }
 
-    override val icon get() = Renderable.itemStack(main.getItemStack())
+    override val icon get() = Renderable.item(main)
     override val percentText get() = if (showPercent && target != null) mappedCurrent.percentWithColorCode(target, 1) else ""
-    override val amount get() = Renderable.string(formatedNum(mappedCurrent) + ((target?.let { " / ${formatedNum(it)}" }).orEmpty()))
+    override val amount get() = Renderable.text(formatedNum(mappedCurrent) + ((target?.let { " / ${formatedNum(it)}" }).orEmpty()))
 
     override fun itemChange(item: PrimitiveItemStack) {
         val multiple = map[item.internalName] ?: throw IllegalStateException("You should not be here!")

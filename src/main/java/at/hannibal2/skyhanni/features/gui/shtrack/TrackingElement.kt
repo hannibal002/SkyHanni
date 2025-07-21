@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.TempStringRenderable
+import at.hannibal2.skyhanni.utils.renderables.decorators.TempRenderable.Companion.toTemp
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonElement
 import com.google.gson.stream.JsonWriter
 import kotlin.time.Duration.Companion.seconds
@@ -77,14 +79,14 @@ abstract class TrackingElement<T : Number> {
     abstract fun atAdd()
 
     abstract val icon: Renderable
-    open val nameText: Renderable get() = Renderable.string(name)
-    open val amount: Renderable get() = Renderable.string(formatedNum(current) + ((target?.let { " / ${formatedNum(it)}" }).orEmpty()))
+    open val nameText: Renderable get() = Renderable.text(name)
+    open val amount: Renderable get() = Renderable.text(formatedNum(current) + ((target?.let { " / ${formatedNum(it)}" }).orEmpty()))
     open val percentText get() = if (showPercent && target != null) current.percentWithColorCode(target ?: current, 1) else ""
 
     protected fun formatedNum(number: T): String = number.addSeparators()
 
     fun generateLine(): List<Renderable> = listOf(
-        icon, nameText, amount, Renderable.string(percentText), gainText,
+        icon, nameText, amount, Renderable.text(percentText), gainText,
     )
 
     private lateinit var gain: T
@@ -103,7 +105,7 @@ abstract class TrackingElement<T : Number> {
                 gain = current.getZero()
                 return Renderable.placeholder(0, 0)
             }
-            return TempStringRenderable(sinceGain, gainDisplayModifier(gain).toStringWithPlusAndColor())
+            return Renderable.text(gainDisplayModifier(gain).toStringWithPlusAndColor()).toTemp(sinceGain)
         }
 
     open fun generateHover(): List<String> = listOf(

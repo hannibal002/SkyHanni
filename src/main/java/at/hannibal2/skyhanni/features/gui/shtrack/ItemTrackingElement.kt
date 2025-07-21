@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import com.google.gson.JsonElement
 
 class ItemTrackingElement(
@@ -40,7 +41,7 @@ class ItemTrackingElement(
         }
     }
 
-    override val icon: Renderable get() = Renderable.itemStack(item.getItemStack())
+    override val icon: Renderable get() = Renderable.item(item)
 
     override fun itemChange(item: PrimitiveItemStack) {
         update(item.amount.toLong())

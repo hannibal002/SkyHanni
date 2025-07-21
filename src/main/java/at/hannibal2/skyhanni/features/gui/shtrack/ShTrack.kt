@@ -34,6 +34,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.move
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonElement
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -439,7 +441,7 @@ object ShTrack {
 
     val tracker get() = ProfileStorageData.profileSpecific?.tracking
 
-    private var display: Renderable = Renderable.placeholder(0, 0)
+    private var display: Renderable = Renderable.empty()
     private var hasGrab = false
     private var scheduledUpdate = false
 
@@ -476,7 +478,7 @@ object ShTrack {
                     if (!hasGrab) {
                         val track = tracker[it]
                         RenderableTooltips.setTooltipForRender(
-                            track.generateHover().map { i -> Renderable.string(i) },
+                            track.generateHover().map { i -> Renderable.text(i) },
                             spacedTitle = true,
                         )
                         track.handleUserInput()

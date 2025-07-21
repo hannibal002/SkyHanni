@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.test
 
+//#if FORGE
+//#endif
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
@@ -50,9 +52,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -67,12 +66,12 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
 import net.minecraft.nbt.NBTTagCompound
-//#if FORGE
 import net.minecraftforge.common.MinecraftForge
-//#endif
 import java.io.File
 import java.time.LocalDate
 import java.time.Month
@@ -459,9 +458,9 @@ object SkyHanniDebugsAndTests {
     val test by lazy {
         Renderable.verticalEditTable(
             listOf(
-                listOf(Renderable.string("Help"), Renderable.string("Me")),
-                listOf(Renderable.string("Not"), Renderable.placeholder(0, 15)),
-                listOf(Renderable.string("I'm Fine"), Renderable.string("And You")),
+                listOf(Renderable.text("Help"), Renderable.text("Me")),
+                listOf(Renderable.text("Not"), Renderable.placeholder(0, 15)),
+                listOf(Renderable.text("I'm Fine"), Renderable.text("And You")),
             ),
             onStartGrab = { ChatUtils.chat("Clicked: $it") },
             onHover = { /* ChatUtils.chat("Hover: $it") */ },

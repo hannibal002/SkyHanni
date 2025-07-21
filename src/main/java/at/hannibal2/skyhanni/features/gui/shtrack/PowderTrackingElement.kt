@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.shtrack
 
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import com.google.gson.JsonElement
 
 class PowderTrackingElement(val type: HotmApi.PowderType, override var current: Long, override val target: Long?) :
@@ -17,7 +18,7 @@ class PowderTrackingElement(val type: HotmApi.PowderType, override var current: 
         }
     }
 
-    override val icon: Renderable get() = Renderable.itemStack(type.icon)
+    override val icon: Renderable get() = Renderable.item(type.icon)
 
     override fun similarElement(other: TrackingElement<*>): Boolean {
         if (other !is PowderTrackingElement) return false

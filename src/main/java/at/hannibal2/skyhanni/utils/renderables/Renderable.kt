@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
@@ -43,7 +42,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
@@ -52,13 +50,15 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
-import java.util.Collections
 import java.util.UUID
 import kotlin.math.max
 //#if TODO
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
+import at.hannibal2.skyhanni.utils.renderables.interactables.DragItem
+import at.hannibal2.skyhanni.utils.renderables.interactables.DragNDrop
+import at.hannibal2.skyhanni.utils.renderables.interactables.Droppable
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 //#endif
 //#if MC < 1.21
@@ -705,7 +705,7 @@ interface Renderable {
 
             val uuid = UUID.randomUUID()
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 isSnappingIn = false
                 ySpace = 0
                 DrawContextUtils.pushMatrix()
@@ -717,9 +717,9 @@ interface Renderable {
                         continue
                     }
                     if (isBoxHovered(
-                            posX,
+                            mouseOffsetX,
                             width,
-                            posY + yOffsets[rowIndex],
+                            mouseOffsetY + yOffsets[rowIndex],
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY - 1,
                         ) && condition() && shouldAllowLink(true, bypassChecks)
                     ) {
@@ -743,7 +743,7 @@ interface Renderable {
                                 override fun preDrop(drop: Any?) {
                                     val element = drop as? Drag ?: return
                                     val index = element.rowIndex
-                                    content[index].drawRow(index, posX, posY + ySpace, ySpace.toFloat(), true)
+                                    content[index].drawRow(index, mouseOffsetX, mouseOffsetY + ySpace, ySpace.toFloat(), true)
                                     dropped = true
                                     isSnappingIn = true
                                 }
@@ -761,14 +761,14 @@ interface Renderable {
                             else ySpace + yOffsets[contentRowIndex + 1] - yOffsets[contentRowIndex]
                         }
                         GuiRenderUtils.drawRect(
-                            posX,
-                            posY + boxY.first,
-                            posX + width,
-                            posY + boxY.second - emptySpaceY,
+                            mouseOffsetX,
+                            mouseOffsetY + boxY.first,
+                            mouseOffsetX + width,
+                            mouseOffsetY + boxY.second - emptySpaceY,
                             Color.GRAY.addAlpha(if (dropped) 50 else 35).rgb,
                         )
                     }
-                    content.getOrNull(contentRowIndex)?.drawRow(contentRowIndex, posX, posY + ySpace, ySpace.toFloat(), true)
+                    content.getOrNull(contentRowIndex)?.drawRow(contentRowIndex, mouseOffsetX, mouseOffsetY + ySpace, ySpace.toFloat(), true)
                     rowIndex++
                     contentRowIndex++
                 }
