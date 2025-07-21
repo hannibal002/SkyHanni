@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,9 +21,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.evictOldestEntry
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -32,6 +33,7 @@ object ItemAddManager {
     enum class Source(val displayName: String) {
         ITEM_ADD("Picked up in inventory"),
         SACKS("Went into Sacks"),
+        SHARD("Went into Hunting Box"),
         COMMAND("Invented via command"),
     }
 
@@ -87,6 +89,11 @@ object ItemAddManager {
         }
 
         Source.ITEM_ADD.addItem(internalName, event.amount)
+    }
+
+    @HandleEvent
+    fun onShardGain(event: ShardGainEvent) {
+        Source.SHARD.addItem(event.shardInternalName, event.amount)
     }
 
     private fun Source.addItem(internalName: NeuInternalName, amount: Int) {

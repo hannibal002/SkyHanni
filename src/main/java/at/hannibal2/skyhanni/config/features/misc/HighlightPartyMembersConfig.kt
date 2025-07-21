@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -16,5 +17,5 @@ class HighlightPartyMembersConfig {
     @Expose
     @ConfigOption(name = "Outline Color", desc = "The color to outline party members in.")
     @ConfigEditorColour
-    var outlineColor: String = "0:245:85:255:85"
+    var outlineColor: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 85, 245)
 }

@@ -14,7 +14,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object HotxFeatures {
@@ -38,7 +39,7 @@ object HotxFeatures {
         val finalFormat = "§b${rotatingPerkEntry.guiName}§8: $perkDescriptionFormat"
 
         configPos.renderRenderable(
-            StringRenderable(finalFormat),
+            Renderable.text(finalFormat),
             posLabel = "${rotatingPerkEntry.guiName} Display",
         )
     }

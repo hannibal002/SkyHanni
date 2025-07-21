@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import kotlinx.coroutines.launch
 import java.awt.Desktop
 import java.io.File
 import java.io.IOException
@@ -124,7 +123,7 @@ object OSUtils {
      * @param expiryDuration the duration threshold used to determine if a file is expired.
      */
     fun deleteExpiredFiles(root: File, expiryDuration: Duration) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             val allFiles = root.walk().filter { it.isFile }.toList()
             val lastModified = allFiles.associateWith { file ->
                 file.lastModifiedTime()

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -139,7 +139,7 @@ object HoppityApi {
         var lastProfit: String = "",
         var lastMeal: HoppityEggType? = null,
         var lastDuplicateAmount: Long? = null,
-    ) : ResettableStorageSet()
+    ) : Resettable()
 
     val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()

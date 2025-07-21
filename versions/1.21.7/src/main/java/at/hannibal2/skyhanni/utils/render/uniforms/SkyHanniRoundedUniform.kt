@@ -18,10 +18,10 @@ class SkyHanniRoundedUniform : AutoCloseable {
         smoothness: Float,
         halfSize: FloatArray,
         centerPos: FloatArray,
-        modelViewMatrix: Matrix4fc
+        modelViewMatrix: Matrix4fc,
     ): GpuBufferSlice {
         return storage.write(
-            UniformValue(scaleFactor, radius, smoothness, halfSize, centerPos, modelViewMatrix)
+            UniformValue(scaleFactor, radius, smoothness, halfSize, centerPos, modelViewMatrix),
         )
     }
 
@@ -39,8 +39,8 @@ class SkyHanniRoundedUniform : AutoCloseable {
         val smoothness: Float,
         val halfSize: FloatArray,
         val centerPos: FloatArray,
-        val modelViewMatrix: Matrix4fc
-    ): DynamicUniformStorage.Uploadable {
+        val modelViewMatrix: Matrix4fc,
+    ) : DynamicUniformStorage.Uploadable {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(scaleFactor)

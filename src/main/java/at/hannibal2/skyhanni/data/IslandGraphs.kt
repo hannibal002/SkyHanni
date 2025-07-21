@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -41,7 +40,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.util.ChatComponentText
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -104,8 +102,6 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object IslandGraphs {
 
-    private val config get() = SkyHanniMod.feature.misc.pathfinding
-
     var currentIslandGraph: Graph? = null
         private set
     private var lastLoadedIslandType = "nothing"
@@ -150,8 +146,6 @@ object IslandGraphs {
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
     private var inGlaciteTunnels: Boolean? = null
-    private var nextChatMessage: ChatComponentText? = null
-    private var lastMessageSent = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
@@ -181,9 +175,7 @@ object IslandGraphs {
     @HandleEvent
     fun onWorldChange() {
         currentIslandGraph = null
-        if (currentTarget != null) {
-            "§e[SkyHanni] Navigation stopped because of world switch!".asComponent().send(pathFindMessageId)
-        }
+        if (currentTarget != null) NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped because of world switch!")
         reset()
     }
 
@@ -299,14 +291,7 @@ object IslandGraphs {
         if (event.isMod(2)) {
             update()
         }
-        updateChat()
-        nextChatMessage?.let {
-            if (lastMessageSent.passedSince() > config.chatUpdateInterval.duration) {
-                it.send(pathFindMessageId)
-                nextChatMessage = null
-                lastMessageSent = SimpleTimeMark.now()
-            }
-        }
+        updateFeedback()
     }
 
     fun update(force: Boolean = false) {
@@ -322,7 +307,7 @@ object IslandGraphs {
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
-                "§e[SkyHanni] Navigation reached §r$label§e!".asComponent().send(pathFindMessageId)
+                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$label§e!")
                 reset()
                 onFound()
             }
@@ -356,7 +341,7 @@ object IslandGraphs {
         val newNodes = path.drop(index)
         val newGraph = Graph(newNodes)
         fastestPath = skipIfCloser(newGraph)
-        setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
+        setFastestPath(newGraph to newGraph.totalLength(), setPath = false)
         return true
     }
 
@@ -368,7 +353,7 @@ object IslandGraphs {
     }
 
     private fun findNewPath() {
-        val goal = IslandGraphs.goal ?: return
+        val goal = goal ?: return
         val closest = pathfindClosestNode ?: return
 
         val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
@@ -389,10 +374,10 @@ object IslandGraphs {
         setFastestPath(path to (distance + nodeDistance))
     }
 
-    private fun Graph.totalLenght(): Double = nodes.zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
+    private fun Graph.totalLength(): Double = nodes.zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
 
     private fun handlePositionChange() {
-        updateChat()
+        updateFeedback()
     }
 
     private var hasMoved = false
@@ -430,7 +415,7 @@ object IslandGraphs {
         if (setPath) {
             this.fastestPath = skipIfCloser(Graph(cutByMaxDistance(nodes, 2.0)))
         }
-        updateChat()
+        updateFeedback()
     }
 
     private fun onNewNode() {
@@ -460,6 +445,7 @@ object IslandGraphs {
         label = ""
         totalDistance = 0.0
         lastDistance = 0.0
+        NavigationFeedback.setNavInactive()
     }
 
     /**
@@ -526,12 +512,10 @@ object IslandGraphs {
         this.condition = condition
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
-        updateChat()
+        updateFeedback()
     }
 
-    private val pathFindMessageId = ChatUtils.getUniqueMessageId()
-
-    private fun updateChat() {
+    private fun updateFeedback() {
         if (label == "") return
         val path = fastestPath ?: return
         var distance = 0.0
@@ -550,25 +534,18 @@ object IslandGraphs {
         if (totalDistance == 0.0 || distance > totalDistance) {
             totalDistance = distance
         }
-        sendChatDistance(distance)
-    }
 
-    private fun sendChatDistance(distance: Double) {
         val percentage = (1 - (distance / totalDistance)) * 100
-        val componentText = "§e[SkyHanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
-        componentText.onClick(
-            onClick = {
-                stop()
-                onManualCancel()
-                "§e[SkyHanni] Navigation stopped!".asComponent().send(pathFindMessageId)
-            },
-        )
-        componentText.hover = "§eClick to stop navigating!".asComponent()
-        nextChatMessage = componentText
+        val component = "§e[SkyHanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
+        component.onClick(onClick = ::cancelClick)
+        component.hover = "§eClick to stop navigating!".asComponent()
+        NavigationFeedback.sendPathFindMessage(component)
     }
 
-    fun overrideChatMessage(message: String) {
-        message.asComponent().send(pathFindMessageId)
+    fun cancelClick() {
+        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+        stop()
+        onManualCancel()
     }
 
     @HandleEvent
@@ -641,6 +618,18 @@ object IslandGraphs {
             category = CommandCategory.USERS_BUG_FIX
             callback { reportCommand(it) }
         }
+        event.register("shstopnavigation") {
+            description = "Stops the current pathfinding."
+            category = CommandCategory.USERS_ACTIVE
+            callback {
+                if (currentTarget != null) {
+                    stop()
+                    NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+                } else {
+                    ChatUtils.userError("No navigation is currently active.")
+                }
+            }
+        }
     }
 
     private fun reportCommand(args: Array<String>) {
@@ -687,7 +676,7 @@ object IslandGraphs {
         ignoreCache: Boolean,
         betaOnly: Boolean,
     ) {
-        val graphArea = IslandAreas.currentAreaName
+        val graphArea = SkyBlockUtils.graphArea
         val scoreboardArea = SkyBlockUtils.scoreboardArea ?: "unknown"
 
         val extraData = mutableMapOf<String, Any>()
@@ -701,7 +690,7 @@ object IslandGraphs {
         extraData["island"] = island
         extraData["location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
         if (graphArea != scoreboardArea) {
-            extraData["area graph"] = graphArea
+            extraData["area graph"] = graphArea.orEmpty()
             extraData["area scoreboard"] = scoreboardArea
         }
 
