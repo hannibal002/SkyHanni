@@ -11,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.observer.Property
 
 class WebhookConfig {
     @Expose
@@ -78,7 +77,7 @@ class WebhookConfig {
         desc = "Send a test message to the Webhook."
     )
     @ConfigEditorButton(buttonText = "Send")
-    var sendTestMessage: Runnable = Runnable {
+    val sendTestMessage: Runnable = Runnable {
         Webhook(
             content = "This is a test message from SkyHanni!",
             embeds = listOf(

@@ -64,7 +64,9 @@ object FriendApi {
      * §r§9§aYou have 1 pending friend requests.
      * §eUse §b/f requests §eto see them!§r§9§m
      * -----------------------------------------------------
+     * Unused but added just in case
      */
+    @Suppress("UnusedPrivateProperty")
     private val offlineRequests by patternGroup.pattern(
         "offline",
         "§9§m-----------------------------------------------------\n" +
