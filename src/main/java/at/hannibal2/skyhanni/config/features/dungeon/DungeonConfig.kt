@@ -172,6 +172,11 @@ class DungeonConfig {
     var terminalWaypoints: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Creation Cooldown", desc = "")
+    @Accordion
+    val creationCooldown: CreationCooldownConfig = CreationCooldownConfig()
+
+    @Expose
     @ConfigOption(name = "Low Health Alert", desc = "")
     @Accordion
     val lowHealthAlert: LowHealthAlertConfig = LowHealthAlertConfig()

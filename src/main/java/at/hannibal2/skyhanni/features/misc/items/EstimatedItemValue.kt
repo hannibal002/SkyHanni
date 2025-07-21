@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -57,6 +59,9 @@ object EstimatedItemValue {
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
         private set
 
+    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
+        private set
+
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
     @HandleEvent
@@ -71,6 +76,7 @@ object EstimatedItemValue {
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
+        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
     private fun isInNeuOverlay(): Boolean {

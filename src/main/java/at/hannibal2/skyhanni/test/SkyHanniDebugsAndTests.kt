@@ -64,7 +64,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import kotlinx.coroutines.launch
 import net.minecraft.nbt.NBTTagCompound
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
@@ -151,7 +150,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             asyncTest(args)
         }
     }
