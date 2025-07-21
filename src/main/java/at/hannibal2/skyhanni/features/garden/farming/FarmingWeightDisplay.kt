@@ -602,6 +602,6 @@ object FarmingWeightDisplay {
         event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
 
         val base = "#garden.farmingWeight"
-        event.move(99, "$base.lastFarmingWeightLeaderboard", "$base.lastLeaderboard")
+        event.move(101, "$base.lastFarmingWeightLeaderboard", "$base.lastLeaderboard")
     }
 }
