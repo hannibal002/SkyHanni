@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
@@ -45,8 +49,12 @@ import java.nio.FloatBuffer
 //$$ import org.joml.Quaternionf
 //#endif
 //#if MC > 1.21.6
+//$$ import net.minecraft.client.render.OverlayTexture
+//$$ import net.minecraft.util.math.RotationAxis
 //$$ import net.minecraft.client.render.ProjectionMatrix2
 //$$ import org.joml.Vector4f
+//$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugZt
+//$$ import at.hannibal2.skyhanni.utils.GuiRenderUtils.DebugItemRendering.Companion.debugHz
 //#endif
 
 // todo 1.21 impl needed
@@ -394,8 +402,38 @@ object GuiRenderUtils {
         )
     }
 
+    class DebugItemRendering {
+        @SkyHanniModule
+        companion object {
+            var debugZt = -100f
+            var debugHz = 8f
+
+            @HandleEvent
+            fun onCommandRegistration(event: CommandRegistrationEvent) {
+                event.registerBrigadier("setdebugzt") {
+                    description = "Set debugZt"
+                    category = CommandCategory.DEVELOPER_DEBUG
+                    legacyCallbackArgs { args ->
+                        val newZt = args.getOrNull(0)?.toFloatOrNull() ?: return@legacyCallbackArgs
+                        debugZt = newZt
+                        ChatUtils.chat("Set debugZt to $debugZt")
+                    }
+                }
+                event.registerBrigadier("setdebughz") {
+                    description = "Set debugHz"
+                    category = CommandCategory.DEVELOPER_DEBUG
+                    legacyCallbackArgs { args ->
+                        val newHz = args.getOrNull(0)?.toFloatOrNull() ?: return@legacyCallbackArgs
+                        debugHz = newHz
+                        ChatUtils.chat("Set debugHz to $debugHz")
+                    }
+                }
+            }
+        }
+    }
+
     //#if MC > 1.21.6
-    //$$ val projMatrix = ProjectionMatrix2("ItemStack", -1000.0f, 1000.0f, true)
+    //$$ val projectionMatrix = ProjectionMatrix2("SkyHanni Item Rendering", 100.0f, 200.0f, true)
     //#endif
 
     fun ItemStack.renderOnScreen(
@@ -427,16 +465,19 @@ object GuiRenderUtils {
         //#if MC < 1.21
         val (hx, hy, hz) = listOf(8f, 8f, 100f)
         val (zT, zS) = listOf(-19f, 0.2f)
-        //#else
-        //$$ val (hx, hy, hz) = listOf(8f, 8f, 148f)
+        //#elseif MC < 1.21.6
+        //$$ val (hx, hy, hz) = listOf(8f, 8f, 8f)
         //$$ val (zT, zS) = listOf(-95f, 1f)
+        //#else
+        //$$ val (hx, hy, hz) = listOf(8f, 8f, debugHz)
+        //$$ val (zT, zS) = listOf(debugZt, finalScale)
         //#endif
 
+        //#if MC < 1.21.6
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(translateX, translateY, zT)
             DrawContextUtils.scale(finalScale, finalScale, zS)
 
-            //#if MC < 1.21.6
             //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
             //#else
@@ -463,13 +504,11 @@ object GuiRenderUtils {
 
                 //#if MC < 1.21
                 GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
-                //#elseif MC < 1.21.6
+                //#else
                 //$$ savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
                 //#endif
             }
-            //#if MC < 1.21.6
             DrawContextUtils.multMatrix(savedMV)
-            //#endif
 
             //#if MC < 1.21
             GL11.glEnable(GL11.GL_NORMALIZE)
@@ -478,11 +517,7 @@ object GuiRenderUtils {
             //$$ RenderSystem.assertOnRenderThread()
             //#endif
 
-            //#if MC < 1.21.6
             RenderHelper.enableGUIStandardItemLighting()
-            //#else
-            //$$ MinecraftClient.getInstance().gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-            //#endif
 
             //#if MC < 1.21
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
@@ -492,63 +527,40 @@ object GuiRenderUtils {
 
             //#if MC < 1.21
             RenderHelper.disableStandardItemLighting()
-            //#elseif MC < 1.21.6
+            //#else
             //$$ DiffuseLighting.disableGuiDepthLighting()
             //#endif
 
             //#if MC < 1.21
             GL11.glDisable(GL11.GL_NORMALIZE)
             //#endif
-
-            //#else
-            //$$ RenderSystem.assertOnRenderThread()
-            //$$ RenderSystem.backupProjectionMatrix()
-            //$$ val client = MinecraftClient.getInstance()
-            //$$ val slice = projMatrix.set(
-            //$$     client.window.framebufferWidth.toFloat() / client.window.scaleFactor.toFloat(),
-            //$$     client.window.framebufferHeight.toFloat() / client.window.scaleFactor.toFloat()
-            //$$ )
-            //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
-
-            //$$ val modelView = Matrix4f()
-            //$$     .setTranslation(translateX, translateY, zT)
-            //$$     .scale(finalScale, finalScale, zS)
-            //$$     .translate(hx, hy, hz)
-            //$$ val rad = Math.PI.toFloat() / 180f
-            //$$ if (rotX != 0f) modelView.rotateX(rotX * rad)
-            //$$ if (rotY != 0f) modelView.rotateY(rotY * rad)
-            //$$ if (rotZ != 0f) modelView.rotateZ(rotZ * rad)
-
-            //$$ RenderSystem.getDynamicUniforms().write(
-            //$$     modelView,
-            //$$     Vector4f(1f, 1f, 1f, 1f),
-            //$$     RenderSystem.getModelOffset(),
-            //$$     RenderSystem.getTextureMatrix(),
-            //$$     RenderSystem.getShaderLineWidth()
-            //$$ )
-
-            //$$ val matrixStack = MatrixStack()
-            //$$ matrixStack.push()
-            //$$ client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-            //$$ val guiAllocator = BufferAllocator(2048)
-            //$$ val vcProvider = VertexConsumerProvider.immediate(guiAllocator)
-            //$$ client.itemRenderer.renderItem(
-            //$$     client.player,
-            //$$     item,
-            //$$     ItemDisplayContext.GUI,
-            //$$     matrixStack,
-            //$$     vcProvider,
-            //$$     client.world,
-            //$$     15728880,
-            //$$     0,
-            //$$     0
-            //$$ )
-            //$$ vcProvider.draw()
-            //$$ guiAllocator.clear()
-            //$$ matrixStack.pop()
-            //$$ RenderSystem.restoreProjectionMatrix()
-            //#endif
         }
+        //#else
+        //$$ RenderSystem.assertOnRenderThread()
+        //$$ val client = MinecraftClient.getInstance()
+        //$$ val window = client.window
+        //$$ RenderSystem.backupProjectionMatrix()
+        //$$ val screenWidth = window.framebufferWidth.toFloat() / window.scaleFactor.toFloat()
+        //$$ val screenHeight = window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()
+        //$$ val slice = projectionMatrix.set(screenWidth, screenHeight)
+        //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
+        //$$ val savedMV = MatrixStack()
+        //$$ savedMV.push()
+        //$$ val newTranslateX = translateX / window.scaleFactor.toFloat() / finalScale
+        //$$ val newTranslateY = translateY / window.scaleFactor.toFloat() / finalScale
+        //$$ savedMV.translate(newTranslateX, newTranslateY, zT)
+        //$$ savedMV.scale(finalScale, finalScale, finalScale)
+        //$$ savedMV.push()
+        //$$ savedMV.translate(hx, hy, hz)
+        //$$ savedMV.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
+        //$$ savedMV.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
+        //$$ savedMV.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
+        //$$ client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
+        //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.FIXED, 15728880, OverlayTexture.DEFAULT_UV, savedMV, client.bufferBuilders.entityVertexConsumers, client.world, 0)
+        //$$ savedMV.pop()
+        //$$ savedMV.pop()
+        //$$ RenderSystem.restoreProjectionMatrix()
+        //#endif
     }
 
     //#if MC < 1.21
