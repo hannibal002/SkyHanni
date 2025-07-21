@@ -15,8 +15,6 @@ import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_50
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateLevelXP
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevelExact
@@ -187,7 +185,7 @@ object SkillApi {
     private fun onUpdateMax(progress: String, skill: SkillType, skillInfo: SkillInfo, skillLevel: Int) {
         val totalXP = progress.formatLong()
         val cap = skill.maxLevel
-        val maxXP = if (cap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
+        val maxXP = xpRequiredForLevel(cap)
         val currentXP = totalXP - maxXP
         val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = calculateSkillLevel(totalXP, cap)
 
@@ -325,11 +323,7 @@ object SkillApi {
     private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXP: Long, maxXP: Long, totalXP: Long, gained: String) {
         val cap = activeSkill?.maxLevel
         val add = cap?.takeIf { level >= it }?.let {
-            when (it) {
-                50 -> XP_NEEDED_FOR_50
-                60 -> XP_NEEDED_FOR_60
-                else -> 0
-            }
+            xpRequiredForLevel(it)
         } ?: 0
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) =

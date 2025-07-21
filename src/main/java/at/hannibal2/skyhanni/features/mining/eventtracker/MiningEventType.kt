@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration
@@ -45,8 +45,8 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val compass = ItemStackRenderable(ItemStack(Items.compass), 0.45)
-            val wind = StringRenderable("§9≈", scale = 0.75)
+            val compass = Renderable.item(ItemStack(Items.compass), 0.45)
+            val wind = Renderable.text("§9≈", scale = 0.75)
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 1f, -2f)
@@ -65,8 +65,8 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val dyeGreen = ItemStackRenderable(DyeCompat.LIME.createStack(), 0.45)
-            val dyePink = ItemStackRenderable(DyeCompat.PINK.createStack(), 0.45)
+            val dyeGreen = Renderable.item(DyeCompat.LIME.createStack(), 0.45)
+            val dyePink = Renderable.item(DyeCompat.PINK.createStack(), 0.45)
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 0f, 0f)
@@ -81,7 +81,7 @@ enum class MiningEventType(
 
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, LorenzColor.RED, true,
-        ItemStackRenderable(createPlayerHead(), 0.36), // Late init when skull texture holder is loaded
+        Renderable.item(createPlayerHead(), 0.36), // Late init when skull texture holder is loaded
     ),
 
     BETTER_TOGETHER(
@@ -92,9 +92,9 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val steveHead = ItemStackRenderable(createPlayerHead(), 0.36)
+            val steveHead = Renderable.item(createPlayerHead(), 0.36)
             val alexHead by lazy {
-                ItemStackRenderable(
+                Renderable.item(
                     ItemUtils.createSkull(
                         "Alex",
                         "6ab43178-89fd-4905-97f6-0f67d9d76fd9",
@@ -140,21 +140,21 @@ enum class MiningEventType(
         iconInput: ItemStack,
     ) : this(
         eventName, shortName, defaultLength, color, dwarvenSpecific,
-        ItemStackRenderable(iconInput, xSpacing = 0),
+        Renderable.item(iconInput, xSpacing = 0),
         iconInput,
     )
 
     private var icon = Renderable.hoverTips(iconInput, listOf(eventName))
-    private val compactText = StringRenderable("${color.getChatColor()}$shortName")
-    private val normalText = StringRenderable("${color.getChatColor()}$eventName")
+    private val compactText = Renderable.text("${color.getChatColor()}$shortName")
+    private val normalText = Renderable.text("${color.getChatColor()}$eventName")
 
-    private var compactTextWithIcon = HorizontalContainerRenderable(listOf(icon, compactText), 0)
-    private var normalTextWithIcon = HorizontalContainerRenderable(listOf(icon, normalText), 0)
+    private var compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
+    private var normalTextWithIcon = Renderable.horizontal(icon, normalText, spacing = 0)
 
     private fun rebuildIcons(iconInput: ItemStack) {
         icon = Renderable.hoverTips(iconInput, listOf(eventName))
-        compactTextWithIcon = HorizontalContainerRenderable(listOf(icon, compactText), 0)
-        normalTextWithIcon = HorizontalContainerRenderable(listOf(icon, normalText), 0)
+        compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
+        normalTextWithIcon = Renderable.horizontal(listOf(icon, normalText), 0)
     }
 
     fun getRenderable(): Renderable = when (config.compressedFormat) {

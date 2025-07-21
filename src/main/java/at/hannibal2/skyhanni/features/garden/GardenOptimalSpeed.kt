@@ -26,9 +26,9 @@ import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.gui.inventory.GuiEditSign
 import kotlin.time.Duration.Companion.seconds
@@ -90,11 +90,9 @@ object GardenOptimalSpeed {
         display = if (config.compactRancherGui) {
             crops.groupBy({ it.second }, { it.first }).map { (speed, crops) ->
                 val color = if (lastCrop in crops) LorenzColor.GOLD else LorenzColor.WHITE
-                val renderable = HorizontalContainerRenderable(
-                    listOf(
-                        HorizontalContainerRenderable(crops.map { ItemStackRenderable(it.icon) }),
-                        StringRenderable("${color.getChatColor()} - $speed"),
-                    ),
+                val renderable = Renderable.horizontal(
+                    Renderable.horizontal(crops.map { Renderable.item(it.icon) }),
+                    Renderable.text("${color.getChatColor()} - $speed"),
                     spacing = 2,
                 )
                 Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })
@@ -102,11 +100,9 @@ object GardenOptimalSpeed {
         } else {
             crops.map { (crop, speed) ->
                 val color = if (lastCrop == crop) LorenzColor.GOLD else LorenzColor.WHITE
-                val renderable = HorizontalContainerRenderable(
-                    listOf(
-                        ItemStackRenderable(crop.icon),
-                        StringRenderable("${color.getChatColor()}${crop.cropName} - $speed"),
-                    ),
+                val renderable = Renderable.horizontal(
+                    Renderable.item(crop.icon),
+                    Renderable.text("${color.getChatColor()}${crop.cropName} - $speed"),
                     spacing = 2,
                 )
                 Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })

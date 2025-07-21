@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.config.features.dungeon.spiritleap
 
+import at.hannibal2.skyhanni.config.storage.Resettable
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class SpiritLeapColorConfig {
+class SpiritLeapColorConfig : Resettable() {
 
     companion object {
-        @Transient const val DEFAULT_COLOR: String = "0:200:0:0:0"
-        private const val DEAD_COLOR: String = "0:200:120:0:0"
+        @Transient val defaultColor = ChromaColour.fromStaticRGB(0, 0, 0, 200)
     }
 
     @Expose
@@ -18,7 +19,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for dead teammates in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var deadTeammateColor: String = "0:200:120:0:0"
+    var deadTeammateColor: ChromaColour = ChromaColour.fromStaticRGB(120, 0, 0, 200)
 
     @Expose
     @ConfigOption(
@@ -26,7 +27,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Archer class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var archerClassColor: String = DEFAULT_COLOR
+    var archerClassColor: ChromaColour = defaultColor
 
     @Expose
     @ConfigOption(
@@ -34,7 +35,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Mage class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var mageClassColor: String = DEFAULT_COLOR
+    var mageClassColor: ChromaColour = defaultColor
 
     @Expose
     @ConfigOption(
@@ -42,7 +43,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Berserk class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var berserkClassColor: String = DEFAULT_COLOR
+    var berserkClassColor: ChromaColour = defaultColor
 
     @Expose
     @ConfigOption(
@@ -50,7 +51,7 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Tank class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var tankClassColor: String = DEFAULT_COLOR
+    var tankClassColor: ChromaColour = defaultColor
 
     @Expose
     @ConfigOption(
@@ -58,16 +59,9 @@ class SpiritLeapColorConfig {
         desc = "Set the highlight color for the Healer class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
-    var healerClassColor: String = DEFAULT_COLOR
+    var healerClassColor: ChromaColour = defaultColor
 
     @ConfigOption(name = "Reset Colors", desc = "Restores the class highlighter colors to their default settings.")
     @ConfigEditorButton(buttonText = "Reset")
-    val resetColors: Runnable = Runnable {
-        deadTeammateColor = DEAD_COLOR
-        archerClassColor = DEFAULT_COLOR
-        mageClassColor = DEFAULT_COLOR
-        berserkClassColor = DEFAULT_COLOR
-        tankClassColor = DEFAULT_COLOR
-        healerClassColor = DEFAULT_COLOR
-    }
+    val resetColors: Runnable = Runnable(::reset)
 }

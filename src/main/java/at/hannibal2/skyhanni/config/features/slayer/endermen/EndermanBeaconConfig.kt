@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.slayer.endermen
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -21,7 +22,7 @@ class EndermanBeaconConfig {
     @Expose
     @ConfigOption(name = "Beacon Color", desc = "Color of the beacon.")
     @ConfigEditorColour
-    var beaconColor: String = "0:255:255:0:88"
+    var beaconColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 88, 255)
 
     @Expose
     @ConfigOption(
@@ -41,7 +42,7 @@ class EndermanBeaconConfig {
     @Expose
     @ConfigOption(name = "Line Color", desc = "Color of the line.")
     @ConfigEditorColour
-    var lineColor: String = "0:255:255:0:88"
+    var lineColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 88, 255)
 
     @Expose
     @ConfigOption(name = "Line Width", desc = "Width of the line.")

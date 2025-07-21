@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -17,7 +18,7 @@ class PatcherCoordsWaypointConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Color of the waypoint.")
     @ConfigEditorColour
-    var color: String = "0:194:75:197:64"
+    var color: ChromaColour = ChromaColour.fromStaticRGB(75, 197, 64, 194)
 
     @Expose
     @ConfigOption(name = "Duration", desc = "Duration of the waypoint.")

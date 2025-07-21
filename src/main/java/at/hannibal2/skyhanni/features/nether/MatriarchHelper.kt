@@ -14,11 +14,11 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.render.LineDrawer
@@ -124,13 +124,13 @@ object MatriarchHelper {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.highlight) {
-            val color = config.highlightColor.toSpecialColor()
+            val color = config.highlightColor.toColor()
             pearlList.forEach {
                 event.drawFilledBoundingBox(it.first.boundingBox.expandBlock(), color, 1f)
             }
         }
         if (config.line) {
-            val color = config.lineColor.toSpecialColor()
+            val color = config.lineColor.toColor()
             var prePoint = event.exactPlayerEyeLocation()
             if (config.simpleLine) {
                 accessPearls().forEach { point ->

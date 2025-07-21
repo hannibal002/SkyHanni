@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
@@ -51,7 +52,7 @@ object ParkourWaypointSaver {
             }
 
             config.saveKey -> {
-                val newLocation = LorenzVec.getBlockBelowPlayer()
+                val newLocation = LocationUtils.getBlockBelowPlayer()
                 if (locations.isNotEmpty() && newLocation == locations.last()) return
                 locations.add(newLocation)
                 update()

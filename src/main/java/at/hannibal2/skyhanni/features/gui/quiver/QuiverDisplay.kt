@@ -19,10 +19,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
@@ -57,10 +57,10 @@ object QuiverDisplay {
             if (hideAmount || arrow == NONE_ARROW_TYPE) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
 
         if (config.showIcon.get()) {
-            add(ItemStackRenderable(itemStack, 1.0))
+            addItemStack(itemStack, scale = 1.0)
         }
-        if (!hideAmount) add(StringRenderable("§b${amount.addSeparators()}x"))
-        add(StringRenderable(" $rarity$arrowDisplayName"))
+        if (!hideAmount) addString("§b${amount.addSeparators()}x")
+        addString(" $rarity$arrowDisplayName")
     }
 
     @HandleEvent
@@ -82,12 +82,12 @@ object QuiverDisplay {
             whenToShow == ShowWhen.ONLY_BOW_HAND && QuiverApi.isHoldingBow()
         ) {
             config.quiverDisplayPos.renderRenderable(
-                HorizontalContainerRenderable(
+                Renderable.horizontal(
                     display,
                     spacing = 1,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 ),
-                posLabel = "Quiver Display"
+                posLabel = "Quiver Display",
             )
         }
     }
@@ -96,7 +96,7 @@ object QuiverDisplay {
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.whenToShow,
-            config.showIcon
+            config.showIcon,
         ) {
             updateDisplay()
         }
