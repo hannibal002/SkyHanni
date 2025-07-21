@@ -125,7 +125,7 @@ object StorageApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onMinutePassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(60) || !isPrivateIslandStorageEnabled()) return
-        mutableIslandChest.removeIf { _, chest ->
+        mutableIslandChest.removeIf { (_, chest) ->
             if (chest.primaryCords == null) {
                 ErrorManager.logErrorStateWithData(
                     "Something went wrong during Private Island cleanup",
@@ -141,7 +141,7 @@ object StorageApi {
                 chest.secondaryCords == null -> getNeighbourBlocks(chest.primaryCords).any { it.second is BlockChest }
                 else -> chest.secondaryCords.getBlockAt() !is BlockChest
             }.also {
-                if (it == true) ChatUtils.debug("Removed Private Island Chest at: ${chest.primaryCords}")
+                if (it) ChatUtils.debug("Removed Private Island Chest at: ${chest.primaryCords}")
             }
         }
     }
