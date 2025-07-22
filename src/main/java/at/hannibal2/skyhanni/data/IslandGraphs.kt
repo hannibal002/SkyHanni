@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
@@ -256,7 +256,7 @@ object IslandGraphs {
         lastLoadedTime = SimpleTimeMark.now()
 
         try {
-            val graph = RepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+            val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
             IslandAreas.display = null
             setNewGraph(graph)
         } catch (e: Error) {
@@ -694,7 +694,7 @@ object IslandGraphs {
             extraData["area scoreboard"] = scoreboardArea
         }
 
-        RepoManager.localRepoCommit.let { (hash, time) ->
+        SkyHanniRepoManager.localRepoCommit.let { (hash, time) ->
             extraData["repo update time"] = time?.toString() ?: "none"
             extraData["repo update age"] = time?.passedSince() ?: "unknown"
             extraData["repo update hash"] = hash ?: "none"
