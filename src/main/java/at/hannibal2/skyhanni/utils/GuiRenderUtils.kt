@@ -599,7 +599,7 @@ object GuiRenderUtils {
     //$$     RenderSystem.teardownOverlayColor()
     //$$     RenderSystem.restoreProjectionMatrix()
     //$$ }
-    //$$
+
     //$$ private fun ItemStack.normalRenderOnScreen(translateX: Float, translateY: Float, scale: Float) {
     //$$     DrawContextUtils.pushPop {
     //$$         DrawContextUtils.translate(translateX, translateY, 0f)
