@@ -17,7 +17,7 @@ class RarityBackgroundConfig : Resettable() {
         name = "Background Padding",
         desc = "How much extra padding should be added to the background circle."
     )
-    @ConfigEditorSlider(minValue = 2f, maxValue = 8f, minStep = 0.5f)
+    @ConfigEditorSlider(minValue = 0f, maxValue = 8f, minStep = 0.25f)
     val padding: Property<Int> = Property.of(4)
 
     @Expose

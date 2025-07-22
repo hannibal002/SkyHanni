@@ -107,8 +107,8 @@ class VisualPetDisplayConfig {
             name = "Ring Padding",
             desc = "How much thicker the XP Ring should be compared to the smaller circles."
         )
-        @ConfigEditorSlider(minValue = 1f, maxValue = 6f, minStep = 0.5f)
-        val padding: Property<Int> = Property.of(3)
+        @ConfigEditorSlider(minValue = 0.5f, maxValue = 6f, minStep = 0.5f)
+        val padding: Property<Int> = Property.of(2)
 
         @Expose
         @ConfigOption(
@@ -198,7 +198,7 @@ class VisualPetDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Icon Scale", desc = "How large the icon should be - Default is 1.7")
-    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.5f, minStep = 0.1f)
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 6.0f, minStep = 0.1f)
     val iconScale: Property<Double> = Property.of(1.7)
 
     @Expose
