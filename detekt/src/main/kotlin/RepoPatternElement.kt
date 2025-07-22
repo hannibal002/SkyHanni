@@ -21,11 +21,14 @@ class RepoPatternElement private constructor(
 
     val regex101Url: String by lazy {
         val encodedPattern = URLEncoder.encode(rawPattern, "UTF-8")
-        val encodedTests = regexTests.joinToString("\n") { URLEncoder.encode(it, "UTF-8") }
+        val urlEncodedNewLine = URLEncoder.encode("\n", "UTF-8")
+        val encodedTests = regexTests.joinToString(urlEncodedNewLine) { URLEncoder.encode(it, "UTF-8") }
         "https://regex101.com/?regex=$encodedPattern&testString=$encodedTests"
     }
 
     companion object {
+        private val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
+
         fun KtPropertyDelegate.asRepoPatternElement(): RepoPatternElement? {
             val expression = this.expression as? KtDotQualifiedExpression ?: return null
             val callExpression = expression.selectorExpression as? KtCallExpression ?: return null
@@ -64,6 +67,11 @@ class RepoPatternElement private constructor(
                 }
                 if (line.contains("REGEX-FAIL: ")) {
                     failingRegexTests.add(line.substringAfter("REGEX-FAIL: "))
+                }
+                wrappedRegexTestPattern.matcher(line).let { matcher ->
+                    if (!matcher.find()) return@forEach
+                    val test = matcher.group("test") ?: return@forEach
+                    regexTests.add(test)
                 }
             }
             return regexTests to failingRegexTests

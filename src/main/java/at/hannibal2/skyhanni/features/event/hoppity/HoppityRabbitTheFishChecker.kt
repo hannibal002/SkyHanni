@@ -1,21 +1,23 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityRabbitTheFishChecker {
@@ -29,7 +31,7 @@ object HoppityRabbitTheFishChecker {
      * REGEX-TEST: Chocolate Déjeuner Egg
      * REGEX-TEST: Chocolate Supper Egg
      */
-    val mealEggInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val mealEggInventoryPattern by CFApi.patternGroup.pattern(
         "inventory.mealegg.name",
         "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) Egg.*",
     )
@@ -37,7 +39,7 @@ object HoppityRabbitTheFishChecker {
     /**
      * REGEX-TEST: §cRabbit the Fish
      */
-    private val rabbitTheFishItemPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val rabbitTheFishItemPattern by CFApi.patternGroup.pattern(
         "item.rabbitthefish",
         "(?:§.)*Rabbit the Fish",
     )
@@ -45,7 +47,7 @@ object HoppityRabbitTheFishChecker {
     /**
      * REGEX-TEST: Click to open Chocolate Factory!
      */
-    private val openCfSlotLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val openCfSlotLorePattern by CFApi.patternGroup.pattern(
         "inventory.mealegg.continue",
         "(?:§.)*Click to open Chocolate Factory!",
     )
@@ -54,7 +56,7 @@ object HoppityRabbitTheFishChecker {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private var rabbitTheFishIndex: Int? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
@@ -62,41 +64,47 @@ object HoppityRabbitTheFishChecker {
         InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         rabbitTheFishIndex = null
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.hasDisplayName() && it.key != 22
+            it.value.displayName.isNotEmpty() && it.key != 22
         }.entries.firstOrNull {
             rabbitTheFishItemPattern.matches(it.value.displayName)
         }?.key
     }
 
-    @SubscribeEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 
         // Prevent opening chocolate factory when Rabbit the Fish is present
         val stack = event.slot?.stack ?: return
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
-            event.cancel()
-            SoundUtils.playErrorSound()
+            event.sendPreventClosureTitle()
         } else if (rabbitTheFishIndex == event.slot.slotIndex) {
             rabbitTheFishIndex = null
         }
     }
 
-    private fun Int.isInventoryClosure(): Boolean =
-        this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || this == Keyboard.KEY_ESCAPE
-
-    @JvmStatic
-    fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
-        if (!shouldContinue) SoundUtils.playErrorSound()
-        return shouldContinue
+    @HandleEvent
+    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+        if (!isEnabled() || rabbitTheFishIndex == null) return
+        event.sendPreventClosureTitle()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingRabbitTheFish
+    private fun SkyHanniEvent.Cancellable.sendPreventClosureTitle() {
+        TitleManager.sendTitle(
+            "§cRabbit the Fish Prevented Close",
+            subtitleText = "§7Hold §eShift §7to bypass",
+            duration = 5.seconds,
+            location = TitleManager.TitleLocation.INVENTORY,
+        )
+        SoundUtils.playErrorSound()
+        cancel()
+    }
+
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && HoppityApi.isHoppityEvent() && config.preventMissingRabbitTheFish
 }

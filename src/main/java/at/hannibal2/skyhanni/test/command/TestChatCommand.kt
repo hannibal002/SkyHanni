@@ -1,13 +1,18 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import net.minecraft.util.ChatComponentText
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.IChatComponent
 
+@SkyHanniModule
 object TestChatCommand {
 
     fun command(args: Array<String>) {
@@ -47,12 +52,16 @@ object TestChatCommand {
 
     private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
         val component = if (isComplex) try {
-            IChatComponent.Serializer.jsonToComponent(text) ?: ChatComponentText("")
+            //#if TODO
+            IChatComponent.Serializer.jsonToComponent(text) ?: "".asComponent()
+            //#else
+            //$$ "complex doesnt work on 1.21".asComponent()
+            //#endif
         } catch (ex: Exception) {
             ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
             return
         }
-        else ChatComponentText(text.replace("&", "§"))
+        else text.replace("&", "§").asComponent()
 
         println("component unformatted: ${component.unformattedText}")
         println("${component.unformattedTextForChat} ${component.chatStyle} ${component.siblings}")
@@ -66,10 +75,10 @@ object TestChatCommand {
 
     private fun test(componentText: IChatComponent, isHidden: Boolean) {
         val message = componentText.formattedText.stripHypixelMessage()
-        val event = LorenzChatEvent(message, componentText)
-        event.postAndCatch() // TODO don't use deprecated function
+        val event = SkyHanniChatEvent(message, componentText)
+        event.post()
 
-        if (event.blockedReason != "") {
+        if (event.blockedReason != null) {
             if (!isHidden) ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
             return
         }
@@ -78,5 +87,14 @@ object TestChatCommand {
             ChatUtils.chat("§eChat modified!")
         }
         ChatUtils.chat(finalMessage)
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestmessage") {
+            description = "Sends a custom chat message client side in the chat"
+            category = CommandCategory.DEVELOPER_TEST
+            legacyCallbackArgs { command(it) }
+        }
     }
 }

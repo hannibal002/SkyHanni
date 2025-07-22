@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
@@ -9,26 +10,25 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -39,27 +39,30 @@ val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
 val motesRegex = Regex("""Motes: ([\d,]+)""")
 val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
 
-private fun getVisitingName(): String {
-    val tabData = TabListData.getTabList()
-    val ownerRegex = Regex(".*Owner: (\\w+).*")
-    for (line in tabData) {
-        val colorlessLine = line.removeColor()
-        if (ownerRegex.matches(colorlessLine)) {
-            return ownerRegex.find(colorlessLine)!!.groupValues[1]
-        }
-    }
-    return "Someone"
-}
+// There is no consistent way to get the full username of the owner of an island you are visiting (as far as I know)
+// so this will be removed until/unless they add it back
+//
+// private fun getVisitingName(): String {
+//     val tabData = TabListData.getTabList()
+//     val ownerRegex = Regex(".*Owner: (\\w+).*")
+//     for (line in tabData) {
+//         val colorlessLine = line.removeColor()
+//         if (ownerRegex.matches(colorlessLine)) {
+//             return ownerRegex.find(colorlessLine)!!.groupValues[1]
+//         }
+//     }
+//     return "Someone"
+// }
 
 var beenAfkFor = SimpleTimeMark.now()
 
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
     val cropCounter = crop?.getCounter()
-    val allowOverflow = GardenAPI.config.cropMilestones.overflow.discordRPC
+    val allowOverflow = GardenApi.config.cropMilestones.overflow.discordRPC
     val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
     val progress = tier?.let {
-        LorenzUtils.formatPercentage(crop.progressToNextLevel(allowOverflow))
+        crop.progressToNextLevel(allowOverflow).formatPercentage()
     } ?: 100 // percentage to next milestone
 
     if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
@@ -72,13 +75,8 @@ private fun getCropMilestoneDisplay(): String {
     return "${crop.cropName}: $text"
 }
 
-fun getPetDisplay(): String = PetAPI.currentPet?.let {
-    val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2).removeColor()
-    val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
-
-    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
-} ?: "No pet equipped"
+private fun getPetDisplay(): String = CurrentPetApi.currentPet?.getUserFriendlyName()
+    ?: "No pet equipped"
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
@@ -86,12 +84,14 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     LOCATION(
         {
-            var location = LorenzUtils.skyBlockArea ?: "invalid"
-            val island = LorenzUtils.skyBlockIsland
+            // graphArea kept giving me no_area on my private island
+            // TODO use island type instead of your island string, use graph area again
+            var location = SkyBlockUtils.scoreboardArea ?: "invalid"
+            val island = SkyBlockUtils.currentIsland
 
             if (location == "Your Island") location = "Private Island"
             lastKnownDisplayStrings[LOCATION] = when (island) {
-                IslandType.PRIVATE_ISLAND_GUEST -> "${getVisitingName()}'s Island"
+                IslandType.PRIVATE_ISLAND_GUEST -> "Visiting an Island"
 
                 IslandType.GARDEN -> {
                     if (location.startsWith("Plot: ")) "Personal Garden ($location)" // Personal Garden (Plot: 8)
@@ -100,14 +100,13 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
                 IslandType.GARDEN_GUEST -> {
                     // Ensure getVisitingName() is used to generate the full string
-                    if (location.startsWith("Plot: ")) "${getVisitingName()}'s Garden ($location)"
-                    else "${getVisitingName()}'s Garden"
+                    if (location.startsWith("Plot: ")) "Visiting a Garden ($location)"
+                    else "Visiting a Garden"
                 }
 
-                else -> location.takeIf { it != "None" && it != "invalid" }
+                else -> location.takeIf { it != "None" && it != "invalid" && it != "no_area" }
                     ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
-
             // Only display None if we don't have a last known area
             lastKnownDisplayStrings[LOCATION].takeIf { it?.isNotEmpty() == true } ?: "None"
         },
@@ -152,7 +151,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     STATS(
         {
-            val statString = if (!RiftAPI.inRift()) {
+            val statString = if (!RiftApi.inRift()) {
                 "❤${ActionBarStatsData.HEALTH.value} ❈${ActionBarStatsData.DEFENSE.value} ✎${ActionBarStatsData.MANA.value}"
             } else {
                 "${ActionBarStatsData.RIFT_TIME.value}ф ✎${ActionBarStatsData.MANA.value}"
@@ -180,14 +179,14 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     PROFILE(
         {
-            val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
+            val sbLevel = AdvancedPlayerList.tabPlayerData[PlayerUtils.getName()]?.sbLevel?.toString() ?: "?"
             var profile = "SkyBlock Level: [$sbLevel] on "
 
             profile += when {
 
-                LorenzUtils.isIronmanProfile -> "♲"
-                LorenzUtils.isBingoProfile -> "Ⓑ"
-                LorenzUtils.isStrandedProfile -> "☀"
+                SkyBlockUtils.isIronmanProfile -> "♲"
+                SkyBlockUtils.isBingoProfile -> "Ⓑ"
+                SkyBlockUtils.isStrandedProfile -> "☀"
                 else -> ""
             }
 
@@ -284,7 +283,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                     percent = if (amount.toDouble() == 0.0) {
                         ""
                     } else {
-                        LorenzUtils.formatPercentage((amount.toDouble() - levels[level - 1]) / (levels[level] - levels[level - 1]))
+                        ((amount.toDouble() - levels[level - 1]) / (levels[level] - levels[level - 1])).formatPercentage()
                     }
                     break
                 }
@@ -296,15 +295,15 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             if (extraAttributes != null) {
                 val enchantments = extraAttributes.getCompoundTag("enchantments")
                 var stackingEnchant = ""
-                for (enchant in DiscordRPCManager.stackingEnchants) {
+                for (enchant in EstimatedItemValue.stackingEnchants) {
                     if (extraAttributes.hasKey(enchant.value.statName)) {
                         stackingEnchant = enchant.key
                         break
                     }
                 }
-                val levels = DiscordRPCManager.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
+                val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
                 val level = enchantments.getInteger(stackingEnchant)
-                val amount = extraAttributes.getInteger(DiscordRPCManager.stackingEnchants[stackingEnchant]?.statName)
+                val amount = extraAttributes.getInteger(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =
@@ -318,16 +317,16 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     DUNGEONS(
         {
-            if (!DungeonAPI.inDungeon()) {
+            if (!DungeonApi.inDungeon()) {
                 AutoStatus.DUNGEONS.placeholderText
             } else {
-                val boss = DungeonAPI.getCurrentBoss()
+                val boss = DungeonApi.getCurrentBoss()
                 if (boss == null) {
                     "Unknown dungeon boss"
                 } else {
-                    val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
-                    val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
-                    val time = DungeonAPI.time
+                    val floor = DungeonApi.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
+                    val amountKills = DungeonApi.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
+                    val time = DungeonApi.time
                     "$floor Kills: $amountKills ($time)"
                 }
             }

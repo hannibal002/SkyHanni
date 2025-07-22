@@ -3,26 +3,24 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.getExtendedColorCode
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawCylinderInWorld
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object AshfangHighlights {
@@ -35,7 +33,7 @@ object AshfangHighlights {
     private val gravityOrbs = mutableSetOf<EntityArmorStand>()
     private const val MAX_DISTANCE = 15.0
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityJoin(event: EntityEnterWorldEvent<EntityArmorStand>) {
         if (!AshfangManager.active) return
         val entity = event.entity
@@ -47,18 +45,18 @@ object AshfangHighlights {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityLeave(event: EntityLeaveWorldEvent<EntityArmorStand>) {
         blazingSouls -= event.entity
         gravityOrbs -= event.entity
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!AshfangManager.active) return
 
         if (config.blazingSouls.enabled) {
-            val color = config.blazingSouls.color.toSpecialColor()
+            val color = config.blazingSouls.color.toColor()
             blazingSouls.forEach {
                 val location = event.exactLocation(it)
                 event.drawWaypointFilled(location.add(-0.5, 1.25, -0.5), color, extraSize = -0.15)
@@ -67,7 +65,7 @@ object AshfangHighlights {
         }
 
         if (config.gravityOrbs.enabled) {
-            val color = config.gravityOrbs.color.toSpecialColor()
+            val color = config.gravityOrbs.color.toColor()
             gravityOrbs.forEach {
                 val location = event.exactLocation(it)
                 event.drawCylinderInWorld(color, location.add(-0.5, -2.0, -0.5), 3.5f, 4.5f)
@@ -76,13 +74,13 @@ object AshfangHighlights {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         blazingSouls.clear()
         gravityOrbs.clear()
     }
 
-    private fun LorenzRenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
+    private fun SkyHanniRenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
         val distance = location.distanceToPlayer()
         if (distance < MAX_DISTANCE) {
             val colorCode = getColorCode(distance)

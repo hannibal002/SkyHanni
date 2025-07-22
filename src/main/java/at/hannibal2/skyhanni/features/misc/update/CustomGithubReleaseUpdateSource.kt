@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.update
 
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.skyhanni.utils.VersionConstants
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.JsonPrimitive
 import moe.nea.libautoupdate.GithubReleaseUpdateData
 import moe.nea.libautoupdate.GithubReleaseUpdateSource
@@ -10,6 +11,11 @@ import moe.nea.libautoupdate.UpdateData
  * This class is a custom implementation of the [GithubReleaseUpdateSource] that filters assets based on the mod's version.
  */
 class CustomGithubReleaseUpdateSource(owner: String, repository: String) : GithubReleaseUpdateSource(owner, repository) {
+
+    override fun findLatestRelease(validReleases: Iterable<GithubRelease>): UpdateData {
+        return validReleases.asSequence().maxBy { ModVersion.fromString(it.tagName) }.let { findAsset(it) }
+            ?: throw IllegalStateException("No valid release found")
+    }
 
     override fun findAsset(release: GithubRelease?): UpdateData? {
         release ?: return null
@@ -24,7 +30,7 @@ class CustomGithubReleaseUpdateSource(owner: String, repository: String) : Githu
         name ?: return false
         browserDownloadUrl ?: return false
         if (!name.endsWith(".jar")) return false
-        return name.contains(PlatformUtils.MC_VERSION)
+        return name.contains(VersionConstants.MC_VERSION)
     }
 
     private fun GithubRelease.Download.createReleaseData(release: GithubRelease): GithubReleaseUpdateData {

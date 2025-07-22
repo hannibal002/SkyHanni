@@ -1,29 +1,32 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -56,27 +59,18 @@ object VerminTracker {
     )
 
     /**
-     * REGEX-TEST: §fVermin Bin: §a27 Silverfishes
-     * REGEX-TEST: §fVermin Bin: §a19 Flies
+     * REGEX-TEST: Vermin Bin: 27 Silverfishes
+     * REGEX-TEST: Vermin Bin: 19 Flies
      */
     private val verminBinPattern by patternGroup.pattern(
-        "binline",
-        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)",
-    )
-
-    /**
-     * REGEX-TEST: §fVacuum Bag: §72 Silverfishes
-     * REGEX-TEST: §fVacuum Bag: §70 Spiders
-     */
-    private val verminBagPattern by patternGroup.pattern(
-        "bagline",
-        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)",
+        "binline-nocolor",
+        "Vermin Bin: (?<count>\\d+) (?<vermin>\\w+)",
     )
 
     private var hasVacuum = false
     private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".toInternalName()
 
-    private val config get() = RiftAPI.config.area.westVillage.verminTracker
+    private val config get() = RiftApi.config.area.westVillage.verminTracker
 
     private val tracker = SkyHanniTracker("Vermin Tracker", { Data() }, { it.rift.verminTracker }) {
         drawDisplay(it)
@@ -98,9 +92,8 @@ object VerminTracker {
         SILVERFISH(3, "§aSilverfish", silverfishPattern),
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftAPI.inRift()) return
         checkVacuum()
     }
 
@@ -109,8 +102,8 @@ object VerminTracker {
             .any { it.getInternalName() == TURBOMAX_VACUUM }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onChat(event: SkyHanniChatEvent) {
         for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
                 tracker.modify { it.count.addOrPut(verminType, 1) }
@@ -122,40 +115,36 @@ object VerminTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!RiftAPI.inRift() || event.inventoryName != "Vermin Bin") return
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (event.inventoryName != "Vermin Bin") return
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
-        val bag = InventoryUtils.getItemsInOwnInventory()
-            .firstOrNull { it.getInternalName() == TURBOMAX_VACUUM }
-            ?.getLore().orEmpty()
 
-        val binCounts = countVermin(bin, verminBinPattern)
+        val binCounts = countVerminBin(bin)
         VerminType.entries.forEach { setVermin(it, binCounts[it] ?: 0) }
 
-        if (bag.isEmpty()) return
+        val bag = InventoryUtils.getItemsInOwnInventory()
+            .firstOrNull { it.getInternalName() == TURBOMAX_VACUUM }
+            ?.getExtraAttributes() ?: return
 
-        val bagCounts = countVermin(bag, verminBagPattern)
+        val bagCounts = mapOf(
+            VerminType.SILVERFISH to bag.getInteger("vacuumed_silverfish"),
+            VerminType.SPIDER to bag.getInteger("vacuumed_spider"),
+            VerminType.FLY to bag.getInteger("vacuumed_mosquito"),
+        )
         VerminType.entries.forEach { addVermin(it, bagCounts[it] ?: 0) }
     }
 
-    private fun countVermin(lore: List<String>, pattern: Pattern): Map<VerminType, Int> {
-        val verminCounts = mutableMapOf(
-            VerminType.SILVERFISH to 0,
-            VerminType.SPIDER to 0,
-            VerminType.FLY to 0,
-        )
-        for (line in lore) {
-            pattern.matchMatcher(line) {
-                val vermin = group("vermin")?.lowercase() ?: continue
-                val verminCount = group("count")?.toInt() ?: continue
+    private fun countVerminBin(lore: List<String>): Map<VerminType, Int> =
+        buildMap {
+            verminBinPattern.matchAll(lore.map { it.removeColor() }) {
+                val vermin = group("vermin").lowercase()
+                val verminCount = group("count").formatInt()
                 val verminType = getVerminType(vermin)
-                verminCounts[verminType] = verminCount
+                put(verminType, verminCount)
             }
         }
-        return verminCounts
-    }
 
     private fun getVerminType(vermin: String): VerminType {
         return when (vermin) {
@@ -182,13 +171,16 @@ object VerminTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!config.showOutsideWestVillage && !RiftAPI.inWestVillage()) return
-        if (!config.showWithoutVacuum && !hasVacuum) return
+    init {
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!config.showOutsideWestVillage && !RiftApi.inWestVillage()) return false
+        if (!config.showWithoutVacuum && !hasVacuum) return false
+
+        return true
     }
 
     @HandleEvent
@@ -198,9 +190,14 @@ object VerminTracker {
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetvermintracker") {
+            description = "Resets the Vermin Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
-    private fun isEnabled() = RiftAPI.inRift() && config.enabled
+    private fun isEnabled() = RiftApi.inRift() && config.enabled
 }

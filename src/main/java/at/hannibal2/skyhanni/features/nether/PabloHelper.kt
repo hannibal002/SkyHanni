@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.api.GetFromSackApi
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 
 // https://wiki.hypixel.net/Pablo
@@ -22,38 +22,31 @@ object PabloHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
-    // TODO RepoPattern.list does not work, find out why
-
-//     /**
-//      * REGEX-TEST: §e[NPC] §5Pablo§f: §b✆ §f§rBring me that §aEnchanted Dandelion §fas soon as you can!
-//      */
-//     private val patterns by RepoPattern.list(
-//         "crimson.pablo.helper",
-//         "\\[NPC] Pablo: (?:✆ )?Could you bring me an (?<flower>[\\w ]+).*",
-//         "\\[NPC] Pablo: (?:✆ )?Bring me that (?<flower>[\\w ]+) as soon as you can!",
-//     )
-
-    private val patterns = listOf(
-        "\\[NPC] Pablo: (?:✆ )?Are you available\\? I desperately need an? (?<flower>[\\w ]+) today\\.".toPattern(),
-        "\\[NPC] Pablo: (?:✆ )?Bring me that (?<flower>[\\w ]+) as soon as you can!".toPattern(),
-        "\\[NPC] Pablo: (?:✆ )?Could you bring me an? (?<flower>[\\w ]+)\\?".toPattern(),
-        "\\[NPC] Pablo: (?:✆ )?I really need an? (?<flower>[\\w ]+) today, do you have one you could spare\\?".toPattern(),
+    /**
+     * REGEX-TEST: §e[NPC] §5Pablo§f: §b✆ §f§rBring me that §aEnchanted Dandelion §fas soon as you can!
+     */
+    private val patterns by RepoPattern.list(
+        "crimson.pablo.helper",
+        "\\[NPC] Pablo: (?:✆ )?Are you available\\? I desperately need an? (?<flower>[\\w ]+) today\\.",
+        "\\[NPC] Pablo: (?:✆ )?Bring me that (?<flower>[\\w ]+) as soon as you can!",
+        "\\[NPC] Pablo: (?:✆ )?Could you bring me an? (?<flower>[\\w ]+)\\?",
+        "\\[NPC] Pablo: (?:✆ )?I really need an? (?<flower>[\\w ]+) today, do you have one you could spare\\?",
     )
 
     private var lastSentMessage = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 5.minutes) return
         val itemName = patterns.matchMatchers(event.message.removeColor()) {
             group("flower")
         } ?: return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) } > 0) return
+        if (InventoryUtils.countItemsInLowerInventory { it.displayName.contains(itemName) } > 0) return
 
         DelayedRun.runNextTick {
-            GetFromSackAPI.getFromChatMessageSackItems(
+            GetFromSackApi.getFromChatMessageSackItems(
                 itemName.toInternalName().makePrimitiveStack(),
                 "Click here to grab an $itemName from sacks!",
             )
@@ -62,5 +55,5 @@ object PabloHelper {
         lastSentMessage = SimpleTimeMark.now()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.pabloHelper
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.pabloHelper
 }

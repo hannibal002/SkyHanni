@@ -8,17 +8,15 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CircularList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUCalculator
+import at.hannibal2.skyhanni.utils.NeuCalculator
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -27,9 +25,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CircularList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -78,9 +77,8 @@ object TheGreatSpook {
         "§5§lFEAR\\. §r§eA §r§dPrimal Fear §r§ehas been summoned!",
     )
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
 
         val fear = SkyblockStat.FEAR.lastKnownValue ?: 0.0
@@ -96,7 +94,7 @@ object TheGreatSpook {
         } else {
             "§5§lPrimal Fear Ready!"
         }
-        displayMobCooldown = Renderable.string(mobCooldownString)
+        displayMobCooldown = Renderable.text(mobCooldownString)
 
         if (config.primalFearNotification && mobCooldown.isInPast()) {
             SoundUtils.playPlingSound()
@@ -113,7 +111,7 @@ object TheGreatSpook {
         } else {
             "§5§lThe Great Spook has ended!"
         }
-        displayGreatSpookEnd = Renderable.string(timeLeftString)
+        displayGreatSpookEnd = Renderable.text(timeLeftString)
     }
 
     @HandleEvent
@@ -147,9 +145,8 @@ object TheGreatSpook {
         isGreatSpookActive = currentTime in timeRange
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
 
         if (config.primalFearTimer) {
@@ -170,7 +167,7 @@ object TheGreatSpook {
     }
 
     private fun mathSolver(query: String?) {
-        val answer = query?.let { NEUCalculator.calculateOrNull(it)?.toInt() } ?: run {
+        val answer = query?.let { NeuCalculator.calculateOrNull(it)?.toInt() } ?: run {
             ChatUtils.userError("Failed to solve $query!")
             return
         }
@@ -193,13 +190,12 @@ object TheGreatSpook {
             action = {
                 HypixelCommands.allChat(solution)
             },
-            oneTimeClick = true
+            oneTimeClick = true,
         )
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isGreatSpookActive) return
 
         if (primalFearSpawnPattern.matches(event.message)) {
@@ -230,7 +226,7 @@ object TheGreatSpook {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventsJson>("Events").greatSpook
 

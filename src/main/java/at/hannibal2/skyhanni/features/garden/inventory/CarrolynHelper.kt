@@ -6,20 +6,20 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object CarrolynHelper {
-    private val config get() = GardenAPI.config
+    private val config get() = GardenApi.config
 
     private val carrolynLocation = LorenzVec(0.5, 103.1, -803.7)
 
@@ -51,7 +51,7 @@ object CarrolynHelper {
 
         if (!event.itemInHand.isCarrolynItem()) return
 
-        if (LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE) {
+        if (SkyBlockUtils.currentIsland == IslandType.CRIMSON_ISLE) {
             startPathfind()
         } else {
             ChatUtils.clickableChat(
@@ -71,6 +71,6 @@ object CarrolynHelper {
         IslandGraphs.pathFind(carrolynLocation, "§5Carrolyn", condition = { isEnabled() })
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.helpCarrolyn
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.helpCarrolyn
 
 }

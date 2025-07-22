@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
@@ -12,10 +11,12 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
 import kotlin.time.Duration.Companion.milliseconds
+//#if MC > 1.21
+//$$ import net.minecraft.client.MinecraftClient
+//#endif
 
 object ClipboardUtils {
 
-    private val dispatcher = Dispatchers.IO
     private var lastClipboardAccessTime = SimpleTimeMark.farPast()
 
     private fun canAccessClipboard(): Boolean {
@@ -26,6 +27,7 @@ object ClipboardUtils {
         return result
     }
 
+    //#if MC < 1.21
     private suspend fun getClipboard(retries: Int = 20): Clipboard? = if (canAccessClipboard()) {
         Toolkit.getDefaultToolkit().systemClipboard
     } else if (retries > 0) {
@@ -34,16 +36,20 @@ object ClipboardUtils {
     } else {
         ErrorManager.logErrorStateWithData(
             "can not read clipboard",
-            "clipboard can not be accessed after 20 retries"
+            "clipboard can not be accessed after 20 retries",
         )
         null
     }
-
+    //#endif
 
     fun copyToClipboard(text: String, step: Int = 0) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             try {
+                //#if MC < 1.21
                 getClipboard()?.setContents(StringSelection(text), null)
+                //#else
+                //$$ net.minecraft.client.util.Clipboard().setClipboard(MinecraftClient.getInstance().window.handle, text)
+                //#endif
             } catch (e: Exception) {
                 if (step == 3) {
                     ErrorManager.logErrorWithData(e, "Error while trying to access the clipboard.")
@@ -54,10 +60,11 @@ object ClipboardUtils {
         }
     }
 
+    //#if MC < 1.21
     suspend fun readFromClipboard(step: Int = 0): String? {
         try {
             return try {
-                withContext(dispatcher) {
+                withContext(Dispatchers.IO) {
                     getClipboard()?.getData(DataFlavor.stringFlavor)?.toString()
                 }
             } catch (e: UnsupportedFlavorException) {
@@ -72,4 +79,26 @@ object ClipboardUtils {
             }
         }
     }
+    //#else
+    //$$ fun readFromClipboard(step: Int = 0): String? {
+    //$$     var shouldRetry = false
+    //$$     val clipboard = net.minecraft.client.util.Clipboard().getClipboard(
+    //$$         0,
+    //$$     ) { _, _ ->
+    //$$         shouldRetry = true
+    //$$     }
+    //$$     if (shouldRetry) {
+    //$$         if (step == 3) {
+    //$$             ErrorManager.logErrorStateWithData(
+    //$$                 "can not read clipboard",
+    //$$                 "clipboard can not be accessed after 3 retries",
+    //$$             )
+    //$$             return null
+    //$$         } else {
+    //$$             return readFromClipboard(step + 1)
+    //$$         }
+    //$$     }
+    //$$     return clipboard
+    //$$ }
+    //#endif
 }

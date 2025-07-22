@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 
+@Suppress("TooManyFunctions")
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -22,16 +22,25 @@ object HypixelCommands {
         send("playtime")
     }
 
+    fun skyblockMenu() {
+        send("sbmenu")
+    }
+
     fun skills() {
         send("skills")
     }
 
-    fun viewRecipe(itemName: String) {
-        send("viewrecipe $itemName")
+    fun viewRecipe(itemId: NeuInternalName, page: Int = 1) {
+        send("viewrecipe ${itemId.skyblockCommandId} $page")
     }
 
     fun recipe(itemName: String) {
         send("recipe $itemName")
+    }
+
+    // opens the crafting table
+    fun craft() {
+        send("craft")
     }
 
     fun npcOption(npc: String, answer: String) {
@@ -62,8 +71,10 @@ object HypixelCommands {
         send("sethome")
     }
 
-    fun getFromSacks(itemName: String, amount: Int) {
-        GetFromSackAPI.getFromSack(itemName.toInternalName(), amount)
+    // Do not remove this deprecation tag, as we want to catch all wrong uses of /gfs in the future forever.
+    @Deprecated("do not send /gfs commands manually to hypixel", ReplaceWith("GetFromSackApi.getFromSack(internalName, amount)"))
+    fun getFromSacks(internalName: NeuInternalName, amount: Int) {
+        GetFromSackApi.getFromSack(internalName, amount)
     }
 
     fun widget() {
@@ -110,6 +121,10 @@ object HypixelCommands {
         send("ec $position")
     }
 
+    fun partyAccept(player: String) {
+        send("party accept $player")
+    }
+
     fun partyWarp() {
         send("party warp")
     }
@@ -138,8 +153,15 @@ object HypixelCommands {
         send("party promote $player")
     }
 
-    fun partyChat(message: String) {
-        send("pc $message")
+    fun partyChat(message: String, prefix: Boolean = false) {
+        when (prefix) {
+            false -> send("pc $message")
+            true -> send("pc [SkyHanni] $message")
+        }
+    }
+
+    fun partyInvite(player: String) {
+        send("party $player")
     }
 
     fun allChat(message: String) {
@@ -183,6 +205,38 @@ object HypixelCommands {
 
     fun locraw() {
         send("locraw")
+    }
+
+    fun starlynSisters() {
+        send("starlynsisterlevels")
+    }
+
+    fun attributeMenu() {
+        send("attributemenu")
+    }
+
+    fun treeGifts() {
+        send("treegifts")
+    }
+
+    fun trades() {
+        send("trades")
+    }
+
+    fun accessories() {
+        send("accessories")
+    }
+
+    fun potionBag() {
+        send("potionbag")
+    }
+
+    fun quiver() {
+        send("quiver")
+    }
+
+    fun fishingBag() {
+        send("fishingbag")
     }
 
     private fun send(command: String) {

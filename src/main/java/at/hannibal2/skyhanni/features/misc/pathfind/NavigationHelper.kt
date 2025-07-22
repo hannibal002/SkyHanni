@@ -1,23 +1,29 @@
 package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
-import at.hannibal2.skyhanni.features.misc.IslandAreas
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.onClick
-import at.hannibal2.skyhanni.utils.chat.Text.send
-import kotlinx.coroutines.launch
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
+import at.hannibal2.skyhanni.utils.compat.hover
 
+@SkyHanniModule
 object NavigationHelper {
-    private const val NAVIGATION_CHAT_ID = -6457562
+    private val messageId = ChatUtils.getUniqueMessageId()
 
     val allowedTags = listOf(
         GraphNodeTag.NPC,
@@ -32,8 +38,19 @@ object NavigationHelper {
         GraphNodeTag.CRIMSON_MINIBOSS,
     )
 
-    fun onCommand(args: Array<String>) {
-        SkyHanniMod.coroutineScope.launch {
+    private fun onCommand(args: Array<String>) {
+        if (args.size == 3) {
+            args.map { it.toDoubleOrNull() }.takeIfAllNotNull()?.let {
+                val location = it.toLorenzVec()
+                pathFind(location.add(-1, -1, -1), "Custom Goal", condition = { true })
+                with(location) {
+                    ChatUtils.chat("Started Navigating to custom goal at §f$x $y $z", messageId = messageId)
+                }
+                return
+            }
+        }
+
+        SkyHanniMod.launchCoroutine {
             doCommandAsync(args)
         }
     }
@@ -49,10 +66,10 @@ object NavigationHelper {
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        Text.displayPaginatedList(
+        TextHelper.displayPaginatedList(
             title,
             locations,
-            chatLineId = NAVIGATION_CHAT_ID,
+            chatLineId = messageId,
             emptyMessage = "No locations found.",
         ) { (name, node) ->
             val distance = distances[node]!!.roundTo(1)
@@ -72,7 +89,7 @@ object NavigationHelper {
         val componentText = "§7Navigating to §r$name".asComponent()
         componentText.onClick(onClick = goBack)
         componentText.hover = "§eClick to stop navigating and return to previous search".asComponent()
-        componentText.send(NAVIGATION_CHAT_ID)
+        componentText.send(messageId)
     }
 
     private fun calculateNames(distances: Map<GraphNode, Double>): List<Pair<String, GraphNode>> {
@@ -81,7 +98,7 @@ object NavigationHelper {
             // hiding areas that are none
             if (node.name == "no_area") continue
             // no need to navigate to the current area
-            if (node.name == IslandAreas.currentAreaName) continue
+            if (node.name == SkyBlockUtils.graphArea) continue
             val tag = node.tags.first { it in allowedTags }
             val name = "${node.name} §7(${tag.displayName}§7)"
             if (name in names) continue
@@ -112,4 +129,11 @@ object NavigationHelper {
         return distances
     }
 
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shnavigate") {
+            description = "Using path finder to go to locations"
+            legacyCallbackArgs { onCommand(it) }
+        }
+    }
 }

@@ -7,16 +7,14 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DungeonHubRacesJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonsRaceGuide {
@@ -41,7 +39,7 @@ object DungeonsRaceGuide {
         currentRace = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DungeonHubRacesJson>("DungeonHubRaces")
         for ((key, map) in data.data) {
@@ -79,18 +77,18 @@ object DungeonsRaceGuide {
     private fun updateConfig() {
         parkourHelpers.values.forEach {
             it.rainbowColor = config.rainbowColor.get()
-            it.monochromeColor = config.monochromeColor.get().toSpecialColor()
+            it.monochromeColor = config.monochromeColor.get().toColor()
             it.lookAhead = config.lookAhead.get() + 1
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (currentRace == null) return
 
         parkourHelpers[currentRace]?.render(event)
     }
 
-    fun isEnabled() = IslandType.DUNGEON_HUB.isInIsland() && config.enabled
+    fun isEnabled() = IslandType.DUNGEON_HUB.isCurrent() && config.enabled
 }

@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
@@ -23,13 +22,15 @@ object ScoreboardEventCarnival : ScoreboardEvent() {
     )
 
     override fun getDisplay() = buildList {
-        ScoreboardPattern.carnivalPattern.firstMatches(getSbLines())?.let {
+        ScoreboardPattern.carnivalPattern.firstMatches(getSBLines())?.let {
             add(it)
-            addAll(patterns.allMatches(getSbLines()))
+            addAll(patterns.allMatches(getSBLines()))
         }
     }
 
     override val configLine = "§7(All Carnival Lines)"
 
-    override fun showIsland() = IslandType.HUB.isInIsland()
+    override val elementPatterns = listOf(ScoreboardPattern.carnivalPattern) + patterns
+
+    override fun showIsland() = IslandType.HUB.isCurrent()
 }

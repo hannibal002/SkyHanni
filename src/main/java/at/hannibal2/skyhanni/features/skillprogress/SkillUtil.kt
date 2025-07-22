@@ -1,42 +1,39 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.api.SkillAPI
-import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
-import at.hannibal2.skyhanni.api.SkillAPI.defaultSkillCap
-import at.hannibal2.skyhanni.api.SkillAPI.exactLevelingMap
-import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
-import at.hannibal2.skyhanni.utils.Quad
+import at.hannibal2.skyhanni.api.SkillApi
+import at.hannibal2.skyhanni.api.SkillApi.activeSkill
+import at.hannibal2.skyhanni.api.SkillApi.exactLevelingMap
+import at.hannibal2.skyhanni.api.SkillApi.levelingMap
 import com.google.common.base.Splitter
 
 object SkillUtil {
 
     val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
-    const val XP_NEEDED_FOR_60 = 111_672_425L
-    const val XP_NEEDED_FOR_50 = 55_172_425L
+    private const val XP_NEEDED_FOR_60 = 111_672_425L
 
-    fun getSkillInfo(skill: SkillType): SkillAPI.SkillInfo? {
-        return SkillAPI.storage?.get(skill)
+    fun getSkillInfo(skill: SkillType): SkillApi.SkillInfo? {
+        return SkillApi.storage?.get(skill)
     }
 
     fun xpRequiredForLevel(desiredLevel: Int): Long {
-        var totalXp = 0L
+        var totalXP = 0L
         val maxLevel = 60
 
         if (desiredLevel <= maxLevel) {
             for (level in 1..desiredLevel) {
-                totalXp += levelingMap[level]?.toLong() ?: 0L
+                totalXP += levelingMap[level]?.toLong() ?: 0L
             }
         } else {
             val xpNeeded = XP_NEEDED_FOR_60
 
-            totalXp += xpNeeded
+            totalXP += xpNeeded
 
             var level = 60
-            var xpForNext = 7000000L + 600000L
-            var slope = 600000L
+            var xpForNext = 7_000_000L + 600_000L
+            var slope = 600_000L
 
             while (level < desiredLevel) {
-                totalXp += xpForNext
+                totalXP += xpForNext
                 level++
                 xpForNext += slope
 
@@ -44,19 +41,30 @@ object SkillUtil {
             }
         }
 
-        return totalXp
+        return totalXP
     }
 
-    fun getLevelExact(neededXp: Long): Int {
-        return exactLevelingMap.getOrDefault(neededXp.toInt(), defaultSkillCap[activeSkill?.lowercaseName] ?: 60)
+    fun getLevelExact(neededXP: Long): Int {
+        return exactLevelingMap.getOrDefault(neededXP.toInt(), activeSkill?.maxLevel ?: 60)
     }
 
-    fun calculateLevelXp(level: Int): Double {
-        return SkillAPI.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
+    fun calculateLevelXP(level: Int): Double {
+        return SkillApi.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
     }
 
-    fun calculateSkillLevel(currentXp: Long, maxSkillCap: Int): Quad<Int, Long, Long, Long> {
-        var xpCurrent = currentXp
+    fun calculateXPForCurrentLevel(level: Int): Long {
+        return SkillApi.levelArray.getOrNull(level)?.toLong() ?: 4000000L
+    }
+
+    fun calculateXPToNextLevel(currentLevel: Int): Long {
+        val xpForCurrentLevel = SkillApi.levelArray.getOrNull(currentLevel)?.toLong() ?: 4000000L
+        val xpForNextLevel = SkillApi.levelArray.getOrNull(currentLevel + 1)?.toLong() ?: 4300000L
+
+        return xpForNextLevel - xpForCurrentLevel
+    }
+
+    fun calculateSkillLevel(currentXP: Long, maxSkillCap: Int): SkillLevel {
+        var xpCurrent = currentXP
         var level = 0
         val maxLevel = maxSkillCap.coerceAtMost(60)
 
@@ -67,23 +75,23 @@ object SkillUtil {
         }
 
         var xpForNext = levelingMap[level + 1]?.toLong() ?: 0L
-        var overflowXp = 0L
+        var overflowXP = 0L
 
         if (level >= maxLevel) {
-            val xpNeeded = if (maxSkillCap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
+            val xpNeeded = xpRequiredForLevel(maxLevel)
 
-            if (currentXp >= xpNeeded) {
-                overflowXp = currentXp - xpNeeded
+            if (currentXP >= xpNeeded) {
+                overflowXP = currentXP - xpNeeded
 
-                xpCurrent = overflowXp
-                var slope = 300000L
-                var xpForCurr = 4000000L + slope
+                xpCurrent = overflowXP
+                var slope = calculateXPToNextLevel(maxLevel)
+                var xpForCurr = calculateXPForCurrentLevel(maxLevel) + slope
 
                 while (xpCurrent >= xpForCurr && level < 60) {
                     level++
                     xpCurrent -= xpForCurr
+                    slope = calculateXPToNextLevel(level)
                     xpForCurr += slope
-                    if (level % 10 == 0) slope *= 2
                 }
 
                 if (level >= 60) {
@@ -101,7 +109,7 @@ object SkillUtil {
             }
         }
 
-        return Quad(level, xpCurrent, xpForNext, overflowXp)
+        return SkillLevel(level, xpCurrent, xpForNext, overflowXP)
     }
 
 }

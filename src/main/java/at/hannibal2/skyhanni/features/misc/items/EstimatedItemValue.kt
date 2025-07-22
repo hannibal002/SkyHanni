@@ -4,7 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,28 +16,31 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
 
@@ -45,33 +51,75 @@ object EstimatedItemValue {
     private var display = emptyList<Renderable>()
     private val cache = mutableMapOf<ItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
-    var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
+    var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
     private var currentlyShowing = false
+
+    var itemValueCalculationData: ItemValueCalculationDataJson? = null
+        private set
+
+    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
+        private set
 
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
-            event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+            event.getConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
+        itemValueCalculationData = data.valueCalculationData
+        crimsonPrestigeCosts = data.crimsonPrestigeCosts
+        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
+    }
+
+    private fun isInNeuOverlay(): Boolean {
+        val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
+        val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
+
+        // Use reflection to make sure tradeMenu exists
+        val neuConfig = NotEnoughUpdates.INSTANCE.config
+        val tradeField = neuConfig.javaClass.getDeclaredField("tradeMenu")
+        val trade = tradeField[neuConfig]
+
+        val booleanField = trade.javaClass.getDeclaredField("enableCustomTrade")
+        val customTradeEnabled = booleanField[trade] as Boolean
+
+        val inNeuTrade = inTrade && customTradeEnabled
+        val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
+
+        return inPv || inNeuTrade || inStorage
+    }
+
+    fun onNeuDrawEquipment(stack: ItemStack) {
+        renderedItems++
+        updateItem(stack)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
         if (!config.enabled) return
-        if (PlatformUtils.isNeuLoaded() && Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
+        if (!PlatformUtils.isNeuLoaded()) return
+        if (!isInNeuOverlay()) return
 
         if (renderedItems == 0) {
             updateItem(event.itemStack)
         }
+        val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
+        // we use renderInNeuStorageOverlay() for this
+        if (inStorage) return
+
+        // render the estimated item value over NEU PV
+        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
+        DrawContextUtils.translate(0f, 0f, -200f)
+
         renderedItems++
     }
 
@@ -83,7 +131,7 @@ object EstimatedItemValue {
      */
     private var renderedItems = 0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         renderedItems = 0
     }
@@ -92,7 +140,7 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        if (LorenzUtils.debug) {
+        if (SkyHanniDebugsAndTests.enabled) {
             if (Keyboard.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
@@ -103,7 +151,8 @@ object EstimatedItemValue {
         }
 
         try {
-            config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
+            // TODO this code needs to be changed around
+            config.position.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
             // that tries to over-render the tooltip, and is not explicitly something we can solve here?
@@ -112,18 +161,18 @@ object EstimatedItemValue {
             ErrorManager.logErrorWithData(
                 ex, "Error in Estimated Item Value renderer",
                 "display" to display,
-                "posLabel" to "Estimated Item Value"
+                "posLabel" to "Estimated Item Value",
             )
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         tryRendering()
     }
 
     private fun checkCurrentlyVisible(): Boolean {
-        if (!LorenzUtils.inSkyBlock) return false
+        if (!SkyBlockUtils.inSkyBlock) return false
         if (!config.enabled) return false
         if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return false
         if (System.currentTimeMillis() > lastToolTipTime + 200) return false
@@ -133,7 +182,7 @@ object EstimatedItemValue {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }
@@ -148,16 +197,14 @@ object EstimatedItemValue {
                 ignoreArmorDyes,
                 ignoreRunes,
                 priceSource,
-                useAttributeComposite,
             ) {
                 cache.clear()
             }
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
         updateItem(event.stack)
@@ -189,7 +236,7 @@ object EstimatedItemValue {
                 e, "Error in Estimated Item Value renderer",
                 "openInventoryName" to openInventoryName,
                 "item" to item,
-                "item name" to item.itemName,
+                "item name" to item.repoItemName,
                 "internal name" to item.getInternalNameOrNull(),
                 "lore" to item.getLore(),
             )
@@ -203,9 +250,9 @@ object EstimatedItemValue {
 
     private fun ItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.name
+            val name = this.displayName
             return (
-                this.item == Items.enchanted_book ||
+                this.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK ||
                     name.contains("Salesperson") ||
                     name == "§6☘ Category: Item Ability (Passive)" ||
                     internalName.isRune() ||
@@ -240,11 +287,7 @@ object EstimatedItemValue {
         }
         list.add("§aTotal: §6§l$numberFormat coins")
 
-        val newDisplay = mutableListOf<Renderable>()
-        for (line in list) {
-            newDisplay.add(Renderable.string(line))
-        }
-        return newDisplay
+        return list.map(StringRenderable::from)
     }
 
     @HandleEvent
@@ -257,5 +300,19 @@ object EstimatedItemValue {
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
+
+        event.move(94, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
+    }
+
+    fun renderInNeuStorageOverlay() {
+        if (!config.enabled) return
+
+        //#if MC < 1.16
+        // render the estimated item value over NEU Storage
+        DrawContextUtils.translate(0f, 0f, 200f)
+        tryRendering()
+        DrawContextUtils.translate(0f, 0f, -200f)
+        renderedItems++
+        //#endif
     }
 }

@@ -2,28 +2,37 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
-import at.hannibal2.skyhanni.data.FriendAPI
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.FriendApi
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
+import at.hannibal2.skyhanni.features.misc.CurrentPing
+import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PartyChatCommands {
-
     private val config get() = SkyHanniMod.feature.misc.partyCommands
     private val storage get() = SkyHanniMod.feature.storage
+    private val devConfig get() = SkyHanniMod.feature.dev
 
     data class PartyChatCommand(
         val names: List<String>,
         val isEnabled: () -> Boolean,
-        val requiresPartyLead: Boolean,
+        val requiresPartyLead: Boolean = true,
+        val triggerableBySelf: Boolean = true,
         val executable: (PartyChatEvent) -> Unit,
     )
 
@@ -34,7 +43,7 @@ object PartyChatCommands {
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
             { config.transferCommand },
-            requiresPartyLead = true,
+            triggerableBySelf = false,
             executable = {
                 HypixelCommands.partyTransfer(it.cleanedAuthor)
             },
@@ -42,7 +51,6 @@ object PartyChatCommands {
         PartyChatCommand(
             listOf("pw", "warp", "warpus"),
             { config.warpCommand && lastWarp.passedSince() > 5.seconds },
-            requiresPartyLead = true,
             executable = {
                 lastWarp = SimpleTimeMark.now()
                 HypixelCommands.partyWarp()
@@ -51,10 +59,43 @@ object PartyChatCommands {
         PartyChatCommand(
             listOf("allinv", "allinvite"),
             { config.allInviteCommand && lastAllInvite.passedSince() > 2.seconds },
-            requiresPartyLead = true,
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
                 HypixelCommands.partyAllInvite()
+            },
+        ),
+        PartyChatCommand(
+            listOf("ping"),
+            { config.pingCommand },
+            requiresPartyLead = false,
+            executable = {
+
+                if (!devConfig.hypixelPingApi) {
+
+                    ChatUtils.clickableChat(
+                        "Hypixel Ping Api is disabled, ping command won't work!",
+                        prefixColor = "§c",
+                        onClick = {
+                            devConfig::hypixelPingApi.jumpToEditor()
+                        },
+                        hover = "§eClick to find setting in the config!",
+                    )
+                    return@PartyChatCommand
+                }
+                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms", prefix = true)
+
+            },
+        ),
+        PartyChatCommand(
+            listOf("tps"),
+            { config.tpsCommand },
+            requiresPartyLead = false,
+            executable = {
+                if (TpsCounter.tps != null) {
+                    HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}", prefix = true)
+                } else {
+                    ChatUtils.chat("TPS Command Sent too early to calculate TPS")
+                }
             },
         ),
     )
@@ -68,8 +109,9 @@ object PartyChatCommands {
     }
 
     private fun isTrustedUser(name: String): Boolean {
-        val friend = FriendAPI.getAllFriends().find { it.name == name }
-        return when (config.defaultRequiredTrustLevel) {
+        if (name == PlayerUtils.getName()) return true
+        val friend = FriendApi.getAllFriends().find { it.name == name }
+        return when (config.requiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
             PartyCommandsConfig.TrustedUser.BEST_FRIENDS -> friend?.bestFriend == true
             PartyCommandsConfig.TrustedUser.ANYONE -> true
@@ -89,10 +131,9 @@ object PartyChatCommands {
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         val name = event.cleanedAuthor
-
-        if (name == LorenzUtils.getPlayerName()) return
+        if (name == PlayerUtils.getName() && (!command.triggerableBySelf || !config.selfTriggerCommands)) return
         if (!command.isEnabled()) return
-        if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) return
+        if (command.requiresPartyLead && PartyApi.partyLeader != PlayerUtils.getName()) return
         if (isBlockedUser(name)) {
             if (config.showIgnoredReminder) ChatUtils.clickableChat(
                 "§cIgnoring chat command from ${event.author}. " +
@@ -116,7 +157,7 @@ object PartyChatCommands {
 
     @HandleEvent
     fun onTabComplete(event: TabCompletionEvent) {
-        if (PartyAPI.partyLeader == null) return
+        if (PartyApi.partyLeader == null) return
         val prefix = event.fullText.firstOrNull() ?: return
         if (prefix !in commandPrefixes) return
 
@@ -127,44 +168,42 @@ object PartyChatCommands {
             .forEach(event::addSuggestion)
     }
 
-    /**
-     * TODO use a utils function for add/remove/list/clear
-     * function(args: Array<String>, list: List<String>, listName: String,
-     * precondition(string): () -> Boolean, onAdd(string), onRemove(string), onList(list))
-     */
-    fun blacklist(input: Array<String>) {
-        if (input.size !in 1..2) {
-            ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
-            return
-        }
-        when (val firstArg = input[0]) {
-            "add" -> {
-                if (input.size != 2) {
-                    ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
-                    return
+    @HandleEvent
+    fun onCommandRegister(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shignore") {
+            description = "Add/Remove a user from your blacklist"
+            category = CommandCategory.USERS_ACTIVE
+
+            literal("add") {
+                arg("name", BrigadierArguments.string()) { nameArg ->
+                    callback {
+                        val name = getArg(nameArg)
+                        if (isBlockedUser(name)) {
+                            ChatUtils.userError("$name is already ignored!")
+                        } else blacklistModify(name)
+                    }
                 }
-                if (isBlockedUser(input[1])) {
-                    ChatUtils.userError("${input[1]} is already ignored!")
-                } else blacklistModify(input[1])
             }
 
-            "remove" -> {
-                if (input.size != 2) {
-                    ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
-                    return
+            literal("remove") {
+                arg("name", BrigadierArguments.string()) { nameArg ->
+                    callback {
+                        val name = getArg(nameArg)
+                        if (!isBlockedUser(name)) {
+                            ChatUtils.userError("$name isn't ignored!")
+                        } else blacklistModify(name)
+                    }
                 }
-                if (!isBlockedUser(input[1])) {
-                    ChatUtils.userError("${input[1]} isn't ignored!")
-                } else blacklistModify(input[1])
             }
-
-            "list" -> {
-                if (input.size == 2) {
-                    blacklistView(input[1])
-                } else blacklistView()
+            literal("list") {
+                argCallback("name", BrigadierArguments.string()) { name ->
+                    blacklistView(name)
+                }
+                callback {
+                    blacklistView()
+                }
             }
-
-            "clear" -> {
+            literalCallback("clear") {
                 ChatUtils.clickableChat(
                     "Are you sure you want to do this? Click here to confirm.",
                     onClick = {
@@ -175,8 +214,9 @@ object PartyChatCommands {
                     oneTimeClick = true,
                 )
             }
-
-            else -> blacklistModify(firstArg)
+            argCallback("name", BrigadierArguments.string()) { name ->
+                blacklistModify(name)
+            }
         }
     }
 
@@ -218,5 +258,10 @@ object PartyChatCommands {
         } else {
             ChatUtils.chat("$player §cisn't §eignored.")
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(95, "misc.partyCommands.defaultRequiredTrustLevel", "misc.partyCommands.requiredTrustLevel")
     }
 }

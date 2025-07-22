@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
 
