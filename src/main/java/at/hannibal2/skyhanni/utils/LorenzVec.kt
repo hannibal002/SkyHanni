@@ -139,14 +139,9 @@ data class LorenzVec(
 
     fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
-    fun roundLocationToBlock(): LorenzVec {
-        val x = (x - .499999).roundTo(0)
-        val y = (y - .499999).roundTo(0)
-        val z = (z - .499999).roundTo(0)
-        return LorenzVec(x, y, z)
-    }
+    fun roundToBlock() = LorenzVec(floor(x), floor(y), floor(z))
 
-    fun blockCenter() = roundLocationToBlock().add(0.5, 0.5, 0.5)
+    fun blockCenter() = roundToBlock().add(0.5, 0.5, 0.5)
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
@@ -269,8 +264,6 @@ data class LorenzVec(
 
             return LorenzVec(this[0], this[1], this[2])
         }
-
-        fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().down()
 
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }

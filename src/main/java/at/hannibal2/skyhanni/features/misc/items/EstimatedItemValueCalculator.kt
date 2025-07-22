@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
@@ -45,6 +44,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFreeWill
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
@@ -103,6 +103,7 @@ object EstimatedItemValueCalculator {
         ::addEnrichment,
         ::addDivanPowderCoating,
         ::addMithrilInfusion,
+        ::addFreeWill,
 
         // counted
         ::addCrimsonPrestige,
@@ -152,6 +153,7 @@ object EstimatedItemValueCalculator {
     private val BOOKWORM_BOOK = "BOOKWORM_BOOK".toInternalName()
     private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
     private val MITHRIL_INFUSION = "MITHRIL_INFUSION".toInternalName()
+    private val FREE_WILL = "FREE_WILL".toInternalName()
 
     fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
         val (totalPrice, basePrice) = calculate(stack, mutableListOf())
@@ -259,6 +261,11 @@ object EstimatedItemValueCalculator {
     private fun addMithrilInfusion(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.getMithrilInfusion()) return 0.0
         return list.formatHaving("Mithril Infusion", MITHRIL_INFUSION)
+    }
+
+    private fun addFreeWill(stack: ItemStack, list: MutableList<String>): Double {
+        if (!stack.getFreeWill()) return 0.0
+        return list.formatHaving("Free Will", FREE_WILL)
     }
 
     private fun addArtOfWar(stack: ItemStack, list: MutableList<String>): Double {
@@ -674,7 +681,7 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
+            if (rawName in EstimatedItemValue.stackingEnchants.keys) level = 1
 
             val enchantmentName = "$rawName;$level".toInternalName()
 

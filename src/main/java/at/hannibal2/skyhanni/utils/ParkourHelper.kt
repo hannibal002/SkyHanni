@@ -44,7 +44,7 @@ class ParkourHelper(
         visible = false
     }
 
-    @Suppress("HandleEventInspection")
+    // Todo change this please for the love of god
     fun render(event: SkyHanniRenderWorldEvent) {
         if (locations.isEmpty()) {
             ErrorManager.logErrorWithData(

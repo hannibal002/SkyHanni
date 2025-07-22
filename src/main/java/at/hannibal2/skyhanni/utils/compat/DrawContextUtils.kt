@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import java.nio.FloatBuffer
 //#if MC > 1.21
+//$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
@@ -14,6 +15,13 @@ import java.nio.FloatBuffer
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
  */
 object DrawContextUtils {
+
+    // GL11.GL_MODELVIEW_MATRIX
+    const val GL_MODELVIEW_MATRIX = 2982
+    // GL11.GL_PROJECTION_MATRIX
+    const val GL_PROJECTION_MATRIX = 2983
+    // GL11.GL_CURRENT_COLOR
+    const val GL_CURRENT_COLOR = 2816
 
     private var _drawContext: DrawContext? = null
 

@@ -133,8 +133,8 @@ object LivingCaveSnakeFeatures {
         snakes.removeIf {
             val invalidShape = it.invalidShape()
             val invalidHead = it.invalidHead()
-            if (invalidShape && SkyHanniDebugsAndTests.enabled) ChatUtils.chat("LivingCaveSnake remove because of invalid shape")
-            if (invalidHead && SkyHanniDebugsAndTests.enabled) ChatUtils.chat("LivingCaveSnake remove because of invalid head")
+            if (invalidShape) ChatUtils.debug("LivingCaveSnake removed because of invalid shape")
+            if (invalidHead) ChatUtils.debug("LivingCaveSnake removed because of invalid head")
             invalidShape || invalidHead
         }
         snakes.forEach { it.tick() }

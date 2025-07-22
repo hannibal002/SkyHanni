@@ -22,6 +22,7 @@ abstract class AbstractRepoReloadEvent(
         // Then return the constant data
         return constantData
     }.getOrElse {
+        manager.addUnsuccessfulConstant(constant)
         manager.logger.throwErrorWithCause("Could not load constant '$constant'", it)
     }
 }

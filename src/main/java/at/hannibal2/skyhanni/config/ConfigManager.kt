@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -223,6 +224,15 @@ class ConfigManager {
             file.parentFile.mkdirs()
             StringFileHandler(file).save(gson.toJson(data))
             logger.log("Saved $fileName file successfully")
+        } catch (e: ClassCastException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Could not save $fileName file to $file",
+                "file" to file,
+                "data" to data,
+                "dataClass" to data.javaClass,
+                "fileName" to fileName,
+            )
         } catch (e: IOException) {
             logger.log("Could not save $fileName file to $file")
             logger.log(e.stackTraceToString())
@@ -267,6 +277,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
     PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
     STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
+    ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

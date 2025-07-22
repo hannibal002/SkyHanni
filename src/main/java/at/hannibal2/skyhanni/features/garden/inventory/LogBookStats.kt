@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 
@@ -85,9 +85,9 @@ object LogBookStats {
             val accepted = loggedVisitors.values.sumOf { it.sumOf { visitor -> visitor.timesAccepted } }
             val visitingNow = VisitorApi.getVisitors().size
             val denied = visited - accepted - visitingNow
-            add(StringRenderable("§6Times Visited: §b${visited.addSeparators()}"))
-            add(StringRenderable("§6Times Accepted: §a${accepted.addSeparators()}"))
-            add(StringRenderable("§6Times Denied: §c${denied.addSeparators()}"))
+            addString("§6Times Visited: §b${visited.addSeparators()}")
+            addString("§6Times Accepted: §a${accepted.addSeparators()}")
+            addString("§6Times Denied: §c${denied.addSeparators()}")
         }
     }
 

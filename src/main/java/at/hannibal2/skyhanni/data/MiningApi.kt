@@ -320,11 +320,11 @@ object MiningApi {
         if (waitingForInitSound) {
             if (event.soundName != "random.orb") {
                 if (event.pitch != 0.7936508f) return
-                val pos = event.location.roundLocationToBlock()
+                val pos = event.location.roundToBlock()
                 if (recentClickedBlocks.none { it.first == pos }) return
                 waitingForInitSound = false
                 waitingForEffMinerBlock = true
-                initBlockPos = event.location.roundLocationToBlock()
+                initBlockPos = event.location.roundToBlock()
                 lastInitSound = SimpleTimeMark.now()
             } else {
                 if (lastClicked.passedSince() > 1.seconds) return

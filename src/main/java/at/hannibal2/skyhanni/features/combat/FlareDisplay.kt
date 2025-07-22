@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.rgb
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
@@ -19,10 +21,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
@@ -72,7 +72,7 @@ object FlareDisplay {
                 0,
                 GuiScreenUtils.displayWidth,
                 GuiScreenUtils.displayHeight,
-                (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
+                (alpha shl 24) or (config.flashColor.rgb and 0xFFFFFF),
             )
             GlStateManager.color(1F, 1F, 1F, 1F)
         }
@@ -103,10 +103,10 @@ object FlareDisplay {
             if (newDisplay == null) {
                 newDisplay = buildList {
                     val displayTime = if (remainingTime.isNegative()) "§eSoon" else "§b${remainingTime.format()}"
-                    add(StringRenderable("$name: $displayTime"))
+                    addString("$name: $displayTime")
                     if (config.showManaBuff) {
                         type.manaBuff?.let {
-                            add(StringRenderable(" §b$it §7mana regen"))
+                            addString(" §b$it §7mana regen")
                         }
                     }
                 }
@@ -182,7 +182,7 @@ object FlareDisplay {
                 FlareType.WARNING -> config.warningColor
                 FlareType.ALERT -> config.alertColor
                 FlareType.SOS -> config.sosColor
-            }.toSpecialColor()
+            }.toColor()
 
             when (config.outlineType) {
                 FlareConfig.OutlineType.FILLED -> {
