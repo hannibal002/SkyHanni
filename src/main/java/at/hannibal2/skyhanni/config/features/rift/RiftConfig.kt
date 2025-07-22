@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
+
 class RiftConfig {
     @ConfigOption(name = "Rift Timer", desc = "")
     @Accordion
@@ -64,4 +65,10 @@ class RiftConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var temporalPillarDodge: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Ubik's cube reminder", desc = "Reminder for Ubik's cube in the rift")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var ubikReminder: Boolean = false
 }
