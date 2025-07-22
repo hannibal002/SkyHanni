@@ -19,9 +19,10 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Keyboard
@@ -64,8 +65,8 @@ class SearchableStorageGui : SkyhanniBaseScreen() {
         OtherInventoryData.close("Searchable Storage GUI")
     }
 
-    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(mouseX, mouseY, partialTicks)
 
         display = Renderable.drawInsideRoundedRect(buildContent(), Color.decode("#202020"))
 
@@ -85,7 +86,7 @@ class SearchableStorageGui : SkyhanniBaseScreen() {
         val header = buildHeader()
 
         val content = when {
-            search.isBlank() -> RenderableString(
+            search.isBlank() -> StringRenderable(
                 "§aSearch something!",
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -94,24 +95,24 @@ class SearchableStorageGui : SkyhanniBaseScreen() {
             else -> buildSearch()
         }
 
-        return VerticalContainerRenderable(listOf(header, Renderable.placeholder(1), content))
+        return Renderable.vertical(listOf(header, Renderable.placeholder(1), content))
     }
 
     private fun buildHeader(): Renderable {
-        val searchField = RenderableString(
+        val searchField = StringRenderable(
             "§eSearch: §7$search",
             horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
             verticalAlign = RenderUtils.VerticalAlignment.TOP,
         )
 
-        val searchModeField = RenderableString(
+        val searchModeField = StringRenderable(
             "§eSearch by: §7${searchMode.name}",
             horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
             verticalAlign = RenderUtils.VerticalAlignment.TOP,
         )
         searchModeRenderable = searchModeField
 
-        return VerticalContainerRenderable(listOf(searchField, searchModeField)).also {
+        return Renderable.vertical(listOf(searchField, searchModeField)).also {
             headerHeight = it.height + 10
         }
     }
@@ -119,7 +120,7 @@ class SearchableStorageGui : SkyhanniBaseScreen() {
     private fun buildSearch(): Renderable {
         val results = searchStorage()
         return if (results.isEmpty()) {
-            RenderableString(
+            StringRenderable(
                 "§cNothing found :( Did you open all your storages?",
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -129,10 +130,10 @@ class SearchableStorageGui : SkyhanniBaseScreen() {
         }
     }
 
-    override fun onKeyTyped(typedChar: Char, keyCode: Int) {
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         when (keyCode) {
             Keyboard.KEY_BACK -> if (search.isNotEmpty()) search = search.dropLast(1)
-            else -> if (typedChar.isLetterOrDigit() || typedChar in listOf(' ', '_', '-')) {
+            else -> if (typedChar != null && typedChar.isLetterOrDigit() || typedChar in listOf(' ', '_', '-')) {
                 search += typedChar
             }
         }

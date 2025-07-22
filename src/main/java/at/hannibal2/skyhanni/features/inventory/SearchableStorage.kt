@@ -37,8 +37,8 @@ object SearchableStorage {
     var waypoints = listOf<LorenzVec>()
     var inventoryName = ""
 
-    @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class)
+    fun onBackgroundDrawn() {
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
             val slotNumber = when (inventoryName) {
                 "Island Chest" -> slot.slotNumber
@@ -51,8 +51,8 @@ object SearchableStorage {
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (lastCloseTime.passedSince() <= 30.seconds) return
         highlightSlots = listOf()
         waypoints = listOf()

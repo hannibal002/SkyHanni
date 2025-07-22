@@ -102,7 +102,7 @@ object RenderableInventory {
                     if (uv == SlotsUv.CENTER)
                         items[index++]?.let {
                             val itemRenderable = item(it, scale, 0, 0, false)
-                            if (highlightSlots.contains(index)) Renderable.drawInsideRoundedRect(
+                            if (highlightSlots.contains(index)) drawInsideRoundedRect(
                                 itemRenderable,
                                 color = Color.GREEN,
                                 padding = 0,
