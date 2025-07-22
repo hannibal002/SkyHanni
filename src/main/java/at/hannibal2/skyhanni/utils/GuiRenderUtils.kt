@@ -487,7 +487,11 @@ object GuiRenderUtils {
             //$$ RenderSystem.assertOnRenderThread()
             //#endif
 
+            //#if MC < 1.21.6
             RenderHelper.enableGUIStandardItemLighting()
+            //#else
+            //$$ MinecraftClient.getInstance().gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
+            //#endif
 
             //#if MC < 1.21
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
