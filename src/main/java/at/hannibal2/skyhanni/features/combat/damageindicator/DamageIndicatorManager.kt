@@ -928,7 +928,7 @@ object DamageIndicatorManager {
         return maxHealth.getOrDefault(entity.uniqueID!!, 0L)
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
         mobFinder?.handleNewEntity(event.entity)
     }
