@@ -64,17 +64,4 @@ class ForagingConfig {
     @FeatureToggle
     @OnlyModern
     var mutePhantoms = true
-
-    @Expose
-    @ConfigOption(name = "Mute Tree Breaking", desc = "Mutes the sound of the tree fully breaking.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @OnlyModern
-    var muteTreeBreaking = true
-
-    @Expose
-    @ConfigOption(name = "Also on Galatea", desc = "Also mutes tree breaking sounds on Galatea.")
-    @ConfigEditorBoolean
-    @OnlyModern
-    var muteTreeBreakingOnGalatea = true
 }
