@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTracke
 import at.hannibal2.skyhanni.config.features.mining.nucleus.MetalDetectorConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.orderedwaypoints.OrderedWaypointsConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -65,6 +66,11 @@ class MiningConfig {
     @ConfigOption(name = "Metal Detector", desc = "")
     @Accordion
     val metalDetector: MetalDetectorConfig = MetalDetectorConfig()
+
+    @Expose
+    @ConfigOption(name = "Ordered Waypoints", desc = "")
+    @Accordion
+    val orderedWaypoints: OrderedWaypointsConfig = OrderedWaypointsConfig()
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
