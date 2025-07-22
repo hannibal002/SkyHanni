@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.event
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -34,7 +35,7 @@ class YearOfTheSealConfig {
     @ConfigOption(name = "Bouncy Ball Line Color", desc = "Color of the Bouncy Ball Line.")
     @ConfigEditorColour
     @SearchTag("beach")
-    var bouncyBallLineColor: String = "0:245:255:0:196"
+    var bouncyBallLineColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 196, 245)
 
     @Expose
     @ConfigOption(name = "Bouncy Ball Landing Spot", desc = "Show the spot where the Bouncy Ball will land, and add a counter.")

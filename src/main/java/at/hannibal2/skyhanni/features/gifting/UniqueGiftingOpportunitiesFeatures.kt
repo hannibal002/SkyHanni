@@ -68,7 +68,7 @@ object UniqueGiftingOpportunitiesFeatures {
         analyzeArmorStand(event.entity)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityJoinWorld(event: EntityEnterWorldEvent<Entity>) {
         playerColor(event)
         val entity = event.entity as? EntityArmorStand ?: return
@@ -93,7 +93,7 @@ object UniqueGiftingOpportunitiesFeatures {
     private fun isIronman(entity: EntityLivingBase) =
         !SkyBlockUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         giftedPattern.matchMatcher(event.message) {
             addGiftedPlayer(group("player"))

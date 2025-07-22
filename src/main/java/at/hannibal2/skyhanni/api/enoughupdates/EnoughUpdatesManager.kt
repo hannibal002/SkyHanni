@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
@@ -93,12 +94,17 @@ object EnoughUpdatesManager {
     private suspend fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         fileSystem.list("items").mapNotNullAsync { name ->
-            val internalName = name.removeSuffix(".json")
-            val parsed = parseItem(
-                internalName = internalName,
-                json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
-            ) ?: return@mapNotNullAsync null
-            internalName to parsed
+            try {
+                val internalName = name.removeSuffix(".json")
+                val parsed = parseItem(
+                    internalName = internalName,
+                    json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
+                ) ?: return@mapNotNullAsync null
+                internalName to parsed
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
+                null
+            }
         }.forEach { (internalName, item) ->
             tempItemMap[internalName] = item
         }
@@ -452,7 +458,7 @@ object EnoughUpdatesManager {
         neuPetsJson = event.getConstant<NeuPetsJson>("pets")
         neuPetNums = event.getConstant<JsonObject>("petnums")
         if (itemMap.isNotEmpty()) {
-            ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
+            ChatUtils.chat("Reloaded ${itemMap.size.addSeparators()} items in the NEU repo")
         }
     }
 
