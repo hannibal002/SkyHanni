@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-
 class RiftConfig {
     @ConfigOption(name = "Rift Timer", desc = "")
     @Accordion
