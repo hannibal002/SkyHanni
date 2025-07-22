@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -22,7 +23,7 @@ class VoltCruxConfig {
     @Expose
     @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the Volt range be highlighted?")
     @ConfigEditorColour
-    var voltColor: String = "0:60:0:0:255"
+    var voltColor: ChromaColour = ChromaColour.fromStaticRGB(0, 0, 255, 60)
 
     @Expose
     @ConfigOption(name = "Volt Mood Color", desc = "Change the color of the Volt enemy depending on their mood.")

@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -28,8 +27,8 @@ object RenderBackground {
                 backgroundRenderable,
                 0,
                 config.roundedCornerSmoothness,
-                outline.colorTop.toSpecialColor().rgb,
-                outline.colorBottom.toSpecialColor().rgb,
+                outline.colorTop.toColor().rgb,
+                outline.colorBottom.toColor().rgb,
                 outline.thickness,
                 outline.blur,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -84,14 +83,12 @@ object RenderBackground {
                 RenderUtils.HorizontalAlignment.LEFT -> 0 + margin
                 RenderUtils.HorizontalAlignment.CENTER -> scaledWidth / 2 - elementWidth / 2
                 RenderUtils.HorizontalAlignment.RIGHT -> scaledWidth - elementWidth - margin
-                else -> 0
             }
             var y = when (verticalAlignment) {
                 RenderUtils.VerticalAlignment.DONT_ALIGN -> position.getAbsY()
                 RenderUtils.VerticalAlignment.TOP -> 0 + margin
                 RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - elementHeight / 2
                 RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - margin
-                else -> 0
             }
 
             val outlineConfig = config.outline

@@ -13,7 +13,7 @@ class SkyHanniRadialGradientCircleUniform : AutoCloseable {
     val storage = DynamicUniformStorage<UniformValue>(
         "Skyhanni Gradient Circle UBO",
         UNIFORM_SIZE,
-        6
+        6,
     )
 
     fun writeWith(
@@ -22,10 +22,10 @@ class SkyHanniRadialGradientCircleUniform : AutoCloseable {
         endColor: Vector4f,
         progress: Float,
         phaseOffset: Float,
-        reverse: Int
+        reverse: Int,
     ): GpuBufferSlice {
         return storage.write(
-            UniformValue(angle, startColor, endColor, progress, phaseOffset, reverse)
+            UniformValue(angle, startColor, endColor, progress, phaseOffset, reverse),
         )
     }
 
@@ -44,7 +44,7 @@ class SkyHanniRadialGradientCircleUniform : AutoCloseable {
         val progress: Float,
         val phaseOffset: Float,
         val reverse: Int,
-    ): DynamicUniformStorage.Uploadable {
+    ) : DynamicUniformStorage.Uploadable {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(angle)
