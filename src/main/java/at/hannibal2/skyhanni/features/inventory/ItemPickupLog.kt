@@ -290,11 +290,11 @@ object ItemPickupLog {
     }
 
     private fun computeTotalCoinValue(display: MutableList<Renderable>) {
-        if (!coinConfig.totalCoinValue || !(itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) return
+        if (!coinConfig.enabled || !(itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) return
         val valueAdded = itemsAddedToInventory.values.sumOf { it.coinValue() }
         val valueRemoved = itemsRemovedFromInventory.values.sumOf { it.coinValue() }
         val total = valueAdded - valueRemoved
-        if (total >= coinConfig.totalCoinValueThreshold || coinConfig.totalCoinValueThreshold == 0f) {
+        if (total >= coinConfig.threshold || coinConfig.threshold == 0f) {
             display.addString("Value: ${total.formatCoin()} Coins")
         }
     }

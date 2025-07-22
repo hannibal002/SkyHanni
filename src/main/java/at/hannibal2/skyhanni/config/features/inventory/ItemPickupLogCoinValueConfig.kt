@@ -12,7 +12,7 @@ class ItemPickupLogCoinValueConfig {
     @Expose
     @ConfigOption(name = "Total Coin Value", desc = "Show total coin value of the items in your pickup log.")
     @ConfigEditorBoolean
-    var totalCoinValue: Boolean = false
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Price Source", desc = "What price source to use for total coin value.")
@@ -22,5 +22,5 @@ class ItemPickupLogCoinValueConfig {
     @Expose
     @ConfigOption(name = "Total Coin Value Threshold", desc = "Only show total coin value when above this threshold.")
     @ConfigEditorSlider(minValue = 0f, maxValue = 1_000_000f, minStep = 1000f)
-    var totalCoinValueThreshold: Float = 10_000f
+    var threshold: Float = 10_000f
 }
