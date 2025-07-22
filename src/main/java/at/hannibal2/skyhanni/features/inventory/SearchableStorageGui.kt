@@ -190,7 +190,7 @@ class SearchableStorageGui : SkyhanniBaseScreen() {
                     SearchableStorage.waypoints = storage.inventoryContainer.run {
                         SoundUtils.createSound("random.orb", 1.0f).playSound()
                         ChatUtils.chat("Set waypoint to $displayName!")
-                        SearchableStorage.inventoryName = "Island Chest"
+                        SearchableStorage.inventoryName = "Chest"
 
                         listOfNotNull(primaryCords, secondaryCords)
                     }

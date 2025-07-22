@@ -41,7 +41,7 @@ object SearchableStorage {
     fun onBackgroundDrawn() {
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
             val slotNumber = when (inventoryName) {
-                "Island Chest" -> slot.slotNumber
+                "Chest" -> slot.slotNumber
                 else -> slot.slotNumber - 9
             }
 
@@ -56,6 +56,7 @@ object SearchableStorage {
         if (lastCloseTime.passedSince() <= 30.seconds) return
         highlightSlots = listOf()
         waypoints = listOf()
+        lastCloseTime = SimpleTimeMark.farFuture()
     }
 
     @HandleEvent
