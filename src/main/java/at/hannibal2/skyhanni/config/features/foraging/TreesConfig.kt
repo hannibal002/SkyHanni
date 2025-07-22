@@ -35,12 +35,12 @@ class TreesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     @OnlyModern
-    var muteBreaking = false
+    var muteBreaking = true
 
     @Expose
     @ConfigOption(name = "Also on Galatea", desc = "Also mutes tree breaking sounds on Galatea.")
     @ConfigEditorBoolean
     @OnlyModern
-    var muteBreakingOnGalatea = true
+    var muteBreakingOnGalatea = false
 
 }
