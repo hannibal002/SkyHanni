@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,7 +27,7 @@ object UbikReminder {
         "ROUND [1-9] \\(FINAL\\):",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.ubikReminder) return
         val message = event.message
@@ -39,7 +40,9 @@ object UbikReminder {
         isTimerRunning = true
 
         DelayedRun.runDelayed(2.hours) { // 2 hours as a Duration
-            ChatUtils.chat("§aUbik's cube is ready in the rift!")
+            if (config.ubikReminder) {
+                ChatUtils.chat("§aUbik's cube is ready in the rift!")
+            }
             isTimerRunning = false
         }
     }
