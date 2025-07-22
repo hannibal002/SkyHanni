@@ -1,20 +1,22 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
-import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.getCenter
+import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -58,8 +60,9 @@ import java.util.UUID
  * Gives back the second additional armor stand.
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
- * @property id Unique identifier for each Mob instance
+ * @property uniqueId Unique identifier for each Mob instance
  */
+@Suppress("TooManyFunctions")
 class Mob(
     var baseEntity: EntityLivingBase,
     val mobType: Type,
@@ -72,9 +75,12 @@ class Mob(
     val levelOrTier: Int = -1,
 ) {
 
-    private val id: UUID = UUID.randomUUID()
+    private val uniqueId: UUID = UUID.randomUUID()
+    val id = baseEntity.entityId
 
     val owner: MobUtils.OwnerShip?
+
+    fun belongsToPlayer(): Boolean = owner?.equals(PlayerUtils.getName()) ?: false
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
     val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
@@ -104,17 +110,25 @@ class Mob(
             else -> false
         }
     }
-
-    val isCorrupted get() = baseEntity.isCorrupted() // Can change
-    val isRunic = baseEntity.isRunic() // Does not Change
+    /**
+     * @property isCorrupted can change.
+     */
+    val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted()
+    /**
+     * @property isRunic does not change.
+     */
+    val isRunic = !RiftApi.inRift() &&
+        armorStand?.name?.startsWith("§5") == true &&
+        mobType == Type.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isNullOrEmpty()
 
     private var highlightColor: Color? = null
+    private var condition: () -> Boolean = { true }
 
     /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
      * If [color] is set to null it removes a highlight*/
@@ -129,11 +143,18 @@ class Mob(
         }
     }
 
+    // TODO add support for moulconfig.ChromaColour, and eventually removed awt.Color support
+    fun highlight(color: Color, condition: () -> Boolean) {
+        highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
+        this.condition = condition
+        internalHighlight()
+    }
+
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color) { !this.isInvisible() && condition() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color) { !this.isInvisible() && condition() }
             }
         }
     }
@@ -150,6 +171,9 @@ class Mob(
         get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
             ?: baseEntity.entityBoundingBox
 
+    val health: Float get() = baseEntity.health
+    val maxHealth: Int get() = baseEntity.baseMaxHealth
+
     init {
         removeExtraEntitiesFromChecking()
         relativeBoundingBox =
@@ -157,7 +181,7 @@ class Mob(
 
         owner = (
             ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-                summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+                summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
             } else null
             )?.let { MobUtils.OwnerShip(it) }
     }
@@ -227,9 +251,9 @@ class Mob(
         internalHighlight()
     }
 
-    val centerCords get() = boundingBox.getCenter()
+    val centerCords get() = boundingBox.getBoxCenter()
 
-    override fun hashCode() = id.hashCode()
+    override fun hashCode() = uniqueId.hashCode()
 
     override fun toString(): String = "$name - ${baseEntity.entityId}"
 
@@ -237,10 +261,14 @@ class Mob(
         if (this === other) return true
         if (other !is Mob) return false
 
-        return id == other.id
+        return uniqueId == other.uniqueId
     }
 
     // TODO add max distance
-    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean) =
+        LineToMobHandler.register(this, color, lineWidth, depth, condition)
+
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
+
+    val isAlive: Boolean get() = baseEntity.isEntityAlive
 }

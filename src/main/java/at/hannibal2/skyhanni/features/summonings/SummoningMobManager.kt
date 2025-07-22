@@ -1,29 +1,30 @@
 package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -42,7 +43,7 @@ object SummoningMobManager {
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
-        "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)",
+        "§aYou have spawned your .+ §r§asoul! §r§d\\(\\d+ Mana\\)",
     )
 
     /**
@@ -60,7 +61,7 @@ object SummoningMobManager {
      */
     private val seraphRecallPattern by patternGroup.pattern(
         "seraphrecall",
-        "§cThe Seraph recalled your (\\d+) summoned allies!",
+        "§cThe Seraph recalled your \\d+ summoned allies!",
     )
 
     private val despawnPatterns = listOf(
@@ -68,9 +69,9 @@ object SummoningMobManager {
         seraphRecallPattern,
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.summonMessages) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!config.summonMessages) return
         if (spawnPattern.matches(event.message)) event.blockedReason = "summoning_soul"
 
         if (despawnPatterns.any { it.matches(event.message) }) {
@@ -79,22 +80,23 @@ object SummoningMobManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.Summon) {
-        if (event.mob.owner?.ownerName != LorenzUtils.getPlayerName()) return
+        if (!event.mob.belongsToPlayer()) return
 
         mobs += event.mob
         if (config.summoningMobColored) event.mob.highlight(LorenzColor.GREEN.toColor())
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.Summon) {
         val mob = event.mob
         if (mob !in mobs) return
         mobs -= mob
 
         // since MobEvent.DeSpawn can be fired while outside sb
-        if (!LorenzUtils.inSkyBlock) return
+        @Suppress("InSkyBlockEarlyReturn")
+        if (!SkyBlockUtils.inSkyBlock) return
         if (!config.summonMessages) return
 
         if (!mob.isInRender()) return
@@ -105,16 +107,16 @@ object SummoningMobManager {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
-        if (!LorenzUtils.inSkyBlock || !config.summoningMobHideNametag) return
+        if (!config.summoningMobHideNametag) return
         if (event.entity.mob !in mobs) return
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.summoningMobDisplay) return
+        if (!config.summoningMobDisplay) return
         if (mobs.isEmpty()) return
 
         val list = buildList {
@@ -126,13 +128,13 @@ object SummoningMobManager {
                 val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong()).getChatColor()
                 add("#${index + 1} §a${mob.name} $color${health.shortFormat()}§2/${maxHealth.shortFormat()}§c❤")
             }
-        }.map { Renderable.string(it) }
+        }.map(StringRenderable::from)
 
-        val renderable = Renderable.verticalContainer(list)
+        val renderable = Renderable.vertical(list)
         config.summoningMobDisplayPos.renderRenderable(renderable, posLabel = "Summoning Mob Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "summonings", "combat.summonings")
     }

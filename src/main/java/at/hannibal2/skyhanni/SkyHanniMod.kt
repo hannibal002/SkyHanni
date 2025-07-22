@@ -1,150 +1,209 @@
 package at.hannibal2.skyhanni
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.config.StorageData
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
-import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
-import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
+import at.hannibal2.skyhanni.utils.VersionConstants
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.common.event.FMLInitializationEvent
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
-@Mod(
-    modid = SkyHanniMod.MODID,
-    clientSideOnly = true,
-    useMetadata = true,
-    guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "@MOD_VERSION@",
-)
-class SkyHanniMod {
+@SkyHanniModule
+object SkyHanniMod {
 
-    @Mod.EventHandler
-    fun preInit(event: FMLPreInitializationEvent?) {
-        checkIfNeuIsLoaded()
+    fun preInit() {
+        PlatformUtils.checkIfNeuIsLoaded()
 
-        HotswapSupport.load()
-
-        loadModule(this)
-        LoadedModules.modules.forEach { loadModule(it) }
-
-        loadModule(CrimsonIsleReputationHelper(this))
+        LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
-
-        CommandRegistrationEvent.post()
 
         PreInitFinishedEvent.post()
     }
 
-    @Mod.EventHandler
-    fun init(event: FMLInitializationEvent?) {
+    fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        initLogging()
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesRepoManager.initRepo()
+        MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        repo = RepoManager(ConfigManager.configDirectory)
-        loadModule(repo)
         try {
-            repo.loadRepoInformation()
+            SkyHanniRepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
-        loadedClasses.clear()
     }
 
-    private val loadedClasses = mutableSetOf<String>()
-
-    fun loadModule(obj: Any) {
-        if (!loadedClasses.add(obj.javaClass.name)) throw IllegalStateException("Module ${obj.javaClass.name} is already loaded")
-        modules.add(obj)
-        MinecraftForge.EVENT_BUS.register(obj)
-    }
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (screenToOpen != null) {
+    @HandleEvent
+    fun onTick() {
+        screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
-                Minecraft.getMinecraft().thePlayer.closeScreen()
-                OtherInventoryData.close()
-                Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
+                val title = InventoryUtils.openInventoryName()
+                if (shouldCloseScreen) {
+                    //#if MC < 1.21
+                    MinecraftCompat.localPlayer.closeScreen()
+                    //#else
+                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
+                    //#endif
+                    OtherInventoryData.close(title)
+                }
+                shouldCloseScreen = true
+                Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null
             }
         }
     }
 
-    companion object {
+    const val MODID: String = "skyhanni"
+    const val VERSION: String = VersionConstants.MOD_VERSION
 
-        const val MODID = "skyhanni"
+    val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
-        @JvmStatic
-        val version: String
-            get() = Loader.instance().indexedModList[MODID]!!.version
+    val isBetaVersion: Boolean
+        get() = modVersion.isBeta
 
-        @JvmField
-        var feature: Features = Features()
-        lateinit var sackData: SackData
-        lateinit var friendsData: FriendsJson
-        lateinit var knownFeaturesData: KnownFeaturesJson
-        lateinit var jacobContestsData: JacobContestsJson
-        lateinit var visualWordsData: VisualWordsJson
+    @JvmField
+    var feature: Features = Features()
+    lateinit var sackData: SackData
+    lateinit var storageData: StorageData
+    lateinit var friendsData: FriendsJson
+    lateinit var knownFeaturesData: KnownFeaturesJson
+    lateinit var jacobContestsData: JacobContestsJson
+    lateinit var visualWordsData: VisualWordsJson
+    lateinit var petData: PetDataStorage
+    lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
 
-        lateinit var repo: RepoManager
-        lateinit var configManager: ConfigManager
-        val logger: Logger = LogManager.getLogger("SkyHanni")
-        fun getLogger(name: String): Logger {
-            return LogManager.getLogger("SkyHanni.$name")
+    lateinit var configManager: ConfigManager
+    val logger: Logger = LogManager.getLogger("SkyHanni")
+    fun getLogger(name: String): Logger {
+        return LogManager.getLogger("SkyHanni.$name")
+    }
+
+    val modules: MutableList<Any> = ArrayList()
+    private val globalJob: Job = Job(null)
+    private val coroutineScope = CoroutineScope(
+        CoroutineName("SkyHanni") + SupervisorJob(globalJob),
+    )
+
+    /**
+     * Launch an IO coroutine with a lock on the provided mutex.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * @param mutex The mutex to lock during the execution of the block.
+     * @param block The suspend function to execute within the IO context.
+     */
+    fun launchIOCoroutineWithMutex(
+        mutex: Mutex,
+        block: suspend CoroutineScope.() -> Unit
+    ): Job = launchCoroutine {
+        mutex.withLock {
+            withContext(Dispatchers.IO, block)
         }
+    }
 
-        val modules: MutableList<Any> = ArrayList()
-        private val globalJob: Job = Job(null)
-        val coroutineScope = CoroutineScope(
-            CoroutineName("SkyHanni") + SupervisorJob(globalJob),
-        )
-        var screenToOpen: GuiScreen? = null
-        private var screenTicks = 0
-        fun consoleLog(message: String) {
-            logger.log(Level.INFO, message)
+    /**
+     * Launch an IO coroutine in the SkyHanni scope.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * @param block The suspend function to execute within the IO context.
+     */
+    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job = launchCoroutine {
+        withContext(Dispatchers.IO, block)
+    }
+
+    /**
+     * Launches a coroutine in the SkyHanni scope.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * The function provided here must not rely on the CoroutineScope's context.
+     * @param function The function to execute in the coroutine.
+     */
+    fun launchNoScopeCoroutine(function: suspend () -> Unit): Job = launchCoroutine { function() }
+
+    /**
+     * Launches a coroutine in the SkyHanni scope.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * @param function The suspend function to execute in the coroutine.
+     */
+    fun launchCoroutine(function: suspend CoroutineScope.() -> Unit): Job = coroutineScope.launch {
+        try {
+            function()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                e.message ?: "Asynchronous exception caught",
+            )
         }
+    }
 
-        fun launchCoroutine(function: suspend () -> Unit) {
-            coroutineScope.launch {
-                try {
-                    function()
-                } catch (ex: Exception) {
-                    ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
-                }
+    var screenToOpen: GuiScreen? = null
+    var shouldCloseScreen: Boolean = true
+    private var screenTicks = 0
+    fun consoleLog(message: String) {
+        logger.log(Level.INFO, message)
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("sh") {
+            aliases = listOf("skyhanni")
+            description = "Opens the main SkyHanni config"
+            literalCallback("gui") {
+                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
+            }
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
+                openConfigGui(search)
+            }
+            simpleCallback {
+                openConfigGui()
+            }
+        }
+        event.registerBrigadier("shconfigsave") {
+            description = "Manually saving the config"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                ChatUtils.chat("Manually saved the config!")
+                configManager.saveConfig(ConfigFileType.FEATURES, "manual-command")
             }
         }
     }

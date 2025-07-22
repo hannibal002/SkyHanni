@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 object NumberUtil {
@@ -38,9 +41,6 @@ object NumberUtil {
         ),
     )
 
-    @Deprecated("outdated", ReplaceWith("value.shortFormat(preciseBillions)"))
-    fun format(value: Number, preciseBillions: Boolean = false): String = value.shortFormat(preciseBillions)
-
     // 1234 -> 1.2k
     fun Number.shortFormat(preciseBillions: Boolean = false): String {
         return compactFormat(this, preciseBillions)
@@ -51,9 +51,11 @@ object NumberUtil {
      * @link https://stackoverflow.com/a/30661479
      * @author assylias
      */
-    private fun compactFormat(value: Number, preciseBillions: Boolean = false): String {
-        @Suppress("NAME_SHADOWING")
-        val value = value.toLong()
+    private fun compactFormat(input: Number, preciseBillions: Boolean = false): String {
+        val absDoubleValue = input.toDouble().absoluteValue
+        if (absDoubleValue < 1) return input.toString()
+
+        val value = input.toLong()
         // Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
         if (value == Long.MIN_VALUE) return compactFormat(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + compactFormat(-value, preciseBillions)
@@ -87,12 +89,6 @@ object NumberUtil {
     }
 
     fun Float.roundTo(precision: Int): Float = toDouble().roundTo(precision).toFloat()
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun Double.roundToPrecision(precision: Int) = this.roundTo(precision)
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun Float.roundToPrecision(precision: Int) = this.roundTo(precision)
 
     fun Number.ordinal(): String {
         val long = this.toLong()
@@ -263,13 +259,15 @@ object NumberUtil {
 
     // Sometimes we just take an L, never find it and forget to write it down
     val Int.million get() = this * 1_000_000.0
-    private val Int.billion get() = this * 1_000_000_000.0
+    val Int.billion get() = this * 1_000_000_000.0
     val Double.million get() = (this * 1_000_000.0).toLong()
 
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
+
+    fun Int?.isPositive(): Boolean = (this ?: 0) > 0
 
     fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
         var interp = now
@@ -281,4 +279,18 @@ object NumberUtil {
         return interp
     }
 
+    fun Int.intPow(n: Int): Int = toDouble().pow(n).toInt()
+
+    fun Double.formatPercentage(): String = formatPercentage(this, "0.00")
+
+    private fun formatPercentage(percentage: Double, format: String?): String =
+        DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
+
+    fun Double.oneDecimal() = "%.1f".format(this)
+}
+
+class MinMaxNumber(val min: Double, val max: Double) {
+    override fun toString(): String = "${min.formatCoin()}§7-${max.formatCoin()}"
+
+    operator fun plus(other: MinMaxNumber): MinMaxNumber = MinMaxNumber(min + other.min, max + other.max)
 }

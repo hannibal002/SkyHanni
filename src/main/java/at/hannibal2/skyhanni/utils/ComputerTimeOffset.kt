@@ -1,25 +1,36 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlinx.coroutines.delay
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
-import kotlin.concurrent.thread
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 @SkyHanniModule
 object ComputerTimeOffset {
     private var offsetMillis: Duration? = null
 
-    private val config get() = SkyHanniMod.feature.misc.warnAboutPcTimeOffset
+    private val config get() = SkyHanniMod.feature.misc
+
+    private var state = State.NORMAL
+
+    enum class State(val duration: Duration) {
+        NORMAL(1.seconds),
+        SLOW(10.seconds),
+        TOTALLY_OFF(Duration.INFINITE),
+    }
+
+    private var currentlyChecking = false
 
     private val offsetFixLinks by lazy {
         when {
@@ -34,42 +45,63 @@ object ComputerTimeOffset {
     }
 
     init {
-        thread {
-            while (true) {
-                Thread.sleep(1000)
+        SkyHanniMod.launchIOCoroutine {
+            while (state != State.TOTALLY_OFF) {
+                delay(state.duration)
                 detectTimeChange()
             }
         }
     }
 
     private fun checkOffset() {
+        // probably a problem when the response somehow took longer than 1s?
+        if (currentlyChecking) {
+            state = state.next() ?: error("state is already TOTALLY_OFF")
+            if (state == State.TOTALLY_OFF) {
+                ErrorManager.logErrorStateWithData(
+                    "Error when checking Computer Time Offset",
+                    "trying to check again even though the previous check is still not done",
+                )
+            }
+            if (state == State.SLOW) {
+                ChatUtils.chat("Computer Time Offset calculation took longer than normal. Checking less often now.")
+            }
+            currentlyChecking = false
+            return
+        }
+        currentlyChecking = true
         val wasOffsetBefore = (offsetMillis?.absoluteValue ?: 0.seconds) > 5.seconds
-        SkyHanniMod.coroutineScope.launch {
-            offsetMillis = getNtpOffset("time.google.com")
+        SkyHanniMod.launchIOCoroutine {
+            offsetMillis = getNtpOffset(SkyHanniMod.feature.dev.ntpServer)
+            currentlyChecking = false
             offsetMillis?.let {
                 tryDisplayOffset(wasOffsetBefore)
             }
         }
     }
 
-    private fun getNtpOffset(ntpServer: String): Duration? = try {
-        val client = NTPUDPClient()
-        val address = InetAddress.getByName(ntpServer)
-        val timeInfo = client.getTime(address)
-
-        timeInfo.computeDetails()
-        timeInfo.offset.milliseconds
-    } catch (e: Exception) {
-        if (LorenzUtils.inSkyBlock && config) ErrorManager.logErrorWithData(
-            e, "Failed to get NTP offset",
-            "server" to ntpServer,
-        )
-        else {
-            @Suppress("PrintStackTrace")
-            e.printStackTrace()
-        }
-        null
-    }
+    private val clientTimeout = 10.seconds
+    private fun getNtpOffset(ntpServer: String): Duration? =
+        runCatching {
+            NTPUDPClient().use { client ->
+                client.setDefaultTimeout(clientTimeout.toJavaDuration())
+                val address = InetAddress.getByName(ntpServer)
+                val timeInfo = client.getTime(address)
+                timeInfo.computeDetails()
+                timeInfo.offset.milliseconds
+            }
+        }.onFailure { e ->
+            if (SkyBlockUtils.inSkyBlock && config.warnAboutPcTimeOffset) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to get NTP offset",
+                    "server" to ntpServer,
+                )
+            } else {
+                @Suppress("PrintStackTrace")
+                e.printStackTrace()
+            }
+        }.getOrNull()
 
     private var lastSystemTime = System.currentTimeMillis()
 
@@ -86,7 +118,7 @@ object ComputerTimeOffset {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         DelayedRun.runDelayed(5.seconds) {
             checkOffset()
@@ -94,7 +126,7 @@ object ComputerTimeOffset {
     }
 
     private fun tryDisplayOffset(wasOffsetBefore: Boolean) {
-        if (!config || !LorenzUtils.onHypixel) return
+        if (!config.warnAboutPcTimeOffset || !SkyBlockUtils.onHypixel) return
         val offsetMillis = offsetMillis ?: return
         if (offsetMillis.absoluteValue < 5.seconds) {
             if (wasOffsetBefore) {
@@ -107,22 +139,35 @@ object ComputerTimeOffset {
             "Your computer's clock is off by ${offsetMillis.absoluteValue.format()}.\n" +
                 "§ePlease update your time settings. Many features may not function correctly until you do.\n" +
                 "§eClick here for instructions on how to fix your clock.",
-            offsetFixLinks ?: return,
+            url = offsetFixLinks ?: return,
             prefixColor = "§c",
+            replaceSameMessage = true,
         )
     }
 
-    @SubscribeEvent
-    fun onDebugCollect(event: DebugDataCollectEvent) {
-        event.title("Time Offset")
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Computer Time Offset")
+
+        if (state != State.NORMAL) {
+            event.addData("state is $state")
+            return
+        }
+
         val offset = offsetMillis ?: run {
             event.addIrrelevant("not calculated yet")
             return
         }
 
-        val relevant = offset.absoluteValue > 500.milliseconds
+        val relevant = offset.absoluteValue > 1.seconds
         if (relevant) {
-            event.addData(offset.toString())
+            event.addData {
+                add(offset.toString())
+                offsetFixLinks?.let {
+                    add("Instructions on how to fix your clock can be found here:")
+                    add(it)
+                }
+            }
         } else {
             event.addIrrelevant(offset.toString())
         }

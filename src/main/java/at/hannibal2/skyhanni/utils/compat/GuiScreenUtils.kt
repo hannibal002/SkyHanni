@@ -1,59 +1,77 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.client.Minecraft
+//#if MC < 1.16
 import net.minecraft.client.gui.ScaledResolution
-import org.lwjgl.input.Mouse
+//#endif
 
 object GuiScreenUtils {
+
     private val mc get() = Minecraft.getMinecraft()
-    val scaledWindowHeight
+
+    val scaledWindowHeight: Int
         get() =
 //#if MC < 1.16
             ScaledResolution(mc).scaledHeight
 //#else
-//$$            mc.window.guiScaledHeight
+//$$            mc.window.guiScaledHeight.toInt()
 //#endif
 
-    val scaledWindowWidth
+    val scaledWindowWidth: Int
         get() =
 //#if MC < 1.16
             ScaledResolution(mc).scaledWidth
 //#else
-//$$            mc.window.guiScaledWidth
+//$$            mc.window.guiScaledWidth.toInt()
 //#endif
 
-    val displayWidth
+    val displayWidth: Int
         get() =
 //#if MC < 1.16
             mc.displayWidth
 //#else
-//$$            mc.window.width
+//$$            mc.window.width.toInt()
 //#endif
 
-
-    val displayHeight
+    val displayHeight: Int
         get() =
 //#if MC < 1.16
             mc.displayHeight
 //#else
-//$$            mc.window.height
+//$$            mc.window.height.toInt()
 //#endif
 
-    val globalMouseX get() = Mouse.getX()
-    val globalMouseY get() = Mouse.getY()
+    val scaleFactor: Int
+        get() =
+//#if MC < 1.16
+            ScaledResolution(mc).scaleFactor
+//#else
+//$$            mc.window.scaleFactor.toInt()
+//#endif
 
-    val mouseX
-        get() = globalMouseX * scaledWindowWidth / displayWidth
+    private val globalMouseX get() = MouseCompat.getX()
+    private val globalMouseY get() = MouseCompat.getY()
+
+    val mouseX: Int get() {
+        var x = globalMouseX * scaledWindowWidth / displayWidth
+        //#if MC > 1.21
+        //$$ if (mc.window.framebufferWidth > mc.window.width) x *= 2
+        //#endif
+        return x
+    }
+
     val mouseY: Int
         get() {
             val height = this.scaledWindowHeight
             // TODO: in later versions the height - factor is removed, i think
-            val y = globalMouseY * height / displayHeight
-//#if MC < 1.16
+            var y = globalMouseY * height / displayHeight
+//#if MC < 1.21
             return height - y - 1
 //#else
+//$$            if (mc.window.framebufferHeight > mc.window.height) y *= 2
 //$$            return y
 //#endif
         }
 
+    val mousePos: Pair<Int, Int> get() = mouseX to mouseY
 }
