@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.slayer.vampire
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -43,7 +44,7 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
     @ConfigEditorColour
-    var steakColor: String = "0:255:255:0:88"
+    var steakColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 88, 255)
 
     @Expose
     @ConfigOption(name = "Twinclaws", desc = "Delay the Twinclaws alert for a given amount in milliseconds.")
@@ -59,7 +60,7 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Line Color", desc = "Color of the line.")
     @ConfigEditorColour
-    var lineColor: String = "0:255:255:0:88"
+    var lineColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 88, 255)
 
     @Expose
     @ConfigOption(name = "Line Width", desc = "Width of the line.")

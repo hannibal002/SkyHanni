@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -124,7 +124,7 @@ object SkillProgress {
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = barConfig.barStartColor.toSpecialColor(),
+                startColor = barConfig.barStartColor.toColor(),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get(),
             )
@@ -134,8 +134,8 @@ object SkillProgress {
             val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
                 percent = factor,
-                startColor = barConfig.barStartColor.toSpecialColor(),
-                endColor = barConfig.barStartColor.toSpecialColor(),
+                startColor = barConfig.barStartColor.toColor(),
+                endColor = barConfig.barStartColor.toColor(),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get(),

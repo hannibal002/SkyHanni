@@ -152,7 +152,18 @@ object StringUtils {
         return inputWithoutLastChar + incrementedLastChar
     }
 
-    fun UUID.toDashlessUUID(): String = toString().replace("-", "")
+    fun UUID.toUnDashedUUID(): String = toString().replace("-", "")
+
+    @Throws(IllegalArgumentException::class)
+    fun parseUUID(uuidString: String): UUID = if (uuidString.isValidUuid()) UUID.fromString(uuidString)
+    else {
+        require(uuidString.length == 32) { "UUID string must either have dashes, or be 32 characters long" }
+        val builder = StringBuilder(uuidString)
+        builder.insert(8, '-').insert(13, '-').insert(18, '-').insert(23, '-')
+        UUID.fromString(builder.toString())
+    }
+
+    fun parseUUIDOrNull(uuidString: String): UUID? = runCatching { parseUUID(uuidString) }.getOrNull()
 
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")

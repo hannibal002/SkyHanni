@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -23,5 +24,5 @@ class LivingCaveLivingMetalConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Set the color to highlight the blocks in.")
     @ConfigEditorColour
-    val color: Property<String> = Property.of("0:255:85:255:255")
+    val color: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(85, 255, 255, 255))
 }

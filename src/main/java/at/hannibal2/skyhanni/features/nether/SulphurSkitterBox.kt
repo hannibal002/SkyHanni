@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
@@ -76,7 +76,7 @@ object SulphurSkitterBox {
         val location = closestSponge ?: return
         if (location.distanceToPlayer() >= 50) return
         val axis = renderBox ?: return
-        val color = config.boxColor.toSpecialColor()
+        val color = config.boxColor.toColor()
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
                 event.drawFilledBoundingBox(

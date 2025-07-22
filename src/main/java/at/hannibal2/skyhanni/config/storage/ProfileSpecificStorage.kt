@@ -580,9 +580,8 @@ class ProfileSpecificStorage(
         var farmingWeight: FarmingWeightConfig = FarmingWeightConfig()
 
         class FarmingWeightConfig {
-            // TODO rename to lastLeaderboard
             @Expose
-            var lastFarmingWeightLeaderboard: Int = -1
+            var lastLeaderboard: Int = -1
         }
 
         @Expose

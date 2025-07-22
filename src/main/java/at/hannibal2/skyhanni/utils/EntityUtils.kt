@@ -203,12 +203,12 @@ object EntityUtils {
     }?.asSequence()?.filterNotNull().orEmpty()
     //#else
     //$$ fun getAllTileEntities(): Sequence<BlockEntity> {
-    //$$     if (!MinecraftCompat.localWorldExists) return emptySequence()
-    //$$     val blockEntityTickers = MinecraftCompat.localWorld.blockEntityTickers.let {
+    //$$     val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
+    //$$     val blockEntityTickers = world.blockEntityTickers.let {
     //$$         if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
     //$$     }.asSequence().filterNotNull()
     //$$
-    //$$     return blockEntityTickers.map { MinecraftCompat.localWorld.getBlockEntity(it.pos) }.filterNotNull()
+    //$$     return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
     //$$ }
     //#endif
 

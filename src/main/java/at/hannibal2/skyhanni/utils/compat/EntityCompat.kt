@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
@@ -83,3 +85,15 @@ fun createWitherSkeleton(world: World?): EntityLivingBase =
 //$$ val Entity.deceased: Boolean
 //$$     get() = this.isRemoved
 //#endif
+
+fun EntityLivingBase.findHealthReal(): Float {
+    //#if MC < 1.21
+    val entityHealth = health
+    //#else
+    //$$ val entityHealth = health
+    //#endif
+    if (entityHealth == 1024f && !PlatformUtils.IS_LEGACY) {
+        return baseMaxHealth.toFloat()
+    }
+    return entityHealth
+}
