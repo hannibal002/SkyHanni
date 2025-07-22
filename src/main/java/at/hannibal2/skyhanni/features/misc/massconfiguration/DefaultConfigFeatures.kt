@@ -56,7 +56,7 @@ object DefaultConfigFeatures {
         }
     }
 
-    fun onCommand(old: String, new: String) {
+    private fun onCommand(old: String, new: String) {
         val processor = FeatureToggleProcessor()
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
