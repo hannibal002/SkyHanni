@@ -523,6 +523,8 @@ object GuiRenderUtils {
         //$$ val guiHeight = window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()
         //$$ val slice = projectionMatrix.set(guiWidth, guiHeight)
         //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
+        //$$ RenderSystem.setupDefaultState()
+        //$$ RenderSystem.resetTextureMatrix()
         //$$ val consumers = client.bufferBuilders.entityVertexConsumers
         //$$ val matrices = MatrixStack()
         //$$ matrices.push()
@@ -546,6 +548,7 @@ object GuiRenderUtils {
         //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.FIXED, 15728880, OverlayTexture.DEFAULT_UV, matrices, consumers, client.world, 0)
         //$$ consumers.draw()
         //$$ matrices.pop()
+        //$$ RenderSystem.teardownOverlayColor()
         //$$ RenderSystem.restoreProjectionMatrix()
         //#endif
     }

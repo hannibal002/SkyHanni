@@ -26,26 +26,15 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val animationFrames = listOf(ItemStackAnimationFrame(boxOfSeedsProvider, ticks = 0))
 
-    private val rotSets = listOf(
-        ItemStackRotationDefinition(
-            axis = EnumFacing.Axis.Y,
-            rotationSpeed = 65.0,
-        ),
-        ItemStackRotationDefinition(
-            axis = EnumFacing.Axis.X,
-            rotationSpeed = 65.0,
-        ),
-        ItemStackRotationDefinition(
-            axis = EnumFacing.Axis.Z,
-            rotationSpeed = 65.0,
-        ),
-    )
-
-    private val animatedItemStackRenderables by lazy {
-        rotSets.map {
-            Renderable.animatedItemStack(
+    private val spinningStacks by lazy {
+        EnumFacing.Axis.entries.map {
+            val rotationDef = ItemStackRotationDefinition(
+                axis = it,
+                rotationSpeed = 65.0,
+            )
+            it to Renderable.animatedItemStack(
                 animationFrames,
-                rotation = it,
+                rotation = rotationDef,
                 bounce = ItemStackBounceDefinition(
                     upwardBounce = 25,
                     downwardBounce = 25,
@@ -83,7 +72,14 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
                     ),
                 ),
                 horizontal(
-                    animatedItemStackRenderables.map { it.renderBounds() },
+                    spinningStacks.map { (axis, renderable) ->
+                        vertical(
+                            text("${axis.name.uppercase()} Axis"),
+                            renderable.renderBounds(),
+                            spacing = 1,
+                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                        )
+                    },
                     spacing = 2,
                     verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 ),
