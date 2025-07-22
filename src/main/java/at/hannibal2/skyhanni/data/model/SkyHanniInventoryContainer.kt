@@ -25,6 +25,7 @@ class SkyHanniInventoryContainer(
                 items,
                 rowSize,
                 scale,
+                highlightSlots
             ),
         )
     }
