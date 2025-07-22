@@ -24,8 +24,6 @@ object CompactStarlynSisters {
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
     private val patternGroup = RepoPattern.group("foraging.agatha")
 
-    // would rather keep the extra int-related capture groups, you never know when you'll need them
-
     /**
      * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou reached the §r§lCOMMON §fBracket in my contest!
      * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou reached the §a§lUNCOMMON §fBracket in my contest!
