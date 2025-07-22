@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.inventory.ItemPickupLog
 import at.hannibal2.skyhanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -45,6 +46,11 @@ class ItemPickupLogConfig {
     var coins: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Pickup Coin Value", desc = "")
+    @Accordion
+    val coinValue: ItemPickupLogCoinValueConfig = ItemPickupLogCoinValueConfig()
+
+    @Expose
     @ConfigOption(name = "Alignment", desc = "How the item pickup log should be aligned.")
     @ConfigEditorDropdown
     var alignment: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP
@@ -67,5 +73,3 @@ class ItemPickupLogConfig {
     @ConfigLink(owner = ItemPickupLogConfig::class, field = "enabled")
     val position: Position = Position(-256, 140)
 }
-
-

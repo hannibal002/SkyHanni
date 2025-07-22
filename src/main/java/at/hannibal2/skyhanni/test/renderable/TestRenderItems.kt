@@ -24,6 +24,7 @@ import net.minecraft.util.EnumFacing
 object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
 
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
+    private val bambooProvider = NeuItemStackProvider("BAMBOO".toInternalName())
     private val animationFrames = listOf(ItemStackAnimationFrame(boxOfSeedsProvider, ticks = 0))
 
     private val spinningStacks by lazy {
@@ -57,7 +58,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
             ItemStack(Blocks.melon_block),
         ).map { item ->
             scaleList.map { Renderable.item(item, it, 0).renderBounds() }
-        }
+        } + listOf(scaleList.map { Renderable.item(bambooProvider, it, 0).renderBounds() })
 
         val tableContent = listOf(labels) + items
 
