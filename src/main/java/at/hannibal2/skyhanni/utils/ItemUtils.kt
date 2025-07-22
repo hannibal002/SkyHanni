@@ -981,13 +981,12 @@ object ItemUtils {
         return skull
     }
 
-    @Suppress("unused")
-    fun ItemStack.isSkull(ignoreModel: Boolean = false): Boolean {
+    fun ItemStack.isSkull(): Boolean {
         //#if MC < 1.21
         return item === Items.skull
         //#else
         //$$ val hasItemModel = this.getItemModel() != null
-        //$$ return item == Items.PLAYER_HEAD && (!hasItemModel || ignoreModel)
+        //$$ return item == Items.PLAYER_HEAD && !hasItemModel
         //#endif
     }
 
