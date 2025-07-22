@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 // depends-on-plugin org.jetbrains.kotlin
+// depends-on-plugin com.intellij.java
 
 fun buildPrimaryNameMap(project: Project): Map<String, String> {
     val result = mutableMapOf<String, String>()
@@ -106,7 +107,9 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                 }
 
                 // Validate function annotation and parameters
-                if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic) {
+                if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic &&
+                    !function.hasModifier(KtTokens.OPEN_KEYWORD)
+                ) {
                     holder.registerProblem(
                         function,
                         "Event handler function should be annotated with @HandleEvent",

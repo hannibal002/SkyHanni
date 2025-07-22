@@ -7,16 +7,18 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import org.lwjgl.opengl.GL11
@@ -94,7 +96,7 @@ object HoppityEggDisplayManager {
                 add("§7 - ${it.formattedName}$color $timeFormat")
             }
 
-            if (!unclaimedEggsConfig.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
+            if (!unclaimedEggsConfig.showCollectedLocationCount || !SkyBlockUtils.inSkyBlock) return@buildList
 
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
@@ -102,11 +104,11 @@ object HoppityEggDisplayManager {
                 val collectedFormat = formatEggsCollected(collectedEggs)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }
-        }.map { it.partyModeReplace() }
+        }.map { CFApi.partyModeReplace(it) }
 
         if (displayList.size == 1) return emptyList()
 
-        val container = Renderable.verticalContainer(displayList.map(Renderable::string))
+        val container = Renderable.vertical(displayList.map(StringRenderable::from))
         return listOf(
             if (unclaimedEggsConfig.warpClickEnabled) Renderable.clickable(
                 container,

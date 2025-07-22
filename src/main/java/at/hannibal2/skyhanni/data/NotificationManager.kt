@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -76,12 +77,14 @@ object NotificationManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestnotification") {
+        event.registerBrigadier("shtestnotification") {
             description = "Shows a test notification"
             category = CommandCategory.DEVELOPER_TEST
-            callback {
-                val testingText = it.joinToString(" ").replace("\\n", "\n")
-                queueNotification(SkyHanniNotification(testingText, Duration.INFINITE))
+            arg("notification", BrigadierArguments.greedyString()) {
+                callback {
+                    val testingText = getArg(it).replace("\\n", "\n")
+                    queueNotification(SkyHanniNotification(testingText, Duration.INFINITE))
+                }
             }
         }
     }
@@ -100,7 +103,7 @@ data class SkyHanniNotification(
 
     var endTime = SimpleTimeMark.farFuture()
 
-    val width = (message.maxOfOrNull { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0) + 8
+    val width by lazy { (message.maxOfOrNull { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0) + 8 }
     val height = message.size * 10 + 18
 
     fun setEndTime() {

@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -134,6 +134,8 @@ object CFApi {
     var warningSound = SoundUtils.createSound("note.pling", 1f)
     val mainInventory = InventoryDetector { name -> name == "Chocolate Factory" }
 
+    private val partyModeRegex = Regex("§[a-fA-F0-9]")
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
@@ -227,7 +229,7 @@ object CFApi {
         return chocolateMilestones.higher(amount) ?: 0
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
 
@@ -274,9 +276,11 @@ object CFApi {
         it.maxChocolate == it.currentChocolate
     } ?: false
 
-    fun String.partyModeReplace(): String =
-        if (config.partyMode.get() && inChocolateFactory && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
-        else this
+    fun partyModeReplace(text: String): String {
+        return if (config.partyMode.get() && inChocolateFactory && chromaEnabled) {
+            text.replace(partyModeRegex, "§z")
+        } else text
+    }
 
     fun updatePosition(position: Int?, leaderboard: String) {
         position ?: return

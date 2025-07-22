@@ -5,22 +5,23 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getHitmanTimeToAll
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getOpenSlots
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getTimeToFull
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import kotlin.time.Duration
@@ -33,8 +34,8 @@ object CFStats {
 
     private var display: Renderable? = null
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
+    fun onSecondPassed() {
         if (!CFApi.chocolateFactoryPaused) return
         updateDisplay()
     }
@@ -90,7 +91,7 @@ object CFStats {
         val text = config.statsDisplayList.filter {
             it.shouldDisplay()
         }.flatMap {
-            map[it]?.partyModeReplace()?.split("\n").orEmpty()
+            map[it]?.let { text -> CFApi.partyModeReplace(text) }?.split("\n").orEmpty()
         }
         display = createDisplay(text)
     }
@@ -190,11 +191,11 @@ object CFStats {
     }
 
     private fun createDisplay(text: List<String>) = Renderable.clickable(
-        Renderable.verticalContainer(text.map(Renderable::string)),
+        Renderable.vertical(text.map(StringRenderable::from)),
         tips = listOf("§bCopy to Clipboard!"),
         onLeftClick = {
             val list = text.toMutableList()
-            list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
+            list.add(0, "${PlayerUtils.getName()}'s Chocolate Factory Stats")
 
             ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
         },

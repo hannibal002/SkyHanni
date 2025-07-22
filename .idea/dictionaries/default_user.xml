@@ -21,6 +21,7 @@
       <w>bezal</w>
       <w>biblio</w>
       <w>biome</w>
+      <w>birries</w>
       <w>bladesoul</w>
       <w>blobbercyst</w>
       <w>blobbercysts</w>
@@ -51,6 +52,7 @@
       <w>clientbound</w>
       <w>coflnet</w>
       <w>coords</w>
+      <w>coralot</w>
       <w>craftable</w>
       <w>crit</w>
       <w>cropie</w>
@@ -62,6 +64,7 @@
       <w>demonlord</w>
       <w>derpy</w>
       <w>despawn</w>
+      <w>despawned</w>
       <w>dicer</w>
       <w>disintegrator</w>
       <w>disintegrators</w>
@@ -71,6 +74,7 @@
       <w>dreadlord</w>
       <w>dungeoneering</w>
       <w>dwarven</w>
+      <w>eequipped</w>
       <w>egglocator</w>
       <w>einary</w>
       <w>einary's</w>
@@ -95,6 +99,7 @@
       <w>ghast</w>
       <w>glacite</w>
       <w>glowstone</w>
+      <w>goback</w>
       <w>goldor</w>
       <w>golem</w>
       <w>gratitudes</w>
@@ -102,16 +107,21 @@
       <w>hatcessory</w>
       <w>hecatomb</w>
       <w>hexatorum</w>
+      <w>hideonleaf</w>
       <w>hideparticles</w>
       <w>highlite</w>
+      <w>hitbox</w>
+      <w>hitman</w>
       <w>hoppity</w>
       <w>hoppity's</w>
       <w>hoppitys</w>
       <w>horsezooka</w>
       <w>hotbar</w>
+      <w>hotf</w>
       <w>hotm</w>
       <w>hoverable</w>
       <w>hpb's</w>
+      <w>huntaxe</w>
       <w>hypixel</w>
       <w>hypixel's</w>
       <w>ichor</w>
@@ -123,6 +133,7 @@
       <w>insanium</w>
       <w>internalname</w>
       <w>interp</w>
+      <w>invisibug</w>
       <w>itemstack</w>
       <w>jawbus</w>
       <w>jerries</w>
@@ -145,6 +156,7 @@
       <w>lerp</w>
       <w>livids</w>
       <w>locraw</w>
+      <w>lushlilac</w>
       <w>magmafish</w>
       <w>matriarch</w>
       <w>mawdredge</w>
@@ -161,15 +173,19 @@
       <w>missclick</w>
       <w>mmclick</w>
       <w>mobtracker</w>
+      <w>mochibear</w>
       <w>modid</w>
       <w>modrinth</w>
       <w>moldfin</w>
+      <w>moonglade</w>
       <w>mooshroom</w>
+      <w>mossybit</w>
       <w>moul</w>
       <w>moulberry</w>
       <w>moulconfig</w>
       <w>mouselocked</w>
       <w>mouselowered</w>
+      <w>mousemat</w>
       <w>mycelium</w>
       <w>nametag</w>
       <w>nametags</w>
@@ -180,6 +196,7 @@
       <w>nukekebi</w>
       <w>nukekubi</w>
       <w>obsolite</w>
+      <w>oceandy</w>
       <w>odger</w>
       <w>odger's</w>
       <w>odonata</w>
@@ -233,6 +250,7 @@
       <w>sethome</w>
       <w>shcopytranslation</w>
       <w>shcropstartlocation</w>
+      <w>shelmet</w>
       <w>shlanedetection</w>
       <w>shmarkplayer</w>
       <w>shmouselock</w>
@@ -257,6 +275,8 @@
       <w>soulweaver</w>
       <w>spawnable</w>
       <w>sprayonator</w>
+      <w>starborn</w>
+      <w>starlyn</w>
       <w>statspocalypse</w>
       <w>stillgore</w>
       <w>stonk</w>
@@ -279,7 +299,9 @@
       <w>turbomax</w>
       <w>twinclaws</w>
       <w>typhoeus</w>
+      <w>ubik</w>
       <w>ultrasequencer</w>
+      <w>unmineable</w>
       <w>unobtained</w>
       <w>unsummarized</w>
       <w>untrackable</w>

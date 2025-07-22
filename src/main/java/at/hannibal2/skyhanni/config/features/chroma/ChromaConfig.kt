@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.chroma
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -21,7 +20,7 @@ class ChromaConfig {
     @ConfigOption(name = "Enabled", desc = "Toggle SkyHanni's chroma.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Chroma Size", desc = "Change the size of each color in the chroma.")
@@ -43,24 +42,24 @@ class ChromaConfig {
     @ConfigEditorDropdown
     var chromaDirection: Direction = Direction.FORWARD_RIGHT
 
-    enum class Direction(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        FORWARD_RIGHT("Forward + Right", 0),
-        FORWARD_LEFT("Forward + Left", 1),
-        BACKWARD_RIGHT("Backward + Right", 2),
-        BACKWARD_LEFT("Backward + Left", 3);
+    enum class Direction(private val displayName: String) {
+        FORWARD_RIGHT("Forward + Right"),
+        FORWARD_LEFT("Forward + Left"),
+        BACKWARD_RIGHT("Backward + Right"),
+        BACKWARD_LEFT("Backward + Left"),
+        ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all chroma settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    var resetSettings: Runnable = Runnable { ChromaManager.resetChromaSettings() }
+    val resetSettings: Runnable = Runnable { ChromaManager.resetChromaSettings() }
 
     @Expose
     @ConfigOption(
         name = "Everything Chroma",
-        desc = "Render §4§l§oALL §r§7text in chroma. §e(Disables Patcher's Optimized Font Renderer while enabled)"
+        desc = "Render §4§l§oALL §r§7text in chroma. §e(Disables Patcher's Optimized Font Renderer while enabled)",
     )
     @ConfigEditorBoolean
     var allChroma: Boolean = false
@@ -68,7 +67,7 @@ class ChromaConfig {
     @Expose
     @ConfigOption(
         name = "Ignore Chat",
-        desc = "Prevent Everything Chroma from applying to the chat (if you unironically use that feature...)"
+        desc = "Prevent Everything Chroma from applying to the chat (if you unironically use that feature...)",
     )
     @ConfigEditorBoolean
     var ignoreChat: Boolean = false

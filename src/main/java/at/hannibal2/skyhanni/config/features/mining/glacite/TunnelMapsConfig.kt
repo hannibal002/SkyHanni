@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.mining.glacite
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -24,7 +25,7 @@ class TunnelMapsConfig {
 
     @Expose
     @ConfigLink(owner = TunnelMapsConfig::class, field = "enable")
-    var position: Position = Position(20, 20)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
@@ -72,7 +73,7 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(name = "Path Color", desc = "The color for the paths, if the dynamic color option is turned off.")
     @ConfigEditorColour
-    var pathColor: String = "0:255:0:255:0"
+    var pathColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, 255)
 
     @Expose
     @ConfigOption(name = "Text Size", desc = "Size of the waypoint texts.")
@@ -92,10 +93,10 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(name = "Compact Gemstone", desc = "Only show the icon for gemstones in the selection list.")
     @ConfigEditorBoolean
-    var compactGemstone: Property<Boolean> = Property.of(false)
+    val compactGemstone: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Exclude Fairy", desc = "Exclude the fairy soul spots from the selection list.")
     @ConfigEditorBoolean
-    var excludeFairy: Property<Boolean> = Property.of(false)
+    val excludeFairy: Property<Boolean> = Property.of(false)
 }

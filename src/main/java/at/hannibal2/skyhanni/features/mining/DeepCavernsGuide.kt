@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
-import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -17,14 +17,13 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Items
@@ -88,7 +87,7 @@ object DeepCavernsGuide {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.rainbowColor.get()
-            monochromeColor = config.monochromeColor.get().toSpecialColor()
+            monochromeColor = config.monochromeColor.get().toColor()
             lookAhead = config.lookAhead.get() + 1
         }
     }
@@ -96,7 +95,7 @@ object DeepCavernsGuide {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockArea != "Gunpowder Mines") return
+        if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
         if (notUnlockedPattern.matches(event.message)) {
             DelayedRun.runNextTick {
                 start()
@@ -109,7 +108,7 @@ object DeepCavernsGuide {
         showStartIcon = false
         if (!isEnabled()) return
         if (event.inventoryName != "Lift") return
-        if (LorenzUtils.skyBlockArea != "Gunpowder Mines") return
+        if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
         showStartIcon = true
 
         event.inventoryItems[31]?.let {
@@ -127,7 +126,7 @@ object DeepCavernsGuide {
             ChatUtils.clickableChat(
                 "DeepCavernsParkour missing in SkyHanni Repo! Try /shupdaterepo to fix it!",
                 onClick = {
-                    RepoManager.updateRepo()
+                    SkyHanniRepoManager.updateRepo()
                 },
                 "§eClick to update the repo!",
                 prefixColor = "§c",
@@ -169,7 +168,7 @@ object DeepCavernsGuide {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = IslandType.DEEP_CAVERNS.isInIsland() && config.enabled
+    fun isEnabled() = IslandType.DEEP_CAVERNS.isCurrent() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

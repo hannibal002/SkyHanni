@@ -11,11 +11,14 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -213,7 +216,7 @@ enum class CarnivalGoal(
         }
 
         fun isEnabled() =
-            LorenzUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
+            SkyBlockUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
 
         private enum class GoalType(val item: Item, display: String) {
             FRUIT_DIGGING(Item.getItemFromBlock(Blocks.sand), "§6Fruit Digging"),
@@ -221,11 +224,9 @@ enum class CarnivalGoal(
             ZOMBIE_SHOOTOUT(Items.arrow, "§cZombie Shootout");
 
             val singleDisplay by lazy {
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.itemStack(ItemStack(item)),
-                        Renderable.string(display),
-                    ),
+                Renderable.horizontal(
+                    Renderable.item(ItemStack(item)),
+                    Renderable.text(display),
                 )
             }
 
@@ -233,7 +234,7 @@ enum class CarnivalGoal(
                 get() {
                     val goals = getGoals.filterNot { it.isReached }
                     if (goals.isEmpty()) return emptyList()
-                    return listOf(singleDisplay) + goals.map { Renderable.string(" " + it.display) }
+                    return listOf(singleDisplay) + goals.map { Renderable.text(" " + it.display) }
                 }
 
             val getGoals get() = CarnivalGoal.entries.filter { it.type == this }

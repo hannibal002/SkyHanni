@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -68,7 +68,7 @@ object UniqueGiftingOpportunitiesFeatures {
         analyzeArmorStand(event.entity)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityJoinWorld(event: EntityEnterWorldEvent<Entity>) {
         playerColor(event)
         val entity = event.entity as? EntityArmorStand ?: return
@@ -88,12 +88,12 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     private fun isBingo(entity: EntityLivingBase) =
-        !LorenzUtils.isBingoProfile && entity.displayName.formattedText.endsWith("Ⓑ§r")
+        !SkyBlockUtils.isBingoProfile && entity.displayName.formattedText.endsWith("Ⓑ§r")
 
     private fun isIronman(entity: EntityLivingBase) =
-        !LorenzUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
+        !SkyBlockUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         giftedPattern.matchMatcher(event.message) {
             addGiftedPlayer(group("player"))

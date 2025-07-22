@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fakeInventory
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 
@@ -18,18 +18,16 @@ class SkyHanniInventoryContainer(
     @Expose val primaryCords: LorenzVec? = null,
     @Expose val secondaryCords: LorenzVec? = null,
 ) {
-    fun toRenderable(scale: Double = 1.0, highlightSlots: List<Int> = listOf()): Renderable =
-        VerticalContainerRenderable(
-            listOf(
-                RenderableString(displayName, scale),
-                RenderableInventory.fakeInventory(
-                    items,
-                    rowSize,
-                    scale,
-                    highlightSlots,
-                ),
+    fun toRenderable(scale: Double = 1.0, highlightSlots: List<Int> = listOf()): Renderable = with(Renderable) {
+        vertical(
+            text(displayName, scale),
+            fakeInventory(
+                items,
+                rowSize,
+                scale,
             ),
         )
+    }
 
     override fun toString() = internalName
 

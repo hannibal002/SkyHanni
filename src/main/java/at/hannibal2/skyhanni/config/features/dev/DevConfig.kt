@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
@@ -14,24 +15,27 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
-// todo 1.21 impl needed
 class DevConfig {
-    //#if TODO
+
     @Expose
     @ConfigOption(name = "Repository", desc = "")
     @Accordion
-    var repo: RepositoryConfig = RepositoryConfig()
-    //#endif
+    val repo: RepositoryConfig = RepositoryConfig()
+
+    @Expose
+    @ConfigOption(name = "Neu Repository", desc = "")
+    @Accordion
+    val neuRepo: NeuRepositoryConfig = NeuRepositoryConfig()
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")
     @Accordion
-    var debug: DebugConfig = DebugConfig()
+    val debug: DebugConfig = DebugConfig()
 
     @Expose
     @ConfigOption(name = "Repo Pattern", desc = "")
     @Accordion
-    var repoPattern: RepoPatternConfig = RepoPatternConfig()
+    val repoPattern: RepoPatternConfig = RepoPatternConfig()
 
     @Expose
     @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
@@ -68,24 +72,26 @@ class DevConfig {
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion
     @Expose
-    var waypoint: WaypointsConfig = WaypointsConfig()
+    val waypoint: WaypointsConfig = WaypointsConfig()
 
-    // Does not have a config element!
+    // Todo move these into debug config
     @Expose
-    var debugPos: Position = Position(10, 10)
+    @NoConfigLink
+    val debugPos: Position = Position(10, 10)
 
-    // Does not have a config element!
     @Expose
-    var debugLocationPos: Position = Position(1, 160)
+    @NoConfigLink
+    val debugLocationPos: Position = Position(1, 160)
 
-    // Does not have a config element!
     @Expose
-    var debugItemPos: Position = Position(90, 70)
+    @NoConfigLink
+    val debugItemPos: Position = Position(90, 70)
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "raytracedOreblock")
-    var debugOrePos: Position = Position(1, 200)
+    val debugOrePos: Position = Position(1, 200)
 
+    // Todo move [these] to a ContributorAppearanceConfig, or something similar
     @Expose
     @ConfigOption(
         name = "Fancy Contributors",
@@ -156,15 +162,14 @@ class DevConfig {
 
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
-    var minecraftConsoles: MinecraftConsoleConfig = MinecraftConsoleConfig()
+    val minecraftConsoles: MinecraftConsoleConfig = MinecraftConsoleConfig()
 
     @Expose
     @Category(name = "Dev Tools", desc = "Tooling for devs")
-    var devTool: DevToolConfig = DevToolConfig()
+    val devTool: DevToolConfig = DevToolConfig()
 
-    //#if TODO
+    // Todo move into Debug Config?
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
-    var mobDebug: DebugMobConfig = DebugMobConfig()
-    //#endif
+    val mobDebug: DebugMobConfig = DebugMobConfig()
 }

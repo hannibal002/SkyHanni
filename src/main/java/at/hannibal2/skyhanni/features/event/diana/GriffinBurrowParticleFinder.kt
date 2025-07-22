@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes
@@ -67,13 +66,16 @@ object GriffinBurrowParticleFinder {
 
         val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
-        // TODO remove the workaround once we know what is going on exactly and can fix this properly
-        val location = workaround(event.location)
+        // TODO the rounding is a workaround, may need to be removed once we know what is going on exactly and can fix this properly
+        val location = event.location.roundToBlock().down()
+
         val burrow = burrows.getOrPut(location) { Burrow(location) }
         val oldBurrowType = burrow.type
 
         when (type) {
+            //#if MC < 1.16
             ParticleType.FOOTSTEP -> burrow.hasFootstep = true
+            //#endif
             ParticleType.ENCHANT -> burrow.hasEnchant = true
             ParticleType.EMPTY -> burrow.type = 0
             ParticleType.MOB -> burrow.type = 1
@@ -90,10 +92,8 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    private fun workaround(location: LorenzVec) = location.toBlockPos().down().toLorenzVec()
-
-    // TODO this funciton needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
-    //  and instead of ticks alive, should use found time stamp and use passed since > 1.min
+    // TODO this function needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
+    // and instead of ticks alive, should use found timestamp and use passed since > 1.min
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
@@ -111,6 +111,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
+    // TODO move to ParticleUtils or similar
     // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(
@@ -122,9 +123,11 @@ object GriffinBurrowParticleFinder {
         TREASURE(
             { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
+        //#if MC < 1.16
         FOOTSTEP(
             { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
         ),
+        //#endif
         ENCHANT(
             {
                 type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset.roundTo(2) == LorenzVec(
@@ -206,7 +209,11 @@ object GriffinBurrowParticleFinder {
 
     class Burrow(
         var location: LorenzVec,
+        //#if MC < 1.16
         var hasFootstep: Boolean = false,
+        //#else
+        //$$ var hasFootstep: Boolean = true,
+        //#endif
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,

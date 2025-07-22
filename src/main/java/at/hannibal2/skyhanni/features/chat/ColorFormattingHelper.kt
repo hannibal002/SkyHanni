@@ -1,13 +1,18 @@
 package at.hannibal2.skyhanni.features.chat
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 
+@SkyHanniModule
 object ColorFormattingHelper {
-    fun printColorCodeList() {
+    private fun printColorCodeList() {
         val text = mutableListOf<String>()
         text.add("§c=================== General Colors ===================")
         text.add("§f&0 = §0Black              §f&1 = §1Dark Blue")
@@ -34,13 +39,13 @@ object ColorFormattingHelper {
     }
 
     private fun printColorCodesExtra() {
-        ChatUtils.chat("§c================= Formatting Extra ==================", false)
+        ChatUtils.chat("§c================= Formatting Extra ==================", prefix = false)
         ChatUtils.clickableLinkChat(
             "§#§6§a§e§e§4§8§/[Click here to view codes on minecraft.wiki]",
             "https://minecraft.wiki/w/Formatting_codes#Color_codes",
             "§eOpen §cminecraft.wiki§e!",
-            false,
-            false,
+            autoOpen = false,
+            prefix = false,
         )
         ChatUtils.chat(
             "§eYou can also uses SkyHanni's system for any colors. " +
@@ -55,6 +60,17 @@ object ColorFormattingHelper {
             "§eOpen §ccolor-hex.com§e!",
             prefix = false,
         )
-        ChatUtils.chat("§c===================================================", false)
+        ChatUtils.chat("§c===================================================", prefix = false)
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcolors") {
+            description = "Prints a list of all Minecraft color & formatting codes in chat."
+            category = CommandCategory.USERS_ACTIVE
+            @Suppress("AvoidBritishSpelling")
+            aliases = listOf("shcolor", "shcolours", "shcolour")
+            simpleCallback { printColorCodeList() }
+        }
     }
 }

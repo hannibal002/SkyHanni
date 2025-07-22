@@ -6,14 +6,13 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 
@@ -59,7 +58,7 @@ object GeyserFishing {
         if (geyser.distanceToPlayerIgnoreY() > 96) return
         if (config.onlyWithRod && !FishingApi.holdingLavaRod) return
 
-        val color = config.boxColor.toSpecialColor()
+        val color = config.boxColor.toColor()
         event.drawFilledBoundingBox(geyserBox, color)
     }
 
@@ -73,5 +72,5 @@ object GeyserFishing {
     }
 
     private fun shouldProcessParticles() =
-        IslandType.CRIMSON_ISLE.isInIsland() && IslandAreas.currentAreaName == "Blazing Volcano" && (config.hideParticles || config.drawBox)
+        IslandType.CRIMSON_ISLE.isCurrent() && SkyBlockUtils.graphArea == "Blazing Volcano" && (config.hideParticles || config.drawBox)
 }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -19,17 +20,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-//#if MC < 1.12
+//#if MC < 1.16
 import net.minecraft.world.WorldSettings
 //#else
-//$$ import net.minecraft.world.GameType
+//$$ import net.minecraft.world.level.GameType
 //#endif
 
 @SkyHanniModule
@@ -59,9 +59,7 @@ object TabListData {
                     add(" '$line'")
                 }
             }
-        } ?: run {
-            event.addIrrelevant("not active.")
-        }
+        } ?: event.addIrrelevant("not active.")
     }
 
     private fun toggleDebug() {
@@ -70,14 +68,14 @@ object TabListData {
             debugCache = null
             return
         }
-        SkyHanniMod.coroutineScope.launch {
-            val clipboard = OSUtils.readFromClipboard() ?: return@launch
+        SkyHanniMod.launchCoroutine {
+            val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             debugCache = clipboard.lines()
             ChatUtils.chat("Enabled tab list debug with your clipboard.")
         }
     }
 
-    fun copyCommand(args: Array<String>) {
+    private fun copyCommand(noColor: Boolean) {
         if (debugCache != null) {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
@@ -88,7 +86,6 @@ object TabListData {
         }
 
         val resultList = mutableListOf<String>()
-        val noColor = args.size == 1 && args[0] == "true"
         for (line in getTabList()) {
             val tabListLine = line.transformIf({ noColor }) { removeColor() }
             if (tabListLine != "") resultList.add("'$tabListLine'")
@@ -115,12 +112,12 @@ object TabListData {
             val team1 = o1.playerTeam
             val team2 = o2.playerTeam
             return ComparisonChain.start().compareTrueFirst(
-                //#if MC<1.12
+                //#if MC < 1.16
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
                 o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
-                //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR,
+                //$$ o1.gameMode != GameType.SPECTATOR,
+                //$$ o2.gameMode != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(
@@ -171,7 +168,7 @@ object TabListData {
         if (tablistCache != tabList) {
             tablistCache = tabList
             TabListUpdateEvent(getTabList()).post()
-            if (!LorenzUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
         }
@@ -188,7 +185,7 @@ object TabListData {
 
     private fun workaroundDelayedTabListUpdateAgain() {
         DelayedRun.runDelayed(2.seconds) {
-            if (LorenzUtils.onHypixel) {
+            if (SkyBlockUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
                 TabListUpdateEvent(getTabList()).post()
             }
@@ -197,10 +194,18 @@ object TabListData {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtesttablist") {
+        event.registerBrigadier("shtesttablist") {
             description = "Set your clipboard as a fake tab list."
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleDebug() }
+            simpleCallback { toggleDebug() }
+        }
+        event.registerBrigadier("shcopytablist") {
+            description = "Copies the tab list data to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("nocolor", BrigadierArguments.bool()) { noColor ->
+                callback { copyCommand(getArg(noColor)) }
+            }
+            simpleCallback { copyCommand(false) }
         }
     }
 }

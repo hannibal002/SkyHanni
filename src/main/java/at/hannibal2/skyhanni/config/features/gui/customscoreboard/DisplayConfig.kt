@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.data.DateFormat
-//#if TODO
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
 import at.hannibal2.skyhanni.utils.RenderUtils
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -14,47 +12,46 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class DisplayConfig {
     @Expose
     @ConfigOption(name = "Alignment Options", desc = "")
     @Accordion
-    var alignment: AlignmentConfig = AlignmentConfig()
+    val alignment: AlignmentConfig = AlignmentConfig()
 
     @Expose
     @ConfigOption(name = "Arrow Options", desc = "")
     @Accordion
-    var arrow: ArrowConfig = ArrowConfig()
+    val arrow: ArrowConfig = ArrowConfig()
 
     @Expose
     @ConfigOption(name = "Chunked Stats Options", desc = "")
     @Accordion
-    var chunkedStats: ChunkedStatsConfig = ChunkedStatsConfig()
+    val chunkedStats: ChunkedStatsConfig = ChunkedStatsConfig()
 
     @Expose
     @ConfigOption(name = "Events Options", desc = "")
     @Accordion
-    var events: EventsConfig = EventsConfig()
+    val events: EventsConfig = EventsConfig()
 
     @Expose
     @ConfigOption(name = "Maxwell Options", desc = "")
     @Accordion
-    var maxwell: MaxwellConfig = MaxwellConfig()
+    val maxwell: MaxwellConfig = MaxwellConfig()
 
     @Expose
     @ConfigOption(name = "Mayor Options", desc = "")
     @Accordion
-    var mayor: MayorConfig = MayorConfig()
+    val mayor: MayorConfig = MayorConfig()
 
     @Expose
     @ConfigOption(name = "Party Options", desc = "")
     @Accordion
-    var party: PartyConfig = PartyConfig()
+    val party: PartyConfig = PartyConfig()
 
     @Expose
     @ConfigOption(name = "Title and Footer Options", desc = "")
     @Accordion
-    var titleAndFooter: TitleAndFooterConfig = TitleAndFooterConfig()
+    val titleAndFooter: TitleAndFooterConfig = TitleAndFooterConfig()
 
     @Expose
     @ConfigOption(
@@ -64,7 +61,7 @@ class DisplayConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideVanillaScoreboard: Property<Boolean> = Property.of(true)
+    val hideVanillaScoreboard: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Show earned/lost", desc = "Show the amount you earned/lost on any Number display.")
@@ -117,7 +114,6 @@ class DisplayConfig {
         }
     }
 
-    //#if TODO
     @Expose
     @ConfigOption(
         name = "Number Display Format",
@@ -125,7 +121,6 @@ class DisplayConfig {
     )
     @ConfigEditorDropdown
     var numberDisplayFormat: NumberDisplayFormat = NumberDisplayFormat.TEXT_COLOR_NUMBER
-    //#endif
 
     @Expose
     @ConfigOption(
@@ -161,7 +156,6 @@ class DisplayConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
     var lineSpacing: Int = 10
 
-    //#if TODO
     @Expose
     @ConfigOption(
         name = "Text Alignment",
@@ -169,7 +163,6 @@ class DisplayConfig {
     )
     @ConfigEditorDropdown
     var textAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
-    //#endif
 
     @Expose
     @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")

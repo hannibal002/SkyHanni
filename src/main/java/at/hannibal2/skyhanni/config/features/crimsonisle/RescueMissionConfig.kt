@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.crimsonisle
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -36,22 +37,22 @@ class RescueMissionConfig {
         desc = "For Barbarian S-tier, there are two variants. If your path seems wrong, change it to the other one.",
     )
     @ConfigEditorDropdown
-    var variant: Property<PathVariant> = Property.of(PathVariant.ONE)
+    val variant: Property<PathVariant> = Property.of(PathVariant.ONE)
 
     @Expose
     @ConfigOption(name = "Look Ahead", desc = "Change how many waypoints should be shown in front of you.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
-    var lookAhead: Property<Int> = Property.of(2)
+    val lookAhead: Property<Int> = Property.of(2)
 
     @Expose
     @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect.")
     @ConfigEditorBoolean
-    var chroma: Property<Boolean> = Property.of(true)
+    val chroma: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Single Color", desc = "Make the waypoints an unchanging color for slow computers.")
     @ConfigEditorColour
-    var solidColor: Property<String> = Property.of("0:60:0:0:255")
+    val solidColor: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(0, 0, 255, 60))
 
     enum class PathVariant(val displayName: String) {
         ONE("1"),

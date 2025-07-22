@@ -21,9 +21,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlass
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
-import net.minecraft.item.Item
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -140,8 +140,10 @@ object SunGeckoHelper {
         val mob = event.mob
         val name = mob.name
         if (!name.contains("Sun Gecko")) return
-        if (name.contains("?") && config.highlightFakeBoss) {
-            mob.highlight(Color.RED.addAlpha(80))
+        if (name.contains("?")) {
+            if (config.highlightFakeBoss) {
+                mob.highlight(Color.RED.addAlpha(80))
+            }
         } else {
             if (config.highlightRealBoss) {
                 mob.highlight(Color.GREEN.addAlpha(80))
@@ -194,9 +196,8 @@ object SunGeckoHelper {
 
         for (modifier in Modifiers.entries) {
             val slot = modifier.slot
-            val item = event.inventoryItems[slot] ?: continue
-            if (item.item != Item.getItemFromBlock(Blocks.stained_glass_pane)) continue
-            if (item.itemDamage != 5) continue
+            val stack = event.inventoryItems[slot] ?: continue
+            if (!stack.isStainedGlass(ColoredBlockCompat.LIME)) continue
             modifiers.add(modifier)
         }
     }

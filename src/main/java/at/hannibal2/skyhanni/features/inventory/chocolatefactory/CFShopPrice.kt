@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -26,9 +25,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
@@ -164,12 +165,12 @@ object CFShopPrice {
         }
 
         display = buildList {
-            add(Renderable.string("§e§lCoins per million chocolate§f:"))
+            addString("§e§lCoins per million chocolate§f:")
             // TODO update this value every second
             // TODO add time until can afford
-            add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
+            addString("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}")
             // TODO add chocolate spend needed for next milestone
-            add(Renderable.string("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
+            addString("§eChocolate spent: §6${chocolateSpent.addSeparators()}")
             add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale.toDouble()))
         }
     }
@@ -204,7 +205,7 @@ object CFShopPrice {
 
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     private data class Product(
         var slot: Int?,

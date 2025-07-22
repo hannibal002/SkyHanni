@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.subMapOfStringsStartingWith
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
@@ -35,25 +36,30 @@ object StorageApi {
         get() = ProfileStorageData.storageProfiles?.data ?: TreeMap()
 
     /**
+     * REGEX-TEST: Ender Chest
      * REGEX-TEST: Ender Chest (1/9)
      */
-    private val enderchestPattern by RepoPattern.pattern("storage.enderchest", "Ender Chest \\((?<page>\\d+)/\\d+\\)")
+    private val enderchestPattern by RepoPattern.pattern(
+        "storage.enderchest",
+        "Ender Chest(?: \\((?<page>\\d+)/\\d+\\))?",
+    )
 
     /**
      * REGEX-TEST: Jumbo Backpack§r (Slot #2)
      */
-    private val backpackPattern by RepoPattern.pattern("storage.backpack", ".* Backpack§r \\(Slot #(?<page>\\d+)\\)")
+    private val backpackPattern by RepoPattern.pattern(
+        "storage.backpack",
+        ".* Backpack§r \\(Slot #(?<page>\\d+)\\)",
+    )
 
     /**
      * REGEX-TEST: Rift Storage (1/2)
+     * REGEX-TEST: Rift Storage
      */
-    private val riftStoragePattern by RepoPattern.pattern("storage.rift", "Rift Storage \\((?<page>\\d+)/\\d+\\)")
-
-    /**
-     * REGEX-TEST: Chest
-     * REGEX-TEST: Large Chest
-     */
-    private val chestPattern by RepoPattern.pattern("storage.chest", "(?:Large )?Chest")
+    private val riftStoragePattern by RepoPattern.pattern(
+        "storage.rift",
+        "Rift Storage(?: \\((?<page>\\d+)/\\d+\\))?",
+    )
 
     val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
     val enderchest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
@@ -72,22 +78,22 @@ object StorageApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         enderchestPattern.matchMatcher(event.inventoryName) {
-            val page = group("page").toInt()
+            val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Ender Chest $page", event.inventoryItemsWithNull.values)
             return
         }
         backpackPattern.matchMatcher(event.inventoryName) {
-            val page = group("page").toInt()
+            val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Backpack $page", event.inventoryItemsWithNull.values)
             return
         }
         riftStoragePattern.matchMatcher(event.inventoryName) {
-            val page = group("page").toInt()
+            val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Rift Storage $page", event.inventoryItemsWithNull.values)
             return
         }
         if (!IslandType.PRIVATE_ISLAND.isCurrent() || !isPrivateIslandStorageEnabled()) return
-        chestPattern.matchMatcher(event.inventoryName) {
+        if (InventoryUtils.isInNormalChest(event.inventoryName)) {
             handlePrivateIslandRead(event.inventoryItemsWithNull.values)
         }
     }
@@ -116,10 +122,10 @@ object StorageApi {
         shouldSave = false
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onMinutePassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(60) || !isPrivateIslandStorageEnabled()) return
-        mutableIslandChest.removeIf { _, chest ->
+        mutableIslandChest.removeIf { (_, chest) ->
             if (chest.primaryCords == null) {
                 ErrorManager.logErrorStateWithData(
                     "Something went wrong during Private Island cleanup",
@@ -135,7 +141,7 @@ object StorageApi {
                 chest.secondaryCords == null -> getNeighbourBlocks(chest.primaryCords).any { it.second is BlockChest }
                 else -> chest.secondaryCords.getBlockAt() !is BlockChest
             }.also {
-                if (it == true) ChatUtils.debug("Removed Private Island Chest at: ${chest.primaryCords}")
+                if (it) ChatUtils.debug("Removed Private Island Chest at: ${chest.primaryCords}")
             }
         }
     }
@@ -186,7 +192,7 @@ object StorageApi {
             it to it.getBlockAt()
         }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         if (!isPrivateIslandStorageEnabled()) return
@@ -215,6 +221,5 @@ object StorageApi {
         }
     }
 
-    // TODO add config value
-    private fun isPrivateIslandStorageEnabled() = true
+    private fun isPrivateIslandStorageEnabled() = SkyHanniMod.feature.inventory.savePrivateIslandChests
 }

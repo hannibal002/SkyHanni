@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import com.google.gson.annotations.Expose
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -11,6 +12,7 @@ import net.minecraft.util.Vec3
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.acos
+import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
 import kotlin.math.max
@@ -20,6 +22,7 @@ import kotlin.math.round
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 data class LorenzVec(
     val x: Double,
     val y: Double,
@@ -136,14 +139,9 @@ data class LorenzVec(
 
     fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
-    fun roundLocationToBlock(): LorenzVec {
-        val x = (x - .499999).roundTo(0)
-        val y = (y - .499999).roundTo(0)
-        val z = (z - .499999).roundTo(0)
-        return LorenzVec(x, y, z)
-    }
+    fun roundToBlock() = LorenzVec(floor(x), floor(y), floor(z))
 
-    fun blockCenter() = roundLocationToBlock().add(0.5, 0.5, 0.5)
+    fun blockCenter() = roundToBlock().add(0.5, 0.5, 0.5)
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
@@ -152,6 +150,20 @@ data class LorenzVec(
         val x = if (x < 0) x.toInt() - 1 else x.toInt()
         val y = y.toInt() - 1
         val z = if (z < 0) z.toInt() - 1 else z.toInt()
+        return LorenzVec(x, y, z)
+    }
+
+    fun floor(): LorenzVec {
+        val x = floor(x).toInt()
+        val y = floor(y).toInt()
+        val z = floor(z).toInt()
+        return LorenzVec(x, y, z)
+    }
+
+    fun ceil(): LorenzVec {
+        val x = ceil(x).toInt()
+        val y = ceil(y).toInt()
+        val z = ceil(z).toInt()
         return LorenzVec(x, y, z)
     }
 
@@ -231,13 +243,13 @@ data class LorenzVec(
             LorenzVec(0, 0, -1),
         )
 
-        fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
-            val yaw: Double = (yaw + 90) * Math.PI / 180
-            val pitch: Double = (pitch + 90) * Math.PI / 180
+        fun getFromYawPitch(yawDegrees: Double, pitchDegrees: Double): LorenzVec {
+            val yawRad: Double = (yawDegrees + 90) * Math.PI / 180
+            val pitchRad: Double = (pitchDegrees + 90) * Math.PI / 180
 
-            val x = sin(pitch) * cos(yaw)
-            val y = sin(pitch) * sin(yaw)
-            val z = cos(pitch)
+            val x = sin(pitchRad) * cos(yawRad)
+            val y = sin(pitchRad) * sin(yawRad)
+            val z = cos(pitchRad)
             return LorenzVec(x, z, y)
         }
 
@@ -253,8 +265,6 @@ data class LorenzVec(
             return LorenzVec(this[0], this[1], this[2])
         }
 
-        fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().down()
-
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }
 }
@@ -263,8 +273,29 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
+fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(serverPosX, serverPosY, serverPosZ)
 
 fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
+
+fun Entity.getPositionLog() = PositionLog(
+    tick = ticksExisted,
+    position = getLorenzVec(),
+    prev = getPrevLorenzVec(),
+    server = getServerLorenzVec(),
+    motion = getMotionLorenzVec(),
+    yaw = rotationYaw,
+    pitch = rotationPitch,
+)
+
+data class PositionLog(
+    @Expose val tick: Int,
+    @Expose val position: LorenzVec,
+    @Expose val prev: LorenzVec,
+    @Expose val server: LorenzVec,
+    @Expose val motion: LorenzVec,
+    @Expose val yaw: Float,
+    @Expose val pitch: Float,
+)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 

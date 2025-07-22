@@ -1,30 +1,30 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -33,31 +33,32 @@ import net.minecraft.nbt.JsonToNBT
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import java.util.TreeMap
 import kotlin.math.floor
 //#if MC > 1.21
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
 //$$ import net.minecraft.nbt.NbtString
+//$$ import net.minecraft.text.Text
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.component.type.LoreComponent
+//$$ import at.hannibal2.skyhanni.utils.ComponentUtils
+//$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 //#else
 import net.minecraft.nbt.NBTTagString
-import net.minecraft.nbt.NBTException
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
 
-    val configLocation = File("config/notenoughupdates")
-    val repoLocation = File(configLocation, "repo")
+    val configDirectory = File("config/notenoughupdates")
+    val repoDirectory = File(configDirectory, "repo")
 
+    private val loadingMutex = Mutex()
     private val itemMap = TreeMap<String, JsonObject>()
     private val itemStackCache = mutableMapOf<String, ItemStack>()
     private val displayNameCache = mutableMapOf<String, String>()
-    private val recipes = mutableSetOf<PrimitiveRecipe>()
     private val recipesMap = mutableMapOf<NeuInternalName, MutableSet<PrimitiveRecipe>>()
 
     private var neuPetsJson: NeuPetsJson? = null
@@ -67,49 +68,46 @@ object EnoughUpdatesManager {
 
     fun getItemInformation() = itemMap
 
-    fun downloadRepo() {
-        SkyHanniMod.coroutineScope.launch {
-            EnoughUpdatesRepo.downloadRepo()
-        }
-    }
+    fun inLoadingState() = loadingMutex.isLocked || EnoughUpdatesRepoManager.repoMutex.isLocked
 
-    fun reloadRepo() {
+    /**
+     * Called by the Neu Repo Manager when the NEU repo is reloaded.
+     */
+    suspend fun reloadItemsFromRepo() = loadingMutex.withLock {
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
         titleWordMap.clear()
-        recipes.clear()
         recipesMap.clear()
 
         val tempItemMap = TreeMap<String, JsonObject>()
-        SkyHanniMod.coroutineScope.launch {
-            loadItemMap(tempItemMap)
-            synchronized(itemMap) {
-                itemMap.clear()
-                itemMap.putAll(tempItemMap)
-            }
-            NeuRepositoryReloadEvent.post()
-            ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
+        loadItemMap(tempItemMap)
+
+        synchronized(itemMap) {
+            itemMap.clear()
+            itemMap.putAll(tempItemMap)
         }
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
-    private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
-        val itemDir = File(repoLocation, "items")
-        if (!itemDir.exists()) return
-        for (file in itemDir.listFiles() ?: return) {
-            if (file.extension != "json") continue
+    private suspend fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
+        val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
+        fileSystem.list("items").mapNotNullAsync { name ->
             try {
-                InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8).use { reader ->
-                    val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
-                    tempItemMap[file.nameWithoutExtension] = parseItem(file.nameWithoutExtension, json) ?: continue
-                }
+                val internalName = name.removeSuffix(".json")
+                val parsed = parseItem(
+                    internalName = internalName,
+                    json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
+                ) ?: return@mapNotNullAsync null
+                internalName to parsed
             } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Error while loading neu repo")
+                ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
+                null
             }
+        }.forEach { (internalName, item) ->
+            tempItemMap[internalName] = item
         }
-        return
     }
 
     private fun parseItem(internalName: String, json: JsonObject): JsonObject? {
@@ -143,7 +141,6 @@ object EnoughUpdatesManager {
     }
 
     fun registerRecipe(recipe: PrimitiveRecipe) {
-        recipes.add(recipe)
         for (internalName in recipe.outputs) {
             val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
             recipeSet.add(recipe)
@@ -163,9 +160,10 @@ object EnoughUpdatesManager {
         json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
         //#if MC < 1.21
-        // todo nbt tag doesnt exist on modern
         json.addProperty("nbttag", tag.toString())
         json.addProperty("damage", stack.itemDamage)
+        //#else
+        //$$ json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
         //#endif
 
         val jsonLore = JsonArray()
@@ -174,6 +172,22 @@ object EnoughUpdatesManager {
         }
         json.add("lore", jsonLore)
         return json
+    }
+
+    private val nbtListRegex = Regex("([\\[,])\\d+:")
+
+    private fun convertNbtToJson(nbtString: String): NeuNbtInfoJson? {
+        var convertedNbt = nbtString
+        convertedNbt = convertedNbt.replace(nbtListRegex, "$1")
+        try {
+            val json = ConfigManager.gson.fromJson(convertedNbt, JsonObject::class.java)
+            val fromJson = ConfigManager.gson.fromJson(json, NeuNbtInfoJson::class.java)
+            return fromJson
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Error converting nbt to json", "malformed nbt" to convertedNbt, "original nbt" to nbtString)
+        }
+
+        return null
     }
 
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
@@ -194,12 +208,16 @@ object EnoughUpdatesManager {
 
         json["count"]?.asInt?.let { stack.stackSize = it }
         json["damage"]?.asInt?.let { stack.itemDamage = it }
-        json["nbttag"]?.asString?.let { nbt ->
-            try {
-                val tag = JsonToNBT.getTagFromJson(nbt)
-                stack.tagCompound = tag
-            } catch (_: NBTException) {
+        try {
+            val nbtString = json["nbttag"]?.let { rawJsonNbt ->
+                if (rawJsonNbt.isJsonObject) rawJsonNbt.toString()
+                else rawJsonNbt.asString
             }
+            val tag = JsonToNBT.getTagFromJson(nbtString)
+            stack.tagCompound = tag
+        } catch (_: Exception) {
+            println("json was malformed: ${json["nbttag"]}")
+            println("whole json: $json")
         }
 
         var replacements = mapOf<String, String>()
@@ -222,12 +240,64 @@ object EnoughUpdatesManager {
             stack.tagCompound = tag
         }
 
-
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
         //#else
-        //$$ // todo clearly this isnt correct but this is lot that has to change and this works for now
-        //$$ return ItemStack(Items.PAINTING)
+        //$$ json ?: return ItemStack(Items.PAINTING)
+        //$$ var usingCache = useCache && !useReplacements
+        //$$ val internalName = json["internalname"].asString
+        //$$ if (internalName == "_") usingCache = false
+        //$$
+        //$$ if (usingCache) {
+        //$$     val cachedStack = itemStackCache[internalName]
+        //$$     if (cachedStack != null) return cachedStack.copy()
+        //$$ }
+        //$$
+        //$$ val damage = json["damage"]?.asInt ?: 0
+        //$$ val item: Item = ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
+        //$$     println(json["itemid"].asString + " " + damage + " is invalid item")
+        //$$     return ItemStack(Blocks.STONE.asItem())
+        //$$ }
+        //$$ val stack = ItemStack(item)
+        //$$ if (stack.item == Items.AIR) {
+        //$$     return ItemStack(Blocks.STONE.asItem())
+        //$$ }
+        //$$
+        //$$ json["count"]?.asInt?.let { stack.count = it }
+        //$$
+        //$$
+        //$$ if (json["nbttag"]?.isJsonObject == false) {
+        //$$     json["nbttag"]?.asString?.let { nbt ->
+        //$$         ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
+        //$$     }
+        //$$ } else {
+        //$$     val neuNbtInfoJson = ConfigManager.gson.fromJson(json["nbttag"], NeuNbtInfoJson::class.java)
+        //$$     ComponentUtils.convertToComponents(stack, neuNbtInfoJson)
+        //$$ }
+        //$$
+        //$$ var replacements = mapOf<String, String>()
+        //$$ if (useReplacements) {
+        //$$     replacements = getPetLoreReplacements(stack, -1)
+        //$$     json["displayname"]?.asString?.let {
+        //$$         var name = it
+        //$$         for ((key, value) in replacements) {
+        //$$             name = name.replace("{$key}", value)
+        //$$         }
+        //$$         stack.setCustomItemName(name)
+        //$$     }
+        //$$ }
+        //$$
+        //$$ json["lore"]?.asJsonArray?.let { lore ->
+        //$$     val loreList: MutableList<String> = mutableListOf()
+        //$$     for (nbtElement in processLore(lore, replacements)) {
+        //$$         loreList.add(nbtElement.asString().get())
+        //$$     }
+        //$$
+        //$$     stack.setLore(loreList)
+        //$$ }
+        //$$
+        //$$ if (usingCache) itemStackCache[internalName] = stack
+        //$$ return stack.copy()
         //#endif
     }
 
@@ -264,7 +334,7 @@ object EnoughUpdatesManager {
             replacements["LVL"] = level.toString()
         } else {
             neuPetsJson?.customPetLeveling?.get(petName)?.let { petLeveling ->
-                val maxLevel = petLeveling.asJsonObject.get("maxLevel")?.asInt ?: 100
+                val maxLevel = petLeveling.maxLevel ?: 100
                 replacements["LVL"] = "1➡$maxLevel"
             } ?: run { replacements["LVL"] = "1➡100" }
         }
@@ -379,57 +449,30 @@ object EnoughUpdatesManager {
     }
 
     private fun itemCountInRepoFolder(): Int {
-        val itemsFolder = File(repoLocation, "items")
+        val itemsFolder = File(repoDirectory, "items")
         return itemsFolder.listFiles()?.size ?: 0
     }
 
     @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
-        if (itemMap.isEmpty() && itemCountInRepoFolder() > 0) {
-            reloadRepo()
-            println("No loaded items in NEU repo, attempting to reload the repo.")
-        }
-    }
-
-    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        neuPetsJson = event.readConstant<NeuPetsJson>("pets")
-        neuPetNums = event.readConstant<JsonObject>("petnums")
+        neuPetsJson = event.getConstant<NeuPetsJson>("pets")
+        neuPetNums = event.getConstant<JsonObject>("petnums")
+        if (itemMap.isNotEmpty()) {
+            ChatUtils.chat("Reloaded ${itemMap.size.addSeparators()} items in the NEU repo")
+        }
     }
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        if (!PlatformUtils.isNeuLoaded()) {
-            event.register("neureloadrepo") {
-                aliases = listOf("shreloadneurepo")
-                description = "Reloads the NEU repo"
-                category = CommandCategory.DEVELOPER_TEST
-                callback { reloadRepo() }
-            }
-            event.register("neuresetrepo") {
-                aliases = listOf("shresetneurepo")
-                description = "Redownload the NEU repo"
-                category = CommandCategory.DEVELOPER_TEST
-                callback { downloadRepo() }
-            }
-        }
+    fun reportItemStatus() {
+        val loadedItems = itemMap.size
+        val directorySize = itemCountInRepoFolder()
 
-        event.register("shneurepostatus") {
-            description = "Get the status of the NEU repo"
-            category = CommandCategory.DEVELOPER_TEST
-            callback {
-                val loadedItems = itemMap.size
-                val directorySize = itemCountInRepoFolder()
-
-                ChatUtils.chat("NEU Repo Status:")
-                when {
-                    directorySize == 0 -> ChatUtils.chat("§cNo items directory found!", prefix = false)
-                    loadedItems == 0 -> ChatUtils.chat("§cNo items loaded!", prefix = false)
-                    loadedItems < directorySize -> ChatUtils.chat("§eLoaded $loadedItems/$directorySize items", prefix = false)
-                    loadedItems > directorySize -> ChatUtils.chat("§eLoaded Items: $loadedItems (more than directory size)", prefix = false)
-                    else -> ChatUtils.chat("§aLoaded all $loadedItems items!", prefix = false)
-                }
-            }
+        val status = when {
+            directorySize == 0 -> "§cNo items directory found!"
+            loadedItems == 0 -> "§cNo items loaded!"
+            loadedItems < directorySize -> "§eLoaded $loadedItems/$directorySize items"
+            loadedItems > directorySize -> "§eLoaded Items: $loadedItems (more than directory size)"
+            else -> "§aLoaded all $loadedItems items!"
         }
+        ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
     }
 }

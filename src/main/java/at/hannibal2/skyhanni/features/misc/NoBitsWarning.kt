@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -32,7 +32,7 @@ object NoBitsWarning {
         }
 
         if (config.bitsGainChatMessage) {
-            if (event.bits < config.threshold) return
+            if (event.bits < config.messageThreshold) return
             ChatUtils.chat("You have gained §b${event.difference.addSeparators()} §eBits.")
         }
     }
@@ -42,5 +42,6 @@ object NoBitsWarning {
         event.move(35, "misc.noBitsWarning", "misc.noBitsWarning.enabled")
         event.move(40, "misc.noBitsWarning.enabled", "misc.bits.enableWarning")
         event.move(40, "misc.noBitsWarning.notificationSound", "misc.bits.notificationSound")
+        event.move(94, "misc.bits.threshold", "misc.bits.messageThreshold")
     }
 }

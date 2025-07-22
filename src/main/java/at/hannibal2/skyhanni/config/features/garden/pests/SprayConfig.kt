@@ -11,7 +11,7 @@ class SprayConfig {
     @Expose
     @ConfigOption(
         name = "Pest Spray Selector",
-        desc = "Show the pests that are attracted when changing the selected material of the §aSprayonator§7."
+        desc = "Show the pests that are attracted when changing the selected material of the §aSprayonator§7.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -25,7 +25,7 @@ class SprayConfig {
 
     @Expose
     @ConfigLink(owner = SprayConfig::class, field = "pestWhenSelector")
-    var position: Position = Position(315, -200, 2.3f)
+    val position: Position = Position(315, -200, 2.3f)
 
     @Expose
     @ConfigOption(name = "Spray Display", desc = "Show the active spray and duration for your current plot.")
@@ -42,13 +42,19 @@ class SprayConfig {
     @Expose
     @ConfigOption(
         name = "Spray Expiration Notice",
-        desc = "Show a notification in chat when a spray runs out in any plot. Only active in Garden."
+        desc = "Show a notification in chat when a spray runs out in any plot. Only active in Garden.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var expiryNotification: Boolean = true
 
     @Expose
+    @ConfigOption(name = "New Spray Notice", desc = "Send a message in chat if a new spray is detected when entering a plot.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var newSprayNotification: Boolean = false
+
+    @Expose
     @ConfigLink(owner = SprayConfig::class, field = "displayEnabled")
-    var displayPosition: Position = Position(390, 75)
+    val displayPosition: Position = Position(390, 75)
 }

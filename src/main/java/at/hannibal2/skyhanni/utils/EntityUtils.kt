@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.keepOnlyIn
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
@@ -25,12 +25,18 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.EquipmentSlot
+//#else
+import net.minecraft.entity.SharedMonsterAttributes
+//#endif
 
 @SkyHanniModule
 object EntityUtils {
@@ -158,8 +164,20 @@ object EntityUtils {
 
     fun EntityPlayer.isNpc() = !isRealPlayer()
 
+    //#if MC < 1.21
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
+    //#else
+    //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    //$$     if (this !is PlayerEntity) return null
+    //$$     return buildList {
+    //$$         add(inventory.equipment.get(EquipmentSlot.FEET).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.LEGS).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.CHEST).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.HEAD).orNull())
+    //$$     }.normalizeAsArray()
+    //$$ }
+    //#endif
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
@@ -179,9 +197,24 @@ object EntityUtils {
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
+    //#if MC < 1.21
     fun getAllTileEntities(): Sequence<TileEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
+    //#else
+    //$$ fun getAllTileEntities(): Sequence<BlockEntity> {
+    //$$     val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
+    //$$     val blockEntityTickers = world.blockEntityTickers.let {
+    //$$         if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
+    //$$     }.asSequence().filterNotNull()
+    //$$
+    //$$     return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
+    //$$ }
+    //#endif
+
+    inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
+        list.keepOnlyIn(getEntities<T>())
+    }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
         if (isDead) return false
@@ -203,6 +236,6 @@ object EntityUtils {
         //#if MC < 1.21
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
     //#else
-    //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
+    //$$ get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
 }

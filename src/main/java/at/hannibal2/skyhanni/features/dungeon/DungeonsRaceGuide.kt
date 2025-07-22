@@ -10,11 +10,10 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -78,7 +77,7 @@ object DungeonsRaceGuide {
     private fun updateConfig() {
         parkourHelpers.values.forEach {
             it.rainbowColor = config.rainbowColor.get()
-            it.monochromeColor = config.monochromeColor.get().toSpecialColor()
+            it.monochromeColor = config.monochromeColor.get().toColor()
             it.lookAhead = config.lookAhead.get() + 1
         }
     }
@@ -91,5 +90,5 @@ object DungeonsRaceGuide {
         parkourHelpers[currentRace]?.render(event)
     }
 
-    fun isEnabled() = IslandType.DUNGEON_HUB.isInIsland() && config.enabled
+    fun isEnabled() = IslandType.DUNGEON_HUB.isCurrent() && config.enabled
 }

@@ -24,7 +24,7 @@ class EliteFarmingWeightConfig {
 
     @Expose
     @ConfigLink(owner = EliteFarmingWeightConfig::class, field = "display")
-    var pos: Position = Position(180, 10)
+    val pos: Position = Position(180, 10)
 
     @Expose
     @ConfigOption(
@@ -40,8 +40,11 @@ class EliteFarmingWeightConfig {
     @ConfigEditorDropdown
     val eliteLBType: Property<EliteFarmingWeightLBType> = Property.of(EliteFarmingWeightLBType.DEFAULT)
 
-    enum class EliteFarmingWeightLBType(private val displayName: String) {
-        DEFAULT("All-Time"),
+    enum class EliteFarmingWeightLBType(
+        private val displayName: String,
+        val leaderboardName: String = displayName
+    ) {
+        DEFAULT("All-Time", leaderboardName = ""),
         MONTHLY("Monthly"),
         ;
 
@@ -77,7 +80,7 @@ class EliteFarmingWeightConfig {
             "ten thousands and you don't want to see small ETAs."
     )
     @ConfigEditorBoolean
-    var useEtaGoalRank: Property<Boolean> = Property.of(true)
+    val useEtaGoalRank: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -85,7 +88,7 @@ class EliteFarmingWeightConfig {
         desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")"
     )
     @ConfigEditorText
-    var etaGoalRank: Property<String> = Property.of("10000")
+    val etaGoalRank: Property<String> = Property.of("10000")
 
     @Expose
     @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")

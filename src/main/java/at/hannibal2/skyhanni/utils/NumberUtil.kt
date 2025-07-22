@@ -1,17 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-//#if TODO
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
-//#endif
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
-// todo 1.21 impl needed
 object NumberUtil {
 
     private val config get() = SkyHanniMod.feature
@@ -53,9 +51,11 @@ object NumberUtil {
      * @link https://stackoverflow.com/a/30661479
      * @author assylias
      */
-    private fun compactFormat(value: Number, preciseBillions: Boolean = false): String {
-        @Suppress("NAME_SHADOWING")
-        val value = value.toLong()
+    private fun compactFormat(input: Number, preciseBillions: Boolean = false): String {
+        val absDoubleValue = input.toDouble().absoluteValue
+        if (absDoubleValue < 1) return input.toString()
+
+        val value = input.toLong()
         // Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
         if (value == Long.MIN_VALUE) return compactFormat(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + compactFormat(-value, preciseBillions)
@@ -290,11 +290,7 @@ object NumberUtil {
 }
 
 class MinMaxNumber(val min: Double, val max: Double) {
-    //#if TODO
     override fun toString(): String = "${min.formatCoin()}§7-${max.formatCoin()}"
-    //#else
-    //$$ override fun toString(): String = "${min}§7-${max}"
-    //#endif
 
     operator fun plus(other: MinMaxNumber): MinMaxNumber = MinMaxNumber(min + other.min, max + other.max)
 }

@@ -12,14 +12,21 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.init.Items
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private fun Item.toItemStack(meta: Int = 0): ItemStack = ItemStack(this, 1, meta)
+private fun createPlayerHead(): ItemStack =
+    //#if MC < 1.16
+    ItemStack(Items.skull, 1, 3)
+//#else
+//$$ ItemStack(Items.PLAYER_HEAD)
+//#endif
 
 enum class MiningEventType(
     val eventName: String,
@@ -38,14 +45,14 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val compass = Renderable.itemStack(Items.compass.toItemStack(), 0.45)
-            val wind = Renderable.string("§9≈", scale = 0.75)
+            val compass = Renderable.item(ItemStack(Items.compass), 0.45)
+            val wind = Renderable.text("§9≈", scale = 0.75)
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 1f, -2f)
-                compass.render(posX, posY)
+                compass.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(-1f, -2f, 2f)
-                wind.render(posX, posY)
+                wind.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(0f, 1f, 0f)
             }
         },
@@ -58,14 +65,14 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val dyeGreen = Renderable.itemStack(DyeCompat.LIME.createStack(), 0.45)
-            val dyePink = Renderable.itemStack(DyeCompat.PINK.createStack(), 0.45)
+            val dyeGreen = Renderable.item(DyeCompat.LIME.createStack(), 0.45)
+            val dyePink = Renderable.item(DyeCompat.PINK.createStack(), 0.45)
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 0f, 0f)
-                dyePink.render(posX + 1, posY - 1)
+                dyePink.render(mouseOffsetX + 1, mouseOffsetY - 1)
                 DrawContextUtils.translate(-2f, 1.5f, 0f)
-                dyeGreen.render(posX, posY)
+                dyeGreen.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(1f, -1.5f, 0f)
             }
 
@@ -74,7 +81,7 @@ enum class MiningEventType(
 
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, LorenzColor.RED, true,
-        Renderable.itemStack(Items.skull.toItemStack(3), 0.36), // Late init when skull texture holder is loaded
+        Renderable.item(createPlayerHead(), 0.36), // Late init when skull texture holder is loaded
     ),
 
     BETTER_TOGETHER(
@@ -85,9 +92,9 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val steveHead = Renderable.itemStack(Items.skull.toItemStack(3), 0.36)
+            val steveHead = Renderable.item(createPlayerHead(), 0.36)
             val alexHead by lazy {
-                Renderable.itemStack(
+                Renderable.item(
                     ItemUtils.createSkull(
                         "Alex",
                         "6ab43178-89fd-4905-97f6-0f67d9d76fd9",
@@ -97,11 +104,11 @@ enum class MiningEventType(
                 )
             }
 
-            override fun render(posX: Int, posY: Int) {
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(-1f, 0f, 0f)
-                alexHead.render(posX, posY)
+                alexHead.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(+4f, +3f, 0f)
-                steveHead.render(posX, posY)
+                steveHead.render(mouseOffsetX, mouseOffsetY)
                 DrawContextUtils.translate(-3f, -3f, 0f)
             }
 
@@ -113,7 +120,7 @@ enum class MiningEventType(
         160.seconds,
         color = LorenzColor.GOLD,
         dwarvenSpecific = true,
-        iconInput = Items.name_tag.toItemStack().overrideId("MINING_RAFFLE_TICKET"),
+        iconInput = ItemStack(Items.name_tag).overrideId("MINING_RAFFLE_TICKET"),
     ),
     MITHRIL_GOURMAND(
         "MITHRIL GOURMAND",
@@ -133,23 +140,21 @@ enum class MiningEventType(
         iconInput: ItemStack,
     ) : this(
         eventName, shortName, defaultLength, color, dwarvenSpecific,
-        Renderable.itemStack(
-            iconInput, xSpacing = 0,
-        ),
+        Renderable.item(iconInput, xSpacing = 0),
         iconInput,
     )
 
     private var icon = Renderable.hoverTips(iconInput, listOf(eventName))
-    private val compactText = Renderable.string("${color.getChatColor()}$shortName")
-    private val normalText = Renderable.string("${color.getChatColor()}$eventName")
+    private val compactText = Renderable.text("${color.getChatColor()}$shortName")
+    private val normalText = Renderable.text("${color.getChatColor()}$eventName")
 
-    private var compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), 0)
-    private var normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), 0)
+    private var compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
+    private var normalTextWithIcon = Renderable.horizontal(icon, normalText, spacing = 0)
 
     private fun rebuildIcons(iconInput: ItemStack) {
         icon = Renderable.hoverTips(iconInput, listOf(eventName))
-        compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), 0)
-        normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), 0)
+        compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
+        normalTextWithIcon = Renderable.horizontal(listOf(icon, normalText), 0)
     }
 
     fun getRenderable(): Renderable = when (config.compressedFormat) {

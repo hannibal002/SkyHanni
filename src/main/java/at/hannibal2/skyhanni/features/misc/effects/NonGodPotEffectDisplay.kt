@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -14,17 +14,19 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -32,9 +34,10 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object NonGodPotEffectDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.potionEffect
+    private val config get() = SkyHanniMod.feature.misc.nonGodPotEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
+    private val setRecently: TimeLimitedSet<NonGodPotEffect> = TimeLimitedSet(5.seconds)
     private var display = emptyList<String>()
 
     /**
@@ -62,18 +65,17 @@ object NonGodPotEffectDisplay {
 
     @HandleEvent
     fun onEffectUpdate(event: EffectDurationChangeEvent) {
+        val duration = event.duration ?: Duration.ZERO
         when (event.durationChangeType) {
             EffectDurationChangeType.ADD -> {
-                event.duration?.let {
-                    val existing = effectDuration[event.effect]?.duration ?: Duration.ZERO
-                    effectDuration[event.effect] = Timer(existing + it)
-                }
+                if (setRecently.contains(event.effect)) return
+                val existing = effectDuration[event.effect]?.duration ?: Duration.ZERO
+                effectDuration[event.effect] = Timer(existing + duration)
             }
 
             EffectDurationChangeType.SET -> {
-                event.duration?.let {
-                    effectDuration[event.effect] = Timer(it)
-                }
+                effectDuration[event.effect] = Timer(duration)
+                setRecently.add(event.effect)
             }
 
             EffectDurationChangeType.REMOVE -> {
@@ -99,7 +101,7 @@ object NonGodPotEffectDisplay {
             if (time.ended) continue
             if (effect == NonGodPotEffect.INVISIBILITY) continue
 
-            if (effect.isMixin && !config.nonGodPotEffectShowMixins) continue
+            if (effect.isMixin && !config.showMixins) continue
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
             val format = remaining.format(TimeUnit.HOUR)
@@ -122,7 +124,7 @@ object NonGodPotEffectDisplay {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        if (config.nonGodPotEffectDisplay) update()
+        if (config.displayEnabled) update()
 
         val effectWarning = config.expireWarning
         val effectSound = config.expireSound
@@ -161,10 +163,10 @@ object NonGodPotEffectDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !config.nonGodPotEffectDisplay) return
+        if (!isEnabled() || !config.displayEnabled) return
         if (RiftApi.inRift()) return
 
-        config.nonGodPotEffectPos.renderStrings(
+        config.position.renderStrings(
             display,
             extraSpace = 3,
             posLabel = "Non God Pot Effects",
@@ -176,7 +178,11 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
+        event.move(95, "misc.potionEffect.nonGodPotEffectPos", "misc.potionEffect.position")
+        event.move(95, "misc.potionEffect.nonGodPotEffectDisplay", "misc.potionEffect.displayEnabled")
+        event.move(95, "misc.potionEfect.nonGodPotEffectShowMixins", "misc.potionEffect.showMixins")
+        event.move(95, "misc.potionEffect", "misc.nonGodPotEffect")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && !DungeonApi.inDungeon() && !KuudraApi.inKuudra
 }
