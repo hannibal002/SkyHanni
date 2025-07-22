@@ -298,10 +298,13 @@ kotlin {
 // Tasks:
 tasks.processResources {
     from(includeBackupRepo)
-    inputs.property("version", version)
+
+    // Set Version inside Meta files
+    inputs.property("version", project.version.toString())
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
-        expand("version" to version)
+        expand("version" to inputs.properties["version"].toString())
     }
+
     if (target.isFabric) {
         exclude("mcmod.info")
     } // else do NOT exclude fabric.mod.json. We use fabric.mod.json in order to show a logo in prism launcher.
