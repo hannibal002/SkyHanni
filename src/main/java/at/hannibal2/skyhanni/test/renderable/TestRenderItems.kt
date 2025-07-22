@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
@@ -25,20 +26,23 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val animationFrames = listOf(ItemStackAnimationFrame(boxOfSeedsProvider, ticks = 0))
 
-    private val animatedItemStackRenderable by lazy {
-        Renderable.animatedItemStack(
-            animationFrames,
-            rotation = ItemStackRotationDefinition(
-                axis = EnumFacing.Axis.Y,
+    private val spinningStacks by lazy {
+        EnumFacing.Axis.entries.map {
+            val rotationDef = ItemStackRotationDefinition(
+                axis = it,
                 rotationSpeed = 65.0,
-            ),
-            bounce = ItemStackBounceDefinition(
-                upwardBounce = 25,
-                downwardBounce = 25,
-                bounceSpeed = 8.0,
-            ),
-            scale = 4.0,
-        ).renderBounds()
+            )
+            it to Renderable.animatedItemStack(
+                animationFrames,
+                rotation = rotationDef,
+                bounce = ItemStackBounceDefinition(
+                    upwardBounce = 25,
+                    downwardBounce = 25,
+                    bounceSpeed = 8.0,
+                ),
+                scale = 4.0,
+            )
+        }
     }
 
     override fun renderable(): Renderable {
@@ -67,7 +71,18 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
                         spacing = 1,
                     ),
                 ),
-                animatedItemStackRenderable,
+                horizontal(
+                    spinningStacks.map { (axis, renderable) ->
+                        vertical(
+                            text("${axis.name.uppercase()} Axis"),
+                            renderable.renderBounds(),
+                            spacing = 1,
+                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                        )
+                    },
+                    spacing = 2,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                ),
                 spacing = 4,
             )
         }
