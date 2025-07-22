@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -281,30 +282,28 @@ object ItemPickupLog {
         if (display.isEmpty()) {
             this.display = null
         } else {
-            if (config.totalCoinValue && (itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) {
-                computeTotalCoinValue(display)
-            }
+            computeTotalCoinValue(display)
             val renderable = Renderable.vertical(display, verticalAlign = config.alignment)
             this.display = Renderable.fixedSizeColumn(renderable, 30)
         }
     }
 
     private fun computeTotalCoinValue(display: MutableList<Renderable>) {
-        val valueAdded = itemsAddedToInventory.values.sumOf { entry ->
-            // Handle purse coins as a special case
-            if (entry.name == "§6Coins") entry.amount.toDouble()
-            else (entry.neuInternalName?.getPriceOrNull(config.priceSource) ?: 0.0) * entry.amount
-        }
-        val valueRemoved = itemsRemovedFromInventory.values.sumOf { entry ->
-            // Handle purse coins as a special case
-            if (entry.name == "§6Coins") entry.amount.toDouble()
-            else (entry.neuInternalName?.getPriceOrNull(config.priceSource) ?: 0.0) * entry.amount
-        }
+        if (!config.totalCoinValue || !(itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) return
+        val valueAdded = itemsAddedToInventory.values.sumOf { it.coinValue() }
+        val valueRemoved = itemsRemovedFromInventory.values.sumOf { it.coinValue() }
         val total = valueAdded - valueRemoved
         if (total >= config.totalCoinValueThreshold || config.totalCoinValueThreshold == 0f) {
-            val displayValue = "Value: ${total.formatCoin()} Coins"
-            display.add(Renderable.text(displayValue))
+            display.addString("Value: ${total.formatCoin()} Coins")
         }
+    }
+
+    private fun PickupEntry.coinValue() = if (name == "§6Coins") {
+        // Handle purse coins as a special case
+        amount.toDouble()
+    } else {
+        val pricePer = neuInternalName?.getPriceOrNull(config.priceSource) ?: 0.0
+        pricePer * amount
     }
 
     private fun handleCompactLines(
