@@ -15,7 +15,7 @@ object RendererLivingEntityHook {
     @JvmStatic
     fun setOutlineColor(red: Float, green: Float, blue: Float, alpha: Float, entity: EntityLivingBase) {
         //#if MC < 1.21
-        val color = EntityOutlineRenderer.getCustomOutlineColor(entity)
+        val color = EntityOutlineRenderer.getCustomOutlineColor(entity)?.rgb
 
         if (color != null) {
             val colorRed = (color shr 16 and 255).toFloat() / 255f

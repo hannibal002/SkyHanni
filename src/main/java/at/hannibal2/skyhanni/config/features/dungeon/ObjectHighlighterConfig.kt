@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -36,7 +37,7 @@ class ObjectHighlighterConfig {
         @Expose
         @ConfigOption(name = "Color", desc = "The color used to highlight starred mobs.")
         @ConfigEditorColour
-        val colour: Property<String> = Property.of("0:60:255:255:0")
+        val color: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(255, 255, 0, 60))
     }
 
     @Expose
@@ -59,6 +60,6 @@ class ObjectHighlighterConfig {
         @Expose
         @ConfigOption(name = "Color", desc = "The color used to highlight fel skulls and draw the line.")
         @ConfigEditorColour
-        val colour: Property<String> = Property.of("0:200:255:0:255")
+        val color: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(255, 0, 255, 200))
     }
 }
