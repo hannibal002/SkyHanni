@@ -7,7 +7,6 @@ import java.nio.FloatBuffer
 //#if MC > 1.21
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
-//$$ import net.minecraft.client.util.math.MatrixStack
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
 //#endif
