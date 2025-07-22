@@ -30,49 +30,40 @@ class ColeweightWaypointFormat : WaypointFormat {
 
     override fun load(string: String): Waypoints<SkyhanniWaypoint>? {
         val type = object : TypeToken<Waypoints<ColeweightWaypoint>>() {}.type
-
         return try {
-            Waypoints(
-                ConfigManager.gson.fromJson<Waypoints<ColeweightWaypoint>>(string, type)
-                    .map {
-                        SkyhanniWaypoint(
-                            LorenzVec(it.x, it.y, it.z),
-                            @Suppress("UnsafeCallOnNullableType")
-                            it.options["name"]!!.toInt(),
-                            it.options,
-                        )
-                    }
-                    .toMutableList()
-            )
+            ConfigManager.gson.fromJson<Waypoints<ColeweightWaypoint>>(string, type).transform { it.load() }
         } catch (e: Exception) {
             ChatUtils.debug(e.stackTraceToString())
             null
         }
     }
 
+    private fun ColeweightWaypoint.load() = SkyhanniWaypoint(
+        LorenzVec(x, y, z),
+        @Suppress("UnsafeCallOnNullableType")
+        options["name"]!!.toInt(),
+        options,
+    )
+
     override fun canLoad(string: String): Boolean {
         return load(string) != null
     }
 
     override fun export(waypoints: Waypoints<SkyhanniWaypoint>): String {
-        return ConfigManager.gson.toJson(
-            Waypoints(
-                waypoints.map {
-                    ColeweightWaypoint(
-                        it.location.x.toInt(),
-                        it.location.y.toInt(),
-                        it.location.z.toInt(),
-                        0.0,
-                        1.0,
-                        0.0,
-                        it.options,
-                    )
-                }.toMutableList(),
-            ),
-            Waypoints<ColeweightWaypoint>()::class.java,
+        return ConfigManager.gson.toJson(waypoints.transform { it.export() }, Waypoints<ColeweightWaypoint>()::class.java)
+    }
+
+    private fun SkyhanniWaypoint.export(): ColeweightWaypoint = with(location) {
+        ColeweightWaypoint(
+            x.toInt(),
+            y.toInt(),
+            z.toInt(),
+            r = 0.0,
+            g = 1.0,
+            b = 0.0,
+            options,
         )
     }
 
-    override val name: String
-        get() = "coleweight"
+    override val name: String get() = "coleweight"
 }
