@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.hours
 @SkyHanniModule
 object UbikReminder {
 
-    private val config get() = RiftApi.config
+    private val config get() = RiftApi.config.area.mountaintop
 
     private var isTimerRunning = false
     private val patternGroup = RepoPattern.group("rift.ubik")

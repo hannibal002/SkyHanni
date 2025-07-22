@@ -65,10 +65,4 @@ class RiftConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var temporalPillarDodge: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Ubik's cube reminder", desc = "Reminder for Ubik's cube in the rift")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var ubikReminder: Boolean = false
 }
