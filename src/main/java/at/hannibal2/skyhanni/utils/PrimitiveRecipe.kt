@@ -12,4 +12,3 @@ data class PrimitiveRecipe(
 
     fun isCraftingRecipe() = this.recipeType == NeuRecipeType.CRAFTING
 }
-

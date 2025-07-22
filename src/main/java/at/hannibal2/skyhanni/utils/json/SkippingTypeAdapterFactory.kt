@@ -28,16 +28,13 @@ object SkippingTypeAdapterFactory : TypeAdapterFactory {
         override fun read(reader: JsonReader): T? {
             return try {
                 parent.read(reader)
-            } catch (e: IllegalStateException) {
-                SkyHanniMod.logger.warn("❗ Skipping malformed JSON at ${reader.path}: ${e.message}")
-                if (!reader.hasNext()) return null
-                reader.skipValue()
-                null
             } catch (e: Exception) {
+                // TODO include path and value found (as string)
                 SkyHanniMod.logger.warn("Failed to read value from JSON, skipping", e)
                 if (!reader.hasNext()) return null
                 // reader skip value seems to have an infinite loop if you dont have another element
                 reader.skipValue()
+
                 null
             }
         }

@@ -187,10 +187,8 @@ dependencies {
         shadowImpl("org.spongepowered:mixin:$mixinVersion") {
             isTransitive = false
         }
-        // todo when we get rid of 1.8, this is no longer needed
-        shadowImpl("com.google.code.gson:gson:2.11.0")
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
-        annotationProcessor("com.google.code.gson:gson:2.11.0")
+        annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
     } else {
         target.fabricLoaderVersion?.let { modImplementation(it) }
@@ -258,7 +256,6 @@ dependencies {
     if (target.isModern) {
         modCompileOnly(libs.roughlyenoughitems) {
             exclude(group = "net.fabricmc.fabric-api")
-            exclude(module = "gson")
         }
     }
 
@@ -400,9 +397,6 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
-    if (target.isForge) {
-        relocate("com.google.gson", "at.hannibal2.skyhanni.deps.gson")
-    }
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
