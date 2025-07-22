@@ -88,7 +88,7 @@ object ItemPickupLog {
     }
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLog
-    private val coinConfig = config.coinValue
+    private val coinConfig get() = config.coinValue
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
     private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
@@ -295,7 +295,7 @@ object ItemPickupLog {
         val valueRemoved = itemsRemovedFromInventory.values.sumOf { it.coinValue() }
         val total = valueAdded - valueRemoved
         if (total >= coinConfig.threshold || coinConfig.threshold == 0f) {
-            display.addString("Value: ${total.formatCoin()} Coins")
+            display.add(0, Renderable.text("§eValue: ${total.formatCoin()} coins"))
         }
     }
 
