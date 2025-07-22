@@ -324,6 +324,7 @@ net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
 net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
 
+net.minecraft.world.entity.Entity blockPosition() getPosition()
 net.minecraft.world.entity.Entity customName setCustomNameTag()
 net.minecraft.world.entity.Entity deltaMovement.x motionX
 net.minecraft.world.entity.Entity deltaMovement.y motionY
@@ -411,7 +412,7 @@ net.minecraft.world.entity.monster.Guardian net.minecraft.entity.monster.EntityG
 net.minecraft.world.entity.monster.MagmaCube net.minecraft.entity.monster.EntityMagmaCube
 net.minecraft.world.entity.monster.Monster net.minecraft.entity.monster.EntityMob
 net.minecraft.world.entity.monster.Silverfish net.minecraft.entity.monster.EntitySilverfish
-net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntitySkeleton
+net.minecraft.world.entity.monster.AbstractSkeleton net.minecraft.entity.monster.EntitySkeleton
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
 net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
 net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch

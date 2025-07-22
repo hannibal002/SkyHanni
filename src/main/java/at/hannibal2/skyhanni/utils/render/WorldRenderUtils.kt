@@ -121,17 +121,6 @@ object WorldRenderUtils {
         tessellator.draw()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawColor(
-        location: LorenzVec,
-        color: Color,
-        beacon: Boolean = false,
-        alpha: Float = -1f,
-        seeThroughBlocks: Boolean = true,
-    ) {
-        drawColor(location, color, beacon, alpha, seeThroughBlocks)
-    }
-
     fun SkyHanniRenderWorldEvent.drawColor(
         location: LorenzVec,
         color: LorenzColor,
@@ -179,31 +168,6 @@ object WorldRenderUtils {
         GlStateManager.enableCull()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawWaypointFilled(
-        location: LorenzVec,
-        color: Color,
-        seeThroughBlocks: Boolean = false,
-        beacon: Boolean = false,
-        extraSize: Double = 0.0,
-        extraSizeTopY: Double = extraSize,
-        extraSizeBottomY: Double = extraSize,
-        minimumAlpha: Float = 0.2f,
-        inverseAlphaScale: Boolean = false,
-    ) {
-        drawWaypointFilled(
-            location,
-            color,
-            seeThroughBlocks,
-            beacon,
-            extraSize,
-            extraSizeTopY,
-            extraSizeBottomY,
-            minimumAlpha,
-            inverseAlphaScale,
-        )
-    }
-
     fun SkyHanniRenderWorldEvent.drawWaypointFilled(
         location: LorenzVec,
         color: Color,
@@ -245,21 +209,6 @@ object WorldRenderUtils {
         if (seeThroughBlocks) {
             GlStateManager.enableDepth()
         }
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawFilledBoundingBox(
-        aabb: AxisAlignedBB,
-        c: Color,
-        alphaMultiplier: Float = 1f,
-        /**
-         * If set to `true`, renders the box relative to the camera instead of relative to the world.
-         * If set to `false`, will be relativized to [WorldRenderUtils.getViewerPos].
-         */
-        renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
-    ) {
-        drawFilledBoundingBox(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers)
     }
 
     fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
@@ -354,16 +303,6 @@ object WorldRenderUtils {
         GlStateManager.enableTexture2D()
         GlStateManager.enableCull()
         GlStateManager.disableBlend()
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawString(
-        location: LorenzVec,
-        text: String,
-        seeThroughBlocks: Boolean = false,
-        color: Color? = null,
-    ) {
-        drawString(location, text, seeThroughBlocks, color)
     }
 
     fun SkyHanniRenderWorldEvent.drawString(
@@ -551,18 +490,6 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawCylinderInWorld(
-        color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-        height: Float,
-    ) {
-        drawCylinderInWorld(color, x, y, z, radius, height)
-    }
-
     fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
         location: LorenzVec,
@@ -615,17 +542,6 @@ object WorldRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.popMatrix()
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawPyramid(
-        topPoint: LorenzVec,
-        baseCenterPoint: LorenzVec,
-        baseEdgePoint: LorenzVec,
-        color: Color,
-        depth: Boolean = true,
-    ) {
-        drawPyramid(topPoint, baseCenterPoint, baseEdgePoint, color, depth)
     }
 
     fun SkyHanniRenderWorldEvent.drawPyramid(
@@ -702,18 +618,6 @@ object WorldRenderUtils {
         }
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawSphereInWorld(
-        color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-        segments: Int = 32,
-    ) {
-        drawSphereInWorld(color, x, y, z, radius, segments)
-    }
-
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         location: LorenzVec,
@@ -784,18 +688,6 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawSphereWireframeInWorld(
-        color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
-        radius: Float,
-        segments: Int = 32,
-    ) {
-        drawSphereWireframeInWorld(color, x, y, z, radius, segments)
-    }
-
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
         location: LorenzVec,
@@ -861,21 +753,6 @@ object WorldRenderUtils {
         GlStateManager.enableTexture2D()
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.popMatrix()
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawDynamicText(
-        location: LorenzVec,
-        text: String,
-        scaleMultiplier: Double,
-        yOff: Float = 0f,
-        hideTooCloseAt: Double = 4.5,
-        smallestDistanceVew: Double = 5.0,
-        ignoreBlocks: Boolean = true,
-        ignoreY: Boolean = false,
-        maxDistance: Int? = null,
-    ) {
-        drawDynamicText(location, text, scaleMultiplier, yOff, hideTooCloseAt, smallestDistanceVew, ignoreBlocks, ignoreY, maxDistance)
     }
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
@@ -987,17 +864,6 @@ object WorldRenderUtils {
         }
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._draw3DLine(
-        p1: LorenzVec,
-        p2: LorenzVec,
-        color: Color,
-        lineWidth: Int,
-        depth: Boolean,
-    ) {
-        draw3DLine(p1, p2, color, lineWidth, depth)
-    }
-
     fun SkyHanniRenderWorldEvent.draw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
@@ -1006,16 +872,6 @@ object WorldRenderUtils {
         depth: Boolean,
     ) = LineDrawer.draw3D(this, lineWidth, depth) {
         draw3DLine(p1, p2, color)
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._outlineTopFace(
-        boundingBox: AxisAlignedBB,
-        lineWidth: Int,
-        color: Color,
-        depth: Boolean,
-    ) {
-        outlineTopFace(boundingBox, lineWidth, color, depth)
     }
 
     fun SkyHanniRenderWorldEvent.outlineTopFace(
@@ -1029,16 +885,6 @@ object WorldRenderUtils {
         draw3DLine(cornerTwo, cornerThree, color, lineWidth, depth)
         draw3DLine(cornerThree, cornerFour, color, lineWidth, depth)
         draw3DLine(cornerFour, cornerOne, color, lineWidth, depth)
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawHitbox(
-        boundingBox: AxisAlignedBB,
-        color: Color,
-        lineWidth: Int = 3,
-        depth: Boolean = true,
-    ) {
-        drawHitbox(boundingBox, color, lineWidth, depth)
     }
 
     fun SkyHanniRenderWorldEvent.drawHitbox(
@@ -1062,41 +908,8 @@ object WorldRenderUtils {
         }
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        drawLineToEye(location, color, lineWidth, depth)
-    }
-
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
-    }
-
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._draw3DPathWithWaypoint(
-        path: Graph,
-        colorLine: Color,
-        lineWidth: Int,
-        depth: Boolean,
-        startAtEye: Boolean = true,
-        textSize: Double = 1.0,
-        waypointColor: Color =
-            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
-        bezierPoint: Double = 1.0,
-        showNodeNames: Boolean = false,
-        markLastBlock: Boolean = true,
-    ) {
-        draw3DPathWithWaypoint(
-            path,
-            colorLine,
-            lineWidth,
-            depth,
-            startAtEye,
-            textSize,
-            waypointColor,
-            bezierPoint,
-            showNodeNames,
-            markLastBlock,
-        )
     }
 
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(

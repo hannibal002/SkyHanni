@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe
 
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class SpacingConfig : ResettableStorageSet() {
+class SpacingConfig : Resettable() {
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe spacing settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")

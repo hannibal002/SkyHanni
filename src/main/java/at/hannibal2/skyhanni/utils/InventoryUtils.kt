@@ -184,7 +184,7 @@ object InventoryUtils {
         Minecraft.getMinecraft().currentScreen = null
     }
 
-    fun isInNormalChest(): Boolean = openInventoryName() in normalChestInternalNames.map { I18n.format(it) }
+    fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.format(it) }
 
     // TODO replace mode with GuiContainerEvent.ClickType
     fun clickSlot(slotNumber: Int, windowId: Int? = null, mouseButton: Int = 0, mode: Int = 0) {

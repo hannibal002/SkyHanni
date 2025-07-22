@@ -13,13 +13,15 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
+import at.hannibal2.skyhanni.utils.api.ApiStaticPostPath
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
@@ -35,8 +37,8 @@ object MiningEventTracker {
     private const val MINING_API_NAME = "Soopy Mining Events"
     private const val MINING_URL = "https://api.soopy.dev/skyblock/chevents"
 
-    private val miningFetchStatic = ApiUtils.StaticApiPath("$MINING_URL/get", MINING_API_NAME)
-    private val miningSendStatic = ApiUtils.StaticApiPath("$MINING_URL/set", MINING_API_NAME)
+    private val miningFetchStatic = ApiStaticGetPath("$MINING_URL/get", MINING_API_NAME, silentError = !SkyBlockUtils.debug)
+    private val miningSendStatic = ApiStaticPostPath("$MINING_URL/set", MINING_API_NAME)
 
     // <editor-fold desc="Patterns">
     /**
@@ -181,8 +183,7 @@ object MiningEventTracker {
     }
 
     private suspend fun sendData(json: String) {
-        val response = ApiUtils.postJSON(miningSendStatic, json).takeIf { it.success } ?: return
-        val data = response.data ?: return
+        val (_, data) = ApiUtils.postJson(miningSendStatic, json).assertSuccessWithData() ?: return
 
         val formattedResponse = ConfigManager.gson.fromJson<MiningEventDataReceive>(data)
         if (!formattedResponse.success && config.enabled) {
@@ -201,7 +202,7 @@ object MiningEventTracker {
 
     private suspend fun fetchData() {
         canRequestAt = SimpleTimeMark.now() + defaultCooldown
-        val receivedData = ApiUtils.getJSONResponse(miningFetchStatic, silentError = !SkyBlockUtils.debug) ?: run {
+        val (_, receivedData) = ApiUtils.getJsonResponse(miningFetchStatic).assertSuccessWithData() ?: run {
             apiErrorCount++
             canRequestAt = SimpleTimeMark.now() + 20.minutes
             return

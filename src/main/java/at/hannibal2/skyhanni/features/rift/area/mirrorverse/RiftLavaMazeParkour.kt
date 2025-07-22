@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.entity.Entity
 
 @SkyHanniModule
@@ -64,7 +64,7 @@ object RiftLavaMazeParkour {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.rainbowColor.get()
-            monochromeColor = config.monochromeColor.get().toSpecialColor()
+            monochromeColor = config.monochromeColor.get().toColor()
             lookAhead = config.lookAhead.get() + 1
         }
     }

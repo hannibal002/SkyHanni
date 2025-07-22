@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -32,7 +31,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -202,8 +201,8 @@ object CFStrayTracker {
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
             if (rarity == LorenzRarity.LEGENDARY) tip += extractGoldenTypesCaught(data)
-            Renderable.hoverTips(StringRenderable(lineFormat), tips = CFApi.partyModeReplace(tip).split("\n"))
-        } ?: StringRenderable(lineFormat)
+            Renderable.hoverTips(Renderable.text(lineFormat), tips = CFApi.partyModeReplace(tip).split("\n"))
+        } ?: Renderable.text(lineFormat)
         return renderable.toSearchable(rarity.toString())
     }
 
@@ -259,19 +258,19 @@ object CFStrayTracker {
         // Golden Strays, "Golden Click"
         goldenStrayClick.matchMatcher(loreLine) {
             incrementGoldenType("goldenclick")
-            incrementRarity(LEGENDARY, 0)
+            incrementRarity(LorenzRarity.LEGENDARY, 0)
         }
 
         // Golden Strays, hoard/stampede
         strayHoardPattern.matchMatcher(loreLine.removeResets()) {
             incrementGoldenType("stampede")
-            incrementRarity(LEGENDARY, 0)
+            incrementRarity(LorenzRarity.LEGENDARY, 0)
         }
 
         // El Dorado - all catches
         strayDoradoPattern.matchMatcher(loreLine) {
             groupOrNull("amount")?.let { amount ->
-                incrementRarity(LEGENDARY, amount.formatLong())
+                incrementRarity(LorenzRarity.LEGENDARY, amount.formatLong())
             }
             incrementGoldenType("dorado")
         }

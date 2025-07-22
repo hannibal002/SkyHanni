@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
@@ -25,8 +24,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
@@ -174,18 +173,15 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
                     // TODO remove unnecessary update call, as both invokes above call the modify fun. in modify there is also a update call
                     update()
                 },
-            ) else StringRenderable(string)
+            ) else Renderable.text(string)
 
             val row = mutableMapOf<TextPart, Renderable>()
             row[TextPart.NAME] = string(" $displayName")
 
-            val itemStackOrNull = if (internalName == SKYBLOCK_COIN) {
-                ItemUtils.getCoinItemStack(amount)
+            row[TextPart.ICON] = if (internalName == SKYBLOCK_COIN) {
+                Renderable.item(ItemUtils.getCoinItemStack(amount))
             } else {
-                internalName.getItemStackOrNull()
-            }
-            itemStackOrNull?.let {
-                row[TextPart.ICON] = ItemStackRenderable(it)
+                Renderable.item(internalName)
             }
 
             row[TextPart.TOTAL_PRICE] = string(" $priceFormat")

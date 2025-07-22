@@ -110,9 +110,7 @@ object WikiManager {
         val wiki = if (useFandom) "SkyBlock Fandom Wiki" else "Official SkyBlock Wiki"
         val urlPrefix = if (useFandom) FANDOM_URL_PREFIX else OFFICIAL_URL_PREFIX
         if (search == "") {
-            ChatUtils.clickableLinkChat(
-                "§7Click §e§lHERE §7to visit the §6$wiki§7!", urlPrefix, "§7The $wiki!"
-            )
+            ChatUtils.clickableLinkChat("§7Click §e§lHERE §7to visit the §6$wiki§7!", urlPrefix, "§7The $wiki!")
             return
         }
 
@@ -123,7 +121,7 @@ object WikiManager {
             "§7Click §e§lHERE §7to find §a$displaySearch §7on the §6$wiki§7!",
             searchUrl,
             "§7View §a$displaySearch §7on the §6$wiki§7!",
-            autoOpen
+            autoOpen,
         )
     }
 

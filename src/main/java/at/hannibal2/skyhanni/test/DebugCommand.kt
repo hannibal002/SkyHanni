@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
@@ -173,14 +173,14 @@ object DebugCommand {
         val config = SkyHanniMod.feature.dev.repo
 
         val hasDefaultSettings = config.location.hasDefaultSettings()
-        val unsuccessfulConstants = RepoManager.getFailedConstants()
+        val unsuccessfulConstants = SkyHanniRepoManager.getFailedConstants()
         val list = buildList {
             add(" repoAutoUpdate: ${config.repoAutoUpdate}")
-            add(" usingBackupRepo: ${RepoManager.isUsingBackup}")
+            add(" usingBackupRepo: ${SkyHanniRepoManager.isUsingBackup}")
             if (hasDefaultSettings) {
                 add((" repo location: default"))
             } else {
-                add(" non-default repo location: '${RepoManager.getGitHubRepoPath()}'")
+                add(" non-default repo location: '${SkyHanniRepoManager.getGitHubRepoPath()}'")
             }
 
             if (unsuccessfulConstants.isNotEmpty()) {
@@ -202,7 +202,7 @@ object DebugCommand {
             add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
         }
 
-        val isRelevant = RepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
+        val isRelevant = SkyHanniRepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
         if (isRelevant) {
             event.addData(list)
         } else {

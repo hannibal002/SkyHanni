@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
-import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
@@ -361,7 +360,7 @@ object SkyHanniConfigSearchResetCommand {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
             legacyCallbackArgs {
-                SkyHanniMod.coroutineScope.launch {
+                SkyHanniMod.launchCoroutine {
                     ChatUtils.chat(runCommand(it))
                 }
                 lastCommand = it

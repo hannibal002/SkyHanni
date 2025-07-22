@@ -44,11 +44,12 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import java.awt.Color
@@ -192,14 +193,11 @@ object BlockStrengthGuide {
             val (progressBar, percentLine, untilNextLine) = processProgressData(ticks, speed, ore)
 
             return Renderable.hoverTips(
-                HorizontalContainerRenderable(
-                    listOf(
-                        ItemStackRenderable(icon),
-                        progressBar,
-                        StringRenderable("$ticks"),
-                    ),
+                Renderable.horizontal(
+                    Renderable.item(icon),
+                    progressBar,
+                    Renderable.text("$ticks"),
                     spacing = 0,
-                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
                 ),
                 tips = buildList<Renderable> {
                     val blockName = name.allLettersFirstUppercase()
@@ -238,7 +236,7 @@ object BlockStrengthGuide {
                     add(Renderable.placeholder(0, 5))
                     addString("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}")
                     addString("§3Blocks in that group:")
-                    add(WrappedStringRenderable(hoverText, width = 200))
+                    add(Renderable.wrappedText(hoverText, setWidth = 200))
 
                     if (!showExtraInfos) {
                         add(Renderable.placeholder(0, 5))
@@ -341,11 +339,11 @@ object BlockStrengthGuide {
             base.toInt().addSeparators(),
             gemstone.toInt().addSeparators(),
             metal.toInt().addSeparators(),
-        ).map { StringRenderable("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
+        ).map { Renderable.text("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
     }
 
     private val headerHeaderLine = listOf("Base", "Gemstone", "Metal").map {
-        StringRenderable(
+        Renderable.text(
             text = it,
             scale = 0.75,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -357,18 +355,15 @@ object BlockStrengthGuide {
     private fun createDisplay(): Renderable {
         requestSpeed()
         return Renderable.drawInsideRoundedRectWithOutline(
-            VerticalContainerRenderable(
-                listOf(
-                    VerticalContainerRenderable(
-                        createHeader(),
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    ),
-                    Renderable.table(
-                        createTableContent(), 5, 3,
-                    ),
+            Renderable.vertical(
+                Renderable.vertical(
+                    createHeader(),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                ),
+                Renderable.table(
+                    createTableContent(), 5, 3,
                 ),
                 spacing = 8,
-                RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
             ),
             color = LorenzColor.GRAY.addOpacity(180),
             topOutlineColor = Color(0, 0, 0, 200).rgb,
@@ -384,30 +379,28 @@ object BlockStrengthGuide {
     }.distribute(3)
 
     private fun createHeader(): List<Renderable> = listOf(
-        StringRenderable(
+        Renderable.text(
             SkyblockStat.MINING_SPEED.iconWithName,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
-        HorizontalContainerRenderable(
-            listOf(
-                Renderable.table(
-                    listOf(
-                        headerHeaderLine,
-                        speed.toRenderables(),
-                    ),
-                    xPadding = 5,
+        Renderable.horizontal(
+            Renderable.table(
+                listOf(
+                    headerHeaderLine,
+                    speed.toRenderables(),
                 ),
-                Renderable.clickable(
-                    StringRenderable(
-                        "§${if (inMineshaft) 'b' else '7'}Mineshaft",
-                        scale = 0.5,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                    ),
-                    onLeftClick = {
-                        inMineshaft = !inMineshaft
-                        display = createDisplay()
-                    },
+                xPadding = 5,
+            ),
+            Renderable.clickable(
+                Renderable.text(
+                    "§${if (inMineshaft) 'b' else '7'}Mineshaft",
+                    scale = 0.5,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 ),
+                onLeftClick = {
+                    inMineshaft = !inMineshaft
+                    display = createDisplay()
+                },
             ),
             spacing = 3,
         ),
@@ -452,7 +445,7 @@ object BlockStrengthGuide {
         if (!sbMenuOpened) {
             if (lastRunCommand.passedSince() < 2.seconds) {
                 sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
-                StringRenderable(
+                Renderable.text(
                     "Loading...",
                     scale = 2.0,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

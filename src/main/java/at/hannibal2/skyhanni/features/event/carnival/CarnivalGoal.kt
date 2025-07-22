@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -224,11 +224,9 @@ enum class CarnivalGoal(
             ZOMBIE_SHOOTOUT(Items.arrow, "§cZombie Shootout");
 
             val singleDisplay by lazy {
-                HorizontalContainerRenderable(
-                    listOf(
-                        ItemStackRenderable(ItemStack(item)),
-                        StringRenderable(display),
-                    ),
+                Renderable.horizontal(
+                    Renderable.item(ItemStack(item)),
+                    Renderable.text(display),
                 )
             }
 
@@ -236,7 +234,7 @@ enum class CarnivalGoal(
                 get() {
                     val goals = getGoals.filterNot { it.isReached }
                     if (goals.isEmpty()) return emptyList()
-                    return listOf(singleDisplay) + goals.map { StringRenderable(" " + it.display) }
+                    return listOf(singleDisplay) + goals.map { Renderable.text(" " + it.display) }
                 }
 
             val getGoals get() = CarnivalGoal.entries.filter { it.type == this }

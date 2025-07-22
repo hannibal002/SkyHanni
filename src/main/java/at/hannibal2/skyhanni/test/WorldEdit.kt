@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -42,15 +43,23 @@ object WorldEdit {
             }
         }
 
-    fun copyToClipboard() {
-        ClipboardUtils.copyToClipboard(generateCodeSnippet())
+    fun copyToClipboard(useModern: Boolean) {
+        ClipboardUtils.copyToClipboard(generateCodeSnippet(useModern))
+        ChatUtils.chat("Copied text to clipboard.")
     }
 
-    private fun generateCodeSnippet(): String {
+    private const val legacyBlockPos = "net.minecraft.util.BlockPos"
+    private const val modernBlockPos = "net.minecraft.util.math.BlockPos"
+    private const val legacyAABB = "net.minecraft.util.AxisAlignedBB"
+    private const val modernAABB = "net.minecraft.util.math.Box"
+
+    private fun generateCodeSnippet(useModern: Boolean): String {
+        val blockPosText = if (useModern) modernBlockPos else legacyBlockPos
+        val aabbText = if (useModern) modernAABB else legacyAABB
         var text = ""
-        leftPos?.run { text += "val redLeft = net.minecraft.util.BlockPos($x, $y, $z)\n" }
-        rightPos?.run { text += "val blueRight = net.minecraft.util.BlockPos($x, $y, $z)\n" }
-        aabb?.run { text += "val aabb = net.minecraft.util.AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ)\n" }
+        leftPos?.run { text += "val redLeft = $blockPosText($x, $y, $z)\n" }
+        rightPos?.run { text += "val blueRight = $blockPosText($x, $y, $z)\n" }
+        aabb?.run { text += "val aabb = $aabbText($minX, $minY, $minZ, $maxX, $maxY, $maxZ)\n" }
         return text
     }
 
@@ -96,53 +105,44 @@ object WorldEdit {
         }
     }
 
-    fun command(it: Array<String>) {
-        if (!isEnabled()) {
-            ChatUtils.userError("World Edit is disabled in the config. Enable it if you want to use it.")
-            return
-        }
-        when (it.firstOrNull()) {
-            null, "help" -> {
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shworldedit") {
+            description = "Select regions in the world"
+            category = CommandCategory.DEVELOPER_DEBUG
+            literalCallback("help") {
                 ChatUtils.chat(
                     "Use a wood axe and left/right click to select a region in the world. " +
                         "Then use /shworldedit copy or /shworldedit reset.",
                 )
             }
-
-            "copy" -> {
-                copyToClipboard()
-                ChatUtils.chat("Copied text to clipboard.")
+            literal("copy") {
+                argCallback("useModern", BrigadierArguments.bool()) { modern ->
+                    copyToClipboard(modern)
+                }
+                simpleCallback {
+                    copyToClipboard(false)
+                }
             }
-
-            "reset" -> {
+            literalCallback("reset") {
                 leftPos = null
                 rightPos = null
                 ChatUtils.chat("Reset selected region")
             }
-
-            "left", "pos1" -> {
+            literalCallback("left", "pos1") {
                 leftPos = LocationUtils.playerLocation().toBlockPos()
                 ChatUtils.chat("Set left pos.")
             }
-
-            "right", "pos2" -> {
+            literalCallback("right", "pos2") {
                 rightPos = LocationUtils.playerLocation().toBlockPos()
                 ChatUtils.chat("Set right pos.")
             }
-
-            else -> {
-                ChatUtils.chat("Unknown subcommand")
+            simpleCallback {
+                ChatUtils.chat(
+                    "Use a wood axe and left/right click to select a region in the world. " +
+                        "Then use /shworldedit copy or /shworldedit reset.",
+                )
             }
-        }
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shworldedit") {
-            description = "Select regions in the world"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { command(it) }
-            autoComplete { listOf("copy", "reset", "help", "left", "right") }
         }
     }
 

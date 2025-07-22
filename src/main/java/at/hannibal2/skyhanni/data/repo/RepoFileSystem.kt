@@ -39,25 +39,32 @@ sealed interface RepoFileSystem {
 
     fun loadFromZip(
         zipFile: File,
-    ) = ZipFile(zipFile.absolutePath).use { zip ->
-        zip.entries().asSequence().filter { !it.isDirectory }.forEach { entry ->
-            val relative = entry.name
-                .substringAfter('/', "")
-                .takeIf { it.isNotBlank() }
-                ?: return@forEach
+        logger: RepoLogger,
+    ): Boolean = runCatching {
+        ZipFile(zipFile.absolutePath).use { zip ->
+            zip.entries().asSequence().filter { !it.isDirectory }.forEach { entry ->
+                val relative = entry.name
+                    .substringAfter('/', "")
+                    .takeIf { it.isNotBlank() }
+                    ?: return@forEach
 
-            if (this is DiskRepoFileSystem) {
-                // Security: ensure the file is within the root directory
-                val outPath = root.toPath().resolve(relative).normalize()
-                if (!outPath.startsWith(root.toPath())) throw RuntimeException(
-                    "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                        "please report this on the SkyHanni discord."
-                )
+                if (this@RepoFileSystem is DiskRepoFileSystem) {
+                    // Security: ensure the file is within the root directory
+                    val outPath = root.toPath().resolve(relative).normalize()
+                    if (!outPath.startsWith(root.toPath())) throw RuntimeException(
+                        "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                            "please report this on the SkyHanni discord."
+                    )
+                }
+
+                val data = zip.getInputStream(entry).readBytes()
+                write(relative, data)
             }
-
-            val data = zip.getInputStream(entry).readBytes()
-            write(relative, data)
         }
+        true
+    }.getOrElse {
+        logger.logNonDestructiveError("Failed to load repo from zip file: ${zipFile.absolutePath}")
+        false
     }
 
     companion object {
@@ -80,8 +87,8 @@ class DiskRepoFileSystem(val root: File) : RepoFileSystem {
     override fun deleteRecursively(path: String) {
         File(root, path).deleteRecursively()
     }
-    override fun list(path: String) = root.resolve(path).listFiles {
-        it.extension == "json"
+    override fun list(path: String) = root.resolve(path).listFiles { file ->
+        file.exists() && file.extension == "json"
     }?.mapNotNull { it.name }?.toList().orEmpty()
 }
 
@@ -102,12 +109,10 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
     }.map { it.removePrefix("$path/") }
 
-    override fun loadFromZip(zipFile: File) {
-        super.loadFromZip(zipFile)
-        if (flushJob != null) return
-        flushJob = SkyHanniMod.launchIOCoroutine {
-            saveToDisk(diskRoot)
-        }
+    override fun loadFromZip(zipFile: File, logger: RepoLogger): Boolean {
+        val success = super.loadFromZip(zipFile, logger)
+        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine { saveToDisk(diskRoot) }
+        return success
     }
 
     override fun dispose() = storage.clear()

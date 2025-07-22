@@ -18,8 +18,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
@@ -119,7 +117,7 @@ object ShinyOrbTracker {
         val orbPrice = 5000.0
         val totalOrbPrice = data.orbsUsed * orbPrice
         profit -= totalOrbPrice
-        add(StringRenderable("§7${data.orbsUsed}x §6Shiny Orb§7: §c-${totalOrbPrice.shortFormat()} coins").toSearchable())
+        addSearchString("§7${data.orbsUsed}x §6Shiny Orb§7: §c-${totalOrbPrice.shortFormat()} coins")
 
         // Skill XP gains
         addSkillXpInfo(data.skillXpGained)

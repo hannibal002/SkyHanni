@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class TabWidgetConfig {
     @Expose
@@ -22,19 +23,19 @@ class TabWidgetConfig {
         desc = "If the information isn't shown in the tablist it won't show anything. Use /widget to turn on the information you need."
     )
     @ConfigEditorInfoText
-    var text1: String? = null
+    var warning: String? = null
 
     @ConfigOption(
         name = "Enable Info",
         desc = "Drag only one new value at time into the list, since the default locations are all the same."
     )
     @ConfigEditorInfoText
-    var text2: String? = null
+    var warning2: String? = null
 
     @Expose
     @ConfigOption(name = "Widgets", desc = "")
     @ConfigEditorDraggableList
-    val display: MutableList<TabWidgetDisplay> = mutableListOf()
+    val display: Property<MutableList<TabWidgetDisplay>> = Property.of(mutableListOf())
 
     @Expose
     @ConfigLink(owner = TabWidgetConfig::class, field = "enabled")

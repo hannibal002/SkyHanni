@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.minecraft.util.IChatComponent
@@ -104,11 +105,16 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
     // Will be invoked by the implementation of this class
+    @Suppress("HandleEventInspection")
     fun registerCommands(event: CommandRegistrationEvent) {
         if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
-            description = "Download the $commonName repo again"
+            description = "Remove and re-download the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback { updateRepo() }
+            simpleCallback { updateRepo(forceReset = true) }
+            argCallback("force", BoolArgumentType.bool()) {
+                description = "optionally only re-download if the repo is out of date"
+                updateRepo(forceReset = it)
+            }
         }
         if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
@@ -123,6 +129,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
+    fun addUnsuccessfulConstant(fileName: String) = unsuccessfulConstants.add(fileName)
 
     @PublishedApi
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
@@ -154,7 +161,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     // <editor-fold desc="Repo Management">
-    fun updateRepo() {
+    fun updateRepo(forceReset: Boolean = false) {
         shouldManuallyReload = true
         if (!config.location.valid) {
             ChatUtils.userError("Invalid $commonName Repo settings detected, resetting default settings.")
@@ -162,7 +169,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         SkyHanniMod.launchIOCoroutine {
-            fetchAndUnpackRepo(command = true)
+            fetchAndUnpackRepo(command = true, forceReset = forceReset)
             reloadRepository("$commonName Repo updated successfully.")
             if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launchIOCoroutine
             val informed = logger.logErrorStateWithData(
@@ -176,7 +183,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
+    private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
             if (manual) ChatUtils.chat("$commonShortNameCased Repo settings are already on default!")
             return
@@ -220,7 +227,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             prepCleanRepoFileSystem()
 
             Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            repoFileSystem.loadFromZip(repoZipFile)
+            if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
+                logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
+            }
 
             commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
             logger.debug("Successfully switched to backup repo")
@@ -236,11 +245,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
+            ChatUtils.chat("$commonName Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             reportExtraStatusInfo()
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
+        ChatUtils.chat("$commonName Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
@@ -260,7 +269,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         val text = mutableListOf<IChatComponent>()
         text.add(
             (
-                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7Repo Issue! Some features may not work. " +
+                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work. " +
                     "Please report this error on the Discord!"
                 ).asComponent(),
         )
@@ -282,7 +291,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * @param command If true, will report the status of the repo to the user.
      * @param silentError If true, will not log errors to the console.
      */
-    private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true) = repoMutex.withLock {
+    private suspend fun fetchAndUnpackRepo(
+        command: Boolean,
+        silentError: Boolean = true,
+        forceReset: Boolean = false,
+    ) = repoMutex.withLock {
         localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
         val (currentSha, currentCommitTime) = localRepoCommit
 
@@ -291,16 +304,16 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         } ?: ((null to null).also { downloadFailed = true })
 
         val diffCheck = RepoComparison(currentSha, currentCommitTime, latestSha, latestCommitTime)
+        val outdated = !diffCheck.hashesMatch
 
-        if (repoDirectory.exists() && diffCheck.hashesMatch && unsuccessfulConstants.isEmpty()) {
+        if (!outdated && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
             if (command) {
                 diffCheck.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
             return
-        }
+        } else if ((command && outdated) || forceReset) diffCheck.reportRepoOutdated()
 
-        if (command) diffCheck.reportRepoOutdated()
         prepCleanRepoFileSystem()
 
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
@@ -309,12 +322,15 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         // Actually unpack the repo zip file into our local 'file system'
-        repoFileSystem.loadFromZip(repoZipFile)
-
-        localRepoCommit = RepoCommit(latestSha, latestCommitTime)
-        commitStorage.writeToFile(localRepoCommit)
-        downloadFailed = false
-        isUsingBackup = false
+        if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
+            downloadFailed = true
+            logger.logError("Failed to unpack the downloaded zip file.")
+        } else {
+            localRepoCommit = RepoCommit(latestSha, latestCommitTime)
+            commitStorage.writeToFile(localRepoCommit)
+            downloadFailed = false
+            isUsingBackup = false
+        }
     }
 
     private fun prepCleanRepoFileSystem() {

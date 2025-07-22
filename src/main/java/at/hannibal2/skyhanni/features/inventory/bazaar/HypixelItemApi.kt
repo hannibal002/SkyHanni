@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson
 import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 
 class HypixelItemApi {
@@ -19,15 +20,15 @@ class HypixelItemApi {
         fun getNpcPrice(internalName: NeuInternalName) = npcPrices[internalName]
     }
 
-    private val hypixelItemStatic = ApiUtils.StaticApiPath(
+    private val hypixelItemStatic = ApiStaticGetPath(
         "https://api.hypixel.net/v2/resources/skyblock/items",
-        "Hypixel SkyBlock Items"
+        "Hypixel SkyBlock Items",
     )
 
     private suspend fun loadNpcPrices(): MutableMap<NeuInternalName, Double> {
         val list = mutableMapOf<NeuInternalName, Double>()
-        val apiResponse = ApiUtils.getJSONResponse(hypixelItemStatic) ?: return list
-        val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
+        val (_, apiResponseData) = ApiUtils.getJsonResponse(hypixelItemStatic).assertSuccessWithData() ?: return list
+        val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponseData)
 
         val motesPrice = mutableMapOf<NeuInternalName, Double>()
         val allStats = mutableMapOf<NeuInternalName, Map<String, Int>>()
