@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -57,22 +58,16 @@ object VoltHighlighter {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!(config.voltRange || config.voltMoodMeter)) return
         for (entity in getEntities<EntityLivingBase>()) {
-            val state = getVoltState(entity)
-            if (state == VoltState.NO_VOLT) continue
+            val state = getVoltState(entity).takeIf { it != VoltState.NO_VOLT } ?: continue
 
-            if (config.voltMoodMeter)
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
-                    entity,
-                    when (state) {
-                        VoltState.FRIENDLY -> 0x8000FF00.toInt()
-                        VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
-                        VoltState.HOSTILE -> 0x80FF0000.toInt()
-                        else -> 0
-                    },
-                ) { config.voltMoodMeter }
+            if (config.voltMoodMeter) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                entity,
+                state.color.toColor()
+            ) { config.voltMoodMeter }
+
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 event.drawCylinderInWorld(
-                    config.voltColor.toSpecialColor(),
+                    config.voltColor.toColor(),
                     entity.posX,
                     entity.posY - 4f,
                     entity.posZ,
@@ -92,11 +87,11 @@ object VoltHighlighter {
         }
     }
 
-    enum class VoltState {
-        NO_VOLT,
-        FRIENDLY,
-        HOSTILE,
-        DOING_LIGHTNING,
+    enum class VoltState(val color: ChromaColour) {
+        NO_VOLT(ChromaColour.fromStaticRGB(0, 0, 0, 0)),
+        FRIENDLY(ChromaColour.fromStaticRGB(0, 255, 0, 128)),
+        HOSTILE(ChromaColour.fromStaticRGB(255, 0, 0, 128)),
+        DOING_LIGHTNING(ChromaColour.fromStaticRGB(0, 0, 255, 128)),
     }
 
     private fun getVoltState(itemStack: ItemStack): VoltState {

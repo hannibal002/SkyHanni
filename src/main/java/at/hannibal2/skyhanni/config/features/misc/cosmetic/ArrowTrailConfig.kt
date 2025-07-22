@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc.cosmetic
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -22,7 +23,7 @@ class ArrowTrailConfig {
     @Expose
     @ConfigOption(name = "Arrow Color", desc = "Color of the line.")
     @ConfigEditorColour
-    var arrowColor: String = "0:200:85:255:85"
+    var arrowColor: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 85, 200)
 
     @Expose
     @ConfigOption(name = "Player Arrows", desc = "Different color for the line of arrows that you have shot.")
@@ -32,7 +33,7 @@ class ArrowTrailConfig {
     @Expose
     @ConfigOption(name = "Player Arrow Color", desc = "Color of the line of your own arrows.")
     @ConfigEditorColour
-    var playerArrowColor: String = "0:200:85:255:255"
+    var playerArrowColor: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 255, 200)
 
     @Expose
     @ConfigOption(name = "Time Alive", desc = "Time in seconds until the trail fades out.")

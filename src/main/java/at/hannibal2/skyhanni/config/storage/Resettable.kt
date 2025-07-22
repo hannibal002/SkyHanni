@@ -19,7 +19,7 @@ import kotlin.reflect.jvm.jvmErasure
  * Defines a class that can be reset to its default values.
  *  - vars will be set to their default value
  *  - mutable maps/collections will be cleared
- *  Params can be "ignored" from the reset by annotating them with [Transient].
+ *  Params can be "ignored" from the reset by annotating them with [Transient] or [NoReset].
  */
 abstract class Resettable {
     private val classSimpleName by lazy { this::class.simpleName ?: "UnknownClass" }

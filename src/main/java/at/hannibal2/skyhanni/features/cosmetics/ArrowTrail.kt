@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.getPrevLorenzVec
@@ -54,14 +54,13 @@ object ArrowTrail {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val color = if (config.handlePlayerArrowsDifferently) config.playerArrowColor else config.arrowColor
-        val playerArrowColor = color.toSpecialColor()
         listYourArrow.forEach {
-            event.draw3DLine(it.start, it.end, playerArrowColor, config.lineWidth, true)
+            event.draw3DLine(it.start, it.end, color.toColor(), config.lineWidth, true)
         }
         if (!config.hideOtherArrows) {
-            val arrowColor = config.arrowColor.toSpecialColor()
+            val arrowColor = config.arrowColor
             listAllArrow.forEach {
-                event.draw3DLine(it.start, it.end, arrowColor, config.lineWidth, true)
+                event.draw3DLine(it.start, it.end, arrowColor.toColor(), config.lineWidth, true)
             }
         }
     }

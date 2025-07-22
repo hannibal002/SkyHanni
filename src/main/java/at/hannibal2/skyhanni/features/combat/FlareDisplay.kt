@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.rgb
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
@@ -19,8 +21,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -72,7 +72,7 @@ object FlareDisplay {
                 0,
                 GuiScreenUtils.displayWidth,
                 GuiScreenUtils.displayHeight,
-                (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
+                (alpha shl 24) or (config.flashColor.rgb and 0xFFFFFF),
             )
             GlStateManager.color(1F, 1F, 1F, 1F)
         }
@@ -182,7 +182,7 @@ object FlareDisplay {
                 FlareType.WARNING -> config.warningColor
                 FlareType.ALERT -> config.alertColor
                 FlareType.SOS -> config.sosColor
-            }.toSpecialColor()
+            }.toColor()
 
             when (config.outlineType) {
                 FlareConfig.OutlineType.FILLED -> {

@@ -63,10 +63,8 @@ sealed interface RepoFileSystem {
         }
         true
     }.getOrElse {
-        logger.throwErrorWithCause(
-            "Failed to load repo from zip file: ${zipFile.absolutePath}",
-            it,
-        )
+        logger.logNonDestructiveError("Failed to load repo from zip file: ${zipFile.absolutePath}")
+        false
     }
 
     companion object {
@@ -89,8 +87,8 @@ class DiskRepoFileSystem(val root: File) : RepoFileSystem {
     override fun deleteRecursively(path: String) {
         File(root, path).deleteRecursively()
     }
-    override fun list(path: String) = root.resolve(path).listFiles {
-        it.extension == "json"
+    override fun list(path: String) = root.resolve(path).listFiles { file ->
+        file.exists() && file.extension == "json"
     }?.mapNotNull { it.name }?.toList().orEmpty()
 }
 

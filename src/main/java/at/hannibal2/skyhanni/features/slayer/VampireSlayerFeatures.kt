@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -95,7 +95,7 @@ object VampireSlayerFeatures {
                 val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
                 if (isIchor || stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) {
                     val color =
-                        (if (isIchor) configBloodIchor.color else configKillerSpring.color).toSpecialColor().addAlpha(config.withAlpha)
+                        (if (isIchor) configBloodIchor.color else configKillerSpring.color).toColor().addAlpha(config.withAlpha)
                     if (distance <= 15) {
                         RenderLivingEntityHelper.setEntityColor(
                             stand,
@@ -170,11 +170,10 @@ object VampireSlayerFeatures {
             val shouldRender = if (ownBoss) true else if (otherBoss) true else coopBoss
 
             val color = when {
-                canUseSteak && config.changeColorWhenCanSteak -> config.steakColor.color()
-                ownBoss -> configOwnBoss.highlightColor.color()
-                otherBoss -> configOtherBoss.highlightColor.color()
-                coopBoss -> configCoopBoss.highlightColor.color()
-
+                canUseSteak && config.changeColorWhenCanSteak -> config.steakColor.toColor()
+                ownBoss -> configOwnBoss.highlightColor.toColor()
+                otherBoss -> configOtherBoss.highlightColor.toColor()
+                coopBoss -> configCoopBoss.highlightColor.toColor()
                 else -> Color.BLACK
             }
 
@@ -196,10 +195,6 @@ object VampireSlayerFeatures {
 
     private fun EntityOtherPlayerMP.isHighlighted(): Boolean {
         return entityList.contains(this) || taggedEntityList.contains(entityId)
-    }
-
-    private fun String.color(): Color {
-        return this.toSpecialColor().addAlpha(config.withAlpha)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -269,7 +264,7 @@ object VampireSlayerFeatures {
                 val vec = event.exactLocation(it)
                 event.drawLineToEye(
                     vec.up(1.54),
-                    config.lineColor.toSpecialColor(),
+                    config.lineColor.toColor(),
                     config.lineWidth,
                     true,
                 )
@@ -282,7 +277,7 @@ object VampireSlayerFeatures {
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
             val isSpring = stand.hasSkullTexture(KILLER_SPRING_TEXTURE)
             if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) continue
-            val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toSpecialColor().addAlpha(config.withAlpha)
+            val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toColor().addAlpha(config.withAlpha)
             if (distance <= 15) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,
@@ -290,7 +285,7 @@ object VampireSlayerFeatures {
                 ) { isEnabled() }
 
                 val linesColorStart =
-                    (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toSpecialColor()
+                    (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
                 val text = if (isIchor) "§4Ichor" else "§4Spring"
                 event.drawColor(
                     stand.position.toLorenzVec().up(2.0),
@@ -321,7 +316,7 @@ object VampireSlayerFeatures {
             if (configBloodIchor.renderBeam && isIchor && stand.isEntityAlive) {
                 event.drawWaypointFilled(
                     event.exactLocation(stand).add(0, y = -2, 0),
-                    configBloodIchor.color.toSpecialColor(),
+                    configBloodIchor.color.toColor(),
                     beacon = true,
                 )
             }
