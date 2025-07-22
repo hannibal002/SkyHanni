@@ -108,10 +108,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     @Suppress("HandleEventInspection")
     fun registerCommands(event: CommandRegistrationEvent) {
         if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
-            description = "Check for updates, and optionally, remove/redownload the $commonName repo"
+            description = "Remove and re-download the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback(::updateRepo)
+            simpleCallback { updateRepo(forceReset = true) }
             argCallback("force", BoolArgumentType.bool()) {
+                description = "optionally only re-download if the repo is out of date"
                 updateRepo(forceReset = it)
             }
         }
@@ -311,7 +312,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 shouldManuallyReload = false
             }
             return
-        } else if (command && outdated) diffCheck.reportRepoOutdated()
+        } else if ((command && outdated) || forceReset) diffCheck.reportRepoOutdated()
 
         prepCleanRepoFileSystem()
 

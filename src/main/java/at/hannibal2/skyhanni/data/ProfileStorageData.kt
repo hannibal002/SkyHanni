@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.StorageData
+import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -41,12 +42,15 @@ object ProfileStorageData {
     private var petPlayers: PetDataStorage.PlayerSpecific? = null
     var petProfiles: PetDataStorage.ProfileSpecific? = null
 
+    var orderedWaypointsRoutes: OrderedWaypointsRoutes? = null
+
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
         val storagePlayer = storagePlayer
         val petPlayers = petPlayers
+        val orderedWaypointsRoutes = orderedWaypointsRoutes
         val profileName = event.name
         if (playerSpecific == null) {
             DelayedRun.runDelayed(10.seconds) {
@@ -63,7 +67,9 @@ object ProfileStorageData {
         if (petPlayers == null) {
             ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
         }
-
+        if (orderedWaypointsRoutes == null) {
+            ErrorManager.skyHanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
+        }
         loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
         ConfigLoadEvent.post()
     }
@@ -74,6 +80,7 @@ object ProfileStorageData {
         val sackPlayers = sackPlayers
         val storagePlayer = storagePlayer
         val petPlayers = petPlayers
+        val orderedWaypointsRoutes = orderedWaypointsRoutes
 
         if (playerSpecific == null) {
             ErrorManager.skyHanniError(
@@ -90,9 +97,11 @@ object ProfileStorageData {
         if (storagePlayer == null) {
             ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
         }
-
         if (petPlayers == null) {
             ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
+        }
+        if (orderedWaypointsRoutes == null) {
+            ErrorManager.skyHanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
         }
 
         loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
@@ -159,6 +168,7 @@ object ProfileStorageData {
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         storagePlayer = SkyHanniMod.storageData.players.getOrPut(playerUuid) { StorageData.PlayerSpecific() }
         petPlayers = SkyHanniMod.petData.players.getOrPut(playerUuid) { PetDataStorage.PlayerSpecific() }
+        orderedWaypointsRoutes = SkyHanniMod.orderedWaypointsRoutesData
         ConfigLoadEvent.post()
     }
 

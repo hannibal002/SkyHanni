@@ -4,8 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -41,6 +44,7 @@ object AttributeShardOverlay {
     private var priceToMax = 0.0
 
     private var lastShardsData: Map<String, ProfileSpecificStorage.AttributeShardData> = emptyMap()
+    private var lastItemIdsInInventory: Set<NeuInternalName> = setOf()
     private var lastTotalSyphoned = 0
 
     fun updateDisplay() {
@@ -88,7 +92,12 @@ object AttributeShardOverlay {
 
         val lines = mutableListOf<AttributeShardDisplayLine>()
 
-        for ((shardName, shardData) in lastShardsData) {
+        lastItemIdsInInventory = InventoryUtils.getItemIdsInOpenChest()
+        val filteredShards = lastShardsData.filter { shardData ->
+            !config.onlyCurrentInventory || AttributeShardsData.shardNameToInternalName(shardData.key) in lastItemIdsInInventory
+        }
+
+        for ((shardName, shardData) in filteredShards) {
             val shardInternalName = AttributeShardsData.shardNameToInternalName(shardName) ?: continue
 
             val amountSyphoned = shardData.amountSyphoned
@@ -121,11 +130,13 @@ object AttributeShardOverlay {
             true
         }
 
+        val adjustedMaxShards = if (config.onlyCurrentInventory) lastItemIdsInInventory.size else AttributeShardsData.maxShards
+
         display = buildList {
             addString("§eAttribute Shard Overlay")
-            addString("§7Found Shards: §a$unlockedShards/${AttributeShardsData.maxShards}")
-            addString("§7Maxed Shards: §a$maxedShards/${AttributeShardsData.maxShards}")
-            addString("§7Total Shard Levels: §a$totalShardLevels/${AttributeShardsData.maxShards * 10}")
+            addString("§7Found Shards: §a$unlockedShards/$adjustedMaxShards")
+            addString("§7Maxed Shards: §a$maxedShards/$adjustedMaxShards")
+            addString("§7Total Shard Levels: §a$totalShardLevels/${adjustedMaxShards * 10}")
             if (shardsWithData != AttributeShardsData.maxShards) {
                 val missingAmount = AttributeShardsData.maxShards - shardsWithData
                 val plural = StringUtils.pluralize(missingAmount, "shard")
@@ -139,7 +150,8 @@ object AttributeShardOverlay {
                 add(filtered.map { it.renderLine }.buildSearchableScrollable(height = 225, textInput, velocity = 25.0))
             }
             if (priceToMax > 0) {
-                addString("§7Total Price to Max All Shards: §6${priceToMax.shortFormat()}")
+                val description = if (config.onlyCurrentInventory) "Shown" else "All"
+                addString("§7Total Price to Max $description Shards: §6${priceToMax.shortFormat()}")
             }
             addButtons()
         }
@@ -191,6 +203,16 @@ object AttributeShardOverlay {
             config = config::includeHuntingBox,
             enabled = "Include Hunting Box",
             disabled = "Exclude Hunting Box",
+            onChange = {
+                reconstructDisplay()
+            },
+        )
+
+        addRenderableButton(
+            label = "Only Current Inventory",
+            config = config::onlyCurrentInventory,
+            enabled = "Only in Current Inventory",
+            disabled = "Show All Shards",
             onChange = {
                 reconstructDisplay()
             },
@@ -271,6 +293,19 @@ object AttributeShardOverlay {
         return AttributeShardDisplayLine(
             shardItemName.removeColor(), currentTier, priceUntilNextTier, priceUntilMaxed, searchable,
         )
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!AttributeShardsData.attributeMenuInventory.isInside()) return
+        if (!config.onlyCurrentInventory) return
+
+        DelayedRun.runNextTick {
+            val newItemIds = InventoryUtils.getItemIdsInOpenChest()
+            if (lastItemIdsInInventory != newItemIds) {
+                reconstructDisplay()
+            }
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)

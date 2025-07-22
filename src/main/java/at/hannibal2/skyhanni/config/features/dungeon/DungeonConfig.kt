@@ -191,4 +191,12 @@ class DungeonConfig {
     @Accordion
     val spiritLeapOverlay: SpiritLeapConfig = SpiritLeapConfig()
 
+    @Expose
+    @ConfigOption(
+        name = "Spring Boots Notification",
+        desc = "Shows sound and title when Spring Boots are charged up enough to reach the Crystals in phase 1 of the floor 7 boss fight.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var springBootsNotification: Boolean = false
 }
