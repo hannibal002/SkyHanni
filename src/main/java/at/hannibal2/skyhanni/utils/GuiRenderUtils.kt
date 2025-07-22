@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
+import at.hannibal2.skyhanni.utils.ItemUtils.isBlock
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -21,6 +22,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.Vec3
@@ -47,6 +49,9 @@ import java.nio.FloatBuffer
 //$$ import net.minecraft.util.math.RotationAxis
 //$$ import net.minecraft.client.render.ProjectionMatrix2
 //$$ import kotlin.math.sqrt
+//$$ import at.hannibal2.skyhanni.utils.ItemUtils.is3dModel
+//$$ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
+//$$ import net.minecraft.block.Blocks
 //#endif
 
 // todo 1.21 impl needed
@@ -402,15 +407,21 @@ object GuiRenderUtils {
     //$$ val projectionMatrix = ProjectionMatrix2("SkyHanni Item Rendering", 1000f, 11000f, true)
     //#endif
 
+    @Suppress("unused")
     fun ItemStack.renderOnScreen(
         x: Float,
         y: Float,
         scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
+        rescale3dBlocks: Boolean = true,
         rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
-        val isSkull = rescaleSkulls && item.isSkull()
+        val isSkull = rescaleSkulls && item.isSkull(ignoreModel = true)
+        //#if MC > 1.21.6
+        //$$ val isPane = this.isStainedGlassPane() || this.item == Blocks.GLASS_PANE.asItem()
+        //$$ val is3dBlock = rescale3dBlocks && this.is3dModel() && !isPane
+        //#endif
 
         val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
@@ -418,15 +429,29 @@ object GuiRenderUtils {
 
         //#if MC < 1.21
         val baseScale = if (isSkull) (4f / 3f) else 1f
-        //#else
+        //#elseif MC < 1.21.6
         //$$ val baseScale = if (isSkull) (5f / 4f) else 1f
+        //#else
+        //$$ val baseScale = when {
+        //$$     isSkull -> 1f
+        //$$     is3dBlock -> (5f / 4f)
+        //$$     else -> 1f
+        //$$ }
         //#endif
         val finalScale = (baseScale * scaleMultiplier).toFloat()
 
-        val (translateX, translateY) = if (isSkull) {
-            val skullDiff = ((scaleMultiplier) * 2.5f).toFloat()
-            x - skullDiff to y - skullDiff
-        } else x to y
+        //#if MC < 1.21.6
+        val translateOffset = if (isSkull) 2.5f * scaleMultiplier.toFloat() else 0f
+        //#else
+        //$$ val translateOffset = when {
+        //$$    // Idk man see field_53210 in HeadFeatureRenderer
+        //$$    isSkull -> -1.1875F * 0.5f * scaleMultiplier.toFloat() // Scale UP instead of down
+        //$$    is3dBlock -> (1f / baseScale) * 2f * scaleMultiplier.toFloat()
+        //$$    else -> 0f
+        //$$ }
+        //#endif
+
+        val (translateX, translateY) = (x - translateOffset) to (y - translateOffset)
 
         //#if MC < 1.21
         val (hx, hy, hz) = listOf(8f, 8f, 100f)
@@ -506,17 +531,24 @@ object GuiRenderUtils {
         //$$ // Because on modern versions the matrices are not directly accessible, and we have to make our own MatrixStack,
         //$$ // we need to use the DrawContext matrices to fetch the current origin instead of relying on 0,0 being pre-translated.
         //$$ val matrices2D = DrawContextUtils.drawContext.matrices
+        //$$ val preTranslateX = matrices2D.m20
+        //$$ val preTranslateY = matrices2D.m21
+
         //$$ // And similarly, we need to extract the scaling from the GUI editor as well, since we're building our own stack.
         //$$ val scaleX = sqrt(matrices2D.m00() * matrices2D.m00() + matrices2D.m01() * matrices2D.m01())
         //$$ val scaleY = sqrt(matrices2D.m10() * matrices2D.m10() + matrices2D.m11() * matrices2D.m11())
         //$$ val guiScale = (scaleX + scaleY) * 0.5f
+
         //$$ // We need scales to calc real translations
-        //$$ val screenX = matrices2D.m20 + translateX * guiScale
-        //$$ val screenY = matrices2D.m21 + translateY * guiScale
+        //$$ val screenX = preTranslateX + translateX * guiScale
+        //$$ val screenY = preTranslateY + translateY * guiScale
+
         //$$ // Now we can calculate the final scaling
         //$$ val adjustedScale = finalScale * guiScale
         //$$ val client = MinecraftClient.getInstance()
+        //$$ val consumers = client.bufferBuilders.entityVertexConsumers
         //$$ val window = client.window
+
         //$$ // Thank Vixid for this -  I would have never figured out how to do this.
         //$$ RenderSystem.backupProjectionMatrix()
         //$$ val guiWidth = window.framebufferWidth.toFloat()  / window.scaleFactor.toFloat()
@@ -525,10 +557,12 @@ object GuiRenderUtils {
         //$$ RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
         //$$ RenderSystem.setupDefaultState()
         //$$ RenderSystem.resetTextureMatrix()
-        //$$ val consumers = client.bufferBuilders.entityVertexConsumers
+
+        //$$ // We have to use our own MatrixStack, because the DrawContext matrices are a 2D matrix now
         //$$ val matrices = MatrixStack()
         //$$ matrices.push()
         //$$ matrices.translate(screenX, screenY, zT)
+
         //$$ // Because by default the item is rendered flipped in all directions (what the fuck, Mojang?),
         //$$ // we need to translate all three ways before rendering the item, so we can flip it, and still
         //$$ // have it 'end' in the right position.
@@ -536,16 +570,34 @@ object GuiRenderUtils {
         //$$ matrices.translate(itemSize, itemSize, itemSize)
         //$$ // These scales being negative is what does the "flipping back to normal viewing"
         //$$ matrices.scale(-adjustedScale, -adjustedScale, -zS)
+
         //$$ // Since we want to rotate the item around its center point, we translate half in, in each direction
         //$$ matrices.translate(hx, hy, hz)
+
+        //$$ // With the ItemRenderer call, all blocks and skulls are rendered from a true side view, rather than
+        //$$ // the old "angled down" view. This rotation set re-creates the old view.
+        //$$ if (is3dBlock || isSkull) {
+        //$$    matrices.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(30f))
+        //$$    matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(45f))
+        //$$ }
+
+        //$$ // Any other 'planned' rotations are done now.
         //$$ if (rotX != 0f) matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
         //$$ if (rotY != 0f) matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
         //$$ if (rotZ != 0f) matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
-        //$$ client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-        //$$ // I don't know why the magic value is 12f, but it is.
-        //$$ matrices.scale(12f, 12f, 12f)
+
+        //$$ // We need to scale up before rendering - for some reason the default is 1 x 1 x 1
+        //$$ matrices.scale(16f, 16f, 16f)
+
+        //$$ if (is3dBlock || isSkull) {
+        //$$    client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
+        //$$ } else {
+        //$$    client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_FLAT)
+        //$$ }
+
         //$$ // 15728880 comes from LightmapTextureManager.MAX_LIGHT_COORDINATE
         //$$ client.itemRenderer.renderItem(item, ItemDisplayContext.FIXED, 15728880, OverlayTexture.DEFAULT_UV, matrices, consumers, client.world, 0)
+
         //$$ consumers.draw()
         //$$ matrices.pop()
         //$$ RenderSystem.teardownOverlayColor()
