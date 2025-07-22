@@ -200,5 +200,4 @@ class DungeonConfig {
     @FeatureToggle
     var springBootsNotification: Boolean = false
 
-
 }
