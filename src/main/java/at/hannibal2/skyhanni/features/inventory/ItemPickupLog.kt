@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -279,8 +281,29 @@ object ItemPickupLog {
         if (display.isEmpty()) {
             this.display = null
         } else {
+            if (config.totalCoinValue && (itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) {
+                computeTotalCoinValue(display)
+            }
             val renderable = Renderable.vertical(display, verticalAlign = config.alignment)
             this.display = Renderable.fixedSizeColumn(renderable, 30)
+        }
+    }
+
+    private fun computeTotalCoinValue(display: MutableList<Renderable>) {
+        val valueAdded = itemsAddedToInventory.values.sumOf { entry ->
+            // Handle purse coins as a special case
+            if (entry.name == "§6Coins") entry.amount.toDouble()
+            else (entry.neuInternalName?.getPriceOrNull(config.priceSource) ?: 0.0) * entry.amount
+        }
+        val valueRemoved = itemsRemovedFromInventory.values.sumOf { entry ->
+            // Handle purse coins as a special case
+            if (entry.name == "§6Coins") entry.amount.toDouble()
+            else (entry.neuInternalName?.getPriceOrNull(config.priceSource) ?: 0.0) * entry.amount
+        }
+        val total = valueAdded - valueRemoved
+        if (total >= config.totalCoinValueThreshold || config.totalCoinValueThreshold == 0f) {
+            val displayValue = "Value: ${total.formatCoin()} Coins"
+            display.add(Renderable.text(displayValue))
         }
     }
 
