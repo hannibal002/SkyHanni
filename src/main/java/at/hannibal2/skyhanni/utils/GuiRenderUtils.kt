@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
-import at.hannibal2.skyhanni.utils.ItemUtils.isBlock
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -22,7 +21,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.Vec3

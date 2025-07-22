@@ -981,6 +981,7 @@ object ItemUtils {
         return skull
     }
 
+    @Suppress("unused")
     fun ItemStack.isSkull(ignoreModel: Boolean = false): Boolean {
         //#if MC < 1.21
         return item === Items.skull
