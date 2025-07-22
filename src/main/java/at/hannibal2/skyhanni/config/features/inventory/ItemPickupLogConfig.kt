@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.config.features.inventory
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.inventory.ItemPickupLog
-import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -46,19 +46,9 @@ class ItemPickupLogConfig {
     var coins: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Total Coin Value", desc = "Show total coin value of the items in your pickup log.")
-    @ConfigEditorBoolean
-    var totalCoinValue: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Price Source", desc = "What price source to use for total coin value.")
-    @ConfigEditorDropdown
-    var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
-
-    @Expose
-    @ConfigOption(name = "Total Coin Value Threshold", desc = "Only show total coin value when above this threshold.")
-    @ConfigEditorSlider(minValue = 0f, maxValue = 1_000_000f, minStep = 1000f)
-    var totalCoinValueThreshold: Float = 10_000f
+    @ConfigOption(name = "Pickup Coin Value", desc = "")
+    @Accordion
+    val coinValue: ItemPickupLogCoinValueConfig = ItemPickupLogCoinValueConfig()
 
     @Expose
     @ConfigOption(name = "Alignment", desc = "How the item pickup log should be aligned.")
@@ -83,5 +73,3 @@ class ItemPickupLogConfig {
     @ConfigLink(owner = ItemPickupLogConfig::class, field = "enabled")
     val position: Position = Position(-256, 140)
 }
-
-

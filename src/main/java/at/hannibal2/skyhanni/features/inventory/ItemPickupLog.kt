@@ -88,6 +88,7 @@ object ItemPickupLog {
     }
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLog
+    private val coinConfig = config.coinValue
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
     private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
@@ -289,11 +290,11 @@ object ItemPickupLog {
     }
 
     private fun computeTotalCoinValue(display: MutableList<Renderable>) {
-        if (!config.totalCoinValue || !(itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) return
+        if (!coinConfig.totalCoinValue || !(itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) return
         val valueAdded = itemsAddedToInventory.values.sumOf { it.coinValue() }
         val valueRemoved = itemsRemovedFromInventory.values.sumOf { it.coinValue() }
         val total = valueAdded - valueRemoved
-        if (total >= config.totalCoinValueThreshold || config.totalCoinValueThreshold == 0f) {
+        if (total >= coinConfig.totalCoinValueThreshold || coinConfig.totalCoinValueThreshold == 0f) {
             display.addString("Value: ${total.formatCoin()} Coins")
         }
     }
@@ -302,7 +303,7 @@ object ItemPickupLog {
         // Handle purse coins as a special case
         amount.toDouble()
     } else {
-        val pricePer = neuInternalName?.getPriceOrNull(config.priceSource) ?: 0.0
+        val pricePer = neuInternalName?.getPriceOrNull(coinConfig.priceSource) ?: 0.0
         pricePer * amount
     }
 
