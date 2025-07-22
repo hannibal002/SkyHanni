@@ -211,11 +211,23 @@ enum class TimeUnit(val factor: Long, private val shortName: String, private val
     SECOND(FACTOR_SECONDS, "s", "Second"),
     ;
 
+    fun asDuration(value: Int): Duration = (value * factor).milliseconds
+
     fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
         " $longName" + if (value == 1) "" else "s"
     } else shortName
 
     fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
+
+    companion object {
+        fun getByName(name: String, tryRemoveSuffix: Boolean = true) = entries.firstOrNull {
+            val nameMatches = it.name.equals(name, ignoreCase = true)
+            if (nameMatches) return@firstOrNull true
+            if (!tryRemoveSuffix) return@firstOrNull false
+            val suffixRemoved = name.uppercase().removeSuffix("S")
+            it.name.equals(suffixRemoved, ignoreCase = true)
+        }
+    }
 }
 
 val Duration.inPartialSeconds: Double get() = toDouble(DurationUnit.SECONDS)

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
+import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -43,7 +44,7 @@ object GlowingDroppedItems {
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
-    private fun getEntityOutlineColor(entity: Entity): Int? {
+    private fun getEntityOutlineColor(entity: Entity): Color? {
         val item = entity as? EntityItem ?: return null
         if (shouldHideShowcaseItem(entity)) return null
 
@@ -56,7 +57,7 @@ object GlowingDroppedItems {
         val isSprayItem = EnumUtils.enumValueOfOrNull<SprayType>(internalName.asString()) != null
         if (isSprayItem) return null
         val rarity = entityItem.getItemRarityOrNull()
-        return rarity?.color?.toColor()?.rgb
+        return rarity?.color?.toColor()
     }
 
     private val isShowcaseArea by RecalculatingValue(1.seconds) {

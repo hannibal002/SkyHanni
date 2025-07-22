@@ -1,14 +1,21 @@
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.editor.event.EditorMouseEvent
+import com.intellij.openapi.editor.event.EditorMouseEventArea
+import com.intellij.openapi.editor.event.EditorMouseListener
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ClassInheritorsSearch
 import liveplugin.registerInspection
 import org.jetbrains.kotlin.idea.codeinsight.api.classic.inspections.AbstractKotlinInspection
 import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtVisitorVoid
 
@@ -21,7 +28,7 @@ val primaryAnnotationName = "PrimaryFunction"
 registerInspection(EventLinkingInspection())
 
 class EventLinkingInspection : AbstractKotlinInspection() {
-    override fun buildVisitor(holder: com.intellij.codeInspection.ProblemsHolder, isOnTheFly: Boolean) =
+    override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean) =
         object : KtVisitorVoid() {
             override fun visitNamedFunction(function: KtNamedFunction) {
                 val functionName = function.name ?: return
@@ -105,3 +112,25 @@ fun buildPrimaryNameMap(project: Project): Map<String, String> {
     }
     return result
 }
+
+EditorFactory.getInstance().eventMulticaster.addEditorMouseListener(
+    object : EditorMouseListener {
+        override fun mouseClicked(e: EditorMouseEvent) {
+            if (e.area != EditorMouseEventArea.EDITING_AREA) return
+            val me = e.mouseEvent.takeIf { it.isControlDown && it.isShiftDown } ?: return
+            val editor = e.editor
+            val project = editor.project ?: return
+
+            val vp = editor.xyToVisualPosition(me.point)
+            val offset = editor.visualPositionToOffset(vp)
+
+            val psi = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? KtFile ?: return
+            val func = psi.findElementAt(offset)?.parent as? KtNamedFunction ?: return
+
+            val targetFqn = buildPrimaryNameMap(project)[func.name] ?: return
+            val clazz = JavaPsiFacade.getInstance(project).findClass(targetFqn, GlobalSearchScope.allScope(project)) ?: return
+            clazz.navigate(true)
+        }
+    },
+    pluginDisposable
+)

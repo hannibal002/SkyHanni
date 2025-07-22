@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -55,7 +55,7 @@ object TestCanSeeFace {
         var generallySeen: Boolean = false,
         var finished: Boolean = false,
         var debugRenderable: Renderable? = null,
-    ) : ResettableStorageSet() {
+    ) : Resettable() {
         fun resetFromBlockVec(blockVec: LorenzVec) {
             this.reset()
             val base = blockVec.floor()

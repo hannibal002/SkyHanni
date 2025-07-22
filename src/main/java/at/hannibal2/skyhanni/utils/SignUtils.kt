@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -41,14 +40,14 @@ object SignUtils {
     fun checkDeleting(gui: GuiScreen?) {
         val deleteClicked = KeyboardManager.isDeleteWordDown() || KeyboardManager.isDeleteLineDown()
         if (!deleteLastClicked && deleteClicked && gui is AccessorGuiEditSign) {
-            SkyHanniMod.coroutineScope.launch {
+            SkyHanniMod.launchCoroutine {
                 val newLine = if (KeyboardManager.isDeleteLineDown()) ""
                 else if (KeyboardManager.isDeleteWordDown()) {
                     val currentLine = gui.signText[gui.currentRow].unformattedText
 
                     val lastSpaceIndex = currentLine.trimEnd().lastIndexOf(' ')
                     if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 2) else ""
-                } else return@launch
+                } else return@launchCoroutine
                 setTextIntoSign(newLine, gui.currentRow)
             }
         }
@@ -58,7 +57,7 @@ object SignUtils {
     fun checkCopying(gui: GuiScreen?) {
         val copyClicked = KeyboardManager.isCopyingKeysDown()
         if (!copyLastClicked && copyClicked && gui is AccessorGuiEditSign) {
-            SkyHanniMod.coroutineScope.launch {
+            SkyHanniMod.launchCoroutine {
                 ClipboardUtils.copyToClipboard(gui.signText[gui.currentRow].unformattedText)
             }
         }
@@ -68,7 +67,7 @@ object SignUtils {
     fun checkPaste() {
         val pasteClicked = KeyboardManager.isPastingKeysDown()
         if (!pasteLastClicked && pasteClicked) {
-            SkyHanniMod.coroutineScope.launch {
+            SkyHanniMod.launchCoroutine {
                 OSUtils.readFromClipboard()?.let {
                     addTextIntoSign(it)
                 }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -53,7 +54,7 @@ class FlareConfig {
     @Expose
     @ConfigOption(name = "Flash Color", desc = "Color of the screen when flashing")
     @ConfigEditorColour
-    var flashColor: String = "0:153:159:0:5"
+    var flashColor: ChromaColour = ChromaColour.fromStaticRGB(159, 0, 5, 153)
 
     @Expose
     @ConfigOption(name = "Display Type", desc = "Where to show the timer.")
@@ -90,17 +91,17 @@ class FlareConfig {
     @Expose
     @ConfigOption(name = "Warning Flare Color", desc = "Color for Warning Flare.")
     @ConfigEditorColour
-    var warningColor: String = "0:153:29:255:136"
+    var warningColor: ChromaColour = ChromaColour.fromStaticRGB(29, 255, 136, 153)
 
     @Expose
     @ConfigOption(name = "Alert Flare Color", desc = "Color for Alert Flare.")
     @ConfigEditorColour
-    var alertColor: String = "0:153:0:159:137"
+    var alertColor: ChromaColour = ChromaColour.fromStaticRGB(0, 159, 137, 153)
 
     @Expose
     @ConfigOption(name = "SOS Flare Color", desc = "Color for SOS Flare.")
     @ConfigEditorColour
-    var sosColor: String = "0:153:159:0:5"
+    var sosColor: ChromaColour = ChromaColour.fromStaticRGB(159, 0, 5, 153)
 
     @Expose
     @ConfigLink(owner = FlareConfig::class, field = "enabled")
