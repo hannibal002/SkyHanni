@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
@@ -25,20 +26,34 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val animationFrames = listOf(ItemStackAnimationFrame(boxOfSeedsProvider, ticks = 0))
 
-    val animatedItemStackRenderable by lazy {
-        Renderable.animatedItemStack(
-            animationFrames,
-            rotation = ItemStackRotationDefinition(
-                axis = EnumFacing.Axis.Y,
-                rotationSpeed = 65.0,
-            ),
-            bounce = ItemStackBounceDefinition(
-                upwardBounce = 25,
-                downwardBounce = 25,
-                bounceSpeed = 8.0,
-            ),
-            scale = 4.0,
-        ).renderBounds()
+    private val rotSets = listOf(
+        ItemStackRotationDefinition(
+            axis = EnumFacing.Axis.Y,
+            rotationSpeed = 65.0,
+        ),
+        ItemStackRotationDefinition(
+            axis = EnumFacing.Axis.X,
+            rotationSpeed = 65.0,
+        ),
+        ItemStackRotationDefinition(
+            axis = EnumFacing.Axis.Z,
+            rotationSpeed = 65.0,
+        ),
+    )
+
+    private val animatedItemStackRenderables by lazy {
+        rotSets.map {
+            Renderable.animatedItemStack(
+                animationFrames,
+                rotation = it,
+                bounce = ItemStackBounceDefinition(
+                    upwardBounce = 25,
+                    downwardBounce = 25,
+                    bounceSpeed = 8.0,
+                ),
+                scale = 4.0,
+            )
+        }
     }
 
     override fun renderable(): Renderable {
@@ -67,7 +82,11 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
                         spacing = 1,
                     ),
                 ),
-                animatedItemStackRenderable,
+                horizontal(
+                    animatedItemStackRenderables.map { it.renderBounds() },
+                    spacing = 2,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                ),
                 spacing = 4,
             )
         }
