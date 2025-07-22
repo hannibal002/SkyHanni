@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import kotlin.time.Duration.Companion.hours
 
 @SkyHanniModule
-object Ubikreminder {
+object UbikReminder {
 
     private val config get() = RiftApi.config
 
