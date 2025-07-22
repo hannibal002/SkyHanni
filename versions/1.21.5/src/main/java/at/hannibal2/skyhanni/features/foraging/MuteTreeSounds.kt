@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 object MuteTreeSounds {
     val config get() = SkyHanniMod.feature.foraging
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName == "entity.creaking.death" && config.muteTreeBreaking) {
             if (IslandType.GALATEA.isCurrent() && !config.muteTreeBreakingOnGalatea) return
