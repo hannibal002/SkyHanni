@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.hours
 
 @SkyHanniModule
@@ -14,14 +16,21 @@ object UbikReminder {
     private val config get() = RiftApi.config
 
     private var isTimerRunning = false
-    private val messageRegex = Regex("ROUND [1-9] \\(FINAL\\):")
+    private val patternGroup = RepoPattern.group("rift.ubik")
 
+    /**
+     * REGEX-TEST: ROUND 2 (FINAL):
+     */
+    private val ubikRoundPattern by patternGroup.pattern(
+        "reminder",
+        "ROUND [1-9] \\(FINAL\\):",
+    )
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.ubikReminder) return
         val message = event.message
-        if (messageRegex.matches(message) && !isTimerRunning) {
+        if (ubikRoundPattern.matches(message) && !isTimerRunning) {
             startTimer()
         }
     }
