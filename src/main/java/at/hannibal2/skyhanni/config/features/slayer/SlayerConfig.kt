@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class SlayerConfig {
     // TODO rename to "enderman"
@@ -80,7 +81,7 @@ class SlayerConfig {
     @ConfigOption(
         name = "Hide Mob Names",
         desc = "Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. " +
-                "Exclude mobs that are damaged, corrupted, runic or semi rare.",
+            "Exclude mobs that are damaged, corrupted, runic or semi rare.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -104,17 +105,20 @@ class SlayerConfig {
     @Expose
     @ConfigOption(
         name = "Hide Irrelevant Mobs",
-        desc = "Makes mobs in or near slayer areas partially transparent so that they dont annoy while having an active slayer quest. E.g. Magma Cube in Burning Desert for Tara Slayer.",
+        desc = "Makes mobs partially transparent so that they dont annoy while having an active slayer quest. " +
+            "Useful for e.g. Magma Cubes in Burning Desert for Tara Slayer.",
     )
+    @SearchTag("tarantula, spider")
     @ConfigEditorBoolean
     @FeatureToggle
     var hideIrrelevantMobs: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "Adjust irrelevant opacity",
+        name = "Adjust Irrelevant Opacity",
         desc = "Adjust the opacity of irrelevant mobs. (in %)",
     )
+    @SearchTag("magma cube, tarantula, tara, spider, slayer, quest")
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
     var hideIrrelevantMobsOpacity: Int = 40
 }
