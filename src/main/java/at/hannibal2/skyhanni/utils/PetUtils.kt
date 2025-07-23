@@ -35,7 +35,7 @@ object PetUtils {
     private var displayNameMap: Map<String, String> = mapOf()
     private var petSkinVariants: Map<NeuInternalName, List<String>> = mapOf()
     private var petInternalNames: Set<NeuInternalName> = setOf()
-    private var petSkinNbtNames: List<String> = listOf()
+    private var petSkinNbtNames: Set<String> = setOf()
     private var petItemResolution: Map<String, NeuInternalName> = mapOf()
 
     // Late load from SH repo
