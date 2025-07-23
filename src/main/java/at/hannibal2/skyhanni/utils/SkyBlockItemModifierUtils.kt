@@ -96,7 +96,10 @@ object SkyBlockItemModifierUtils {
         @Deprecated("Do not use, does not reflect Tier Boost, use PetData(petInfo).fauxInternalName instead")
         val _internalName = "$type;${tier.id}".toInternalName()
         val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
-        fun getSkinVariantIndex() = properSkinItem?.let { PetUtils.getVariantIndexOrNull(it) }
+        fun getSkinVariantIndex() = properSkinItem?.let {
+            val extraData = extraData ?: return@let null
+            PetUtils.getVariantIndexOrNull(extraData)
+        }
     }
 
     fun ItemStack.getPetCandyUsed(): Int? {
@@ -134,8 +137,8 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
-    var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
+    private val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
+    private var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
 
     fun ItemStack.getPetInfo(): PetInfo? {
         val colorlessName = displayName.removeColor()
