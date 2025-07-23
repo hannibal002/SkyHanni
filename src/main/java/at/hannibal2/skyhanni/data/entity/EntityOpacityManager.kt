@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import org.lwjgl.opengl.GL11
 
+// TODO add 1.21.x support
 @SkyHanniModule
 object EntityOpacityManager {
 
