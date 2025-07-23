@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -41,7 +42,8 @@ object SplatterHearts {
         shownHearts.forEach {
             val pos = it.add(-0.5, 0.3, -0.5)
             val aabb = pos.axisAlignedTo(pos.add(1, 1, 1))
-            event.drawFilledBoundingBox(aabb, LorenzColor.RED.addOpacity(100))
+            // TODO add chroma color support via config
+            event.drawFilledBoundingBox(aabb, LorenzColor.RED.addOpacity(100).toChromaColor())
         }
     }
 

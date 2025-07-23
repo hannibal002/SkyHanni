@@ -82,7 +82,7 @@ object AllBurrowsList {
         if (!config.showAll) return
 
         for (location in list) {
-            event.drawColor(location, LorenzColor.DARK_AQUA)
+            event.drawColor(location, LorenzColor.DARK_AQUA.toChromaColor())
         }
     }
 
