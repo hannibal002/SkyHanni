@@ -11,8 +11,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 
 @SkyHanniModule
 object FixDoubleClicks {
-    private val itemIds = setOf(
-        // Blaze daggers
+    private val blazeDaggers = setOf(
         "FIREDUST_DAGGER", "BURSTFIRE_DAGGER", "HEARTFIRE_DAGGER",
         "MAWDUST_DAGGER", "BURSTMAW_DAGGER", "HEARTMAW_DAGGER",
     ).toInternalNames()
@@ -23,7 +22,7 @@ object FixDoubleClicks {
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
         val itemInHand = event.itemInHand ?: return
-        val shouldPrevent = FishingApi.holdingRod || itemIds.contains(itemInHand.getInternalName())
+        val shouldPrevent = FishingApi.holdingRod || blazeDaggers.contains(itemInHand.getInternalName())
 
         if (shouldPrevent) event.cancel()
     }
