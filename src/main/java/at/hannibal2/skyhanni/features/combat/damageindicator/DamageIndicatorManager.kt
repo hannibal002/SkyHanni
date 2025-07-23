@@ -452,6 +452,15 @@ object DamageIndicatorManager {
                 return thorn
             }
 
+            BossType.SLAYER_SPIDER_5_1 -> {
+                entityData.nameAbove = "§e1/2"
+                return ""
+            }
+            BossType.SLAYER_SPIDER_5_2 -> {
+                entityData.nameAbove = "§e2/2"
+                return ""
+            }
+
             BossType.SLAYER_ENDERMAN_1,
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
