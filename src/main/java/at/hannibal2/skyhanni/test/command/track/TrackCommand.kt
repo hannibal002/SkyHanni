@@ -207,6 +207,14 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
             literalCallback("end") { endRecording() }
             literal("ignore") {
                 registerIgnoreBlock()
+                literalCallback("list") {
+                    val message = if (ignoredTypes.isEmpty()) "§cNo $commonName §eignored types"
+                    else "§aIgnored $commonName §etypes:\n§e${ignoredTypes.joinToString(", ")}"
+                    ChatUtils.chat(message, replaceSameMessage = true)
+                }
+                callback {
+                    ChatUtils.chat("§cSpecify a $commonName type to ignore", replaceSameMessage = true)
+                }
             }
             legacyCallbackArgs(::tryStartRecording)
         }
