@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocatio
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
-import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 //#if MC > 1.12

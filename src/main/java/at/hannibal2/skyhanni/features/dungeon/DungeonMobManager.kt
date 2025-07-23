@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.entity.EntityLivingBase
-import java.awt.Color
 
 @SkyHanniModule
 object DungeonMobManager {

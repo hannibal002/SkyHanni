@@ -55,18 +55,16 @@ object MobDebug {
         }
 
         if (config.skyblockMob.isHighlight()) {
-            MobData.skyblockMobs.highlight(event) { val lorenzColor: ChromaColour =
-                if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN.toChromaColor() else LorenzColor.GREEN.toChromaColor()
-                lorenzColor
+            MobData.skyblockMobs.highlight(event) {
+                (if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN).toChromaColor()
             }
         }
         if (config.displayNPC.isHighlight()) {
             MobData.displayNpcs.highlight(event) { LorenzColor.RED.toChromaColor() }
         }
         if (config.realPlayerHighlight) {
-            MobData.players.highlight(event) { val color =
-                if (it.baseEntity is EntityPlayerSP) LorenzColor.CHROMA.toChromaColor() else LorenzColor.BLUE.toChromaColor()
-                color
+            MobData.players.highlight(event) {
+                (if (it.baseEntity is EntityPlayerSP) LorenzColor.CHROMA else LorenzColor.BLUE).toChromaColor()
             }
         }
         if (config.summon.isHighlight()) {
