@@ -416,7 +416,7 @@ object GuiRenderUtils {
         val item = checkBlinkItem()
         val isSkull = rescaleSkulls && item.isSkull()
         //#if MC > 1.21.6
-        //$$ val is3dBlock = rescale3dBlocks && this.is3dModel()
+        //$$ val is3dBlock = rescale3dBlocks && item.is3dModel()
         //#endif
 
         val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
