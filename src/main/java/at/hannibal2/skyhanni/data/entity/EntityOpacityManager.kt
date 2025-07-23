@@ -34,7 +34,7 @@ object EntityOpacityManager {
     fun onTick() {
         if (!active) return
         val entities = mutableMapOf<EntityLivingBase, Int>()
-        for (entity in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(50.0)) {
+        for (entity in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(80.0)) {
             val event = EntityOpacityEvent(entity)
             event.post()
             event.opacity?.let {
