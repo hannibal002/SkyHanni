@@ -65,7 +65,7 @@ object RiftUpsideDownParkour {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.rainbowColor.get()
-            monochromeColor = config.monochromeColor.get().toColor()
+            monochromeColor = config.monochromeColor.get()
             lookAhead = config.lookAhead.get() + 1
             outline = config.outline
         }

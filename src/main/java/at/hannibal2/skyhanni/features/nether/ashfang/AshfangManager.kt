@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.MobUtils.mob
@@ -33,6 +34,7 @@ object AshfangManager {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
+        // TODO add config optioinhs for colors
         val color = when (mob.name) {
             "Ashfang Follower" -> LorenzColor.DARK_GRAY
             "Ashfang Underling" -> LorenzColor.RED
@@ -45,7 +47,7 @@ object AshfangManager {
             else -> return
         }
         ashfangMobs += mob
-        if (config.highlightBlazes) mob.highlight(color.toColor().addAlpha(40))
+        if (config.highlightBlazes) mob.highlight(color.toColor().addAlpha(40).toChromaColor())
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)

@@ -68,7 +68,7 @@ object FrozenTreasureHighlighter {
 
         for (location in treasureLocations) {
             val aabb = location.boundingToOffset(1.0, 1.0, 1.0).expand(0.001)
-            event.drawFilledBoundingBox(aabb, config.treasureColor.getEffectiveColour(), renderRelativeToCamera = false)
+            event.drawFilledBoundingBox(aabb, config.treasureColor, renderRelativeToCamera = false)
         }
     }
 }

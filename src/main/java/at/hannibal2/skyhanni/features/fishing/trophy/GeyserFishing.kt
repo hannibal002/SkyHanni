@@ -58,7 +58,7 @@ object GeyserFishing {
         if (geyser.distanceToPlayerIgnoreY() > 96) return
         if (config.onlyWithRod && !FishingApi.holdingLavaRod) return
 
-        val color = config.boxColor.toColor()
+        val color = config.boxColor
         event.drawFilledBoundingBox(geyserBox, color)
     }
 

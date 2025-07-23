@@ -335,7 +335,7 @@ object RescueMissionWaypoints {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.chroma.get()
-            monochromeColor = config.solidColor.get().toColor()
+            monochromeColor = config.solidColor.get()
             lookAhead = config.lookAhead.get() + 1
         }
     }
