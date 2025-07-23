@@ -12,8 +12,5 @@ class Waypoints<T : Copyable<T>>(
 ) : MutableList<T> by waypoints {
     fun deepCopy() = transform { it.copy() }
 
-    inline fun <R : Copyable<R>> transform(transform: (T) -> R): Waypoints<R> {
-        val waypoints1 = waypoints.map { transform(it) }.toMutableList()
-        return Waypoints(waypoints1)
-    }
+    inline fun <R : Copyable<R>> transform(transform: (T) -> R): Waypoints<R> = Waypoints(waypoints.map { transform(it) }.toMutableList())
 }
