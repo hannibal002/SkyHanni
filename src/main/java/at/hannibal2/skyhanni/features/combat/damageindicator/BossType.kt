@@ -33,6 +33,8 @@ enum class BossType(
     SLAYER_SPIDER_2("§eTarantula Broodfather 2", Type.TARANTULA_BROODFATHER, "§eTara 2", showDeathTime = true),
     SLAYER_SPIDER_3("§cTarantula Broodfather 3", Type.TARANTULA_BROODFATHER, "§cTara 3", showDeathTime = true),
     SLAYER_SPIDER_4("§4Tarantula Broodfather 4", Type.TARANTULA_BROODFATHER, "§4Tara 4", showDeathTime = true),
+    SLAYER_SPIDER_5_1("§5Tarantula Broodfather 5", Type.TARANTULA_BROODFATHER, "§4Tara 5", showDeathTime = true),
+    SLAYER_SPIDER_5_2("§5Tarantula Broodfather 5", Type.TARANTULA_BROODFATHER, "§4Tara 5", showDeathTime = true),
 
     SLAYER_WOLF_1("§aSven Packmaster 1", Type.SVEN_PACKMASTER, "§aSven 1", showDeathTime = true),
     SLAYER_WOLF_2("§eSven Packmaster 2", Type.SVEN_PACKMASTER, "§eSven 2", showDeathTime = true),

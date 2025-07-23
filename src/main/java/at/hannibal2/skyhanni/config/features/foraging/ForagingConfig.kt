@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 /**
  * Attention developers:
@@ -35,6 +36,7 @@ class ForagingConfig {
 
     @Expose
     @ConfigOption(name = "Starlyn Contests", desc = "")
+    @SearchTag("Agatha")
     @Accordion
     val starlynContest: StarlynContestsConfig = StarlynContestsConfig()
 
