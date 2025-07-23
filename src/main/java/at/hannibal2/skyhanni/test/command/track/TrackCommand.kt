@@ -208,9 +208,13 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
             literal("ignore") {
                 registerIgnoreBlock()
                 literalCallback("list") {
-                    val message = if (ignoredTypes.isEmpty()) "§cNo $commonName §eignored types"
+                    val message = if (ignoredTypes.isEmpty()) "§cNo §eignored $commonName types"
                     else "§aIgnored $commonName §etypes:\n§e${ignoredTypes.joinToString(", ")}"
                     ChatUtils.chat(message, replaceSameMessage = true)
+                }
+                literalCallback("clear") {
+                    ignoredTypes.clear()
+                    ChatUtils.chat("§aCleared all ignored $commonName types", replaceSameMessage = true)
                 }
                 callback {
                     ChatUtils.chat("§cSpecify a $commonName type to ignore", replaceSameMessage = true)
