@@ -572,15 +572,15 @@ object GuiRenderUtils {
     //$$     // Since we want to rotate the item around its center point, we translate half in, in each direction
     //$$     matrices.translate(hx, hy, hz)
     //$$
+    //$$     // 'planned' rotations are done now.
+    //$$     if (rotX != 0f) matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
+    //$$     if (rotY != 0f) matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
+    //$$     if (rotZ != 0f) matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
+    //$$
     //$$     // With the ItemRenderer call, all blocks and skulls are rendered from a true side view, rather than
     //$$     // the old "angled down" view. This rotation set re-creates the old view.
     //$$     matrices.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(30f))
     //$$     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(45f))
-    //$$
-    //$$     // Any other 'planned' rotations are done now.
-    //$$     if (rotX != 0f) matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
-    //$$     if (rotY != 0f) matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
-    //$$     if (rotZ != 0f) matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
     //$$
     //$$     // We need to scale up before rendering - for some reason the default is 1 x 1 x 1
     //$$     matrices.scale(16f, 16f, 16f)
