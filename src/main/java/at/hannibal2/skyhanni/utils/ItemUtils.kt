@@ -56,9 +56,6 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import net.minecraft.init.Items
 import net.minecraft.item.Item
-//#if MC < 1.21
-import net.minecraft.item.ItemBlock
-//#endif
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList

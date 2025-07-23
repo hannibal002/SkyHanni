@@ -532,9 +532,9 @@ object GuiRenderUtils {
 
     //#if MC > 1.21.6
     //$$ private fun ItemStack.customRenderOnScreen(
-    //$$         preTranslateX: Float, preTranslateY: Float, xTranslation: Float, yTranslation: Float, guiScale: Float, actualScale: Float,
-    //$$         rotX: Float, rotY: Float, rotZ: Float,
-    //$$     ) {
+    //$$     preTranslateX: Float, preTranslateY: Float, xTranslation: Float, yTranslation: Float, guiScale: Float, actualScale: Float,
+    //$$     rotX: Float, rotY: Float, rotZ: Float,
+    //$$ ) {
     //$$     val (hx, hy, hz) = listOf(8f, 8f, 8f)
     //$$     val (zT, zS) = listOf(-1100f, 1f)
     //$$
