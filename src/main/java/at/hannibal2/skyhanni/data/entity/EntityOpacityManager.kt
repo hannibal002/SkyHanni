@@ -73,7 +73,7 @@ object EntityOpacityManager {
     }
 
     @HandleEvent
-    fun onRenderPlayer(event: EntityRenderLayersEvent.Pre<EntityLivingBase>) {
+    fun onRender(event: EntityRenderLayersEvent.Pre<EntityLivingBase>) {
         if (!active) return
         if (!canChangeOpacity(event.entity)) return
         if (!shouldHide) return
