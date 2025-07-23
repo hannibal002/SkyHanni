@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.entity.item.EntityArmorStand
 
 @SkyHanniModule
-class DebugEntitySkinCommand {
+object DebugEntitySkinCommand {
 
     private var skinToFind: String? = null
     private var foundEntities = setOf<EntityArmorStand>()
@@ -27,7 +27,7 @@ class DebugEntitySkinCommand {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebugentityskin") {
-            description = "Highlights entities in world that have the given skin texture."
+            description = "Highlights armor stands in the world that hold or wear a skull with the given skin texture."
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback { toggleSkin() }
         }
@@ -36,14 +36,14 @@ class DebugEntitySkinCommand {
     private fun toggleSkin() {
         skinToFind?.let {
             skinToFind = null
-            ChatUtils.chat("Disabled debug entity skin highlighter.")
+            ChatUtils.chat("Disabled Debug Entity Skin Highlighter.")
             foundEntities = emptySet()
             return
         }
         SkyHanniMod.launchIOCoroutine {
             val skin = OSUtils.readFromClipboard() ?: error("no string in clipboard")
             skinToFind = skin
-            ChatUtils.chat("Enabled and set clipboard to skin texture for entity skin highlighter.")
+            ChatUtils.chat("Enabled Debug Entity Skin Highlighter and set clipboard as skin texture.")
             updateSkinEntities(skin)
         }
     }
