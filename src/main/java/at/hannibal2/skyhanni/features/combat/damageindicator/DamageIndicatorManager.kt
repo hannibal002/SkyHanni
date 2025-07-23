@@ -455,11 +455,9 @@ object DamageIndicatorManager {
             }
 
             BossType.SLAYER_SPIDER_5_1 -> {
-                if (entity.mob in SlayerSpiderFeatures.stuckTier5) {
-                    entityData.nameAbove = if (config.spiderSlayer.showInvincible) {
-                        "§eKill hatchlings!"
-                    } else ""
-                }
+                entityData.nameAbove = if (entity.mob in SlayerSpiderFeatures.stuckTier5 && config.spiderSlayer.showInvincible) {
+                    "§eKill hatchlings!"
+                } else ""
                 entityData.nameSuffix = " §e1/2"
                 return ""
             }
