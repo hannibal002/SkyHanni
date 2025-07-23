@@ -71,7 +71,7 @@ class SlayerConfig {
     @Expose
     @ConfigOption(
         name = "Line to Miniboss Width",
-        desc = "The width of the line pointing to every Slayer Mini-Boss around you."
+        desc = "The width of the line pointing to every Slayer Mini-Boss around you.",
     )
     @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
     var slayerMinibossLineWidth: Int = 3
@@ -80,7 +80,7 @@ class SlayerConfig {
     @ConfigOption(
         name = "Hide Mob Names",
         desc = "Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. " +
-            "Exclude mobs that are damaged, corrupted, runic or semi rare."
+                "Exclude mobs that are damaged, corrupted, runic or semi rare.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -89,7 +89,7 @@ class SlayerConfig {
     @Expose
     @ConfigOption(
         name = "Quest Warning",
-        desc = "Warn when wrong Slayer quest is selected, or killing mobs for the wrong Slayer."
+        desc = "Warn when wrong Slayer quest is selected, or killing mobs for the wrong Slayer.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -100,4 +100,21 @@ class SlayerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var questWarningTitle: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Hide Irrelevant Mobs",
+        desc = "Makes mobs in or near slayer areas partially transparent so that they dont annoy while having an active slayer quest. E.g. Magma Cube in Burning Desert for Tara Slayer.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideIrrelevantMobs: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Adjust irrelevant opacity",
+        desc = "Adjust the opacity of irrelevant mobs. (in %)",
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    var hideIrrelevantMobsOpacity: Int = 40
 }
