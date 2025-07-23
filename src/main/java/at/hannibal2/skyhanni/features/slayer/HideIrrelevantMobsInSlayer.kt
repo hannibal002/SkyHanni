@@ -40,7 +40,6 @@ object HideIrrelevantMobsInSlayer {
             mobNames = setOf("Magma Cube", "Magma Cube Rider"),
             isInArea = { IslandType.CRIMSON_ISLE.isCurrent() && SkyBlockUtils.graphArea == "Burning Desert" },
         )
-        ;
     }
 
     private fun isActive() = SlayerApi.isInCorrectArea && config.hideIrrelevantMobs
