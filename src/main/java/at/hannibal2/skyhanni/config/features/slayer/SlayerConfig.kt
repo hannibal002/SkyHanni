@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.slayer
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
+import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -12,6 +13,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SlayerConfig {
+
+    @Expose
+    @ConfigOption(name = "Spider", desc = "")
+    @Accordion
+    val spider: SpiderConfig = SpiderConfig()
+
     // TODO rename to "enderman"
     @Expose
     @Category(name = "Enderman", desc = "Enderman Slayer Feature")

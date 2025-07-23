@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
+import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -33,6 +34,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -453,11 +455,17 @@ object DamageIndicatorManager {
             }
 
             BossType.SLAYER_SPIDER_5_1 -> {
-                entityData.nameAbove = "§e1/2"
+                if (entity.mob in SlayerSpiderFeatures.stuckTier5) {
+                    entityData.nameAbove = if (config.spiderSlayer.showInvincible) {
+                        "§eKill hatchlings!"
+                    } else ""
+                }
+                entityData.nameSuffix = " §e1/2"
                 return ""
             }
+
             BossType.SLAYER_SPIDER_5_2 -> {
-                entityData.nameAbove = "§e2/2"
+                entityData.nameSuffix = " §e2/2"
                 return ""
             }
 
