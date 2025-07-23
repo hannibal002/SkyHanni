@@ -116,7 +116,7 @@ object HoppityEggLocator {
             } else "§aGuess #${index + 1}"
             drawEggWaypoint(eggLocation, name)
             if (waypointsConfig.showLine) {
-                drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
+                drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toChromaColor(), 2, false)
             }
         }
     }
@@ -127,7 +127,8 @@ object HoppityEggLocator {
             val dist = eggLocation.distanceToPlayer()
             if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
                 val alpha = ((10 - dist) / 10).coerceAtMost(0.5).toFloat()
-                drawColor(eggLocation, LorenzColor.RED, false, alpha)
+                // TODO add chroma color support via config
+                drawColor(eggLocation, LorenzColor.RED.toChromaColor(), false, alpha)
                 drawDynamicText(eggLocation.up(), "§cDuplicate Location!", 1.5)
             }
         }
@@ -139,7 +140,7 @@ object HoppityEggLocator {
         if (!shouldMarkDuplicate) {
             drawWaypointFilled(location, waypointsConfig.color.toColor(), seeThroughBlocks = true)
         } else {
-            drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
+            drawColor(location, LorenzColor.RED.toChromaColor(), false, 0.5f)
         }
         drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }

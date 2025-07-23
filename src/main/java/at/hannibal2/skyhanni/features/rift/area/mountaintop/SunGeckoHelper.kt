@@ -140,6 +140,7 @@ object SunGeckoHelper {
         val mob = event.mob
         val name = mob.name
         if (!name.contains("Sun Gecko")) return
+        // TODO config options for colors
         if (name.contains("?")) {
             if (config.highlightFakeBoss) {
                 mob.highlight(Color.RED.addAlpha(80))

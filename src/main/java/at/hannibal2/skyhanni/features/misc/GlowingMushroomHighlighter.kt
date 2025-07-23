@@ -73,7 +73,7 @@ object GlowingMushroomHighlighter {
 
         for (mushroom in glowingMushrooms) {
             val aabb = mushroom.pos.boundingToOffset(1.0, 1.0, 1.0).expand(0.001)
-            event.drawFilledBoundingBox(aabb, config.mushroomColor.getEffectiveColour(), renderRelativeToCamera = false)
+            event.drawFilledBoundingBox(aabb, config.mushroomColor, renderRelativeToCamera = false)
         }
     }
 }

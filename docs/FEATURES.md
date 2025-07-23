@@ -144,6 +144,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Spirit Leap Keybinds. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/3844)
     + Allows player to use keybinds to leap to specific player.
     + Keybind hints added for easier keybind usage.
++ Added Dungeon Instance Creation Cooldown display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3373)
+    + Optionally blocks sending /joininstance command during cooldown.
++ Added Floor 7 Spring Boots Helper. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2581)
 
 </details>
 <details open><summary>
@@ -964,6 +967,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows collected ores, time gained from mining, profit for raw ores, and Highlite profit.
 + Added drop location for Rose'End Flowerpot Enigma Soul on second moving platform. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4004)
 + Added a workaround for a Hypixel bug that results in no sounds for a few seconds after the Vampire Slayer's Killer Spring spawns on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4434)
++ Added Ubik's Cube reminder. - jepn (https://github.com/hannibal002/SkyHanni/pull/3125)
 
 </details>
 <details open><summary>
@@ -1048,6 +1052,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Mineshaft Detection. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4343)
     + Ability to send entered Mineshaft to party chat.
     + Tracks how many shafts you entered since each Mineshaft Type.
++ Added Coleweight's Ordered Waypoints (/shordered or /sho). - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3622)
 
 </details>
 <details open><summary>
@@ -1086,6 +1091,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added profit per Agatha Coupon in Agatha's Shop. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4250)
 + Added Compact messages for sweep details. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4259)
 + Added HotF Lottery display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
++ Added compact messages for Agatha/Starlyn Sister contests. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4258)
++ Added option to mute final Tree Breaking Sound. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4459)
 
 </details>
 <details open><summary>

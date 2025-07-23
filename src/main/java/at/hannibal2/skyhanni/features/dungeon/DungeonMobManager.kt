@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.entity.EntityLivingBase
-import java.awt.Color
 
 @SkyHanniModule
 object DungeonMobManager {
@@ -104,7 +104,7 @@ object DungeonMobManager {
         felOnTheGround.forEach { mob ->
             event.drawWaypointFilled(
                 mob.baseEntity.getLorenzVec().add(-0.5, -0.23, -0.5),
-                color,
+                color.toColor(),
                 seeThroughBlocks = false,
                 beacon = false,
                 extraSize = -0.2,
@@ -114,7 +114,7 @@ object DungeonMobManager {
         }
     }
 
-    private fun getFelColor() = fel.color.get().toColor()
+    private fun getFelColor() = fel.color.get()
 
     private fun handleStar(mob: Mob) {
         if (!starredConfig.highlight.get()) return
@@ -133,12 +133,16 @@ object DungeonMobManager {
         }
     }
 
-    private fun getStarColor(): Color = starredConfig.color.get().toColor()
+    private fun getStarColor(): ChromaColour = starredConfig.color.get()
 
-    private fun handleStar0(mob: Mob, colour: Color?) {
+    private fun handleStar0(mob: Mob, colour: ChromaColour?) {
         if (mob.name == "Fels") {
             if (mob in felMoving) {
-                mob.highlight(colour)
+                colour?.let {
+                    mob.highlight(it)
+                } ?: run {
+                    mob.removeHighlight()
+                }
             }
             return
         }
@@ -146,7 +150,11 @@ object DungeonMobManager {
             staredInvisible.add(mob)
             return
         }
-        mob.highlight(colour)
+        colour?.let {
+            mob.highlight(it)
+        } ?: run {
+            mob.removeHighlight()
+        }
         starredVisibleMobs.add(mob)
     }
 
