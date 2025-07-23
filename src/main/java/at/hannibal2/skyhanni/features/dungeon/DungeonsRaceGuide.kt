@@ -76,8 +76,7 @@ object DungeonsRaceGuide {
     private fun updateConfig() {
         parkourHelpers.values.forEach {
             it.rainbowColor = config.rainbowColor.get()
-            it.
-            monochromeColor = config.monochromeColor.get()
+            it.monochromeColor = config.monochromeColor.get()
             it.lookAhead = config.lookAhead.get() + 1
         }
     }

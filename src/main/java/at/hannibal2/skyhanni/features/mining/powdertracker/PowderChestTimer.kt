@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.block.BlockChest
 import net.minecraft.block.state.IBlockState
 import java.awt.Color

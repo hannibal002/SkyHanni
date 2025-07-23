@@ -58,7 +58,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
     @Deprecated("Use ChromaColour instead", ReplaceWith("toChromaColor()"))
     fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
 
-    private val cachedChromaColor by lazy { color.toChromaColor(this.color.alpha, 0)}
+    private val cachedChromaColor by lazy { color.toChromaColor(this.color.alpha, 0) }
 
     // TODO make deprecated
     @JvmOverloads
