@@ -79,7 +79,7 @@ object PetUtils {
     }
 
     fun getVariantIndexOrNull(extraData: JsonObject): Int? = petSkinNbtNames.firstNotNullOfOrNull {
-        extraData.get(it).asInt
+        extraData.get(it)?.asInt
     }
 
     fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName]
