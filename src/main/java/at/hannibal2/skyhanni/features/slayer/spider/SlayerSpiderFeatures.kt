@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.network.play.client.C02PacketUseEntity
@@ -46,8 +44,9 @@ object SlayerSpiderFeatures {
         if (event.message != "§cYou need to kill the Broodfather's hatchlings before it can be damaged again!") return
 
         val mob = lastClickedTier5 ?: return
-        mob.highlight(LorenzColor.GRAY.toColor().addAlpha(20), condition = { config.highlightInvincible && mob in stuckTier5 })
+        mob.highlight(config.highlightInvincibleColor, condition = { config.highlightInvincible && mob in stuckTier5 })
         stuckTier5.add(mob)
+
     }
 
     @HandleEvent
@@ -55,7 +54,7 @@ object SlayerSpiderFeatures {
         val mob = event.entity.mob ?: return
         if (mob in stuckTier5) {
             stuckTier5.remove(mob)
-            mob.highlight(null)
+            mob.removeHighlight()
         }
     }
 
