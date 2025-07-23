@@ -48,7 +48,7 @@ object SeaCreatureFeatures {
 
         if (!config.highlight) return
 
-        mob.highlight(LorenzColor.GREEN.toColor())
+        mob.highlight(LorenzColor.GREEN.toChromaColor())
     }
 
     @HandleEvent

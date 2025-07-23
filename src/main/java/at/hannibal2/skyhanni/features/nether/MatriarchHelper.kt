@@ -124,7 +124,7 @@ object MatriarchHelper {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.highlight) {
-            val color = config.highlightColor.toColor()
+            val color = config.highlightColor
             pearlList.forEach {
                 event.drawFilledBoundingBox(it.first.boundingBox.expandBlock(), color, 1f)
             }

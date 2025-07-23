@@ -118,7 +118,7 @@ object FishingHotspotRadar {
         val location = hotspotLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
         if (config.lineToHotspot) {
-            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toColor(), lineWidth = 3, depth = false)
+            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toChromaColor(), lineWidth = 3, depth = false)
         }
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()
