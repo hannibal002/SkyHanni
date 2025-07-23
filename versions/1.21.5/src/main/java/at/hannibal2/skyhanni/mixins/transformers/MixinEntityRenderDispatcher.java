@@ -20,7 +20,7 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
     @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/client/render/entity/state/EntityRenderState;DDDLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V"), cancellable = true)
     public void onRenderPre(E entity, double x, double y, double z, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, EntityRenderer<? super E, S> renderer, CallbackInfo ci) {
         if (entity instanceof LivingEntity livingEntity) {
-            if (new SkyHanniRenderEntityEvent.Pre(livingEntity, x, y, z).post()) {
+            if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, x, y, z).post()) {
                 ci.cancel();
             }
         }
@@ -30,8 +30,9 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
     @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/client/render/entity/state/EntityRenderState;DDDLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V", shift = At.Shift.AFTER))
     public void onRenderPost(E entity, double x, double y, double z, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, EntityRenderer<? super E, S> renderer, CallbackInfo ci) {
         if (entity instanceof LivingEntity livingEntity) {
-            new SkyHanniRenderEntityEvent.Post(livingEntity, x, y, z).post();
+            new SkyHanniRenderEntityEvent.Post<>(livingEntity, x, y, z).post();
         }
+        EntityRenderDispatcherHookKt.clearEntity();
     }
 
 }

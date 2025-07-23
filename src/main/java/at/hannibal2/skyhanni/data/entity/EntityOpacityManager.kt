@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import org.lwjgl.opengl.GL11
 
-// TODO add 1.21.x support
 @SkyHanniModule
 object EntityOpacityManager {
 
@@ -43,6 +42,15 @@ object EntityOpacityManager {
         }
         this.entities = entities
     }
+
+    //#if MC > 1.21
+    //$$ @JvmStatic
+    //$$ fun getEntityOpacity(entity: LivingEntity): Int? {
+    //$$     if (!active) return null
+    //$$     if (!canChangeOpacity(entity)) return null
+    //$$     return (opacity(entity) * 2.55).toInt()
+    //$$ }
+    //#endif
 
     private fun canChangeOpacity(entity: EntityLivingBase) = entities.containsKeys(entity) && opacity(entity) < 100
 
