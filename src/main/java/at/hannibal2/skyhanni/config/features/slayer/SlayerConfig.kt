@@ -108,7 +108,7 @@ class SlayerConfig {
         desc = "Makes mobs partially transparent so that they dont annoy while having an active slayer quest. " +
             "Useful for e.g. Magma Cubes in Burning Desert for Tara Slayer.",
     )
-    @SearchTag("tarantula, spider opacity")
+    @SearchTag("tarantula spider opacity")
     @ConfigEditorBoolean
     @FeatureToggle
     var hideIrrelevantMobs: Boolean = false
@@ -118,7 +118,7 @@ class SlayerConfig {
         name = "Adjust Irrelevant Opacity",
         desc = "Adjust the opacity of irrelevant mobs. (in %)",
     )
-    @SearchTag("magma cube, tarantula, tara, spider, slayer, quest")
+    @SearchTag("magma cube tarantula tara spider slayer quest")
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
     var hideIrrelevantMobsOpacity: Int = 40
 }
