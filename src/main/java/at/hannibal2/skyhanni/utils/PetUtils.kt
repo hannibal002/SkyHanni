@@ -18,7 +18,9 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputat
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -82,8 +84,9 @@ object PetUtils {
         extraData.get(it)?.asInt
     }
 
-    fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName]
-        ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf { !it.isPet }
+    fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName] ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf {
+        !it.isPet && it.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET_ITEM
+    }
 
     fun isKnownPetInternalName(internalName: NeuInternalName) = internalName in petInternalNames
 
