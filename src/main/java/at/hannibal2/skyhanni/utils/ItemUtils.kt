@@ -75,8 +75,6 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import net.minecraft.component.type.NbtComponent
 //$$ import net.minecraft.component.ComponentMap
-//$$ import net.minecraft.item.BlockItem
-//$$ import net.minecraft.block.BlockRenderType
 //$$ import com.mojang.authlib.GameProfile
 //$$ import java.util.UUID
 //$$ import com.mojang.authlib.properties.Property
@@ -991,27 +989,11 @@ object ItemUtils {
         //#endif
     }
 
-    fun ItemStack.isBlock(): Boolean {
-        //#if MC < 1.21
-        return item is ItemBlock
-        //#else
-        //$$ return item is BlockItem
-        //#endif
-    }
-
     //#if MC > 1.21
     //$$ fun ItemStack.getItemModel(): Item? {
     //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
-    //$$     val item = Registries.ITEM.get(identifier)
-    //$$     return if (item == Items.AIR) null else item
-    //$$ }
-    //#endif
-
-    //#if MC > 1.21
-    //$$ fun ItemStack.is3dModel(): Boolean {
-    //$$     if (item !is BlockItem) return false
-    //$$     val blockState = (item as BlockItem).block.defaultState
-    //$$     return blockState.renderType == BlockRenderType.MODEL
+    //$$     val itemModel = Registries.ITEM.get(identifier)
+    //$$     return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
     //$$ }
     //#endif
 }

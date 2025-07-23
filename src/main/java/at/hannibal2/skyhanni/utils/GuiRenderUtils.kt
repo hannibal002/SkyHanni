@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -47,8 +48,9 @@ import java.nio.FloatBuffer
 //$$ import net.minecraft.util.math.RotationAxis
 //$$ import net.minecraft.client.render.ProjectionMatrix2
 //$$ import kotlin.math.sqrt
-//$$ import at.hannibal2.skyhanni.utils.ItemUtils.is3dModel
 //$$ import net.minecraft.client.render.LightmapTextureManager
+//$$ import net.minecraft.client.render.item.ItemRenderState
+//$$ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 //#endif
 
 // todo 1.21 impl needed
@@ -402,7 +404,10 @@ object GuiRenderUtils {
     //  if we do change this, the 1.21.6 zT below will need to be adjusted as well.
     //#if MC > 1.21.6
     //$$ private val projectionMatrix by lazy { ProjectionMatrix2("SkyHanni Item Rendering", 1000f, 11000f, true) }
+    //$$ private val itemRenderStateButCool by lazy { ItemRenderState() }
     //#endif
+
+    private val SKULL_SCALE = if (PlatformUtils.IS_LEGACY) (4f / 3f) else (5f / 4f)
 
     @Suppress("unused")
     fun ItemStack.renderOnScreen(
@@ -410,24 +415,16 @@ object GuiRenderUtils {
         y: Float,
         scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
-        rescale3dBlocks: Boolean = true,
         rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
         val isSkull = rescaleSkulls && item.isSkull()
-        //#if MC > 1.21.6
-        //$$ val is3dBlock = rescale3dBlocks && item.is3dModel()
-        //#endif
 
         val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
         val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
 
-        //#if MC < 1.21
-        val baseScale = if (isSkull) (4f / 3f) else 1f
-        //#else
-        //$$ val baseScale = if (isSkull) (5f / 4f) else 1f
-        //#endif
+        val baseScale = if (isSkull) SKULL_SCALE else 1f
         val finalScale = (baseScale * scaleMultiplier).toFloat()
 
         val (translateX, translateY) = if (isSkull) {
@@ -518,12 +515,15 @@ object GuiRenderUtils {
         //$$ val guiScale = (scaleX + scaleY) * 0.5f
         //$$ val totalScale = guiScale * finalScale
         //$$
-        //$$ // TODO once random items don't break this can be re-enabled on items when their scale is high
-        //$$ if (rotationDegrees != null /* || totalScale > 1.5 */) {
-        //$$     item.customRenderOnScreen(
-        //$$         matrices2D.m20, matrices2D.m21, translateX, translateY, guiScale, totalScale, is3dBlock, isSkull,
-        //$$         rotX, rotY, rotZ
-        //$$     )
+        //$$ MinecraftClient.getInstance().itemModelManager.clearAndUpdate(itemRenderStateButCool, item, ItemDisplayContext.FIXED, MinecraftCompat.localWorld, MinecraftCompat.localPlayer, 0)
+        //$$
+        //$$ if (rotationDegrees != null || (totalScale > 1 && itemRenderStateButCool.isSideLit)) {
+        //$$     val actualScale = ((5f / 4f) * scaleMultiplier).toFloat()
+        //$$     val translateOffset = 2f * actualScale
+        //$$
+        //$$     val (xTranslation, yTranslation) = (x - translateOffset) to (y - translateOffset)
+        //$$
+        //$$     item.customRenderOnScreen(matrices2D.m20, matrices2D.m21, xTranslation, yTranslation, guiScale, actualScale, rotX, rotY, rotZ)
         //$$ } else {
         //$$     item.normalRenderOnScreen(translateX, translateY, finalScale)
         //$$ }
@@ -532,15 +532,15 @@ object GuiRenderUtils {
 
     //#if MC > 1.21.6
     //$$ private fun ItemStack.customRenderOnScreen(
-    //$$     preTranslateX: Float, preTranslateY: Float, translateX: Float, translateY: Float, guiScale: Float, totalScale: Float,
-    //$$     is3dBlock: Boolean, isSkull: Boolean, rotX: Float, rotY: Float, rotZ: Float
-    //$$ ) {
+    //$$         preTranslateX: Float, preTranslateY: Float, xTranslation: Float, yTranslation: Float, guiScale: Float, actualScale: Float,
+    //$$         rotX: Float, rotY: Float, rotZ: Float,
+    //$$     ) {
     //$$     val (hx, hy, hz) = listOf(8f, 8f, 8f)
     //$$     val (zT, zS) = listOf(-1100f, 1f)
     //$$
     //$$     // We need scales to calc real translations
-    //$$     val screenX = preTranslateX + translateX * guiScale
-    //$$     val screenY = preTranslateY + translateY * guiScale
+    //$$     val screenX = preTranslateX + xTranslation * guiScale
+    //$$     val screenY = preTranslateY + yTranslation * guiScale
     //$$
     //$$     val client = MinecraftClient.getInstance()
     //$$     val consumers = client.bufferBuilders.entityVertexConsumers
@@ -548,7 +548,7 @@ object GuiRenderUtils {
     //$$
     //$$     // Thank Vixid for this -  I would have never figured out how to do this.
     //$$     RenderSystem.backupProjectionMatrix()
-    //$$     val guiWidth = window.framebufferWidth.toFloat()  / window.scaleFactor.toFloat()
+    //$$     val guiWidth = window.framebufferWidth.toFloat() / window.scaleFactor.toFloat()
     //$$     val guiHeight = window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()
     //$$     val slice = projectionMatrix.set(guiWidth, guiHeight)
     //$$     RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
@@ -559,24 +559,23 @@ object GuiRenderUtils {
     //$$     val matrices = MatrixStack()
     //$$     matrices.push()
     //$$     matrices.translate(screenX, screenY, zT)
+    //$$     val finalScale = actualScale * guiScale
     //$$
     //$$     // Because by default the item is rendered flipped in all directions (what the fuck, Mojang?),
     //$$     // we need to translate all three ways before rendering the item, so we can flip it, and still
     //$$     // have it 'end' in the right position.
-    //$$     val itemSize = 16f * totalScale
-    //$$     matrices.translate(itemSize, itemSize, itemSize)
+    //$$     val itemSize = 16f * finalScale
+    //$$     matrices.translate(itemSize, itemSize, 0f)
     //$$     // These scales being negative is what does the "flipping back to normal viewing"
-    //$$     matrices.scale(-totalScale, -totalScale, -zS)
+    //$$     matrices.scale(-finalScale, -finalScale, -zS)
     //$$
     //$$     // Since we want to rotate the item around its center point, we translate half in, in each direction
     //$$     matrices.translate(hx, hy, hz)
     //$$
     //$$     // With the ItemRenderer call, all blocks and skulls are rendered from a true side view, rather than
     //$$     // the old "angled down" view. This rotation set re-creates the old view.
-    //$$     if (is3dBlock || isSkull) {
-    //$$         matrices.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(30f))
-    //$$         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(45f))
-    //$$     }
+    //$$     matrices.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(30f))
+    //$$     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(45f))
     //$$
     //$$     // Any other 'planned' rotations are done now.
     //$$     if (rotX != 0f) matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
@@ -586,13 +585,9 @@ object GuiRenderUtils {
     //$$     // We need to scale up before rendering - for some reason the default is 1 x 1 x 1
     //$$     matrices.scale(16f, 16f, 16f)
     //$$
-    //$$     if (is3dBlock || isSkull) {
-    //$$         client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-    //$$     } else {
-    //$$         client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_FLAT)
-    //$$     }
+    //$$     client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
     //$$
-    //$$     client.itemRenderer.renderItem(this, ItemDisplayContext.FIXED, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, matrices, consumers, client.world, 0)
+    //$$     itemRenderStateButCool.render(matrices, consumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV)
     //$$
     //$$     consumers.draw()
     //$$     matrices.pop()
