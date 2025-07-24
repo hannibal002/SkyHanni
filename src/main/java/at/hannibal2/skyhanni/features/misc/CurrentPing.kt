@@ -16,47 +16,66 @@ import net.hypixel.modapi.packet.impl.serverbound.ServerboundPingPacket
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+//#if MC >= 1.21
+//$$ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+//$$ import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
+//$$ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+//$$ import net.minecraft.client.MinecraftClient
+//#endif
 
 @SkyHanniModule
 object CurrentPing {
 
-    private var lastPingRequested = SimpleTimeMark.farPast()
-    val previousPings = mutableListOf<Long>()
-    private var waitingForPacket = false
-    var averagePing = Duration.ZERO
-        private set
     private val config get() = SkyHanniMod.feature.dev
 
+    val averagePing: Duration
+        get() = previousPings.takeIf { !it.isEmpty() }?.average()?.milliseconds ?: Duration.ZERO
+
+    //#if MC < 1.21
+    val previousPings = mutableListOf<Long>()
+
+    private var lastPingTime = SimpleTimeMark.farPast()
+    private var waitingForPacket = false
+
     @Suppress("UNUSED_PARAMETER")
-    fun onPingPacket(packet: ClientboundPingPacket) {
+    fun onPongPacket(packet: ClientboundPingPacket) {
         if (!isEnabled()) return
         waitingForPacket = false
 
         if (previousPings.size > 5) {
-            previousPings.removeAt(0)
+            previousPings.subList(0, previousPings.size - 5).clear()
         }
-        previousPings.add((lastPingRequested.passedSince()).inWholeMilliseconds)
-        averagePing = previousPings.average().milliseconds
+        previousPings.add(lastPingTime.passedSince().inWholeMilliseconds)
     }
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(10)) return
-        if (lastPingRequested.passedSince() > 20.seconds) waitingForPacket = false
+        if (lastPingTime.passedSince() > 20.seconds) waitingForPacket = false
         requestPing()
     }
 
     private fun requestPing() {
         if (waitingForPacket || !SkyBlockUtils.onHypixel) return
-        lastPingRequested = SimpleTimeMark.now()
+        lastPingTime = SimpleTimeMark.now()
         waitingForPacket = true
         HypixelEventApi.sendPacket(ServerboundPingPacket())
     }
 
-    fun getFormattedPing(): String {
-        return "Current Ping: ${averagePing.inWholeMilliseconds.addSeparators()}ms"
-    }
+    //#else
+    //$$ val previousPings: List<Long>
+    //$$     get() = buildList {
+    //$$         MinecraftClient.getInstance().debugHud.pingLog.let {
+    //$$             for (i in 0..<it.getLength()) {
+    //$$                 add(it.get(i))
+    //$$             }
+    //$$         }
+    //$$     }
+    //#endif
+
+    fun getFormattedPing(): String =
+        "Current Ping: ${averagePing.inWholeMilliseconds.addSeparators()} ms"
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -66,8 +85,8 @@ object CurrentPing {
             simpleCallback {
                 if (!isEnabled()) {
                     ChatUtils.chatAndOpenConfig(
-                        "This requires you to turn on \"Hypixel Ping API\". Click this message to open the config",
-                        config::hypixelPingApi,
+                        "This requires you to turn on \"Ping API\". Click this message to open the config.",
+                        config::pingApi,
                     )
                 } else {
                     ChatUtils.chat(getFormattedPing())
@@ -77,5 +96,5 @@ object CurrentPing {
         }
     }
 
-    private fun isEnabled() = config.hypixelPingApi
+    fun isEnabled() = config.pingApi
 }

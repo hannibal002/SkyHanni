@@ -68,14 +68,12 @@ object PartyChatCommands {
             { config.pingCommand },
             requiresPartyLead = false,
             executable = {
-
-                if (!devConfig.hypixelPingApi) {
-
+                if (!CurrentPing.isEnabled()) {
                     ChatUtils.clickableChat(
-                        "Hypixel Ping Api is disabled, ping command won't work!",
+                        "Ping API is disabled, the ping command won't work!",
                         prefixColor = "§c",
                         onClick = {
-                            devConfig::hypixelPingApi.jumpToEditor()
+                            devConfig::pingApi.jumpToEditor()
                         },
                         hover = "§eClick to find setting in the config!",
                     )
