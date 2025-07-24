@@ -48,7 +48,7 @@ object MobHighlight {
         if (!config.runicMobHighlight) return
 
         toHighlightRunicMobs.forEach {
-            it.highlight(LorenzColor.LIGHT_PURPLE.toColor()) { config.runicMobHighlight }
+            it.highlight(LorenzColor.LIGHT_PURPLE.toChromaColor()) { config.runicMobHighlight }
         }
         toHighlightRunicMobs.clear()
     }
@@ -133,7 +133,7 @@ object MobHighlight {
 
         event.drawLineToEye(
             arachne.getLorenzVec().up(),
-            LorenzColor.RED.toColor(),
+            LorenzColor.RED.toChromaColor(),
             config.lineToArachneWidth,
             true,
         )

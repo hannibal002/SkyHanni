@@ -140,7 +140,7 @@ object HoppityEggLocations {
         for (location in legacyLocations) {
             val name = apiLocations.entries.find { it.value == location }?.key
             val isCollected = collectedLocations.contains(location)
-            val color = if (isCollected) LorenzColor.GREEN else LorenzColor.RED
+            val color = if (isCollected) LorenzColor.GREEN.toChromaColor() else LorenzColor.RED.toChromaColor()
             val nameColorCode = (if (name != null) LorenzColor.GREEN else LorenzColor.RED).getChatColor()
 
             event.drawColor(location, color, false, 0.5f)

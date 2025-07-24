@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -66,14 +67,14 @@ class LivingCaveSnake(
                 if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
                     continue
                 }
-                drawEdges(block, state.color.toColor())
+                drawEdges(block, state.chromaColor.toColor())
             }
         }
     }
 
     private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec) {
         val isSelected = isSelected()
-        drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
+        drawColor(location, state.chromaColor, alpha = 1f, seeThroughBlocks = isSelected)
         if (isSelected) {
             drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
             drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
@@ -114,7 +115,7 @@ class LivingCaveSnake(
         return false
     }
 
-    enum class State(val color: LorenzColor, label: String) {
+    enum class State(private val color: LorenzColor, label: String) {
         SPAWNING(LorenzColor.AQUA, "Spawning"),
         ACTIVE(LorenzColor.YELLOW, "Active"),
         NOT_TOUCHING_AIR(LorenzColor.RED, "Not touching air"),
@@ -122,5 +123,7 @@ class LivingCaveSnake(
         ;
 
         val display = "${color.getChatColor()}$label snake"
+
+        val chromaColor = color.toChromaColor()
     }
 }

@@ -264,7 +264,7 @@ object VampireSlayerFeatures {
                 val vec = event.exactLocation(it)
                 event.drawLineToEye(
                     vec.up(1.54),
-                    config.lineColor.toColor(),
+                    config.lineColor,
                     config.lineWidth,
                     true,
                 )
@@ -289,7 +289,7 @@ object VampireSlayerFeatures {
                 val text = if (isIchor) "§4Ichor" else "§4Spring"
                 event.drawColor(
                     stand.position.toLorenzVec().up(2.0),
-                    LorenzColor.DARK_RED,
+                    LorenzColor.DARK_RED.toChromaColor(),
                     alpha = 1f,
                 )
                 event.drawDynamicText(
