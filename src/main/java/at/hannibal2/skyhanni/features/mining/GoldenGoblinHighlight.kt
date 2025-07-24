@@ -58,9 +58,9 @@ object GoldenGoblinHighlight {
         lastGoblinSpawn = SimpleTimeMark.farPast()
 
         val goblin = lastGoblin ?: return
-        goblin.highlight(LorenzColor.GREEN.toColor())
+        goblin.highlight(LorenzColor.GREEN.toChromaColor())
         if (config.lineToYourGoldenGoblin) {
-            goblin.lineToPlayer(LorenzColor.GREEN.toColor()) { config.lineToYourGoldenGoblin }
+            goblin.lineToPlayer(LorenzColor.GREEN.toChromaColor()) { config.lineToYourGoldenGoblin }
         }
         lastGoblin = null
     }

@@ -210,7 +210,7 @@ object DungeonLividFinder {
 
         event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
 
-        val color = lorenzColor.toColor()
+        val color = lorenzColor.toChromaColor()
         event.drawFilledBoundingBox(boundingBox, color, 0.5f)
         event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)
     }

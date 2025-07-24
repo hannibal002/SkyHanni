@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
-import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
@@ -449,15 +449,9 @@ object CaptureFarmingGear {
         event.registerBrigadier("shcarrolyn") {
             description = "Toggles if the specified crops effect is active from carrolyn"
             category = CommandCategory.USERS_BUG_FIX
-            legacyCallbackArgs { args ->
-                val string = args.joinToString("_").uppercase()
-                val crop = CropType.entries.firstOrNull { it.name == string }
-                    ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string")
-                        .run<Unit, Nothing> { return@legacyCallbackArgs }
-                val carrolyn = CarrolynTable.getByCrop(crop)
-                    ?: ChatUtils.userError("Invalid Argument, crop is not valid")
-                        .run<Unit, Nothing> { return@legacyCallbackArgs }
-                carrolyn.setVisibleActive(!carrolyn.get())
+
+            argCallback("crop", EnumArgumentType.custom<CarrolynTable>({ it.crop.simpleName })) { crop ->
+                crop.setVisibleActive(!crop.get())
             }
         }
         event.registerBrigadier("shresetfarmingitems") {

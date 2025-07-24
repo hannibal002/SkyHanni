@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 
 @SkyHanniModule
@@ -32,9 +33,9 @@ object MobDebug {
 
     private fun Mob.isNotInvisible() = !this.isInvisible() || (config.showInvisible && this == lastRayHit)
 
-    private fun MobData.MobSet.highlight(event: SkyHanniRenderWorldEvent, color: (Mob) -> (LorenzColor)) {
+    private fun MobData.MobSet.highlight(event: SkyHanniRenderWorldEvent, color: (Mob) -> (ChromaColour)) {
         for (mob in filter { it.isNotInvisible() }) {
-            event.drawFilledBoundingBox(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
+            event.drawFilledBoundingBox(mob.boundingBox.expandBlock(), color.invoke(mob), 0.3f)
         }
     }
 
@@ -54,19 +55,23 @@ object MobDebug {
         }
 
         if (config.skyblockMob.isHighlight()) {
-            MobData.skyblockMobs.highlight(event) { if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN }
+            MobData.skyblockMobs.highlight(event) {
+                (if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN).toChromaColor()
+            }
         }
         if (config.displayNPC.isHighlight()) {
-            MobData.displayNpcs.highlight(event) { LorenzColor.RED }
+            MobData.displayNpcs.highlight(event) { LorenzColor.RED.toChromaColor() }
         }
         if (config.realPlayerHighlight) {
-            MobData.players.highlight(event) { if (it.baseEntity is EntityPlayerSP) LorenzColor.CHROMA else LorenzColor.BLUE }
+            MobData.players.highlight(event) {
+                (if (it.baseEntity is EntityPlayerSP) LorenzColor.CHROMA else LorenzColor.BLUE).toChromaColor()
+            }
         }
         if (config.summon.isHighlight()) {
-            MobData.summoningMobs.highlight(event) { LorenzColor.YELLOW }
+            MobData.summoningMobs.highlight(event) { LorenzColor.YELLOW.toChromaColor() }
         }
         if (config.special.isHighlight()) {
-            MobData.special.highlight(event) { LorenzColor.AQUA }
+            MobData.special.highlight(event) { LorenzColor.AQUA.toChromaColor() }
         }
         if (config.skyblockMob.isName()) {
             MobData.skyblockMobs.showName(event)
@@ -82,7 +87,7 @@ object MobDebug {
         }
         if (config.showRayHit) {
             lastRayHit?.let {
-                event.drawFilledBoundingBox(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
+                event.drawFilledBoundingBox(it.boundingBox.expandBlock(), LorenzColor.GOLD.toChromaColor(), 0.5f)
             }
         }
     }

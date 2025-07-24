@@ -100,7 +100,7 @@ object EndermanSlayerFeatures {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
             for (location in endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }) {
-                event.drawColor(location, beaconConfig.beaconColor.toColor(), alpha = 0.5f)
+                event.drawColor(location, beaconConfig.beaconColor, alpha = 0.5f)
             }
         }
 
@@ -127,7 +127,7 @@ object EndermanSlayerFeatures {
                 if (!skull.canBeSeen(viewDistance = 20)) continue
                 event.drawLineToEye(
                     skullLocation.up(),
-                    LorenzColor.GOLD.toColor(),
+                    LorenzColor.GOLD.toChromaColor(),
                     3,
                     true,
                 )
@@ -147,7 +147,7 @@ object EndermanSlayerFeatures {
                 val beaconLocation = event.exactLocation(beacon)
                 event.drawLineToEye(
                     beaconLocation.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor.toColor(),
+                    beaconConfig.lineColor,
                     beaconConfig.lineWidth,
                     true,
                 )
@@ -161,7 +161,7 @@ object EndermanSlayerFeatures {
             if (beaconConfig.showLine) {
                 event.drawLineToEye(
                     location.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor.toColor(),
+                    beaconConfig.lineColor,
                     beaconConfig.lineWidth,
                     true,
                 )
@@ -170,7 +170,7 @@ object EndermanSlayerFeatures {
             if (beaconConfig.highlightBeacon) {
                 val duration = 5.seconds - time.passedSince()
                 val durationFormat = duration.format(showMilliSeconds = true)
-                event.drawColor(location, beaconConfig.beaconColor.toColor(), alpha = 1f)
+                event.drawColor(location, beaconConfig.beaconColor, alpha = 1f)
                 event.drawWaypointFilled(location, beaconConfig.beaconColor.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
             }

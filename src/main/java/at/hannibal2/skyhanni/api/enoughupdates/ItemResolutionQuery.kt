@@ -190,7 +190,7 @@ class ItemResolutionQuery {
         resolvedName = if (resolvedName == null) {
             resolveContextualName()
         } else {
-            when (resolvedName.intern()) {
+            when (resolvedName) {
                 "PET" -> resolvePetName()
                 "RUNE", "UNIQUE_RUNE" -> resolveRuneName()
                 "ENCHANTED_BOOK" -> resolveEnchantedBookNameFromNBT()
