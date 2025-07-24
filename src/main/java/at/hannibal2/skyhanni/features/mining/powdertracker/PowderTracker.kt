@@ -41,7 +41,7 @@ object PowderTracker {
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
     private val pickedPattern by patternGroup.pattern(
         "picked",
-        " {2}§r§6§lCHEST LOCKPICKED ",
+        "  §r§6§lCHEST LOCKPICKED ",
     )
     private val powderStartedPattern by patternGroup.pattern(
         "powder.started",

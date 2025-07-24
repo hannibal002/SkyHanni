@@ -89,12 +89,13 @@ object FishingProfitTracker {
         }
 
         override fun getCustomPricePer(internalName: NeuInternalName): Double {
-            return if (internalName.getItemCategoryOrNull() == ItemCategory.TROPHY_FISH){
+            return if (internalName.getItemCategoryOrNull() == ItemCategory.TROPHY_FISH) {
                 SkyHanniTracker.getPricePer(MAGMA_FISH) * FishingApi.getFilletPerTrophy(internalName)
             } else super.getCustomPricePer(internalName)
         }
     }
 
+    @Suppress("unused")
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
 
     private val MAGMA_FISH = "MAGMA_FISH".toInternalName()

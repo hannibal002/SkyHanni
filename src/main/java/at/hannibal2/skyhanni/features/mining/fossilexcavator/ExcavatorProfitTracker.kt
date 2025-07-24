@@ -54,7 +54,7 @@ object ExcavatorProfitTracker {
             )
         }
         override fun getCoinName(item: TrackedItem) = "<no coins>"
-        override fun getCoinDescription(item: TrackedItem)= listOf("<no coins>")
+        override fun getCoinDescription(item: TrackedItem) = listOf("<no coins>")
     }
 
     private val scrapItem get() = FossilExcavatorApi.scrapItem
