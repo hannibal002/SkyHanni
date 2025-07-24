@@ -149,7 +149,6 @@ object OrderedWaypoints {
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("sho")
             literal("load", "import") {
-                description = "Loads ordered waypoints from your clipboard or config."
                 arg(
                     "name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getRouteNames() },
                 ) { name ->
@@ -158,60 +157,57 @@ object OrderedWaypoints {
                 simpleCallback { load("") }
             }
             literal("unload", "clear") {
-                description = "Unloads the current ordered waypoints."
                 simpleCallback { unload() }
             }
             literal("skip") {
-                description = "Skips the next waypoint."
                 arg("amount", BrigadierArguments.integer()) { amount ->
                     callback { skip(getArg(amount)) }
                 }
                 simpleCallback { skip(1) }
             }
             literal("skipto") {
-                description = "Skips to the waypoint with the inputted number."
                 arg("number", BrigadierArguments.integer()) { number ->
                     callback { skipto(getArg(number)) }
                 }
                 simpleCallback { skipto(1) }
             }
             literal("unskip") {
-                description = "Goes back by the number inputted many waypoints."
                 arg("amount", BrigadierArguments.integer()) { amount ->
                     callback { unskip(getArg(amount)) }
                 }
                 simpleCallback { unskip(1) }
             }
             literal("delete", "remove") {
-                description = "Deletes the waypoint with the inputted number."
                 arg("number", BrigadierArguments.integer()) { number ->
                     callback { delete(getArg(number)) }
                 }
             }
             literal("add", "insert") {
-                description = "Inserts a waypoint with the specified numbering below the player."
                 arg("number", BrigadierArguments.integer()) { number ->
                     callback { add(getArg(number)) }
                 }
             }
             literal("export") {
-                description = "Exports the loaded ordered waypoints to clipboard."
                 arg("format", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getWaypointFormats() }) { format ->
                     callback { export(getArg(format)) }
                 }
                 simpleCallback { export("coleweight") }
             }
             literal("save") {
-                description = "Saves the loaded ordered waypoints to your config."
                 arg("name", BrigadierArguments.string()) { name ->
                     callback { save(getArg(name)) }
                 }
             }
             literal("erase", "delete-route") {
-                description = "Erases the route with the specified name."
                 arg("name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getRouteNames() }) { name ->
                     callback { erase(getArg(name)) }
                 }
+            }
+            simpleCallback {
+                ChatUtils.userError(
+                    "An argument must be provided to /shordered. " +
+                        "To see the possible arguments, run /shcommands shordered."
+                )
             }
         }
     }
