@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
@@ -82,7 +81,7 @@ object PartyChatCommands {
                     )
                     return@PartyChatCommand
                 }
-                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms", prefix = true)
+                HypixelCommands.partyChat(CurrentPing.getFormattedPing(), prefix = true)
 
             },
         ),
