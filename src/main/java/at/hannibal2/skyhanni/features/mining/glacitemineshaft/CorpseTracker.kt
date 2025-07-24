@@ -40,11 +40,9 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 ) {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
-    class BucketData : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
-        override fun resetItems() {
-            corpsesLooted = enumMapOf()
-        }
-
+    data class BucketData(
+        @Expose var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
+    ) : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
         override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
@@ -61,15 +59,8 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 
         override fun getCoinName(bucket: CorpseType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: CorpseType?, item: TrackedItem): List<String> = listOf("<no coins>")
-
         override fun CorpseType.isBucketSelectable() = true
-
-        override fun bucketName(): String {
-            return "Corpse"
-        }
-
-        @Expose
-        var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
+        override fun bucketName(): String = "Corpse"
 
         fun getCorpseCount(): Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }

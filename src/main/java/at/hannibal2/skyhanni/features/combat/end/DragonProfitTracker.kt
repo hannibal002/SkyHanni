@@ -40,16 +40,14 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
     private var lastPlaced: Int = 0
     private val SUMMONING_EYE = "SUMMONING_EYE".toInternalName()
 
-    class BucketData : BucketedItemTrackerData<DragonType>(DragonType::class) {
+    data class BucketData(
+        @Expose var dragonKills: MutableMap<DragonType, Long> = EnumMap(DragonType::class.java),
+        @Expose var eyesPlaced: Long = 0,
+    ) : BucketedItemTrackerData<DragonType>(DragonType::class) {
         override fun getCoinName(bucket: DragonType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: DragonType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
         override fun DragonType.isBucketSelectable(): Boolean = this.selectable
-
-        override fun resetItems() {
-            dragonKills.clear()
-            eyesPlaced = 0
-        }
 
         override fun getDescription(bucket: DragonType?, timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / getTotalDragonCount()
@@ -60,9 +58,7 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
             )
         }
 
-        override fun bucketName(): String {
-            return "Dragon"
-        }
+        override fun bucketName(): String = "Dragon"
 
         fun getTotalDragonCount(): Long {
             return if (selectedBucket == null || selectedBucket !in DragonType.entries) {
@@ -71,12 +67,6 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
                 dragonKills[selectedBucket] ?: 0
             }
         }
-
-        @Expose
-        var dragonKills: MutableMap<DragonType, Long> = EnumMap(DragonType::class.java)
-
-        @Expose
-        var eyesPlaced: Long = 0
     }
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {

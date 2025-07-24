@@ -92,13 +92,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         @Expose var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java),
         @Expose var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java),
     ) : BucketedItemTrackerData<PestType>(PestType::class) {
-        override fun resetItems() {
-            @Suppress("DEPRECATION")
-            totalPestsKills = 0L
-            pestKills.clear()
-            spraysUsed.clear()
-        }
-
         override fun getDescription(bucket: PestType?, timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / getTotalPestCount()
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -124,7 +117,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             return "Pest"
         }
 
-        @Suppress("DEPRECATION")
         fun getTotalPestCount(): Long =
             if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
             else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)

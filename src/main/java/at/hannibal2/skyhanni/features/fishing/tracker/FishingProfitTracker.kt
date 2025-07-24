@@ -71,12 +71,12 @@ object FishingProfitTracker {
             totalCatchAmount = 0
         }
 
-        override fun getDescription(timesCaught: Long): List<String> {
-            val percentage = timesCaught.toDouble() / totalCatchAmount
+        override fun getDescription(timesGained: Long): List<String> {
+            val percentage = timesGained.toDouble() / totalCatchAmount
             val catchRate = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
-                "§7Caught §e${timesCaught.addSeparators()} §7times.",
+                "§7Caught §e${timesGained.addSeparators()} §7times.",
                 "§7Your catch rate: §c$catchRate",
             )
         }
@@ -158,7 +158,7 @@ object FishingProfitTracker {
         }
 
         if (tracker.isInventoryOpen()) {
-            addButton<String>(
+            addButton(
                 label = "Category",
                 current = currentCategory,
                 getName = { it + " §7(" + amounts[it] + ")" },
