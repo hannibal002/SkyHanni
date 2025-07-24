@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -35,7 +36,7 @@ object AreaMiniBossFeatures {
         }
         lastSpawnTime = time
         if (config.areaBossHighlight) {
-            event.mob.highlight(type.color.addOpacity(type.colorOpacity))
+            event.mob.highlight(type.color.addOpacity(type.colorOpacity).toChromaColor())
         }
         currentMobs.add(event.mob)
     }

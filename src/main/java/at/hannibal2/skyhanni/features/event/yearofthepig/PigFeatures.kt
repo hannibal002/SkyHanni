@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.yearofthepig.YearOfThePigConfig
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -36,7 +37,7 @@ object PigFeatures {
         val pigEntityLocation = WorldRenderUtils.exactLocation(pigEntity, partialTicks)
         drawLineToEye(
             pigEntityLocation.up(0.54),
-            Color.PINK,
+            Color.PINK.toChromaColor(),
             3,
             true,
         )

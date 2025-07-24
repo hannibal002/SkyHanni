@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.features.chat.StashCompact.StashType.Companion.fromGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -180,5 +181,12 @@ object StashCompact {
         val base = "chat.filterType.stashMessages"
 
         event.move(87, "$base.hideDuplicateCounts", "$base.hideDuplicateWarning.enabled")
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTabComplete(event: TabCompletionEvent) {
+        if (!config.tabCompleteStashCommand) return
+        if (!event.isCommand("viewstash")) return
+        event.addSuggestions(listOf("item", "material"))
     }
 }

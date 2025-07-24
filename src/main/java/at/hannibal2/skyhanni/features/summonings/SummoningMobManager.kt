@@ -85,6 +85,7 @@ object SummoningMobManager {
         if (!event.mob.belongsToPlayer()) return
 
         mobs += event.mob
+        // TODO config option for color
         if (config.summoningMobColored) event.mob.highlight(LorenzColor.GREEN.toColor())
     }
 

@@ -49,11 +49,9 @@ object InventoryUtils {
             .filter { it.inventory !is InventoryPlayer }
     }
 
-//     fun getItemsInLowerChestWithNull(): List<Slot> {
-//         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList()
-//         return guiChest.inventorySlots.inventorySlots
-//             .filter { it.inventory is InventoryPlayer }
-//     }
+    fun getItemIdsInOpenChest(): Set<NeuInternalName> {
+        return getItemsInOpenChest().mapNotNull { it.stack?.getInternalNameOrNull() }.toSet()
+    }
 
     // only works while not in an inventory
     fun getSlotsInOwnInventory(): List<Slot> {
@@ -184,7 +182,7 @@ object InventoryUtils {
         Minecraft.getMinecraft().currentScreen = null
     }
 
-    fun isInNormalChest(): Boolean = openInventoryName() in normalChestInternalNames.map { I18n.format(it) }
+    fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.format(it) }
 
     // TODO replace mode with GuiContainerEvent.ClickType
     fun clickSlot(slotNumber: Int, windowId: Int? = null, mouseButton: Int = 0, mode: Int = 0) {

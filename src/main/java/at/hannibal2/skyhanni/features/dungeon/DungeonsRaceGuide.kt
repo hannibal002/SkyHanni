@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -77,7 +76,7 @@ object DungeonsRaceGuide {
     private fun updateConfig() {
         parkourHelpers.values.forEach {
             it.rainbowColor = config.rainbowColor.get()
-            it.monochromeColor = config.monochromeColor.get().toColor()
+            it.monochromeColor = config.monochromeColor.get()
             it.lookAhead = config.lookAhead.get() + 1
         }
     }

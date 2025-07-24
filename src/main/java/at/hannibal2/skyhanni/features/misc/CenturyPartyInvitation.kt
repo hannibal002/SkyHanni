@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -23,8 +22,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.item.ItemStack
-import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -214,11 +213,11 @@ object CenturyPartyInvitation {
         }
     }
 
-    private fun wrongColor() = config.canNotColor.get().toColor()
+    private fun wrongColor() = config.canNotColor.get()
 
-    private fun correctColor() = config.canColor.get().toColor()
+    private fun correctColor() = config.canColor.get()
 
-    private fun Mob.setColor(color: Color) {
+    private fun Mob.setColor(color: ChromaColour) {
         highlight(color) { config.playerHighlighter && inHand }
     }
 

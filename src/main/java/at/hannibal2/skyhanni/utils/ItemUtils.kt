@@ -910,6 +910,7 @@ object ItemUtils {
         showRepoWarning(name)
     }
 
+    // These two are matching right now, but we keep them separate for future-proofing
     val resetCommand get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
     else EnoughUpdatesRepoManager.updateCommand
 

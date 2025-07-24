@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourShortCut
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.outlineTopFace
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,7 +32,7 @@ class ParkourHelper(
     private var visible = false
 
     var rainbowColor = false
-    var monochromeColor: Color = Color.WHITE
+    var monochromeColor: ChromaColour = Color.WHITE.toChromaColor()
     var lookAhead = 2
     var outline = false
     var showEverything = false
@@ -115,7 +117,7 @@ class ParkourHelper(
                 drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
 
                 val aabb = axisAlignedBB(locations[shortCut.to])
-                drawFilledBoundingBox(aabb, Color.RED, 1f)
+                drawFilledBoundingBox(aabb, Color.RED.toChromaColor(), 1f)
                 if (outline) outlineTopFace(aabb, 2, Color.BLACK, depth)
             }
         }
@@ -164,6 +166,6 @@ class ParkourHelper(
     private fun axisAlignedBB(loc: LorenzVec) = loc.boundingToOffset(platformSize, 1.0, platformSize).expandBlock()
 
     private fun colorForIndex(index: Int) = if (rainbowColor) {
-        RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f)
+        RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f).toChromaColor()
     } else monochromeColor
 }

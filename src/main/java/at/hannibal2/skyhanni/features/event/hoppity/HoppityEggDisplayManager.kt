@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityUnclaimedEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
+import at.hannibal2.skyhanni.events.entity.EntityOpacityActiveEvent
+import at.hannibal2.skyhanni.events.entity.EntityOpacityEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,58 +19,40 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
-import org.lwjgl.opengl.GL11
 
 @SkyHanniModule
 object HoppityEggDisplayManager {
 
     private val config get() = HoppityEggsManager.config
     private val unclaimedEggsConfig get() = config.unclaimedEggs
-    private var shouldHidePlayer: Boolean = false
 
-    var display = listOf<Renderable>()
+    private var display = listOf<Renderable>()
 
     private fun canChangeOpacity(entity: EntityPlayer): Boolean {
-        if (!HoppityEggLocator.isEnabled()) return false
         if (entity.isLocalPlayer) return false
         if (!entity.isRealPlayer()) return false
-        return config.playerOpacity < 100
+
+        val shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { entity.distanceTo(it) < 4.0 }
+            ?: HoppityEggLocator.possibleEggLocations.any { entity.distanceTo(it) < 4.0 }
+
+        return config.playerOpacity < 100 && shouldHidePlayer
     }
 
     @HandleEvent
-    fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityPlayer>) {
-        if (!canChangeOpacity(event.entity)) return
-
-        shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { event.entity.distanceTo(it) < 4.0 }
-            ?: HoppityEggLocator.possibleEggLocations.any { event.entity.distanceTo(it) < 4.0 }
-
-        if (!shouldHidePlayer) return
-        if (config.playerOpacity <= 0) return event.cancel()
-
-        GlStateManager.enableBlend()
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        GlStateManager.color(1f, 1f, 1f, config.playerOpacity / 100f)
+    fun onEntityOpacityActive(event: EntityOpacityActiveEvent) {
+        event.setActive(HoppityEggLocator.isEnabled() && config.playerOpacity < 100)
     }
 
     @HandleEvent
-    fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityPlayer>) {
-        if (!canChangeOpacity(event.entity)) return
-
-        GlStateManager.color(1f, 1f, 1f, 1f)
-        GlStateManager.disableBlend()
+    fun onEntityOpacity(event: EntityOpacityEvent<EntityPlayer>) {
+        if (canChangeOpacity(event.entity)) {
+            event.opacity = config.playerOpacity
+        }
     }
 
-    @HandleEvent
-    fun onRenderPlayerLayers(event: EntityRenderLayersEvent.Pre<EntityPlayer>) {
-        if (!canChangeOpacity(event.entity)) return
-        if (!shouldHidePlayer) return
-        event.cancel()
-    }
-
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         display = updateDisplay()
     }
 

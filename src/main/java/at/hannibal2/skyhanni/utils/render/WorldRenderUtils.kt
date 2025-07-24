@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.ColorUtils.rgb
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -12,6 +14,7 @@ import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -129,17 +132,7 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawColor(
         location: LorenzVec,
-        color: LorenzColor,
-        beacon: Boolean = false,
-        alpha: Float = -1f,
-        seeThroughBlocks: Boolean = true,
-    ) {
-        drawColor(location, color.toColor(), beacon, alpha, seeThroughBlocks)
-    }
-
-    fun SkyHanniRenderWorldEvent.drawColor(
-        location: LorenzVec,
-        color: Color,
+        color: ChromaColour,
         beacon: Boolean = false,
         alpha: Float = -1f,
         seeThroughBlocks: Boolean = true,
@@ -151,9 +144,7 @@ object WorldRenderUtils {
         val distSq = x * x + y * y + z * z
         val realAlpha = if (alpha == -1f) {
             (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
-        } else {
-            alpha
-        }
+        } else alpha
         if (seeThroughBlocks) {
             GlStateManager.disableDepth()
         }
@@ -174,6 +165,7 @@ object WorldRenderUtils {
         GlStateManager.enableCull()
     }
 
+    // TODO add chroma support
     fun SkyHanniRenderWorldEvent.drawWaypointFilled(
         location: LorenzVec,
         color: Color,
@@ -217,6 +209,21 @@ object WorldRenderUtils {
         }
     }
 
+    fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
+        aabb: AxisAlignedBB,
+        c: ChromaColour,
+        alphaMultiplier: Float = 1f,
+        /**
+         * If set to `true`, renders the box relative to the camera instead of relative to the world.
+         * If set to `false`, will be relativized to [WorldRenderUtils.getViewerPos].
+         */
+        renderRelativeToCamera: Boolean = false,
+        drawVerticalBarriers: Boolean = true,
+    ) {
+        drawFilledBoundingBox(aabb, c.toColor(), alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers)
+    }
+
+    // TODO make deprecated
     fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
         aabb: AxisAlignedBB,
         c: Color,
@@ -858,16 +865,28 @@ object WorldRenderUtils {
         }
     }
 
+    // TODO add chroma color support
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         LineDrawer.draw3D(this, lineWidth, depth) {
             drawEdges(location, color)
         }
     }
 
+    // TODO add chroma color support
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
         LineDrawer.draw3D(this, lineWidth, depth) {
             drawEdges(axisAlignedBB, color)
         }
+    }
+
+    fun SkyHanniRenderWorldEvent.draw3DLine(
+        p1: LorenzVec,
+        p2: LorenzVec,
+        color: ChromaColour,
+        lineWidth: Int,
+        depth: Boolean,
+    ) {
+        draw3DLine(p1, p2, color.toColor(), lineWidth, depth)
     }
 
     fun SkyHanniRenderWorldEvent.draw3DLine(
@@ -893,6 +912,7 @@ object WorldRenderUtils {
         draw3DLine(cornerFour, cornerOne, color, lineWidth, depth)
     }
 
+    // TODO add chroma color support
     fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
         color: Color,
@@ -912,6 +932,10 @@ object WorldRenderUtils {
         for (i in 0..3) {
             this.draw3DLine(cornersBottom[i], cornersTop[i], color, lineWidth, depth)
         }
+    }
+
+    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
+        drawLineToEye(location, color.toColor(), lineWidth, depth)
     }
 
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
