@@ -84,6 +84,14 @@ class NeuInternalName private constructor(private val internalName: String) {
 
     fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
 
+    private val categoryCache = mutableMapOf<NeuInternalName, ItemCategory?>()
+
+    fun getItemCategoryOrNull(): ItemCategory? {
+        return categoryCache.getOrPut(this) {
+            getItemStackOrNull()?.getItemCategoryOrNull()
+        }
+    }
+
     /**
      * This is because skyblock has special ids in commands such as /viewrecipe for items like enchanted books and pets
      */

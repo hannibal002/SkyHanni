@@ -59,11 +59,9 @@ object CrystalNucleusTracker {
         { it.mining.crystalNucleusTracker },
     ) { drawDisplay(it) }
 
-    class Data : ItemTrackerData() {
-        override fun resetItems() {
-            runsCompleted = 0L
-        }
-
+    data class Data(
+        @Expose var runsCompleted: Long = 0L
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / runsCompleted
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -76,9 +74,6 @@ object CrystalNucleusTracker {
         // No direct coin drops from nuc runs
         override fun getCoinName(item: TrackedItem) = ""
         override fun getCoinDescription(item: TrackedItem) = mutableListOf<String>()
-
-        @Expose
-        var runsCompleted = 0L
     }
 
     @HandleEvent(onlyOnSkyblock = true)

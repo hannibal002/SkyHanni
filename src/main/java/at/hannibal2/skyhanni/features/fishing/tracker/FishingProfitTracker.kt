@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -65,12 +66,9 @@ object FishingProfitTracker {
         { it.fishing.fishingProfitTracker },
     ) { drawDisplay(it) }
 
-    class Data : ItemTrackerData() {
-
-        override fun resetItems() {
-            totalCatchAmount = 0
-        }
-
+    data class Data(
+        @Expose var totalCatchAmount: Long = 0L
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / totalCatchAmount
             val catchRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -91,16 +89,10 @@ object FishingProfitTracker {
         }
 
         override fun getCustomPricePer(internalName: NeuInternalName): Double {
-            // TODO find better way to tell if the item is a trophy
-            val neuInternalNames = itemCategories["Trophy Fish"].orEmpty()
-
-            return if (internalName in neuInternalNames) {
+            return if (internalName.getItemCategoryOrNull() == ItemCategory.TROPHY_FISH){
                 SkyHanniTracker.getPricePer(MAGMA_FISH) * FishingApi.getFilletPerTrophy(internalName)
             } else super.getCustomPricePer(internalName)
         }
-
-        @Expose
-        var totalCatchAmount = 0L
     }
 
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained

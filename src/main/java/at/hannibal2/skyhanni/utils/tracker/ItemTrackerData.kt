@@ -7,9 +7,6 @@ import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData : Resettable {
 
-    @Deprecated("Make data class extend Resettable instead")
-    abstract fun resetItems()
-
     abstract fun getDescription(timesGained: Long): List<String>
 
     abstract fun getCoinName(item: TrackedItem): String
@@ -19,7 +16,7 @@ abstract class ItemTrackerData : Resettable {
 
     open fun getCustomPricePer(internalName: NeuInternalName) = SkyHanniTracker.getPricePer(internalName)
 
-    final override fun reset() {
+    override fun reset() {
         super.reset()
         items.clear()
     }
