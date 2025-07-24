@@ -24,7 +24,7 @@ class ResettableTest {
         var nullInt: Int? = null,
         @Transient var transientString: String = "transient",
         val defaultBool: Boolean = false,
-    ) : Resettable() {
+    ) : Resettable {
         val list: MutableList<String> = mutableListOf()
         private val privateList: MutableList<String> = mutableListOf("privateListItem")
         val map: MutableMap<String, Int> = mutableMapOf()

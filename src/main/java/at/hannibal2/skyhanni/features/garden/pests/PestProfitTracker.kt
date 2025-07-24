@@ -87,7 +87,11 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
 
-    class BucketData : BucketedItemTrackerData<PestType>(PestType::class) {
+    data class BucketData(
+        @Expose private var totalPestsKills: Long = 0L,
+        @Expose var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java),
+        @Expose var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java),
+    ) : BucketedItemTrackerData<PestType>(PestType::class) {
         override fun resetItems() {
             @Suppress("DEPRECATION")
             totalPestsKills = 0L
@@ -124,16 +128,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         fun getTotalPestCount(): Long =
             if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
             else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
-
-        @Expose
-        @Deprecated("Use pestKills instead")
-        var totalPestsKills = 0L
-
-        @Expose
-        var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java)
-
-        @Expose
-        var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java)
     }
 
     private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }

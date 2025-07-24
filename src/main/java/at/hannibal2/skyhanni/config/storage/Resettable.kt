@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.lang.reflect.Modifier
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
@@ -21,11 +22,18 @@ import kotlin.reflect.jvm.jvmErasure
  *  - mutable maps/collections will be cleared
  *  Params can be "ignored" from the reset by annotating them with [Transient] or [NoReset].
  */
-abstract class Resettable {
-    private val classSimpleName by lazy { this::class.simpleName ?: "UnknownClass" }
-    private val props = run {
+interface Resettable {
+    companion object {
+        private val propCache: MutableMap<KClass<*>, List<KProperty1<out Resettable, *>>> = mutableMapOf()
+        private val nameCache: MutableMap<KClass<*>, String> = mutableMapOf()
+    }
+
+    private val classSimpleName get() = nameCache.getOrPut(this::class) {
+        this::class.simpleName ?: this::class.qualifiedName ?: "UnknownClass"
+    }
+    private val props: List<KProperty1<out Resettable, *>> get() = propCache.getOrPut(this::class) {
         val vars = this::class.memberProperties.filterIsInstance<KMutableProperty1<out Resettable, Any?>>()
-        val others = listOf(
+        val others: List<KProperty1<out Resettable, *>> = listOf(
             MutableCollection::class,
             MutableMap::class,
             MutableIterator::class,
@@ -45,7 +53,7 @@ abstract class Resettable {
         }
     }
 
-    open fun reset() {
+    fun reset() {
         val defaults = this::class.createInstance()
         props.forEach { prop ->
             tryResetProp(prop, defaults)
