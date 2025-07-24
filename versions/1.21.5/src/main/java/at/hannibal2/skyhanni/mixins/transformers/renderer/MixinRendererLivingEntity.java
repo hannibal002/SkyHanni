@@ -70,7 +70,8 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
 
     @Inject(method = "getRenderLayer", at = @At("HEAD"), cancellable = true)
     public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderLayer> cir) {
-        if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity) {
+        if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+            if (EntityOpacityManager.getEntityOpacity(livingEntity) == null) return;
             cir.setReturnValue(RenderLayer.getItemEntityTranslucentCull(this.getTexture(state)));
         }
     }

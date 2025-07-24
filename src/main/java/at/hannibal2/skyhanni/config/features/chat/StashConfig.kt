@@ -65,4 +65,9 @@ class StashConfig {
     @ConfigOption(name = "Disable Empty Warnings", desc = "Disable first-time warnings for empty messages left behind.")
     @ConfigEditorBoolean
     var disableEmptyWarnings: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Tab Complete Stash Command", desc = "Adds tab completion to the /viewstash commands.")
+    @ConfigEditorBoolean
+    var tabCompleteStashCommand: Boolean = true
 }
