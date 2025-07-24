@@ -52,10 +52,6 @@ data class SkyBlockTime(
         private const val SKYBLOCK_MINUTE_MILLIS = SKYBLOCK_HOUR_MILLIS / 60
         private const val SKYBLOCK_SECOND_MILLIS = SKYBLOCK_MINUTE_MILLIS / 60
 
-        @Deprecated("Use fromTimeMark() instead")
-        fun fromInstant(instant: Instant): SkyBlockTime =
-            calculateSkyBlockTime(instant.toEpochMilli() - SKYBLOCK_EPOCH_START_MILLIS)
-
         fun fromTimeMark(timeMark: SimpleTimeMark): SkyBlockTime =
             calculateSkyBlockTime(timeMark.toMillis() - SKYBLOCK_EPOCH_START_MILLIS)
 
