@@ -22,7 +22,6 @@ class PowderChestTimerConfig {
     @Expose
     @ConfigOption(name = "Only When Max Great Explorer", desc = "Only enable the feature when your Great Explorer is maxed.")
     @ConfigEditorBoolean
-    @FeatureToggle
     var onlyMaxGreatExplorer: Boolean = false
 
     @Expose
