@@ -427,32 +427,20 @@ object MoongladeBeacon {
         private var recentTicks: MutableList<Int> = mutableListOf()
         private var currentRefSlot: Int = BeaconSlotRange.MATCH.range.first
 
-        fun getLowestVariance(): Pair<BeaconPieceTarget, Duration>? = nextPitchPair.asMap.map { (target, mark) ->
+        fun getLowestVariance(): Pair<BeaconPieceTarget, Duration>? = nextPitchPair.asMap.mapNotNull { (target, mark) ->
+            if (target == BeaconPieceTarget.OURS && paused) return@mapNotNull null
             val duration = mark?.absoluteDifference(SimpleTimeMark.now()) ?: Duration.INFINITE
             target to duration
         }.minByOrNull { it.second.inWholeMilliseconds }
 
         fun handlePitch(pitch: BeaconPitch, target: BeaconPieceTarget) {
-            recordPitch(pitch, forReference = target == BeaconPieceTarget.REFERENCE)
-            pitchPair[BeaconPieceTarget.REFERENCE] = getAveragePitch(forReference = true) ?: pitchPair[BeaconPieceTarget.REFERENCE]
-            pitchPair[BeaconPieceTarget.OURS] = getAveragePitch(forReference = false) ?: pitchPair[BeaconPieceTarget.OURS]
-            nextPitchPair[target] = null
-        }
-
-        private fun recordPitch(pitch: BeaconPitch, forReference: Boolean) {
-            val targetBuf = if (forReference) bufferPair.reference else {
-                bufferPair.ours.takeIf { !paused } ?: return
-            }
-            val buf = targetBuf ?: return
-            if (buf.size >= 20) buf.removeAt(0)
-            buf.add(pitch)
-            if (buf.distinct().size > 3) buf.clear()
-        }
-
-        private fun getAveragePitch(forReference: Boolean): BeaconPitch? {
-            val targetBuf = if (forReference) bufferPair.reference else bufferPair.ours
-            val buf = targetBuf?.takeIf { it.size >= 3 }
-            return buf?.groupingBy { it }?.eachCount()?.maxByOrNull { it.value }?.key
+            if (target == BeaconPieceTarget.OURS && paused) return
+            val buffer = bufferPair[target] ?: return
+            if (buffer.size >= 20) buffer.removeAt(0)
+            buffer.add(pitch)
+            if (buffer.distinct().size > 3) buffer.clear()
+            if (buffer.size < 3) return
+            pitchPair[target] = buffer.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
         }
 
         fun allCorrect(): Boolean {
