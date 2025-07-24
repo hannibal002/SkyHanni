@@ -73,7 +73,7 @@ object ShowFishingItemName {
 
     private fun inCorrectArea(): Boolean {
         if (IslandType.HUB.isCurrent()) {
-            IslandAreas.currentAreaName.let {
+            SkyBlockUtils.graphArea?.let {
                 if (it.endsWith(" Atrium") || it.endsWith(" Museum")) return false
                 if (it == "Fashion Shop" || it == "Shen's Auction") return false
             }

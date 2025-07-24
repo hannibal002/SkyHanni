@@ -47,9 +47,6 @@ object IslandAreas {
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
 
-    @Deprecated("moved", ReplaceWith("SkyBlockUtils.graphArea"))
-    val currentAreaName get() = currentArea
-
     var currentArea = ""
     private val textInput = SearchTextInput()
 
