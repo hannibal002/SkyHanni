@@ -99,7 +99,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
-    private var downloadFailed: Boolean = false
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
@@ -169,7 +168,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         SkyHanniMod.launchIOCoroutine {
-            fetchAndUnpackRepo(command = true, forceReset = forceReset)
+            if (!fetchAndUnpackRepo(command = true, forceReset = forceReset).canContinue) {
+                logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
+                return@launchIOCoroutine
+            }
             reloadRepository("$commonName Repo updated successfully.")
             if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launchIOCoroutine
             val informed = logger.logErrorStateWithData(
@@ -202,19 +204,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun initRepo() {
         shouldManuallyReload = true
         SkyHanniMod.launchIOCoroutine {
-            if (config.repoAutoUpdate) {
-                fetchAndUnpackRepo(command = false)
-                if (downloadFailed) switchToBackupRepo()
+            if (config.repoAutoUpdate && !fetchAndUnpackRepo(command = false).canContinue) {
+                logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
+                return@launchIOCoroutine
             }
             reloadRepository()
         }
     }
 
     // Code taken + adapted from NotEnoughUpdates
-    private fun switchToBackupRepo() {
+    private fun switchToBackupRepo(): FetchUnpackResult {
         if (backupRepoResourcePath == null) {
             logger.warn("No backup repo resource path provided, cannot switch to backup repo.")
-            return
+            return FetchUnpackResult.FAILED
         }
 
         isUsingBackup = true
@@ -233,9 +235,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
             commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
             logger.debug("Successfully switched to backup repo")
+            return FetchUnpackResult.SWITCHED_TO_BACKUP
         } catch (e: Error) {
-            logger.logErrorWithData(e, "Failed to switch to backup repo")
+            logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
         }
+        return FetchUnpackResult.FAILED
     }
 
     open fun reportExtraStatusInfo(): Unit = Unit
@@ -284,26 +288,40 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         TextHelper.multiline(text).send()
     }
 
+    enum class FetchUnpackResult(val canContinue: Boolean = true) {
+        SUCCESS,
+        SWITCHED_TO_BACKUP,
+        FAILED(false),
+    }
+
     /**
      * Determines the latest commit on the GitHub repo and compares it to the current commit.
      * If out of date, will download the latest commit zip file and unpack it into the repo directory.
+     * Will automatically switch to the backup repo if the download fails or the unpacking fails,
+     * unless `switchToBackupOnFail` is false.
      *
      * @param command If true, will report the status of the repo to the user.
      * @param silentError If true, will not log errors to the console.
+     * @param forceReset If true, will always download the latest commit zip file, even if the repo is up to date.
+     * @param switchToBackupOnFail If true, will switch to the backup repo if the download or unpacking fails.
+     * @return FetchUnpackResult.SUCCESS if the repo was successfully fetched and unpacked,
+     *         FetchUnpackResult.SWITCHED_TO_BACKUP if the backup repo was used,
+     *         FetchUnpackResult.FAILED if the repo could not be fetched or unpacked and no backup repo is available.
      */
     private suspend fun fetchAndUnpackRepo(
         command: Boolean,
         silentError: Boolean = true,
         forceReset: Boolean = false,
-    ) = repoMutex.withLock {
+        switchToBackupOnFail: Boolean = true,
+    ): FetchUnpackResult = repoMutex.withLock {
         localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
-        val (currentSha, currentCommitTime) = localRepoCommit
 
-        val (latestSha, latestCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
-            response.sha to response.commit.committer.date
-        } ?: ((null to null).also { downloadFailed = true })
+        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: run {
+            return if (switchToBackupOnFail) switchToBackupRepo()
+            else FetchUnpackResult.FAILED
+        }
 
-        val diffCheck = RepoComparison(currentSha, currentCommitTime, latestSha, latestCommitTime)
+        val diffCheck = RepoComparison(localRepoCommit, latestRepoCommit)
         val outdated = !diffCheck.hashesMatch
 
         if (!outdated && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
@@ -311,26 +329,27 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 diffCheck.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
-            return
+            return FetchUnpackResult.SUCCESS
         } else if ((command && outdated) || forceReset) diffCheck.reportRepoOutdated()
 
         prepCleanRepoFileSystem()
 
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
-            downloadFailed = true
-            logger.logError("Failed to download the repo zip file from GitHub.")
+            logger.logNonDestructiveError("Failed to download the repo zip file from GitHub.")
+            return if (switchToBackupOnFail) switchToBackupRepo()
+            else FetchUnpackResult.FAILED
         }
 
         // Actually unpack the repo zip file into our local 'file system'
         if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
-            downloadFailed = true
-            logger.logError("Failed to unpack the downloaded zip file.")
-        } else {
-            localRepoCommit = RepoCommit(latestSha, latestCommitTime)
-            commitStorage.writeToFile(localRepoCommit)
-            downloadFailed = false
-            isUsingBackup = false
+            logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
+            return if (switchToBackupOnFail) switchToBackupRepo()
+            else FetchUnpackResult.FAILED
         }
+
+        commitStorage.writeToFile(latestRepoCommit)
+        isUsingBackup = false
+        return FetchUnpackResult.SUCCESS
     }
 
     private fun prepCleanRepoFileSystem() {

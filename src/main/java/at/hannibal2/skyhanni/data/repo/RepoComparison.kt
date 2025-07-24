@@ -10,6 +10,16 @@ data class RepoComparison(
     val latestSha: String?,
     val latestCommitTime: SimpleTimeMark?,
 ) {
+    constructor(
+        localCommit: RepoCommit?,
+        latestCommit: RepoCommit?,
+    ) : this(
+        localSha = localCommit?.sha,
+        localCommitTime = localCommit?.time,
+        latestSha = latestCommit?.sha,
+        latestCommitTime = latestCommit?.time,
+    )
+
     val hashesMatch = localSha == latestSha
 
     fun reportRepoUpToDate() = ChatUtils.clickToClipboard(
