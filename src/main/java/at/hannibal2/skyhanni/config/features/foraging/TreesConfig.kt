@@ -30,4 +30,17 @@ class TreesConfig {
     @FeatureToggle
     var compactSweepDetails = true
 
+    @Expose
+    @ConfigOption(name = "Mute Tree Breaking", desc = "Mutes the sound of the tree fully breaking.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var muteBreaking = true
+
+    @Expose
+    @ConfigOption(name = "Also on Galatea", desc = "Also mutes tree breaking sounds on Galatea.")
+    @ConfigEditorBoolean
+    @OnlyModern
+    var muteBreakingOnGalatea = false
+
 }

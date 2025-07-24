@@ -87,6 +87,8 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
 
     abstract fun E.isBucketSelectable(): Boolean
 
+    abstract fun bucketName(): String
+
     private val buckets: Array<E> = clazz.java.enumConstants
     val selectableBuckets: List<E> = buckets.filter { it.isBucketSelectable() }
 

@@ -62,6 +62,10 @@ object DragonProfitTracker {
             )
         }
 
+        override fun bucketName(): String {
+            return "Dragon"
+        }
+
         fun getTotalDragonCount(): Long {
             return if (selectedBucket == null || selectedBucket !in DragonType.values()) {
                 dragonKills.values.sum()

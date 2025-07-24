@@ -2,39 +2,50 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
+import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.garden.sensitivity.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenPlotApi {
 
     private val patternGroup = RepoPattern.group("garden.plot")
+    private val config get() = PestApi.config.spray
 
     /**
      * REGEX-TEST: §aPlot §7- §b4
      */
     private val plotNamePattern by patternGroup.pattern(
         "name",
-        "§.Plot §7- §b(?<name>.*)"
+        "§.Plot §7- §b(?<name>.*)",
     )
 
     /**
@@ -42,7 +53,7 @@ object GardenPlotApi {
      */
     private val barnNamePattern by patternGroup.pattern(
         "barnname",
-        "§.(?<name>The Barn)"
+        "§.(?<name>The Barn)",
     )
 
     /**
@@ -50,7 +61,7 @@ object GardenPlotApi {
      */
     private val uncleanedPlotPattern by patternGroup.pattern(
         "uncleaned",
-        "§7Cleanup: .* (?:§.)*Completed"
+        "§7Cleanup: .* (?:§.)*Completed",
     )
 
     /**
@@ -58,7 +69,7 @@ object GardenPlotApi {
      */
     private val unlockPlotChatPattern by patternGroup.pattern(
         "chat.unlock",
-        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
+        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!",
     )
 
     /**
@@ -66,11 +77,15 @@ object GardenPlotApi {
      */
     private val cleanPlotChatPattern by patternGroup.pattern(
         "chat.clean",
-        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!"
+        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!",
     )
+
+    /**
+     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b6 §r§7with §r§aCompost§r§7!
+     */
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
-        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
+        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!",
     )
 
     /**
@@ -79,9 +94,20 @@ object GardenPlotApi {
      */
     private val portableWasherPattern by patternGroup.pattern(
         "spray.cleared.portablewasher",
-        "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
+        "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!",
     )
 
+    /**
+     * REGEX-TEST: Spray: §r§7None
+     * REGEX-TEST: Spray: §r§aCompost §r§7(12m)
+     * REGEX-TEST: Spray: §r§aCompost §r§7(1m 3s)
+     * REGEX-TEST: Spray: §r§aCompost §r§7(53s)
+     * REGEX-TEST: Spray: §r§aHoney Jar §r§7(53s)
+     */
+    private val plotSprayedTablistPattern by patternGroup.pattern(
+        "tablist.spray",
+        "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?",
+    )
     var plots = listOf<Plot>()
 
     fun getCurrentPlot(): Plot? {
@@ -89,6 +115,19 @@ object GardenPlotApi {
     }
 
     class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+
+    private var currentPlot: Plot? = null
+
+    fun checkCurrentPlot() {
+        if (getCurrentPlot() != currentPlot) {
+            currentPlot = getCurrentPlot()
+            updateCurrentPlot()
+        }
+    }
+
+    private fun updateCurrentPlot() {
+        PlotChangeEvent(currentPlot).post()
+    }
 
     class PlotData(
         @Expose
@@ -210,6 +249,26 @@ object GardenPlotApi {
         }
     }
 
+    private fun sendSprayMessage(plot: String, spray: String, time: String) {
+        ChatUtils.chat("§r§aPlot §r§7- §r§b$plot §r§7was sprayed with §r§a$spray§r§7!§r")
+        ChatUtils.chat("§r§7This will expire in §r§a$time§r§7!§r")
+    }
+
+    private fun isSprayAccurate(
+        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType,
+    ): Boolean {
+        return sprayExpiryTime >= expectedExpireTime + 6.seconds ||
+            sprayExpiryTime <= expectedExpireTime - 1.minutes ||
+            currentSpray != newSpray
+    }
+
+    private fun sprayMessageEligible(
+        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType,
+    ): Boolean {
+        return (sprayExpiryTime <= expectedExpireTime - 10.minutes || currentSpray != newSpray) &&
+            (config.newSprayNotification && sprayExpiryTime >= SimpleTimeMark.now() + 1.minutes)
+    }
+
     fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
@@ -307,6 +366,74 @@ object GardenPlotApi {
                 uncleanedPlotPattern.matchMatcher(line) {
                     plot.uncleared = true
                 }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PESTS)) return
+        val plot = getCurrentPlot() ?: return
+        if (plot.isBarn()) return
+
+        plotSprayedTablistPattern.firstMatcher(event.lines.map { it.trim() }) {
+
+            val sprayName = group("spray").trim()
+            val minutes = group("minutes")?.toInt() ?: 0
+            val seconds = group("seconds")?.toInt() ?: 0
+
+            val time = if (seconds == 0) (minutes + 1).minutes
+            else minutes.minutes + seconds.seconds
+
+            val timeString = when {
+                minutes != 0 && seconds != 0 -> "${minutes}m ${seconds}s"
+                minutes != 0 -> "${minutes + 1}m"
+                else -> "${seconds}s"
+            }
+
+            val newSpray: SprayType? = SprayType.getByNameOrNull(sprayName)
+
+            if (plot.currentSpray != null) {
+                val expectedExpireTime = SimpleTimeMark.now() + time
+                val data = plot.getData() ?: return
+
+                val sprayExpiryTime = data.sprayExpiryTime ?: return
+                val currentSpray = data.sprayType ?: return
+
+                if (newSpray == null) {
+                    plot.removeSpray()
+                    return
+                } else {
+                    if (isSprayAccurate(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
+                        if (sprayMessageEligible(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
+                            sendSprayMessage(plot.name, sprayName, timeString)
+                        }
+                        plot.setSpray(newSpray, time)
+                    }
+                }
+            } else {
+                if (newSpray == null) return
+                if (config.newSprayNotification) {
+                    sendSprayMessage(plot.name, sprayName, timeString)
+                }
+                plot.setSpray(newSpray, time)
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onPlotChange(event: PlotChangeEvent) {
+        ChatUtils.debug("Current Plot: " + event.plot?.name)
+        DelayedRun.runDelayed(3.seconds) {
+            TabWidget.forceUpdateWidget(TabWidget.PESTS)
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (event.isLocalPlayer) {
+            DelayedRun.runDelayed(.5.seconds) {
+                checkCurrentPlot()
             }
         }
     }

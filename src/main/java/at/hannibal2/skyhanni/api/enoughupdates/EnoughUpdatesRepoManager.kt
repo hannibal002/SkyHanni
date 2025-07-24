@@ -19,7 +19,7 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
 
     override val reloadCommand: String = "neureloadrepo"
     override val statusCommand: String = "neurepostatus"
-    override val updateCommand: String = "neuupdaterepo"
+    override val updateCommand: String = "neuresetrepo"
 
     override val shouldRegisterReloadCommand: Boolean = !PlatformUtils.isNeuLoaded()
     override val shouldRegisterUpdateCommand: Boolean = !PlatformUtils.isNeuLoaded()

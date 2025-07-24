@@ -12,8 +12,10 @@ object ColorUtils {
     fun Color.toChromaColor(alpha: Int = this.alpha, chromaSpeedMillis: Int = 0): ChromaColour =
         ChromaColour.fromRGB(red, green, blue, chromaSpeedMillis, alpha)
 
+    // TODO use this function only in utils classes
     fun ChromaColour.toColor(): Color = getEffectiveColour()
 
+    // TODO use this function only in utils classes
     fun ChromaColour.toInt() = this.getEffectiveColour().rgb
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
@@ -55,6 +57,7 @@ object ColorUtils {
 
     val TRANSPARENT_COLOR = Color(0, 0, 0, 0)
 
+    // TODO make this function unnecessary, replace with chroma color
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 
     fun getColorFromHex(hex: String): Int = runCatching { Color(Integer.decode(hex)) }.getOrNull()?.rgb ?: 0
