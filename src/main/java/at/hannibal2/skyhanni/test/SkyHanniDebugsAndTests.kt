@@ -115,9 +115,6 @@ object SkyHanniDebugsAndTests {
             return result
         }
 
-    @Deprecated(message = "use SkyBlockUtils", ReplaceWith("SkyBlockUtils.debug"))
-    val enabled get() = SkyBlockUtils.debug
-
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
