@@ -66,6 +66,10 @@ object CorpseTracker {
 
         override fun CorpseType.isBucketSelectable() = true
 
+        override fun bucketName(): String {
+            return "Corpse"
+        }
+
         @Expose
         var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
 

@@ -70,7 +70,8 @@ object PatcherSendCoordinates {
             val distance = location.distanceToPlayer()
             val formattedDistance = distance.toInt().addSeparators()
 
-            event.drawColor(location, LorenzColor.DARK_GREEN, alpha = 1f)
+            // TODO add chroma color support via config
+            event.drawColor(location, LorenzColor.DARK_GREEN.toChromaColor(), alpha = 1f)
             event.drawWaypointFilled(location, config.color.toColor(), seeThroughBlocks = true, beacon = true)
             event.drawString(location.blockCenter(), beacon.name + " §e[${formattedDistance}m]", true, LorenzColor.DARK_BLUE.toColor())
         }

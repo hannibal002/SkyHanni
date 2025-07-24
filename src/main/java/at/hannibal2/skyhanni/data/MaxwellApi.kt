@@ -252,7 +252,6 @@ object MaxwellApi {
                 "Unknown power: $displayName",
                 "displayName" to displayName,
                 "lore" to selectedPowerStack.getLore(),
-                noStackTrace = true,
             )
             return
         }
@@ -317,11 +316,11 @@ object MaxwellApi {
                 val power = group("power")
                 currentPower = getPowerByNameOrNull(power)
                     ?: return@matchMatcher ErrorManager.logErrorWithData(
-                        UnknownMaxwellPower("Unknown power: ${stack.displayName}"),
-                        "Unknown power: ${stack.displayName}",
+                        UnknownMaxwellPower("Unknown power: $power"),
+                        "Unknown power: $power",
+                        "line" to line,
                         "displayName" to stack.displayName,
                         "lore" to stack.getLore(),
-                        noStackTrace = true,
                     )
             }
         }

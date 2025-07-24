@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -58,7 +57,7 @@ object GeyserFishing {
         if (geyser.distanceToPlayerIgnoreY() > 96) return
         if (config.onlyWithRod && !FishingApi.holdingLavaRod) return
 
-        val color = config.boxColor.toColor()
+        val color = config.boxColor
         event.drawFilledBoundingBox(geyserBox, color)
     }
 

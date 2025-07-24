@@ -69,7 +69,7 @@ object NucleusBarriersBox {
                 BoundingBoxType.FILLED -> {
                     event.drawFilledBoundingBox(
                         crystal.boundingBox,
-                        crystal.configColorOption.get().toColor(),
+                        crystal.configColorOption.get(),
                     )
                 }
 

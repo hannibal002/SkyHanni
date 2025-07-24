@@ -136,6 +136,11 @@ class DamageIndicatorConfig {
     var showBactePhase: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Spider Slayer", desc = "")
+    @Accordion
+    val spiderSlayer: SpiderSlayerConfig = SpiderSlayerConfig()
+
+    @Expose
     @ConfigOption(name = "Ender Slayer", desc = "")
     @Accordion
     val enderSlayer: EnderSlayerConfig = EnderSlayerConfig()

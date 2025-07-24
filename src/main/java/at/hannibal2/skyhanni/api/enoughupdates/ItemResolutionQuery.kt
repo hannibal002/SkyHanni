@@ -186,13 +186,9 @@ class ItemResolutionQuery {
     }
 
     fun resolveInternalName(): NeuInternalName? {
-        knownInternalName?.let {
-            return it
-        }
-        var resolvedName = resolveFromSkyblock()
-        resolvedName = if (resolvedName == null) {
-            resolveContextualName()
-        } else when (resolvedName.asString().intern()) {
+        knownInternalName?.let { return it }
+        val resolvedName = resolveFromSkyblock() ?: return resolveContextualName()
+        return when (resolvedName.asString()) {
             "PET" -> resolvePetName()
             "RUNE", "UNIQUE_RUNE" -> resolveRuneName()
             "ENCHANTED_BOOK" -> resolveEnchantedBookNameFromNBT()
@@ -204,8 +200,6 @@ class ItemResolutionQuery {
             "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
             else -> resolvedName
         }
-
-        return resolvedName
     }
 
     private fun resolvePetName(): NeuInternalName? {
