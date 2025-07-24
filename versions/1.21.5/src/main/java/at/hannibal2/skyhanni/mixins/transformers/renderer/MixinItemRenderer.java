@@ -27,7 +27,8 @@ public class MixinItemRenderer {
 
     @ModifyArg(method = "renderItem(Lnet/minecraft/item/ItemDisplayContext;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II[ILjava/util/List;Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/item/ItemRenderState$Glint;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;getItemGlintConsumer(Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/RenderLayer;ZZ)Lnet/minecraft/client/render/VertexConsumer;"), index = 1)
     private static RenderLayer modifyRenderLayer(RenderLayer layer) {
-        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity) {
+        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+            if (EntityOpacityManager.getEntityOpacity(livingEntity) == null) return layer;
             return TexturedRenderLayers.getItemEntityTranslucentCull();
         }
         return layer;
