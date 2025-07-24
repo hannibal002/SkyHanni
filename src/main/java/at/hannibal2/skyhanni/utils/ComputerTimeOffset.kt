@@ -76,7 +76,8 @@ object ComputerTimeOffset {
                 ChatUtils.chat("Computer Time Offset calculation took longer than normal. Checking less often now.")
             }
             return
-        }
+        } else timeCheckMutex.unlock() // Immediate release, we only want to check if it's already running
+
         val wasOffsetBefore = (offsetDuration?.absoluteValue ?: 0.seconds) > 5.seconds
         SkyHanniMod.launchIOCoroutineWithMutex(timeCheckMutex) {
             offsetDuration = getNtpOffset(devConfig.ntpServer)
