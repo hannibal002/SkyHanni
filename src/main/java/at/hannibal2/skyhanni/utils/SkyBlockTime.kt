@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import java.time.Instant
 import kotlin.time.Duration
 
 /**
