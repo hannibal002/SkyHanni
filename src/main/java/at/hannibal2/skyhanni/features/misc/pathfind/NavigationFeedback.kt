@@ -58,7 +58,7 @@ object NavigationFeedback {
     }
 
     private fun sendGuiFeedback(component: ChatComponentText): Boolean {
-        val guiFormattedText = component.formattedText.removePrefix("§e[SkyHanni] ")
+        val guiFormattedText = component.formattedText.replace("§e[SkyHanni] ", "§e")
         guiRenderable = Renderable.clickable(
             Renderable.text(guiFormattedText),
             onLeftClick = IslandGraphs::cancelClick,

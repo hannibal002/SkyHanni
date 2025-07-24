@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onDisable
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -111,11 +112,12 @@ object BeachBallCatchHelper {
         val distance = location.distance(player)
         drawFilledBoundingBox(
             location.getAABB(predictor.variant),
+            // TODO add chroma color support via config
             when {
                 distance < 0.3 -> Color.GREEN
                 distance < 0.9 -> Color.ORANGE
                 else -> Color.RED
-            },
+            }.toChromaColor(),
         )
     }
 

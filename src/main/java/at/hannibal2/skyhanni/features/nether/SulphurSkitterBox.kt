@@ -76,7 +76,7 @@ object SulphurSkitterBox {
         val location = closestSponge ?: return
         if (location.distanceToPlayer() >= 50) return
         val axis = renderBox ?: return
-        val color = config.boxColor.toColor()
+        val color = config.boxColor
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
                 event.drawFilledBoundingBox(
@@ -86,7 +86,7 @@ object SulphurSkitterBox {
             }
 
             SulphurSkitterBoxConfig.BoxType.WIREFRAME -> {
-                event.drawHitbox(axis, color)
+                event.drawHitbox(axis, color.toColor())
             }
         }
     }
