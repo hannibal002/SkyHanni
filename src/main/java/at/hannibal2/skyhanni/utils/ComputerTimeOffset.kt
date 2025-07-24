@@ -67,14 +67,12 @@ object ComputerTimeOffset {
         // probably a problem when the response somehow took longer than 1s?
         if (!timeCheckMutex.tryLock()) {
             state = state.next() ?: error("state is already TOTALLY_OFF")
-            if (state == State.TOTALLY_OFF) {
-                ErrorManager.logErrorStateWithData(
-                    "Error when checking Computer Time Offset",
-                    "trying to check again even though the previous check is still not done",
-                )
-            } else if (state == State.SLOW) {
-                ChatUtils.chat("Computer Time Offset calculation took longer than normal. Checking less often now.")
-            }
+            if (state == State.TOTALLY_OFF) ErrorManager.logErrorStateWithData(
+                "Error when checking Computer Time Offset",
+                "trying to check again even though the previous check is still not done",
+            ) else if (state == State.SLOW) ChatUtils.chat(
+                "Computer Time Offset calculation took longer than normal. Checking less often now.",
+            )
             return
         } else timeCheckMutex.unlock() // Immediate release, we only want to check if it's already running
 
