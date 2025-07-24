@@ -48,6 +48,7 @@ object IslandAreas {
     private var targetNode: GraphNode? = null
 
     var currentArea = ""
+        private set
     private val textInput = SearchTextInput()
 
     @HandleEvent
