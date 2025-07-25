@@ -353,7 +353,7 @@ object MoongladeBeacon {
     open class DataPair<T : Any>(
         open var reference: T? = null,
         open var ours: T? = null,
-    ) : Resettable() {
+    ) : Resettable {
         open operator fun set(target: BeaconPieceTarget, value: T?) = when (target) {
             BeaconPieceTarget.REFERENCE -> reference = value
             BeaconPieceTarget.OURS -> ours = value
@@ -402,7 +402,7 @@ object MoongladeBeacon {
 
     data class BeaconTuneData(
         val isEnchanted: Boolean = false,
-    ) : Resettable() {
+    ) : Resettable {
         private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
         private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
         private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
