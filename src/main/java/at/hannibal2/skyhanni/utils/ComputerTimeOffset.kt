@@ -99,7 +99,7 @@ object ComputerTimeOffset {
         NTPUDPClient().apply {
             setDefaultTimeout(10.seconds.toJavaDuration())
         }.use { client ->
-            val address  = InetAddress.getByName(ntpServer)
+            val address = InetAddress.getByName(ntpServer)
             val timeInfo = client.getTime(address)
             timeInfo.computeDetails()
             timeInfo.offset.milliseconds
