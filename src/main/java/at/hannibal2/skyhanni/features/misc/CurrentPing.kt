@@ -89,7 +89,6 @@ object CurrentPing {
                     ChatUtils.chat(getFormattedPing())
                 }
             }
-
         }
     }
 
