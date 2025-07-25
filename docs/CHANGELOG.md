@@ -35,6 +35,7 @@
 #### Commands
 
 + Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
++ Added /shping to show your ping in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/4478)
 
 #### Rift
 
@@ -103,6 +104,14 @@
 
 + Added customizable keybinds to easily repeat and confirm fusions. - Luna (https://github.com/hannibal002/SkyHanni/pull/4440)
 
+#### Slayer
+
++ Added Hide Irrelevant Mobs for Slayers. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4468)
+    + Makes mobs partially transparent so that they don't annoy while having an active slayer quest.
+    + Useful for e.g. Magma Cubes in Burning Desert for Tara Slayer.
++ Added Mark When Invincible Tara 5. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4471)
+    + Highlight the Tarantula Slayer tier 5 in a customizeable color while the hatchlings are alive.
+
 ### Improvements
 
 #### Garden
@@ -113,6 +122,8 @@
 
 + Added Spider Slayer tier 5 minibosses to Miniboss Highlight. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4458)
 + Added Tara 5 support for Damage Indicator. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4460)
++ Added Text When Invincible to Damage Indicator. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4471)
+    + Show the info that you need to kill the hatchlings during tarantula slayer tier 5 fight.
 
 #### Inventory
 
@@ -129,6 +140,7 @@
 + Beacon solver will now work with Signal Enhancer upgrade minigame as well. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4432)
 + Added option to only show Attribute Shard data for shards visible in your current inventory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4456)
 + Added option to show total coin value of items in the Item Pickup Log. - pretzoot (https://github.com/hannibal002/SkyHanni/pull/4457)
++ Added a way to reset tracked hunting box shards for the attribute shard overlay. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4477)
 
 #### Farming
 
@@ -147,6 +159,7 @@
 + Made `/shtps` automatically send the TPS after its calculating cooldown. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4412)
 + Added option to show `/shnavigate` feedback in a UI element instead of chat. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4399)
 + Separated Foraging and Hunting features in the config. - Luna (https://github.com/hannibal002/SkyHanni/pull/4437)
++ Added some more information when clock offset fails to calculate. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4439)
 
 #### Foraging
 
@@ -166,11 +179,20 @@
 #### Commands
 
 + Added /shresetkeybinds. - nopo (https://github.com/hannibal002/SkyHanni/pull/4340)
++ Added /sho setupmode to easily toggle setup mode for ordered waypoints. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4490)
++ Added tab completion to /viewstash. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4469)
++ Made SkyHanni able to tab complete a few hypixel commands on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4465)
+    + This includes warps, party commands, gfs, viewrecipe and various player related commands.
++ Made /shedittracker more clear for bucketed trackers. - nopo (https://github.com/hannibal002/SkyHanni/pull/4476)
 
 #### Chat
 
 + Added filter for Swoop's message. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4388)
 + Made copy chat work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4408)
+
+#### Mining
+
++ Added option to only show powder chest features when great explorer 20. - nopo (https://github.com/hannibal002/SkyHanni/pull/4481)
 
 ### Fixes
 
@@ -186,6 +208,7 @@
 + Fixed Agaricus Cap timer incorrectly resetting whenever you move your camera on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4384)
 + Fixed Bacte Tentacle Waypoints not updating Tentacle HP on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
 + Fixed Sun Gecko Helper's Highlight Real Boss incorrectly highlighting the clones in green if Highlight Clones is disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/4431)
++ Fixed Ubik Reminder sending every second in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4464)
 
 #### Crimson Isle
 
@@ -255,6 +278,7 @@
 #### Farming
 
 + Fixed Jacob Contests Saying they went for 55 years. - nopo (https://github.com/hannibal002/SkyHanni/pull/4383)
++ Added warty and half eaten mushrooms to /ff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4480)
 
 ### Technical Details
 
@@ -374,6 +398,19 @@
 + Changed update-repo commands to fully remove and re-download the repo. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4403)
 + Replaced all instances of `SpecialColor` with `ChromaColour`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4415)
     + Deleted SpecialColor - use ChromaColour going forward.
++ Added abstract logic for changing the opacity of entites with EntityOpacityManager. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4468)
+    + This also includes the two new events EntityOpacityActiveEvent and EntityOpacityEvent.
++ Added debug command /shdebugentityskin. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4467)
+    + Highlights armor stands in the world that hold or wear a skull with the given skin texture.
++ Also show the graph area in the debug gui in f3. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4489)
++ Cleaned up more around time offset. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4439)
++ Cleaned up some code in ColeweightWaypointFormat . - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4463)
++ Decluttered code by using chroma color in more render functions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4472)
++ Made opacity stuff work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4470)
++ Ported all item rendering functionality to 1.21.7. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4454)
++ Removed an unnecessary `.intern()` call in ItemResolutionQuery that may lead to a performance hit. - Luna (https://github.com/hannibal002/SkyHanni/pull/4474)
++ Switched /shcarrolyn and /shtrackcollection to use brigadier commands. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4469)
++ Use native ping method instead of Hypixel Mod API on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4488)
 
 ## Version 4.0.0
 
