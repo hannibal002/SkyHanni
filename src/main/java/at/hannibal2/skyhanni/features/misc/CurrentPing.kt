@@ -30,7 +30,8 @@ object CurrentPing {
         get() = previousPings.takeIf { it.isNotEmpty() }?.average()?.milliseconds ?: Duration.ZERO
 
     //#if MC < 1.21
-    val previousPings = mutableListOf<Long>()
+    private val _previousPings = mutableListOf<Long>()
+    val previousPings: List<Long> = _previousPings
 
     private var lastPingTime = SimpleTimeMark.farPast()
     private var waitingForPacket = false
@@ -40,10 +41,10 @@ object CurrentPing {
         if (!isEnabled()) return
         waitingForPacket = false
 
-        if (previousPings.size > 5) {
-            previousPings.subList(0, previousPings.size - 5).clear()
+        if (_previousPings.size > 5) {
+            _previousPings.subList(0, _previousPings.size - 5).clear()
         }
-        previousPings.add(lastPingTime.passedSince().inWholeMilliseconds)
+        _previousPings.add(lastPingTime.passedSince().inWholeMilliseconds)
     }
 
     @HandleEvent
