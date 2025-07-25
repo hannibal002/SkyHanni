@@ -280,6 +280,11 @@ object MoongladeBeacon {
         if (!colorMinigameInventory.isInside() || event.soundName != "note.bassattack") return
         val pitch = BeaconPitch.getByPitch(event.pitch) ?: return
 
+        if (upgradingStrength) pitch.handleMultipleSet()
+        else normalTuning.handlePitch(pitch, singleSet = true)
+    }
+
+    private fun BeaconPitch.handleMultipleSet() {
         val varianceSets = listOfNotNull(normalTuning, enchantedTuning.takeIf { upgradingStrength }).mapNotNull { set ->
             set.getLowestVariance()?.let { (target, duration) -> Triple(set, target, duration) }
         }
@@ -288,7 +293,7 @@ object MoongladeBeacon {
             it.third.inWholeMilliseconds
         } ?: return
 
-        bestSet.handlePitch(pitch, target)
+        bestSet.handlePitch(this, target)
     }
 
     init {
@@ -433,14 +438,19 @@ object MoongladeBeacon {
             target to duration
         }.minByOrNull { it.second.inWholeMilliseconds }
 
-        fun handlePitch(pitch: BeaconPitch, target: BeaconPieceTarget) {
-            if (target == BeaconPieceTarget.OURS && paused) return
-            val buffer = bufferPair[target] ?: return
+        fun handlePitch(pitch: BeaconPitch, target: BeaconPieceTarget? = null, singleSet: Boolean = false) {
+            val trueTarget = target ?: getLowestVariance()?.first ?: if (paused) BeaconPieceTarget.REFERENCE else BeaconPieceTarget.OURS
+            if (trueTarget == BeaconPieceTarget.OURS && paused) return
+            else if (singleSet && pitch != pitchPair[BeaconPieceTarget.OURS]) {
+                pitchPair[BeaconPieceTarget.REFERENCE] = pitch
+                return
+            }
+            val buffer = bufferPair[trueTarget] ?: return
             if (buffer.size >= 20) buffer.removeAt(0)
             buffer.add(pitch)
             if (buffer.distinct().size > 3) buffer.clear()
             if (buffer.size < 3) return
-            pitchPair[target] = buffer.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+            pitchPair[trueTarget] = buffer.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
         }
 
         fun allCorrect(): Boolean {
