@@ -63,12 +63,8 @@ object CurrentPing {
 
     //#else
     //$$ val previousPings: List<Long>
-    //$$     get() = buildList {
-    //$$         MinecraftClient.getInstance().debugHud.pingLog.let {
-    //$$             for (i in 0..<it.getLength()) {
-    //$$                 add(it.get(i))
-    //$$             }
-    //$$         }
+    //$$     get() = MinecraftClient.getInstance().debugHud.pingLog.let {
+    //$$         List(it.length) { i -> it[i] }
     //$$     }
     //#endif
 
