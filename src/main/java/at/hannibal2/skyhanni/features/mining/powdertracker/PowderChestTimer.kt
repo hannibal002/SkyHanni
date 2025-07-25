@@ -207,5 +207,5 @@ object PowderChestTimer {
 
     private fun IBlockState.isChest() = block is BlockChest
 
-    private fun isEnabled() = config.enabled && (!config.onlyMaxGreatExplorer || HotmData.GREAT_EXPLORER.activeLevel >= 20)
+    private fun isEnabled() = config.enabled && (!config.onlyMaxGreatExplorer || HotmData.GREAT_EXPLORER.isMaxLevel)
 }
