@@ -213,6 +213,13 @@ object OrderedWaypoints {
                     callback { erase(getArg(name)) }
                 }
             }
+            literal("setupmode") {
+                description = "Erases the route with the specified name."
+                arg("enable", BrigadierArguments.bool()) { enableSetupMode ->
+                    callback { toggleSetupMode(getArg(enableSetupMode)) }
+                }
+                simpleCallback { toggleSetupMode(!config.setupMode) }
+            }
         }
     }
 
@@ -361,6 +368,11 @@ object OrderedWaypoints {
         }
         saveConfig()
         ChatUtils.chat("Route $name successfully deleted.")
+    }
+
+    private fun toggleSetupMode(value: Boolean) {
+        config.setupMode = value
+        ChatUtils.chat("Toggled setup mode to $value")
     }
 
     private fun decideWaypoints() {
