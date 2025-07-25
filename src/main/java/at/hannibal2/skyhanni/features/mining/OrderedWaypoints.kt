@@ -214,9 +214,9 @@ object OrderedWaypoints {
                 }
             }
             literal("setupmode") {
-                description = "Erases the route with the specified name."
-                arg("enable", BrigadierArguments.bool()) { enableSetupMode ->
-                    callback { toggleSetupMode(getArg(enableSetupMode)) }
+                description = "Toggles setup mode."
+                argCallback("enable", BrigadierArguments.bool()) { enableSetupMode ->
+                    toggleSetupMode(enableSetupMode)
                 }
                 simpleCallback { toggleSetupMode(!config.setupMode) }
             }
