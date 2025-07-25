@@ -15,6 +15,7 @@ import kotlinx.coroutines.sync.Mutex
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -35,11 +36,6 @@ object ComputerTimeOffset {
             OSUtils.isMac -> "https://support.apple.com/guide/mac-help/mchlp2996/mac"
             OSUtils.isSolaris -> "https://docs.oracle.com/cd/E53394_01/html/E54798/sysressysinfo-11048.html"
             else -> null
-        }
-    }
-    private val ntpUdpClient: NTPUDPClient by lazy {
-        NTPUDPClient().apply {
-            setDefaultTimeout(10.seconds.toJavaDuration())
         }
     }
 
@@ -100,14 +96,16 @@ object ComputerTimeOffset {
             }
             return@runCatching null
         }
-        ntpUdpClient.use { client ->
-            val address = InetAddress.getByName(ntpServer)
+        NTPUDPClient().apply {
+            setDefaultTimeout(10.seconds.toJavaDuration())
+        }.use { client ->
+            val address  = InetAddress.getByName(ntpServer)
             val timeInfo = client.getTime(address)
             timeInfo.computeDetails()
             timeInfo.offset.milliseconds
         }
     }.onFailure { e ->
-        if (e is SocketTimeoutException) {
+        if (e is SocketTimeoutException || e is UnknownHostException) {
             timeoutMap.addOrPut(ntpServer, 1)
             return@onFailure
         } else if (SkyBlockUtils.inSkyBlock && config.warnAboutPcTimeOffset) ErrorManager.logErrorWithData(
