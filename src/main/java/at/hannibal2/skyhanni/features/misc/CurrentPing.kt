@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -26,7 +27,7 @@ object CurrentPing {
     private val config get() = SkyHanniMod.feature.dev
 
     val averagePing: Duration
-        get() = previousPings.takeIf { !it.isEmpty() }?.average()?.milliseconds ?: Duration.ZERO
+        get() = previousPings.takeIf { it.isNotEmpty() }?.average()?.milliseconds ?: Duration.ZERO
 
     //#if MC < 1.21
     val previousPings = mutableListOf<Long>()
@@ -93,4 +94,9 @@ object CurrentPing {
     }
 
     fun isEnabled() = config.pingApi
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(102, "dev.hypixelPingApi", "dev.pingApi")
+    }
 }
