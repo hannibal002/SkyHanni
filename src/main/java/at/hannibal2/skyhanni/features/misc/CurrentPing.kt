@@ -17,9 +17,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 //#if MC >= 1.21
-//$$ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-//$$ import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-//$$ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 //$$ import net.minecraft.client.MinecraftClient
 //#endif
 
