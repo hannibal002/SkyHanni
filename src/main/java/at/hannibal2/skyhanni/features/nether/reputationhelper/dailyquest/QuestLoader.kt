@@ -135,6 +135,7 @@ object QuestLoader {
         return DailyQuestHelper.quests.firstOrNull { it.internalName == name }
     }
 
+    @Suppress("HandleEventInspection")
     fun checkInventory(event: InventoryFullyOpenedEvent) {
         val inMageRegion = SkyBlockUtils.graphArea == "Community Center"
         val inBarbarianRegion = SkyBlockUtils.graphArea == "Dragontail"

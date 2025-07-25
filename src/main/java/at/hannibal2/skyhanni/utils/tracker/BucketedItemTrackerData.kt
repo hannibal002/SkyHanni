@@ -7,38 +7,22 @@ import kotlin.reflect.KClass
 
 abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrackerData() {
 
-    @Deprecated(
-        "Use getDescription(bucket, timesGained) instead",
-        ReplaceWith("getDescription(bucket, timesGained)"),
-    )
-    override fun getDescription(timesGained: Long): List<String> =
+    final override fun getDescription(timesGained: Long): List<String> =
         throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
 
     abstract fun getDescription(bucket: E?, timesGained: Long): List<String>
 
-    @Deprecated(
-        "Use getCoinName(bucket, item) instead",
-        ReplaceWith("getCoinName(bucket, item)"),
-    )
-    override fun getCoinName(item: TrackedItem): String =
+    final override fun getCoinName(item: TrackedItem): String =
         throw UnsupportedOperationException("Use getCoinName(bucket, item) instead")
 
     abstract fun getCoinName(bucket: E?, item: TrackedItem): String
 
-    @Deprecated(
-        "Use getCoinDescription(bucket, item) instead",
-        ReplaceWith("getCoinDescription(bucket, item)"),
-    )
-    override fun getCoinDescription(item: TrackedItem): List<String> =
+    final override fun getCoinDescription(item: TrackedItem): List<String> =
         throw UnsupportedOperationException("Use getCoinDescription(bucket, item) instead")
 
     abstract fun getCoinDescription(bucket: E?, item: TrackedItem): List<String>
 
-    @Deprecated(
-        "Use addItem(bucket, internalName, amount) instead",
-        ReplaceWith("addItem(bucket, internalName, amount)"),
-    )
-    override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) =
+    final override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount) instead")
 
     fun addItem(bucket: E, internalName: NeuInternalName, stackSize: Int, command: Boolean) {
@@ -55,11 +39,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
         resetItems()
     }
 
-    @Deprecated(
-        "Use removeItem(bucket, internalName) instead",
-        ReplaceWith("removeItem(bucket, internalName)"),
-    )
-    override fun removeItem(internalName: NeuInternalName) =
+    final override fun removeItem(internalName: NeuInternalName) =
         throw UnsupportedOperationException("Use removeItem(bucket, internalName) instead")
 
     fun removeItem(bucket: E?, internalName: NeuInternalName) {
@@ -70,11 +50,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
         }
     }
 
-    @Deprecated(
-        "Use toggleItemHide(bucket, internalName, currentlyHidden) instead",
-        ReplaceWith("toggleItemHide(bucket, internalName, currentlyHidden)"),
-    )
-    override fun toggleItemHide(internalName: NeuInternalName, currentlyHidden: Boolean) =
+    final override fun toggleItemHide(internalName: NeuInternalName, currentlyHidden: Boolean) =
         throw UnsupportedOperationException("Use toggleItemHide(bucket, internalName, currentlyHidden) instead")
 
     fun toggleItemHide(bucket: E?, internalName: NeuInternalName, currentlyHidden: Boolean) {

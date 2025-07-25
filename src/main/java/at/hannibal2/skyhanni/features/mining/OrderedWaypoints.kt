@@ -203,10 +203,16 @@ object OrderedWaypoints {
                     callback { erase(getArg(name)) }
                 }
             }
+            literal("setupmode") {
+                argCallback("enable", BrigadierArguments.bool()) { enableSetupMode ->
+                    toggleSetupMode(enableSetupMode)
+                }
+                simpleCallback { toggleSetupMode(!config.setupMode) }
+            }
             simpleCallback {
                 ChatUtils.userError(
                     "An argument must be provided to /shordered. " +
-                        "To see the possible arguments, run /shcommands shordered."
+                        "To see the possible arguments, run /shcommands shordered.",
                 )
             }
         }
@@ -357,6 +363,11 @@ object OrderedWaypoints {
         }
         saveConfig()
         ChatUtils.chat("Route $name successfully deleted.")
+    }
+
+    private fun toggleSetupMode(value: Boolean) {
+        config.setupMode = value
+        ChatUtils.chat("Toggled setup mode to $value")
     }
 
     private fun decideWaypoints() {
