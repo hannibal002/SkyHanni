@@ -23,7 +23,7 @@ sealed interface AbstractWaypoint : Waypoint {
     fun SkyHanniRenderWorldEvent.drawFilledSelf(color: ChromaColour) = this.drawWaypointFilled(
         location,
         color.toColor(),
-        true
+        true,
     )
 
     fun SkyHanniRenderWorldEvent.drawEdgesSelf(color: ChromaColour, thickness: Int) = this.drawEdges(
@@ -43,7 +43,7 @@ sealed interface AbstractWaypoint : Waypoint {
         location.add(0.5, 0.25, 0.5),
         color.toColor(),
         thickness,
-        depth = true
+        depth = true,
     )
 
     fun SkyHanniRenderWorldEvent.draw3DLineToOther(
@@ -66,7 +66,7 @@ sealed interface AbstractWaypoint : Waypoint {
 sealed class AbstractXYZWaypoint(
     open val x: Int,
     open val y: Int,
-    open val z: Int
+    open val z: Int,
 ) : AbstractWaypoint {
     override val location by lazy { LorenzVec(x, y, z) }
 }
@@ -81,7 +81,7 @@ sealed interface AbstractSequencedWaypoint : AbstractWaypoint {
 
 sealed interface AbstractNamedWaypoint : Waypoint {
     var name: String
-    
+
     fun refreshOrRetainName(number: Int) {
         if (name != number.toString()) return
         name = number.toString()
@@ -89,7 +89,7 @@ sealed interface AbstractNamedWaypoint : Waypoint {
 
     fun SkyHanniRenderWorldEvent.drawName() = this.drawString(
         location.add(0.5, 2.5, 0.5),
-        "§e${name}",
+        "§e$name",
         seeThroughBlocks = true,
     )
 }
@@ -103,13 +103,14 @@ sealed interface AbstractRGBColoredWaypoint : AbstractColoredWaypoint {
     val g: Number
     val b: Number
 
-    override val color: ChromaColour get() {
-        val shouldScale = listOf(r, g, b).none { it.toInt() > 1 }
-        val (sr, sg, sb) = listOf(r, g, b).map {
-            if (shouldScale) it.toFloat() * 255.0f else it.toFloat()
-        }.map { it.toInt() }
-        return ChromaColour.fromStaticRGB(sr, sg, sb, a = 255)
-    }
+    override val color: ChromaColour
+        get() {
+            val shouldScale = listOf(r, g, b).none { it.toInt() > 1 }
+            val (sr, sg, sb) = listOf(r, g, b).map {
+                if (shouldScale) it.toFloat() * 255.0f else it.toFloat()
+            }.map { it.toInt() }
+            return ChromaColour.fromStaticRGB(sr, sg, sb, a = 255)
+        }
 }
 
 sealed interface AbstractToggleableWaypoint {

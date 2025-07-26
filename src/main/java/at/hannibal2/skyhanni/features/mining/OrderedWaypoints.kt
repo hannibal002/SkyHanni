@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.AbstractWaypoint
+import at.hannibal2.skyhanni.data.model.waypoints.AbstractWaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.SequencedWaypointSet
 import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
-import at.hannibal2.skyhanni.data.model.waypoints.AbstractWaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointSet
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -30,7 +30,6 @@ import java.util.ServiceLoader
 object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
     private val profileStorage get() = ProfileStorageData.orderedWaypointsRoutes
-    private val modStorage get() = SkyHanniMod.orderedWaypointsRoutesData
     private val services by lazy { ServiceLoader.load(AbstractWaypointFormat::class.java) }
 
     private var waypointData = SequencedWaypointSet<SkyhanniWaypoint>()
@@ -43,42 +42,44 @@ object OrderedWaypoints {
 
     private val waypointCount: Int get() = waypointData.size
     private val waypoints: List<SkyhanniWaypoint> get() = waypointData.waypoints
-    private val orderedWaypoints: Map<Int, SkyhanniWaypoint> get() = waypointData.orderedWaypoints
+    private val sequencedWaypoints: Map<Int, SkyhanniWaypoint> get() = waypointData.sequencedWaypoints
     private val renderWaypointIndices: MutableList<Int> = mutableListOf()
 
     fun saveConfig() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ROUTES, "Save file")
     }
 
+    private fun SkyHanniRenderWorldEvent.drawSequenced() = sequencedWaypoints.forEach { (waypointNumber, waypoint) ->
+        val configNext = config.nextCount + 1
+        // todo right now we're discarding the 'color' from the waypoint entirely - seems like we should change that
+        val waypointColor = if (!config.showAll) when (waypointNumber) {
+            0 -> config.previousWaypointColor
+            1 -> config.currentWaypointColor
+            in 2..configNext -> config.nextWaypointColor
+            else -> config.setupModeColor
+        } else config.showAllWaypointColor
+
+        with(waypoint) {
+            if (config.fillBlock) drawFilledSelf(waypointColor)
+            else drawEdgesSelf(waypointColor, config.blockOutlineThickness.toInt())
+
+            val inHighlightRange = waypointNumber in 0..configNext
+            if (config.setupMode || config.showAll || inHighlightRange) drawName()
+
+            if (config.showDistance) drawDistanceTo()
+        }
+    }
+
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
 
-        for ((waypointNumber, waypoint) in orderedWaypoints) {
-            val configNext = config.nextCount + 1
-            // todo right now we're discarding the 'color' from the waypoint entirely - seems like we should change that
-            val wpColor = if (!config.showAll) when (waypointNumber) {
-                0 -> config.previousWaypointColor
-                1 -> config.currentWaypointColor
-                in 2..configNext -> config.nextWaypointColor
-                else -> config.setupModeColor
-            } else config.showAllWaypointColor
+        event.drawSequenced()
 
-            with(waypoint) {
-                if (config.fillBlock) event.drawFilledSelf(wpColor)
-                else event.drawEdgesSelf(wpColor, config.blockOutlineThickness.toInt())
-
-                val inHighlightRange = waypointNumber in 0..configNext
-                if (config.setupMode || config.showAll || inHighlightRange) event.drawName()
-
-                if (config.showDistance) event.drawDistanceTo()
-            }
-        }
-
-        if (waypointCount <= 1) return decideWaypoints()
+        if (waypointCount <= 1) return recalcWaypointState()
 
         val renderIndex = renderWaypointIndices.first().takeIf { renderWaypointIndices.size == 2 } ?: renderWaypointIndices[2]
-        val renderWaypoint = orderedWaypoints[renderIndex] ?: return
+        val renderWaypoint = sequencedWaypoints[renderIndex] ?: return
         with(renderWaypoint) {
             val shouldDrawEyeLine = config.traceLine && !config.showAll && !config.setupMode
             if (shouldDrawEyeLine) event.drawLineToEye(config.traceLineColor, config.traceLineThickness.toInt())
@@ -95,7 +96,7 @@ object OrderedWaypoints {
             }
         }
 
-        decideWaypoints()
+        recalcWaypointState()
     }
 
     @HandleEvent
@@ -295,7 +296,7 @@ object OrderedWaypoints {
         ChatUtils.chat("Toggled setup mode to ${config.setupMode}")
     }
 
-    private fun decideWaypoints() {
+    private fun recalcWaypointState() {
         renderWaypointIndices.clear()
         if (waypointData.isEmpty()) return
         val currentIndex = currentWaypointIndex

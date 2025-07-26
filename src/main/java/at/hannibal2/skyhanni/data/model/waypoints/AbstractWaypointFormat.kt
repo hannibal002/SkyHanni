@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 /**
  * @param N the native type of the waypoint, which extends [AbstractWaypoint].
  */
-interface AbstractWaypointFormat<N> where N : AbstractWaypoint{
+interface AbstractWaypointFormat<N> where N : AbstractWaypoint {
     val formatType: WaypointFormatType
     val name get() = formatType.name.lowercase()
 

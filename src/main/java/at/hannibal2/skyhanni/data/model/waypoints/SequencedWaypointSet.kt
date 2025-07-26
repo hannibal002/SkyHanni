@@ -7,14 +7,13 @@ import com.google.gson.annotations.Expose
 class SequencedWaypointSet<T : AbstractSequencedWaypoint>(
     @Expose override val waypoints: MutableList<T> = mutableListOf(),
     @Expose var currentIndex: Int = 0,
-) : WaypointSet<T>(){
+) : WaypointSet<T>() {
     private var waypointsHash: Int = 0
     private var orderedWaypointsCache: MutableMap<Int, T> by LazyVar { mutableMapOf() }
-    val orderedWaypoints get() = if (waypointsHash == waypoints.hashCode()) orderedWaypointsCache else {
-        waypoints.associateBy { it.number }.toMutableMap().also {
+    val sequencedWaypoints get() = orderedWaypointsCache.takeIf { waypointsHash == waypoints.hashCode()}
+        ?: waypoints.associateBy { it.number }.toMutableMap().also {
             orderedWaypointsCache = it
         }
-    }
 
     override fun deepCopy(): SequencedWaypointSet<T> = SequencedWaypointSet(waypoints, currentIndex)
 
