@@ -15,7 +15,7 @@ data class ColeweightWaypoint(
     @Expose override val g: Float = 1.0f,
     @Expose override val b: Float = 0.0f,
     @Expose val options: MutableMap<String, String> = mutableMapOf(),
-) : AbstractXYZWaypoint<ColeweightWaypoint>(x, y, z),
+) : AbstractXYZWaypoint(x, y, z),
     AbstractRGBColoredWaypoint,
     AbstractWaypointFormat<ColeweightWaypoint> {
 

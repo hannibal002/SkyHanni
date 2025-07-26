@@ -63,7 +63,7 @@ sealed interface AbstractWaypoint : Waypoint {
     }
 }
 
-sealed class AbstractXYZWaypoint<T : AbstractWaypoint>(
+sealed class AbstractXYZWaypoint(
     open val x: Int,
     open val y: Int,
     open val z: Int
