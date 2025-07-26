@@ -17,7 +17,7 @@ sealed interface Waypoint {
     val location: LorenzVec
 }
 
-sealed interface AbstractWaypoint<T: AbstractWaypoint<T>> : Waypoint {
+sealed interface AbstractWaypoint : Waypoint {
     fun toSkyHanniFormat(): SkyhanniWaypoint
 
     fun SkyHanniRenderWorldEvent.drawFilledSelf(color: ChromaColour) = this.drawWaypointFilled(
@@ -47,7 +47,7 @@ sealed interface AbstractWaypoint<T: AbstractWaypoint<T>> : Waypoint {
     )
 
     fun SkyHanniRenderWorldEvent.draw3DLineToOther(
-        other: AbstractWaypoint<T>,
+        other: AbstractWaypoint,
         color: ChromaColour,
         thickness: Int,
         accountForSneak: Boolean,
@@ -63,11 +63,11 @@ sealed interface AbstractWaypoint<T: AbstractWaypoint<T>> : Waypoint {
     }
 }
 
-sealed class AbstractXYZWaypoint<T : AbstractWaypoint<T>>(
+sealed class AbstractXYZWaypoint<T : AbstractWaypoint>(
     open val x: Int,
     open val y: Int,
     open val z: Int
-) : AbstractWaypoint<T> {
+) : AbstractWaypoint {
     override val location by lazy { LorenzVec(x, y, z) }
 }
 

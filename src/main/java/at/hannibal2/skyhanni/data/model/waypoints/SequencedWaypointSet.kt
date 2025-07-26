@@ -7,8 +7,8 @@ import com.google.gson.annotations.Expose
 class SequencedWaypointSet<T>(
     @Expose override val waypoints: MutableList<T> = mutableListOf(),
     @Expose var currentIndex: Int = 0,
-) : WaypointSet<T>() where T : AbstractWaypoint<T>, T : AbstractSequencedWaypoint {
-    private var waypointsHash: Int by LazyVar { waypoints.hashCode() }
+) : WaypointSet<T>() where T : AbstractWaypoint, T : AbstractSequencedWaypoint {
+    private var waypointsHash: Int = 0
     private var orderedWaypointsCache: MutableMap<Int, T> by LazyVar { mutableMapOf() }
     val orderedWaypoints get() = if (waypointsHash == waypoints.hashCode()) orderedWaypointsCache else {
         waypoints.associateBy { it.number }.toMutableMap().also {

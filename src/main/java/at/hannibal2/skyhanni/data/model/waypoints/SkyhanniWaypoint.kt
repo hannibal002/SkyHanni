@@ -12,7 +12,7 @@ data class SkyhanniWaypoint(
     @Expose override var number: Int,
     @Expose val options: MutableMap<String, String> = mutableMapOf(),
     @Expose override var name: String = options["name"] ?: number.toString(),
-) : AbstractWaypoint<SkyhanniWaypoint>,
+) : AbstractWaypoint,
     AbstractDescriptiveWaypoint,
     AbstractWaypointFormat<SkyhanniWaypoint> {
 

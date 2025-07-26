@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 /**
  * @param N the native type of the waypoint, which extends [AbstractWaypoint].
  */
-interface AbstractWaypointFormat<N> where N : AbstractWaypoint<N>{
+interface AbstractWaypointFormat<N> where N : AbstractWaypoint{
     val formatType: WaypointFormatType
     val name get() = formatType.name.lowercase()
 
@@ -14,7 +14,7 @@ interface AbstractWaypointFormat<N> where N : AbstractWaypoint<N>{
     fun serialize(set: WaypointSet<N>): String = ConfigManager.gson.toJson(set)
 }
 
-enum class WaypointFormatType(val castClazz: Class<out AbstractWaypoint<*>>) {
+enum class WaypointFormatType(val castClazz: Class<out AbstractWaypoint>) {
     SKYHANNI(SkyhanniWaypoint::class.java),
     COLEWEIGHT(ColeweightWaypoint::class.java),
 }

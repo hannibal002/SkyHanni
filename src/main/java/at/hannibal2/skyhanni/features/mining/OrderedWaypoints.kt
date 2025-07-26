@@ -343,7 +343,7 @@ object OrderedWaypoints {
         return@firstNotNullOfOrNull SequencedWaypointSet(shConverted)
     }
 
-    private fun <N : AbstractWaypoint<N>> exportWaypointSet(
+    private fun <N : AbstractWaypoint> exportWaypointSet(
         waypoints: WaypointSet<N>,
         name: String,
     ): String? = services.firstOrNull { it.name == name }?.let {
