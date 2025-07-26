@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.waypoints.AbstractWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.SequencedWaypointSet
 import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.AbstractWaypointFormat
@@ -342,10 +343,14 @@ object OrderedWaypoints {
         return@firstNotNullOfOrNull SequencedWaypointSet(shConverted)
     }
 
-    private fun exportWaypointSet(
-        waypoints: WaypointSet<SkyhanniWaypoint>,
+    private fun <N : AbstractWaypoint<N>> exportWaypointSet(
+        waypoints: WaypointSet<N>,
         name: String,
-    ): String? = services.firstOrNull { it.name == name }?.serialize(waypoints)
+    ): String? = services.firstOrNull { it.name == name }?.let {
+        @Suppress("UNCHECKED_CAST")
+        val fmt = it as? AbstractWaypointFormat<N> ?: return null
+        fmt.serialize(waypoints)
+    }
 
     private fun getAvailableWaypointFormats(): List<String> = services.map { it.name }
 }

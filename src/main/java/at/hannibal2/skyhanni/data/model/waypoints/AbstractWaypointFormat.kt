@@ -11,7 +11,7 @@ interface AbstractWaypointFormat<N> where N : AbstractWaypoint<N>{
     val name get() = formatType.name.lowercase()
 
     fun deserialize(string: String): WaypointSet<N>? = ConfigManager.gson.fromJson<WaypointSet<N>>(string)
-    fun serialize(set: WaypointSet<*>): String = ConfigManager.gson.toJson(set)
+    fun serialize(set: WaypointSet<N>): String = ConfigManager.gson.toJson(set)
 }
 
 enum class WaypointFormatType(val castClazz: Class<out AbstractWaypoint<*>>) {
