@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.system.LazyVar
 import com.google.gson.annotations.Expose
 
-class SequencedWaypointSet<T>(
+class SequencedWaypointSet<T : AbstractSequencedWaypoint>(
     @Expose override val waypoints: MutableList<T> = mutableListOf(),
     @Expose var currentIndex: Int = 0,
-) : WaypointSet<T>() where T : AbstractWaypoint, T : AbstractSequencedWaypoint {
+) : WaypointSet<T>(){
     private var waypointsHash: Int = 0
     private var orderedWaypointsCache: MutableMap<Int, T> by LazyVar { mutableMapOf() }
     val orderedWaypoints get() = if (waypointsHash == waypoints.hashCode()) orderedWaypointsCache else {

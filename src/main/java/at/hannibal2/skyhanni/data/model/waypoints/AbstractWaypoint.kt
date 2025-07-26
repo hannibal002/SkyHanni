@@ -75,7 +75,7 @@ sealed interface AbstractDescriptiveWaypoint : AbstractSequencedWaypoint, Abstra
     fun hasCustomName() = name != number.toString()
 }
 
-sealed interface AbstractSequencedWaypoint {
+sealed interface AbstractSequencedWaypoint : AbstractWaypoint {
     var number: Int
 }
 
