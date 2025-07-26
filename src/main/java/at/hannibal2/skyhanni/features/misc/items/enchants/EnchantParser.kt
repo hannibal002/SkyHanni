@@ -102,6 +102,7 @@ object EnchantParser {
             config.colorParsing,
             config.format,
             config.perfectEnchantColor,
+            config.ultimateEnchantColor,
             config.boldPerfectEnchant,
             config.greatEnchantColor,
             config.goodEnchantColor,
