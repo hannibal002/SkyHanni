@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.loadMissingTrophyFish
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -55,6 +56,7 @@ object TrophyFishDisplay {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRIMSON_ISLE) {
             DelayedRun.runDelayed(200.milliseconds) {
+                TrophyFishManager.loadMissingTrophyFish()
                 update()
             }
         }
@@ -62,6 +64,7 @@ object TrophyFishDisplay {
 
     @HandleEvent
     fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
+        TrophyFishManager.loadMissingTrophyFish()
         recentlyDroppedTrophies[getInternalName(event.trophyFishName)] = event.rarity
         update()
         DelayedRun.runDelayed(5.1.seconds) {
@@ -72,6 +75,7 @@ object TrophyFishDisplay {
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
+        TrophyFishManager.loadMissingTrophyFish()
         update()
     }
 
