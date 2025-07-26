@@ -20,6 +20,10 @@ import kotlin.reflect.typeOf
 
 inline fun <reified T : Any> Gson.fromJson(string: String): T = this.fromJson(string, typeOf<T>().javaType)
 
+inline fun <reified T : Any> Gson.fromJsonOrNull(string: String): T? = runCatching {
+    this.fromJson<T>(string)
+}.getOrNull()
+
 inline fun <reified T : Any> Gson.fromJson(jsonElement: JsonElement): T =
     this.fromJson(jsonElement, typeOf<T>().javaType)
 

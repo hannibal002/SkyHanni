@@ -37,13 +37,13 @@ class OrderedWaypointsConfig {
     var nextWaypointColor: ChromaColour = ChromaColour.fromRGB(255, 255, 85, 0, 153)
 
     @Expose
-    @ConfigOption(name = "Next WaypointSet", desc = "How many waypoints in front of the current waypoint should be rendered.")
+    @ConfigOption(name = "Next Waypoints", desc = "How many waypoints in front of the current waypoint should be rendered.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 5f, minStep = 1f)
-    var nextCount: Float = 2f
+    var nextCount: Int = 2
 
     @Expose
     @ConfigOption(name = "Block Outline Thickness", desc = "Thickness of the block outline.")
-    @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+    @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 0.5f)
     var blockOutlineThickness: Float = 1f
 
     @Expose
