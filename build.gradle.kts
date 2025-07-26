@@ -300,7 +300,7 @@ tasks.processResources {
     from(includeBackupRepo)
 
     // Set Version inside Meta files
-    inputs.property("version", project.version.toString())
+    inputs.property("version", project.version)
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to inputs.properties["version"].toString())
     }
