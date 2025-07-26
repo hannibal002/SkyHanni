@@ -18,7 +18,7 @@ sealed interface Waypoint {
 }
 
 sealed interface AbstractWaypoint : Waypoint {
-    fun toSkyHanniFormat(): SkyhanniWaypoint
+    fun toSkyHanniFormat(indexOffer: Int): SkyhanniWaypoint
 
     fun SkyHanniRenderWorldEvent.drawFilledSelf(color: ChromaColour) = this.drawWaypointFilled(
         location,

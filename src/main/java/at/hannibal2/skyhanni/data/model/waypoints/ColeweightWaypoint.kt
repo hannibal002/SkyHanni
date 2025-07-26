@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.model.waypoints
 
 import at.hannibal2.skyhanni.utils.KSerializable
-import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.auto.service.AutoService
 import com.google.gson.annotations.Expose
 
@@ -27,9 +26,9 @@ data class ColeweightWaypoint(
     )
 
     override val formatType = WaypointFormatType.COLEWEIGHT
-    override fun toSkyHanniFormat() = SkyhanniWaypoint(
-        LorenzVec(x, y, z),
-        options["name"]?.toIntOrNull() ?: -1,
+    override fun toSkyHanniFormat(indexOffer: Int) = SkyhanniWaypoint(
+        location,
+        options["name"]?.toIntOrNull() ?: (indexOffer + 1),
         options,
     )
 }

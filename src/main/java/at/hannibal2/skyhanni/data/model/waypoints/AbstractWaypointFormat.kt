@@ -17,4 +17,5 @@ interface AbstractWaypointFormat<N> where N : AbstractWaypoint {
 enum class WaypointFormatType(val castClazz: Class<out AbstractWaypoint>) {
     SKYHANNI(SkyhanniWaypoint::class.java),
     COLEWEIGHT(ColeweightWaypoint::class.java),
+    SKYTILS(SkytilsWaypoint::class.java),
 }

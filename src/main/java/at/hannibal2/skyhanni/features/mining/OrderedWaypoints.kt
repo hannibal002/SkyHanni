@@ -51,7 +51,7 @@ object OrderedWaypoints {
 
     private fun SkyHanniRenderWorldEvent.drawSequenced() = sequencedWaypoints.forEach { (waypointNumber, waypoint) ->
         val configNext = config.nextCount + 1
-        // todo right now we're discarding the 'color' from the waypoint entirely - seems like we should change that
+        // todo right now we're discarding the color from the waypoint entirely - seems like we should change that
         val waypointColor = if (!config.showAll) when (waypointNumber) {
             0 -> config.previousWaypointColor
             1 -> config.currentWaypointColor
@@ -340,7 +340,9 @@ object OrderedWaypoints {
 
     private fun loadWaypoints(data: String): SequencedWaypointSet<SkyhanniWaypoint>? = services.firstNotNullOfOrNull { format ->
         val deserialized = format.deserialize(data) ?: return@firstNotNullOfOrNull null
-        val shConverted = deserialized.map { it.toSkyHanniFormat() }.toMutableList()
+        val shConverted = deserialized.mapIndexed { index, waypoint ->
+            waypoint.toSkyHanniFormat(indexOffer = index)
+        }.toMutableList()
         return@firstNotNullOfOrNull SequencedWaypointSet(shConverted)
     }
 

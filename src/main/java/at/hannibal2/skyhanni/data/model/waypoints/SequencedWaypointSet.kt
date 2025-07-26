@@ -10,7 +10,7 @@ class SequencedWaypointSet<T : AbstractSequencedWaypoint>(
 ) : WaypointSet<T>() {
     private var waypointsHash: Int = 0
     private var orderedWaypointsCache: MutableMap<Int, T> by LazyVar { mutableMapOf() }
-    val sequencedWaypoints get() = orderedWaypointsCache.takeIf { waypointsHash == waypoints.hashCode()}
+    val sequencedWaypoints get() = orderedWaypointsCache.takeIf { waypointsHash == waypoints.hashCode() }
         ?: waypoints.associateBy { it.number }.toMutableMap().also {
             orderedWaypointsCache = it
         }

@@ -17,5 +17,5 @@ data class SkyhanniWaypoint(
     AbstractWaypointFormat<SkyhanniWaypoint> {
 
     override val formatType = WaypointFormatType.SKYHANNI
-    override fun toSkyHanniFormat() = this
+    override fun toSkyHanniFormat(indexOffer: Int) = this
 }
