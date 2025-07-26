@@ -166,7 +166,7 @@ class DungeonConfig {
     var shadowAssassinJumpNotifier: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Terminal WaypointSet", desc = "Displays WaypointSet in the F7/M7 Goldor Phase.")
+    @ConfigOption(name = "Terminal Waypoints", desc = "Displays WaypointSet in the F7/M7 Goldor Phase.")
     @ConfigEditorBoolean
     @FeatureToggle
     var terminalWaypoints: Boolean = true

@@ -114,7 +114,7 @@ class MiscConfig {
     val bits: BitsConfig = BitsConfig()
 
     @Expose
-    @ConfigOption(name = "Patcher Coords WaypointSet", desc = "")
+    @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
     @Accordion
     val patcherCoordsWaypoint: PatcherCoordsWaypointConfig = PatcherCoordsWaypointConfig()
 

@@ -16,7 +16,7 @@ class HoppityWaypointsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Shared WaypointSet",
+        name = "Shared Waypoints",
         desc = "Enable being able to share and receive egg waypoints in your lobby."
     )
     @ConfigEditorBoolean
@@ -42,7 +42,7 @@ class HoppityWaypointsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show All WaypointSet",
+        name = "Show All Waypoints",
         desc = "Show all possible egg waypoints for the current lobby. §e" +
             "Only works when you don't have an Egglocator in your inventory."
     )
@@ -51,7 +51,7 @@ class HoppityWaypointsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Hide Duplicate WaypointSet",
+        name = "Hide Duplicate Waypoints",
         desc = "Hide egg waypoints you have already found.\n" +
             "§eOnly works when you don't have an Egglocator in your inventory."
     )
@@ -61,7 +61,7 @@ class HoppityWaypointsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Mark Duplicate WaypointSet",
+        name = "Mark Duplicate Waypoints",
         desc = "Marks egg location waypoints which you have already found in red."
     )
     @ConfigEditorBoolean

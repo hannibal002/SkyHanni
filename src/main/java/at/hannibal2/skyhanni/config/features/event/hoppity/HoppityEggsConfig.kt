@@ -38,7 +38,7 @@ class HoppityEggsConfig {
     val chat: HoppityChatConfig = HoppityChatConfig()
 
     @Expose
-    @ConfigOption(name = "Egg WaypointSet", desc = "")
+    @ConfigOption(name = "Egg Waypoints", desc = "")
     @Accordion
     val waypoints: HoppityWaypointsConfig = HoppityWaypointsConfig()
 

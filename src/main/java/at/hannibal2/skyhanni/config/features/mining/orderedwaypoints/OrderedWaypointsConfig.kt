@@ -16,7 +16,7 @@ class OrderedWaypointsConfig {
     var notice: String = ""
 
     @Expose
-    @ConfigOption(name = "Enable Ordered WaypointSet", desc = "Enables ordered waypoints.")
+    @ConfigOption(name = "Enable Ordered Waypoints", desc = "Enables ordered waypoints.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
@@ -112,7 +112,7 @@ class OrderedWaypointsConfig {
     var sneakingDuringRoute: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show All WaypointSet", desc = "Whether all waypoints should be displayed.")
+    @ConfigOption(name = "Show All Waypoints", desc = "Whether all waypoints should be displayed.")
     @ConfigEditorBoolean
     var showAll: Boolean = false
 
