@@ -81,6 +81,39 @@ object RenderableInventory {
         }
     }
 
+    fun Renderable.Companion.fakeSlot(
+        item: ItemStack,
+        scale: Double,
+        highlight: Boolean = false,
+        horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+        verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+    ): Renderable {
+        val uv = createUvList(1, 1)
+        val coords = SlotsUv.CENTER.getUvCoords()
+
+        val itemRenderable = item(item, scale, 0, 0, false)
+        val finalRenderable = if (highlight) drawInsideRoundedRect(
+            itemRenderable,
+            color = Color.GREEN,
+            padding = 0,
+            radius = 16 * (scale / 2).toInt(),
+        ) else itemRenderable
+
+        return drawInsideFixedSizedImage(
+            finalRenderable,
+            inventoryTextures,
+            (16 * scale).toInt(),
+            (16 * scale).toInt(),
+            padding = scale.toInt(),
+            uMin = coords[0],
+            uMax = coords[1],
+            vMin = coords[2],
+            vMax = coords[3],
+            horizontalAlign = horizontalAlign,
+            verticalAlign = verticalAlign
+        )
+    }
+
     fun Renderable.Companion.fakeInventory(
         items: List<ItemStack?>,
         maxRowSize: Int,
@@ -98,9 +131,15 @@ object RenderableInventory {
         val finalList = uvList.map { uvRow ->
             uvRow.map { uv ->
                 val uvArray = uv.getUvCoords()
+                if (index in highlightSlots) println(index)
                 drawInsideFixedSizedImage(
                     if (uv == SlotsUv.CENTER)
-                        items[index++]?.let {
+                        items[index]?.let {
+                            if (index in highlightSlots) {
+                                println("test")
+                                println(index)
+                                println(highlightSlots)
+                            }
                             val itemRenderable = item(it, scale, 0, 0, false)
                             if (highlightSlots.contains(index)) drawInsideRoundedRect(
                                 itemRenderable,
@@ -108,7 +147,7 @@ object RenderableInventory {
                                 padding = 0,
                                 radius = 16 * (scale / 2).toInt(),
                             ) else itemRenderable
-                        } ?: emptySlot
+                        }.also { index++ } ?: emptySlot
                     else Renderable.empty(),
                     inventoryTextures,
                     (uv.width() * scale).toInt(),

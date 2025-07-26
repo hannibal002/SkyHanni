@@ -1,21 +1,27 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.searchablestorage
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.inventory.searchablestorage.SearchableStorageGui.SearchMode
+import at.hannibal2.skyhanni.features.inventory.searchablestorage.SearchableStorageGui.SortMode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -24,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SearchableStorage {
 
-    private var lastCloseTime = SimpleTimeMark.farPast()
+    private val config get() = SkyHanniMod.feature.inventory
 
     /**
      * REGEX-TEST: Backpack 5
@@ -33,6 +39,9 @@ object SearchableStorage {
      */
     val storagePattern by RepoPattern.pattern("storage.storage", "(?<type>.*) (?<page>\\d+)")
 
+    private var lastCloseTime = SimpleTimeMark.farPast()
+    var searchMode = SearchMode.NAME
+    var sortMode = SortMode.NAME_DESC
     var highlightSlots = listOf<Int>()
     var waypoints = listOf<LorenzVec>()
     var inventoryName = ""
@@ -78,10 +87,26 @@ object SearchableStorage {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsearchstorage") {
-            description = "Search your storage for items with their names or lore."
+        event.registerBrigadier("shsearchstorage") {
+            description = "Opens a gui to search for items across storages"
             category = CommandCategory.USERS_ACTIVE
-            callback { SkyHanniMod.screenToOpen = SearchableStorageGui() }
+            simpleCallback { onCommand() }
+            argCallback("search", BrigadierArguments.greedyString()) { search -> onCommand(search) }
         }
     }
+
+    fun onCommand(search: String = "") {
+        SkyHanniMod.screenToOpen = if (shouldRemind()) SearchableStorageReminderGui(search) else SearchableStorageGui(search)
+    }
+
+    fun minecraftButton(text: String) = Renderable.drawInsideRoundedRectWithOutline(
+        StringRenderable(text), Color.decode("#8b8b8b"),
+        radius = 0,
+        topOutlineColor = Color.WHITE.rgb,
+        bottomOutlineColor = Color.WHITE.rgb,
+        borderOutlineThickness = 2,
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+    )
+
+    private fun shouldRemind() = config.searchableStorageReminder && !config.savePrivateIslandChests
 }
