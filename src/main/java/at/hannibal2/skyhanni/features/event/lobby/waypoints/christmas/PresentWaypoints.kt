@@ -80,7 +80,7 @@ object PresentWaypoints {
 
     private fun handleAllPresentsFound() {
         // If all presents are found, disable the feature
-        ChatUtils.chat("Congratulations! As all presents are found, we are disabling the Christmas Present WaypointSet feature.")
+        ChatUtils.chat("Congratulations! As all presents are found, we are disabling the Christmas Present Waypoints feature.")
         config.allWaypoints = false
         config.allEntranceWaypoints = false
     }
