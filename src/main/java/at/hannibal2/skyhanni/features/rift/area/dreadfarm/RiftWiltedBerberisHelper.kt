@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -129,14 +130,15 @@ object RiftWiltedBerberisHelper {
                 if (y == 0.0) continue
 
                 val location = currentParticles.fixLocation(berberis)
+                // TODO add chroma color support via config
                 if (!moving) {
-                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW, 0.7f)
+                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW.toChromaColor(), 0.7f)
                     event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, seeThroughBlocks = false)
                 } else {
-                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE, 0.5f)
+                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE.toChromaColor(), 0.5f)
                     previous?.fixLocation(berberis)?.let {
-                        event.drawFilledBoundingBox(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
-                        event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE, 3, false)
+                        event.drawFilledBoundingBox(axisAlignedBB(it), Color.LIGHT_GRAY.toChromaColor(), 0.2f)
+                        event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE.toChromaColor(), 3, false)
                     }
                 }
             }

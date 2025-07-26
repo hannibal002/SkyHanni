@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes

@@ -115,9 +115,6 @@ object SkyHanniDebugsAndTests {
             return result
         }
 
-    @Deprecated(message = "use SkyBlockUtils", ReplaceWith("SkyBlockUtils.debug"))
-    val enabled get() = SkyBlockUtils.debug
-
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
@@ -455,10 +452,12 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay() {
         if (MinecraftCompat.showDebugHud) {
             if (debugConfig.currentAreaDebug) {
-                config.debugLocationPos.renderString(
-                    "Current Area: ${HypixelData.skyBlockArea}",
-                    posLabel = "SkyBlock Area (Debug)",
-                )
+                val renderables = buildList {
+                    addString("Current Area: ${HypixelData.skyBlockArea}")
+                    addString("Graph Area: ${SkyBlockUtils.graphArea}")
+                }
+
+                config.debugLocationPos.renderRenderables(renderables, posLabel = "SkyBlock Area (Debug)")
             }
 
             if (debugConfig.raytracedOreblock) {

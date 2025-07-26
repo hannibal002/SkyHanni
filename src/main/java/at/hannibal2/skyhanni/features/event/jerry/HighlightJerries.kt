@@ -36,13 +36,13 @@ object HighlightJerries {
             "Purple" -> LorenzColor.DARK_PURPLE
             "Golden" -> LorenzColor.GOLD
             else -> return
-        }
-        mob.highlight(color.toColor()) { config.highlightJerries.get() }
-        mob.lineToPlayer(color.toColor()) { config.lineJerries.get() }
+        }.toChromaColor()
+        mob.highlight(color) { config.highlightJerries.get() }
+        mob.lineToPlayer(color) { config.lineJerries.get() }
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         config.highlightJerries.onEnable { MobData.skyblockMobs.forEach { parseJerry(it) } }
         config.lineJerries.onEnable { MobData.skyblockMobs.forEach { parseJerry(it) } }
     }

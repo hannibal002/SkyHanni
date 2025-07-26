@@ -60,12 +60,12 @@ object OrderedWaypoints {
         for (i in renderWaypoints.indices) {
             val wpColor = if (!config.showAll) {
                 when (i) {
-                    0 -> config.previousWaypointColor.toColor()
-                    1 -> config.currentWaypointColor.toColor()
-                    in 2..(1 + config.nextCount.toInt()) -> config.nextWaypointColor.toColor()
-                    else -> config.setupModeColor.toColor()
+                    0 -> config.previousWaypointColor
+                    1 -> config.currentWaypointColor
+                    in 2..(1 + config.nextCount.toInt()) -> config.nextWaypointColor
+                    else -> config.setupModeColor
                 }
-            } else config.showAllWaypointColor.toColor()
+            } else config.showAllWaypointColor
 
             if (orderedWaypointsList.size <= renderWaypoints[i]) {
                 ChatUtils.debug("${renderWaypoints[i]} $i")
@@ -75,13 +75,13 @@ object OrderedWaypoints {
             when (config.fillBlock) {
                 true -> event.drawWaypointFilled(
                     orderedWaypointsList[renderWaypoints[i]].location,
-                    wpColor,
+                    wpColor.toColor(),
                     true,
                 )
 
                 else -> event.drawEdges(
                     orderedWaypointsList[renderWaypoints[i]].location,
-                    wpColor,
+                    wpColor.toColor(),
                     config.blockOutlineThickness.toInt(),
                     false,
                 )
@@ -110,7 +110,7 @@ object OrderedWaypoints {
 
         val traceWP = if (renderWaypoints.size == 2) orderedWaypointsList[renderWaypoints[0]]
         else orderedWaypointsList[renderWaypoints[2]]
-        val traceLineColor = config.traceLineColor.toColor()
+        val traceLineColor = config.traceLineColor
         if (config.traceLine && !config.showAll && !config.setupMode) {
             event.drawLineToEye(
                 traceWP.location.add(0.5, 0.25, 0.5),
@@ -121,7 +121,7 @@ object OrderedWaypoints {
         }
 
         val currentWP = orderedWaypointsList[renderWaypoints[1]]
-        val setupModeLineColor = config.setupModeLineColor.toColor()
+        val setupModeLineColor = config.setupModeLineColor
         if (config.setupMode && !config.showAll) {
             val eyePos = if (config.sneakingDuringRoute) 1.54
             else 1.62
@@ -212,6 +212,13 @@ object OrderedWaypoints {
                 arg("name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getRouteNames() }) { name ->
                     callback { erase(getArg(name)) }
                 }
+            }
+            literal("setupmode") {
+                description = "Toggles setup mode."
+                argCallback("enable", BrigadierArguments.bool()) { enableSetupMode ->
+                    toggleSetupMode(enableSetupMode)
+                }
+                simpleCallback { toggleSetupMode(!config.setupMode) }
             }
         }
     }
@@ -361,6 +368,11 @@ object OrderedWaypoints {
         }
         saveConfig()
         ChatUtils.chat("Route $name successfully deleted.")
+    }
+
+    private fun toggleSetupMode(value: Boolean) {
+        config.setupMode = value
+        ChatUtils.chat("Toggled setup mode to $value")
     }
 
     private fun decideWaypoints() {

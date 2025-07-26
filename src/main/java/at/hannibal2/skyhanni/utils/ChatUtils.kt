@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
@@ -58,8 +57,7 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ) {
-        val debug = SkyHanniDebugsAndTests.enabled
-        if (debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
+        if (SkyBlockUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             consoleLog("[Debug] $message")
         }
     }

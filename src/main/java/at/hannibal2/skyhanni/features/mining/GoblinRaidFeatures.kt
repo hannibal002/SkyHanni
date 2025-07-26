@@ -16,6 +16,6 @@ object GoblinRaidFeatures {
 
         if (event.mob.name != "Superprotectron") return
 
-        event.mob.highlight(config.superprotectronHighlightColor.getEffectiveColour())
+        event.mob.highlight(config.superprotectronHighlightColor)
     }
 }
