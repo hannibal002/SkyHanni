@@ -74,7 +74,7 @@ class EventConfig {
     @Expose
     val yearOfThePig: YearOfThePigConfig = YearOfThePigConfig()
 
-    @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
+    @Category(name = "Lobby WaypointSet", desc = "Lobby Event Waypoint settings")
     @Expose
     val lobbyWaypoints: LobbyWaypointsConfig = LobbyWaypointsConfig()
 }

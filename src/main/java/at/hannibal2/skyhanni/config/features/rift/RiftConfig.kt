@@ -20,7 +20,7 @@ class RiftConfig {
     @Expose
     val cruxTalisman: CruxTalismanDisplayConfig = CruxTalismanDisplayConfig()
 
-    @ConfigOption(name = "Enigma Soul Waypoints", desc = "")
+    @ConfigOption(name = "Enigma Soul WaypointSet", desc = "")
     @Accordion
     @Expose
     val enigmaSoulWaypoints: EnigmaSoulConfig = EnigmaSoulConfig()

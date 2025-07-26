@@ -341,7 +341,7 @@ object RescueMissionWaypoints {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Rescue Mission Waypoints")
+        event.title("Rescue Mission WaypointSet")
 
         parkourHelper ?: run {
             event.addIrrelevant("no parkour loaded")

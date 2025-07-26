@@ -13,7 +13,7 @@ class ColosseumConfig {
     var highlightBlobbercysts: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Tentacle Waypoints", desc = "Show waypoints for tentacles with their HP in Bacte fight.")
+    @ConfigOption(name = "Tentacle WaypointSet", desc = "Show waypoints for tentacles with their HP in Bacte fight.")
     @ConfigEditorBoolean
     @FeatureToggle
     var tentacleWaypoints: Boolean = true

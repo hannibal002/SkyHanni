@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
-import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
+import at.hannibal2.skyhanni.data.model.waypoints.WaypointSet
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -35,24 +35,19 @@ import java.util.ServiceLoader
 @SkyHanniModule
 object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
+    private val profileStorage get() = ProfileStorageData.orderedWaypointsRoutes
+    private val modStorage get() = SkyHanniMod.orderedWaypointsRoutesData
 
-    private var orderedWaypointsList = Waypoints<SkyhanniWaypoint>()
+    private var orderedWaypointsList = WaypointSet<SkyhanniWaypoint>()
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
-
-    @HandleEvent(HypixelJoinEvent::class)
-    fun onHypixelJoin() {
-        if (SkyHanniMod.orderedWaypointsRoutesData.routes == null) {
-            SkyHanniMod.orderedWaypointsRoutesData.routes = mutableMapOf()
-            saveConfig()
-        }
-    }
 
     fun saveConfig() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ROUTES, "Save file")
     }
 
+    // todo split this function up
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
@@ -137,7 +132,7 @@ object OrderedWaypoints {
         decideWaypoints()
     }
 
-    @HandleEvent(WorldChangeEvent::class)
+    @HandleEvent
     fun onWorldChange() {
         currentOrderedWaypointIndex = 0
     }
@@ -145,7 +140,7 @@ object OrderedWaypoints {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shordered") {
-            description = "Ordered Waypoints commands."
+            description = "Ordered WaypointSet commands."
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("sho")
             literal("load", "import") {
@@ -431,16 +426,16 @@ object OrderedWaypoints {
         currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
     }
 
-    private fun loadWaypoints(data: String): Waypoints<SkyhanniWaypoint>? {
+    private fun loadWaypoints(data: String): WaypointSet<SkyhanniWaypoint>? {
         return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull {
-            it.load(data)
+            it.deserialize(data)
         }?.let {
-            Waypoints(it.toMutableList())
+            WaypointSet(it.toMutableList())
         }
     }
 
-    private fun exportWaypoints(waypoints: Waypoints<SkyhanniWaypoint>, name: String): String? {
-        return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.export(waypoints)
+    private fun exportWaypoints(waypoints: WaypointSet<SkyhanniWaypoint>, name: String): String? {
+        return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.serialize(waypoints)
     }
 
     private fun getWaypointFormats(): List<String> {

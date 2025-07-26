@@ -69,7 +69,7 @@ class DevConfig {
     @ConfigEditorBoolean
     var worldEdit: Boolean = false
 
-    @ConfigOption(name = "Parkour Waypoints", desc = "")
+    @ConfigOption(name = "Parkour WaypointSet", desc = "")
     @Accordion
     @Expose
     val waypoint: WaypointsConfig = WaypointsConfig()

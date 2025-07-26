@@ -68,7 +68,7 @@ class MiningConfig {
     val metalDetector: MetalDetectorConfig = MetalDetectorConfig()
 
     @Expose
-    @ConfigOption(name = "Ordered Waypoints", desc = "")
+    @ConfigOption(name = "Ordered WaypointSet", desc = "")
     @Accordion
     val orderedWaypoints: OrderedWaypointsConfig = OrderedWaypointsConfig()
 

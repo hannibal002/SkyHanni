@@ -16,7 +16,7 @@ class OrderedWaypointsConfig {
     var notice: String = ""
 
     @Expose
-    @ConfigOption(name = "Enable Ordered Waypoints", desc = "Enables ordered waypoints.")
+    @ConfigOption(name = "Enable Ordered WaypointSet", desc = "Enables ordered waypoints.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
@@ -37,7 +37,7 @@ class OrderedWaypointsConfig {
     var nextWaypointColor: ChromaColour = ChromaColour.fromRGB(255, 255, 85, 0, 153)
 
     @Expose
-    @ConfigOption(name = "Next Waypoints", desc = "How many waypoints in front of the current waypoint should be rendered.")
+    @ConfigOption(name = "Next WaypointSet", desc = "How many waypoints in front of the current waypoint should be rendered.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 5f, minStep = 1f)
     var nextCount: Float = 2f
 
@@ -112,7 +112,7 @@ class OrderedWaypointsConfig {
     var sneakingDuringRoute: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show All Waypoints", desc = "Whether all waypoints should be displayed.")
+    @ConfigOption(name = "Show All WaypointSet", desc = "Whether all waypoints should be displayed.")
     @ConfigEditorBoolean
     var showAll: Boolean = false
 

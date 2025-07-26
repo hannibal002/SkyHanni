@@ -25,7 +25,7 @@ class TiaRelayConfig {
     var nextWaypoint: Boolean = true
 
     @Expose
-    @ConfigOption(name = "All Waypoints", desc = "Show all relay waypoints at once (intended for debugging).")
+    @ConfigOption(name = "All WaypointSet", desc = "Show all relay waypoints at once (intended for debugging).")
     @ConfigEditorBoolean
     var allWaypoints: Boolean = false
 

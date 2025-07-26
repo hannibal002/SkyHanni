@@ -48,7 +48,7 @@ class FarmingLaneConfig {
     val distanceDisplayPosition: Position = Position(0, 200)
 
     @Expose
-    @ConfigOption(name = "Corner Waypoints", desc = "Show the corner for the current lane in the world.")
+    @ConfigOption(name = "Corner WaypointSet", desc = "Show the corner for the current lane in the world.")
     @ConfigEditorBoolean
     @FeatureToggle
     var cornerWaypoints: Boolean = false

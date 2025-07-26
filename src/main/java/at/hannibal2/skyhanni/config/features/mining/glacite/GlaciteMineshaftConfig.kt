@@ -8,7 +8,7 @@ import org.lwjgl.input.Keyboard
 
 class GlaciteMineshaftConfig {
     @Expose
-    @ConfigOption(name = "Mineshaft Waypoints", desc = "General waypoints inside the Mineshaft.")
+    @ConfigOption(name = "Mineshaft WaypointSet", desc = "General waypoints inside the Mineshaft.")
     @Accordion
     val mineshaftWaypoints: MineshaftWaypointsConfig = MineshaftWaypointsConfig()
 

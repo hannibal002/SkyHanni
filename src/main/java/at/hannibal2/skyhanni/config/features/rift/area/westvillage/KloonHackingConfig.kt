@@ -20,7 +20,7 @@ class KloonHackingConfig {
 
     @Expose
     @ConfigOption(
-        name = "Terminal Waypoints",
+        name = "Terminal WaypointSet",
         desc = "While wearing the helmet, waypoints will appear at each terminal location."
     )
     @ConfigEditorBoolean
