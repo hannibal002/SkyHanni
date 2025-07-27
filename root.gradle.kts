@@ -26,7 +26,7 @@ allprojects {
      * Beta version
      * Bugfix version
      */
-    version = providers.fileContents(buildToolsPath.file("PROJECT_VERSION")).asText.map { it.trim() }
+    version = providers.fileContents(buildToolsPath.file("PROJECT_VERSION")).asText.map { it.trim() }.get()
 
     repositories {
         mavenCentral()
