@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
@@ -69,20 +68,18 @@ object PartyChatCommands {
             { config.pingCommand },
             requiresPartyLead = false,
             executable = {
-
-                if (!devConfig.hypixelPingApi) {
-
+                if (!CurrentPing.isEnabled()) {
                     ChatUtils.clickableChat(
-                        "Hypixel Ping Api is disabled, ping command won't work!",
+                        "Ping API is disabled, the ping command won't work!",
                         prefixColor = "§c",
                         onClick = {
-                            devConfig::hypixelPingApi.jumpToEditor()
+                            devConfig::pingApi.jumpToEditor()
                         },
                         hover = "§eClick to find setting in the config!",
                     )
                     return@PartyChatCommand
                 }
-                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms", prefix = true)
+                HypixelCommands.partyChat(CurrentPing.getFormattedPing(), prefix = true)
 
             },
         ),

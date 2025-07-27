@@ -40,12 +40,14 @@ object OSUtils {
     val isWindows: Boolean
     val isMac: Boolean
     val isLinux: Boolean
+    val isSolaris: Boolean
 
     init {
         val os = getOperatingSystem()
         isWindows = os == OperatingSystem.WINDOWS
         isMac = os == OperatingSystem.MACOS
         isLinux = os == OperatingSystem.LINUX
+        isSolaris = os == OperatingSystem.SOLARIS
     }
 
     @JvmStatic

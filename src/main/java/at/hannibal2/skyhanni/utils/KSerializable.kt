@@ -17,6 +17,7 @@ import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
@@ -53,8 +54,11 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                     it.name == param.name && it.returnType.isSubtypeOf(typeOf<Map<String, JsonElement>>())
                 } as KProperty1<Any, Map<String, JsonElement>>
             }
-        val parameterInfos = params.map { param ->
+        val parameterInfos = params.mapNotNull { param ->
             val field = kotlinClass.memberProperties.single { it.name == param.name } as KProperty1<Any, Any?>
+            kotlin.runCatching {
+                field.isAccessible = true
+            }.getOrNull() ?: return@mapNotNull null
             val kType = field.returnType
             val name = param.findAnnotation<SerializedName>()?.value ?: param.name!!
 
