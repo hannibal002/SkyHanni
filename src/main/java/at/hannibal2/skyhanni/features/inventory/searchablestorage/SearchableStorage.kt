@@ -13,15 +13,14 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.inventory.searchablestorage.SearchableStorageGui.SearchMode
 import at.hannibal2.skyhanni.features.inventory.searchablestorage.SearchableStorageGui.SortMode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -96,17 +95,9 @@ object SearchableStorage {
     }
 
     fun onCommand(search: String = "") {
+        if (!SkyBlockUtils.inSkyBlock) return ChatUtils.userError("You can only use this in Skyblock!")
         SkyHanniMod.screenToOpen = if (shouldRemind()) SearchableStorageReminderGui(search) else SearchableStorageGui(search)
     }
-
-    fun minecraftButton(text: String) = Renderable.drawInsideRoundedRectWithOutline(
-        StringRenderable(text), Color.decode("#8b8b8b"),
-        radius = 0,
-        topOutlineColor = Color.WHITE.rgb,
-        bottomOutlineColor = Color.WHITE.rgb,
-        borderOutlineThickness = 2,
-        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-    )
 
     private fun shouldRemind() = config.searchableStorageReminder && !config.savePrivateIslandChests
 }

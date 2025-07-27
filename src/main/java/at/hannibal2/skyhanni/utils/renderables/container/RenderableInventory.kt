@@ -135,11 +135,6 @@ object RenderableInventory {
                 drawInsideFixedSizedImage(
                     if (uv == SlotsUv.CENTER)
                         items[index]?.let {
-                            if (index in highlightSlots) {
-                                println("test")
-                                println(index)
-                                println(highlightSlots)
-                            }
                             val itemRenderable = item(it, scale, 0, 0, false)
                             if (highlightSlots.contains(index)) drawInsideRoundedRect(
                                 itemRenderable,

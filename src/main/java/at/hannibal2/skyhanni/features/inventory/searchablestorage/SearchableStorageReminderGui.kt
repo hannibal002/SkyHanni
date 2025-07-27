@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.searchablestorage
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.features.inventory.searchablestorage.SearchableStorage.minecraftButton
+import at.hannibal2.skyhanni.features.inventory.searchablestorage.SearchableStorageUtil.minecraftButtonRenderable
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -53,9 +53,9 @@ class SearchableStorageReminderGui(private var search: String = "") : SkyhanniBa
         val warningText1 = string("§cYou currently don't save private island chests.")
         val warningText2 = string("§cIt is recommended to enable that option for maximum QOL.")
         val placeholder = Renderable.placeholder(warningText1.width)
-        val dontRemind = minecraftButton("§${if (config.searchableStorageReminder) "cD" else "2W"}on't remind again")
-        val settings = minecraftButton("§eTo Settings")
-        val acknowledge = minecraftButton("§aAcknowledge")
+        val dontRemind = minecraftButtonRenderable("§${if (config.searchableStorageReminder) "cD" else "2W"}on't remind again")
+        val settings = minecraftButtonRenderable("§eTo Settings")
+        val acknowledge = minecraftButtonRenderable("§aAcknowledge")
         val contents = listOf(
             warning,
             warningText1,
