@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.garden.pests
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.garden.laneswitch.LaneSwitchSoundSettings
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -60,6 +62,11 @@ class PestTimerConfig {
     var cooldownOverWarning: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Repeat Warning", desc = "Repeat the warning sound and title until wardrobe is opened or pest cooldown is over.")
+    @ConfigEditorBoolean
+    var repeatWarning: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Warn Before Cooldown End", desc = "Warn this many seconds before the cooldown is over.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
     var cooldownWarningTime: Int = 5
@@ -79,6 +86,11 @@ class PestTimerConfig {
     )
     @ConfigEditorBoolean
     var pestSpawnChatMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Sound Settings", desc = "")
+    @Accordion
+    val sound: PestTimerSoundSettings = PestTimerSoundSettings()
 
     @Expose
     @ConfigLink(owner = PestTimerConfig::class, field = "enabled")
