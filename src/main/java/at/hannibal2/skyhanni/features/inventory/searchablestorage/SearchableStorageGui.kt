@@ -182,7 +182,10 @@ class SearchableStorageGui(private var search: String = "") : SkyhanniBaseScreen
                 it.position.x, it.position.y,
                 it.renderable.width, it.renderable.height,
             )
-        } ?: return
+        } ?: run {
+            tooltipRenderable = null
+            return
+        }
 
 
         tooltipRenderable = buildTooltip(item)
