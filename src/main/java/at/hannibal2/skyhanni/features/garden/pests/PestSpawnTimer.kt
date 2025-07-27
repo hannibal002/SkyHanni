@@ -291,7 +291,7 @@ object PestSpawnTimer {
             duration = 1.seconds,
             intention = PestTitleIntention.COOLDOWN_COUNTDOWN,
             addType = TitleManager.TitleAddType.FORCE_FIRST,
-            //countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
+            // countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
         )
     }
 
