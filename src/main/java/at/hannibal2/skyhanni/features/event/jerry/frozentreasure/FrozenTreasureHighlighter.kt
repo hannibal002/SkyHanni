@@ -40,7 +40,6 @@ object FrozenTreasureHighlighter {
     fun onTick() {
         if (!isEnabled()) return
 
-        @Suppress("LoopWithTooManyJumpStatements")
         for (armorStand in EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(50.0)) {
             if (armorStand.getInventoryItems().count { it.isNotEmpty() } != 1) continue
 
