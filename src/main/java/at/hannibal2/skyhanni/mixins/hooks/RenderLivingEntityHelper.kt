@@ -17,12 +17,41 @@ object RenderLivingEntityHelper {
     private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
     private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+
+    @JvmStatic
     var areMobsHighlighted = false
-    var renderingRealGlow = false
+    @JvmStatic
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
-    fun isEntityInGlowEvent(entity: Entity): Int {
+    private fun isEntityInGlowEvent(entity: Entity): Int {
         return currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb ?: 0
+    }
+
+    @JvmStatic
+    fun check() {
+        areMobsHighlighted = false
+        val conditions = entityColorCondition.values
+        for (entry in conditions) {
+            if (entry.invoke()) {
+                areMobsHighlighted = true
+                return
+            }
+        }
+        if (currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true) areMobsHighlighted = true
+    }
+
+    @JvmStatic
+    fun getEntityGlowColor(entity: Entity): Int? {
+        val livingEntity = entity as? EntityLivingBase ?: return null
+        val color = internalSetColorMultiplier(livingEntity, 0)
+        if (color == 0) {
+            val eventColor = isEntityInGlowEvent(entity)
+            if (eventColor == 0) {
+                return null
+            }
+            return eventColor
+        }
+        return color
     }
 
     @HandleEvent
@@ -38,18 +67,6 @@ object RenderLivingEntityHelper {
         entityColorMap.removeIfKey { it.isDead }
         entityColorCondition.removeIfKey { it.isDead }
         entityNoHurtTimeCondition.removeIfKey { it.isDead }
-    }
-
-    fun check() {
-        areMobsHighlighted = false
-        val conditions = entityColorCondition.values
-        for (entry in conditions) {
-            if (entry.invoke()) {
-                areMobsHighlighted = true
-                return
-            }
-        }
-        if (currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true) areMobsHighlighted = true
     }
 
     fun <T : EntityLivingBase> removeEntityColor(entity: T) {
