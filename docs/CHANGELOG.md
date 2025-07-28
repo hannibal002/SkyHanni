@@ -421,6 +421,8 @@
 + Removed an unnecessary `.intern()` call in ItemResolutionQuery that may lead to a performance hit. - Luna (https://github.com/hannibal002/SkyHanni/pull/4474)
 + Switched /shcarrolyn and /shtrackcollection to use brigadier commands. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4469)
 + Use native ping method instead of Hypixel Mod API on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4488)
++ Created SkyHanniBlockHighlighter which is a class that is abstracted to allow multiple different block highlighting implementations. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4502)
++ Split our entity outlines vertex consumer from the normal Minecraft one so that we can modify depth test per entity. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
 
 ## Version 4.0.0
 
