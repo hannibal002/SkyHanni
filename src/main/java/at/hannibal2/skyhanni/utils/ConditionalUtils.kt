@@ -91,7 +91,7 @@ object ConditionalUtils {
         current: Any,
         visited: MutableSet<Any>
     ): List<Property<*>> = buildList {
-        if (current.javaClass.isArray) return@buildList
+        if (current.javaClass.isArray || current.javaClass.isSynthetic) return@buildList
         if (!visited.add(current)) return emptyList()
 
         val nonTransientProps = current::class.memberProperties.filter { !it.hasAnnotation<Transient>() }
