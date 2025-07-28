@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -27,6 +28,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderCrosshair
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
 import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
 import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
@@ -244,7 +247,9 @@ object CurrentPetDisplay {
                 axis = EnumFacing.Axis.Y,
                 rotationSpeed = degreesPerSecond.toDouble(),
             ),
-        )
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        ).renderBounds(LorenzColor.WHITE.toColor()).renderCrosshair()
     }
 
     private fun PetData.buildTextRenderableOrNull(): Renderable? = Renderable.vertical(

@@ -519,11 +519,8 @@ object GuiRenderUtils {
         //$$
         //$$ if (rotationDegrees != null || (totalScale > 1 && itemRenderStateButCool.isSideLit)) {
         //$$     val actualScale = ((5f / 4f) * scaleMultiplier).toFloat()
-        //$$     val translateOffset = 2f * actualScale
         //$$
-        //$$     val (xTranslation, yTranslation) = (x - translateOffset) to (y - translateOffset)
-        //$$
-        //$$     item.customRenderOnScreen(matrices2D.m20, matrices2D.m21, xTranslation, yTranslation, guiScale, actualScale, rotX, rotY, rotZ)
+        //$$     item.customRenderOnScreen(matrices2D.m20, matrices2D.m21, translateX, translateY, guiScale, actualScale, rotX, rotY, rotZ)
         //$$ } else {
         //$$     item.normalRenderOnScreen(translateX, translateY, finalScale)
         //$$ }
