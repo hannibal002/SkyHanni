@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ErrorManagerJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,22 +36,20 @@ fun requireDevEnv(value: Boolean, lazyMessage: (() -> Any)?) {
 @SkyHanniModule
 object ErrorManager {
 
-    // random id -> error message
-    private val errorMessages = mutableMapOf<String, String>()
-    private val fullErrorMessages = mutableMapOf<String, String>()
-    private val cache = TimeLimitedSet<CachedError>(10.minutes)
-    private var repoErrors: List<RepoErrorData> = emptyList()
-
-    private val breakAfter = listOf(
+    // These are left as mutable properties so that they can be updated by the repo
+    // however we still want to leave some defaults in here in case a repo reload fails
+    // and tries to call ErrorManager methods.
+    // <editor-fold defaultstate="collapsed" desc="Error Manager Data (semi-REPO controlled)">
+    private var breakAfter: List<String> = listOf(
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand",
         "at net.minecraftforge.fml.common.eventhandler.EventBus.post",
         "at at.hannibal2.skyhanni.mixins.hooks.NetHandlerPlayClientHookKt.onSendPacket",
         "at net.minecraft.client.main.Main.main",
         "at.hannibal2.skyhanni.api.event.EventListeners.createZeroParameterConsumer",
         "at.hannibal2.skyhanni.api.event.EventListeners.createSingleParameterConsumer",
+        "at.hannibal2.skyhanni.api.event.SkyHanniEvent.post"
     )
-
-    private val replace = mapOf(
+    private var replace: Map<String, String> = mapOf(
         "at.hannibal2.skyhanni." to "SH.",
         "io.moulberry.notenoughupdates." to "NEU.",
         "net.minecraft." to "MC.",
@@ -58,13 +57,11 @@ object ErrorManager {
         "knot//" to "",
         "java.base/" to "",
     )
-
-    private val replaceEntirely = mapOf(
+    private var replaceEntirely: Map<String, String> = mapOf(
         "at.hannibal2.skyhanni.api.event.EventListeners.createZeroParameterConsumer" to "<Skyhanni event post>",
         "at.hannibal2.skyhanni.api.event.EventListeners.createSingleParameterConsumer" to "<Skyhanni event post>",
     )
-
-    private val ignored = listOf(
+    private var ignored: List<String> = listOf(
         "at java.lang.Thread.run",
         "at java.util.concurrent.",
         "at java.lang.reflect.",
@@ -85,6 +82,13 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.api.event.EventHandler.post",
         "at net.minecraft.launchwrapper.",
     )
+    // </editor-fold>
+
+    // random id -> error message
+    private val errorMessages = mutableMapOf<String, String>()
+    private val fullErrorMessages = mutableMapOf<String, String>()
+    private val cache = TimeLimitedSet<CachedError>(10.minutes)
+    private var repoErrors: List<RepoErrorData> = emptyList()
 
     // this hides the whole stack trace of one error of the list of all errors in the error message
     // where the error class name is the key and the first line contains one of the entries in the list of values
@@ -284,6 +288,12 @@ object ErrorManager {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
+        val repoData = event.getConstant<ErrorManagerJson>("ErrorManager")
+        breakAfter = repoData.breakAfter
+        replace = repoData.replacements
+        replaceEntirely = repoData.entireReplacements
+        ignored = repoData.ignored
+
         val data = event.getConstant<ChangedChatErrorsJson>("ChangedChatErrors")
         val version = SkyHanniMod.modVersion
 
