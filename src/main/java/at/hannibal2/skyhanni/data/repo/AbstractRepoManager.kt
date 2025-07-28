@@ -320,16 +320,14 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         val diffCheck = RepoComparison(localRepoCommit, latestRepoCommit)
-        val outdated = !diffCheck.hashesMatch
-
-        if (!outdated && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
+        if (diffCheck.hashesMatch && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
             if (command) {
                 diffCheck.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
             return FetchUnpackResult.SUCCESS
         } else if (command) {
-            if (outdated) diffCheck.reportRepoOutdated()
+            if (!diffCheck.hashesMatch) diffCheck.reportRepoOutdated()
             else if (forceReset) diffCheck.reportForceRebuild()
         }
 
