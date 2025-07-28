@@ -328,7 +328,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 shouldManuallyReload = false
             }
             return FetchUnpackResult.SUCCESS
-        } else if ((command && outdated) || forceReset) diffCheck.reportRepoOutdated()
+        } else if (command) {
+            if (outdated) diffCheck.reportRepoOutdated()
+            else if (forceReset) diffCheck.reportForceRebuild()
+        }
 
         prepCleanRepoFileSystem()
 
