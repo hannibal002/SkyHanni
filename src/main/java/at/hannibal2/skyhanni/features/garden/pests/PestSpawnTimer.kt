@@ -185,6 +185,7 @@ object PestSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onIslandChange(event: IslandChangeEvent) {
+        shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
     }
 
@@ -297,7 +298,7 @@ object PestSpawnTimer {
 
     private fun repeatSound() {
         with(config) {
-            if (!enabled) return
+            if (!enabled || !GardenApi.inGarden()) return
             if (lastPlayedSound.passedSince() >= sound.repeatDuration.ticks) {
                 lastPlayedSound = SimpleTimeMark.now()
                 playUserSound()
