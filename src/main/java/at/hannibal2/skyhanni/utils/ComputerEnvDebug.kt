@@ -27,6 +27,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object ComputerEnvDebug {
 
     private var launchers: List<LauncherEntry> = listOf()
+    private var genericStacks: List<String> = listOf()
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -40,7 +41,9 @@ object ComputerEnvDebug {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        launchers = event.getConstant<LaunchersJson>("Launchers").launchers
+        val repoJson = event.getConstant<LaunchersJson>("Launchers")
+        launchers = repoJson.launchers
+        genericStacks = repoJson.genericStacks
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -51,39 +54,44 @@ object ComputerEnvDebug {
             return
         }
 
-        val (launcher, relevant) = findLauncher(firstStack)
+        val launcherBrand = System.getProperty("minecraft.launcher.brand")
+        val (launcher, relevant) = findLauncher(firstStack, launcherBrand)
 
         launcher?.let {
-            if (relevant) {
-                event.addData(it)
-            } else {
-                event.addIrrelevant(it)
-            }
+            if (relevant) event.addData(it)
+            else event.addIrrelevant(it)
             return
         }
 
         event.addData {
             add("Unknown launcher!")
-            val launcherBrand = System.getProperty("minecraft.launcher.brand")
             add("System property of 'minecraft.launcher.brand': '$launcherBrand'")
             add("firstStack: '$firstStack'")
         }
     }
 
-    private fun findLauncher(firstStack: String): Pair<String?, Boolean> = launchers.firstNotNullOfOrNull {
-        if (it.firstStacks.none { firstStack.contains(it) }) return@firstNotNullOfOrNull null
-        Pair(it.name, it.flagged)
-    } ?: Pair(null, true)
-
-    private fun getFirstStack(): String? {
-        val firstStack = try {
-            Thread.currentThread().stackTrace.last().toString()
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Failed loading current thread stack trace info")
-            null
+    private fun findLauncher(firstStack: String, launcherBrand: String): Pair<String?, Boolean> {
+        val isGeneric = genericStacks.any { firstStack.contains(it) }
+        val matchingLaunchers = launchers.filter { launcher ->
+            val firstStackMatch = launcher.firstStacks.any { firstStack.contains(it) }
+            val brandMatch = launcher.brand.isEmpty() || launcher.brand.equals(launcherBrand, ignoreCase = true)
+            (isGeneric || firstStackMatch) && brandMatch
         }
-        return firstStack
+        val fallbackPair = null to true
+        return when (matchingLaunchers.size) {
+            0 -> fallbackPair
+            1 -> matchingLaunchers.first().getIdPair()
+            else -> matchingLaunchers.firstOrNull {
+                it.brand.equals(launcherBrand, ignoreCase = true)
+            }?.getIdPair() ?: fallbackPair
+        }
     }
+
+    private fun getFirstStack(): String? = kotlin.runCatching {
+        Thread.currentThread().stackTrace.last().toString()
+    }.onFailure { e ->
+        ErrorManager.logErrorWithData(e, "Failed loading current thread stack trace info")
+    }.getOrNull()
 
     private fun java(event: DebugDataCollectEvent) {
         // outdated java 8 is only a mc 1.8.9 thing. in mc 1.21 we have modern java 21 anyway
