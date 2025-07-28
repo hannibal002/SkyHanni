@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent

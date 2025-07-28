@@ -556,8 +556,18 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Boss Spawn Warning - HiZe + hannibal2
     + Send a title when your slayer boss is about to spawn
     + Configurable percentage at which the title and sound should be sent
++ Added Hide Irrelevant Mobs for Slayers. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4468)
+    + Makes mobs partially transparent so that they don't annoy while having an active slayer quest.
+    + Useful for e.g. Magma Cubes in Burning Desert for Tara Slayer.
++ Added Mark When Invincible Tara 5. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4471)
+    + Highlight the Tarantula Slayer tier 5 in a customizeable color while the hatchlings are alive.
+
+</details>
+<details open><summary>
 
 ### Diana
+
+</summary>
 
 + Show burrows near you.
 + Uses Soopy's Guess Logic to find the next burrow. Does not require SoopyV2 or chat triggers to be installed.
@@ -1310,6 +1320,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added party commands !ping and !tps. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4001)
     + Customizable trigger permissions for party commands.
 + Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
++ Added /shping to show your ping in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/4478)
 
 </details>
 <details open><summary>
