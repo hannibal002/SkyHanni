@@ -3,7 +3,10 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.LauncherEntry
+import at.hannibal2.skyhanni.data.jsonobjects.repo.LaunchersJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -23,6 +26,8 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComputerEnvDebug {
 
+    private var launchers: List<LauncherEntry> = listOf()
+
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         os(event)
@@ -31,6 +36,11 @@ object ComputerEnvDebug {
         ram(event)
         uptime(event)
         performanceMods(event)
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        launchers = event.getConstant<LaunchersJson>("Launchers").launchers
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -60,25 +70,10 @@ object ComputerEnvDebug {
         }
     }
 
-    // TODO put into repo
-    private fun findLauncher(firstStack: String): Pair<String?, Boolean> {
-        if (firstStack.contains("net.fabricmc.devlaunchinjector.Main.main")) {
-            return Pair("Dev Env", false)
-        }
-        if (firstStack.contains("net.minecraft.launchwrapper.Launch.main")) {
-            return Pair("Vanilla Launcher", false)
-        }
-        if (firstStack.contains("org.prismlauncher.EntryPoint.main")) {
-            return Pair("Prism", false)
-        }
-        if (firstStack.contains("org.multimc.EntryPoint.main")) {
-            return Pair("MultiMC", false)
-        }
-        if (firstStack.contains("net.digitalingot.vendor.") || firstStack.contains("net.digitalingot.rustextension.")) {
-            return Pair("Feather Client", true)
-        }
-        return Pair(null, true)
-    }
+    private fun findLauncher(firstStack: String): Pair<String?, Boolean> = launchers.firstNotNullOfOrNull {
+        if (it.firstStacks.none { firstStack.contains(it) }) return@firstNotNullOfOrNull null
+        Pair(it.name, it.flagged)
+    } ?: Pair(null, false)
 
     private fun getFirstStack(): String? {
         val firstStack = try {
