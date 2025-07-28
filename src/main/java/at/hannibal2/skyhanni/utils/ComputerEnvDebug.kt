@@ -54,7 +54,9 @@ object ComputerEnvDebug {
             return
         }
 
-        val launcherBrand = System.getProperty("minecraft.launcher.brand")
+        val launcherBrand = runCatching {
+            System.getProperty("minecraft.launcher.brand")
+        }.getOrNull().orEmpty()
         val (launcher, relevant) = findLauncher(firstStack, launcherBrand)
 
         launcher?.let {
