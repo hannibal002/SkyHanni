@@ -43,10 +43,8 @@ object DefaultConfigFeatures {
             val lastVersion = knownToggles.keys.lastOrNull { it != SkyHanniMod.VERSION }
                 ?: ErrorManager.skyHanniError(
                     "lastVersion is null, this should never happen",
-                    extraData = listOf(
-                        "knownToggles" to knownToggles,
-                        "version" to SkyHanniMod.VERSION,
-                    ).toTypedArray()
+                    "knownToggles" to knownToggles,
+                    "version" to SkyHanniMod.VERSION,
                 )
             val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
             ChatUtils.chat("Looks like you updated SkyHanni.")
