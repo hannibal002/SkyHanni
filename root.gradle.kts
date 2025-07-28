@@ -20,7 +20,7 @@ allprojects {
      * Beta version
      * Bugfix version
      */
-    version = "4.10.0"
+    version = "4.11.0"
 
     repositories {
         mavenCentral()
