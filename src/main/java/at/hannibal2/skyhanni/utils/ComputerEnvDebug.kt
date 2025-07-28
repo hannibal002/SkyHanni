@@ -73,7 +73,7 @@ object ComputerEnvDebug {
     private fun findLauncher(firstStack: String): Pair<String?, Boolean> = launchers.firstNotNullOfOrNull {
         if (it.firstStacks.none { firstStack.contains(it) }) return@firstNotNullOfOrNull null
         Pair(it.name, it.flagged)
-    } ?: Pair(null, false)
+    } ?: Pair(null, true)
 
     private fun getFirstStack(): String? {
         val firstStack = try {
