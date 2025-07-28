@@ -139,8 +139,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             return repoFileSystem.readAllBytesAsJsonElement(path)
         }
         val onDisk = repoDirectory.resolve(path)
-        if (!onDisk.isFile) logger.throwError("Repo file not found: $path")
-        return onDisk.getJson()
+        return if (!onDisk.isFile) {
+            logger.logNonDestructiveError("Repo file not found: $path")
+            null
+        } else onDisk.getJson()
     }
 
     @PublishedApi
@@ -213,34 +215,30 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     // Code taken + adapted from NotEnoughUpdates
-    private fun switchToBackupRepo(): FetchUnpackResult {
+    private fun switchToBackupRepo(): FetchUnpackResult = runCatching {
         if (backupRepoResourcePath == null) {
             logger.warn("No backup repo resource path provided, cannot switch to backup repo.")
             return FetchUnpackResult.FAILED
         }
 
-        isUsingBackup = true
         logger.debug("Attempting to switch to backup repo")
+        val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath)
+            ?: logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
 
-        try {
-            val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath)
-                ?: logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
+        prepCleanRepoFileSystem()
 
-            prepCleanRepoFileSystem()
-
-            Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
-                logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
-            }
-
-            commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
-            logger.debug("Successfully switched to backup repo")
-            return FetchUnpackResult.SWITCHED_TO_BACKUP
-        } catch (e: Error) {
-            logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
+        Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
+            logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
         }
-        return FetchUnpackResult.FAILED
-    }
+
+        isUsingBackup = true
+        commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
+        logger.debug("Successfully switched to backup repo")
+        return FetchUnpackResult.SWITCHED_TO_BACKUP
+    }.onFailure { e ->
+        logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
+    }.getOrDefault(FetchUnpackResult.FAILED)
 
     open fun reportExtraStatusInfo(): Unit = Unit
 
@@ -288,7 +286,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         TextHelper.multiline(text).send()
     }
 
-    enum class FetchUnpackResult(val canContinue: Boolean = true) {
+    private enum class FetchUnpackResult(val canContinue: Boolean = true) {
         SUCCESS,
         SWITCHED_TO_BACKUP,
         FAILED(false),
