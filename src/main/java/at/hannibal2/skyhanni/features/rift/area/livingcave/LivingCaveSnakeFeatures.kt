@@ -10,13 +10,13 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.livingcave.snake.LivingCaveSnake
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.block.Block
@@ -112,7 +112,7 @@ object LivingCaveSnakeFeatures {
     fun onTick() {
         if (!isEnabled()) return
 
-        if (SkyHanniDebugsAndTests.enabled && MinecraftCompat.localPlayer.isSneaking && snakes.isNotEmpty()) {
+        if (SkyBlockUtils.debug && MinecraftCompat.localPlayer.isSneaking && snakes.isNotEmpty()) {
             snakes.clear()
             ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
             return
