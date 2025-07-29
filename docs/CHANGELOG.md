@@ -111,6 +111,10 @@
     + Useful for e.g. Magma Cubes in Burning Desert for Tara Slayer.
 + Added Mark When Invincible Tara 5. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4471)
     + Highlight the Tarantula Slayer tier 5 in a customizeable color while the hatchlings are alive.
++ Added Slayer Kill Timer. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
+    + Sends time to kill a slayer in chat.
++ Added Slayer Time messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
+    + Sends time to complete (Spawn & Kill) a slayer quest in chat.
 
 ### Improvements
 
@@ -160,6 +164,8 @@
 + Added option to show `/shnavigate` feedback in a UI element instead of chat. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4399)
 + Separated Foraging and Hunting features in the config. - Luna (https://github.com/hannibal002/SkyHanni/pull/4437)
 + Added some more information when clock offset fails to calculate. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4439)
++ Improved compatability between SkyHanni's glow and Minecraft's glow on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
++ Improved performance a bit. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4519)
 
 #### Foraging
 
@@ -199,6 +205,7 @@
 #### Combat
 
 + Fixed Damage Indicator showing bosses at 1k HP before first hit. - nopo (https://github.com/hannibal002/SkyHanni/pull/4451)
++ Fixed wrong color for Tara T5 Name in Damage Indicator. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4518)
 
 #### Rift
 
@@ -209,12 +216,15 @@
 + Fixed Bacte Tentacle Waypoints not updating Tentacle HP on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
 + Fixed Sun Gecko Helper's Highlight Real Boss incorrectly highlighting the clones in green if Highlight Clones is disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/4431)
 + Fixed Ubik Reminder sending every second in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4464)
++ Fixed Puff not showing in Crux Talisman Display on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4506)
 
 #### Crimson Isle
 
 + Fixed rare error in Crimson Miniboss Respawn Timer on 1.21. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4447)
 + Fixed Wither Skeleton Mob Detection on 1.21+. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4455)
     + Fixed Mob HP for Bladesoul and Quazzi.
++ Fixed errors with reading 'Kill Kuudra' quests. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4495)
++ Fixed Trophy Fish Display incorrectly saying you caught all trophy fish of a specific tier when you have never caught any tier of some. - Luna (https://github.com/hannibal002/SkyHanni/pull/4501)
 
 #### Misc
 
@@ -238,6 +248,13 @@
 + Fixed rare error when converting config from 1.21 to 1.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4420)
 + Fixed errors with Pet XP calculations. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4438)
 + Fixed more repo loading issues. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4449)
++ Fixed Ancient Skin gdrags autopet messages not being blocked. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4507)
++ Fixed negative shards being added to profit trackers. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4503)
++ Fixed rare error in glowing mushroom highlighter. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4502)
++ Fixed rare error when searching in config. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4500)
++ Fixed Voodoo Doll/Jinxed Voodoo Doll ability detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/4493)
++ Fixed missing text on config button. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4512)
++ Fixed repo errors when GitHub is inaccessible. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4483)
 
 #### Chat
 
@@ -247,6 +264,7 @@
 + Fixed shorten coin amount behaving incorrectly on values < 1. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4417)
 + Fixed Your computer's clock is off messages sometimes spamming the chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4435)
 + Fixed tab complete on some commands not working on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4453)
++ Fixed warp tab complete removing tab complete for some Hypixel commands on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4504)
 
 #### Inventory
 
@@ -270,6 +288,7 @@
 + Fixed colorful item tooltips replacing commas with dots. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4423)
 + Fixed Custom Wardrobe not hiding the inventory screen on 1.21.7. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4452)
 + Fixed inventory names not showing on 1.21.7 when Improved SB Menus was off. - nopo (https://github.com/hannibal002/SkyHanni/pull/4450)
++ Fixed SkyHanni not recognizing belt-exclusive reforges, preventing NEU repo load errors. - Luna (https://github.com/hannibal002/SkyHanni/pull/4515)
 
 #### Fishing
 
@@ -411,6 +430,12 @@
 + Removed an unnecessary `.intern()` call in ItemResolutionQuery that may lead to a performance hit. - Luna (https://github.com/hannibal002/SkyHanni/pull/4474)
 + Switched /shcarrolyn and /shtrackcollection to use brigadier commands. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4469)
 + Use native ping method instead of Hypixel Mod API on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4488)
++ Created SkyHanniBlockHighlighter which is a class that is abstracted to allow multiple different block highlighting implementations. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4502)
++ Split our entity outlines vertex consumer from the normal Minecraft one so that we can modify depth test per entity. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
++ Added Damage Indicator checks to /shdebug. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4517)
++ Fixed /shconfig search functionality. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4516)
++ Moved Sh Project Version from Gradle to external file. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4497)
++ Removed obsolete Fishing Weapon item category. - Luna (https://github.com/hannibal002/SkyHanni/pull/4515)
 
 ## Version 4.0.0
 

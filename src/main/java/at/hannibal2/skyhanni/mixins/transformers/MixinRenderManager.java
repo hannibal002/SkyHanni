@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.EntityData;
-import at.hannibal2.skyhanni.features.misc.HideArmor;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#if MC > 1.21
+//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//$$ import at.hannibal2.skyhanni.features.misc.HideArmor;
 //$$ import net.minecraft.client.util.math.MatrixStack;
 //$$ import net.minecraft.client.render.VertexConsumerProvider;
 //#endif
