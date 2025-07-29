@@ -88,14 +88,8 @@ object ReforgeApi {
                 ItemCategory.LEGGINGS,
                 ItemCategory.BOOTS,
             )
-            ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
             ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
-            ReforgeType.CLOAK -> itemCategory == ItemCategory.CLOAK
-            ReforgeType.BELT -> itemCategory == ItemCategory.BELT
-            ReforgeType.AXE -> itemCategory == ItemCategory.AXE
-            ReforgeType.HOE -> itemCategory == ItemCategory.HOE
-            ReforgeType.AXE_AND_HOE -> itemCategory in setOf(ItemCategory.HOE, ItemCategory.AXE)
-            ReforgeType.PICKAXE -> itemCategory in setOf(ItemCategory.PICKAXE, ItemCategory.DRILL, itemCategory.GAUNTLET)
+            ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
             ReforgeType.EQUIPMENT -> itemCategory in setOf(
                 ItemCategory.NECKLACE,
                 ItemCategory.CLOAK,
@@ -103,6 +97,12 @@ object ReforgeApi {
                 ItemCategory.GLOVES,
                 ItemCategory.BRACELET,
             )
+            ReforgeType.CLOAK -> itemCategory == ItemCategory.CLOAK
+            ReforgeType.BELT -> itemCategory == ItemCategory.BELT
+            ReforgeType.AXE -> itemCategory == ItemCategory.AXE
+            ReforgeType.HOE -> itemCategory == ItemCategory.HOE
+            ReforgeType.AXE_AND_HOE -> itemCategory in setOf(ItemCategory.HOE, ItemCategory.AXE)
+            ReforgeType.PICKAXE -> itemCategory in setOf(ItemCategory.PICKAXE, ItemCategory.DRILL, ItemCategory.GAUNTLET)
             ReforgeType.ROD -> itemCategory == ItemCategory.FISHING_ROD
             ReforgeType.SWORD_AND_ROD -> itemCategory in setOf(
                 ItemCategory.SWORD,
