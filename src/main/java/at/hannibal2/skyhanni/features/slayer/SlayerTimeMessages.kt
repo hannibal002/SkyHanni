@@ -35,9 +35,9 @@ object SlayerTimeMessages {
 
         ChatUtils.chat(
             if (config.compactTimeMessage)
-                "Slayer took §b${duration}§e in total."
+                "Slayer took §b$duration§e in total."
             else
-                "Slayer quest took §b${duration}§es to complete.",
+                "Slayer quest took §b$duration§es to complete.",
         )
     }
 }

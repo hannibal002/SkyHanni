@@ -68,6 +68,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+typealias EntityData = DamageIndicatorEntityData
+
 // TODO cut class into smaller pieces
 @SkyHanniModule
 @Suppress("LargeClass")
