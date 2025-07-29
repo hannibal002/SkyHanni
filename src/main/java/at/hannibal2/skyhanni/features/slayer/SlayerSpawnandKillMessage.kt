@@ -16,8 +16,8 @@ object SlayerSpawnandKillMessage {
     @HandleEvent
     fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
         val entityData = event.data
-        if (entityData.bossType.isSlayer && config.TimeToKillMessage) {
-            val killTimeMessage = when (config.CompactKillMessage) {
+        if (entityData.bossType.isSlayer && config.timeToKillMessage) {
+            val killTimeMessage = when (config.compactKillMessage) {
                 false -> "It took ${entityData.timeToKill}§e to kill ${entityData.bossType.fullName}."
                 true -> "${entityData.bossType.fullName}§e Took ${entityData.timeToKill}."
             }
