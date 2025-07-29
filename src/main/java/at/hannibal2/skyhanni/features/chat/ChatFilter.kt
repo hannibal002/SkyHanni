@@ -30,6 +30,7 @@ object ChatFilter {
     private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
     private val foragingConfig get() = config.foraging
     private val huntingConfig get() = config.hunting
+    private val slayerConfig get() = config.slayer
 
     private val chatFilterGroup = RepoPattern.group("chat-filter")
     private val huntingPatternGroup = chatFilterGroup.group("hunting")
@@ -126,25 +127,7 @@ object ChatFilter {
 
     // OTHERS
     // Bazaar And AH Mini
-    private val miniBazaarAndAHMessages = listOf(
-        "§7Putting item in escrow...",
-        "§7Putting coins in escrow...",
-
-        // Auction House
-        "§7Setting up the auction...",
-        "§7Processing purchase...",
-        "§7Processing bid...",
-        "§7Claiming BIN auction...",
-
-        // Bazaar
-        "§6[Bazaar] §r§7Submitting sell offer...",
-        "§6[Bazaar] §r§7Submitting buy order...",
-        "§6[Bazaar] §r§7Executing instant sell...",
-        "§6[Bazaar] §r§7Executing instant buy...",
-        "§6[Bazaar] §r§7Cancelling order...",
-        "§6[Bazaar] §r§7Claiming order...",
-        "§6[Bazaar] §r§7Putting goods in escrow...",
-
+    private val BankMessages = listOf(
         // Bank
         "§8Depositing coins...",
         "§8Withdrawing coins...",
@@ -234,15 +217,17 @@ object ChatFilter {
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
         "(?:§a)?§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
+        "§eYour previous (.*) §r§ewas removed!".toPattern(),
     )
     private val uselessNotificationMessages = listOf(
-        "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
-        "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!",
-        "§cYour Mining Speed Boost has expired!",
-        "§a§r§6Mining Speed Boost §r§ais now available!",
         "§aYou have just received §r§60 coins §r§aas interest in your personal bank account!",
         "§aSince you've been away you earned §r§60 coins §r§aas interest in your personal bank account!",
         "§aYou have just received §r§60 coins §r§aas interest in your co-op bank account!",
+    )
+    private val miningAbilityNotificationPatterns = listOf(
+        "§aYou used your §r§6(.*) §r§aPickaxe Ability!".toPattern(),
+        "§cYour (.*) has expired!".toPattern(),
+        "§a§r§6(.*) §r§ais now available!".toPattern(),
     )
 
     // Party
@@ -253,7 +238,14 @@ object ChatFilter {
     // MONEY
     // Auction House
     private val auctionHouseMessages = listOf(
-        "§b-----------------------------------------------------", "§eVisit the Auction House to collect your item!",
+        "§b-----------------------------------------------------",
+        "§eVisit the Auction House to collect your item!",
+        "§7Putting item in escrow...",
+        "§7Putting coins in escrow...",
+        "§7Setting up the auction...",
+        "§7Processing purchase...",
+        "§7Processing bid...",
+        "§7Claiming BIN auction...",
     )
 
     // Bazaar
@@ -262,6 +254,13 @@ object ChatFilter {
         "§eSell Offer Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.".toPattern(),
         "§cCancelled! §r§7Refunded §r§6(.*) coins §r§7from cancelling buy order!".toPattern(),
         "§cCancelled! §r§7Refunded §r§a(.*)§r§7x (.*) §r§7from cancelling sell offer!".toPattern(),
+        "§6[Bazaar] §r§7Submitting sell offer...".toPattern(),
+        "§6[Bazaar] §r§7Submitting buy order...".toPattern(),
+        "§6[Bazaar] §r§7Executing instant sell...".toPattern(),
+        "§6[Bazaar] §r§7Executing instant buy...".toPattern(),
+        "§6[Bazaar] §r§7Cancelling order...".toPattern(),
+        "§6[Bazaar] §r§7Claiming order...".toPattern(),
+        "§6[Bazaar] §r§7Putting goods in escrow...".toPattern(),
     )
 
     // Winter Island
@@ -272,14 +271,12 @@ object ChatFilter {
     // Useless Warning
     private val uselessWarningMessages = listOf(
         "§cYou are sending commands too fast! Please slow down.", // TODO prevent in the future
-        "§cYou can't use this while in combat!",
         "§cYou can not modify your equipped armor set!",
         "§cPlease wait a few seconds between refreshing!",
         "§cThis item is not salvageable!", // TODO prevent in the future
         "§cPlace a Dungeon weapon or armor piece above the anvil to salvage it!",
         "§cWhoa! Slow down there!",
         "§cWait a moment before confirming!",
-        "§cYou cannot open the SkyBlock menu while in combat!",
     )
 
     // Annoying Spam
@@ -507,7 +504,8 @@ object ChatFilter {
         "useless_drop" to uselessDropPatterns,
         "legacy_items" to legacyItems,
         "useless_notification" to uselessNotificationPatterns,
-        "money" to bazaarPatterns,
+        "bazaar" to bazaarPatterns,
+        "mining_ability" to miningAbilityNotificationPatterns,
         "winter_island" to winterIslandPatterns,
         "annoying_spam" to annoyingSpamPatterns,
         "winter_gift" to winterGiftPatterns,
@@ -536,12 +534,12 @@ object ChatFilter {
         "warping" to warpingMessages,
         "welcome" to welcomeMessages,
         "kill_combo" to killComboMessages,
-        "bz_ah_minis" to miniBazaarAndAHMessages,
+        "bank" to BankMessages,
         "slayer" to slayerMessages,
         "useless_drop" to uselessDropMessages,
         "useless_notification" to uselessNotificationMessages,
         "party" to partyMessages,
-        "money" to auctionHouseMessages,
+        "auction_house" to auctionHouseMessages,
         "useless_warning" to uselessWarningMessages,
         "annoying_spam" to annoyingSpamMessages,
         "powder_mining" to powderMiningMessages,
@@ -588,10 +586,18 @@ object ChatFilter {
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
         config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
+        config.hideParty && message.isPresent("party") -> "party"
+        config.hideBazaar && message.isPresent("money") -> "money"
+        config.hideAH && message.isPresent("money") -> "money"
+        config.hideWinterIsland && message.isPresent("winter_island") -> "winter_island"
+        config.hideBank && message.isPresent("bank") -> "bank"
+        config.hideUselessDrops && message.isPresent("useless_drops") -> "useless_drops"
+        config.hideMiningAbilityMessages && message.isPresent("mining_ability") -> "mining_ability"
+        config.hideUselessNotifications && message.isPresent("useless_notification") -> "useless_notification"
+        config.hideUselessWarning && message.isPresent("useless_warning") -> "useless_notification"
+        config.hideAnnoyingSpam && message.isPresent("annoying_spam") -> "annoying_spam"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
-
-        config.others && isOthers(message) -> othersMsg
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
 
@@ -614,6 +620,8 @@ object ChatFilter {
         huntingConfig.swoopAxeMessage && message.isPresent("swoop_axe") -> "swoop_axe"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
         config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
+        slayerConfig.slayerDropMessages && message.isPresent("slayer_drop") -> "slayer_drop"
+        slayerConfig.questMessages && message.isPresent("slayer") -> "slayer"
 
         else -> null
     }
@@ -665,22 +673,6 @@ object ChatFilter {
      * @see othersMsg
      * @see block
      */
-    private fun isOthers(message: String): Boolean {
-        othersMsg = when {
-            message.isPresent("bz_ah_minis") -> "bz_ah_minis"
-            message.isPresent("slayer") -> "slayer"
-            message.isPresent("slayer_drop") -> "slayer_drop"
-            message.isPresent("useless_drop") -> "useless_drop"
-            message.isPresent("useless_notification") -> "useless_notification"
-            message.isPresent("party") -> "party"
-            message.isPresent("money") -> "money"
-            message.isPresent("winter_island") -> "winter_island"
-            message.isPresent("useless_warning") -> "useless_warning"
-            message.isPresent("annoying_spam") -> "annoying_spam"
-            else -> null
-        }
-        return othersMsg != null
-    }
 
     /**
      * Checks if the message is present in the list of messages or patterns

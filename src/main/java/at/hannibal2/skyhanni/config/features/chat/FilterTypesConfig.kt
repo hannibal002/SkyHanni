@@ -36,6 +36,11 @@ class FilterTypesConfig {
     val stashMessages: StashConfig = StashConfig()
 
     @Expose
+    @ConfigOption(name = "Slayer", desc = "")
+    @Accordion
+    val slayer: SlayerFilterConfig = SlayerFilterConfig()
+
+    @Expose
     @ConfigOption(
         name = "Hypixel Lobbies",
         desc = "Hide announcements in Hypixel lobbies " +
@@ -177,6 +182,67 @@ class FilterTypesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var teleportPads: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Party Chat splitters", desc = "Hides the ---- seperators from party chat messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideParty: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Bazaar buy/sell Order messages", desc = "Hides annoying Bazaar order messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideBazaar: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Auction House messages", desc = "Hides the ---- seperators from Auction house chat messages and visit auction house messages." +
+        "§4This will also hide the dividing lines from Visit messages as they share the same message.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideAH: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Bank messages", desc = "Hides You Depositing/Withdrawing useless Bank messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideBank: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "miscellaneous 'rare' drops", desc = "Hides random drops that are technically 'rare' like carrots and potatos")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideUselessDrops: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Useless Notification Hider", desc = "Hides Notifications for early orb placement, tipping players and 0 interest Bank messages")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideUselessNotifications: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Snow Cannon Message", desc = "Hides You mounted a snow cannon message")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideWinterIsland: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Useless Warning hider", desc = "Hides generally pointless warnings")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideUselessWarning: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Mining Ability Messages", desc = "Hides Expiration and Usage messages of mining abilities")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideMiningAbilityMessages: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hypixel Spam message hider", desc = "Hides spammed messages like Implosion, Molten Wave, Spirit Sceptre and breaking power warnings")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideAnnoyingSpam: Boolean = false
 
     // TODO remove
     @Expose

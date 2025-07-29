@@ -195,6 +195,7 @@ class ChatConfig {
     @FeatureToggle
     var hideLottery: Boolean = true
 
+
     @Expose
     @ConfigOption(
         name = "Shorten Coin Amounts",
