@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.entity.EntityLivingBase
 
+// TODO replace all "cancel only" usages of this event. the only remaining stuff should be EntityOpacityManager
+@Deprecated("use CheckRenderEntityEvent instead")
 open class SkyHanniRenderEntityEvent<T : EntityLivingBase>(
     val entity: T,
     val x: Double,

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndica
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
@@ -946,7 +947,7 @@ object DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 

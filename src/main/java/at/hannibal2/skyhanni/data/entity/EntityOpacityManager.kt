@@ -56,7 +56,7 @@ object EntityOpacityManager {
 
     private fun opacity(entity: EntityLivingBase): Int = entities[entity] ?: error("can not read opacity bc not in map")
 
-    @HandleEvent
+    @HandleEvent//TODO keep
     fun onPreRender(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         if (!active) return
         val canChangeOpacity = canChangeOpacity(event.entity)
@@ -71,7 +71,7 @@ object EntityOpacityManager {
         GlStateManager.color(1f, 1f, 1f, opacity / 100f)
     }
 
-    @HandleEvent
+    @HandleEvent//TODO keep
     fun onPostRender(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         if (!active) return
         if (!canChangeOpacity(event.entity)) return
