@@ -303,22 +303,22 @@ object SkyHanniConfigSearchResetCommand {
         return map
     }
 
-    private fun isLeaf(v: Any?): Boolean = v == null
-        || v is Boolean          // true, false
-        || v is Char             // 'x'
-        || v is Number           // Int, Long, Double, Float, Byte, Short, BigDecimal
-        || v is String           // "hello"
-        || v is Map<*, *>        // any Map<_, _>
-        || v is Collection<*>    // List, Set, Queue
-        || v is TemporalAccessor // LocalDate, Instant, LocalTime
-        || v is TemporalAmount   // Duration, Period
-        || v is Date             // java.util.Date
-        || v is UUID             // java.util.UUID
-        || v is URI              // java.net.URI
-        || v is Path             // java.nio.file.Path
-        || v is File             // java.io.File
-        || v.javaClass.isArray   // Array<*>, IntArray, String[]
-        || v.javaClass.isEnum    // any enum type
+    private fun isLeaf(v: Any?): Boolean = v == null ||
+        v is Boolean ||// true, false
+        v is Char || // 'x'
+        v is Number ||  // Int, Long, Double, Float, Byte, Short, BigDecimal
+        v is String || // "hello"
+        v is Map<*, *> || // any Map<_, _>
+        v is Collection<*> || // List, Set, Queue
+        v is TemporalAccessor || // LocalDate, Instant, LocalTime
+        v is TemporalAmount ||  // Duration, Period
+        v is Date || // java.util.Date
+        v is UUID ||  // java.util.UUID
+        v is URI || // java.net.URI
+        v is Path ||  // java.nio.file.Path
+        v is File || // java.io.File
+        v.javaClass.isArray || // Array<*>, IntArray, String[]
+        v.javaClass.isEnum // any enum type
 
 
     private fun Any.getClassName(): String {
