@@ -117,8 +117,8 @@ object ReforgeHelper {
         }
         itemToReforge = newItem
         val newReforgeName = itemToReforge?.getReforgeName().orEmpty()
-        if (newReforgeName == currentReforge?.lowercaseName) return
-        currentReforge = ReforgeApi.reforgeList.firstOrNull { it.lowercaseName == newReforgeName }
+        if (newReforgeName == currentReforge?.nbtModifier) return
+        currentReforge = ReforgeApi.reforgeList.firstOrNull { it.nbtModifier == newReforgeName }
         updateDisplay()
     }
 

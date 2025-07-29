@@ -178,7 +178,7 @@ object EstimatedItemValueCalculator {
         val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         val reforge = ReforgeApi.onlyPowerStoneReforge.firstOrNull {
-            rawReforgeName == it.lowercaseName || rawReforgeName == it.reforgeStone?.asString()?.lowercase()
+            rawReforgeName == it.nbtModifier
         } ?: return 0.0
         val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()

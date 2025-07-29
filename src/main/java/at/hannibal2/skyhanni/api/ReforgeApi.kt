@@ -58,6 +58,7 @@ object ReforgeApi {
 
     class Reforge(
         val name: String,
+        val nbtModifier: String,
         val type: ReforgeType,
         val stats: Map<LorenzRarity, SkyblockStatList>,
         val reforgeStone: NeuInternalName? = null,
@@ -69,8 +70,6 @@ object ReforgeApi {
         val isReforgeStone = reforgeStone != null
 
         val rawReforgeStoneName = reforgeStone?.itemNameWithoutColor
-
-        val lowercaseName = name.lowercase().replace('-', '_')
 
         fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
 
@@ -192,6 +191,7 @@ object ReforgeApi {
         val type = it.itemType
         return Reforge(
             name = it.reforgeName,
+            nbtModifier = it.nbtModifier,
             type = EnumUtils.enumValueOf<ReforgeType>(type.first),
             stats = it.reforgeStats.orEmpty(),
             reforgeStone = it.internalName,

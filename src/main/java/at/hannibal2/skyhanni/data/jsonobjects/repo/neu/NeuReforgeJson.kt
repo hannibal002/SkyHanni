@@ -12,6 +12,7 @@ import com.google.gson.annotations.SerializedName
 data class NeuReforgeJson(
     @Expose val internalName: NeuInternalName?,
     @Expose val reforgeName: String,
+    @Expose val nbtModifier: String,
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
     @Expose val reforgeCosts: Map<LorenzRarity, Long>?,
@@ -22,23 +23,24 @@ data class NeuReforgeJson(
     private lateinit var reforgeAbilityField: Map<LorenzRarity, String>
     private lateinit var itemTypeField: Pair<String, List<NeuInternalName>>
 
-    val reforgeAbility
-        get() = if (this::reforgeAbilityField.isInitialized) reforgeAbilityField
-        else {
-            reforgeAbilityField = when (this.rawReforgeAbility) {
-                is String -> {
-                    this.requiredRarities.associateWith { this.rawReforgeAbility }
+    val reforgeAbility: Map<LorenzRarity, String>
+        get() {
+            if (!this::reforgeAbilityField.isInitialized) {
+                reforgeAbilityField = when (this.rawReforgeAbility) {
+                    is String -> {
+                        this.requiredRarities.associateWith { this.rawReforgeAbility }
+                    }
+
+                    is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
+                        LorenzRarity.valueOf(
+                            it.key.uppercase().replace(" ", "_"),
+                        )
+                    }.orEmpty()
+
+                    else -> emptyMap()
                 }
-
-                is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
-                    LorenzRarity.valueOf(
-                        it.key.uppercase().replace(" ", "_"),
-                    )
-                }.orEmpty()
-
-                else -> emptyMap()
             }
-            reforgeAbilityField
+            return reforgeAbilityField
         }
 
     val itemType: Pair<String, List<NeuInternalName>>
