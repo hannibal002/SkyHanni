@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.entity.EntityLivingBase
 
@@ -27,5 +28,5 @@ class DamageIndicatorEntityData(
     var serverTicksAlive: Long = 0L,
 ) {
 
-    val timeToKill by lazy { "§e" + foundTime.passedSince().format() }
+    val timeToKill by lazy { "§e" + foundTime.passedSince().format(TimeUnit.SECOND, showMilliSeconds = true) }
 }
