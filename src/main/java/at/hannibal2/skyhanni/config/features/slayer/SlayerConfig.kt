@@ -128,4 +128,19 @@ class SlayerConfig {
     @SearchTag("magma cube tarantula tara spider slayer quest")
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
     var hideIrrelevantMobsOpacity: Int = 40
+
+    @Expose
+    @ConfigOption(name = "Slayer Time to Kill Message", desc = "Sends time to kill in Chat on Slayer Boss Death.")
+    @ConfigEditorBoolean
+    var TimeToKillMessage: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Compact Time Message", desc = "Shorter Time To Kill Message")
+    @ConfigEditorBoolean
+    var CompactKillMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Quest Time Message", desc = "Sends a message on Slayer Quest Completion of Time (Spawn & Kill)")
+    @ConfigEditorBoolean
+    var fullQuestTime: Boolean = true
 }
