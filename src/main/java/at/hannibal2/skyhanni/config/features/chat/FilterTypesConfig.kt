@@ -196,8 +196,11 @@ class FilterTypesConfig {
     var hideBazaar: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Auction House messages", desc = "Hides the ---- seperators from Auction house chat messages and visit auction house messages." +
-        "§4This will also hide the dividing lines from Visit messages as they share the same message.")
+    @ConfigOption(
+        name = "Auction House messages",
+        desc = "Hides the ---- seperators from Auction house chat messages and visit auction house messages." +
+        "\n §4This will also hide the dividing lines from Visit messages as they share the same message."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var hideAH: Boolean = false
@@ -215,6 +218,7 @@ class FilterTypesConfig {
     var hideUselessDrops: Boolean = false
 
     @Expose
+    @Suppress
     @ConfigOption(name = "Useless Notification Hider", desc = "Hides Notifications for early orb placement, tipping players and 0 interest Bank messages")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -239,15 +243,10 @@ class FilterTypesConfig {
     var hideMiningAbilityMessages: Boolean = false
 
     @Expose
+    @Suppress
     @ConfigOption(name = "Hypixel Spam message hider", desc = "Hides spammed messages like Implosion, Molten Wave, Spirit Sceptre and breaking power warnings")
     @ConfigEditorBoolean
     @FeatureToggle
     var hideAnnoyingSpam: Boolean = false
 
-    // TODO remove
-    @Expose
-    @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var others: Boolean = false
 }

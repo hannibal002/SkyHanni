@@ -662,17 +662,6 @@ object ChatFilter {
         return null
     }
 
-    private var othersMsg: String? = null
-
-    /**
-     * Checks if the message is an "other" message.
-     * Will also set the variable othersMsg to the reason why the message was blocked,
-     * so that it can be used in the block function.
-     * @param message The message to check
-     * @return True if the message is part of "other"
-     * @see othersMsg
-     * @see block
-     */
 
     /**
      * Checks if the message is present in the list of messages or patterns
