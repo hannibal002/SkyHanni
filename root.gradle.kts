@@ -14,13 +14,19 @@ plugins {
 allprojects {
     group = "at.hannibal2.skyhanni"
 
+    val buildToolsPath = when (name) {
+        "SkyHanni" -> layout.projectDirectory.dir("buildTools")
+        "annotation-processors", "detekt" -> layout.projectDirectory.dir("../buildTools")
+        else -> layout.projectDirectory.dir("../../buildTools")
+    }
+
     /**
      * The version of the project.
      * Stable version
      * Beta version
      * Bugfix version
      */
-    version = "4.11.0"
+    version = providers.fileContents(buildToolsPath.file("PROJECT_VERSION")).asText.map { it.trim() }.get()
 
     repositories {
         mavenCentral()
