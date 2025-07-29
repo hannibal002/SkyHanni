@@ -67,6 +67,15 @@ object RareDropMessages {
     )
 
     /**
+     * REGEX-TEST Smite VI
+     *
+     */
+    private val slayerBookPattern by repoGroup.pattern(
+        "slayerbook",
+        "(Smite VII?)|(Ender Slayer VII?)|(Bane of Arthropods VI)|(Critical VI)|(Fire Aspect III)|(Duplex I)",
+    )
+
+    /**
      * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §fBlue Whale Pet
      * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §5Giraffe Pet
      */
@@ -146,7 +155,7 @@ object RareDropMessages {
             )
         }
 
-        if (!anyRecentMessage && config.enchantedBookMissingMessage) {
+        if (!anyRecentMessage && config.enchantedBookMissingMessage && !slayerBookPattern.matches(internalName.repoItemName)) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
             if (SkyHanniMod.feature.misc.userLuck) {
                 userLuck.takeIf { it != 0f }?.let { luck ->
