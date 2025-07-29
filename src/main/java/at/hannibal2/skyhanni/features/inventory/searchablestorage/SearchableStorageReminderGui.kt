@@ -22,7 +22,6 @@ class SearchableStorageReminderGui(private var search: String = "") : SkyhanniBa
 
     private var display: Renderable? = null
     private var content: List<Renderable>? = null
-    private var buttonSpacing = 0
     private var guiLeft = 0
     private var guiTop = 0
 
