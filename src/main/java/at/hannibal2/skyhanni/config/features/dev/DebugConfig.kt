@@ -172,7 +172,7 @@ class DebugConfig {
     var bypassAdvancedPlayerTabList: Int = Keyboard.KEY_NONE
 
     @Expose
-    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while F3 is open.")
+    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area and graph area in SkyBlock while F3 is open.")
     @ConfigEditorBoolean
     var currentAreaDebug: Boolean = true
 
@@ -221,6 +221,11 @@ class DebugConfig {
     @ConfigOption(name = "Always Great Spook", desc = "Assumes the Great Spook is always active.")
     @ConfigEditorBoolean
     val forceGreatSpook: Property<Boolean> = Property.of(false)
+
+    @Expose
+    @ConfigOption(name = "Moonglade Beacon", desc = "Add more debug information to the beacon solver.")
+    @ConfigEditorBoolean
+    var moongladeBeacon: Boolean = false
 
     @Expose
     @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")

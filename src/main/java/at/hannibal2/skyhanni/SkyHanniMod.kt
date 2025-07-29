@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.PetDataStorage
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -37,6 +38,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -66,7 +69,7 @@ object SkyHanniMod {
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
         try {
-            RepoManager.initRepo()
+            SkyHanniRepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
@@ -111,6 +114,7 @@ object SkyHanniMod {
     lateinit var jacobContestsData: JacobContestsJson
     lateinit var visualWordsData: VisualWordsJson
     lateinit var petData: PetDataStorage
+    lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -120,21 +124,55 @@ object SkyHanniMod {
 
     val modules: MutableList<Any> = ArrayList()
     private val globalJob: Job = Job(null)
-
-    // todo when no more direct .launch calls are made outside of this class, make this private
-    @Deprecated(
-        "Use SkyHanniMod.launchCoroutine or SkyHanniMod.launchIOCoroutine instead",
-        ReplaceWith("SkyHanniMod.launchCoroutine { ... }"),
-    )
-    val coroutineScope = CoroutineScope(
+    private val coroutineScope = CoroutineScope(
         CoroutineName("SkyHanni") + SupervisorJob(globalJob),
     )
 
-    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job {
-        return launchCoroutine {
-            withContext(Dispatchers.IO) {
-                block()
-            }
+    /**
+     * Launch an IO coroutine with a lock on the provided mutex.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * @param mutex The mutex to lock during the execution of the block.
+     * @param block The suspend function to execute within the IO context.
+     */
+    fun launchIOCoroutineWithMutex(
+        mutex: Mutex,
+        block: suspend CoroutineScope.() -> Unit
+    ): Job = launchCoroutine {
+        mutex.withLock {
+            withContext(Dispatchers.IO, block)
+        }
+    }
+
+    /**
+     * Launch an IO coroutine in the SkyHanni scope.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * @param block The suspend function to execute within the IO context.
+     */
+    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job = launchCoroutine {
+        withContext(Dispatchers.IO, block)
+    }
+
+    /**
+     * Launches a coroutine in the SkyHanni scope.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * The function provided here must not rely on the CoroutineScope's context.
+     * @param function The function to execute in the coroutine.
+     */
+    fun launchNoScopeCoroutine(function: suspend () -> Unit): Job = launchCoroutine { function() }
+
+    /**
+     * Launches a coroutine in the SkyHanni scope.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * @param function The suspend function to execute in the coroutine.
+     */
+    fun launchCoroutine(function: suspend CoroutineScope.() -> Unit): Job = coroutineScope.launch {
+        try {
+            function()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                e.message ?: "Asynchronous exception caught",
+            )
         }
     }
 
@@ -143,21 +181,6 @@ object SkyHanniMod {
     private var screenTicks = 0
     fun consoleLog(message: String) {
         logger.log(Level.INFO, message)
-    }
-
-    @Suppress("DEPRECATION")
-    fun launchCoroutine(function: suspend () -> Unit): Job {
-        @Suppress("DEPRECATION")
-        return coroutineScope.launch {
-            try {
-                function()
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(
-                    e,
-                    e.message ?: "Asynchronous exception caught",
-                )
-            }
-        }
     }
 
     @HandleEvent

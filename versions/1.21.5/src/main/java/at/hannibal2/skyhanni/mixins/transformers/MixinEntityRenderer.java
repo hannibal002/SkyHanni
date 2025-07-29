@@ -19,7 +19,7 @@ public class MixinEntityRenderer {
     @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
     public void onRenderLabelHead(EntityRenderState state, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            if (new SkyHanniRenderEntityEvent.Specials.Pre(livingEntity, state.x, state.y, state.z).post()) {
+            if (new SkyHanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post()) {
                 ci.cancel();
             }
         }
@@ -28,7 +28,7 @@ public class MixinEntityRenderer {
     @Inject(method = "renderLabelIfPresent", at = @At("TAIL"))
     public void onRenderLabelTail(EntityRenderState state, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            new SkyHanniRenderEntityEvent.Post(livingEntity, state.x, state.y, state.z).post();
+            new SkyHanniRenderEntityEvent.Specials.Post<>(livingEntity, state.x, state.y, state.z).post();
         }
     }
 

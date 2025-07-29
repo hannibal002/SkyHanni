@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
-import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
@@ -270,30 +269,39 @@ object SkyHanniConfigSearchResetCommand {
             map["$parentName.<end of depth>"] = null
             return map
         }
+        if (obj.javaClass.`package`?.name?.startsWith("java.") == true) {
+            return map
+        }
         for (field in obj.javaClass.declaredFields) {
-            if ((field.modifiers and Modifier.STATIC) != 0) continue
+            if (Modifier.isStatic(field.modifiers)) continue
 
             val name = field.name
             if (parentName == "playerSpecific" && name == "profiles") continue
             if (parentName == "config.storage" && name == "players") continue
             if (parentName == "config" && name == "storage") continue
             val fieldName = "$parentName.$name"
-            val newObj = field.makeAccessible().get(obj)
-            map[fieldName] = newObj
-            @Suppress("ComplexCondition")
-            if (newObj != null &&
-                newObj !is Boolean &&
-                newObj !is String &&
-                newObj !is Long &&
-                newObj !is Int &&
-                newObj !is Double &&
-                newObj !is Float &&
-                newObj !is Position &&
-                newObj !is Map<*, *> &&
-                newObj !is List<*> &&
-                !newObj.javaClass.isEnum
-            ) {
-                map.putAll(loadAllFields(fieldName, newObj, depth + 1))
+
+            try {
+                val newObj = field.makeAccessible().get(obj)
+                map[fieldName] = newObj
+                @Suppress("ComplexCondition")
+                if (newObj != null &&
+                    newObj !is Boolean &&
+                    newObj !is String &&
+                    newObj !is Long &&
+                    newObj !is Int &&
+                    newObj !is Double &&
+                    newObj !is Float &&
+                    newObj !is Position &&
+                    newObj !is Map<*, *> &&
+                    newObj !is List<*> &&
+                    !newObj.javaClass.isEnum
+                ) {
+                    map.putAll(loadAllFields(fieldName, newObj, depth + 1))
+                }
+            } catch (_: Throwable) {
+                SkyHanniMod.logger.warn("Could not access field '$fieldName' in class '${obj.javaClass.name}'")
+                continue
             }
         }
 
@@ -361,7 +369,7 @@ object SkyHanniConfigSearchResetCommand {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
             legacyCallbackArgs {
-                SkyHanniMod.coroutineScope.launch {
+                SkyHanniMod.launchCoroutine {
                     ChatUtils.chat(runCommand(it))
                 }
                 lastCommand = it

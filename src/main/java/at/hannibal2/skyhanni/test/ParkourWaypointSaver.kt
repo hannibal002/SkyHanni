@@ -107,7 +107,8 @@ object ParkourWaypointSaver {
         } else {
             for (location in locations) {
                 val aabb = location.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
-                event.drawFilledBoundingBox(aabb, LorenzColor.GREEN.toColor(), 1f)
+                // TODO add chroma color support via config
+                event.drawFilledBoundingBox(aabb, LorenzColor.GREEN.toChromaColor(), 1f)
             }
         }
     }

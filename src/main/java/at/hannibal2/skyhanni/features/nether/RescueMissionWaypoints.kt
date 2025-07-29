@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -335,7 +334,7 @@ object RescueMissionWaypoints {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.chroma.get()
-            monochromeColor = config.solidColor.get().toSpecialColor()
+            monochromeColor = config.solidColor.get()
             lookAhead = config.lookAhead.get() + 1
         }
     }

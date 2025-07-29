@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fakeInventory
@@ -14,6 +15,8 @@ class SkyHanniInventoryContainer(
     @Expose val rowSize: Int,
     @Expose var items: List<ItemStack?>,
     @Expose var displayName: String = internalName,
+    @Expose val primaryCords: LorenzVec? = null,
+    @Expose val secondaryCords: LorenzVec? = null,
 ) {
     fun toRenderable(scale: Double = 1.0): Renderable = with(Renderable) {
         vertical(

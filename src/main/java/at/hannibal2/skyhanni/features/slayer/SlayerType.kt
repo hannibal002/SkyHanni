@@ -51,12 +51,15 @@ enum class SlayerType(
 
     companion object {
         fun getByName(name: String): SlayerType? = entries.firstOrNull { name.contains(it.displayName) }
+        fun getByClazzName(name: String): SlayerType? = entries.firstOrNull {
+            it.clazz.simpleName.removePrefix("Entity").equals(name, ignoreCase = true)
+        }
     }
 }
 
 enum class SlayerMiniBossType(vararg names: String) {
     REVENANT("Revenant Sycophant", "Revenant Champion", "Deformed Revenant", "Atoned Champion", "Atoned Revenant"),
-    TARANTULA("Tarantula Vermin", "Tarantula Beast", "Mutant Tarantula"),
+    TARANTULA("Tarantula Vermin", "Tarantula Beast", "Mutant Tarantula", "Primordial Jockey", "Primordial Viscount"),
     SVEN("Pack Enforcer", "Sven Follower", "Sven Alpha"),
     VOIDLING("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac"),
     INFERNAL("Flare Demon", "Kindleheart Demon", "Burningsoul Demon"),

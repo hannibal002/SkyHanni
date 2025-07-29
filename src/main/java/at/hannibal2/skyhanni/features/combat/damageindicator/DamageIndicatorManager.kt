@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
+import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -33,6 +35,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -43,11 +46,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
@@ -182,11 +185,14 @@ object DamageIndicatorManager {
 
         for (data in data.values) {
 
-            // TODO test end stone protector in hole? - maybe change eye pos
-//            data.ignoreBlocks =
-//                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
+            val vecYOffset = when (data.bossType) {
+                BossType.END_ENDSTONE_PROTECTOR -> 3.0
+                BossType.SLAYER_SPIDER_5_1 -> 2.0
 
-            if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0)) continue
+                else -> 0.0
+            }
+
+            if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0, vecYOffset = vecYOffset)) continue
             if (!data.isConfigEnabled()) continue
 
             val entity = data.entity
@@ -450,6 +456,19 @@ object DamageIndicatorManager {
                     )
                 }
                 return thorn
+            }
+
+            BossType.SLAYER_SPIDER_5_1 -> {
+                entityData.nameAbove = if (entity.mob in SlayerSpiderFeatures.stuckTier5 && config.spiderSlayer.showInvincible) {
+                    "§eKill hatchlings!"
+                } else ""
+                entityData.nameSuffix = " §e1/2"
+                return ""
+            }
+
+            BossType.SLAYER_SPIDER_5_2 -> {
+                entityData.nameSuffix = " §e2/2"
+                return ""
             }
 
             BossType.SLAYER_ENDERMAN_1,
@@ -991,5 +1010,25 @@ object DamageIndicatorManager {
         }
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.dev.damageIndicatorBackend
+    private val backendEnabled get() = SkyHanniMod.feature.dev.damageIndicatorBackend
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Damage Indicator")
+        if (!backendEnabled) {
+            event.addData("Damage Indicator is manually disabled!")
+        } else {
+            event.addIrrelevant {
+                add("normal enabled")
+                add("Active mobs: ${data.size}")
+                for (entityData in data.values) {
+                    val type = entityData.bossType
+                    val loc = entityData.entity.getLorenzVec()
+                    add("  - $type ${loc.printWithAccuracy(1)}")
+                }
+            }
+        }
+    }
+
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && backendEnabled
 }

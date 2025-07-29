@@ -22,6 +22,7 @@ object SlayerMiniBossFeatures {
         val mob = event.mob
         if (!SlayerMiniBossType.isMiniboss(mob.name)) return
         miniBosses += mob
+        // TODO config option for color
         if (config.slayerMinibossHighlight) mob.highlight(LorenzColor.AQUA.toColor())
     }
 
@@ -38,7 +39,7 @@ object SlayerMiniBossFeatures {
             if (!mob.baseEntity.canBeSeen(10)) continue
             event.drawLineToEye(
                 mob.baseEntity.getLorenzVec().up(),
-                LorenzColor.AQUA.toColor(),
+                LorenzColor.AQUA.toChromaColor(),
                 config.slayerMinibossLineWidth,
                 true,
             )

@@ -21,10 +21,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntitySlime
+import java.awt.Color
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,7 +48,7 @@ object SeaCreatureFeatures {
 
         if (!config.highlight) return
 
-        mob.highlight(LorenzColor.GREEN.toColor())
+        mob.highlight(LorenzColor.GREEN.toChromaColor())
     }
 
     @HandleEvent
@@ -116,10 +117,10 @@ object SeaCreatureFeatures {
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && !DungeonApi.inDungeon() && !KuudraApi.inKuudra
 
-    private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
+    private val getEntityOutlineColor: (entity: Entity) -> Color? = { entity ->
         (entity as? EntityLivingBase)?.mob?.let { mob ->
             if (mob in rareSeaCreatures && entity.distanceToPlayer() < 30) {
-                LorenzColor.GREEN.toColor().rgb
+                LorenzColor.GREEN.toColor()
             } else null
         }
     }

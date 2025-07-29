@@ -77,7 +77,7 @@ enum class SkyblockStat(
     MAGIC_FIND("§b✯", " *Magic Find: §r§b✯$VALUE_PATTERN", " *§b✯ Magic Find §f$VALUE_PATTERN"),
     PET_LUCK("§d♣", " *Pet Luck: §r§d♣$VALUE_PATTERN", " *§d♣ Pet Luck §f$VALUE_PATTERN"),
     FISHING_SPEED("§b☂", " *Fishing Speed: §r§b☂$VALUE_PATTERN", " *§b☂ Fishing Speed §f$VALUE_PATTERN"),
-    TROPHY_FISH_CHANCE("§b☂", "Trophy Fish Chance: §r§6♔$VALUE_PATTERN", " *§6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
+    TROPHY_FISH_CHANCE("§b♔", "Trophy Fish Chance: §r§6♔$VALUE_PATTERN", " *§6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
     DOUBLE_HOOK_CHANCE(
         "§9⚓",
         " *Double Hook Chance: §r§9⚓$VALUE_PATTERN",
@@ -152,6 +152,11 @@ enum class SkyblockStat(
     HUNTER_FORTUNE("§d☘", " *Hunter Fortune: §r§d☘$VALUE_PATTERN", " *§d☘ Hunter Fortune §f$VALUE_PATTERN"),
     FIG_FORTUNE("§6☘", " *Fig Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Fig Fortune §f$VALUE_PATTERN"),
     MANGROVE_FORTUNE("§6☘", " *Mangrove Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mangrove Fortune §f$VALUE_PATTERN"),
+
+    RIFT_TIME("§aф", " *Rift Time: §r§aф$VALUE_PATTERN", " *§aф Rift Time §f$VALUE_PATTERN"),
+    RIFT_DAMAGE("§5❁", " *Rift Damage: §r§5❁$VALUE_PATTERN", " *§5❁ Rift Damage §f$VALUE_PATTERN"),
+    MANA_REGEN("§b⚡", " *Mana Regen: §r§b⚡$VALUE_PATTERN", " *§b⚡ Mana Regen §f$VALUE_PATTERN"),
+    HEARTS("§c♥", " *Hearts: §r§c♥$VALUE_PATTERN", " *§c♥ Hearts §f$VALUE_PATTERN"),
 
     UNKNOWN("§c?", "", "")
     ;

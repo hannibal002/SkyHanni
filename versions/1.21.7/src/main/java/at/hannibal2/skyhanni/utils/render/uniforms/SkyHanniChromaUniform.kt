@@ -18,7 +18,7 @@ class SkyHanniChromaUniform : AutoCloseable {
         forwardDirection: Int,
     ): GpuBufferSlice {
         return storage.write(
-            UniformValue(chromaSize, timeOffset, saturation, forwardDirection)
+            UniformValue(chromaSize, timeOffset, saturation, forwardDirection),
         )
     }
 
@@ -36,7 +36,7 @@ class SkyHanniChromaUniform : AutoCloseable {
         val chromaSize: Float,
         val timeOffset: Float,
         val saturation: Float,
-        val forwardDirection: Int
+        val forwardDirection: Int,
     ) : DynamicUniformStorage.Uploadable {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)

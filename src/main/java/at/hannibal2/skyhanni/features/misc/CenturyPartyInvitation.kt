@@ -20,11 +20,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.item.ItemStack
-import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -214,11 +213,11 @@ object CenturyPartyInvitation {
         }
     }
 
-    private fun wrongColor() = config.canNotColor.get().toSpecialColor()
+    private fun wrongColor() = config.canNotColor.get()
 
-    private fun correctColor() = config.canColor.get().toSpecialColor()
+    private fun correctColor() = config.canColor.get()
 
-    private fun Mob.setColor(color: Color) {
+    private fun Mob.setColor(color: ChromaColour) {
         highlight(color) { config.playerHighlighter && inHand }
     }
 

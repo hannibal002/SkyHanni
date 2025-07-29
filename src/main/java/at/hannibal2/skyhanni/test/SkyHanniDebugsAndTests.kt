@@ -64,7 +64,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import kotlinx.coroutines.launch
 import net.minecraft.nbt.NBTTagCompound
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
@@ -116,9 +115,6 @@ object SkyHanniDebugsAndTests {
             return result
         }
 
-    @Deprecated(message = "use SkyBlockUtils", ReplaceWith("SkyBlockUtils.debug"))
-    val enabled get() = SkyBlockUtils.debug
-
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
@@ -151,7 +147,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             asyncTest(args)
         }
     }
@@ -456,10 +452,12 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay() {
         if (MinecraftCompat.showDebugHud) {
             if (debugConfig.currentAreaDebug) {
-                config.debugLocationPos.renderString(
-                    "Current Area: ${HypixelData.skyBlockArea}",
-                    posLabel = "SkyBlock Area (Debug)",
-                )
+                val renderables = buildList {
+                    addString("Current Area: ${HypixelData.skyBlockArea}")
+                    addString("Graph Area: ${SkyBlockUtils.graphArea}")
+                }
+
+                config.debugLocationPos.renderRenderables(renderables, posLabel = "SkyBlock Area (Debug)")
             }
 
             if (debugConfig.raytracedOreblock) {

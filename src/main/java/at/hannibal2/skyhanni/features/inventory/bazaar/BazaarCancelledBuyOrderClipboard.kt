@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -73,7 +74,7 @@ object BazaarCancelledBuyOrderClipboard {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val coins = cancelledMessagePattern.matchMatcher(event.message) {
-            group("coins").formatInt()
+            group("coins").formatDouble()
         } ?: return
 
         val latestAmount = latestAmount ?: return
