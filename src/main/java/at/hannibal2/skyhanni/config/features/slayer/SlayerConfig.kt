@@ -130,19 +130,19 @@ class SlayerConfig {
     var hideIrrelevantMobsOpacity: Int = 40
 
     @Expose
-    @ConfigOption(name = "Time to Kill Message", desc = "Sends time to kill in Chat on Slayer Boss Death.")
+    @ConfigOption(name = "Time to Kill Message", desc = "Sends time to kill a slayer in chat.")
     @ConfigEditorBoolean
     @FeatureToggle
     var timeToKillMessage: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Quest Time Message", desc = "Sends a message on Slayer Quest Completion of Time (Spawn & Kill)")
+    @ConfigOption(name = "Quest Complete Message", desc = "Sends time to complete (Spawn & Kill) a slayer quest in chat.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var fullQuestTime: Boolean = true
+    var questCompleteMessage: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Compact Kill Message", desc = "Shorter Time To Kill and Time To Complete messages.")
+    @ConfigOption(name = "Compact Time Messages", desc = "Shorter Time to Kill and Quest Complete messages.")
     @ConfigEditorBoolean
     var compactTimeMessage: Boolean = false
 }

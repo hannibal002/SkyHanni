@@ -29,7 +29,7 @@ object SlayerTimeMessages {
     @HandleEvent
     fun onSlayerQuestCompleteEvent(event: SlayerQuestCompleteEvent) {
         val startTime = SlayerApi.questStartTime
-        if (!config.fullQuestTime || startTime.isFarPast()) return
+        if (!config.questCompleteMessage || startTime.isFarPast()) return
 
         val duration = startTime.passedSince().format()
 
