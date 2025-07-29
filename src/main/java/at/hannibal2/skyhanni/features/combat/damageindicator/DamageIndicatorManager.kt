@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellio
 import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -401,6 +402,12 @@ object DamageIndicatorManager {
                 entityData.dead = true
                 if (entityData.bossType.showDeathTime && config.timeToKillSlayer) {
                     entityData.nameAbove = entityData.timeToKill
+
+                }
+                if (entityData.bossType.showDeathTime && config.timeToKillSlayerMessage) {
+                    var killmsg = "it took §a${entityData.timeToKill}§e for ${entityData.bossType.fullName}§e to die"
+                    ChatUtils.chat(killmsg)
+
                 }
                 "§cDead"
             } else {

@@ -131,6 +131,11 @@ class DamageIndicatorConfig {
     var timeToKillSlayer: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Time to Kill Message", desc = "Sends time to kill in Chat on Slayer Boss Death.")
+    @ConfigEditorBoolean
+    var timeToKillSlayerMessage: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Show Bacte Phase", desc = "Show the current phase of Bacte in the Rift.")
     @ConfigEditorBoolean
     var showBactePhase: Boolean = true
