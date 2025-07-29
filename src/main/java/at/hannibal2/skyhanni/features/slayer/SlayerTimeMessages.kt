@@ -17,11 +17,13 @@ object SlayerTimeMessages {
     fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
         val (bossType, timeToKill) = with(event.data) { bossType to timeToKill }
         if (!config.timeToKillMessage || !bossType.isSlayer) return
-        val killTimeMessage = if (config.compactKillMessage)
-            "It took §b$timeToKill§e to kill ${bossType.fullName}."
-        else "${bossType.shortName}§e took §b$timeToKill§e."
 
-        ChatUtils.chat(killTimeMessage)
+        ChatUtils.chat(
+            if (config.compactTimeMessage)
+                "It took §b$timeToKill§e to kill ${bossType.fullName}."
+            else
+                "${bossType.shortName}§e took §b$timeToKill§e.",
+        )
     }
 
     @HandleEvent
@@ -30,6 +32,12 @@ object SlayerTimeMessages {
         if (!config.fullQuestTime || startTime.isFarPast()) return
 
         val duration = startTime.passedSince().format()
-        ChatUtils.chat("Slayer quest took §b${duration}§es to complete.")
+
+        ChatUtils.chat(
+            if (config.compactTimeMessage)
+                "Slayer took §b${duration}§e in total."
+            else
+                "Slayer quest took §b${duration}§es to complete.",
+        )
     }
 }

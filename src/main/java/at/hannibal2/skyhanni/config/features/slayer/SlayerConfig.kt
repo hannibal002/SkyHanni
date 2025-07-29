@@ -136,13 +136,13 @@ class SlayerConfig {
     var timeToKillMessage: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Compact Kill Message", desc = "Shorter Time To Kill Message.")
-    @ConfigEditorBoolean
-    var compactKillMessage: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Quest Time Message", desc = "Sends a message on Slayer Quest Completion of Time (Spawn & Kill)")
     @ConfigEditorBoolean
     @FeatureToggle
     var fullQuestTime: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Compact Kill Message", desc = "Shorter Time To Kill and Time To Complete messages.")
+    @ConfigEditorBoolean
+    var compactTimeMessage: Boolean = false
 }
