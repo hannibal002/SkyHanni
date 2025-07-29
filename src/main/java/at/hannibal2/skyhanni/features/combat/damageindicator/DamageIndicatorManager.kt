@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
@@ -1009,5 +1010,25 @@ object DamageIndicatorManager {
         }
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.dev.damageIndicatorBackend
+    private val backendEnabled get() = SkyHanniMod.feature.dev.damageIndicatorBackend
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Damage Indicator")
+        if (!backendEnabled) {
+            event.addData("Damage Indicator is manually disabled!")
+        } else {
+            event.addIrrelevant {
+                add("normal enabled")
+                add("Active mobs: ${data.size}")
+                for (entityData in data.values) {
+                    val type = entityData.bossType
+                    val loc = entityData.entity.getLorenzVec()
+                    add("  - $type ${loc.printWithAccuracy(1)}")
+                }
+            }
+        }
+    }
+
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && backendEnabled
 }
