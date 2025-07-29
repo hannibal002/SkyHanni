@@ -55,6 +55,7 @@ object TrophyFishDisplay {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRIMSON_ISLE) {
             DelayedRun.runDelayed(200.milliseconds) {
+                TrophyFishManager.loadMissingTrophyFish()
                 update()
             }
         }
@@ -62,6 +63,7 @@ object TrophyFishDisplay {
 
     @HandleEvent
     fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
+        TrophyFishManager.loadMissingTrophyFish()
         recentlyDroppedTrophies[getInternalName(event.trophyFishName)] = event.rarity
         update()
         DelayedRun.runDelayed(5.1.seconds) {
@@ -72,6 +74,7 @@ object TrophyFishDisplay {
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
+        TrophyFishManager.loadMissingTrophyFish()
         update()
     }
 
@@ -91,6 +94,7 @@ object TrophyFishDisplay {
                 showCaughtHigher,
                 requireArmor,
             ) {
+                TrophyFishManager.loadMissingTrophyFish()
                 update()
             }
         }

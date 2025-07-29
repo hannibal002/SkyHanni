@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 
@@ -39,7 +40,12 @@ object DefaultConfigFeatures {
                 "§eClick to run /shdefaultoptions!",
             )
         } else if (updated) {
-            val lastVersion = knownToggles.keys.last { it != SkyHanniMod.VERSION }
+            val lastVersion = knownToggles.keys.lastOrNull { it != SkyHanniMod.VERSION }
+                ?: ErrorManager.skyHanniError(
+                    "lastVersion is null, this should never happen",
+                    "knownToggles" to knownToggles,
+                    "version" to SkyHanniMod.VERSION,
+                )
             val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
             ChatUtils.chat("Looks like you updated SkyHanni.")
             ChatUtils.clickableChat(

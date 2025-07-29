@@ -20,10 +20,10 @@ class RepoPatternElement private constructor(
     val pattern by lazy { rawPattern.toPattern() }
 
     val regex101Url: String by lazy {
-        val encodedPattern = URLEncoder.encode(rawPattern, "UTF-8")
+        val encodedPattern = URLEncoder.encode(rawPattern.replace("/", "\\/"), "UTF-8")
         val urlEncodedNewLine = URLEncoder.encode("\n", "UTF-8")
         val encodedTests = regexTests.joinToString(urlEncodedNewLine) { URLEncoder.encode(it, "UTF-8") }
-        "https://regex101.com/?regex=$encodedPattern&testString=$encodedTests"
+        "https://regex101.com/?regex=$encodedPattern&testString=$encodedTests&flavor=java"
     }
 
     companion object {

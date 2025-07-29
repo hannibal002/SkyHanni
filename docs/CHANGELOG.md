@@ -160,6 +160,7 @@
 + Added option to show `/shnavigate` feedback in a UI element instead of chat. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4399)
 + Separated Foraging and Hunting features in the config. - Luna (https://github.com/hannibal002/SkyHanni/pull/4437)
 + Added some more information when clock offset fails to calculate. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4439)
++ Improved compatability between SkyHanni's glow and Minecraft's glow on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
 
 #### Foraging
 
@@ -209,12 +210,15 @@
 + Fixed Bacte Tentacle Waypoints not updating Tentacle HP on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4411)
 + Fixed Sun Gecko Helper's Highlight Real Boss incorrectly highlighting the clones in green if Highlight Clones is disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/4431)
 + Fixed Ubik Reminder sending every second in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4464)
++ Fixed Puff not showing in Crux Talisman Display on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4506)
 
 #### Crimson Isle
 
 + Fixed rare error in Crimson Miniboss Respawn Timer on 1.21. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4447)
 + Fixed Wither Skeleton Mob Detection on 1.21+. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4455)
     + Fixed Mob HP for Bladesoul and Quazzi.
++ Fixed errors with reading 'Kill Kuudra' quests. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4495)
++ Fixed Trophy Fish Display incorrectly saying you caught all trophy fish of a specific tier when you have never caught any tier of some. - Luna (https://github.com/hannibal002/SkyHanni/pull/4501)
 
 #### Misc
 
@@ -238,6 +242,11 @@
 + Fixed rare error when converting config from 1.21 to 1.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4420)
 + Fixed errors with Pet XP calculations. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4438)
 + Fixed more repo loading issues. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4449)
++ Fixed Ancient Skin gdrags autopet messages not being blocked. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4507)
++ Fixed negative shards being added to profit trackers. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4503)
++ Fixed rare error in glowing mushroom highlighter. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4502)
++ Fixed rare error when searching in config. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4500)
++ Fixed Voodoo Doll/Jinxed Voodoo Doll ability detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/4493)
 
 #### Chat
 
@@ -247,6 +256,7 @@
 + Fixed shorten coin amount behaving incorrectly on values < 1. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4417)
 + Fixed Your computer's clock is off messages sometimes spamming the chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4435)
 + Fixed tab complete on some commands not working on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4453)
++ Fixed warp tab complete removing tab complete for some Hypixel commands on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4504)
 
 #### Inventory
 
@@ -411,6 +421,8 @@
 + Removed an unnecessary `.intern()` call in ItemResolutionQuery that may lead to a performance hit. - Luna (https://github.com/hannibal002/SkyHanni/pull/4474)
 + Switched /shcarrolyn and /shtrackcollection to use brigadier commands. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4469)
 + Use native ping method instead of Hypixel Mod API on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4488)
++ Created SkyHanniBlockHighlighter which is a class that is abstracted to allow multiple different block highlighting implementations. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4502)
++ Split our entity outlines vertex consumer from the normal Minecraft one so that we can modify depth test per entity. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
 
 ## Version 4.0.0
 
