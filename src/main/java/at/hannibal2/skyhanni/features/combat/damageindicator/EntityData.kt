@@ -29,6 +29,6 @@ class EntityData(
 ) {
 
     val timeToKill by lazy {
-        "§e" + foundTime.passedSince().format(TimeUnit.SECOND, showMilliSeconds = true)
+        "§e" + foundTime.passedSince().format()
     }
 }

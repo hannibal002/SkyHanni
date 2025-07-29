@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.inPartialSeconds
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 @SkyHanniModule
-object SlayerSpawnAndKillMessage {
+object SlayerTimeMessages {
 
     private val config get() = SlayerApi.config
 
@@ -29,7 +29,7 @@ object SlayerSpawnAndKillMessage {
         val startTime = SlayerApi.questStartTime
         if (!config.fullQuestTime || startTime.isFarPast()) return
 
-        val duration = startTime.passedSince().inPartialSeconds
-        ChatUtils.chat("Slayer Quest took ${duration}s to complete.")
+        val duration = startTime.passedSince().format()
+        ChatUtils.chat("Slayer quest took ${duration}s to complete.")
     }
 }
