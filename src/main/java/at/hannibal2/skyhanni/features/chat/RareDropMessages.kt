@@ -69,14 +69,14 @@ object RareDropMessages {
     /**
      * REGEX-TEST Smite VI
      * REGEX-TEST Ender Slayer VII
-     * Bane of Arthropods VI
-     * Critical VI
-     * Fire Aspect III
-     * Duplex I
+     * REGEX-TEST Bane of Arthropods VI
+     * REGEX-TEST Critical VI
+     * REGEX-TEST Fire Aspect III
+     * REGEX-TEST Duplex I
      */
     private val slayerBookPattern by repoGroup.pattern(
         "slayerbook",
-        "(Smite VII?)|(Ender Slayer VII?)|(Bane of Arthropods VI)|(Critical VI)|(Fire Aspect III)|(Duplex I)",
+        "Smite VII?|Ender Slayer VII?|Bane of Arthropods VI|Critical VI|Fire Aspect III|Duplex I",
     )
 
     /**
