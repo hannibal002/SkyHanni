@@ -23,7 +23,7 @@ object EntityData {
     private val maxHealthMap = mutableMapOf<Int, Int>()
     private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
-    private val lastVisibilityCheck = TimeLimitedCache<Entity, Pair<SimpleTimeMark, Boolean>>(500.milliseconds)
+    private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
     @HandleEvent
     fun onTick() {
@@ -73,13 +73,11 @@ object EntityData {
 
     @JvmStatic
     fun onRenderCheck(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
-        lastVisibilityCheck[entity]?.let { (time, result) ->
-            if (time.passedSince() < 200.milliseconds) {
-                return result
-            }
+        lastVisibilityCheck[entity.entityId]?.let { result ->
+            return result
         }
         val result = CheckRenderEntityEvent(entity, camX, camY, camZ).post()
-        lastVisibilityCheck[entity] = SimpleTimeMark.now() to result
+        lastVisibilityCheck[entity.entityId] = result
         return result
     }
 }

@@ -11,7 +11,7 @@ import net.minecraft.entity.EntityLivingBase
  * Do not use this event when you want to do further render calls!
  * Internally we directly mixin to shouldRender.
  */
-data class CheckRenderEntityEvent<T : EntityLivingBase>(
+data class CheckRenderEntityEvent<T : Entity>(
     val entity: T,
     val camX: Double,
     val camY: Double,
