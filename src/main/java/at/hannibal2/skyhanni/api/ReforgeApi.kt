@@ -27,14 +27,14 @@ object ReforgeApi {
     var reforgeList: List<Reforge> = emptyList()
         private set(value) {
             field = value
-            nonePowerStoneReforge = value.filterNot { it.isReforgeStone }
-            onlyPowerStoneReforge = value.filter { it.isReforgeStone }
+            basicReforgeList = value.filterNot { it.isReforgeStone }
+            reforgeStoneList = value.filter { it.isReforgeStone }
         }
 
-    var nonePowerStoneReforge: List<Reforge> = emptyList()
+    var basicReforgeList: List<Reforge> = emptyList()
         private set
 
-    var onlyPowerStoneReforge: List<Reforge> = emptyList()
+    var reforgeStoneList: List<Reforge> = emptyList()
         private set
 
     enum class ReforgeType {

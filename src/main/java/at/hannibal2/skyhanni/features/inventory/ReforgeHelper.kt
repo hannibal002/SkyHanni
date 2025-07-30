@@ -234,7 +234,7 @@ object ReforgeHelper {
         val itemRarity = item.getItemRarityOrNull() ?: return@buildList
 
         val rawReforgeList =
-            if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeApi.nonePowerStoneReforge else ReforgeApi.reforgeList
+            if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeApi.basicReforgeList else ReforgeApi.reforgeList
         val reforgeList = rawReforgeList.filter { it.isValid(itemType, internalName) }
 
         val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.keys }.flatten().toSet()
