@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.ScrollInput
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.container.SlidingWindow
-import at.hannibal2.skyhanni.utils.renderables.container.relativProvider
+import at.hannibal2.skyhanni.utils.renderables.container.relativeProvider
 
 class ScrollTable private constructor(
     override val content: List<List<Renderable>>,
@@ -42,7 +42,7 @@ class ScrollTable private constructor(
     override val windowSize = height - windowMin
     override val windowMax = yOffsets.last() - ySpacing
 
-    private val getRange = relativProvider<Int> { it }
+    private val getRange = relativeProvider<Int> { it }
 
     override val scroll = ScrollInput.Companion.Vertical(
         scrollValue = scrollValue,

@@ -53,7 +53,7 @@ interface SlidingWindowWithScrollHints : SlidingWindow {
  * and the last element that fits inside the window size, if the previous
  * ones are stacked on top of the first element
  */
-fun <P> SlidingWindow.relativProvider(getPostPosition: (post: P) -> Int): (elements: Iterable<P>) -> IntRange = lambda@{ elements ->
+fun <P> SlidingWindow.relativeProvider(getPostPosition: (post: P) -> Int): (elements: Iterable<P>) -> IntRange = lambda@{ elements ->
     val iter = elements.withIndex().iterator()
 
     if (!iter.hasNext()) return@lambda IntRange.EMPTY
@@ -100,7 +100,7 @@ fun <P> SlidingWindow.relativProvider(getPostPosition: (post: P) -> Int): (eleme
  */
 fun <F> SlidingWindow.absoluteProvider(getFencePosition: (fence: F) -> Int): (elements: Iterable<F>) -> IntRange {
     var accumulator = windowMin
-    val provider = relativProvider<F?> { fence ->
+    val provider = relativeProvider<F?> { fence ->
         accumulator.also { fence?.let { accumulator += getFencePosition(fence) } }
     }
     return {
