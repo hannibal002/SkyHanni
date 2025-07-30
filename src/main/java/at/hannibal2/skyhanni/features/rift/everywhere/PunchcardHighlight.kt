@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
@@ -29,8 +29,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.EntityLivingBase
@@ -77,7 +79,7 @@ object PunchcardHighlight {
 
     private val PUNCHCARD_ARTIFACT = "PUNCHCARD_ARTIFACT".toInternalName()
     private val displayIcon by lazy { PUNCHCARD_ARTIFACT.getItemStack() }
-    private var display: Renderable = Renderable.string("hello")
+    private var display: Renderable = Renderable.text("hello")
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
@@ -143,13 +145,8 @@ object PunchcardHighlight {
     }
 
     private fun colorPlayer(entity: EntityLivingBase) {
-        val color = config.color.get().toSpecialColor()
-        val alpha = when (color.alpha) {
-            0 -> 0
-            255 -> 1
-            else -> 255 - color.alpha
-        }
-        RenderLivingEntityHelper.setEntityColor(entity, color.addAlpha(alpha)) { IslandType.THE_RIFT.isCurrent() }
+        val color = config.color.get().toColor()
+        RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isCurrent() }
     }
 
     private fun removePlayerColor(entity: EntityLivingBase) {
@@ -229,11 +226,9 @@ object PunchcardHighlight {
         string += "§d" + if (!config.reverseGUI.get()) playerList.size
         else 20 - playerList.size
 
-        return Renderable.horizontalContainer(
-            listOf(
-                Renderable.itemStack(displayIcon),
-                Renderable.string(string),
-            ),
+        return Renderable.horizontal(
+            Renderable.item(displayIcon),
+            Renderable.text(string),
             spacing = 1,
         )
     }

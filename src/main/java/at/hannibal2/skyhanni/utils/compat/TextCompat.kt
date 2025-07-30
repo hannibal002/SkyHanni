@@ -172,7 +172,7 @@ var IChatComponent.hover: IChatComponent?
         //#if MC < 1.16
         this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
         //#else
-        //$$ (this as MutableText).styled {it.withHoverEvent(HoverEvent.ShowText(value))}
+        //$$ value?.let { value -> (this as MutableText).styled { it.withHoverEvent(HoverEvent.ShowText(value)) } }
         //#endif
     }
 
@@ -214,7 +214,7 @@ var IChatComponent.url: String?
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
         //#else
-        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value)))) }
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
         //#endif
     }
 
@@ -341,7 +341,7 @@ fun createHoverEvent(action: HoverEvent.Action?, component: ChatComponentText): 
 //$$     if (action == null) return null
 //$$     when (action) {
 //$$         HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
-//$$         // i really don't think anyone is using the other 2 lol
+//$$         // I really don't think anyone is using the other 2 lol
 //$$         else -> return null
 //$$     }
 //$$ }
@@ -352,4 +352,38 @@ fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
     this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
 //#else
 //$$ this.copy().formatted(color.toChatFormatting())
+//#endif
+
+fun IChatComponent.convertToJsonString(): String {
+    //#if MC < 1.21
+    return IChatComponent.Serializer.componentToJson(this)
+    //#elseif MC < 1.21.6
+    //$$ return Text.Serializer(net.minecraft.registry.DynamicRegistryManager.EMPTY).serialize(this, null, null).toString()
+    //#else
+    //$$ return net.minecraft.text.TextCodecs.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
+    //#endif
+}
+
+//#if MC > 1.21
+//$$ fun Text.append(newText: Text): Text {
+//$$     return (this as MutableText).append(newText)
+//$$ }
+//$$
+//$$ val formattingPattern = Regex("§.(?:§.)?")
+//$$
+//$$ fun Text.append(newText: String): Text {
+//$$     val mutableText = this as MutableText
+//$$     if (mutableText.string.matches(formattingPattern)) {
+//$$         return Text.of(mutableText.string + newText)
+//$$     }
+//$$     return mutableText.append(newText)
+//$$ }
+//#else
+fun at.hannibal2.skyhanni.utils.compat.Text.append(string: String): at.hannibal2.skyhanni.utils.compat.Text {
+    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + string)
+}
+
+fun at.hannibal2.skyhanni.utils.compat.Text.append(newText: Text): at.hannibal2.skyhanni.utils.compat.Text {
+    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + newText.text)
+}
 //#endif

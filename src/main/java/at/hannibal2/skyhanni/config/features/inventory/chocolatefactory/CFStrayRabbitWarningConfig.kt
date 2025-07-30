@@ -3,12 +3,15 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class CFStrayRabbitWarningConfig {
@@ -20,7 +23,17 @@ class CFStrayRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Highlight Color", desc = "Choose the color that stray rabbits should be highlighted as.")
     @ConfigEditorColour
-    var inventoryHighlightColor: String = LorenzColor.RED.toConfigColor()
+    var inventoryHighlightColor: ChromaColour = LorenzColor.RED.toChromaColor()
+
+    @Expose
+    @ConfigOption(
+        name = "Block Closing",
+        desc = "Block closing the Chocolate Factory while there is a stray active.\n" +
+            "§eHold §cShift §eto bypass"
+    )
+    @SearchTag("prevent close")
+    @ConfigEditorBoolean
+    var blockClosing: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -59,7 +72,7 @@ class CFStrayRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Flash Color", desc = "Color of the screen when flashing")
     @ConfigEditorColour
-    var flashColor: String = "0:127:0:238:255"
+    var flashColor: ChromaColour = ChromaColour.fromStaticRGB(0, 238, 255, 127)
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")

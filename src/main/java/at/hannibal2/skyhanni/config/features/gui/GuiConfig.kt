@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
@@ -170,6 +172,7 @@ class GuiConfig {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @OnlyLegacy
     var configButtonOnPause: Boolean = true
 
     @Expose
@@ -178,8 +181,10 @@ class GuiConfig {
     val widenConfig: Property<Boolean> = Property.of(false)
 
     @Expose
+    @NoConfigLink
     val titlePosition: Position = Position(0, 160)
 
     @Expose
+    @NoConfigLink
     val titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
 }

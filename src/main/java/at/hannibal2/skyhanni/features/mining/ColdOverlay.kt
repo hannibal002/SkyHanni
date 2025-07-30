@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MiningApi.inColdIsland
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -63,5 +63,5 @@ object ColdOverlay {
         }
     }
 
-    private fun isEnabled() = inColdIsland() && config.enabled
+    private fun isEnabled() = IslandTypeTags.IS_COLD.inAny() && config.enabled
 }

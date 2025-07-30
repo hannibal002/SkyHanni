@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -267,17 +266,8 @@ object GardenVisitorDropStatistics {
         val storage = GardenApi.storage?.visitorDrops ?: return
         ChatUtils.clickableChat(
             "Click here to reset Visitor Drops Statistics.",
-            // Todo: Make the storage class extend `ResettableStorageSet`, so this can just be a .reset() call
-            //  This should happen at the same time as the tracker migration - see #profile.garden.visitorDrops
             onClick = {
-                storage.copper = 0
-                storage.bits = 0
-                storage.farmingExp = 0
-                storage.gardenExp = 0
-                storage.gemstonePowder = 0
-                storage.mithrilPowder = 0
-                storage.acceptedRarities = mutableMapOf()
-                storage.rewardsCount = mutableMapOf()
+                storage.reset()
                 ChatUtils.chat("Visitor Drop Statistics reset!")
                 saveAndUpdate()
             },
@@ -316,10 +306,6 @@ object GardenVisitorDropStatistics {
         event.move(3, "${originalPrefix}displayIcons", "${newPrefix}displayIcons")
         event.move(3, "${originalPrefix}onlyOnBarn", "${newPrefix}onlyOnBarn")
         event.move(3, "${originalPrefix}visitorDropPos", "${newPrefix}pos")
-
-        event.transform(11, "${newPrefix}textFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
-        }
 
         // Was a list of longs, now a map of rarity to count
         event.move(

@@ -11,3 +11,7 @@ fun setEntity(entity: Entity?) {
 fun getEntity(): Entity? {
     return savedEntity
 }
+
+fun clearEntity() {
+    savedEntity = null
+}

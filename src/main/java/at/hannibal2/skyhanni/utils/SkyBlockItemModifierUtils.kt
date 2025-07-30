@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.features.fishing.FishingApi
+import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
@@ -21,7 +23,6 @@ import net.minecraft.util.ResourceLocation
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
-
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
@@ -53,6 +54,7 @@ object SkyBlockItemModifierUtils {
     }?.takeIf { it > 0 }
 
     fun ItemStack.getMithrilInfusion(): Boolean = getAttributeByte("mithril_infusion") == 1.toByte()
+    fun ItemStack.getFreeWill(): Boolean = getAttributeByte("free_will") == 1.toByte()
 
     private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1
@@ -94,13 +96,7 @@ object SkyBlockItemModifierUtils {
         @Deprecated("Do not use, does not reflect Tier Boost, use PetData(petInfo).fauxInternalName instead")
         val _internalName = "$type;${tier.id}".toInternalName()
         val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
-        fun getSkinVariantIndex() = skin?.let {
-            extraData?.entrySet()?.firstOrNull { json ->
-                val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == properSkinItem }
-                val expectedKey = PetUtils.petSkinNbtNames.getOrNull(repoVariantIndex) ?: return@firstOrNull false
-                json.key == expectedKey
-            }?.value?.asJsonPrimitive?.asNumber?.toInt()
-        }
+        fun getSkinVariantIndex() = properSkinItem?.let { PetUtils.getVariantIndexOrNull(it) }
     }
 
     fun ItemStack.getPetCandyUsed(): Int? {
@@ -179,6 +175,12 @@ object SkyBlockItemModifierUtils {
             }
         }
         list
+    }
+
+    fun ItemStack.getRodParts(): List<NeuInternalName> {
+        return FishingApi.RodPart.entries.mapNotNull {
+            this.getFishingRodPart(it)
+        }
     }
 
     fun ItemStack.getPowerScroll() = getAttributeString("power_ability_scroll")?.toInternalName()

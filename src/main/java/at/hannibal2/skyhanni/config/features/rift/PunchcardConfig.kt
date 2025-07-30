@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.rift
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -19,7 +20,7 @@ class PunchcardConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Color used for highlighting.")
     @ConfigEditorColour
-    val color: Property<String> = Property.of("0:163:122:11:143")
+    val color: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(122, 11, 143, 163))
 
     @Expose
     @ConfigOption(name = "Enable Overlay", desc = "Shows an overlay with the amount of punched players.")

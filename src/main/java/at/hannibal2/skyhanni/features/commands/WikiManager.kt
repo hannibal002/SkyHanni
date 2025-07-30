@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import net.minecraft.item.ItemStack
 import java.net.URLEncoder
 
@@ -62,7 +62,7 @@ object WikiManager {
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
         if (NeuItems.neuHasFocus()) return
-        val stack = slotUnderCursor()?.stack ?: return
+        val stack = stackUnderCursor() ?: return
 
         if (!config.wikiKeybind.isKeyHeld()) return
         wikiTheItem(stack, config.menuOpenWiki)
@@ -110,9 +110,7 @@ object WikiManager {
         val wiki = if (useFandom) "SkyBlock Fandom Wiki" else "Official SkyBlock Wiki"
         val urlPrefix = if (useFandom) FANDOM_URL_PREFIX else OFFICIAL_URL_PREFIX
         if (search == "") {
-            ChatUtils.clickableLinkChat(
-                "§7Click §e§lHERE §7to visit the §6$wiki§7!", urlPrefix, "§7The $wiki!"
-            )
+            ChatUtils.clickableLinkChat("§7Click §e§lHERE §7to visit the §6$wiki§7!", urlPrefix, "§7The $wiki!")
             return
         }
 
@@ -123,7 +121,7 @@ object WikiManager {
             "§7Click §e§lHERE §7to find §a$displaySearch §7on the §6$wiki§7!",
             searchUrl,
             "§7View §a$displaySearch §7on the §6$wiki§7!",
-            autoOpen
+            autoOpen,
         )
     }
 

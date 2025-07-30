@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
 object FossilSolver {
     /*
     to be used when they have less than 18 clicks
@@ -31,24 +34,16 @@ object FossilSolver {
         Triple(FossilTile(3, 4), 1.0, 2),
     )
 
-    private var currentlySolving = false
-
-    private fun getCurrentSequence(): Set<Triple<FossilTile, Double, Int>> {
-        return if (FossilSolverDisplay.maxCharges < 18) {
-            riskyStartingSequence
-        } else {
-            safeStartingSequence
-        }
-    }
+    private fun getCurrentSequence(): Set<Triple<FossilTile, Double, Int>> =
+        if (FossilSolverDisplay.maxCharges < 18) riskyStartingSequence else safeStartingSequence
 
     private fun isPositionInStartSequence(position: FossilTile): Boolean {
         return getCurrentSequence().any { it.first == position }
     }
 
-    fun findBestTile(fossilLocations: Set<Int>, dirtLocations: Set<Int>, percentage: String?) {
-        if (currentlySolving) return
-        currentlySolving = true
+    private val solvingMutex = Mutex()
 
+    suspend fun findBestTile(fossilLocations: Set<Int>, dirtLocations: Set<Int>, percentage: String?) = solvingMutex.withLock {
         val invalidPositions: MutableSet<FossilTile> = mutableSetOf()
         for (i in 0..53) {
             if (i !in fossilLocations && i !in dirtLocations) {
@@ -62,14 +57,11 @@ object FossilSolver {
         if (needsMoveSequence) {
             val movesTaken = invalidPositions.size
             if (movesTaken >= getCurrentSequence().size) {
-                FossilSolverDisplay.showError()
-                currentlySolving = false
-                return
+                return FossilSolverDisplay.showError()
             }
 
             val nextMove = getCurrentSequence().elementAt(movesTaken)
             FossilSolverDisplay.nextData(nextMove.first, nextMove.second, nextMove.third)
-            currentlySolving = false
             return
         }
 
@@ -105,20 +97,13 @@ object FossilSolver {
             .forEach { possibleClickPositions.remove(it) }
 
         val bestPosition = possibleClickPositions.maxByOrNull { it.value } ?: run {
-            if (fossilLocations.isNotEmpty()) {
+            return if (fossilLocations.isNotEmpty()) {
                 FossilSolverDisplay.showCompleted()
-                currentlySolving = false
-                return
-            }
-
-            FossilSolverDisplay.showError()
-            currentlySolving = false
-            return
+            } else FossilSolverDisplay.showError()
         }
 
         val nextMove = bestPosition.key
         val correctPercentage = bestPosition.value / totalPossibleTiles
-        currentlySolving = false
         FossilSolverDisplay.nextData(nextMove, correctPercentage, totalPossibleTiles.toInt())
     }
 

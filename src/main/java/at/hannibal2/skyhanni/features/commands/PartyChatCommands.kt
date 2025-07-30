@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
@@ -68,20 +68,18 @@ object PartyChatCommands {
             { config.pingCommand },
             requiresPartyLead = false,
             executable = {
-
-                if (!devConfig.hypixelPingApi) {
-
+                if (!CurrentPing.isEnabled()) {
                     ChatUtils.clickableChat(
-                        "Hypixel Ping Api is disabled, ping command won't work!",
+                        "Ping API is disabled, the ping command won't work!",
                         prefixColor = "§c",
                         onClick = {
-                            devConfig::hypixelPingApi.jumpToEditor()
+                            devConfig::pingApi.jumpToEditor()
                         },
                         hover = "§eClick to find setting in the config!",
                     )
                     return@PartyChatCommand
                 }
-                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms", prefix = true)
+                HypixelCommands.partyChat(CurrentPing.getFormattedPing(), prefix = true)
 
             },
         ),
@@ -108,8 +106,9 @@ object PartyChatCommands {
     }
 
     private fun isTrustedUser(name: String): Boolean {
+        if (name == PlayerUtils.getName()) return true
         val friend = FriendApi.getAllFriends().find { it.name == name }
-        return when (config.defaultRequiredTrustLevel) {
+        return when (config.requiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
             PartyCommandsConfig.TrustedUser.BEST_FRIENDS -> friend?.bestFriend == true
             PartyCommandsConfig.TrustedUser.ANYONE -> true
@@ -129,7 +128,7 @@ object PartyChatCommands {
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         val name = event.cleanedAuthor
-        if (name == PlayerUtils.getName() && !command.triggerableBySelf) return
+        if (name == PlayerUtils.getName() && (!command.triggerableBySelf || !config.selfTriggerCommands)) return
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyApi.partyLeader != PlayerUtils.getName()) return
         if (isBlockedUser(name)) {
@@ -256,5 +255,10 @@ object PartyChatCommands {
         } else {
             ChatUtils.chat("$player §cisn't §eignored.")
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(95, "misc.partyCommands.defaultRequiredTrustLevel", "misc.partyCommands.requiredTrustLevel")
     }
 }
