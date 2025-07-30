@@ -2,12 +2,11 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 @SkyHanniModule
@@ -18,7 +17,7 @@ object SlayerTimeMessages {
     @HandleEvent
     fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
         val (bossType, timeToKill) = with(event.data) { bossType to timeToKill }
-        if (!config.timeToKillMessage || !bossType.isSlayer || (event.data.entity.mob?.owner?.ownerName != PlayerUtils.getName())) return
+        if (!config.timeToKillMessage || !bossType.isSlayer || !event.data.entity.belongsToPlayer()) return
 
         ChatUtils.chat(
             if (config.compactTimeMessage)
