@@ -16,7 +16,7 @@ abstract class GuideScrollPage(
 
     private val scroll = ScrollValue()
 
-    fun update(content: List<List<Renderable>>, header: List<Renderable>) {
+    fun update(header: List<Renderable>, content: List<List<Renderable>>) {
         renderable = Renderable.scrollTable(
             content = content,
             height = sizeY - paddingY * 2,

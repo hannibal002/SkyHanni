@@ -41,17 +41,13 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
         else
             FortuneUpgrades.cropSpecificUpgrades
         update(
+            header = header(),
             content = upgradeList.map { upgrade -> upgrade.print() },
-            header = header()
         )
     }
 
     private fun header() = listOf("Upgrade", "", "Item", "FF", "Cost/FF", "Total").map {
-        Renderable.text(
-            it,
-            0.9,
-            horizontalAlign = HorizontalAlignment.CENTER,
-        )
+        Renderable.text(it, scale = 0.9, horizontalAlign = HorizontalAlignment.CENTER)
     }
 
     private fun FortuneUpgrade.print() = buildList {
