@@ -11,6 +11,7 @@ import net.fabricmc.loom.api.processor.MinecraftJarProcessor
 import net.fabricmc.loom.api.processor.ProcessorContext
 import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
+import org.gradle.internal.impldep.org.apache.http.client.methods.RequestBuilder.options
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -278,6 +279,11 @@ dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
 }
 
+tasks.withType<KspTaskJvm> {
+    inputs.property("version", project.version)
+    options.add(SubpluginOption("apoption", lazy((project.version as Provider<*>).map { "skyhanni.modver=${it}" }::get)))
+}
+
 afterEvaluate {
     loom.runs.named("client") {
         if (target == ProjectTarget.MAIN) {
@@ -287,7 +293,6 @@ afterEvaluate {
         }
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
-        this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
         this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
         this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
     }
@@ -381,7 +386,12 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
-    archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
+//     archiveVersion.set(
+//         (version as Provider<*>).map {
+//             "$it-mc${target.minecraftVersion.versionName}"
+//         }
+//     )
+    archiveVersion.set("Hallo")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
@@ -481,15 +491,12 @@ publishing.publications {
 
 detekt {
     buildUponDefaultConfig = true // preconfigure defaults
-    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
     baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
     source.setFrom(project.sourceSets.named("main").map { it.allSource })
 }
 
 tasks.withType<Detekt>().configureEach {
-    onlyIf {
-        target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
-    }
+    enabled = target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
 
@@ -499,6 +506,7 @@ tasks.withType<Detekt>().configureEach {
         sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
         md.required.set(true) // simple Markdown format
     }
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
