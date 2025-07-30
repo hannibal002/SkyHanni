@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.fishing.FishingConfig
 import at.hannibal2.skyhanni.config.features.foraging.ForagingConfig
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
 import at.hannibal2.skyhanni.config.features.gui.GuiConfig
+import at.hannibal2.skyhanni.config.features.hunting.HuntingConfig
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig
@@ -100,6 +101,10 @@ class Features : Config() {
     @Expose
     @Category(name = "Foraging", desc = "Features that help you cut down trees.")
     var foraging: ForagingConfig = ForagingConfig()
+
+    @Expose
+    @Category(name = "Hunting", desc = "Features that help you hunt mobs for their shards.")
+    var hunting: HuntingConfig = HuntingConfig()
 
     // Combat like
     @Expose

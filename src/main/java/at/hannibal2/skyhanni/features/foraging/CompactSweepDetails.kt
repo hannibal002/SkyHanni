@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -76,7 +76,7 @@ object CompactSweepDetails {
         var sweep: Double = -1.0,
         var toughness: Double = -1.0,
         var treeType: String = "",
-    ) : ResettableStorageSet()
+    ) : Resettable()
 
     private var sweepDetailsAreDirty = false
     private var isInsideSweepDetails = false

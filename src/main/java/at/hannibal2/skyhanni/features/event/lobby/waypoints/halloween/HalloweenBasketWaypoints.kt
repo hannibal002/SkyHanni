@@ -127,7 +127,7 @@ object HalloweenBasketWaypoints {
         if (scoreboardTitlePattern.matches(ScoreboardData.objectiveTitle.removeColor())) {
             inHub = true
         }
-        event.full.forEach {
+        event.new.forEach {
             if (halloweenEventPattern.matches(it)) {
                 halloweenMatches = true
             } else if (scoreboardBasketPattern.matches(it)) {

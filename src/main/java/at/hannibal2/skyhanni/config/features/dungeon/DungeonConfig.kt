@@ -172,6 +172,11 @@ class DungeonConfig {
     var terminalWaypoints: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Creation Cooldown", desc = "")
+    @Accordion
+    val creationCooldown: CreationCooldownConfig = CreationCooldownConfig()
+
+    @Expose
     @ConfigOption(name = "Low Health Alert", desc = "")
     @Accordion
     val lowHealthAlert: LowHealthAlertConfig = LowHealthAlertConfig()
@@ -186,4 +191,12 @@ class DungeonConfig {
     @Accordion
     val spiritLeapOverlay: SpiritLeapConfig = SpiritLeapConfig()
 
+    @Expose
+    @ConfigOption(
+        name = "Spring Boots Notification",
+        desc = "Shows sound and title when Spring Boots are charged up enough to reach the Crystals in phase 1 of the floor 7 boss fight.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var springBootsNotification: Boolean = false
 }

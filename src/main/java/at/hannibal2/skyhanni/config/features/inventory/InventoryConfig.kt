@@ -348,4 +348,14 @@ class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightActiveBeaconEffect: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Save Private Island Chests",
+        desc = "Saves every chest you looked at on your private island. The Data gets used by other features, " +
+            "so this does not do anything directly noticeable",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var savePrivateIslandChests: Boolean = false
 }

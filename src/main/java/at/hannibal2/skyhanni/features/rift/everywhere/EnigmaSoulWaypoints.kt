@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -166,7 +166,7 @@ object EnigmaSoulWaypoints {
                         IslandGraphs.pathFind(
                             it,
                             "$name Enigma Soul",
-                            config.color.toSpecialColor(),
+                            config.color.toColor(),
                             condition = { config.showPathFinder },
                         )
                     }
@@ -208,7 +208,7 @@ object EnigmaSoulWaypoints {
         for ((area, souls) in trackedSouls) {
             for (name in souls) {
                 soulLocations[area]?.get(name)?.let { position ->
-                    event.drawWaypointFilled(position, config.color.toSpecialColor(), seeThroughBlocks = true, beacon = true)
+                    event.drawWaypointFilled(position, config.color.toColor(), seeThroughBlocks = true, beacon = true)
                     event.drawDynamicText(position.up(), "§5${name.removeSuffix(" Soul")} Soul", 1.5)
                 }
             }

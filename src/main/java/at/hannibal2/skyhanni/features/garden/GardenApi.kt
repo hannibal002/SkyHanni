@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.checkCurrentPlot
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
@@ -119,6 +120,7 @@ object GardenApi {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.GARDEN) return
         checkItemInHand()
+        checkCurrentPlot()
     }
 
     @HandleEvent

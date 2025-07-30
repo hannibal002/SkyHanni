@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc.cosmetic
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -17,7 +18,7 @@ class FollowingLineConfig {
     @Expose
     @ConfigOption(name = "Line Color", desc = "Color of the line.")
     @ConfigEditorColour
-    var lineColor: String = "0:255:255:255:255"
+    var lineColor: ChromaColour = ChromaColour.fromStaticRGB(255, 255, 255, 255)
 
     @Expose
     @ConfigOption(name = "Time Alive", desc = "Time in seconds until the line fades out.")

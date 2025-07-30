@@ -62,6 +62,10 @@ object ForagingTrackerLegacy {
 
         override fun TreeType.isBucketSelectable() = true
 
+        override fun bucketName(): String {
+            return "tree"
+        }
+
         @Expose
         var treesCut: MutableMap<TreeType, Long> = enumMapOf()
         fun getTreeCount(): Long = selectedBucket?.let { treesCut[it] } ?: treesCut.values.sum()

@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -48,17 +50,28 @@ object CollectionTracker {
     private val OBSOLITE = "OBSOLITE".toInternalName()
     private val TIMITE = "TIMITE".toInternalName()
 
-    private fun command(args: Array<String>) {
-        if (args.isEmpty()) {
-            if (internalName == null) {
-                ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
-                return
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtrackcollection") {
+            description = "Tracks your collection gain over time"
+            category = CommandCategory.USERS_ACTIVE
+            arg(
+                "args", BrigadierArguments.greedyString(),
+            ) { args ->
+                callback { command(getArg(args).split(" ").toTypedArray()) }
             }
-            ChatUtils.chat("Stopped collection tracker.")
-            resetData()
-            return
+            simpleCallback {
+                if (internalName == null) {
+                    ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
+                } else {
+                    ChatUtils.chat("Stopped collection tracker.")
+                    resetData()
+                }
+            }
         }
+    }
 
+    private fun command(args: Array<String>) {
         val lastArg = args.last()
 
         val nameArgs = if (lastArg.isFormatNumber()) {
@@ -184,7 +197,6 @@ object CollectionTracker {
         name == internalName
     }
 
-
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null
 
@@ -234,14 +246,6 @@ object CollectionTracker {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         display?.let {
             SkyHanniMod.feature.misc.collectionCounterPos.renderRenderable(it, posLabel = "Collection Tracker")
-        }
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtrackcollection") {
-            description = "Tracks your collection gain over time"
-            callback { command(it) }
         }
     }
 }

@@ -30,10 +30,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -56,6 +56,7 @@ object TrophyFishDisplay {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRIMSON_ISLE) {
             DelayedRun.runDelayed(200.milliseconds) {
+                TrophyFishManager.loadMissingTrophyFish()
                 update()
             }
         }
@@ -63,6 +64,7 @@ object TrophyFishDisplay {
 
     @HandleEvent
     fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
+        TrophyFishManager.loadMissingTrophyFish()
         recentlyDroppedTrophies[getInternalName(event.trophyFishName)] = event.rarity
         update()
         DelayedRun.runDelayed(5.1.seconds) {
@@ -73,6 +75,7 @@ object TrophyFishDisplay {
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
+        TrophyFishManager.loadMissingTrophyFish()
         update()
     }
 
@@ -92,6 +95,7 @@ object TrophyFishDisplay {
                 showCaughtHigher,
                 requireArmor,
             ) {
+                TrophyFishManager.loadMissingTrophyFish()
                 update()
             }
         }

@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -85,6 +87,7 @@ object ItemPickupLog {
     }
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLog
+    private val coinConfig get() = config.coinValue
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
     private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
@@ -279,9 +282,28 @@ object ItemPickupLog {
         if (display.isEmpty()) {
             this.display = null
         } else {
+            computeTotalCoinValue(display)
             val renderable = Renderable.vertical(display, verticalAlign = config.alignment)
             this.display = Renderable.fixedSizeColumn(renderable, 30)
         }
+    }
+
+    private fun computeTotalCoinValue(display: MutableList<Renderable>) {
+        if (!coinConfig.enabled || !(itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) return
+        val valueAdded = itemsAddedToInventory.values.sumOf { it.coinValue() }
+        val valueRemoved = itemsRemovedFromInventory.values.sumOf { it.coinValue() }
+        val total = valueAdded - valueRemoved
+        if (total >= coinConfig.threshold || coinConfig.threshold == 0f) {
+            display.add(0, Renderable.text("§eValue: ${total.formatCoin()} coins"))
+        }
+    }
+
+    private fun PickupEntry.coinValue() = if (name == "§6Coins") {
+        // Handle purse coins as a special case
+        amount.toDouble()
+    } else {
+        val pricePer = neuInternalName?.getPriceOrNull(coinConfig.priceSource) ?: 0.0
+        pricePer * amount
     }
 
     private fun handleCompactLines(

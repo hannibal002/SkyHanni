@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.misc
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -32,7 +33,7 @@ class AreaPathfinderConfig {
     @Expose
     @ConfigOption(name = "Path Color", desc = "Change the color of the path.")
     @ConfigEditorColour
-    val color: Property<String> = Property.of("0:245:85:255:85")
+    val color: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(85, 255, 85, 245))
 
     @Expose
     @ConfigLink(owner = AreaPathfinderConfig::class, field = "enabled")
