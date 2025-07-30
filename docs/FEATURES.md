@@ -561,6 +561,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Useful for e.g. Magma Cubes in Burning Desert for Tara Slayer.
 + Added Mark When Invincible Tara 5. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4471)
     + Highlight the Tarantula Slayer tier 5 in a customizeable color while the hatchlings are alive.
++ Added Slayer Kill Timer. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
+    + Sends time to kill a slayer in chat.
++ Added Slayer Time messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
+    + Sends time to complete (Spawn & Kill) a slayer quest in chat.
 
 </details>
 <details open><summary>

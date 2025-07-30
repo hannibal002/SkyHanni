@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndica
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -68,6 +68,8 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+
+typealias EntityData = DamageIndicatorEntityData
 
 // TODO cut class into smaller pieces
 @SkyHanniModule
@@ -400,7 +402,7 @@ object DamageIndicatorManager {
             entityData.nameAbove = ""
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
-                if (entityData.bossType.showDeathTime && config.timeToKillSlayer) {
+                if (entityData.bossType.isSlayer && config.timeToKillSlayer) {
                     entityData.nameAbove = entityData.timeToKill
                 }
                 "§cDead"
@@ -946,7 +948,7 @@ object DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 
