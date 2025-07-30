@@ -290,7 +290,7 @@ afterEvaluate {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
         this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
         this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.configver=${file("../../Config_Version").absolutePath}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.configver=${file("../../buildTools/CONFIG_VERSION").absolutePath}"))
     }
 }
 
