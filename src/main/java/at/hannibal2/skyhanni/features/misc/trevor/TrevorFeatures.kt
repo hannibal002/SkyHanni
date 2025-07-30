@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -337,8 +337,8 @@ object TrevorFeatures {
     }
 
     @HandleEvent
-    fun onTick() {
-        inTrapperDen = areaTrappersDenPattern.matches(IslandAreas.currentArea)
+    fun onGraphAreaChange(event: GraphAreaChangeEvent) {
+        inTrapperDen = areaTrappersDenPattern.matches(event.area)
     }
 
     enum class TrapperStatus(baseColor: LorenzColor) {

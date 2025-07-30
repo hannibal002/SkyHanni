@@ -205,15 +205,6 @@ object MiningApi {
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
-    @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
-    fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
-
-    @Deprecated("Use IslandTypeTags.MINING.inAny() instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
-    fun inMiningIsland() = IslandTypeTags.MINING.inAny()
-
-    @Deprecated("Use IslandTypeTags.IS_COLD.inAny() instead", ReplaceWith("IslandTypeTags.IS_COLD.inAny()"))
-    fun inColdIsland() = IslandTypeTags.IS_COLD.inAny()
-
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (IslandTypeTags.IS_COLD.inAny()) {

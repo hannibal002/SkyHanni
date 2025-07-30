@@ -1,4 +1,4 @@
-name: Post-Release
+name: Modrinth Version Upload
 
 on:
 #    release:

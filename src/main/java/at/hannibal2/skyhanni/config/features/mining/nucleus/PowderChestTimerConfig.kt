@@ -20,6 +20,11 @@ class PowderChestTimerConfig {
     var enabled: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Only When Max Great Explorer", desc = "Only enable the feature when your Great Explorer is maxed.")
+    @ConfigEditorBoolean
+    var onlyMaxGreatExplorer: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Highlight Chests",
         desc = "Highlight chests with a color depending on how much time left until they despawn.",

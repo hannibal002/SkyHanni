@@ -82,7 +82,7 @@ inner class RenameKotlinFunctionToUseCamelCaseIntention : PsiElementBaseIntentio
 
     override fun invoke(project: Project, editor: Editor?, element: PsiElement) {
         val info = findRegexInfo(element) ?: return
-        val regex = info.getRegexText()
+        val regex = info.getRegexText()?.replace("/", "\\/")
         if (regex == null) {
             show("Regex needs to be a bare string literal in order to open it in the browser!")
             return
@@ -92,7 +92,7 @@ inner class RenameKotlinFunctionToUseCamelCaseIntention : PsiElementBaseIntentio
                 urlEncode(
                     info.getExamples().joinToString("\n")
                 )
-            }"
+            }&flavor=java"
         )
     }
 
