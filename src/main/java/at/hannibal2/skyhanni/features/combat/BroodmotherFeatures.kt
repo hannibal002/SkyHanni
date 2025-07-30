@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import kotlin.reflect.KProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
@@ -107,18 +106,14 @@ object BroodmotherFeatures {
     private fun onBroodmotherSpawn() {
         broodmotherSpawnTime = SimpleTimeMark.farPast()
         if (!isAliveMessageEnabled()) return
-        val feature: KProperty0<*>
-        if (config.alertOnSpawn) {
-            feature = config::alertOnSpawn
-            val alertSound = SoundUtils.createSound(spawnAlertConfig.alertSound, spawnAlertConfig.pitch)
-            SoundUtils.repeatSound(100, spawnAlertConfig.repeatSound, alertSound)
-            TitleManager.sendTitle(spawnAlertConfig.text.replace("&", "§"))
-        } else {
-            feature = config::stages
-        }
+        if (!config.alertOnSpawn) return
+
+        val alertSound = SoundUtils.createSound(spawnAlertConfig.alertSound, spawnAlertConfig.pitch)
+        SoundUtils.repeatSound(100, spawnAlertConfig.repeatSound, alertSound)
+        TitleManager.sendTitle(spawnAlertConfig.text.replace("&", "§"))
         ChatUtils.clickToActionOrDisable(
             "The Broodmother has spawned!",
-            feature,
+            config::alertOnSpawn,
             actionName = "warp to the Top of the Nest",
             action = { HypixelCommands.warp("nest") },
         )
