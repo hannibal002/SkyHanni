@@ -66,6 +66,7 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
@@ -516,35 +517,31 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
+        if (data.itemRarityLastCheck.passedSince() < 1.seconds) return
         data.itemRarityLastCheck = SimpleTimeMark.now()
-        val internalName = getInternalName()
-        if (internalName == NeuInternalName.NONE) {
-            data.itemRarity = null
-            data.itemCategory = null
-            return
-        }
-        val pair = this.readItemCategoryAndRarity()
-        data.itemRarity = pair.first
-        data.itemCategory = pair.second
+
+        val currentLore = getLore()
+        if (data.lastLore == currentLore) return
+        data.lastLore = currentLore
+
+        val (rarity, category) = if (getInternalName() != NeuInternalName.NONE) {
+            this.readItemCategoryAndRarity()
+        } else null to null
+        data.itemRarity = rarity
+        data.itemCategory = category
     }
 
     fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
         val data = cachedData
-        if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity()
-        }
+        this.updateCategoryAndRarity()
         return data.itemCategory
     }
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
         val data = cachedData
-        if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity()
-        }
+        this.updateCategoryAndRarity()
         return data.itemRarity
     }
-
-    private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
@@ -898,7 +895,7 @@ object ItemUtils {
         if (EnoughUpdatesManager.inLoadingState()) {
             return ChatUtils.debug(
                 "Ignoring missing repo item warning, repo is currently loading or fetching",
-                replaceSameMessage = true
+                replaceSameMessage = true,
             )
         }
 
