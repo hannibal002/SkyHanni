@@ -107,7 +107,7 @@ object ToolTooltipTweaks {
                 if (config.fortuneTooltipKeybind.isKeyHeld()) {
                     iterator.addStat("  §7Base: §6+", baseFortune)
                     iterator.addStat("  §7Tool: §6+", toolFortune)
-                    iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)
+                    iterator.addStat("  §7${reforgeName ?: "Reforge"}: §9+", reforgeFortune)
                     iterator.addStat("  §7Gemstone: §d+", gemstoneFortune)
                     iterator.addStat("  §7Ability: §2+", abilityFortune)
                     iterator.addStat("  §7Green Thumb: §a+", greenThumbFortune)
