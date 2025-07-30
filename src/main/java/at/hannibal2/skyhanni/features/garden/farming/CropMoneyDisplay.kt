@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
@@ -142,7 +142,7 @@ object CropMoneyDisplay {
 
     private fun buildDisplayBody(): Renderable {
         GardenApi.getCurrentlyFarmedCrop()?.let {
-            val reforgeName = InventoryUtils.getItemInHand()?.getReforgeName()
+            val reforgeName = InventoryUtils.getItemInHand()?.getReforgeModifier()
             toolHasBountiful?.put(it, reforgeName == "bountiful")
 
             if (GardenApi.mushroomCowPet && it != CropType.MUSHROOM && config.mooshroom) {

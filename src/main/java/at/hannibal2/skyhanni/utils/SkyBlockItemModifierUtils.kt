@@ -235,7 +235,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.hasAttributes() = getAttributes() != null
 
-    fun ItemStack.getReforgeName() = getAttributeString("modifier")
+    fun ItemStack.getReforgeModifier() = getAttributeString("modifier")
 
     fun ItemStack.isRecombobulated() = getAttributeInt("rarity_upgrades").isPositive()
 

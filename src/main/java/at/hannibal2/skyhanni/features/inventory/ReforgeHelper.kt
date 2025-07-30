@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -116,7 +116,7 @@ object ReforgeHelper {
             reforgeToSearch = null
         }
         itemToReforge = newItem
-        val newReforgeName = itemToReforge?.getReforgeName().orEmpty()
+        val newReforgeName = itemToReforge?.getReforgeModifier().orEmpty()
         if (newReforgeName == currentReforge?.nbtModifier) return
         currentReforge = ReforgeApi.reforgeList.firstOrNull { it.nbtModifier == newReforgeName }
         updateDisplay()

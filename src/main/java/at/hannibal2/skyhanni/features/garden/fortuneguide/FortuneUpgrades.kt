@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import net.minecraft.item.ItemStack
 
@@ -104,7 +104,7 @@ object FortuneUpgrades {
                 )
             }
             recombobulateItem(item, genericUpgrades)
-            when (item.getReforgeName()) {
+            when (item.getReforgeModifier()) {
                 "rooted" -> {}
                 "blooming" -> {
                     reforgeItem(item, FarmingReforge.ROOTED, genericUpgrades)
@@ -123,7 +123,7 @@ object FortuneUpgrades {
             val item = piece.getItemOrNull() ?: return // todo tell them to buy it later
 
             recombobulateItem(item, genericUpgrades)
-            when (item.getReforgeName()) {
+            when (item.getReforgeModifier()) {
                 "mossy" -> {}
                 "bustling" -> {
                     reforgeItem(item, FarmingReforge.MOSSY, genericUpgrades)
@@ -238,7 +238,7 @@ object FortuneUpgrades {
             )
         }
         recombobulateItem(tool, cropSpecificUpgrades)
-        when (tool.getReforgeName()) {
+        when (tool.getReforgeModifier()) {
             "blessed" -> {}
             "bountiful" -> {}
             else -> {
@@ -250,7 +250,7 @@ object FortuneUpgrades {
 
     private fun recombobulateItem(item: ItemStack, list: MutableList<FortuneUpgrade>) {
         if (item.isRecombobulated()) return
-        val reforge = item.getReforgeName()?.let {
+        val reforge = item.getReforgeModifier()?.let {
             FarmingReforge.entries.find { enumValue ->
                 enumValue.name == it.uppercase()
             }

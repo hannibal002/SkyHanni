@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -53,7 +53,7 @@ object ToolTooltipTweaks {
         val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(itemStack, crop)
         val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(itemStack, crop)
 
-        val reforgeName = itemStack.getReforgeName()?.firstLetterUppercase()
+        val reforgeName = itemStack.getReforgeModifier()?.firstLetterUppercase()
 
         val sunderFortune = FarmingFortuneDisplay.getSunderFortune(itemStack)
         val harvestingFortune = FarmingFortuneDisplay.getHarvestingFortune(itemStack)
