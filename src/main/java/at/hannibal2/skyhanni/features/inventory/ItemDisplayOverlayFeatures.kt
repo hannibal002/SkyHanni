@@ -69,6 +69,7 @@ object ItemDisplayOverlayFeatures {
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
     private val tipCache: TimeLimitedCache<Int, String> = TimeLimitedCache(2.minutes)
+    private var lastSize = 0
 
     /**
      * REGEX-TEST: MASTER_SKULL_TIER_1
@@ -121,6 +122,11 @@ object ItemDisplayOverlayFeatures {
 
     @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
+        val currentSize = config.itemNumberAsStackSize.size
+        if (lastSize != currentSize) {
+            lastSize = currentSize
+            tipCache.clear()
+        }
         event.stackTip = getStackTip(event.stack)?.also {
             tipCache[event.stack.hashCode()] = it
         } ?: return
