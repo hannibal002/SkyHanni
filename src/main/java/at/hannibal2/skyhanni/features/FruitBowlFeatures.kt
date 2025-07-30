@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -31,7 +30,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.awt.Color
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -246,11 +245,11 @@ object FruitBowlFeatures {
         )
     }
 
-    private fun wrongColor() = config.canNotColor.get().toSpecialColor()
+    private fun wrongColor() = config.canNotColor.get()
 
-    private fun correctColor() = config.canColor.get().toSpecialColor()
+    private fun correctColor() = config.canColor.get()
 
-    private fun Mob.setColor(color: Color) {
+    private fun Mob.setColor(color: ChromaColour) {
         highlight(color) { config.playerHighlighter && inHand }
     }
 }

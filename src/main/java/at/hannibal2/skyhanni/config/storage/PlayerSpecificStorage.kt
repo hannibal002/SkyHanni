@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
+import java.time.LocalDate
 
 class PlayerSpecificStorage {
     @Expose
@@ -36,6 +37,20 @@ class PlayerSpecificStorage {
 
     @Expose
     var guildMembers: MutableList<String> = mutableListOf()
+
+    @Expose
+    var bazaar: BazaarStorage = BazaarStorage()
+
+    class BazaarStorage {
+        @Expose
+        var taxRate: Double = 1.25
+
+        @Expose
+        var coinsTowardsLimit: Double = 0.0
+
+        @Expose
+        var lastAccessedDay: LocalDate? = null
+    }
 
     @Expose
     var winter: WinterStorage = WinterStorage()

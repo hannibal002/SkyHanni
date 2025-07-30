@@ -124,8 +124,19 @@ val headlessLwjgl: Configuration by configurations.creating {
 }
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
-    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+    this.user = "hannibal002"
+    this.repo = "SkyHanni-Repo"
     this.branch = "main"
+    this.resourcePath = "assets/skyhanni/repo.zip"
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+}
+
+val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
+    this.user = "NotEnoughUpdates"
+    this.repo = "NotEnoughUpdates-Repo"
+    this.branch = "master"
+    this.resourcePath = "assets/skyhanni/neu-repo.zip"
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
 val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
@@ -144,8 +155,8 @@ tasks.runClient {
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = project.findProperty("prTitle") as String
-    this.prBody = project.findProperty("prBody") as String
+    this.prTitle = project.findProperty("prTitle") as? String ?: ""
+    this.prBody = project.findProperty("prBody") as? String ?: ""
 }
 
 // Disabled because it breaks mixins with the minecraft dev plugin
@@ -177,6 +188,9 @@ dependencies {
     headlessLwjgl(libs.headlessLwjgl)
 
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
+
+    ksp(libs.autoservice.ksp)
+    implementation(libs.autoservice.annotations)
 
     val mixinVersion = if (target == ProjectTarget.MAIN) "0.7.11-SNAPSHOT" else "0.8.2"
 
@@ -299,6 +313,7 @@ kotlin {
 // Tasks:
 tasks.processResources {
     from(includeBackupRepo)
+    from(includeBackupNeuRepo)
     inputs.property("version", version)
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)

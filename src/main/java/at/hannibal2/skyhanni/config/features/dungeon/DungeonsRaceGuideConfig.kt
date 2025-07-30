@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -32,5 +33,5 @@ class DungeonsRaceGuideConfig {
     @Expose
     @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the guide waypoints.")
     @ConfigEditorColour
-    val monochromeColor: Property<String> = Property.of("0:60:0:0:255")
+    val monochromeColor: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(0, 0, 255, 60))
 }

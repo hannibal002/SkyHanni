@@ -156,9 +156,10 @@ object MetalDetectorSolver {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         predictedChestLocations.forEach {
-            event.drawColor(it, LorenzColor.GOLD)
-            event.drawLineToEye(it.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toColor(), 3, false)
-            event.drawWaypointFilled(it, LorenzColor.RED.toColor(), true, true)
+            // TODO add chroma color support via config
+            event.drawColor(it, LorenzColor.GOLD.toChromaColor())
+            event.drawLineToEye(it.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toChromaColor(), 3, false)
+            event.drawWaypointFilled(it, LorenzColor.RED.toColor(), seeThroughBlocks = true, beacon = true)
             event.drawString(it, "Treasure: §e${it.distanceToPlayer().roundTo(1)}m", true)
         }
     }
@@ -189,12 +190,12 @@ object MetalDetectorSolver {
     private fun findBaseCoordinates() {
         if (lastSearchedForBase.passedSince() < 15.seconds) return
         lastSearchedForBase = SimpleTimeMark.now()
-        val player = LocationUtils.playerLocation().roundLocationToBlock()
+        val player = LocationUtils.playerLocation().roundToBlock()
 
         for (i in -50 until 50) {
             for (j in 30 downTo -30) {
                 for (k in -50 until 50) {
-                    val blockPosition = player.add(i, j, k).roundLocationToBlock()
+                    val blockPosition = player.add(i, j, k).roundToBlock()
                     val nextBlockPosition = blockPosition.add(0, 13, 0)
                     if (blockPosition.getBlockAt() == Blocks.quartz_stairs && nextBlockPosition.getBlockAt() == Blocks.barrier) {
                         baseCoordinates = getBaseCoordinates(nextBlockPosition)

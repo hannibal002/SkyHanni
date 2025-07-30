@@ -27,6 +27,9 @@ object BrigadierUtils {
         }
     }
 
+    /**
+     * Convert a static collection to be suggestions for an argument
+     */
     fun Collection<String>.toSuggestionProvider() = SuggestionProvider<Any?> { _, builder ->
         for (s in this) {
             if (s.startsWith(builder.remainingLowerCase)) {
@@ -34,6 +37,21 @@ object BrigadierUtils {
             }
         }
         builder.buildFuture()
+    }
+
+    /**
+     * Dynamically generates suggestions for an argument based on a collection provided by a supplier.
+     */
+    fun dynamicSuggestionProvider(supplier: () -> Collection<String>): SuggestionProvider<Any?> {
+        return SuggestionProvider { _, builder ->
+            val remaining = builder.remainingLowerCase
+            for (option in supplier()) {
+                if (option.startsWith(remaining)) {
+                    builder.suggest(option)
+                }
+            }
+            builder.buildFuture()
+        }
     }
 
     private fun isCharAllowed(c: Char): Boolean = StringReader.isAllowedInUnquotedString(c) || c == SINGLE_QUOTE

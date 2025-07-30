@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 
 class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) : GuideTablePage(
     sizeX, sizeY, paddingX, paddingY, footerSpacing,
@@ -209,7 +209,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             ),
         )
 
-        val petFooter = HorizontalContainerRenderable(
+        val petFooter = Renderable.horizontal(
             FarmingItemType.getPetsDisplay(true),
             4,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -246,7 +246,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         content.addTable(
             0,
-            HorizontalContainerRenderable(
+            Renderable.horizontal(
                 FarmingItemType.getArmorDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -255,7 +255,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         )
         content.addTable(
             0,
-            HorizontalContainerRenderable(
+            Renderable.horizontal(
                 FarmingItemType.getEquipmentDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -263,14 +263,12 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             ),
         )
 
-        val realFooter = VerticalContainerRenderable(
-            listOf(
-                petFooter,
-                HorizontalContainerRenderable(
-                    footer,
-                    spacing = 15,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER, verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                ),
+        val realFooter = Renderable.vertical(
+            petFooter,
+            Renderable.horizontal(
+                footer,
+                spacing = 15,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER, verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ),
             spacing = 2,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

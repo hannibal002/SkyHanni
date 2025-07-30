@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 
@@ -76,7 +76,7 @@ object SulphurSkitterBox {
         val location = closestSponge ?: return
         if (location.distanceToPlayer() >= 50) return
         val axis = renderBox ?: return
-        val color = config.boxColor.toSpecialColor()
+        val color = config.boxColor
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
                 event.drawFilledBoundingBox(
@@ -86,7 +86,7 @@ object SulphurSkitterBox {
             }
 
             SulphurSkitterBoxConfig.BoxType.WIREFRAME -> {
-                event.drawHitbox(axis, color)
+                event.drawHitbox(axis, color.toColor())
             }
         }
     }

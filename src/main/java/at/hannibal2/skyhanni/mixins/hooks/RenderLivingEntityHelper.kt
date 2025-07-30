@@ -13,16 +13,45 @@ import java.awt.Color
 @SkyHanniModule
 object RenderLivingEntityHelper {
 
-    private val entityColorMap = mutableMapOf<EntityLivingBase, Int>()
+    private val entityColorMap = mutableMapOf<EntityLivingBase, Color>()
     private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
     private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+
+    @JvmStatic
     var areMobsHighlighted = false
-    var renderingRealGlow = false
+    @JvmStatic
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
-    fun isEntityInGlowEvent(entity: Entity): Int {
-        return currentGlowEvent?.entitiesToOutline?.get(entity) ?: 0
+    private fun isEntityInGlowEvent(entity: Entity): Int {
+        return currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb ?: 0
+    }
+
+    @JvmStatic
+    fun check() {
+        areMobsHighlighted = false
+        val conditions = entityColorCondition.values
+        for (entry in conditions) {
+            if (entry.invoke()) {
+                areMobsHighlighted = true
+                return
+            }
+        }
+        if (currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true) areMobsHighlighted = true
+    }
+
+    @JvmStatic
+    fun getEntityGlowColor(entity: Entity): Int? {
+        val livingEntity = entity as? EntityLivingBase ?: return null
+        val color = internalSetColorMultiplier(livingEntity, 0)
+        if (color == 0) {
+            val eventColor = isEntityInGlowEvent(entity)
+            if (eventColor == 0) {
+                return null
+            }
+            return eventColor
+        }
+        return color
     }
 
     @HandleEvent
@@ -40,43 +69,24 @@ object RenderLivingEntityHelper {
         entityNoHurtTimeCondition.removeIfKey { it.isDead }
     }
 
-    fun check() {
-        areMobsHighlighted = false
-        for (entry in entityColorCondition) {
-            if (entry.value.invoke()) {
-                areMobsHighlighted = true
-                return
-            }
-        }
-        if (currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true) areMobsHighlighted = true
-    }
-
     fun <T : EntityLivingBase> removeEntityColor(entity: T) {
         entityColorMap.remove(entity)
         entityColorCondition.remove(entity)
     }
 
-    fun <T : EntityLivingBase> setEntityColor(entity: T, color: Int, condition: () -> Boolean) {
-        if (color == 0) return
+    fun <T : EntityLivingBase> setEntityColor(entity: T, color: Color, condition: () -> Boolean) {
+        if (color.rgb == 0) return
         entityColorMap[entity] = color
         entityColorCondition[entity] = condition
     }
 
-    fun <T : EntityLivingBase> setEntityColor(entity: T, color: Color, condition: () -> Boolean) {
-        setEntityColor(entity, color.rgb, condition)
-    }
-
-    fun <T : EntityLivingBase> setNoHurtTime(entity: T, condition: () -> Boolean) {
+    private fun <T : EntityLivingBase> setEntityNoHurtTime(entity: T, condition: () -> Boolean) {
         entityNoHurtTimeCondition[entity] = condition
     }
 
-    fun <T : EntityLivingBase> setEntityColorWithNoHurtTime(entity: T, color: Int, condition: () -> Boolean) {
-        setEntityColor(entity, color, condition)
-        setNoHurtTime(entity, condition)
-    }
-
     fun <T : EntityLivingBase> setEntityColorWithNoHurtTime(entity: T, color: Color, condition: () -> Boolean) {
-        setEntityColorWithNoHurtTime(entity, color.rgb, condition)
+        setEntityColor(entity, color, condition)
+        setEntityNoHurtTime(entity, condition)
     }
 
     fun <T : EntityLivingBase> removeNoHurtTime(entity: T) {
@@ -94,7 +104,7 @@ object RenderLivingEntityHelper {
         if (entityColorMap.containsKey(entity)) {
             val condition = entityColorCondition[entity] ?: return default
             if (condition.invoke()) {
-                return entityColorMap[entity] ?: return default
+                return entityColorMap[entity]?.rgb ?: return default
             }
         }
         return default

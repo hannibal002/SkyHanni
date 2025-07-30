@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -52,7 +54,6 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.launch
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -261,8 +262,6 @@ object ItemUtils {
     fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
-
-    fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
@@ -686,6 +685,10 @@ object ItemUtils {
         val bazaarOverridesTypeToken = object : TypeToken<List<BazaarOverride>>() {}.type
         val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", bazaarOverridesTypeToken)
         bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
+
+        // clear the item name cache so any potential missing items are reloaded
+        itemNameCache.clear()
+        missingRepoItems.clear()
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
@@ -795,7 +798,7 @@ object ItemUtils {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -807,12 +810,12 @@ object ItemUtils {
         add("§bSkyHanni Test Item".asComponent())
         add("§eInput: '§f$input§e'".asComponent())
 
-        NeuInternalName.fromItemNameOrNull(input)?.let<NeuInternalName, Nothing> { internalName ->
+        NeuInternalName.fromItemNameOrNull(input)?.let { internalName ->
             formatTestItem(internalName, internalName.getPrice())
             return@buildList
         }
 
-        input.toInternalName().getItemStackOrNull()?.let<ItemStack, Nothing> { item ->
+        input.toInternalName().getItemStackOrNull()?.let { item ->
             val internalName = item.getInternalName()
             formatTestItem(internalName, internalName.getPrice())
             return@buildList
@@ -891,6 +894,14 @@ object ItemUtils {
 
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
+        // If we're currently loading the repo (async in a coroutine), we don't want to show the warning
+        if (EnoughUpdatesManager.inLoadingState()) {
+            return ChatUtils.debug(
+                "Ignoring missing repo item warning, repo is currently loading or fetching",
+                replaceSameMessage = true
+            )
+        }
+
         ChatUtils.debug(message)
         if (!SkyBlockUtils.debug && !PlatformUtils.isDevEnvironment) return
 
@@ -899,11 +910,15 @@ object ItemUtils {
         showRepoWarning(name)
     }
 
+    // These two are matching right now, but we keep them separate for future-proofing
+    val resetCommand get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
+    else EnoughUpdatesRepoManager.updateCommand
+
     private fun showRepoWarning(item: String) {
         val text = listOf(
             "§c§lMissing repo data for item: $item",
             "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
-            "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
+            "§cYou can try §l/$resetCommand§r§c and restart your game to see if that fixes the issue.",
             "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
         )
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
@@ -974,8 +989,8 @@ object ItemUtils {
     //#if MC > 1.21
     //$$ fun ItemStack.getItemModel(): Item? {
     //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
-    //$$     val item = Registries.ITEM.get(identifier)
-    //$$     return if (item == Items.AIR) null else item
+    //$$     val itemModel = Registries.ITEM.get(identifier)
+    //$$     return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
     //$$ }
     //#endif
 }

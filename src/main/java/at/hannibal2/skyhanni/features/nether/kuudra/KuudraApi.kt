@@ -62,10 +62,17 @@ object KuudraApi {
     var kuudraTier: Int? = null
         private set
 
-    @Deprecated("moved", ReplaceWith("KuudraApi.inKuudra"))
-    fun inKuudra() = kuudraTier != null
-
     val inKuudra get() = SkyBlockUtils.inSkyBlock && kuudraTier != null
+
+    enum class KuudraChest(val inventory: String) {
+        FREE("Free Chest"),
+        PAID("Paid Chest"),
+        ;
+
+        companion object {
+            fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
+        }
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {

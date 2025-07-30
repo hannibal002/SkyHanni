@@ -28,6 +28,16 @@ class AttributeShardsConfig {
     var onlyNotUnlocked: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Include Hunting Box", desc = "Accounts for the amount of shards you currently have held in your hunting box.")
+    @ConfigEditorBoolean
+    var includeHuntingBox: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Only Current Inventory", desc = "Only show the shards that are in the current inventory you have open.")
+    @ConfigEditorBoolean
+    var onlyCurrentInventory: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Display Sorting Method", desc = "The method used to sort the attribute shards in the overlay.")
     @ConfigEditorDropdown
     var displaySortingMethod: AttributeShardOverlay.AttributeShardSorting = AttributeShardOverlay.AttributeShardSorting.PRICE_TO_NEXT_TIER

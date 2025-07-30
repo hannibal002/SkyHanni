@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCaveSpider
@@ -48,7 +48,7 @@ object MobHighlight {
         if (!config.runicMobHighlight) return
 
         toHighlightRunicMobs.forEach {
-            it.highlight(LorenzColor.LIGHT_PURPLE.toColor()) { config.runicMobHighlight }
+            it.highlight(LorenzColor.LIGHT_PURPLE.toChromaColor()) { config.runicMobHighlight }
         }
         toHighlightRunicMobs.clear()
     }
@@ -133,7 +133,7 @@ object MobHighlight {
 
         event.drawLineToEye(
             arachne.getLorenzVec().up(),
-            LorenzColor.RED.toColor(),
+            LorenzColor.RED.toChromaColor(),
             config.lineToArachneWidth,
             true,
         )

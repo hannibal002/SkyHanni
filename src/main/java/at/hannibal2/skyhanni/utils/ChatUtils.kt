@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
@@ -58,8 +57,7 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ) {
-        val debug = SkyHanniDebugsAndTests.enabled
-        if (debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
+        if (SkyBlockUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             consoleLog("[Debug] $message")
         }
     }
@@ -169,6 +167,7 @@ object ChatUtils {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
+
         if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(rawText))
         } else {
@@ -251,14 +250,19 @@ object ChatUtils {
         autoOpen: Boolean = false,
         prefix: Boolean = true,
         prefixColor: String = "§e",
+        replaceSameMessage: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(
-            TextHelper.text(msgPrefix + message) {
-                this.url = url
-                this.hover = "$prefixColor$hover".asComponent()
-            },
-        )
+        val text = TextHelper.text(msgPrefix + message) {
+            this.url = url
+            this.hover = "$prefixColor$hover".asComponent()
+        }
+        if (replaceSameMessage) {
+            text.send(getUniqueMessageIdForString(message))
+        } else {
+            chat(text)
+        }
+
         if (autoOpen) OSUtils.openBrowser(url)
     }
 

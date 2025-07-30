@@ -27,17 +27,17 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -210,7 +210,7 @@ object DungeonLividFinder {
 
         event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
 
-        val color = lorenzColor.toColor()
+        val color = lorenzColor.toChromaColor()
         event.drawFilledBoundingBox(boundingBox, color, 0.5f)
         event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)
     }

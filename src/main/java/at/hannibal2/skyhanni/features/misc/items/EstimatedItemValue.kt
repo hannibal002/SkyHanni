@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -14,11 +16,12 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -31,12 +34,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
@@ -56,12 +58,15 @@ object EstimatedItemValue {
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
         private set
 
+    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
+        private set
+
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
-            event.readConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+            event.getConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
     @HandleEvent
@@ -70,6 +75,7 @@ object EstimatedItemValue {
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
+        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
     private fun isInNeuOverlay(): Boolean {
@@ -133,7 +139,7 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        if (SkyHanniDebugsAndTests.enabled) {
+        if (SkyBlockUtils.debug) {
             if (Keyboard.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
@@ -245,7 +251,7 @@ object EstimatedItemValue {
         this.getInternalNameOrNull()?.let { internalName ->
             val name = this.displayName
             return (
-                this.item == Items.enchanted_book ||
+                this.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK ||
                     name.contains("Salesperson") ||
                     name == "§6☘ Category: Item Ability (Passive)" ||
                     internalName.isRune() ||

@@ -50,8 +50,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -61,10 +59,11 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import kotlinx.coroutines.launch
 import net.minecraft.nbt.NBTTagCompound
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
@@ -116,9 +115,6 @@ object SkyHanniDebugsAndTests {
             return result
         }
 
-    @Deprecated(message = "use SkyBlockUtils", ReplaceWith("SkyBlockUtils.debug"))
-    val enabled get() = SkyBlockUtils.debug
-
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
@@ -151,7 +147,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             asyncTest(args)
         }
     }
@@ -456,14 +452,16 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay() {
         if (MinecraftCompat.showDebugHud) {
             if (debugConfig.currentAreaDebug) {
-                config.debugLocationPos.renderString(
-                    "Current Area: ${HypixelData.skyBlockArea}",
-                    posLabel = "SkyBlock Area (Debug)",
-                )
+                val renderables = buildList {
+                    addString("Current Area: ${HypixelData.skyBlockArea}")
+                    addString("Graph Area: ${SkyBlockUtils.graphArea}")
+                }
+
+                config.debugLocationPos.renderRenderables(renderables, posLabel = "SkyBlock Area (Debug)")
             }
 
             if (debugConfig.raytracedOreblock) {
-                BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
+                BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
                             "Looking at: ${ore.name} (${pos.toCleanString()})",

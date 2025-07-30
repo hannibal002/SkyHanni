@@ -205,15 +205,6 @@ object MiningApi {
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
-    @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
-    fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
-
-    @Deprecated("Use IslandTypeTags.MINING.inAny() instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
-    fun inMiningIsland() = IslandTypeTags.MINING.inAny()
-
-    @Deprecated("Use IslandTypeTags.IS_COLD.inAny() instead", ReplaceWith("IslandTypeTags.IS_COLD.inAny()"))
-    fun inColdIsland() = IslandTypeTags.IS_COLD.inAny()
-
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (IslandTypeTags.IS_COLD.inAny()) {
@@ -320,11 +311,11 @@ object MiningApi {
         if (waitingForInitSound) {
             if (event.soundName != "random.orb") {
                 if (event.pitch != 0.7936508f) return
-                val pos = event.location.roundLocationToBlock()
+                val pos = event.location.roundToBlock()
                 if (recentClickedBlocks.none { it.first == pos }) return
                 waitingForInitSound = false
                 waitingForEffMinerBlock = true
-                initBlockPos = event.location.roundLocationToBlock()
+                initBlockPos = event.location.roundToBlock()
                 lastInitSound = SimpleTimeMark.now()
             } else {
                 if (lastClicked.passedSince() > 1.seconds) return

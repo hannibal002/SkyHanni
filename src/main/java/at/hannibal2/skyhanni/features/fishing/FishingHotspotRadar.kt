@@ -18,11 +18,11 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
@@ -118,7 +118,7 @@ object FishingHotspotRadar {
         val location = hotspotLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
         if (config.lineToHotspot) {
-            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toColor(), lineWidth = 3, depth = false)
+            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toChromaColor(), lineWidth = 3, depth = false)
         }
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()

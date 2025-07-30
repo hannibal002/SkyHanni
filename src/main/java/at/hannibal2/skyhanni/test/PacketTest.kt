@@ -136,7 +136,11 @@ object PacketTest {
                 entityMap.getOrDefault(it, mutableListOf()).add(packet)
             }
         } else {
-            val id = packet.getEntityId() ?: return
+            val id = try {
+                packet.getEntityId()
+            } catch (e: NoSuchFieldException) {
+                null
+            } ?: return
             entityMap.getOrDefault(id, mutableListOf()).add(packet)
         }
     }

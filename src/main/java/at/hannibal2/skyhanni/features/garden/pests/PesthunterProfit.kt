@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -65,7 +65,7 @@ object PesthunterProfit {
 
     private fun buildRenderables(items: Map<Int, ItemStack>) = buildList {
         val table = items.mapNotNull { (slot, stack) -> readItem(slot, stack) }
-        add(StringRenderable("§ePesthunter Shop Profit"))
+        addString("§ePesthunter Shop Profit")
         add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
     }
 

@@ -32,28 +32,31 @@ object RenderableTestSuite {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shrenderable") {
-            category = CommandCategory.DEVELOPER_DEBUG
+        event.registerBrigadier("shtestrenderable") {
+            category = CommandCategory.DEVELOPER_TEST
             description = "Used for testing specific gui element primitives."
-            argCallback("test", BrigadierArguments.greedyString(), register.keys) { input ->
-                if (input.isBlank()) {
-                    ChatUtils.userError("No Argument provided")
-                }
-                val test = register[input]
-                if (test == null) {
-                    ChatUtils.userError("Unknown Test '$input'")
-                    return@argCallback
-                }
-                if (active.contains(test)) {
-                    ChatUtils.chat("Renderable Test '$input' is now §cdisabled§e.")
-                    active.remove(test)
-                    return@argCallback
-                }
-                ChatUtils.chat("Renderable Test '$input' is now §aactive§e.")
-                active.add(test)
-                return@argCallback
+            arg("test", BrigadierArguments.greedyString()) { arg ->
+                callback { testCommand(getArg(arg)) }
+            }
+            simpleCallback {
+                ChatUtils.userError("No test name provided! Available tests: ${register.keys}")
             }
         }
+    }
+
+    private fun testCommand(input: String) {
+        val test = register[input]
+        if (test == null) {
+            ChatUtils.userError("Unknown test '$input'! Available tests: ${register.keys}")
+            return
+        }
+        if (active.contains(test)) {
+            ChatUtils.chat("Renderable Test '$input' is now §cdisabled§e.")
+            active.remove(test)
+            return
+        }
+        ChatUtils.chat("Renderable Test '$input' is now §aactive§e.")
+        active.add(test)
     }
 
     private val TestRenderable.finalRenderable: Renderable?
@@ -64,13 +67,13 @@ object RenderableTestSuite {
      *
      * How to use:
      * Declare an object with [RenderableTestSuite.TestRenderable] as supertype.
-     * Annotate the object with ``@SkyHanniModule(devOnly = true)``.
+     * Annotate the object with `@SkyHanniModule(devOnly = true)`.
      * Give it a lowercase [name] (this is used to call it via the command later on).
      * Define your test you want to do with the [renderable] function.
      *
-     * Ingame call it with ``\shrenderable [name]`` to show it (calling it again will disable it)
+     * Ingame call it with `\shrenderable [name]` to show it (calling it again will disable it)
      *
-     * @param name Name of the Test, is the name you have to type to use it ingame with ``\shrenderable``.
+     * @param name Name of the Test, is the name you have to type to use it ingame with `\shrenderable`.
      * @param shouldRenderBounds Enables a Red Boundary around the test [renderable].
      * @property renderable Function that is called for retrieving the [Renderable] that is going to be tested (and rendered on screen, once active). Define here your test you want to do.
      * @property position The position at which the test will be rendered. There should be no reason that is touched. Other than inside [RenderableTestSuite].
