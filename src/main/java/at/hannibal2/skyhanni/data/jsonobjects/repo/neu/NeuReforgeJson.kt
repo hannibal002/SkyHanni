@@ -11,8 +11,8 @@ import com.google.gson.annotations.SerializedName
 
 data class NeuReforgeJson(
     @Expose val internalName: NeuInternalName?,
-    @Expose val reforgeName: String,
     @Expose val nbtModifier: String,
+    @Expose val reforgeName: String,
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
     @Expose val reforgeCosts: Map<LorenzRarity, Long>?,
@@ -44,16 +44,17 @@ data class NeuReforgeJson(
         }
 
     val itemType: Pair<String, List<NeuInternalName>>
-        get() = if (this::itemTypeField.isInitialized) itemTypeField
-        else run {
-            return when (val any = this.rawItemTypes) {
+        get() = if (this::itemTypeField.isInitialized) {
+            itemTypeField
+        } else {
+            when (val raw = this.rawItemTypes) {
                 is String -> {
-                    any.replace("/", "_AND_").uppercase() to emptyList()
+                    raw.replace("/", "_AND_").uppercase() to emptyList()
                 }
 
                 is Map<*, *> -> {
                     val type = "SPECIAL_ITEMS"
-                    val map = any as? Map<String, List<String>> ?: return type to emptyList()
+                    val map = raw as? Map<String, List<String>> ?: return type to emptyList()
                     val internalNames = map["internalName"]?.toInternalNames().orEmpty()
                     val itemType = map["itemid"]?.map {
                         NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())

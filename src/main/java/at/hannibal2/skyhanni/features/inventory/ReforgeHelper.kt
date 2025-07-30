@@ -313,7 +313,7 @@ object ReforgeHelper {
     }
 
     private fun getReforgeEffect(reforge: ReforgeApi.Reforge?, rarity: LorenzRarity) =
-        reforge?.extraProperty?.get(rarity)?.let {
+        reforge?.reforgeAbility?.get(rarity)?.let {
             Renderable.wrappedText(
                 it,
                 190,
