@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.text.DecimalFormat
@@ -53,7 +53,9 @@ object ToolTooltipTweaks {
         val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(itemStack, crop)
         val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(itemStack, crop)
 
-        val reforgeName = itemStack.getReforgeModifier()?.firstLetterUppercase()
+        val reforgeName = itemStack.getReforgeModifier()?.let { modifier ->
+            ReforgeApi.reforgeList.firstOrNull { it.nbtModifier == modifier }
+        }
 
         val sunderFortune = FarmingFortuneDisplay.getSunderFortune(itemStack)
         val harvestingFortune = FarmingFortuneDisplay.getHarvestingFortune(itemStack)

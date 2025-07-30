@@ -142,8 +142,8 @@ object CropMoneyDisplay {
 
     private fun buildDisplayBody(): Renderable {
         GardenApi.getCurrentlyFarmedCrop()?.let {
-            val reforgeName = InventoryUtils.getItemInHand()?.getReforgeModifier()
-            toolHasBountiful?.put(it, reforgeName == "bountiful")
+            val reforge = InventoryUtils.getItemInHand()?.getReforgeModifier()
+            toolHasBountiful?.put(it, reforge == "bountiful")
 
             if (GardenApi.mushroomCowPet && it != CropType.MUSHROOM && config.mooshroom) {
                 val redMushroom = "ENCHANTED_RED_MUSHROOM".toInternalName()
