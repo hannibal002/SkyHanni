@@ -10,9 +10,9 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class NeuReforgeJson(
-    @Expose val internalName: NeuInternalName?,
-    @Expose val nbtModifier: String,
     @Expose val reforgeName: String,
+    @Expose val nbtModifier: String,
+    @Expose val internalName: NeuInternalName?,
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
     @Expose val reforgeCosts: Map<LorenzRarity, Long>?,

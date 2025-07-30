@@ -57,8 +57,8 @@ object ReforgeApi {
     }
 
     class Reforge(
-        val nbtModifier: String,
         val name: String,
+        val nbtModifier: String,
         val type: ReforgeType,
         val stats: Map<LorenzRarity, SkyblockStatList>,
         val reforgeStone: NeuInternalName? = null,
@@ -190,9 +190,8 @@ object ReforgeApi {
 
     private fun mapReforge(reforge: NeuReforgeJson) =
         Reforge(
-            nbtModifier = reforge.nbtModifier,
             name = reforge.reforgeName,
-            type = EnumUtils.enumValueOf<ReforgeType>(reforge.itemType.first),
+            nbtModifier = reforge.nbtModifier, type = EnumUtils.enumValueOf<ReforgeType>(reforge.itemType.first),
             stats = reforge.reforgeStats.orEmpty(),
             reforgeStone = reforge.internalName,
             specialItems = reforge.itemType.second.takeIf { it.isNotEmpty() },
