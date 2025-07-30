@@ -12,7 +12,7 @@ jobs:
         env:
             VERSION_FILE : buildTools/CONFIG_VERSION
         steps:
-            -   name: Gemerate Github App token
+            -   name: Generate Github App token
                 id: app-token
                 uses: actions/create-github-app-token@v2
                 with:
