@@ -10,7 +10,7 @@ jobs:
         if: github.event.pull_request.merged == true
         runs-on: ubuntu-latest
         env:
-            VERSION_FILE : Config_Version
+            VERSION_FILE : buildTools/CONFIG_VERSION
         steps:
             -   name: Gemerate Github App token
                 id: app-token
