@@ -315,7 +315,7 @@ object AttributeShardsData {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Attributes")
+        event.title("Active Attribute Levels")
         event.addIrrelevant {
             for (shardName in attributeInfo.keys) {
                 add("- $shardName: Level ${getActiveLevel(shardName)}/10")
