@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName
 
 data class NeuReforgeJson(
     @Expose val reforgeName: String,
-    @Expose val nbtModifier: String,
+    @Expose @SerializedName("nbtModifier") val rawNbtModifier: String?,
     @Expose val internalName: NeuInternalName?,
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
@@ -22,6 +22,12 @@ data class NeuReforgeJson(
 
     private lateinit var reforgeAbilityField: Map<LorenzRarity, String>
     private lateinit var itemTypeField: Pair<String, List<NeuInternalName>>
+
+    val nbtModifier: String
+        get() = rawNbtModifier ?: reforgeName
+            .lowercase()
+            .replace("[^a-z0-9\\s_-]".toRegex(), "")
+            .replace("[\\s-]".toRegex(), "_")
 
     val reforgeAbility: Map<LorenzRarity, String>
         get() {
