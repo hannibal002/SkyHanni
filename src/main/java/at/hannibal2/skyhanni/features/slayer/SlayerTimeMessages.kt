@@ -12,14 +12,14 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 object SlayerTimeMessages {
 
     private val config get() = SlayerApi.config
-    private var killTime = 0
+    private var killTime = ""
     private var bossName = ""
 
     @HandleEvent
     fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
         val (bossType, timeToKill) = with(event.data) { bossType to timeToKill }
         if (!config.timeToKillMessage || !bossType.isSlayer) return
-        killTime = timeToKill.toInt()
+        killTime = timeToKill
         bossName = if (config.compactTimeMessage) {
             bossType.shortName
         } else
