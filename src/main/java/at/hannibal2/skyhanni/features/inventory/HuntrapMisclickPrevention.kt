@@ -4,14 +4,19 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HuntrapMisclickPrevention {
 
     private val config get() = SkyHanniMod.feature.hunting
+    private var lastNotified = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -28,6 +33,14 @@ object HuntrapMisclickPrevention {
 
         if (hasEmptyStatus) {
             event.cancel()
+            if (lastNotified.passedSince() > 10.seconds) {
+                lastNotified = SimpleTimeMark.now()
+                ChatUtils.clickableChat(
+                    "Prevented clicking an empty trap in Hunting Toolkit! Click here to disable this feature.",
+                    { config::huntrapMisclick.jumpToEditor() },
+                    replaceSameMessage = true,
+                )
+            }
         }
     }
 }
