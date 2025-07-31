@@ -281,6 +281,7 @@ dependencies {
 
 tasks.withType<KspTaskJvm> {
     inputs.property("version", project.version)
+    // TODO fix resolve of version during configuration
     options.add(SubpluginOption("apoption", lazy((project.version as Provider<*>).map { "skyhanni.modver=${it}" }::get)))
 }
 
@@ -386,12 +387,12 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
-//     archiveVersion.set(
-//         (version as Provider<*>).map {
-//             "$it-mc${target.minecraftVersion.versionName}"
-//         }
-//     )
-    archiveVersion.set("Hallo")
+    // TODO fix resolve of version during configuration
+    archiveVersion.set(
+        (version as Provider<*>).map {
+            "$it-mc${target.minecraftVersion.versionName}"
+        }
+    )
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
