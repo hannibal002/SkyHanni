@@ -48,4 +48,13 @@ class HuntingConfig {
     @SearchTag("hunting box")
     var fusionKeybinds = FusionKeybindsConfig()
 
+    @Expose
+    @ConfigOption(
+        name = "Huntrap Misclick Prevention",
+        desc = "Prevents misclicks in the Huntrap GUI by blocking clicks on generators and spawners.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var huntrapMisclick = false
+
 }
