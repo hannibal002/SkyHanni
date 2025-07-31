@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,23 +12,31 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 object SlayerTimeMessages {
 
     private val config get() = SlayerApi.config
+    private var killTime = 0
+    private var bossName = ""
 
     @HandleEvent
     fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
         val (bossType, timeToKill) = with(event.data) { bossType to timeToKill }
-        if (!config.timeToKillMessage || !bossType.isSlayer || !event.data.entity.belongsToPlayer()) return
-
-        ChatUtils.chat(
-            if (config.compactTimeMessage)
-                "${bossType.shortName}§e took §b$timeToKill§e."
-            else
-                "It took §b$timeToKill§e to kill ${bossType.fullName}.",
-        )
+        if (!config.timeToKillMessage || !bossType.isSlayer) return
+        killTime = timeToKill.toInt()
+        bossName = if (config.compactTimeMessage) {
+            bossType.shortName
+        } else
+            bossType.fullName
     }
 
     @HandleEvent
     fun onSlayerQuestCompleteEvent(event: SlayerQuestCompleteEvent) {
         val startTime = SlayerApi.questStartTime
+        if (config.timeToKillMessage) {
+            ChatUtils.chat(
+                if (config.compactTimeMessage)
+                    "${bossName}§e took §b$killTime§e."
+                else
+                    "It took §b$killTime§e to kill ${bossName}.",
+            )
+        }
         if (!config.questCompleteMessage || startTime.isFarPast()) return
 
         val duration = startTime.passedSince().format()
