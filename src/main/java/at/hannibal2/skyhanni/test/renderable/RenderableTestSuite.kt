@@ -32,28 +32,31 @@ object RenderableTestSuite {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shrenderable") {
-            category = CommandCategory.DEVELOPER_DEBUG
+        event.registerBrigadier("shtestrenderable") {
+            category = CommandCategory.DEVELOPER_TEST
             description = "Used for testing specific gui element primitives."
-            argCallback("test", BrigadierArguments.greedyString(), register.keys) { input ->
-                if (input.isBlank()) {
-                    ChatUtils.userError("No Argument provided")
-                }
-                val test = register[input]
-                if (test == null) {
-                    ChatUtils.userError("Unknown Test '$input'")
-                    return@argCallback
-                }
-                if (active.contains(test)) {
-                    ChatUtils.chat("Renderable Test '$input' is now §cdisabled§e.")
-                    active.remove(test)
-                    return@argCallback
-                }
-                ChatUtils.chat("Renderable Test '$input' is now §aactive§e.")
-                active.add(test)
-                return@argCallback
+            arg("test", BrigadierArguments.greedyString()) { arg ->
+                callback { testCommand(getArg(arg)) }
+            }
+            simpleCallback {
+                ChatUtils.userError("No test name provided! Available tests: ${register.keys}")
             }
         }
+    }
+
+    private fun testCommand(input: String) {
+        val test = register[input]
+        if (test == null) {
+            ChatUtils.userError("Unknown test '$input'! Available tests: ${register.keys}")
+            return
+        }
+        if (active.contains(test)) {
+            ChatUtils.chat("Renderable Test '$input' is now §cdisabled§e.")
+            active.remove(test)
+            return
+        }
+        ChatUtils.chat("Renderable Test '$input' is now §aactive§e.")
+        active.add(test)
     }
 
     private val TestRenderable.finalRenderable: Renderable?

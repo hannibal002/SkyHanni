@@ -224,7 +224,7 @@ object DebugCommand {
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
-        val pingEnabled = SkyHanniMod.feature.dev.hypixelPingApi
+        val pingEnabled = SkyHanniMod.feature.dev.pingApi
 
         val list = buildList {
             add("tps: $tps")
