@@ -29,14 +29,14 @@ object SlayerTimeMessages {
     @HandleEvent
     fun onSlayerQuestCompleteEvent(event: SlayerQuestCompleteEvent) {
         val startTime = SlayerApi.questStartTime
-        if (config.timeToKillMessage) {
+        if (config.timeToKillMessage)
             ChatUtils.chat(
                 if (config.compactTimeMessage)
                     "${bossName}§e took §b$killTime§e."
                 else
                     "It took §b$killTime§e to kill ${bossName}.",
             )
-        }
+
         if (!config.questCompleteMessage || startTime.isFarPast()) return
 
         val duration = startTime.passedSince().format()
