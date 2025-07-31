@@ -50,8 +50,8 @@ class HuntingConfig {
 
     @Expose
     @ConfigOption(
-        name = "Huntrap Misclick Prevention",
-        desc = "Prevents misclicks in the Huntrap GUI by blocking clicks on generators and spawners.",
+        name = "Prevent Huntrap Misclick",
+        desc = "Prevents clicking on empty traps in the Hunting Toolkit.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
