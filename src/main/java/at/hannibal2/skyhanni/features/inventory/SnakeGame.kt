@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -49,7 +49,7 @@ object SnakeGame {
             if (!key.isKeyHeld()) continue
             event.cancel()
 
-            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, button = 2, mode = GuiContainerEvent.ClickType.MIDDLE)
+            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, button = 2, mode = ClickType.MIDDLE)
 
             lastClick = SimpleTimeMark.now()
             break

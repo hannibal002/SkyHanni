@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -104,7 +105,7 @@ object InventoryUtils {
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
-            clickSlot(slotNumber, container.windowId, button = 0, mode = GuiContainerEvent.ClickType.SHIFT)
+            clickSlot(slotNumber, container.windowId, button = 0, mode = ClickType.SHIFT)
             this.cancel()
         }
     }
@@ -189,7 +190,7 @@ object InventoryUtils {
         slotId: Int,
         windowId: Int = InventoryCompat.getWindowId(),
         button: Int = 0,
-        mode: GuiContainerEvent.ClickType = GuiContainerEvent.ClickType.NORMAL
+        mode: ClickType = ClickType.NORMAL
     ) {
         InventoryCompat.clickInventorySlot(
             windowId,

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapColorConfig
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -212,7 +213,7 @@ object DungeonSpiritLeapOverlay {
             ChatUtils.chat("§cCannot leap — §e${playerInfo.username} §cis dead.")
             return
         }
-        InventoryUtils.clickSlot(player.slotNumber, button = 2, mode = GuiContainerEvent.ClickType.MIDDLE)
+        InventoryUtils.clickSlot(player.slotNumber, button = 2, mode = ClickType.MIDDLE)
     }
 
     private val deadTeammateColor = colorConfig.deadTeammateColor

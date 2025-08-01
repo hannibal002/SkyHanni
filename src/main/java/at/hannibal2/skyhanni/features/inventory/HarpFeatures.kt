@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -78,7 +79,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, button = 2, mode = GuiContainerEvent.ClickType.MIDDLE)
+            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, button = 2, mode = ClickType.MIDDLE)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -199,7 +200,7 @@ object HarpFeatures {
         if (isHarpGui(InventoryUtils.openInventoryName())) {
             if (config.keybinds) {
                 // needed to not send duplicate clicks via keybind feature
-                if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) {
+                if (event.clickType == ClickType.HOTBAR) {
                     event.cancel()
                     return
                 }
