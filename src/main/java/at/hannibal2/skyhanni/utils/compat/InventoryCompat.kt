@@ -68,15 +68,14 @@ object InventoryCompat {
         //#endif
     }
 
-
-    fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
-        windowId ?: return
+    // Not meant to be called directly, prefer `InventoryUtils.clickSlot()`.
+    fun clickInventorySlot(windowId: Int, slotId: Int, button: Int, mode: Int) {
         val controller = Minecraft.getMinecraft().playerController ?: return
         val player = Minecraft.getMinecraft().thePlayer ?: return
         //#if FORGE
-        controller.windowClick(windowId, slot, mouseButton, mode, player)
+        controller.windowClick(windowId, slotId, button, mode, player)
         //#else
-        //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
+        //$$ controller.clickSlot(windowId, slotId, button, SlotActionType.entries[mode], player)
         //#endif
     }
 
@@ -87,12 +86,15 @@ object InventoryCompat {
 //$$ container.screenHandler.slots
 //#endif
 
-    private fun getWindowId(): Int? =
+    fun getWindowIdOrNull(): Int? =
         //#if FORGE
         (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
 //#else
 //$$ (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
 //#endif
+
+    fun getWindowId(): Int =
+        getWindowIdOrNull() ?: error("windowId is null")
 
     fun Array<ItemStack?>?.filterNotNullOrEmpty(): List<ItemStack>? {
         return this?.filterNotNull()?.filter { it.isNotEmpty() }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.slots
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -135,10 +137,7 @@ object VisitorListener {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorApi.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
-        val inventory = event.guiContainer as? AccessorGuiContainer ?: return
-        inventory as GuiContainer
-        val slot = inventory.slots()[29]
-        InventoryCompat.clickInventorySlot(slot.slotIndex, mouseButton = 0, mode = 0)
+        InventoryUtils.clickSlot(29, Button = 0, mode = GuiContainerEvent.ClickType.NORMAL)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

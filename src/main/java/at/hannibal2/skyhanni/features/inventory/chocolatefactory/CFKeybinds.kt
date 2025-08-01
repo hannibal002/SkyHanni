@@ -30,7 +30,7 @@ object CFKeybinds {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(28 + index, chest.inventorySlots.windowId, mouseButton = 2, mode = 3)
+            InventoryUtils.clickSlot(28 + index, chest.inventorySlots.windowId, button = 2, mode = GuiContainerEvent.ClickType.MIDDLE)
             break
         }
     }

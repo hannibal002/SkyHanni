@@ -78,7 +78,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, 2, 3)
+            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, button = 2, mode = GuiContainerEvent.ClickType.MIDDLE)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -127,20 +127,20 @@ object HarpFeatures {
         //#endif
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class, onlyOnSkyblock = true)
+    fun onInventoryClose() {
         if (!config.guiScale) return
         unSetGuiScale()
     }
 
-    @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) {
+    @HandleEvent(ClientDisconnectEvent::class)
+    fun onDisconnect() {
         if (!config.guiScale) return
         unSetGuiScale()
     }
 
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(IslandChangeEvent::class)
+    fun onIslandChange() {
         if (!config.guiScale) return
         unSetGuiScale()
     }
@@ -220,9 +220,9 @@ object HarpFeatures {
         //$$      }
         //#endif
         indexOfFirst.takeIf { it != -1 }?.let {
-            val clickType = event.clickType?.id ?: return
+            val clickType = event.clickType ?: return
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, clickType)
+            InventoryUtils.clickSlot(it, event.container.windowId, button = event.clickedButton, mode = clickType)
         }
     }
 

@@ -212,7 +212,7 @@ object DungeonSpiritLeapOverlay {
             ChatUtils.chat("§cCannot leap — §e${playerInfo.username} §cis dead.")
             return
         }
-        InventoryUtils.clickSlot(player.slotNumber, mouseButton = 2, mode = 3)
+        InventoryUtils.clickSlot(player.slotNumber, button = 2, mode = GuiContainerEvent.ClickType.MIDDLE)
     }
 
     private val deadTeammateColor = colorConfig.deadTeammateColor
