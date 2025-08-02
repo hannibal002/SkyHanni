@@ -76,7 +76,7 @@ object RareDropMessages {
         "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)",
     )
 
-    @Suppress("maxlinelength")
+
     /**
      * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b✯ Magic Find§r§b)
      * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book
@@ -84,6 +84,7 @@ object RareDropMessages {
      */
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook",
+        @Suppress("MaxLineLength")
         "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book(?<bookname> \\(.*\\))?(?<end> §r§b\\(\\+(?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\))?.*",
     )
 
