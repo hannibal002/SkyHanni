@@ -22,6 +22,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.tileentity.TileEntityBeacon
@@ -150,7 +152,7 @@ object CrimsonMinibossRespawnTimer {
         val lines = MiniBoss.entries.map {
             val timer = it.nextSpawnTime
             val possibleTimer = it.possibleSpawnTime
-            Renderable.string(
+            Renderable.text(
                 buildString {
                     append("§b${it.displayName}: ")
                     if (it.isSpawned()) append("§aSPAWNED!")
@@ -170,7 +172,7 @@ object CrimsonMinibossRespawnTimer {
                 },
             )
         }
-        return Renderable.verticalContainer(lines)
+        return Renderable.vertical(lines)
     }
 
     @HandleEvent

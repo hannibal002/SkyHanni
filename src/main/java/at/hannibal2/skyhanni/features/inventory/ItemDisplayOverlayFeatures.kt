@@ -28,11 +28,9 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -41,6 +39,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -56,17 +55,21 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
+    private val tipCache: TimeLimitedCache<Int, String> = TimeLimitedCache(2.minutes)
+    private var lastSize = 0
 
     /**
      * REGEX-TEST: MASTER_SKULL_TIER_1
@@ -119,10 +122,19 @@ object ItemDisplayOverlayFeatures {
 
     @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        event.stackTip = getStackTip(event.stack) ?: return
+        val currentSize = config.itemNumberAsStackSize.size
+        if (lastSize != currentSize) {
+            lastSize = currentSize
+            tipCache.clear()
+        }
+        event.stackTip = getStackTip(event.stack)?.also {
+            tipCache[event.stack.hashCode()] = it
+        } ?: return
     }
 
     private fun getStackTip(item: ItemStack): String? {
+        tipCache[item.hashCode()]?.let { return it }
+
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
@@ -263,7 +275,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (VACUUM_GARDEN.isSelected() && internalName in PestApi.vacuumVariants && isOwnItem(lore)) {
+        if (VACUUM_GARDEN.isSelected() && internalName.getItemStack().getItemCategoryOrNull() == ItemCategory.VACUUM && isOwnItem(lore)) {
             gardenVacuumPattern.firstMatcher(lore) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
@@ -326,13 +338,13 @@ object ItemDisplayOverlayFeatures {
         return null
     }
 
-    fun isOwnItem(lore: List<String>) =
-        lore.none {
-            it.contains("Click to trade!") ||
-                it.contains("Starting bid:") ||
-                it.contains("Buy it now:") ||
-                it.contains("Click to inspect")
-        }
+    // todo repo
+    private fun isOwnItem(lore: List<String>) = lore.none {
+        it.contains("Click to trade!") ||
+            it.contains("Starting bid:") ||
+            it.contains("Buy it now:") ||
+            it.contains("Click to inspect")
+    }
 
     var done = false
 
@@ -347,9 +359,6 @@ object ItemDisplayOverlayFeatures {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "inventory.itemNumberAsStackSize") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
-        }
         event.transform(29, "inventory.itemNumberAsStackSize") { element ->
             fixRemovedConfigElement(element)
         }

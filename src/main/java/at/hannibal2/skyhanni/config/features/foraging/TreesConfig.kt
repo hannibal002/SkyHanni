@@ -24,4 +24,23 @@ class TreesConfig {
     @Accordion
     val progress = TreeProgressConfig()
 
+    @Expose
+    @ConfigOption(name = "Compact Sweep Details", desc = "Compacts messages related to Sweep Details calculations.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var compactSweepDetails = true
+
+    @Expose
+    @ConfigOption(name = "Mute Tree Breaking", desc = "Mutes the sound of the tree fully breaking.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var muteBreaking = true
+
+    @Expose
+    @ConfigOption(name = "Also on Galatea", desc = "Also mutes tree breaking sounds on Galatea.")
+    @ConfigEditorBoolean
+    @OnlyModern
+    var muteBreakingOnGalatea = false
+
 }

@@ -13,9 +13,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import kotlinx.coroutines.launch
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 
 @SkyHanniModule
 object AllBurrowsList {
@@ -54,8 +53,8 @@ object AllBurrowsList {
     }
 
     private fun addFromClipboard() {
-        SkyHanniMod.coroutineScope.launch {
-            val text = OSUtils.readFromClipboard() ?: return@launch
+        SkyHanniMod.launchIOCoroutine {
+            val text = OSUtils.readFromClipboard() ?: return@launchIOCoroutine
 
             var new = 0
             var duplicate = 0
@@ -83,7 +82,7 @@ object AllBurrowsList {
         if (!config.showAll) return
 
         for (location in list) {
-            event.drawColor(location, LorenzColor.DARK_AQUA)
+            event.drawColor(location, LorenzColor.DARK_AQUA.toChromaColor())
         }
     }
 

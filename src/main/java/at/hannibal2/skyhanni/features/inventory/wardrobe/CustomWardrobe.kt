@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -30,11 +32,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.item.ItemStack
@@ -45,7 +50,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object CustomWardrobe {
 
-    val config get() = SkyHanniMod.feature.inventory.customWardrobe
+    val config: CustomWardrobeConfig get() = SkyHanniMod.feature.inventory.customWardrobe
 
     private var displayRenderable: Renderable? = null
     private var inventoryButton: Renderable? = null
@@ -60,7 +65,6 @@ object CustomWardrobe {
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
 
-    // TODO use inventory InventoryDetector
     private const val GUI_NAME = "Custom Wardrobe"
 
     var renderableTopCorner: Pair<Int, Int> = 0 to 0
@@ -97,7 +101,7 @@ object CustomWardrobe {
         renderableTopCorner = left to top
 
         if (waitingForInventoryUpdate && config.loadingText) {
-            val loadingRenderable = Renderable.string(
+            val loadingRenderable = Renderable.text(
                 "§cLoading...",
                 scale = activeScale / 100.0,
             )
@@ -246,7 +250,7 @@ object CustomWardrobe {
             }
             loreList.add(renderable)
         }
-        return Renderable.verticalContainer(loreList, spacing = 1)
+        return Renderable.vertical(loreList, spacing = 1)
     }
 
     private fun getToolTip(
@@ -341,15 +345,16 @@ object CustomWardrobe {
         currentMaxSize = maxRenderableWidth to maxRenderableHeight
 
         wardrobeWarning?.let { text ->
-            val warningRenderable = Renderable.wrappedString(
+            val warningRenderable = Renderable.wrappedText(
                 text,
                 maxRenderableWidth,
                 3.0 * (activeScale / 100.0),
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
-            val withButtons = Renderable.verticalContainer(
-                listOf(warningRenderable, button),
-                buttonVerticalSpacing,
+            val withButtons = Renderable.vertical(
+                warningRenderable,
+                button,
+                spacing = buttonVerticalSpacing,
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
             return addGuiBackground(withButtons, backgroundPadding)
@@ -377,16 +382,16 @@ object CustomWardrobe {
 
                 Renderable.doubleLayered(playerBackground, playerRenderable, false)
             }
-            Renderable.horizontalContainer(slotsRenderables, horizontalSpacing)
+            Renderable.horizontal(slotsRenderables, horizontalSpacing)
         }
 
-        val allSlotsRenderable = Renderable.verticalContainer(
+        val allSlotsRenderable = Renderable.vertical(
             rowsRenderables,
             verticalSpacing,
             horizontalAlign = HorizontalAlignment.CENTER,
         )
 
-        val withButtons = Renderable.verticalContainer(
+        val withButtons = Renderable.vertical(
             listOf(allSlotsRenderable, button),
             buttonVerticalSpacing,
             horizontalAlign = HorizontalAlignment.CENTER,
@@ -400,7 +405,7 @@ object CustomWardrobe {
             Renderable.doubleLayered(
                 renderable,
                 Renderable.clickable(
-                    Renderable.string(
+                    Renderable.text(
                         "§7SkyHanni",
                         horizontalAlign = HorizontalAlignment.RIGHT,
                         verticalAlign = VerticalAlignment.BOTTOM,
@@ -414,7 +419,7 @@ object CustomWardrobe {
                 ),
                 blockBottomHover = false,
             ),
-            config.color.backgroundColor.toSpecialColor(),
+            config.color.backgroundColor.toColor(),
             padding = borderPadding,
         )
 
@@ -469,15 +474,18 @@ object CustomWardrobe {
             },
         )
 
-        val row = Renderable.horizontalContainer(
-            listOf(backButton, exitButton, onlyFavoriteButton),
-            horizontalSpacing.toInt(),
+        val row = Renderable.horizontal(
+            backButton,
+            exitButton,
+            onlyFavoriteButton,
+            spacing = horizontalSpacing.toInt(),
             horizontalAlign = HorizontalAlignment.CENTER,
         )
 
-        val total = Renderable.verticalContainer(
-            listOf(row, editButton),
-            verticalSpacing.toInt(),
+        val total = Renderable.vertical(
+            row,
+            editButton,
+            spacing = verticalSpacing.toInt(),
             horizontalAlign = HorizontalAlignment.CENTER,
             verticalAlign = VerticalAlignment.CENTER,
         )
@@ -526,7 +534,7 @@ object CustomWardrobe {
             }
         }
 
-        return Renderable.verticalContainer(list, 1, HorizontalAlignment.RIGHT)
+        return Renderable.vertical(list, 1, HorizontalAlignment.RIGHT)
     }
 
     private fun createLabeledButton(
@@ -551,8 +559,8 @@ object CustomWardrobe {
                 ),
                 hoveredColor,
                 padding = 0,
-                topOutlineColor = config.color.topBorderColor.toSpecialColorInt(),
-                bottomOutlineColor = config.color.bottomBorderColor.toSpecialColorInt(),
+                topOutlineColor = config.color.topBorderColor.toColor().rgb,
+                bottomOutlineColor = config.color.bottomBorderColor.toColor().rgb,
                 borderOutlineThickness = 2,
                 horizontalAlign = HorizontalAlignment.CENTER,
             ),
@@ -615,7 +623,7 @@ object CustomWardrobe {
         )
 
     private fun WardrobeSlot.getOutlineColor(): Pair<Color, Color> {
-        val (top, bottom) = config.color.topBorderColor.toSpecialColor() to config.color.bottomBorderColor.toSpecialColor()
+        val (top, bottom) = config.color.topBorderColor.toColor() to config.color.bottomBorderColor.toColor()
         return when {
             isEmpty() || locked -> ColorUtils.TRANSPARENT_COLOR to ColorUtils.TRANSPARENT_COLOR
             !isInCurrentPage() -> top.darker(0.5) to bottom.darker(0.5)
@@ -650,8 +658,8 @@ object CustomWardrobe {
             isCurrentSlot() -> equippedColor
             favorite && !config.onlyFavorites -> favoriteColor
             else -> null
-        }?.toSpecialColor()?.transformIf({ !isInCurrentPage() }) { darker() }
-            ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toSpecialColor()
+        }?.toColor()?.transformIf({ !isInCurrentPage() }) { darker() }
+            ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toColor()
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
@@ -661,7 +669,7 @@ object CustomWardrobe {
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
-    ) = Renderable.string(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
+    ) = Renderable.text(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
 
     @JvmStatic
     fun shouldHideNormalTooltip(): Boolean = WardrobeApi.inCustomWardrobe && !editMode

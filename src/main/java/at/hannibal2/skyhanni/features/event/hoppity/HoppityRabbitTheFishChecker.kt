@@ -2,8 +2,11 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -14,8 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import net.minecraft.client.Minecraft
-import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityRabbitTheFishChecker {
@@ -74,32 +76,34 @@ object HoppityRabbitTheFishChecker {
         }?.key
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 
         // Prevent opening chocolate factory when Rabbit the Fish is present
         val stack = event.slot?.stack ?: return
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
-            event.cancel()
-            SoundUtils.playErrorSound()
+            event.sendPreventClosureTitle()
         } else if (rabbitTheFishIndex == event.slot.slotIndex) {
             rabbitTheFishIndex = null
         }
     }
 
-    private fun Int.isInventoryClosure(): Boolean =
-        //#if MC < 1.21
-        this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || this == Keyboard.KEY_ESCAPE
-    //#else
-    //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(this, this) || this == GLFW.GLFW_KEY_ESCAPE
-    //#endif
+    @HandleEvent
+    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+        if (!isEnabled() || rabbitTheFishIndex == null) return
+        event.sendPreventClosureTitle()
+    }
 
-    @JvmStatic
-    fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
-        if (!shouldContinue) SoundUtils.playErrorSound()
-        return shouldContinue
+    private fun SkyHanniEvent.Cancellable.sendPreventClosureTitle() {
+        TitleManager.sendTitle(
+            "§cRabbit the Fish Prevented Close",
+            subtitleText = "§7Hold §eShift §7to bypass",
+            duration = 5.seconds,
+            location = TitleManager.TitleLocation.INVENTORY,
+        )
+        SoundUtils.playErrorSound()
+        cancel()
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && HoppityApi.isHoppityEvent() && config.preventMissingRabbitTheFish

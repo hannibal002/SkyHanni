@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import kotlin.time.Duration.Companion.minutes
 
 data class CachedItemData(
     // -1 = not loaded
@@ -37,11 +41,8 @@ data class CachedItemData(
 
     var lastExtraAttributesFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 ) {
-    /**
-     * Delegate constructor to avoid calling a function with default arguments from java.
-     * We can't call the generated no args constructors (or rather we cannot generate that constructor), because inline
-     * classes are not part of the java-kotlin ABI that is super well supported (especially with default arguments).
-     */
-    @Suppress("ForbiddenVoid", "UnusedPrivateProperty")
-    constructor(void: Void?) : this()
+    companion object {
+        private val cache = TimeLimitedCache<IdentityCharacteristics<Item>, CachedItemData>(expireAfterWrite = 5.minutes)
+        val ItemStack.cachedData: CachedItemData get() = cache.getOrPut(IdentityCharacteristics(item)) { CachedItemData() }
+    }
 }

@@ -1,4 +1,5 @@
 accessWidener v2 named
+
 accessible field net/minecraft/entity/LivingEntity equipment Lnet/minecraft/entity/EntityEquipment;
 accessible field net/minecraft/entity/EntityEquipment map Ljava/util/EnumMap;
 accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
@@ -32,3 +33,9 @@ accessible method net/minecraft/text/TextColor <init> (ILjava/lang/String;)V
 accessible field net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen text Lnet/minecraft/block/entity/SignText;
 accessible field net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen currentRow I
 accessible method net/minecraft/client/gui/screen/ingame/AbstractSignEditScreen setCurrentRowMessage (Ljava/lang/String;)V
+accessible field net/minecraft/text/TextColor name Ljava/lang/String;
+accessible field net/minecraft/entity/Entity CUSTOM_NAME Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/entity/LivingEntity HEALTH Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/client/gui/hud/ChatHud scrolledLines I
+accessible method net/minecraft/client/gui/hud/ChatHud toChatLineX (D)D
+accessible method net/minecraft/client/gui/hud/ChatHud toChatLineY (D)D

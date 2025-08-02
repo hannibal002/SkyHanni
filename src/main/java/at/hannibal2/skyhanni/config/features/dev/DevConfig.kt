@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
@@ -73,22 +74,24 @@ class DevConfig {
     @Expose
     val waypoint: WaypointsConfig = WaypointsConfig()
 
-    // Does not have a config element!
+    // TODO move these into debug config
     @Expose
+    @NoConfigLink
     val debugPos: Position = Position(10, 10)
 
-    // Does not have a config element!
     @Expose
+    @NoConfigLink
     val debugLocationPos: Position = Position(1, 160)
 
-    // Does not have a config element!
     @Expose
+    @NoConfigLink
     val debugItemPos: Position = Position(90, 70)
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "raytracedOreblock")
     val debugOrePos: Position = Position(1, 200)
 
+    // TODO move [these] to a ContributorAppearanceConfig, or something similar
     @Expose
     @ConfigOption(
         name = "Fancy Contributors",
@@ -100,7 +103,7 @@ class DevConfig {
     var fancyContributors: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Contributor Nametags", desc = "Makes SkyHanni contributors' nametags fancy too. ")
+    @ConfigOption(name = "Contributor Nametags", desc = "Makes SkyHanni contributors' nametags fancy too.")
     @ConfigEditorBoolean
     @FeatureToggle
     var contributorNametags: Boolean = true
@@ -131,15 +134,22 @@ class DevConfig {
     var numberFormatOverride: Boolean = false
 
     // TODO reenable the setting once the hypixel mod api works fine
-//     @Expose
-//     @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
-//     @ConfigEditorBoolean
-//     var hypixelModApi: Boolean = true
+    // @Expose
+    // @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
+    // @ConfigEditorBoolean
+    // var hypixelModApi: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Hypixel Ping API", desc = "Use the Hypixel Mod API for calculating the ping.")
+    @ConfigOption(
+        name = "Ping API",
+        //#if MC < 1.21
+        desc = "Use the Hypixel Mod API to calculate your ping.",
+        //#else
+        //$$ desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
+        //#endif
+    )
     @ConfigEditorBoolean
-    var hypixelPingApi: Boolean = true
+    var pingApi: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -165,6 +175,7 @@ class DevConfig {
     @Category(name = "Dev Tools", desc = "Tooling for devs")
     val devTool: DevToolConfig = DevToolConfig()
 
+    // TODO move into Debug Config?
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
     val mobDebug: DebugMobConfig = DebugMobConfig()

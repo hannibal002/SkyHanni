@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.TimeFormatEntry
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -27,7 +26,6 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -38,6 +36,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -111,7 +111,6 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-
         try {
             val item = event.itemStack
             val counter = GardenApi.readCounter(item) ?: return
@@ -146,7 +145,7 @@ object GardenCropMilestoneDisplay {
     private fun drawProgressDisplay(crop: CropType): List<Renderable> {
         val counter = crop.getCounter()
         val lineMap = mutableMapOf<MilestoneTextEntry, Renderable>()
-        lineMap[MilestoneTextEntry.TITLE] = Renderable.string("§6Crop Milestones")
+        lineMap[MilestoneTextEntry.TITLE] = Renderable.text("§6Crop Milestones")
 
         val customTargetLevel = storage?.get(crop) ?: 0
         val overflowDisplay = overflowConfig.cropMilestoneDisplay
@@ -157,7 +156,7 @@ object GardenCropMilestoneDisplay {
         val useCustomGoal = customTargetLevel != 0 && customTargetLevel > currentTier
         nextTier = if (useCustomGoal) customTargetLevel else nextTier
 
-        lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.line {
+        lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontal {
             addItemStack(crop.icon)
             if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
                 addString("§7" + crop.cropName + " §eMAXED")
@@ -179,11 +178,11 @@ object GardenCropMilestoneDisplay {
 
         lineMap[MilestoneTextEntry.NUMBER_OUT_OF_TOTAL] = if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
             val haveFormat = counter.addSeparators()
-            Renderable.string("§7Counter: §e$haveFormat")
+            Renderable.text("§7Counter: §e$haveFormat")
         } else {
             val haveFormat = have.addSeparators()
             val needFormat = need.addSeparators()
-            Renderable.string("§e$haveFormat§8/§e$needFormat")
+            Renderable.text("§e$haveFormat§8/§e$needFormat")
         }
 
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune()
@@ -201,32 +200,32 @@ object GardenCropMilestoneDisplay {
                 val biggestUnit = config.highestTimeFormat.get().timeUnit
                 val duration = missingTime.format(biggestUnit)
                 val speedText = "§7In §b$duration"
-                lineMap[MilestoneTextEntry.TIME] = Renderable.string(speedText)
+                lineMap[MilestoneTextEntry.TIME] = Renderable.text(speedText)
                 GardenApi.itemInHand?.let {
                     if (GardenApi.readCounter(it) == null) {
-                        lineMap[MilestoneTextEntry.TIME] = Renderable.string("$speedText §7Inaccurate!")
+                        lineMap[MilestoneTextEntry.TIME] = Renderable.text("$speedText §7Inaccurate!")
                     }
                 }
             }
 
             val secondFormat = (farmingFortuneSpeed).addSeparators()
-            lineMap[MilestoneTextEntry.CROPS_PER_SECOND] = Renderable.string("§7Crops/Second§8: §e$secondFormat")
+            lineMap[MilestoneTextEntry.CROPS_PER_SECOND] = Renderable.text("§7Crops/Second§8: §e$secondFormat")
 
             val minuteFormat = (farmingFortuneSpeed * 60).addSeparators()
-            lineMap[MilestoneTextEntry.CROPS_PER_MINUTE] = Renderable.string("§7Crops/Minute§8: §e$minuteFormat")
+            lineMap[MilestoneTextEntry.CROPS_PER_MINUTE] = Renderable.text("§7Crops/Minute§8: §e$minuteFormat")
 
             val hourFormat = (farmingFortuneSpeed * 60 * 60).addSeparators()
-            lineMap[MilestoneTextEntry.CROPS_PER_HOUR] = Renderable.string("§7Crops/Hour§8: §e$hourFormat")
+            lineMap[MilestoneTextEntry.CROPS_PER_HOUR] = Renderable.text("§7Crops/Hour§8: §e$hourFormat")
 
             val formatBps = speed.roundTo(config.blocksBrokenPrecision).addSeparators()
-            lineMap[MilestoneTextEntry.BLOCKS_PER_SECOND] = Renderable.string("§7Blocks/Second§8: §e$formatBps")
+            lineMap[MilestoneTextEntry.BLOCKS_PER_SECOND] = Renderable.text("§7Blocks/Second§8: §e$formatBps")
         }
 
         val percentageFormat = (have.toDouble() / need.toDouble()).formatPercentage()
         lineMap[MilestoneTextEntry.PERCENTAGE] = if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
-            Renderable.string("§7Percentage: §e100%")
+            Renderable.text("§7Percentage: §e100%")
         } else {
-            Renderable.string("§7Percentage: §e$percentageFormat")
+            Renderable.text("§7Percentage: §e$percentageFormat")
         }
 
         if (overflowConfig.chat) {
@@ -286,8 +285,8 @@ object GardenCropMilestoneDisplay {
         val allowOverflow = overflowConfig.cropMilestoneDisplay
         if (mushroom.isMaxed(allowOverflow)) {
             mushroomCowPerkDisplay = listOf(
-                Renderable.string("§6Mooshroom Cow Perk"),
-                Renderable.string("§eMushroom crop is maxed!"),
+                Renderable.text("§6Mooshroom Cow Perk"),
+                Renderable.text("§eMushroom crop is maxed!"),
             )
             return
         }
@@ -309,13 +308,13 @@ object GardenCropMilestoneDisplay {
 
         val missing = need - have
 
-        lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
-        lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.line {
+        lineMap[MushroomTextEntry.TITLE] = Renderable.text("§6Mooshroom Cow Perk")
+        lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontal {
             addItemStack(mushroom.icon)
             addString("§7Mushroom Milestone $nextTier")
         }
 
-        lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.string("§e$haveFormat§8/§e$needFormat")
+        lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.text("§e$haveFormat§8/§e$needFormat")
 
         val speed = GardenCropSpeed.averageBlocksPerSecond
         if (speed != 0.0) {
@@ -324,11 +323,11 @@ object GardenCropMilestoneDisplay {
             val missingTime = (missing / blocksPerSecond).seconds
             val biggestUnit = config.highestTimeFormat.get().timeUnit
             val duration = missingTime.format(biggestUnit)
-            lineMap[MushroomTextEntry.TIME] = Renderable.string("§7In §b$duration")
+            lineMap[MushroomTextEntry.TIME] = Renderable.text("§7In §b$duration")
         }
 
         val percentageFormat = (have.toDouble() / need.toDouble()).formatPercentage()
-        lineMap[MushroomTextEntry.PERCENTAGE] = Renderable.string("§7Percentage: §e$percentageFormat")
+        lineMap[MushroomTextEntry.PERCENTAGE] = Renderable.text("§7Percentage: §e$percentageFormat")
 
         if (currentTier > 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
             GardenCropMilestones.onOverflowLevelUp(mushroom, currentTier - 1, nextTier - 1)
@@ -356,26 +355,5 @@ object GardenCropMilestoneDisplay {
         event.move(3, "garden.cropMilestoneMushroomPetPerkEnabled", "garden.cropMilestones.mushroomPetPerk.enabled")
         event.move(3, "garden.cropMilestoneMushroomPetPerkText", "garden.cropMilestones.mushroomPetPerk.text")
         event.move(3, "garden.cropMilestoneMushroomPetPerkPos", "garden.cropMilestones.mushroomPetPerk.pos")
-        event.move(
-            11,
-            "garden.cropMilestones.highestTimeFormat",
-            "garden.cropMilestones.highestTimeFormat",
-        ) { element ->
-            ConfigUtils.migrateIntToEnum(element, TimeFormatEntry::class.java)
-        }
-        event.move(
-            11,
-            "garden.cropMilestones.text",
-            "garden.cropMilestones.text",
-        ) { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, MilestoneTextEntry::class.java)
-        }
-        event.move(
-            11,
-            "garden.cropMilestones.mushroomPetPerk.text",
-            "garden.cropMilestones.mushroomPetPerk.text",
-        ) { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, MushroomTextEntry::class.java)
-        }
     }
 }

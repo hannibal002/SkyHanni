@@ -12,6 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class PetConfig {
     @Expose
@@ -33,6 +34,12 @@ class PetConfig {
     @ConfigOption(name = "Pet Nametag", desc = "")
     @Accordion
     val nametag: PetNametagConfig = PetNametagConfig()
+
+    @Expose
+    @ConfigOption(name = "Taming 60 Helper", desc = "")
+    @SearchTag("George")
+    @Accordion
+    val tamingSixty: TamingSixtyConfig = TamingSixtyConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Current Pet", desc = "")
@@ -76,7 +83,6 @@ class PetConfig {
     @ConfigEditorSlider(minValue = 0.7f, maxValue = 1.5f, minStep = 0.05f)
     var petItemDisplayScale: Float = 0.9f
 
-
     enum class PetItemsDisplay(
         val icon: String,
         itemDisplayName: String,
@@ -87,7 +93,6 @@ class PetConfig {
         ;
 
         private val displayName: String = "$icon §ffor $itemDisplayName"
-
-        override fun toString() = displayName
+        override fun toString() = "$icon §ffor $displayName"
     }
 }

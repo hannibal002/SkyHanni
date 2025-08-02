@@ -10,11 +10,10 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
 import net.minecraft.util.EnumParticleTypes
@@ -54,7 +53,7 @@ object FireVeilWandParticles {
         if (config.display != DisplayEntry.LINE) return
         if (lastClick.passedSince() > 5.5.seconds) return
 
-        val color = config.displayColor.toSpecialColor()
+        val color = config.displayColor.toColor()
         event.drawCircleWireframe(MinecraftCompat.localPlayer, rad = 3.5, color)
     }
 
@@ -62,9 +61,5 @@ object FireVeilWandParticles {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWands.displayColor")
         event.move(3, "itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWands.display")
-
-        event.transform(15, "itemAbilities.fireVeilWands.display") { element ->
-            ConfigUtils.migrateIntToEnum(element, DisplayEntry::class.java)
-        }
     }
 }

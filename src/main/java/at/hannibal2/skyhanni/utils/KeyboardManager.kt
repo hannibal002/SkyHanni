@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
@@ -7,6 +8,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
+
 //#if MC < 1.21
 //#else
 //$$ import net.minecraft.client.util.InputUtil
@@ -46,7 +48,21 @@ object KeyboardManager {
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
-    fun isRightMouseClicked() = RIGHT_MOUSE.isKeyClicked()
+    @JvmStatic
+    fun checkIsInventoryClosure(keycode: Int): Boolean {
+        // Holding shift bypasses closure checks
+        if (isShiftKeyDown()) return false
+
+        val isClose =
+            //#if MC < 1.21
+            keycode == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || keycode == Keyboard.KEY_ESCAPE
+        //#else
+        //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
+        //#endif
+
+        if (!isClose) return false
+        return AttemptedInventoryCloseEvent().post()
+    }
 
     /**
      * TODO make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,
@@ -57,6 +73,7 @@ object KeyboardManager {
     fun KeyBinding.isActive(): Boolean {
         //#if MC < 1.16
         if (!Keyboard.isCreated()) return false
+        //#endif
         try {
             if (keyCode.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
@@ -67,7 +84,6 @@ object KeyboardManager {
             )
             return false
         }
-        //#endif
         return this.isKeyDown || this.isPressed
     }
 

@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
@@ -60,9 +59,7 @@ object TabListData {
                     add(" '$line'")
                 }
             }
-        } ?: run {
-            event.addIrrelevant("not active.")
-        }
+        } ?: event.addIrrelevant("not active.")
     }
 
     private fun toggleDebug() {
@@ -71,8 +68,8 @@ object TabListData {
             debugCache = null
             return
         }
-        SkyHanniMod.coroutineScope.launch {
-            val clipboard = OSUtils.readFromClipboard() ?: return@launch
+        SkyHanniMod.launchCoroutine {
+            val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             debugCache = clipboard.lines()
             ChatUtils.chat("Enabled tab list debug with your clipboard.")
         }

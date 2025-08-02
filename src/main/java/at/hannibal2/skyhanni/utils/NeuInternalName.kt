@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.init.Items
+import kotlin.time.Duration.Companion.minutes
 
 class NeuInternalName private constructor(private val internalName: String) {
 
@@ -91,11 +94,16 @@ class NeuInternalName private constructor(private val internalName: String) {
                 val (name, level) = internalName.split(";", limit = 2)
                 "ENCHANTED_BOOK_${name}_$level"
             }
+
             else -> internalName
         }
 
+    private val petCache: TimeLimitedCache<NeuInternalName, Boolean> = TimeLimitedCache(10.minutes)
+
     val isPet: Boolean
-        get() = this in PetUtils.petInternalNames
+        get() = petCache.getOrPut(this) {
+            PetUtils.isKnownPetInternalName(this) || this.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET
+        }
 
     private val isEnchantedBook: Boolean
         get() = getItemStackOrNull()?.item == Items.enchanted_book

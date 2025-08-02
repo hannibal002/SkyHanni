@@ -3,14 +3,13 @@ package at.hannibal2.skyhanni.config.features.foraging
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
-import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 /**
  * Attention developers:
@@ -20,8 +19,8 @@ class ForagingConfig {
 
     @ConfigOption(
         name = "§cNotice",
-        desc = "To see all foraging features, please launch the game on a modern version of Minecraft with SkyHanni installed.\n" +
-            "§eJoin the SkyHanni discord for a guide on how to migrate the config.",
+        desc = "To see all Foraging features, please launch the game on a modern version of Minecraft with SkyHanni installed.\n" +
+            "§eJoin the SkyHanni Discord for a guide on how to migrate the config.",
     )
     @OnlyLegacy
     @ConfigEditorInfoText
@@ -36,6 +35,12 @@ class ForagingConfig {
     val trees: TreesConfig = TreesConfig()
 
     @Expose
+    @ConfigOption(name = "Starlyn Contests", desc = "")
+    @SearchTag("Agatha")
+    @Accordion
+    val starlynContest: StarlynContestsConfig = StarlynContestsConfig()
+
+    @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
     @Accordion
     @OnlyModern
@@ -48,21 +53,10 @@ class ForagingConfig {
     var moongladeBeacon = MoongladeBeaconConfig()
 
     @Expose
-    @OnlyModern
-    @Category(name = "Foraging Mob Highlights", desc = "Settings for foraging mob highlights")
-    var mobHighlight = ForagingMobHighlightConfig()
-
-    @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
     @OnlyModern
     @Accordion
     val tracker = ForagingTrackerConfig()
-
-    @Expose
-    @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var lassoDisplay = true
 
     @Expose
     @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Galatea.")
@@ -70,9 +64,4 @@ class ForagingConfig {
     @FeatureToggle
     @OnlyModern
     var mutePhantoms = true
-
-    @Expose
-    @ConfigLink(owner = ForagingConfig::class, field = "lassoDisplay")
-    val lassoDisplayPosition: Position = Position(380, 210)
-
 }

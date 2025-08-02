@@ -26,9 +26,14 @@ class CrimsonIsleConfig {
     val matriarchHelper: MatriarchHelperConfig = MatriarchHelperConfig()
 
     @Expose
+    @ConfigOption(name = "Atoms HitBox", desc = "")
+    @Accordion
+    val atomHitBox: AtomHitBoxConfig = AtomHitBoxConfig()
+
+    @Expose
     @ConfigOption(
         name = "Disable Profile Viewer in Kuudra",
-        desc = "Prevent player interactions during the Kuudra boss fight to stop Profile Viewer from opening."
+        desc = "Prevent player interactions during the Kuudra boss fight to stop Profile Viewer from opening.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -47,11 +52,20 @@ class CrimsonIsleConfig {
     @Expose
     @ConfigOption(
         name = "Pablo NPC Helper",
-        desc = "Show a clickable message that grabs the flower needed from your sacks."
+        desc = "Show a clickable message that grabs the flower needed from your sacks.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var pabloHelper: Boolean = false
+    var pabloHelper: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Sirih NPC Helper",
+        desc = "Show a clickable message that grabs sulphur from your sacks.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var sirihHelper: Boolean = true
 
     @Expose
     @ConfigOption(name = "Volcano Explosivity", desc = "Show a HUD of the current volcano explosivity level.")
@@ -66,7 +80,7 @@ class CrimsonIsleConfig {
     @ConfigOption(
         name = "Dojo Rank Display",
         desc = "Display your rank, score, actual belt, and points needed for the next belt " +
-            "in the Challenges inventory on the Crimson Isles."
+            "in the Challenges inventory on the Crimson Isles.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
