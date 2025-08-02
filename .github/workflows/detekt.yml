@@ -35,7 +35,7 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
-                    gradle-command: detektMain --stacktrace
+                    gradle-command: detektMain --stacktrace --no-configuration-cache
             -   name: Check if SARIF file exists
                 if: always()
                 id: check_sarif

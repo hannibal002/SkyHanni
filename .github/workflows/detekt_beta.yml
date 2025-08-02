@@ -19,7 +19,7 @@ jobs:
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: detektMain --stacktrace
+                    gradle-command: detektMain --stacktrace --no-configuration-cache
             -   name: Check if SARIF file exists
                 id: check_sarif
                 run: |

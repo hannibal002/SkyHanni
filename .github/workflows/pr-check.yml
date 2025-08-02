@@ -29,7 +29,7 @@ jobs:
                     PR_BODY: ${{ github.event.pull_request.body }}
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: checkPrDescription -PprTitle="${PR_TITLE}" -PprBody="${PR_BODY}"
+                    gradle-command: checkPrDescription -PprTitle="${PR_TITLE}" -PprBody="${PR_BODY}" --no-configuration-cache
 
             -   name: Add label if changelog verification fails
                 if: failure()

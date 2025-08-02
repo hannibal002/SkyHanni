@@ -28,7 +28,7 @@ jobs:
             -   name: Build with Gradle w/retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true
+                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true --no-configuration-cache
             -   uses: actions/upload-artifact@v4
                 name: Upload development build
                 with:
@@ -37,7 +37,7 @@ jobs:
             -   name: Test with Gradle w/retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: test
+                    gradle-command: test --no-configuration-cache
             -   uses: actions/upload-artifact@v4
                 name: "Upload test report"
                 if: ${{ !cancelled() }}
@@ -63,7 +63,7 @@ jobs:
             -   name: Build with Gradle w/retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: build --stacktrace -PskipDetekt=true
+                    gradle-command: build --stacktrace -PskipDetekt=true --no-configuration-cache
 
             -   name: Add label if build fails
                 if: ${{ failure() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}

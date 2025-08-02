@@ -29,7 +29,7 @@ jobs:
             -   name: Generate Repo Patterns using Gradle w/retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: generateRepoPatterns --stacktrace
+                    gradle-command: generateRepoPatterns --stacktrace --no-configuration-cache
             -   uses: actions/upload-artifact@v4
                 name: Upload generated repo regexes
                 with:
