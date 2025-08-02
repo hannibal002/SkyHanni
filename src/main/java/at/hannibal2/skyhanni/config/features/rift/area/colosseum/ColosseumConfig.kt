@@ -7,13 +7,28 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class ColosseumConfig {
     @Expose
-    @ConfigOption(name = "Highlight Blobbercysts", desc = "Highlight Blobbercysts in Bacte fight.")
+    @ConfigOption(
+        name = "Highlight Blobbercysts",
+        desc = "Highlight Blobbercysts in the Bacte fight.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightBlobbercysts: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Tentacle Waypoints", desc = "Show waypoints for tentacles with their HP in Bacte fight.")
+    @ConfigOption(
+        name = "Kill Zone Warning",
+        desc = "Alert when you're about to die from being outside the arena during the Bacte fight.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var killZoneWarning: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Tentacle Waypoints",
+        desc = "Show waypoints for tentacles with their HP in the Bacte fight.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var tentacleWaypoints: Boolean = true
