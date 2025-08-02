@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
-import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -54,6 +54,7 @@ object SkyBlockItemModifierUtils {
     }?.takeIf { it > 0 }
 
     fun ItemStack.getMithrilInfusion(): Boolean = getAttributeByte("mithril_infusion") == 1.toByte()
+    fun ItemStack.getFreeWill(): Boolean = getAttributeByte("free_will") == 1.toByte()
 
     private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1
@@ -129,9 +130,6 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
-
-    @Suppress("CAST_NEVER_SUCCEEDS")
-    inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
     val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
     var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()

@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
-import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
@@ -374,10 +373,6 @@ class MiscConfig {
     val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
     @Expose
-    @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
-    val inventoryLoadPos: Position = Position(394, 124)
-
-    @Expose
     @ConfigOption(
         name = "Fix Ghost Entities",
         desc = "Remove ghost entities caused by a Hypixel bug.\n" +
@@ -507,4 +502,14 @@ class MiscConfig {
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var abiphoneAcceptKey: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(
+        name = "Fix item double clicks",
+        desc = "Fixes a Hypixel bug causing double clicks on blocks with blaze daggers or a fishing rod with autopet.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var fixDoubleClicks: Boolean = true
 }

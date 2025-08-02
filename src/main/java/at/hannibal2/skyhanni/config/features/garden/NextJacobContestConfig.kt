@@ -100,8 +100,11 @@ class NextJacobContestConfig {
     @ConfigEditorDraggableList
     val warnFor: MutableList<CropType> = CropType.entries.toMutableList()
 
-    // Todo rename to position
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
-    val pos: Position = Position(-200, 10)
+    val position: Position = Position(-200, 10)
+
+    @Expose
+    @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
+    val inventoryPosition: Position = Position(394, 124)
 }

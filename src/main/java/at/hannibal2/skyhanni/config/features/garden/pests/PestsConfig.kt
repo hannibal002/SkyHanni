@@ -31,6 +31,11 @@ class PestsConfig {
     val pestTimer: PestTimerConfig = PestTimerConfig()
 
     @Expose
+    @ConfigOption(name = "Pest Trap", desc = "")
+    @Accordion
+    val pestTrap: PestTrapConfig = PestTrapConfig()
+
+    @Expose
     @ConfigOption(name = "Pest Profit Tracker", desc = "")
     @Accordion
     val pestProfitTacker: PestProfitTrackerConfig = PestProfitTrackerConfig()

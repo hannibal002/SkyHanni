@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
 import net.minecraft.client.audio.SoundCategory
@@ -114,7 +113,7 @@ object SoundUtils {
 
     // TODO use duration for delay
     fun repeatSound(delay: Long, repeat: Int, sound: ISound) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             repeat(repeat) {
                 sound.playSound()
                 delay(delay)

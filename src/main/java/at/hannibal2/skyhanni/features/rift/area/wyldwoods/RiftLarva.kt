@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.entity.item.EntityArmorStand
 
 @SkyHanniModule
@@ -44,7 +44,7 @@ object RiftLarva {
             if (stand.wearingSkullTexture(LARVA_SKULL_TEXTURE)) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,
-                    config.highlightColor.toSpecialColor().addAlpha(1),
+                    config.highlightColor.toColor().addAlpha(1),
                 ) { isEnabled() && hasHookInHand }
             }
         }

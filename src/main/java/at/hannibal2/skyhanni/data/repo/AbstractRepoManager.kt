@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.minecraft.util.IChatComponent
@@ -98,17 +99,21 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
-    private var downloadFailed: Boolean = false
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
     // Will be invoked by the implementation of this class
+    @Suppress("HandleEventInspection")
     fun registerCommands(event: CommandRegistrationEvent) {
         if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
-            description = "Download the $commonName repo again"
+            description = "Remove and re-download the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback { updateRepo() }
+            simpleCallback { updateRepo(forceReset = true) }
+            argCallback("force", BoolArgumentType.bool()) {
+                description = "optionally only re-download if the repo is out of date"
+                updateRepo(forceReset = it)
+            }
         }
         if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
@@ -123,6 +128,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
+    fun addUnsuccessfulConstant(fileName: String) = unsuccessfulConstants.add(fileName)
 
     @PublishedApi
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
@@ -133,8 +139,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             return repoFileSystem.readAllBytesAsJsonElement(path)
         }
         val onDisk = repoDirectory.resolve(path)
-        if (!onDisk.isFile) logger.throwError("Repo file not found: $path")
-        return onDisk.getJson()
+        return if (!onDisk.isFile) {
+            logger.logNonDestructiveError("Repo file not found: $path")
+            null
+        } else onDisk.getJson()
     }
 
     @PublishedApi
@@ -154,7 +162,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     // <editor-fold desc="Repo Management">
-    fun updateRepo() {
+    fun updateRepo(forceReset: Boolean = false) {
         shouldManuallyReload = true
         if (!config.location.valid) {
             ChatUtils.userError("Invalid $commonName Repo settings detected, resetting default settings.")
@@ -162,7 +170,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         SkyHanniMod.launchIOCoroutine {
-            fetchAndUnpackRepo(command = true)
+            if (!fetchAndUnpackRepo(command = true, forceReset = forceReset).canContinue) {
+                logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
+                return@launchIOCoroutine
+            }
             reloadRepository("$commonName Repo updated successfully.")
             if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launchIOCoroutine
             val informed = logger.logErrorStateWithData(
@@ -176,7 +187,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
+    private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
             if (manual) ChatUtils.chat("$commonShortNameCased Repo settings are already on default!")
             return
@@ -195,41 +206,39 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun initRepo() {
         shouldManuallyReload = true
         SkyHanniMod.launchIOCoroutine {
-            if (config.repoAutoUpdate) {
-                fetchAndUnpackRepo(command = false)
-                if (downloadFailed) switchToBackupRepo()
+            if (config.repoAutoUpdate && !fetchAndUnpackRepo(command = false).canContinue) {
+                logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
+                return@launchIOCoroutine
             }
             reloadRepository()
         }
     }
 
     // Code taken + adapted from NotEnoughUpdates
-    private fun switchToBackupRepo() {
+    private fun switchToBackupRepo(): FetchUnpackResult = runCatching {
         if (backupRepoResourcePath == null) {
             logger.warn("No backup repo resource path provided, cannot switch to backup repo.")
-            return
+            return FetchUnpackResult.FAILED
+        }
+
+        logger.debug("Attempting to switch to backup repo")
+        val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath)
+            ?: logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
+
+        prepCleanRepoFileSystem()
+
+        Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
+            logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
         }
 
         isUsingBackup = true
-        logger.debug("Attempting to switch to backup repo")
-
-        try {
-            val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath)
-                ?: logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
-
-            prepCleanRepoFileSystem()
-
-            Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
-                logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
-            }
-
-            commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
-            logger.debug("Successfully switched to backup repo")
-        } catch (e: Error) {
-            logger.logErrorWithData(e, "Failed to switch to backup repo")
-        }
-    }
+        commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
+        logger.debug("Successfully switched to backup repo")
+        return FetchUnpackResult.SWITCHED_TO_BACKUP
+    }.onFailure { e ->
+        logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
+    }.getOrDefault(FetchUnpackResult.FAILED)
 
     open fun reportExtraStatusInfo(): Unit = Unit
 
@@ -238,11 +247,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
+            ChatUtils.chat("$commonName Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             reportExtraStatusInfo()
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
+        ChatUtils.chat("$commonName Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
@@ -262,7 +271,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         val text = mutableListOf<IChatComponent>()
         text.add(
             (
-                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7Repo Issue! Some features may not work. " +
+                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work. " +
                     "Please report this error on the Discord!"
                 ).asComponent(),
         )
@@ -277,49 +286,69 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         TextHelper.multiline(text).send()
     }
 
+    private enum class FetchUnpackResult(val canContinue: Boolean = true) {
+        SUCCESS,
+        SWITCHED_TO_BACKUP,
+        FAILED(false),
+    }
+
     /**
      * Determines the latest commit on the GitHub repo and compares it to the current commit.
      * If out of date, will download the latest commit zip file and unpack it into the repo directory.
+     * Will automatically switch to the backup repo if the download fails or the unpacking fails,
+     * unless `switchToBackupOnFail` is false.
      *
      * @param command If true, will report the status of the repo to the user.
      * @param silentError If true, will not log errors to the console.
+     * @param forceReset If true, will always download the latest commit zip file, even if the repo is up to date.
+     * @param switchToBackupOnFail If true, will switch to the backup repo if the download or unpacking fails.
+     * @return FetchUnpackResult.SUCCESS if the repo was successfully fetched and unpacked,
+     *         FetchUnpackResult.SWITCHED_TO_BACKUP if the backup repo was used,
+     *         FetchUnpackResult.FAILED if the repo could not be fetched or unpacked and no backup repo is available.
      */
-    private suspend fun fetchAndUnpackRepo(command: Boolean, silentError: Boolean = true) = repoMutex.withLock {
+    private suspend fun fetchAndUnpackRepo(
+        command: Boolean,
+        silentError: Boolean = true,
+        forceReset: Boolean = false,
+        switchToBackupOnFail: Boolean = true,
+    ): FetchUnpackResult = repoMutex.withLock {
         localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
-        val (currentSha, currentCommitTime) = localRepoCommit
 
-        val (latestSha, latestCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
-            response.sha to response.commit.committer.date
-        } ?: ((null to null).also { downloadFailed = true })
+        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: run {
+            return if (switchToBackupOnFail) switchToBackupRepo()
+            else FetchUnpackResult.FAILED
+        }
 
-        val diffCheck = RepoComparison(currentSha, currentCommitTime, latestSha, latestCommitTime)
-
-        if (repoDirectory.exists() && diffCheck.hashesMatch && unsuccessfulConstants.isEmpty()) {
+        val diffCheck = RepoComparison(localRepoCommit, latestRepoCommit)
+        if (diffCheck.hashesMatch && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
             if (command) {
                 diffCheck.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
-            return
+            return FetchUnpackResult.SUCCESS
+        } else if (command) {
+            if (!diffCheck.hashesMatch) diffCheck.reportRepoOutdated()
+            else if (forceReset) diffCheck.reportForceRebuild()
         }
 
-        if (command) diffCheck.reportRepoOutdated()
         prepCleanRepoFileSystem()
 
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
-            downloadFailed = true
-            logger.logError("Failed to download the repo zip file from GitHub.")
+            logger.logNonDestructiveError("Failed to download the repo zip file from GitHub.")
+            return if (switchToBackupOnFail) switchToBackupRepo()
+            else FetchUnpackResult.FAILED
         }
 
         // Actually unpack the repo zip file into our local 'file system'
         if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
-            downloadFailed = true
-            logger.logError("Failed to unpack the downloaded zip file.")
+            logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
+            return if (switchToBackupOnFail) switchToBackupRepo()
+            else FetchUnpackResult.FAILED
         }
 
-        localRepoCommit = RepoCommit(latestSha, latestCommitTime)
-        commitStorage.writeToFile(localRepoCommit)
-        downloadFailed = false
+        commitStorage.writeToFile(latestRepoCommit)
         isUsingBackup = false
+        return FetchUnpackResult.SUCCESS
     }
 
     private fun prepCleanRepoFileSystem() {

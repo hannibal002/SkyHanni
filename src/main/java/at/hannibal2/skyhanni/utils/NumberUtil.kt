@@ -7,6 +7,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 object NumberUtil {
@@ -50,9 +51,11 @@ object NumberUtil {
      * @link https://stackoverflow.com/a/30661479
      * @author assylias
      */
-    private fun compactFormat(value: Number, preciseBillions: Boolean = false): String {
-        @Suppress("NAME_SHADOWING")
-        val value = value.toLong()
+    private fun compactFormat(input: Number, preciseBillions: Boolean = false): String {
+        val absDoubleValue = input.toDouble().absoluteValue
+        if (absDoubleValue < 1) return input.toString()
+
+        val value = input.toLong()
         // Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
         if (value == Long.MIN_VALUE) return compactFormat(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + compactFormat(-value, preciseBillions)

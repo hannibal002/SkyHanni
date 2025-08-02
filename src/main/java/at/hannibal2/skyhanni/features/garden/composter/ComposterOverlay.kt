@@ -402,7 +402,7 @@ object ComposterOverlay {
                 " §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview",
                 tips = listOf(
                     "§7Shows how much you make as §6profit §7from",
-                    "§7selling §aCompsot §7after subtracting the §ccosts§6.",
+                    "§7selling §aCompost §7after subtracting the §ccosts§6.",
                 ),
             )
             addVerticalSpacer()

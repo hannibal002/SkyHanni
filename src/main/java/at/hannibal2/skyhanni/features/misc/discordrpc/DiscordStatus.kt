@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -294,15 +295,15 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             if (extraAttributes != null) {
                 val enchantments = extraAttributes.getCompoundTag("enchantments")
                 var stackingEnchant = ""
-                for (enchant in DiscordRPCManager.stackingEnchants) {
+                for (enchant in EstimatedItemValue.stackingEnchants) {
                     if (extraAttributes.hasKey(enchant.value.statName)) {
                         stackingEnchant = enchant.key
                         break
                     }
                 }
-                val levels = DiscordRPCManager.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
+                val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
                 val level = enchantments.getInteger(stackingEnchant)
-                val amount = extraAttributes.getInteger(DiscordRPCManager.stackingEnchants[stackingEnchant]?.statName)
+                val amount = extraAttributes.getInteger(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =

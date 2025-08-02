@@ -64,6 +64,7 @@ object ItemAbilityCooldown {
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val WEIRD_TUBA = "WEIRD_TUBA".toInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".toInternalName()
+    private val VOODOO_DOLL = "VOODOO_DOLL".toInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".toInternalName()
     private val WARNING_FLARE = "WARNING_FLARE".toInternalName()
     private val ALERT_FLARE = "ALERT_FLARE".toInternalName()
@@ -135,16 +136,10 @@ object ItemAbilityCooldown {
                 ItemAbility.STARLIGHT_WAND.sound()
             }
             // Voodoo Doll
-            event.soundName == "mob.guardian.curse" && event.volume == 0.2f -> {
-                ItemAbility.VOODOO_DOLL.sound()
-            }
-            // Jinxed Voodoo Doll Hit
-            event.soundName == "random.successful_hit" && event.volume == 1f && event.pitch == 0.7936508f -> {
-                ItemAbility.VOODOO_DOLL_WILTED.sound()
-            }
-            // Jinxed Voodoo Doll Miss
             event.soundName == "mob.ghast.scream" && event.volume == 1f && event.pitch >= 1.6 && event.pitch <= 1.7 -> {
-                if (VOODOO_DOLL_WILTED.recentlyHeld()) {
+                if (VOODOO_DOLL.recentlyHeld()) {
+                    ItemAbility.VOODOO_DOLL.sound()
+                } else if (VOODOO_DOLL_WILTED.recentlyHeld()) {
                     ItemAbility.VOODOO_DOLL_WILTED.sound()
                 }
             }

@@ -13,8 +13,8 @@ object ConfigGuiManager {
 
     private val widenConfig get() = SkyHanniMod.feature.gui.widenConfig
 
-    @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         getEditorInstance().wide = widenConfig.get()
         ConditionalUtils.onToggle(widenConfig) {
             getEditorInstance().wide = widenConfig.get()
