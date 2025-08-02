@@ -74,9 +74,9 @@ object RareDropMessages {
      * REGEX-TEST: Fire Aspect III
      * REGEX-TEST: Duplex I
      */
-    private val slayerBookPattern by repoGroup.pattern(
+    private val slayerBookIDPattern by repoGroup.pattern(
         "slayerbook",
-        "Smite VII?|Ender Slayer VII?|Bane of Arthropods VI|Critical VI|Fire Aspect III|Duplex I",
+        "SMITE;(?:6|7)|ENDER_SLAYER;(?:6|7)|MANA_STEAL;1|SMARTY_PANTS;1|BANE_OF_ARTHROPODS;6|CRITIAL;6|FIRE_ASPECT;3|ULTIMATE_REITERATE;1",
     )
 
     /**
@@ -159,7 +159,8 @@ object RareDropMessages {
             )
         }
 
-        if (!anyRecentMessage && config.enchantedBookMissingMessage && !slayerBookPattern.matches(internalName.repoItemName)) {
+        // Hypixel send Slayer Book messages late, so we do a manual internalName Regex Match
+        if (!anyRecentMessage && config.enchantedBookMissingMessage && !slayerBookIDPattern.matches(internalName.asString())) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
             if (SkyHanniMod.feature.misc.userLuck) {
                 userLuck.takeIf { it != 0f }?.let { luck ->
