@@ -259,7 +259,9 @@ object IslandGraphs {
             try {
                 val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreas.display = null
-                setNewGraph(graph)
+                DelayedRun.runNextTick {
+                    setNewGraph(graph)
+                }
             } catch (e: Error) {
                 currentIslandGraph = null
             }
