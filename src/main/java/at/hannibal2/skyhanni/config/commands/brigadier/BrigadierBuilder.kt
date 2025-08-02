@@ -77,53 +77,14 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         simpleCallback { block(emptyArray()) }
     }
 
-
+    @Suppress("Unused")
     fun <O : CommandContextAwareObject, A : CommandArgument<O>> ComplexCommand<O>.complexArgs() {
-        val root = LiteralArgumentBuilder.literal<Any>(name)
-            .executes { run(context(this), emptyList()) }
-
 
         val suggestionProvider = SuggestionProvider<Any> { ctx, builder ->
             val input = builder.input.substring(builder.start)
-            val tokens = input.trim().split(Regex("\\s+")).toMutableList()
-            val contextObj = context(this)
+            val tokens = input.trim().split(Regex("\\s+"))
 
-            var idx = 0
-            var posCounter = 0
-            while (idx < tokens.size - 1) {
-                val tok = tokens[idx]
-                val spec = findMatchingSpec(tok, posCounter, contextObj) ?: break
-
-                if (spec.prefix.isNotEmpty() && spec.prefix == tok) {
-                    if (idx + 1 >= tokens.size - 1) break // cursor is at next arg
-                    idx += 2
-                } else {
-                    posCounter++
-                    idx++
-                }
-            }
-
-            val current = tokens.lastOrNull() ?: ""
-            val candidates = mutableListOf<String>()
-            val validSpecs = specifiers.filter { it.validity(contextObj) }
-
-            for (spec in validSpecs) {
-                if (spec.prefix.isNotEmpty() && spec.prefix.startsWith(current)) {
-                    candidates.add(spec.prefix)
-                }
-            }
-
-            val matchSpec = validSpecs.find { it.prefix == current || (it.prefix.isEmpty() && it.defaultPosition == posCounter) }
-            val suggestList = if (matchSpec != null) {
-                matchSpec.tabComplete("", contextObj)
-            } else {
-                validSpecs.filter { it.defaultPosition == posCounter }.flatMap { it.tabComplete(current, contextObj) }
-            }
-
-            candidates.forEach {
-                builder.suggest(it)
-            }
-            suggestList.forEach {
+            this.tabParse(tokens).forEach {
                 builder.suggest(it)
             }
             CompletableFuture.completedFuture(builder.build())
@@ -133,8 +94,9 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
             .suggests(suggestionProvider)
             .executes {
                 run(context(this), StringArgumentType.getString(it, "_input").split(Regex("\\s+")))
+                0
             }
-        builder.then(root.then(argsNode))
+        builder.then(argsNode)
     }
 
     /**

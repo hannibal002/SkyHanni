@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-//#if FORGE
-//#endif
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
@@ -70,7 +68,9 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.nbt.NBTTagCompound
+//#if FORGE
 import net.minecraftforge.common.MinecraftForge
+//#endif
 import java.io.File
 import java.time.LocalDate
 import java.time.Month

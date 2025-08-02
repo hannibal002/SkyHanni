@@ -31,14 +31,14 @@ data class ComplexCommand<O : CommandContextAwareObject>(
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         try {
-            handleCommand(args)
+            handleCommand(args.asList())
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(e, "Error while running command /$name")
         }
     }
+    //#endif
 
-    private fun handleCommand(args: Array<String>) {
-        val context = context(this)
+    fun handleCommand(args: List<String>, context: O = context(this)) {
         var index = 0
         var amountNoPrefixArguments = 0
 
@@ -57,7 +57,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         }
     }
 
-    private fun tabParse(args: Array<String>, partial: String?): List<String> {
+    private fun tabParse(args: List<String>, partial: String?): List<String> {
         val context = context(this)
 
         var index = 0
@@ -100,15 +100,19 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         return result
     }
 
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? {
-        val rawArgs = args.toList()
+    fun tabParse(args: List<String>): List<String> {
+        val rawArgs = args
         val isPartial = rawArgs.last().isNotEmpty()
         val newArgs = if (isPartial) rawArgs.dropLast(1) else rawArgs
 
         val partial = if (isPartial) rawArgs.last() else null
 
-        return tabParse(newArgs.toTypedArray(), partial)
+        return tabParse(newArgs, partial)
     }
+
+
+    //#if MC < 1.21
+    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? = tabParse(args.asList())
     //#endif
 
     fun constructHelp(description: String): String = buildString {
@@ -146,51 +150,5 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         }
     }
 
-    fun run(ctx: O, tokens: List<String>): Int {
-        val contextObj = context(this)
-        var positionCount = 0
-        var idx = 0
-
-        while (idx < tokens.size) {
-            val tok = tokens[idx]
-            val spec = findMatchingSpec(tok, positionCount, contextObj)
-            if (spec == null) {
-                contextObj.errorMessage = "Unknown argument: '$tok'"
-                break
-            }
-
-            val valueToken: String
-            if (spec.prefix.isNotEmpty() && spec.prefix == tok) {
-                if (idx + 1 >= tokens.size) {
-                    contextObj.errorMessage = "Missing value for flag $tok"
-                    break
-                }
-                valueToken = tokens[++idx]
-            } else {
-                valueToken = tok
-                positionCount++
-            }
-
-            try {
-                spec.handler(valueToken.split(" "), contextObj)
-            } catch (e: Exception) {
-                contextObj.errorMessage = "Invalid value '$valueToken' for ${spec.prefix.ifEmpty { "arg at pos ${spec.defaultPosition}" }}"
-                break
-            }
-            idx++
-        }
-
-        contextObj.errorMessage?.let {
-            println("Error: $it")
-            return 0
-        }
-
-        contextObj.post()
-        contextObj.errorMessage?.let {
-            println("Error: $it")
-            return 0
-        }
-
-        return 1
-    }
+    fun run(ctx: O, tokens: List<String>) = handleCommand(tokens,ctx)
 }

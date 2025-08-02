@@ -239,7 +239,7 @@ data class CommandArgument<T : CommandContextAwareObject>(
     override fun toString(): String = documentation
 
     fun getResult(
-        args: Array<String>,
+        args: List<String>,
         lookup: Int,
         index: Int,
         context: T,
@@ -273,7 +273,7 @@ data class CommandArgument<T : CommandContextAwareObject>(
         }
 
         fun <A : CommandArgument<O>, O : CommandContextAwareObject> Collection<A>.findSpecifierAndGetResult(
-            args: Array<String>,
+            args: List<String>,
             index: Int,
             context: O,
             amountNoPrefixArguments: Int,
