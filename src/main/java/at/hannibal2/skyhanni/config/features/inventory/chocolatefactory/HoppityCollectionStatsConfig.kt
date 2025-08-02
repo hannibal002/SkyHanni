@@ -48,6 +48,14 @@ class HoppityCollectionStatsConfig {
 
     @Expose
     @ConfigOption(
+        name = "Descriptive Milestones",
+        desc = "Show a more detailed description of how to unlock a milestone rabbit in Hoppity's Collection."
+    )
+    @ConfigEditorBoolean
+    var descriptiveMilestones: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Missing Location Rabbits",
         desc = "Show the locations you have yet to find enough egg locations for in order to unlock the rabbit for that location."
     )

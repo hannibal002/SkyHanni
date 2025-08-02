@@ -10,13 +10,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.compat.convertToJsonString
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
-//#if MC > 1.21
-//$$ import net.minecraft.registry.DynamicRegistryManager
-//#endif
 
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
 
@@ -26,8 +24,11 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
     private val h = 300
     private val reasonMaxLength = history.maxOf { reasonLength(it) }
 
+    private fun ChatManager.MessageFilteringResult.getReason(): String? =
+        actionReason ?: modifiedReason
+
     private fun reasonLength(result: ChatManager.MessageFilteringResult): Int =
-        result.actionReason?.let { fontRenderer().getStringWidth(it) } ?: 0
+        result.getReason()?.let { fontRenderer().getStringWidth(it) } ?: 0
 
     private val historySize =
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
@@ -50,31 +51,31 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         var mouseY = originalMouseY - (t - scroll).toInt() - 5
 
         for (msg in history) {
-            GuiRenderUtils.drawString(msg.actionKind.renderedString, 0, 0, -1)
-            msg.actionReason?.let { GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1) }
-            var size = drawMultiLineText(msg.message, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
-            msg.modified?.let {
-                GuiRenderUtils.drawString("§e§lNEW TEXT", 0, 0, -1)
-                size += drawMultiLineText(it, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
-            }
+            val messageLines = splitLine(msg.message)
+            val modifiedLines = msg.modified?.let { splitLine(it) }.orEmpty()
+            val size = messageLines.size + modifiedLines.size
+
             val isHovered = mouseX in 0..w && mouseY in 0..<(size * 10) && originalMouseY >= t + 5
 
             if (isHovered) {
-                DrawContextUtils.translate(0f, 0f, -1f)
-                GuiRenderUtils.drawGradientRect(0, -size * 10 - 2, w, 0)
-                DrawContextUtils.translate(0f, 0f, 1f)
+                GuiRenderUtils.drawRect(0, -2, w, size * 10, 0x20FFFFFF)
+            }
+
+            GuiRenderUtils.drawString(msg.actionKind.renderedString, 0, 0, -1)
+            msg.getReason()?.let {
+                GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1)
+            }
+            drawMultipleTextLines(messageLines, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
+            msg.modified?.let {
+                GuiRenderUtils.drawString("§e§lNEW TEXT", 0, 0, -1)
+                drawMultipleTextLines(modifiedLines, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             }
 
             if (isHovered && msg.hoverInfo.isNotEmpty()) queuedTooltip = msg.hoverInfo
             if (isHovered && KeyboardManager.isShiftKeyDown() && msg.hoverExtraInfo.isNotEmpty()) queuedTooltip = msg.hoverExtraInfo
             if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
-                    //#if MC < 1.21
-                    OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
-                    //#else
-                    //$$ val serialize = Text.Serializer(DynamicRegistryManager.EMPTY).serialize(msg.message, null, null)
-                    //$$ OSUtils.copyToClipboard(serialize.toString())
-                    //#endif
+                    OSUtils.copyToClipboard(msg.message.convertToJsonString())
                     ChatUtils.chat("Copied structured chat line to clipboard", false)
                 } else {
                     val message = msg.message.formattedText.stripHypixelMessage()
@@ -88,7 +89,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         wasMouseButtonDown = isMouseButtonDown
         DrawContextUtils.popMatrix()
         queuedTooltip?.let { tooltip ->
-            RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
+            RenderableTooltips.setTooltipForRender(tooltip.map(StringRenderable::from))
         }
     }
 
@@ -106,13 +107,11 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         this.scroll = newScroll.coerceAtMost(historySize - h + 10.0).coerceAtLeast(0.0)
     }
 
-    private fun drawMultiLineText(comp: IChatComponent, xPos: Int): Int {
-        val lines = splitLine(comp)
+    private fun drawMultipleTextLines(lines: List<String>, xPos: Int) {
         for (line in lines) {
             GuiRenderUtils.drawString(line, xPos, 0, -1)
             DrawContextUtils.translate(0f, 10f, 0f)
         }
-        return lines.size
     }
 
     private fun fontRenderer() = Minecraft.getMinecraft().fontRendererObj

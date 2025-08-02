@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.config.features.event.hoppity
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HoppityEggsConfig {
     @Expose
@@ -80,9 +83,29 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Prevent Missing Rabbit the Fish",
-        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.",
+        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.\n" +
+            "§eHold §cShift §eto bypass.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var preventMissingRabbitTheFish: Boolean = true
+
+    enum class EggSoundMode(private val displayName: String) {
+        NO_MODIFICATION("No Modification"),
+        MUTE("Mute Sounds"),
+        REVERT("Revert to Eat Sound"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigOption(
+        name = "Modify Egg Sounds",
+        desc = "Mute or revert the note block sounds when opening an egg."
+    )
+    @ConfigEditorDropdown
+    @OnlyModern
+    @SearchTag("rolling eat")
+    var soundMode: EggSoundMode = EggSoundMode.NO_MODIFICATION
 }

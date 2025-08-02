@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -16,15 +15,17 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
@@ -45,7 +46,9 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
     private var scrollValue = ScrollValue()
 
     open fun addCoins(amount: Int, command: Boolean) {
-        addItem(SKYBLOCK_COIN, amount, command)
+        modify {
+            it.addItem(SKYBLOCK_COIN, amount, command)
+        }
     }
 
     open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
@@ -167,20 +170,18 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
                 onLeftClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
+                    // TODO remove unnecessary update call, as both invokes above call the modify fun. in modify there is also a update call
                     update()
                 },
-            ) else Renderable.string(string)
+            ) else Renderable.text(string)
 
             val row = mutableMapOf<TextPart, Renderable>()
             row[TextPart.NAME] = string(" $displayName")
 
-            val itemStackOrNull = if (internalName == SKYBLOCK_COIN) {
-                ItemUtils.getCoinItemStack(amount)
+            row[TextPart.ICON] = if (internalName == SKYBLOCK_COIN) {
+                Renderable.item(ItemUtils.getCoinItemStack(amount))
             } else {
-                internalName.getItemStackOrNull()
-            }
-            itemStackOrNull?.let {
-                row[TextPart.ICON] = Renderable.itemStack(it)
+                Renderable.item(internalName)
             }
 
             row[TextPart.TOTAL_PRICE] = string(" $priceFormat")
@@ -230,7 +231,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         add("§7to edit the number.")
         add("§7Use negative numbers to remove items.")
 
-        if (SkyHanniDebugsAndTests.enabled) {
+        if (SkyBlockUtils.debug) {
             add("")
             add("§7$internalName")
         }

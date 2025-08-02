@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
 import net.minecraft.client.audio.SoundCategory
@@ -22,6 +21,7 @@ import net.minecraft.client.audio.PositionedSound
 @SkyHanniModule
 object SoundUtils {
 
+    private val config get() = SkyHanniMod.feature.misc
     private val beepSoundCache = mutableMapOf<Float, ISound>()
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
@@ -30,10 +30,15 @@ object SoundUtils {
 
     fun ISound.playSound() {
         DelayedRun.onThread.execute {
-            val oldLevel = Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.PLAYERS)
-            if (!SkyHanniMod.feature.misc.maintainGameVolume) {
-                Minecraft.getMinecraft().soundHandler.setSoundLevel(SoundCategory.PLAYERS, 1f)
-            }
+            //#if MC < 1.21
+            val category = SoundCategory.PLAYERS
+            //#else
+            //$$ val category = this.category
+            //#endif
+
+            val oldLevel = Minecraft.getMinecraft().gameSettings.getSoundLevel(category)
+            if (!config.maintainGameVolume) category.setLevel(1f)
+
             try {
                 Minecraft.getMinecraft().soundHandler.playSound(this)
             } catch (e: IllegalArgumentException) {
@@ -50,12 +55,13 @@ object SoundUtils {
                     "soundLocation" to this.soundLocation,
                 )
             } finally {
-                if (!SkyHanniMod.feature.misc.maintainGameVolume) {
-                    Minecraft.getMinecraft().soundHandler.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
-                }
+                if (!config.maintainGameVolume) category.setLevel(oldLevel)
             }
         }
     }
+
+    private fun SoundCategory.setLevel(level: Float) =
+        Minecraft.getMinecraft().soundHandler.setSoundLevel(this, level)
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
         //#if MC < 1.21
@@ -107,7 +113,7 @@ object SoundUtils {
 
     // TODO use duration for delay
     fun repeatSound(delay: Long, repeat: Int, sound: ISound) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             repeat(repeat) {
                 sound.playSound()
                 delay(delay)

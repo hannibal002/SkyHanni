@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
@@ -64,6 +65,10 @@ object CorpseTracker {
         override fun getCoinDescription(bucket: CorpseType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
         override fun CorpseType.isBucketSelectable() = true
+
+        override fun bucketName(): String {
+            return "Corpse"
+        }
 
         @Expose
         var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
@@ -125,7 +130,7 @@ object CorpseTracker {
             val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.repoItemName else "§eCorpse Keys"
             val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
             add(
-                if (applicableKeys.count() == 1) Renderable.string(keyFormat).toSearchable()
+                if (applicableKeys.count() == 1) Renderable.text(keyFormat).toSearchable()
                 else Renderable.hoverTips(
                     keyFormat,
                     keyCostStrings,

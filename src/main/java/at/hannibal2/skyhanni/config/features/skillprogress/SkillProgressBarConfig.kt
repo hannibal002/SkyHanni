@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.skillprogress
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -34,7 +35,7 @@ class SkillProgressBarConfig {
     @Expose
     @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.\n§eIgnored if Chroma is enabled.")
     @ConfigEditorColour
-    var barStartColor: String = "0:255:255:0:0"
+    var barStartColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 0, 255)
 
     @Expose
     @ConfigOption(name = "Textured Bar", desc = "")

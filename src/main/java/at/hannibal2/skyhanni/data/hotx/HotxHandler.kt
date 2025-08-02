@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.data.hotx
 
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -15,11 +17,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import kotlin.reflect.KClass
 
 abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: Collection<Data>)
     where RotPerkE : Enum<*>,
-          RotPerkE : RepoPatternEnum {
+          RotPerkE : RotatingPerk {
 
     /**
      * Name of the Tree Eg: HotM, HotF
@@ -49,7 +50,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     protected abstract val resetTokensPattern: Pattern
     protected abstract val readingLevelTransform: Matcher.() -> Int
 
-    var inInventory: Boolean = false
+    val inApplicableIsland: Boolean get() = applicableIslandType.inAny()
+    val inInventory: Boolean get() = treeInventoryDetector.isInside()
     var heartItem: Slot? = null
 
     init {
@@ -113,7 +115,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         entry.enabled = lore.any { enabledPattern.matches(it) }
 
         fetchRotatingPerk(entry, lore)?.let {
-            setRotatingPerk(it)
+            currentRotPerk = it
         }
         extraHandling(entry, lore)
     }
@@ -168,9 +170,15 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         availableTokens = tokens
     }
 
+    private val treeInventoryDetector by lazy {
+        InventoryDetector(
+            pattern = inventoryPattern,
+            openInventory = ::onInventoryFullyOpened,
+            closeInventory = ::onInventoryClose,
+        )
+    }
+
     open fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!inInventory) return
-        inInventory = false
         data.forEach {
             it.slot = null
             it.item = null
@@ -179,23 +187,21 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     }
 
     open fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        inInventory = inventoryPattern.matches(event.inventoryName)
-        if (!inInventory) return
         DelayedRun.runNextTick {
             InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
             extraInventoryHandling()
         }
     }
 
-    abstract val rotatingPerkClazz: KClass<RotPerkE>
-    abstract val rotatingPerks: List<RotPerkE>
-    private val rotatingPerkClassName by lazy { rotatingPerkClazz.java.simpleName.removeSuffix("Perk") }
+    protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
+    protected abstract val rotatingPerks: List<RotPerkE>
+    protected abstract val applicableIslandType: IslandTypeTag
+    abstract var currentRotPerk: RotPerkE?
+        protected set
 
     abstract val resetChatPattern: Pattern
-    open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
 
     abstract fun extraChatHandling(event: SkyHanniChatEvent)
-    abstract fun setRotatingPerk(newRotatingPerk: RotPerkE?)
 
     open fun onChat(event: SkyHanniChatEvent) {
         if (resetChatPattern.matches(event.message)) {
@@ -211,12 +217,11 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         rotatingPerkPattern.matchMatcher(event.message) {
             val perkString = group("perk")
             val foundPerk = rotatingPerks.firstNotNullOfOrNull { perk ->
-                if (perk !is ChatRepoPatternEnum) return@firstNotNullOfOrNull null
                 if (!perk.chatPattern.matches(perkString)) return@firstNotNullOfOrNull null
                 perk
             } ?: return false
             tryBlock(event)
-            setRotatingPerk(foundPerk)
+            currentRotPerk = foundPerk
             return true
         }
         return null
@@ -229,7 +234,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
         val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: run {
             ErrorManager.logErrorStateWithData(
-                "Could not read the $rotatingPerkClassName effect from the $name tree",
+                "Could not read the ${rotatingPerkEntry.guiName} effect from the $name tree",
                 "itemPreEffectPattern didn't match",
                 "lore" to lore,
             )
@@ -238,17 +243,20 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         val nextLine = lore[index + 1]
         val perkLore = HotxPatterns.rotatingPerkPattern.matchGroup(nextLine, "perk") ?: return null
         val perkEnum: RotPerkE? = rotatingPerks.firstNotNullOfOrNull { perk ->
-            if (perk !is ItemRepoPatternEnum) null
-            else if (perk.itemPattern.matches(perkLore)) perk
+            if (perk.itemPattern.matches(perkLore)) perk
             else null
         }
         if (perkEnum == null) {
             ErrorManager.logErrorStateWithData(
-                "Could not read the $rotatingPerkClassName effect from the $name tree",
+                "Could not read the ${rotatingPerkEntry.guiName} effect from the $name tree",
                 "no itemPattern matched",
                 "nextLine" to nextLine,
             )
         }
         return perkEnum
+    }
+
+    interface RotatingPerk {
+        val perkDescription: String
     }
 }

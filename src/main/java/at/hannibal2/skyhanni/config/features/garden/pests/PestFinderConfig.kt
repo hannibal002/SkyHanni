@@ -19,7 +19,7 @@ class PestFinderConfig {
     var showDisplay: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show Plot in World", desc = "Mark infested plot names and world border in the world.")
+    @ConfigOption(name = "Show Plot in World", desc = "Mark infested plots in the world.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showPlotInWorld: Boolean = true
@@ -39,26 +39,25 @@ class PestFinderConfig {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Only With Vacuum",
-        desc = "Only show the pest display and waypoints while holding a vacuum in the hand."
-    )
-    @ConfigEditorBoolean
-    var onlyWithVacuum: Boolean = true
+    @ConfigOption(name = "When to Show", desc = "Change when the pest display and plot markers should be visible in the Garden.")
+    @ConfigEditorDropdown
+    var whenToShow: WhenToShow = WhenToShow.ALWAYS
+
+    enum class WhenToShow(private val displayName: String) {
+        ALWAYS("Always"),
+        BOTH("Vacuum or Lasso in hand"),
+        ONLY_WITH_VACUUM_IN_HAND("Vacuum in hand"),
+        ONLY_WITH_LASSO_IN_HAND("Lasso in hand"),
+        ;
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(
-        name = "Mute Vacuum",
-        desc = "Mute the pest vacuum when using its right click ability."
-    )
-    @ConfigEditorBoolean
-    var muteVacuum: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Show For Seconds",
-        desc = "Show plots border for a given amount of seconds after holding a vacuum.\n" +
-            "§e0 = Always show when holding vacuum"
+        name = "Show After Holding",
+        desc = "How many seconds the plot borders should remain visible for " +
+            "after switching away from the item(s) specified in 'When To Show'.",
     )
     @ConfigEditorSlider(minStep = 1f, minValue = 0f, maxValue = 10f)
     var showBorderForSeconds: Int = 1

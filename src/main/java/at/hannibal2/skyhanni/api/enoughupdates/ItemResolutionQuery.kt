@@ -141,11 +141,13 @@ class ItemResolutionQuery {
                 "$prefix$cleanedEnchantName;${group("level").romanToDecimal()}".uppercase()
             }
 
+        // TODO repo
         private fun String.renamedEnchantmentCheck(): String = when (this) {
             "Turbo-Cocoa" -> "Turbo-Coco"
             "Turbo-Cacti" -> "Turbo-Cactus"
             "Prismatic" -> "Pristine"
             "Dragon Tracer" -> "Aiming"
+            "Drain" -> "Syphon"
             else -> this
         }
 
@@ -188,7 +190,7 @@ class ItemResolutionQuery {
         resolvedName = if (resolvedName == null) {
             resolveContextualName()
         } else {
-            when (resolvedName.intern()) {
+            when (resolvedName) {
                 "PET" -> resolvePetName()
                 "RUNE", "UNIQUE_RUNE" -> resolveRuneName()
                 "ENCHANTED_BOOK" -> resolveEnchantedBookNameFromNBT()
@@ -338,7 +340,7 @@ class ItemResolutionQuery {
         if (guiName == "Attribute Menu") {
             return resolveItemInAttributeMenu(compound.getLore())
         }
-        if (guiName == "Hunting Box" || guiName == "Fusion Box") {
+        if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
             return resolveItemInHuntingBoxMenu(displayName)
         }
         return null
@@ -357,11 +359,7 @@ class ItemResolutionQuery {
         return lore.contains("§7To Bazaar")
     }
 
-    private fun getExtraAttributes(): NBTTagCompound {
-        compound?.let {
-            return it.extraAttributes
-        } ?: return NBTTagCompound()
-    }
+    private fun getExtraAttributes(): NBTTagCompound = compound?.extraAttributes ?: NBTTagCompound()
 
     private fun resolveFromSkyblock(): String? {
         val internalName = getExtraAttributes().getString("id")

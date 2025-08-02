@@ -4,25 +4,30 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
 @SkyHanniModule
@@ -37,18 +42,20 @@ object AttributeShardOverlay {
     private var unlockedShards = 0
     private var maxedShards = 0
     private var totalShardLevels = 0
+    private var priceToMax = 0.0
 
     private var lastShardsData: Map<String, ProfileSpecificStorage.AttributeShardData> = emptyMap()
-    private var lastTotalSyphoned = 0
+    private var lastItemIdsInInventory: Set<NeuInternalName> = setOf()
+    private var lastTotalShardsCollected = 0
 
     fun updateDisplay() {
         if (!config.enabled) return
-        val newData = storage?.toMap().orEmpty()
-        val newTotalSyphoned = newData.values.sumOf { it.amountSyphoned }
+        val newData = storage?.toMap().orEmpty().filter { it.key !in AttributeShardsData.unconsumableAttributes }
+        val newTotalShardsCollected = newData.values.sumOf { it.amountSyphoned + it.amountInBox }
 
-        if (lastShardsData == newData && newTotalSyphoned == lastTotalSyphoned) return
+        if (lastShardsData == newData && newTotalShardsCollected == lastTotalShardsCollected) return
         lastShardsData = newData
-        lastTotalSyphoned = newTotalSyphoned
+        lastTotalShardsCollected = newTotalShardsCollected
 
         reconstructDisplay()
     }
@@ -63,7 +70,7 @@ object AttributeShardOverlay {
 
     enum class AttributeShardPriceSource(val displayName: String, val priceSource: ItemPriceSource) {
         INSTANT_BUY("BZ Instant Buy", ItemPriceSource.BAZAAR_INSTANT_BUY),
-        SELL_ORDER("BZ Sell Order", ItemPriceSource.BAZAAR_INSTANT_SELL),
+        SELL_ORDER("BZ Buy Order", ItemPriceSource.BAZAAR_INSTANT_SELL),
         ;
 
         override fun toString(): String = displayName
@@ -82,11 +89,18 @@ object AttributeShardOverlay {
         unlockedShards = 0
         maxedShards = 0
         totalShardLevels = 0
+        priceToMax = 0.0
 
         val lines = mutableListOf<AttributeShardDisplayLine>()
 
-        for ((shardName, shardData) in lastShardsData) {
-            val shardInternalName = AttributeShardsData.shardNameToInternalName(shardName)
+        lastItemIdsInInventory = InventoryUtils.getItemIdsInOpenChest()
+        val filteredShards = lastShardsData.filter { shardData ->
+            !config.onlyCurrentInventory || AttributeShardsData.shardNameToInternalName(shardData.key) in lastItemIdsInInventory
+        }
+
+        for ((shardName, shardData) in filteredShards) {
+            val shardInternalName = AttributeShardsData.shardNameToInternalName(shardName) ?: continue
+
             val amountSyphoned = shardData.amountSyphoned
             val (tier, toNextTier, toMax) = AttributeShardsData.findTierAndAmountUntilNext(shardName, amountSyphoned)
             if (tier == 10) {
@@ -102,6 +116,7 @@ object AttributeShardOverlay {
                     currentTier = tier,
                     amountToNextTier = toNextTier,
                     amountUntilMaxed = toMax,
+                    amountInHuntingBox = if (config.includeHuntingBox) shardData.amountInBox else 0,
                 ),
             )
         }
@@ -116,22 +131,28 @@ object AttributeShardOverlay {
             true
         }
 
+        val adjustedMaxShards = if (config.onlyCurrentInventory) lastItemIdsInInventory.size else AttributeShardsData.maxShards
+
         display = buildList {
-            add(StringRenderable("§eAttribute Shard Overlay"))
-            add(StringRenderable("§7Found Shards: §a$unlockedShards/${AttributeShardsData.maxShards}"))
-            add(StringRenderable("§7Maxed Shards: §a$maxedShards/${AttributeShardsData.maxShards}"))
-            add(StringRenderable("§7Total Shard Levels: §a$totalShardLevels/${AttributeShardsData.maxShards * 10}"))
+            addString("§eAttribute Shard Overlay")
+            addString("§7Found Shards: §a$unlockedShards/$adjustedMaxShards")
+            addString("§7Maxed Shards: §a$maxedShards/$adjustedMaxShards")
+            addString("§7Total Shard Levels: §a$totalShardLevels/${adjustedMaxShards * 10}")
             if (shardsWithData != AttributeShardsData.maxShards) {
                 val missingAmount = AttributeShardsData.maxShards - shardsWithData
                 val plural = StringUtils.pluralize(missingAmount, "shard")
-                add(StringRenderable("§cMissing shard data for $missingAmount $plural"))
-                add(StringRenderable("§cPlease open /am and turn on advanced mode."))
+                addString("§cMissing shard data for $missingAmount $plural")
+                addString("§cPlease open /am and turn on advanced mode.")
             }
             if (filtered.isEmpty()) {
-                add(StringRenderable("§cNo Shards Found"))
-                add(StringRenderable("§cTry changing your settings below."))
+                addString("§cNo Shards Found")
+                addString("§cTry changing your settings below.")
             } else {
                 add(filtered.map { it.renderLine }.buildSearchableScrollable(height = 225, textInput, velocity = 25.0))
+            }
+            if (priceToMax > 0) {
+                val description = if (config.onlyCurrentInventory) "Shown" else "All"
+                addString("§7Total Price to Max $description Shards: §6${priceToMax.shortFormat()}")
             }
             addButtons()
         }
@@ -177,6 +198,47 @@ object AttributeShardOverlay {
                 reconstructDisplay()
             },
         )
+
+        addRenderableButton(
+            label = "Include Hunting Box",
+            config = config::includeHuntingBox,
+            enabled = "Include Hunting Box",
+            disabled = "Exclude Hunting Box",
+            onChange = {
+                reconstructDisplay()
+            },
+        )
+
+        addRenderableButton(
+            label = "Only Current Inventory",
+            config = config::onlyCurrentInventory,
+            enabled = "Only in Current Inventory",
+            disabled = "Show All Shards",
+            onChange = {
+                reconstructDisplay()
+            },
+        )
+
+        addResetHuntingBoxDataButton()
+    }
+
+    private fun MutableList<Renderable>.addResetHuntingBoxDataButton() {
+        if (!config.includeHuntingBox) return
+
+        val clickable = Renderable.clickable(
+            "§7Reset hunting box shards",
+            tips = listOf(
+                "§cThis will reset your",
+                "§ctracked hunting box shards",
+                "§cif there is an error with the data",
+            ),
+            onLeftClick = {
+                storage?.forEach { it.value.amountInBox = 0 }
+                ChatUtils.chat("Reset hunting box shards data")
+                reconstructDisplay()
+            }
+        )
+        add(clickable)
     }
 
     private fun createShardRenderable(
@@ -184,43 +246,62 @@ object AttributeShardOverlay {
         currentTier: Int,
         amountToNextTier: Int,
         amountUntilMaxed: Int,
+        amountInHuntingBox: Int,
     ): AttributeShardDisplayLine {
         val individualPrice = internalName.getPrice(config.overlayPriceSource.priceSource)
-        val priceUntilNextTier = individualPrice * amountToNextTier
-        val priceUntilMaxed = individualPrice * amountUntilMaxed
+
+        val actualAmountToNextTier = (amountToNextTier - amountInHuntingBox).coerceAtLeast(0)
+        val actualAmountUntilMaxed = (amountUntilMaxed - amountInHuntingBox).coerceAtLeast(0)
+
+        val priceUntilNextTier = individualPrice * actualAmountToNextTier
+        val priceUntilMaxed = individualPrice * actualAmountUntilMaxed
         val shardItemName = internalName.repoItemName
+
+        val priceToNextTierString = if (actualAmountToNextTier == 0) {
+            "§aEnough in Hunting Box"
+        } else {
+            "§6${(individualPrice * actualAmountToNextTier).shortFormat()}"
+        }
+        val priceUntilMaxedString = if (actualAmountUntilMaxed == 0) {
+            "§aEnough in Hunting Box"
+        } else {
+            "§6${(individualPrice * actualAmountUntilMaxed).shortFormat()}"
+        }
+
+        priceToMax += priceUntilMaxed
 
         val priceString = when {
             currentTier == 10 -> "§a§lMaxed"
-            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> "§6${priceUntilMaxed.shortFormat()}"
-            else -> "§6${priceUntilNextTier.shortFormat()}"
+            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> "§6$priceUntilMaxedString"
+            else -> "§6$priceToNextTierString"
         }
 
         val bazaarAmount = when {
-            currentTier == 10 -> 1
-            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> amountUntilMaxed
-            else -> amountToNextTier
-        }
+            actualAmountUntilMaxed == 0 -> 1
+            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> actualAmountUntilMaxed
+            else -> actualAmountToNextTier
+        }.coerceAtLeast(1)
 
         val tooltip = buildList {
             add(shardItemName)
             add("§7Current Tier: §e$currentTier")
             add("§7Price per Shard: §6${individualPrice.shortFormat()}")
+            add("§7Amount in Hunting Box: §a${amountInHuntingBox.addSeparators()}")
             if (currentTier < 10) {
                 if (currentTier != 9) {
                     add("")
-                    add("§7Amount to Next Tier: §a$amountToNextTier")
-                    add("§7Price to Next Tier: §6${priceUntilNextTier.shortFormat()}")
+                    if (actualAmountToNextTier != 0) add("§7Amount to Next Tier: §a$actualAmountToNextTier")
+                    add("§7Price to Next Tier: §6$priceToNextTierString")
                 }
                 add("")
-                add("§7Amount Until Maxed: §a$amountUntilMaxed")
-                add("§7Price Until Maxed: §6${priceUntilMaxed.shortFormat()}")
+                if (actualAmountUntilMaxed != 0) add("§7Amount Until Maxed: §a$actualAmountUntilMaxed")
+                add("§7Price Until Maxed: §6$priceUntilMaxedString")
             }
             add("")
             add("§eClick to open on bazaar!")
         }
 
-        val stack = ItemStackRenderable(internalName.getItemStack())
+        val stack = Renderable.item(internalName.getItemStack())
 
         val clickable = Renderable.clickable(
             " §7- $shardItemName §e$currentTier $priceString",
@@ -229,13 +310,24 @@ object AttributeShardOverlay {
                 BazaarApi.searchForBazaarItem(shardItemName, bazaarAmount)
             },
         )
-        val searchable = HorizontalContainerRenderable(
-            listOf(stack, clickable),
-        ).toSearchable(shardItemName)
+        val searchable = Renderable.horizontal(stack, clickable).toSearchable(shardItemName)
 
         return AttributeShardDisplayLine(
             shardItemName.removeColor(), currentTier, priceUntilNextTier, priceUntilMaxed, searchable,
         )
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!AttributeShardsData.attributeMenuInventory.isInside()) return
+        if (!config.onlyCurrentInventory) return
+
+        DelayedRun.runNextTick {
+            val newItemIds = InventoryUtils.getItemIdsInOpenChest()
+            if (lastItemIdsInInventory != newItemIds) {
+                reconstructDisplay()
+            }
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)

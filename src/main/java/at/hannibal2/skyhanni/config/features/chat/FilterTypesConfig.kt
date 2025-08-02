@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -16,6 +17,18 @@ class FilterTypesConfig {
     @ConfigOption(name = "Crystal Nucleus", desc = "")
     @Accordion
     val crystalNucleus: CrystalNucleusConfig = CrystalNucleusConfig()
+
+    @Expose
+    @ConfigOption(name = "Foraging", desc = "")
+    @OnlyModern
+    @Accordion
+    val foraging: ForagingFilterConfig = ForagingFilterConfig()
+
+    @Expose
+    @ConfigOption(name = "Hunting", desc = "")
+    @OnlyModern
+    @Accordion
+    val hunting: HuntingFilterConfig = HuntingFilterConfig()
 
     @Expose
     @ConfigOption(name = "Stash Messages", desc = "")
@@ -77,7 +90,7 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(
         name = "Watchdog",
-        desc = "Hide the message where Hypixel flexes about how many players they have banned over the last week."
+        desc = "Hide the message where Hypixel flexes about how many players they have banned over the last week.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -96,6 +109,12 @@ class FilterTypesConfig {
     var fireSale: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Reward Bundles", desc = "Hide the reminders to claim seasonal reward bundles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var rewardBundles: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Event Level Up", desc = "Hide event level up messages.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -104,7 +123,7 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(
         name = "Diana",
-        desc = "Hide chat messages around griffin burrow chains, griffin feather drops, and coin drops."
+        desc = "Hide chat messages around griffin burrow chains, griffin feather drops, and coin drops.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -114,7 +133,7 @@ class FilterTypesConfig {
     @ConfigOption(
         name = "Factory Upgrade",
         desc = "Hide §nHypixel's§r Chocolate Factory upgrade and employee promotion messages.\n" +
-            "§eTo turn off SkyHanni's upgrade messages, search §lUpgrade Warning"
+            "§eTo turn off SkyHanni's upgrade messages, search §lUpgrade Warning",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -147,7 +166,7 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(
         name = "Parkour Messages",
-        desc = "Hide parkour messages (starting, stopping, reaching a checkpoint)."
+        desc = "Hide parkour messages (starting, stopping, reaching a checkpoint).",
     )
     @ConfigEditorBoolean
     @FeatureToggle

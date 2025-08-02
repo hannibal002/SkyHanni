@@ -31,6 +31,11 @@ class PestsConfig {
     val pestTimer: PestTimerConfig = PestTimerConfig()
 
     @Expose
+    @ConfigOption(name = "Pest Trap", desc = "")
+    @Accordion
+    val pestTrap: PestTrapConfig = PestTrapConfig()
+
+    @Expose
     @ConfigOption(name = "Pest Profit Tracker", desc = "")
     @Accordion
     val pestProfitTacker: PestProfitTrackerConfig = PestProfitTrackerConfig()
@@ -49,6 +54,14 @@ class PestsConfig {
     @Accordion
     @Expose
     val pesthunterShop: PesthunterShopConfig = PesthunterShopConfig()
+
+    @Expose
+    @ConfigOption(
+        name = "Mute Vacuum",
+        desc = "Mute the pest vacuum when using its right click ability.",
+    )
+    @ConfigEditorBoolean
+    var muteVacuum: Boolean = false
 
     @Expose
     @ConfigOption(name = "Bonus Chance Display", desc = "Displays your bonus pest chance and if it is enabled or not.")

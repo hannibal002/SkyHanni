@@ -207,8 +207,36 @@ object HypixelCommands {
         send("locraw")
     }
 
+    fun starlynSisters() {
+        send("starlynsisterlevels")
+    }
+
     fun attributeMenu() {
         send("attributemenu")
+    }
+
+    fun treeGifts() {
+        send("treegifts")
+    }
+
+    fun trades() {
+        send("trades")
+    }
+
+    fun accessories() {
+        send("accessories")
+    }
+
+    fun potionBag() {
+        send("potionbag")
+    }
+
+    fun quiver() {
+        send("quiver")
+    }
+
+    fun fishingBag() {
+        send("fishingbag")
     }
 
     private fun send(command: String) {

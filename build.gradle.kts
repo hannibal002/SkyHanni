@@ -17,9 +17,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
+import skyhannibuildsystem.PublishToModrinth
 import java.io.Serializable
 import java.nio.file.Path
-import java.util.Properties
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.moveTo
@@ -64,8 +64,11 @@ loom {
             mixinConfig("mixins.skyhanni.json")
         }
     }
-    if (target == ProjectTarget.MODERN) {
-        accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
+    if (target.isModern) {
+        val accessWidenerFile = file("src/main/resources/skyhanni.accesswidener")
+        if (accessWidenerFile.exists()) {
+            accessWidenerPath = accessWidenerFile
+        }
     }
     @Suppress("UnstableApiUsage")
     mixin {
@@ -78,7 +81,7 @@ loom {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(false)
                 this.runDir(runDirectory.relativeTo(projectDir).toString())
-            } else if (target == ProjectTarget.MODERN) {
+            } else if (target.isModern) {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(true)
                 this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
@@ -121,13 +124,26 @@ val headlessLwjgl: Configuration by configurations.creating {
 }
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
-    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+    this.user = "hannibal002"
+    this.repo = "SkyHanni-Repo"
     this.branch = "main"
+    this.resourcePath = "assets/skyhanni/repo.zip"
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+}
+
+val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
+    this.user = "NotEnoughUpdates"
+    this.repo = "NotEnoughUpdates-Repo"
+    this.branch = "master"
+    this.resourcePath = "assets/skyhanni/neu-repo.zip"
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
 val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
     this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
+
+val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
     this.javaLauncher.set(
@@ -139,8 +155,8 @@ tasks.runClient {
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = project.findProperty("prTitle") as String
-    this.prBody = project.findProperty("prBody") as String
+    this.prTitle = project.findProperty("prTitle") as? String ?: ""
+    this.prBody = project.findProperty("prBody") as? String ?: ""
 }
 
 // Disabled because it breaks mixins with the minecraft dev plugin
@@ -173,6 +189,9 @@ dependencies {
 
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
+    ksp(libs.autoservice.ksp)
+    implementation(libs.autoservice.annotations)
+
     val mixinVersion = if (target == ProjectTarget.MAIN) "0.7.11-SNAPSHOT" else "0.8.2"
 
     if (!target.isFabric) {
@@ -182,19 +201,14 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
-    } else if (target == ProjectTarget.BRIDGE116FABRIC) {
-        modImplementation("net.fabricmc:fabric-loader:0.16.7")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
-    } else if (target == ProjectTarget.MODERN) {
-        modImplementation("net.fabricmc:fabric-loader:0.16.13")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5")
-        // on fabric everyone be using the kotlin language mod so we don't need to bundle kotlin ourselves
-        modImplementation("net.fabricmc:fabric-language-kotlin:1.13.2+kotlin.2.1.20")
-
-        modImplementation(libs.modmenu)
+    } else {
+        target.fabricLoaderVersion?.let { modImplementation(it) }
+        target.fabricApiVersion?.let { modImplementation(it) }
+        modImplementation(libs.fabricLanguageKotlin)
+        target.modMenuVersion?.let { modImplementation("maven.modrinth:modmenu:$it") }
     }
 
-    if (target != ProjectTarget.MODERN) {
+    if (!target.isModern) {
         implementation(kotlin("stdlib-jdk8"))
         shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
             exclude(group = "org.jetbrains.kotlin")
@@ -222,15 +236,15 @@ dependencies {
 
     if (target == ProjectTarget.MAIN) {
         shadowModImpl(libs.moulconfig)
-    } else if (target == ProjectTarget.MODERN) {
-        shadowModImpl(libs.moulconfigModern)
-        include(libs.moulconfigModern)
+    } else if (target.isModern) {
+        shadowModImpl("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")
+        include("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")
     }
     @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
-    if (target != ProjectTarget.MODERN) {
+    if (!target.isModern) {
         shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     }
     implementation(libs.hotswapagentforge)
@@ -245,12 +259,12 @@ dependencies {
     if (target.minecraftVersion == MinecraftVersion.MC189) {
         compileOnly(libs.hypixelmodapi.forge)
         shadowImpl(libs.hypixelmodapitweaker)
-    } else if (target == ProjectTarget.MODERN) {
+    } else if (target.isModern) {
         modImplementation(libs.hypixelmodapi)
         include(libs.hypixelmodapi.fabric)
     }
 
-    if (target == ProjectTarget.MODERN) {
+    if (target.isModern) {
         modCompileOnly(libs.roughlyenoughitems) {
             exclude(group = "net.fabricmc.fabric-api")
         }
@@ -268,7 +282,7 @@ afterEvaluate {
     loom.runs.named("client") {
         if (target == ProjectTarget.MAIN) {
             programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
-        } else if (target == ProjectTarget.MODERN) {
+        } else if (target.isModern) {
             programArgs("--quickPlayMultiplayer", "hypixel.net")
         }
     }
@@ -298,6 +312,7 @@ kotlin {
 // Tasks:
 tasks.processResources {
     from(includeBackupRepo)
+    from(includeBackupNeuRepo)
     inputs.property("version", version)
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
