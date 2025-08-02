@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.rift.area.mountaintop
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -24,4 +25,10 @@ class MountaintopConfig {
     )
     @ConfigEditorBoolean
     var enigmaRoseFlowerpot: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Ubik's Cube Reminder", desc = "Reminder when the 2 hours are over for Ubik's Cube in the Rift.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var ubikReminder: Boolean = false
 }

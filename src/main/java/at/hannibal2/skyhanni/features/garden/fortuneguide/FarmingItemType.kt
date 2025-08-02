@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -98,7 +98,7 @@ enum class FarmingItemType(
     fun getDisplay(clickEnabled: Boolean = false) = object : Renderable {
 
         val content = Renderable.clickable(
-            ItemStackRenderable(getItem(), scale = 1.0, xSpacing = 0, ySpacing = 0, rescaleSkulls = false).withTip(),
+            Renderable.item(getItem(), scale = 1.0, xSpacing = 0, ySpacing = 0, rescaleSkulls = false).withTip(),
             onLeftClick = onClick(),
             condition = { clickEnabled },
         )
@@ -108,7 +108,7 @@ enum class FarmingItemType(
         override val horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-        override fun render(posX: Int, posY: Int) {
+        override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
             GuiRenderUtils.drawRect(
                 0,
                 0,
@@ -116,7 +116,7 @@ enum class FarmingItemType(
                 height,
                 if (selectedState) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt(),
             )
-            content.render(posX, posY)
+            content.render(mouseOffsetX, mouseOffsetY)
         }
     }
 

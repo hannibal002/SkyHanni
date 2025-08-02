@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.rift
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
@@ -33,7 +34,7 @@ class EnigmaSoulConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Color of the Enigma Souls.")
     @ConfigEditorColour
-    var color: String = "0:245:219:27:198"
+    var color: ChromaColour = ChromaColour.fromStaticRGB(219, 27, 198, 245)
 
     @Expose
     @ConfigOption(

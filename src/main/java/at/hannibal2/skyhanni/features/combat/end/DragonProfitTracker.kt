@@ -21,9 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -64,6 +62,10 @@ object DragonProfitTracker {
             )
         }
 
+        override fun bucketName(): String {
+            return "Dragon"
+        }
+
         fun getTotalDragonCount(): Long {
             return if (selectedBucket == null || selectedBucket !in DragonType.values()) {
                 dragonKills.values.sum()
@@ -89,17 +91,13 @@ object DragonProfitTracker {
         val totalEyePrice = eyePrice * bucketData.eyesPlaced
         profit -= totalEyePrice
         val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §c${(-totalEyePrice).shortFormat()}"
-        add(
-            Renderable.string(eyeFormat).toSearchable("Summoning Eye"),
-        )
+        addSearchString(eyeFormat, "Summoning Eye")
 
         val colorCode = bucketData.selectedBucket?.color ?: LorenzColor.AQUA
         val displayName = bucketData.selectedBucket?.displayName ?: "Total Dragon"
         val killAmount = bucketData.getTotalDragonCount()
         val dragonString = "${colorCode.getChatColor()}$displayName §r§bkills: $killAmount"
-        add(
-            Renderable.string(dragonString).toSearchable(),
-        )
+        addSearchString(dragonString)
 
         add(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon"))
 
@@ -161,9 +159,7 @@ object DragonProfitTracker {
 
 
         val eyePrice = SkyHanniTracker.getPricePer(SUMMONING_EYE)
-        if (eyePrice != null) {
-            totalProfit -= eyePrice * lastPlaced
-        }
+        totalProfit -= eyePrice * lastPlaced
 
         val hover = lootMap.sortedDesc().keys.toMutableList()
 

@@ -2,14 +2,17 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -18,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -29,6 +31,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.Objects
@@ -42,19 +48,15 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                Renderable.string("$prefix$formattedAmount")
+                Renderable.text("$prefix$formattedAmount")
             },
         ),
         ICON(
             "§e✎",
             { entry, _ ->
-                val itemIcon = entry.neuInternalName?.getItemStackOrNull()
-                if (itemIcon != null) {
-                    Renderable.itemStack(itemIcon)
-                } else {
-                    ItemNameResolver.getInternalNameOrNull(entry.name)?.let { Renderable.itemStack(it.getItemStack()) }
-                        ?: Renderable.string("§c?")
-                }
+                val entryInternalName = entry.neuInternalName ?: ItemNameResolver.getInternalNameOrNull(entry.name)
+                if (entryInternalName != null) Renderable.item(entryInternalName)
+                else Renderable.text("§c?")
             },
         ),
         ITEM_NAME(
@@ -64,7 +66,7 @@ object ItemPickupLog {
                 if (entry.name == "Air") {
                     name = entry.neuInternalName?.repoItemName ?: "?"
                 }
-                Renderable.string(name)
+                Renderable.text(name)
             },
         ),
         ;
@@ -81,9 +83,18 @@ object ItemPickupLog {
         }
 
         fun isExpired() = timeUntilExpiry.passedSince() > config.expireAfter.seconds
+
+        fun getPlusRenderable(hash: Int) = renderableCache.getOrPut(hash to "§a+") {
+            renderList("§a+", this)
+        }
+        fun getMinusRenderable(hash: Int) = renderableCache.getOrPut(hash to "§c-") {
+            renderList("§c-", this)
+        }
     }
 
-    private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
+    private val renderableCache = mutableMapOf<Pair<Int, String>, Renderable>()
+    private val config get() = SkyHanniMod.feature.inventory.itemPickupLog
+    private val coinConfig get() = config.coinValue
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
     private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
@@ -106,7 +117,7 @@ object ItemPickupLog {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        display?.let { config.pos.renderRenderable(it, posLabel = "Item Pickup Log Display") }
+        display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
 
     @HandleEvent
@@ -130,6 +141,16 @@ object ItemPickupLog {
     }
 
     @HandleEvent
+    fun onShardGain(event: ShardGainEvent) {
+        if (!isEnabled() || !config.shards) return
+
+        val itemStack = event.shardInternalName.getItemStack()
+        val item = PickupEntry(itemStack.dynamicName(), event.amount.absoluteValue.toLong(), event.shardInternalName)
+
+        updateItem(itemStack.hash(), item, event.amount < 0)
+    }
+
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
@@ -137,38 +158,13 @@ object ItemPickupLog {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 
         oldItemList.putAll(itemList)
 
-        if (!InventoryUtils.inInventory()) {
-            itemList.clear()
-
-            val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, _ -> i != 8 }
-                ?.filterNotNull().orEmpty().toMutableList()
-            val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
-
-            if (cursorItem != null) {
-                val hash = cursorItem.hash()
-                // this prevents items inside hypixel guis counting when picked up
-                if (oldItemList.contains(hash)) {
-                    inventoryItems.add(cursorItem)
-                }
-            }
-
-            for (itemStack in inventoryItems) {
-                val hash = itemStack.hash()
-                val old = itemList[hash]
-                if (old != null) {
-                    itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
-                } else {
-                    itemList[hash] = itemStack to itemStack.stackSize
-                }
-            }
-        }
-
+        if (!InventoryUtils.inInventory()) handleNotInInventory(oldItemList)
         if (!worldChangeCooldown()) return
 
         checkForDuplicateItems(itemList, oldItemList, false)
@@ -183,6 +179,32 @@ object ItemPickupLog {
         }
     }
 
+    private fun handleNotInInventory(oldItemList: MutableMap<Int, Pair<ItemStack, Int>>) {
+        itemList.clear()
+
+        val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, _ -> i != 8 }
+            ?.filterNotNull().orEmpty().toMutableList()
+        val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
+
+        if (cursorItem != null) {
+            val hash = cursorItem.hash()
+            // this prevents items inside hypixel guis counting when picked up
+            if (oldItemList.contains(hash)) {
+                inventoryItems.add(cursorItem)
+            }
+        }
+
+        for (itemStack in inventoryItems) {
+            val hash = itemStack.hash()
+            val old = itemList[hash]
+            if (old != null) {
+                itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
+            } else {
+                itemList[hash] = itemStack to itemStack.stackSize
+            }
+        }
+    }
+
     // TODO merge with ItemAddInInventoryEvent
     private fun updateItem(hash: Int, itemInfo: PickupEntry, removed: Boolean) {
         val targetInventory = if (removed) itemsRemovedFromInventory else itemsAddedToInventory
@@ -190,10 +212,12 @@ object ItemPickupLog {
 
         oppositeInventory[hash]?.let { existingItem ->
             existingItem.timeUntilExpiry = SimpleTimeMark.now()
+            renderableCache.keys.removeIf { it.first == hash }
         }
 
         targetInventory[hash]?.let { existingItem ->
             existingItem.updateAmount(itemInfo.amount)
+            renderableCache.keys.removeIf { it.first == hash }
             return
         }
 
@@ -201,7 +225,7 @@ object ItemPickupLog {
         dirty = true
     }
 
-    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.line {
+    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontal {
         val displayLayout: List<DisplayLayout> = config.displayLayout
         for (item in displayLayout) {
             add(item.renderable(entry, prefix))
@@ -249,69 +273,81 @@ object ItemPickupLog {
         )
     }
 
+    private data class ItemPickupLogSnapshot(
+        val removedItems: MutableMap<Int, PickupEntry>,
+        val addedItems: MutableMap<Int, PickupEntry>,
+    ) {
+        val display: MutableList<Renderable> = mutableListOf()
+    }
+
     private fun updateDisplay() {
         if (!isEnabled()) return
 
-        val display = mutableListOf<Renderable>()
+        val currentSnapshot = ItemPickupLogSnapshot(itemsRemovedFromInventory.toMutableMap(), itemsAddedToInventory.toMutableMap())
+        with(currentSnapshot) {
+            if (config.compactLines) handleCompactLines()
+            else handleNormalLines()
 
-        val removedItemsToNoLongerShow = itemsRemovedFromInventory.toMutableMap()
-        val addedItemsToNoLongerShow = itemsAddedToInventory.toMutableMap()
+            addRemainingRemovedItems(display, removedItems)
 
-        if (config.compactLines) {
-            handleCompactLines(display, addedItemsToNoLongerShow, removedItemsToNoLongerShow)
-        } else {
-            handleNormalLines(display, addedItemsToNoLongerShow, removedItemsToNoLongerShow)
-        }
-
-        addRemainingRemovedItems(display, removedItemsToNoLongerShow)
-
-        if (display.isEmpty()) {
-            this.display = null
-        } else {
-            val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
-            this.display = Renderable.fixedSizeColumn(renderable, 30)
-        }
-    }
-
-    private fun handleCompactLines(
-        display: MutableList<Renderable>,
-        addedItems: MutableMap<Int, PickupEntry>,
-        removedItems: MutableMap<Int, PickupEntry>,
-    ) {
-        val iterator = addedItems.iterator()
-        while (iterator.hasNext()) {
-            val item = iterator.next()
-
-            if (removedItems.containsKey(item.key)) {
-                val currentTotalValue = item.value.amount - (removedItems[item.key]?.amount ?: 0)
-                val entry = PickupEntry(item.value.name, currentTotalValue, item.value.neuInternalName)
-
-                if (currentTotalValue > 0) {
-                    display.add(renderList("§a+", entry))
-                } else if (currentTotalValue < 0) {
-                    display.add(renderList("§c", entry))
-                } else {
-                    itemsAddedToInventory.remove(item.key)
-                    itemsRemovedFromInventory.remove(item.key)
+            this@ItemPickupLog.display = when {
+                display.isEmpty() -> null
+                else -> {
+                    computeTotalCoinValue(display)
+                    Renderable.fixedSizeColumn(
+                        Renderable.vertical(display, verticalAlign = config.alignment),
+                        30,
+                    )
                 }
-                removedItems.remove(item.key)
-                iterator.remove()
-            } else {
-                display.add(renderList("§a+", item.value))
             }
         }
     }
 
-    private fun handleNormalLines(
-        display: MutableList<Renderable>,
-        addedItems: MutableMap<Int, PickupEntry>,
-        removedItems: MutableMap<Int, PickupEntry>,
-    ) {
-        for (item in addedItems) {
-            display.add(renderList("§a+", item.value))
-            removedItems[item.key]?.let {
-                display.add(renderList("§c-", it))
-                removedItems.remove(item.key)
+    private fun computeTotalCoinValue(display: MutableList<Renderable>) {
+        if (!coinConfig.enabled || !(itemsAddedToInventory.isNotEmpty() || itemsRemovedFromInventory.isNotEmpty())) return
+        val valueAdded = itemsAddedToInventory.values.sumOf { it.coinValue() }
+        val valueRemoved = itemsRemovedFromInventory.values.sumOf { it.coinValue() }
+        val total = valueAdded - valueRemoved
+        if (total >= coinConfig.threshold || coinConfig.threshold == 0f) {
+            display.add(0, Renderable.text("§eValue: ${total.formatCoin()} coins"))
+        }
+    }
+
+    private fun PickupEntry.coinValue() = if (name == "§6Coins") {
+        // Handle purse coins as a special case
+        amount.toDouble()
+    } else {
+        val pricePer = neuInternalName?.getPriceOrNull(coinConfig.priceSource) ?: 0.0
+        pricePer * amount
+    }
+
+    private fun ItemPickupLogSnapshot.handleCompactLines() {
+        val iterator = addedItems.iterator()
+        while (iterator.hasNext()) {
+            val (hash, rawEntry) = iterator.next()
+
+            if (removedItems.containsKey(hash)) {
+                val currentTotalValue = rawEntry.amount - (removedItems[hash]?.amount ?: 0)
+                val entry = PickupEntry(rawEntry.name, currentTotalValue, rawEntry.neuInternalName)
+
+                if (currentTotalValue > 0) display.add(entry.getPlusRenderable(hash))
+                else if (currentTotalValue < 0) display.add(entry.getMinusRenderable(hash))
+                else {
+                    itemsAddedToInventory.remove(hash)
+                    itemsRemovedFromInventory.remove(hash)
+                }
+                removedItems.remove(hash)
+                iterator.remove()
+            } else display.add(rawEntry.getPlusRenderable(hash))
+        }
+    }
+
+    private fun ItemPickupLogSnapshot.handleNormalLines() {
+        for ((hash, entry) in addedItems) {
+            display.add(entry.getPlusRenderable(hash))
+            removedItems[hash]?.let { removedEntry ->
+                display.add(removedEntry.getMinusRenderable(hash))
+                removedItems.remove(hash)
             }
         }
     }
@@ -319,13 +355,17 @@ object ItemPickupLog {
     private fun addRemainingRemovedItems(
         display: MutableList<Renderable>,
         removedItems: MutableMap<Int, PickupEntry>,
-    ) {
-        for (item in removedItems) {
-            display.add(renderList("§c-", item.value))
-        }
+    ) = removedItems.onEach { (hash, entry) ->
+        display.add(entry.getMinusRenderable(hash))
     }
 
     private fun worldChangeCooldown(): Boolean = SkyBlockUtils.lastWorldSwitch.passedSince() > 2.seconds
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(97, "inventory.itemPickupLogConfig", "inventory.itemPickupLog")
+        event.move(97, "inventory.itemPickupLog.pos", "inventory.itemPickupLog.position")
+    }
 }

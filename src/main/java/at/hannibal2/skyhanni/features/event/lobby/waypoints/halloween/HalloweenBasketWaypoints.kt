@@ -21,9 +21,9 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -127,7 +127,7 @@ object HalloweenBasketWaypoints {
         if (scoreboardTitlePattern.matches(ScoreboardData.objectiveTitle.removeColor())) {
             inHub = true
         }
-        event.full.forEach {
+        event.new.forEach {
             if (halloweenEventPattern.matches(it)) {
                 halloweenMatches = true
             } else if (scoreboardBasketPattern.matches(it)) {

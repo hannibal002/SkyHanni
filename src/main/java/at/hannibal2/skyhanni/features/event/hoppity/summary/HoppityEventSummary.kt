@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.StatString
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -77,7 +76,7 @@ object HoppityEventSummary {
     var statYear: Int = currentSbYear
 
     private fun MutableList<StatString>.chromafyHoppityStats(): MutableList<StatString> = map {
-        if (CFApi.config.partyMode.get()) it.copy(string = it.string.partyModeReplace())
+        if (CFApi.config.partyMode.get()) it.copy(string = CFApi.partyModeReplace(it.string))
         else it
     }.toMutableList()
 

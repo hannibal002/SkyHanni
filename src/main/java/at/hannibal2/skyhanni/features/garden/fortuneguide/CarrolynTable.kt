@@ -30,6 +30,18 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
         "FINE FLOURS EXPORTATION COMPLETE!",
         "[NPC] Carrolyn: Thank you for the flour.",
     ),
+    WARTY(
+        CropType.NETHER_WART,
+        "Warty",
+        "WARTYS EXPORTATION COMPLETE!",
+        "[NPC] Carrolyn: Thank you for the warts.",
+    ),
+    HALF_EATEN_MUSHROOM(
+        CropType.MUSHROOM,
+        "Half Eaten Mushroom",
+        "MUSHROOMS EXPORTATION COMPLETE!",
+        "[NPC] Carrolyn: Thank you for the mushrooms.",
+    )
     ;
 
     /** Pattern without color codes */
@@ -54,14 +66,5 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
 
     companion object {
         fun getByCrop(crop: CropType?) = if (crop == null) null else entries.firstOrNull { it.crop == crop }
-
-        fun isCarrolynCrop(crop: CropType): Boolean = CarrolynTable.getByCrop(crop) != null
-        fun customTabComplete(command: String): List<String>? {
-            if (command == "shcarrolyn") {
-                return entries.map { it.crop.name }
-            }
-
-            return null
-        }
     }
 }

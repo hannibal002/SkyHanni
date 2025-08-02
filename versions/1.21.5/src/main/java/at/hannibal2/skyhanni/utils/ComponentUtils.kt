@@ -236,6 +236,7 @@ object ComponentUtils {
             strippedId == "fence" -> "oak_fence"
             strippedId == "fence_gate" -> "oak_fence_gate"
             strippedId == "grass" -> "grass_block"
+            strippedId == "pumpkin" -> "carved_pumpkin"
             strippedId == "lit_pumpkin" -> "jack_o_lantern"
             strippedId == "planks" -> getWood(damage) + "_planks"
             strippedId == "mob_spawner" -> "spawner"

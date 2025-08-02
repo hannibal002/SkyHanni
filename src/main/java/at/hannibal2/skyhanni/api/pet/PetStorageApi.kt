@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstUniqueByOrNull
@@ -45,6 +46,7 @@ import java.util.regex.Matcher
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PetStorageApi {
@@ -56,6 +58,8 @@ object PetStorageApi {
     private const val SB_MENU_CURRENT_PET_SLOT = 30
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
     private val EXP_SHARE_SLOTS = listOf(30, 31, 32)
+    private var jsonNeedsSave: Boolean = false
+    private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
 
     // <editor-fold desc="Patterns">
     /**
@@ -96,7 +100,7 @@ object PetStorageApi {
     @Suppress("MaxLineLength")
     private val petTabWidgetXpPattern by patternGroup.pattern(
         "tab.xp",
-        " (?:§.)+(?:(?<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:§.|\\/)*(?<next>[\\d,.kM]*) XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)",
+        " (?:§.)+(?:(?<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:(?:§.|\\/)*(?<next>[\\d,.kM]+))? XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)",
     )
 
     /**
@@ -138,11 +142,12 @@ object PetStorageApi {
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §6Golden Dragon§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dRabbit§9 ✦§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §8[§634§8§4✦§8] §6Golden Dragon§e! §a§lVIEW RULE
      */
     @Suppress("MaxLineLength")
     private val autoPetMessagePattern by patternGroup.pattern(
         "autopet.message",
-        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?:(?:§.)+\\[(?:§.)+\\d+(?<altskin>§.✦)\\] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+)(?<skin>§. ✦)?§e! §a§lVIEW RULE",
+        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?:(?:§.)+\\[(?:§.)*\\d+(?:§.)*(?<altskin>§.✦)(?:§.)*\\] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+)(?<skin>§. ✦)?§e! §a§lVIEW RULE",
     )
 
     /**
@@ -159,12 +164,18 @@ object PetStorageApi {
 
     private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName): NeuItemJson? {
         val skin = groupOrNull("skin") ?: groupOrNull("altskin") ?: return null
-        return PetUtils.getPetSkinOrNull(petInternalName, skin)
+        return PetUtils.findPetSkinOrNull(petInternalName, skin)
     }
 
     private fun Matcher.getRarityOrNull() = LorenzRarity.getByColorCode(group("rarity")[0])
 
-    private fun saveConfig() = SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+    @HandleEvent
+    fun onSecondPassed() {
+        if (!jsonNeedsSave || lastSaved.passedSince() < 30.seconds) return
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+        jsonNeedsSave = false
+        lastSaved = SimpleTimeMark.now()
+    }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -174,9 +185,7 @@ object PetStorageApi {
             val level = group("level").toInt()
             val rarity = getRarityOrNull() ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                val trimmed = line.trim().removeResets()
-                PetUtils.petItemResolution[trimmed]
-                    ?: NeuInternalName.fromItemNameOrNull(trimmed)?.takeIf { !it.isPet }
+                PetUtils.resolvePetItemOrNull(line.trim().removeResets())
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{
@@ -204,11 +213,11 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.TAB)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent) {
         autoPetMessagePattern.matchMatcher(event.message) {
             if (config.hideAutopet) event.blockedReason = "autopet"
@@ -225,7 +234,7 @@ object PetStorageApi {
             }?.split("\n") ?: return
 
             val petHeldItem = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo) {
-                PetUtils.petItemResolution[group("item").removeResets()]
+                PetUtils.resolvePetItemOrNull(group("item").removeResets())
             }
 
             val resolvedPet = resolvePetDataOrNull(
@@ -243,7 +252,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.AUTOPET)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 
@@ -271,7 +280,7 @@ object PetStorageApi {
 
             else -> return
         }
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
@@ -296,6 +305,7 @@ object PetStorageApi {
                 heldItemInternalName = petInfo.heldItem,
                 exp = petInfo.exp,
                 uuid = petInfo.uniqueId,
+                skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
             )
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
@@ -304,8 +314,7 @@ object PetStorageApi {
                 petStorage.pets[it] = data
             } ?: petStorage.pets.add(data)
         }
-
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
@@ -322,6 +331,7 @@ object PetStorageApi {
             heldItemInternalName = petInfo.heldItem,
             exp = petInfo.exp,
             uuid = petInfo.uniqueId,
+            skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
         )
 
         petStorage.pets.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {
@@ -329,7 +339,7 @@ object PetStorageApi {
         } ?: petStorage.pets.add(data)
 
         CurrentPetApi.assertFoundCurrentData(data, CurrentPetApi.PetDataAssertionSource.MENU)
-        saveConfig()
+        jsonNeedsSave = true
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
@@ -380,7 +390,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.MENU)
-            saveConfig()
+            jsonNeedsSave = true
         }
     }
 

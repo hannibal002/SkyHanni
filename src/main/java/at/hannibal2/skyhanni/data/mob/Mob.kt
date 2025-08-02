@@ -1,24 +1,27 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
-import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
+import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.observer.Property
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -82,7 +85,11 @@ class Mob(
 
     val owner: MobUtils.OwnerShip?
 
-    fun belongsToPlayer(): Boolean = owner?.equals(PlayerUtils.getName()) ?: false
+    companion object {
+
+        fun Entity?.belongsToPlayer(): Boolean = this?.mob.belongsToPlayer()
+        fun Mob?.belongsToPlayer(): Boolean = this?.owner?.equals(PlayerUtils.getName()) ?: false
+    }
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
     val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
@@ -112,9 +119,16 @@ class Mob(
             else -> false
         }
     }
-
-    val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted() // Can change
-    val isRunic = !RiftApi.inRift() && baseEntity.isRunic() // Does not Change
+    /**
+     * @property isCorrupted can change.
+     */
+    val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted()
+    /**
+     * @property isRunic does not change.
+     */
+    val isRunic = !RiftApi.inRift() &&
+        armorStand?.name?.startsWith("§5") == true &&
+        mobType == Type.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
@@ -125,9 +139,17 @@ class Mob(
     private var highlightColor: Color? = null
     private var condition: () -> Boolean = { true }
 
-    /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
-     * If [color] is set to null it removes a highlight*/
-    fun highlight(color: Color?) {
+    /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127*/
+    fun highlight(color: ChromaColour) {
+        highlight(color.toColor())
+    }
+
+    fun removeHighlight() {
+        internalRemoveColor()
+        highlightColor = null
+    }
+
+    fun highlight(color: Color) {
         if (color == highlightColor) return
         if (color == null) {
             internalRemoveColor()
@@ -138,7 +160,14 @@ class Mob(
         }
     }
 
-    // TODO add support for moulconfig.ChromaColour, and eventually removed awt.Color support
+    fun highlight(color: Property<ChromaColour>, condition: () -> Boolean) {
+        highlight(color.get(), condition)
+    }
+
+    fun highlight(color: ChromaColour, condition: () -> Boolean) {
+        highlight(color.toColor(), condition)
+    }
+
     fun highlight(color: Color, condition: () -> Boolean) {
         highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
         this.condition = condition
@@ -147,9 +176,9 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() && condition() }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color) { !this.isInvisible() && condition() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() && condition() }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color) { !this.isInvisible() && condition() }
             }
         }
     }
@@ -260,7 +289,7 @@ class Mob(
     }
 
     // TODO add max distance
-    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean) =
+    fun lineToPlayer(color: ChromaColour, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean) =
         LineToMobHandler.register(this, color, lineWidth, depth, condition)
 
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()

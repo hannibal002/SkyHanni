@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -42,9 +41,6 @@ object LimboTimeTracker {
     private var onFire = false
 
     private val bedWarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
-
-    private var doMigrate = false
-    private var notMigratedPB = 0
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -181,27 +177,6 @@ object LimboTimeTracker {
             add("isLimboFake: $inFakeLimbo")
             add("since: ${limboJoinTime.passedSince()}")
         }
-    }
-
-    fun workaroundMigration(personalBest: Int) {
-        doMigrate = true
-        notMigratedPB = personalBest
-    }
-
-    @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
-        if (!doMigrate) return
-        if (notMigratedPB != 0) {
-            ChatUtils.debug("Migrating limbo personalBest")
-            storage?.personalBest = notMigratedPB
-            storage?.userLuck = notMigratedPB * USER_LUCK_MULTIPLIER
-        }
-        if ((storage?.personalBest ?: 0) > (storage?.playtime ?: 0)) {
-            ChatUtils.debug("Migrating limbo playtime")
-            storage?.playtime = (storage?.personalBest ?: 0)
-        }
-        doMigrate = false
-        notMigratedPB = 0
     }
 
     fun isEnabled() = config.showTimeInLimbo

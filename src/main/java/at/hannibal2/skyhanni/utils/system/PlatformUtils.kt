@@ -23,13 +23,12 @@ import net.minecraftforge.fml.common.Loader
  */
 object PlatformUtils {
 
-
     //#if MC < 1.21
-    const val MC_VERSION: String = VersionConstants.MC_VERSION
+    val MC_VERSION: String = VersionConstants.MC_VERSION
     //#else
     //$$ val MC_VERSION: String = net.minecraft.SharedConstants.getGameVersion().name
     //#endif
-    const val IS_LEGACY: Boolean = VersionConstants.MC_VERSION == "1.8.9"
+    val IS_LEGACY: Boolean = VersionConstants.MC_VERSION == "1.8.9"
 
     val isDevEnvironment: Boolean by lazy {
         //#if MC < 1.16
@@ -74,8 +73,7 @@ object PlatformUtils {
         //#if FORGE
         return Loader.isModLoaded(modId)
         //#else
-        // TODO implement this for fabric
-        //$$ return false
+        //$$ return FabricLoader.getInstance().isModLoaded(modId)
         //#endif
     }
 

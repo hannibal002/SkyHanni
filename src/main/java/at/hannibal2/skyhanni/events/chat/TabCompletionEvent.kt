@@ -1,27 +1,24 @@
 package at.hannibal2.skyhanni.events.chat
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 class TabCompletionEvent(
     val leftOfCursor: String,
     val fullText: String,
-    val originalCompletions: List<String>,
+    private val originalCompletions: List<String>,
 ) : SkyHanniEvent() {
     val lastWord = leftOfCursor.substringAfterLast(' ')
-    val additionalSuggestions = mutableSetOf<String>()
-    val suppressedSuggestions = mutableSetOf<String>()
+    private val additionalSuggestions = mutableSetOf<String>()
 
     fun addSuggestion(suggestion: String) {
-        if (suggestion.startsWith(lastWord, ignoreCase = true))
-            additionalSuggestions.add(suggestion)
+        if (!suggestion.startsWith(lastWord, ignoreCase = true)) return
+        val adjustedSuggestion = if (PlatformUtils.IS_LEGACY) suggestion else suggestion.removePrefix("/")
+        additionalSuggestions.add(adjustedSuggestion)
     }
 
     fun addSuggestions(suggestions: Iterable<String>) {
         suggestions.forEach(this::addSuggestion)
-    }
-
-    fun excludeAllDefault() {
-        suppressedSuggestions.addAll(originalCompletions)
     }
 
     val command = if (leftOfCursor.startsWith("/"))
@@ -33,7 +30,7 @@ class TabCompletionEvent(
     }
 
     fun intoSuggestionArray(): Array<String>? {
-        if (additionalSuggestions.isEmpty() && suppressedSuggestions.isEmpty()) return null
-        return (originalCompletions - suppressedSuggestions + additionalSuggestions).toTypedArray()
+        if (additionalSuggestions.isEmpty()) return null
+        return (originalCompletions + additionalSuggestions).toTypedArray()
     }
 }

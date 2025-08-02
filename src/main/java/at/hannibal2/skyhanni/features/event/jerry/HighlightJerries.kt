@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.jerry
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.MobEvent
@@ -36,13 +37,13 @@ object HighlightJerries {
             "Purple" -> LorenzColor.DARK_PURPLE
             "Golden" -> LorenzColor.GOLD
             else -> return
-        }
-        mob.highlight(color.toColor()) { config.highlightJerries.get() }
-        mob.lineToPlayer(color.toColor()) { config.lineJerries.get() }
+        }.toChromaColor()
+        mob.highlight(color) { config.highlightJerries.get() }
+        mob.lineToPlayer(color) { config.lineJerries.get() }
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         config.highlightJerries.onEnable { MobData.skyblockMobs.forEach { parseJerry(it) } }
         config.lineJerries.onEnable { MobData.skyblockMobs.forEach { parseJerry(it) } }
     }

@@ -52,6 +52,11 @@ object MiningApi {
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
     /**
+     * REGEX-TEST: Mines of Divan
+     */
+    private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
+
+    /**
      * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
      * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
      */
@@ -194,21 +199,11 @@ object MiningApi {
 
     fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isCurrent()
 
+    fun inMinesOfDivan() = inCrystalHollows() && minesOfDivanPattern.matches(HypixelData.skyBlockArea)
+
     fun inMineshaft() = IslandType.MINESHAFT.isCurrent()
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
-
-    @Deprecated("Use IslandTypeTags.CUSTOM_MINING.inAny() instead", ReplaceWith("IslandTypeTags.CUSTOM_MINING.inAny()"))
-    fun inCustomMiningIsland() = IslandTypeTags.CUSTOM_MINING.inAny()
-
-    @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
-    fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
-
-    @Deprecated("Use IslandTypeTags.MINING.inAny() instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
-    fun inMiningIsland() = IslandTypeTags.MINING.inAny()
-
-    @Deprecated("Use IslandTypeTags.IS_COLD.inAny() instead", ReplaceWith("IslandTypeTags.IS_COLD.inAny()"))
-    fun inColdIsland() = IslandTypeTags.IS_COLD.inAny()
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
@@ -316,11 +311,11 @@ object MiningApi {
         if (waitingForInitSound) {
             if (event.soundName != "random.orb") {
                 if (event.pitch != 0.7936508f) return
-                val pos = event.location.roundLocationToBlock()
+                val pos = event.location.roundToBlock()
                 if (recentClickedBlocks.none { it.first == pos }) return
                 waitingForInitSound = false
                 waitingForEffMinerBlock = true
-                initBlockPos = event.location.roundLocationToBlock()
+                initBlockPos = event.location.roundToBlock()
                 lastInitSound = SimpleTimeMark.now()
             } else {
                 if (lastClicked.passedSince() > 1.seconds) return

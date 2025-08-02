@@ -5,17 +5,17 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.entity.item.EntityItem
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -37,8 +37,8 @@ object ShowFishingItemName {
     fun onTick() {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
-            val itemStack = entityItem.entityItem
-            // Hypixel sometimes replaces the bait item midair with a stone
+            val itemStack = entityItem.entityItem.orNull() ?: continue
+            // On 1.8 if the itemstack is null it returns stone instead
             if (itemStack.displayName.removeColor() == "Stone") continue
             var text = ""
 
@@ -72,7 +72,7 @@ object ShowFishingItemName {
 
     private fun inCorrectArea(): Boolean {
         if (IslandType.HUB.isCurrent()) {
-            IslandAreas.currentAreaName.let {
+            SkyBlockUtils.graphArea?.let {
                 if (it.endsWith(" Atrium") || it.endsWith(" Museum")) return false
                 if (it == "Fashion Shop" || it == "Shen's Auction") return false
             }

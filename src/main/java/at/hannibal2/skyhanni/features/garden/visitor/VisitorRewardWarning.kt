@@ -139,7 +139,7 @@ object VisitorRewardWarning {
         formattedLoss: String,
     ) = blockReason.description + when (blockReason) {
         VisitorBlockReason.CHEAP_COPPER, VisitorBlockReason.EXPENSIVE_COPPER ->
-            " §7(§6$pricePerCopper §7per)"
+            " §7(paying §6$pricePerCopper §7per)"
 
         VisitorBlockReason.LOW_LOSS, VisitorBlockReason.HIGH_LOSS ->
             " §7(§6$formattedLoss §7${if (loss > 0) "loss" else "profit"} selling §9Green Thumb I§7)"
