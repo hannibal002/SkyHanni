@@ -80,11 +80,11 @@ object RareDropMessages {
     /**
      * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b✯ Magic Find§r§b)
      * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book
-     * §r§6§lRARE DROP! §r§fEnchanted Book (Corruption I§r§f) §r§b(+§r§b314 §r§b✯ Magic Find§r§b)§r
+     * REGEX-TEST: §r§6§lRARE DROP! §r§fEnchanted Book (Corruption I§r§f) §r§b(+§r§b314 §r§b✯ Magic Find§r§b)§r
      */
+    @Suppress("MaxLineLength")
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook",
-        @Suppress("MaxLineLength")
         "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book(?<bookname> \\(.*\\))?(?<end> §r§b\\(\\+(?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\))?.*",
     )
 
