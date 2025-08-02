@@ -35,6 +35,7 @@ object RareDropMessages {
 
     /**
      * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168 §r§b✯ Magic Find§r§b)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
      */
     private val petDroppedPattern by petGroup.pattern(
