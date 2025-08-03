@@ -29,7 +29,7 @@ object AttributeOverlay {
         val rollType: RollType,
     )
 
-    private val cachedData = TimeLimitedCache<ItemStack, CachedData>(5.seconds)
+    private val cachedData = TimeLimitedCache<ItemStack, CachedData>(5.seconds)//TODO use item cache instead
 
     @HandleEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
