@@ -524,7 +524,7 @@ object ItemUtils {
         if (data.lastLore == currentLore) return
         data.lastLore = currentLore
 
-        val (rarity, category) = if (getInternalName() != NeuInternalName.NONE) {
+        val (rarity, category) = if (this.getInternalNameOrNull() != null) {
             this.readItemCategoryAndRarity()
         } else null to null
         data.itemRarity = rarity
