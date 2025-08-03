@@ -31,6 +31,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CachedItemData
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -55,20 +57,17 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
-import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
-    private val tipCache: TimeLimitedCache<Int, String> = TimeLimitedCache(2.minutes)
     private var lastSize = 0
 
     /**
@@ -125,16 +124,15 @@ object ItemDisplayOverlayFeatures {
         val currentSize = config.itemNumberAsStackSize.size
         if (lastSize != currentSize) {
             lastSize = currentSize
-            tipCache.clear()
+            CachedItemData.forEachValue { it.stackTip = null }
         }
-        event.stackTip = getStackTip(event.stack)?.also {
-            tipCache[event.stack.hashCode()] = it
-        } ?: return
+        val stack = event.stack
+        val cachedData = stack.cachedData
+        val tip = cachedData.stackTip ?: getStackTip(stack).also { cachedData.stackTip = it ?: "" }
+        tip?.takeIf { it.isNotEmpty() }?.let { event.stackTip = it }
     }
 
     private fun getStackTip(item: ItemStack): String? {
-        tipCache[item.hashCode()]?.let { return it }
-
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
@@ -178,7 +176,7 @@ object ItemDisplayOverlayFeatures {
                 // 0.0 Would probably work, but rounding errors can occur
                 // due to hypixel's imprecision in storage.
                 it.exp > 10.0 || PetStorageApi.mainPetMenuNamePattern.matches(
-                    InventoryUtils.openInventoryName()
+                    InventoryUtils.openInventoryName(),
                 )
             } ?: return null
             val level = item.getPetLevel()

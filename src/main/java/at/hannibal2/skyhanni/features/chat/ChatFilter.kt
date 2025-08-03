@@ -109,7 +109,7 @@ object ChatFilter {
 
     // Kill Combo
     /**
-     * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
+     * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b✯ Magic Find
      */
     private val killComboPatterns = listOf(
         "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
