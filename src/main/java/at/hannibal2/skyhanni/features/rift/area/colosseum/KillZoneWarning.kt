@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -61,7 +62,11 @@ object KillZoneWarning {
         title?.stop()
         title = TitleManager.sendTitle(
             "§cGet back in the arena!",
-            String.format("§7%.2fs left", killDeadline.timeUntil().inPartialSeconds),
+            String.format(
+                Locale.US,
+                "§7%.2fs left",
+                killDeadline.timeUntil().inPartialSeconds,
+            ),
             50.milliseconds,
             addType = TitleAddType.FORCE_FIRST,
         )
