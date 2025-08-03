@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -16,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerBossSpawnSoon {
 
-    private val config get() = SkyHanniMod.feature.slayer.slayerBossWarning
+    private val config get() = SlayerApi.config.slayerBossWarning
 
     private val progressPattern by RepoPattern.pattern(
         "slayer.bosswarning.progress",

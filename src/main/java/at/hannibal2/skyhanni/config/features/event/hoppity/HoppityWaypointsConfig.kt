@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.hoppity
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -23,18 +24,9 @@ class HoppityWaypointsConfig {
     var shared: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Show Waypoints Immediately",
-        desc = "Show an estimated waypoint immediately after clicking.\n" +
-            "§cThis might cause issues with other particle sources."
-    )
-    @ConfigEditorBoolean
-    var showImmediately: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Color", desc = "Color of the waypoint.")
     @ConfigEditorColour
-    var color: String = "0:53:46:224:73"
+    var color: ChromaColour = ChromaColour.fromStaticRGB(46, 224, 73, 53)
 
     @Expose
     @ConfigOption(name = "Show Line", desc = "Show a line to the waypoint.")
@@ -83,10 +75,17 @@ class HoppityWaypointsConfig {
     var showNearbyDuplicates: Boolean = false
 
     @Expose
+    //#if FORGE
     @ConfigOption(
         name = "Load from NEU PV",
         desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer."
     )
+    //#else
+    //$$@ConfigOption(
+    //$$    name = "Load from SkyBlock PV",
+    //$$    desc = "Load Hoppity Egg Location data from API when opening the SkyBlock Profile Viewer mod."
+    //$$)
+    //#endif
     @ConfigEditorBoolean
     @FeatureToggle
     var loadFromNeuPv: Boolean = true

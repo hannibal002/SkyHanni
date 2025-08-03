@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
@@ -9,28 +10,25 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -41,17 +39,20 @@ val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
 val motesRegex = Regex("""Motes: ([\d,]+)""")
 val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
 
-private fun getVisitingName(): String {
-    val tabData = TabListData.getTabList()
-    val ownerRegex = Regex(".*Owner: (\\w+).*")
-    for (line in tabData) {
-        val colorlessLine = line.removeColor()
-        if (ownerRegex.matches(colorlessLine)) {
-            return ownerRegex.find(colorlessLine)!!.groupValues[1]
-        }
-    }
-    return "Someone"
-}
+// There is no consistent way to get the full username of the owner of an island you are visiting (as far as I know)
+// so this will be removed until/unless they add it back
+//
+// private fun getVisitingName(): String {
+//     val tabData = TabListData.getTabList()
+//     val ownerRegex = Regex(".*Owner: (\\w+).*")
+//     for (line in tabData) {
+//         val colorlessLine = line.removeColor()
+//         if (ownerRegex.matches(colorlessLine)) {
+//             return ownerRegex.find(colorlessLine)!!.groupValues[1]
+//         }
+//     }
+//     return "Someone"
+// }
 
 var beenAfkFor = SimpleTimeMark.now()
 
@@ -74,13 +75,8 @@ private fun getCropMilestoneDisplay(): String {
     return "${crop.cropName}: $text"
 }
 
-fun getPetDisplay(): String = PetApi.currentPet?.let {
-    val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2).removeColor()
-    val petLevel = if (PlatformUtils.isNeuLoaded()) getCurrentPet()?.petLevel?.currentLevel ?: "?" else "?"
-
-    "[Lvl $petLevel] ${LorenzRarity.colorCodeToRarity(colorCode)} $petName"
-} ?: "No pet equipped"
+private fun getPetDisplay(): String = CurrentPetApi.currentPet?.getUserFriendlyName()
+    ?: "No pet equipped"
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
@@ -88,12 +84,14 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     LOCATION(
         {
-            var location = LorenzUtils.skyBlockArea ?: "invalid"
-            val island = LorenzUtils.skyBlockIsland
+            // graphArea kept giving me no_area on my private island
+            // TODO use island type instead of your island string, use graph area again
+            var location = SkyBlockUtils.scoreboardArea ?: "invalid"
+            val island = SkyBlockUtils.currentIsland
 
             if (location == "Your Island") location = "Private Island"
             lastKnownDisplayStrings[LOCATION] = when (island) {
-                IslandType.PRIVATE_ISLAND_GUEST -> "${getVisitingName()}'s Island"
+                IslandType.PRIVATE_ISLAND_GUEST -> "Visiting an Island"
 
                 IslandType.GARDEN -> {
                     if (location.startsWith("Plot: ")) "Personal Garden ($location)" // Personal Garden (Plot: 8)
@@ -102,14 +100,13 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
                 IslandType.GARDEN_GUEST -> {
                     // Ensure getVisitingName() is used to generate the full string
-                    if (location.startsWith("Plot: ")) "${getVisitingName()}'s Garden ($location)"
-                    else "${getVisitingName()}'s Garden"
+                    if (location.startsWith("Plot: ")) "Visiting a Garden ($location)"
+                    else "Visiting a Garden"
                 }
 
-                else -> location.takeIf { it != "None" && it != "invalid" }
+                else -> location.takeIf { it != "None" && it != "invalid" && it != "no_area" }
                     ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
-
             // Only display None if we don't have a last known area
             lastKnownDisplayStrings[LOCATION].takeIf { it?.isNotEmpty() == true } ?: "None"
         },
@@ -182,14 +179,14 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     PROFILE(
         {
-            val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
+            val sbLevel = AdvancedPlayerList.tabPlayerData[PlayerUtils.getName()]?.sbLevel?.toString() ?: "?"
             var profile = "SkyBlock Level: [$sbLevel] on "
 
             profile += when {
 
-                LorenzUtils.isIronmanProfile -> "♲"
-                LorenzUtils.isBingoProfile -> "Ⓑ"
-                LorenzUtils.isStrandedProfile -> "☀"
+                SkyBlockUtils.isIronmanProfile -> "♲"
+                SkyBlockUtils.isBingoProfile -> "Ⓑ"
+                SkyBlockUtils.isStrandedProfile -> "☀"
                 else -> ""
             }
 
@@ -298,15 +295,15 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             if (extraAttributes != null) {
                 val enchantments = extraAttributes.getCompoundTag("enchantments")
                 var stackingEnchant = ""
-                for (enchant in DiscordRPCManager.stackingEnchants) {
+                for (enchant in EstimatedItemValue.stackingEnchants) {
                     if (extraAttributes.hasKey(enchant.value.statName)) {
                         stackingEnchant = enchant.key
                         break
                     }
                 }
-                val levels = DiscordRPCManager.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
+                val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
                 val level = enchantments.getInteger(stackingEnchant)
-                val amount = extraAttributes.getInteger(DiscordRPCManager.stackingEnchants[stackingEnchant]?.statName)
+                val amount = extraAttributes.getInteger(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =

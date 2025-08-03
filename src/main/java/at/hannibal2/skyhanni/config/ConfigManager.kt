@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -22,11 +24,20 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
+//#if MC < 1.21
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybindL
+//#endif
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOptionImpl
 import java.io.File
 import java.io.IOException
+import java.lang.reflect.Field
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.concurrent.fixedRateTimer
@@ -53,7 +64,7 @@ class ConfigManager {
 
     private val jsonHolder: Map<ConfigFileType, Any> = enumMapOf()
 
-    lateinit var processor: MoulConfigProcessor<Features>
+    lateinit var processor: BlockingMoulConfigProcessor
     private var disableSaving = false
 
     private fun setConfigHolder(type: ConfigFileType, value: Any) {
@@ -80,12 +91,7 @@ class ConfigManager {
         }
 
         val features = SkyHanniMod.feature
-        processor = MoulConfigProcessor(SkyHanniMod.feature)
-        BuiltinMoulConfigGuis.addProcessors(processor)
-        UpdateManager.injectConfigProcessor(processor)
-        val driver = ConfigProcessorDriver(processor)
-        driver.warnForPrivateFields = false
-        driver.processConfig(features)
+        recreateConfig()
 
         try {
             findPositionLinks(features, mutableSetOf())
@@ -99,22 +105,6 @@ class ConfigManager {
     private fun deleteOldBackups() {
         OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
-
-    // Some position elements don't need config links as they don't have a config option.
-    private val ignoredMissingConfigLinks = listOf(
-        // commands
-        "features.garden.GardenConfig.cropSpeedMeterPos",
-        "features.misc.MiscConfig.collectionCounterPos",
-        "features.misc.MiscConfig.carryPosition",
-        "features.misc.MiscConfig.lockedMouseDisplay",
-
-        // debug features
-        "features.dev.DebugConfig.trackSoundPosition",
-        "features.dev.DebugConfig.trackParticlePosition",
-        "features.dev.DevConfig.debugPos",
-        "features.dev.DevConfig.debugLocationPos",
-        "features.dev.DevConfig.debugItemPos",
-    )
 
     private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
         if (obj == null) return
@@ -133,7 +123,8 @@ class ConfigManager {
                 if (PlatformUtils.isDevEnvironment) {
                     var name = "${field.declaringClass.name}.${field.name}"
                     name = name.replace("at.hannibal2.skyhanni.config.", "")
-                    if (name !in ignoredMissingConfigLinks) {
+                    val hasExplanatoryAnnotation = field.getAnnotation(NoConfigLink::class.java) != null
+                    if (!hasExplanatoryAnnotation) {
                         println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
                         missingConfigLink = true
                     }
@@ -158,7 +149,7 @@ class ConfigManager {
             println("Steps to fix:")
             println("1. Search for `WEE WOO WEE WOO` in the console output.")
             println("2. Either add the Config Link.")
-            println("3. Or add the name to ignoredMissingConfigLinks.")
+            println("3. Or add the @NoConfigLink annotation to the field.")
             println("")
             PlatformUtils.shutdownMinecraft("Missing Config Link")
         }
@@ -233,6 +224,15 @@ class ConfigManager {
             file.parentFile.mkdirs()
             StringFileHandler(file).save(gson.toJson(data))
             logger.log("Saved $fileName file successfully")
+        } catch (e: ClassCastException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Could not save $fileName file to $file",
+                "file" to file,
+                "data" to data,
+                "dataClass" to data.javaClass,
+                "fileName" to fileName,
+            )
         } catch (e: IOException) {
             logger.log("Could not save $fileName file to $file")
             logger.log(e.stackTraceToString())
@@ -241,6 +241,17 @@ class ConfigManager {
 
     fun disableSaving() {
         disableSaving = true
+    }
+
+    fun recreateConfig() {
+        ConfigGuiManager.editor = null
+        val features = SkyHanniMod.feature
+        processor = BlockingMoulConfigProcessor()
+        BuiltinMoulConfigGuis.addProcessors(processor)
+        UpdateManager.injectConfigProcessor(processor)
+        val driver = ConfigProcessorDriver(processor)
+        driver.warnForPrivateFields = false
+        driver.processConfig(features)
     }
 }
 
@@ -264,8 +275,51 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
+    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
+    STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
+    ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
     val backupFile get() = getBackupFile(file)
+}
+
+class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.feature) {
+    override fun createOptionGui(
+        processedOption: ProcessedOption,
+        field: Field,
+        option: ConfigOption,
+    ): GuiOptionEditor? {
+        val default = super.createOptionGui(processedOption, field, option) ?: return null
+        if (processedOption !is ProcessedOptionImpl) return default
+        var extraPath = ""
+        val categoryParent = processedOption.category.parentCategoryId
+        if (categoryParent != null) {
+            extraPath = categoryParent.split(".").last() + "."
+        }
+        extraPath += processedOption.getPath()
+        if (default is GuiOptionEditorKeybind) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#if MC < 1.21
+        if (default is GuiOptionEditorKeybindL) {
+            UpdateKeybinds.keybinds.add(extraPath)
+        }
+        //#endif
+
+        EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
+            return GuiOptionEditorBlocked(default, extraMessage)
+        }
+
+        if (PlatformUtils.IS_LEGACY) {
+            if (field.isAnnotationPresent(OnlyModern::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
+        } else {
+            if (field.isAnnotationPresent(OnlyLegacy::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
+        }
+        return default
+    }
 }

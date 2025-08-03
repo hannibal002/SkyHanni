@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent
+import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractSourcedChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent
@@ -17,8 +17,7 @@ import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
@@ -174,7 +173,7 @@ object PlayerChatManager {
     private fun ComponentMatcher.isGlobalChat(event: SkyHanniChatEvent): Boolean {
         var author = groupOrThrow("author")
         val chatColor = groupOrThrow("chatColor")
-        if (chatColor.length == 0 && !author.getText().removeColor().endsWith(LorenzUtils.getPlayerName())) {
+        if (chatColor.length == 0 && !author.getText().removeColor().endsWith(PlayerUtils.getName())) {
             // The last format string is always present, unless this is the players own message
             return false
         }
@@ -186,7 +185,7 @@ object PlayerChatManager {
 
         var privateIslandRank: ComponentSpan? = null
         var privateIslandGuest: ComponentSpan? = null
-        if (IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.PRIVATE_ISLAND_GUEST.isInIsland()) {
+        if (IslandTypeTags.PRIVATE_ISLAND.inAny()) {
             privateIslandGuestPattern.matchStyledMatcher(author) {
                 privateIslandGuest = groupOrThrow("guest")
                 val prefix = groupOrThrow("prefix")
@@ -220,7 +219,7 @@ object PlayerChatManager {
         }
     }
 
-    private fun AbstractChatEvent.postChat(event: SkyHanniChatEvent) {
+    private fun AbstractSourcedChatEvent.postChat(event: SkyHanniChatEvent) {
         post()
         event.handleChat(blockedReason, chatComponent)
     }

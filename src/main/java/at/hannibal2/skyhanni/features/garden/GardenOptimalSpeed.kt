@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SignUtils
@@ -25,6 +26,9 @@ import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.gui.inventory.GuiEditSign
 import kotlin.time.Duration.Companion.seconds
@@ -64,7 +68,7 @@ object GardenOptimalSpeed {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
-        currentSpeed = (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
+        currentSpeed = PlayerUtils.getWalkSpeed()
 
         if (sneaking && !sneakingSince.isInPast()) {
             sneakingSince = SimpleTimeMark.now()
@@ -86,11 +90,9 @@ object GardenOptimalSpeed {
         display = if (config.compactRancherGui) {
             crops.groupBy({ it.second }, { it.first }).map { (speed, crops) ->
                 val color = if (lastCrop in crops) LorenzColor.GOLD else LorenzColor.WHITE
-                val renderable = Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.horizontalContainer(crops.map { Renderable.itemStack(it.icon) }),
-                        Renderable.string("${color.getChatColor()} - $speed"),
-                    ),
+                val renderable = Renderable.horizontal(
+                    Renderable.horizontal(crops.map { Renderable.item(it.icon) }),
+                    Renderable.text("${color.getChatColor()} - $speed"),
                     spacing = 2,
                 )
                 Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })
@@ -98,11 +100,9 @@ object GardenOptimalSpeed {
         } else {
             crops.map { (crop, speed) ->
                 val color = if (lastCrop == crop) LorenzColor.GOLD else LorenzColor.WHITE
-                val renderable = Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.itemStack(crop.icon),
-                        Renderable.string("${color.getChatColor()}${crop.cropName} - $speed"),
-                    ),
+                val renderable = Renderable.horizontal(
+                    Renderable.item(crop.icon),
+                    Renderable.text("${color.getChatColor()}${crop.cropName} - $speed"),
                     spacing = 2,
                 )
                 Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })

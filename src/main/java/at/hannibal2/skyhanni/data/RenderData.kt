@@ -3,29 +3,31 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 
 @SkyHanniModule
 object RenderData {
 
-    @HandleEvent
-    fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
+    @JvmStatic
+    fun postRenderOverlay(context: DrawContext) {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
+        val screen = Minecraft.getMinecraft().currentScreen
 
-        event.context.matrices.translate(0f, 0f, -3f)
-        renderOverlay(event.context)
-        event.context.matrices.translate(0f, 0f, 3f)
+        DrawContextUtils.setContext(context)
+        DrawContextUtils.translated(z = -3) {
+            renderOverlay(DrawContextUtils.drawContext, screen != null && screen !is GuiChat)
+        }
+        DrawContextUtils.clearContext()
     }
 
     @HandleEvent
@@ -35,25 +37,26 @@ object RenderData {
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 
-        event.context.matrices.pushMatrix()
-        GlStateManager.enableDepth()
+        DrawContextUtils.pushPop {
+            GlStateManager.enableDepth()
 
-        if (GuiEditManager.isInGui()) {
-            event.context.matrices.translate(0f, 0f, -3f)
-            renderOverlay(event.context)
-            event.context.matrices.translate(0f, 0f, 3f)
+            if (GuiEditManager.isInGui()) {
+                DrawContextUtils.translated(z = -3) {
+                    renderOverlay(DrawContextUtils.drawContext, true)
+                }
+            }
         }
 
-        GuiRenderEvent.ChestGuiOverlayRenderEvent(event.context).post()
-
-        event.context.matrices.popMatrix()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
+        GuiRenderEvent.GuiOnTopRenderEvent(DrawContextUtils.drawContext).post()
     }
 
     var outsideInventory = false
 
-    fun renderOverlay(context: DrawContext) {
+    fun renderOverlay(context: DrawContext, inventoryPresent: Boolean = false) {
         outsideInventory = true
         GuiRenderEvent.GuiOverlayRenderEvent(context).post()
+        if (!inventoryPresent) GuiRenderEvent.GuiOnTopRenderEvent(context).post()
         outsideInventory = false
     }
 }

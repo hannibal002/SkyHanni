@@ -1,13 +1,25 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.GuiEditManager
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
-//#if MC < 1.21
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-//#endif
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 
+@SkyHanniModule
 object ConfigGuiManager {
+
+    private val widenConfig get() = SkyHanniMod.feature.gui.widenConfig
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        getEditorInstance().wide = widenConfig.get()
+        ConditionalUtils.onToggle(widenConfig) {
+            getEditorInstance().wide = widenConfig.get()
+        }
+    }
 
     var editor: MoulConfigEditor<Features>? = null
 
@@ -19,20 +31,6 @@ object ConfigGuiManager {
         if (search != null) {
             editor.search(search)
         }
-        //#if MC < 1.21
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
-        //#endif
-    }
-
-    fun onCommand(args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (args[0].lowercase() == "gui") {
-                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
-            } else {
-                openConfigGui(args.joinToString(" "))
-            }
-        } else {
-            openConfigGui()
-        }
     }
 }

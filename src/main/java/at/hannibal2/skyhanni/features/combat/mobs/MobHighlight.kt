@@ -2,19 +2,21 @@ package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCaveSpider
@@ -27,6 +29,29 @@ object MobHighlight {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
     private var arachne: EntityLivingBase? = null
+    private val toHighlightRunicMobs: HashSet<Mob> = hashSetOf()
+
+    @HandleEvent
+    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+        val mob = event.mob
+        if (mob.isRunic) toHighlightRunicMobs.add(mob)
+    }
+
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
+        val mob = event.mob
+        if (mob.isRunic) toHighlightRunicMobs.remove(mob)
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick() {
+        if (!config.runicMobHighlight) return
+
+        toHighlightRunicMobs.forEach {
+            it.highlight(LorenzColor.LIGHT_PURPLE.toChromaColor()) { config.runicMobHighlight }
+        }
+        toHighlightRunicMobs.clear()
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
@@ -104,11 +129,11 @@ object MobHighlight {
             return
         }
 
-        if (arachne.distanceToPlayer() > 10) return
+        if (!arachne.canBeSeen(10)) return
 
         event.drawLineToEye(
             arachne.getLorenzVec().up(),
-            LorenzColor.RED.toColor(),
+            LorenzColor.RED.toChromaColor(),
             config.lineToArachneWidth,
             true,
         )
@@ -117,6 +142,7 @@ object MobHighlight {
     @HandleEvent
     fun onWorldChange() {
         arachne = null
+        toHighlightRunicMobs.clear()
     }
 
     private fun checkArachne(entity: EntitySpider) {

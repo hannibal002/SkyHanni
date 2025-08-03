@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
@@ -11,16 +12,18 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.seconds
@@ -83,6 +86,7 @@ object SummoningMobManager {
         if (!event.mob.belongsToPlayer()) return
 
         mobs += event.mob
+        // TODO config option for color
         if (config.summoningMobColored) event.mob.highlight(LorenzColor.GREEN.toColor())
     }
 
@@ -94,7 +98,7 @@ object SummoningMobManager {
 
         // since MobEvent.DeSpawn can be fired while outside sb
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
         if (!config.summonMessages) return
 
         if (!mob.isInRender()) return
@@ -126,9 +130,9 @@ object SummoningMobManager {
                 val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong()).getChatColor()
                 add("#${index + 1} §a${mob.name} $color${health.shortFormat()}§2/${maxHealth.shortFormat()}§c❤")
             }
-        }.map { Renderable.string(it) }
+        }.map(StringRenderable::from)
 
-        val renderable = Renderable.verticalContainer(list)
+        val renderable = Renderable.vertical(list)
         config.summoningMobDisplayPos.renderRenderable(renderable, posLabel = "Summoning Mob Display")
     }
 

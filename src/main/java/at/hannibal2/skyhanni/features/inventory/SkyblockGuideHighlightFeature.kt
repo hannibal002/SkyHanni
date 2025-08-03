@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -11,10 +12,10 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
 
@@ -71,14 +72,14 @@ class SkyblockGuideHighlightFeature private constructor(
     @SkyHanniModule
     companion object {
 
-        private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuideConfig
+        private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuide
 
         private val objectList = mutableListOf<SkyblockGuideHighlightFeature>()
 
         private var activeObject: SkyblockGuideHighlightFeature? = null
         private val missing = mutableSetOf<Int>()
 
-        fun isEnabled() = LorenzUtils.inSkyBlock
+        fun isEnabled() = SkyBlockUtils.inSkyBlock
         fun close() {
             activeObject = null
         }
@@ -103,7 +104,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             event.container.inventorySlots
                 .filter { missing.contains(it.slotNumber) }
-                .forEach { it.highlight(event.context, LorenzColor.RED) }
+                .forEach { it.highlight(LorenzColor.RED) }
         }
 
         @HandleEvent
@@ -157,7 +158,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
         init {
             SkyblockGuideHighlightFeature(
-                { SkyHanniMod.feature.inventory.highlightMissingSkyBlockLevelGuide },
+                { SkyHanniMod.feature.inventory.skyblockGuide.missingTasks },
                 "level.guide",
                 ".*Guide ➜.*",
                 xPattern,
@@ -265,6 +266,25 @@ class SkyblockGuideHighlightFeature private constructor(
                 "Daily Tasks",
                 "§c§lINCOMPLETE",
             )
+            SkyblockGuideHighlightFeature(
+                { SkyHanniMod.feature.inventory.attributeShards.highlightDisabledAttributes },
+                "attribute.disable",
+                "Attribute Menu",
+                "§7Enabled: §cNo",
+            )
+        }
+    }
+
+    private val massMigrations = mapOf(
+        "inventory.skyblockGuideConfig" to "inventory.skyblockGuide",
+        "inventory.highlightMissingSkyBlockLevelGuide" to "inventory.skyblockGuide.missingTasks",
+        "inventory.powerStoneGuide" to "inventory.skyblockGuide.powerStone",
+    )
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        massMigrations.forEach { (oldPath, newPath) ->
+            event.move(97, oldPath, newPath)
         }
     }
 }

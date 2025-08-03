@@ -9,7 +9,6 @@ enum class ItemCategory {
     BOW,
     SHORT_BOW,
     WAND,
-    FISHING_WEAPON,
     FISHING_ROD,
     ROD_PART,
     AXE,
@@ -58,6 +57,14 @@ enum class ItemCategory {
     BLOCK,
     DWARVEN_METAL,
     GEMSTONE,
+    LASSO,
+    FISHING_NET,
+    SALT,
+    TRAP,
+    BOOSTER,
+    WATER_SHARD,
+    FOREST_SHARD,
+    COMBAT_SHARD,
 
     NONE,
     ;
@@ -70,5 +77,7 @@ enum class ItemCategory {
         val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)
 
         val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
+
+        val equipment = setOf(NECKLACE, BELT, CLOAK, GLOVES, BRACELET)
     }
 }

@@ -18,10 +18,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
@@ -34,10 +38,20 @@ object AnitaMedalProfit {
 
     var inInventory = false
 
-    enum class MedalType(val displayName: String, val factorBronze: Int) {
-        GOLD("§6Gold medal", 8),
-        SILVER("§fSilver medal", 2),
-        BRONZE("§cBronze medal", 1),
+    enum class MedalType(
+        val displayName: String,
+        val simpleName: String = displayName.removeColor().split(" ")[0],
+        val factorBronze: Int,
+        val color: LorenzColor = displayName.substring(1, 2)[0].toLorenzColor() ?: LorenzColor.WHITE,
+    ) {
+        GOLD("§6Gold medal", "gold", 8),
+        SILVER("§fSilver medal", "silver", 2),
+        BRONZE("§cBronze medal", "bronze", 1),
+        ;
+
+        companion object {
+            fun bySimpleNameOrNull(name: String) = entries.firstOrNull { it.simpleName == name }
+        }
     }
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
@@ -70,7 +84,7 @@ object AnitaMedalProfit {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eProfit per Bronze Medal"))
+        newList.addString("§eProfit per Bronze Medal")
         newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
@@ -137,15 +151,14 @@ object AnitaMedalProfit {
         }
     }
 
-    private fun isInvalidItemName(itemName: String): Boolean = when (itemName) {
+    private val invalidItemNames = listOf(
         " ",
         "§cClose",
         "§eUnique Gold Medals",
         "§aMedal Trades",
-        -> true
+    )
 
-        else -> false
-    }
+    private fun isInvalidItemName(itemName: String): Boolean = itemName in invalidItemNames
 
     private fun getItemName(item: ItemStack): String {
         val name = item.displayName

@@ -23,10 +23,12 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
+    private var newBurrow = true
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onIslandChange() {
         bezierFitter.reset()
+        newBurrow = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
@@ -51,7 +53,8 @@ object PreciseGuessBurrow {
 
         val guessPosition = guessBurrowLocation() ?: return
 
-        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock(), precise = true).post()
+        BurrowGuessEvent(guessPosition.down(0.5).roundToBlock(), precise = bezierFitter.count() > 5, new = newBurrow).post()
+        newBurrow = false
     }
 
     private fun guessBurrowLocation(): LorenzVec? = bezierFitter.solve()
@@ -71,6 +74,7 @@ object PreciseGuessBurrow {
         }
         bezierFitter.reset()
         lastDianaSpade = SimpleTimeMark.now()
+        newBurrow = true
     }
 
     @HandleEvent
@@ -85,7 +89,7 @@ object PreciseGuessBurrow {
         val guess = guessBurrowLocation()
         event.addIrrelevant {
             add("Burrow Guess: " + (guess?.toCleanString() ?: "No Guess"))
-            add("Rounded Guess: " + (guess?.down(0.5)?.roundLocationToBlock()?.toCleanString() ?: "No Guess"))
+            add("Rounded Guess: " + (guess?.down(0.5)?.roundToBlock()?.toCleanString() ?: "No Guess"))
             add("Particle Locations:")
             addAll(
                 bezierFitter.points.mapIndexed { index, lorenzVec ->

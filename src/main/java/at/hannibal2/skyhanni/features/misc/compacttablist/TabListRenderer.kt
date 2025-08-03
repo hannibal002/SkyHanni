@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
@@ -12,14 +13,11 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 
 @SkyHanniModule
 object TabListRenderer {
@@ -34,13 +32,13 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (event.type != RenderGameOverlayEvent.ElementType.PLAYER_LIST) return
+        if (event.type != RenderLayer.PLAYER_LIST) return
         if (!config.enabled.get()) return
         event.cancel()
 
         if (config.toggleTab) return
 
-        drawTabList(event.context)
+        drawTabList()
     }
 
     private var isPressed = false
@@ -62,16 +60,16 @@ object TabListRenderer {
         }
 
         if (isTabToggled) {
-            drawTabList(event.context)
+            drawTabList()
         }
     }
 
-    private fun drawTabList(context: DrawContext) {
+    private fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
 
-        context.matrices.translate(0f, 0f, TAB_Z_OFFSET)
+        DrawContextUtils.translate(0f, 0f, TAB_Z_OFFSET)
 
         var maxLines = 0
         var totalWidth = 0 - COLUMN_SPACING
@@ -104,48 +102,47 @@ object TabListRenderer {
         val x = screenWidth - totalWidth / 2
         val y = 10
 
-        GuiRenderUtils.drawRect(
-            context,
-            x - COLUMN_SPACING,
-            y - TAB_PADDING,
-            screenWidth + totalWidth / 2 + COLUMN_SPACING,
-            10 + totalHeight + TAB_PADDING,
-            -0x80000000,
-        )
+        if (!config.hideTabBackground) {
+            GuiRenderUtils.drawRect(
+                x - COLUMN_SPACING,
+                y - TAB_PADDING,
+                screenWidth + totalWidth / 2 + COLUMN_SPACING,
+                10 + totalHeight + TAB_PADDING,
+                -0x80000000,
+            )
+        }
 
         var headerY = y
         if (header.isNotEmpty()) {
             for (line in header) {
                 GuiRenderUtils.drawString(
-                    context,
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     headerY.toFloat(),
-                    0xFFFFFF,
+                    -1,
                 )
                 headerY += 8 + 1
             }
         }
 
-        drawColumns(context, x, headerY, columns, minecraft)
+        drawColumns(x, headerY, columns)
 
         if (footer.isNotEmpty()) {
             var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
             for (line in footer) {
                 GuiRenderUtils.drawString(
-                    context,
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     footerY.toFloat(),
-                    -0x1,
+                    -1,
                 )
                 footerY += LINE_HEIGHT
             }
         }
-        context.matrices.translate(0f, 0f, -TAB_Z_OFFSET)
+        DrawContextUtils.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
-    private fun drawColumns(context: DrawContext, x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
+    private fun drawColumns(x: Int, headerY: Int, columns: List<RenderColumn>) {
         var middleX = x
         var lastTitle: TabLine? = null
         var lastSubTitle: TabLine? = null
@@ -164,12 +161,11 @@ object TabListRenderer {
             }.let(::RenderColumn)
 
             GuiRenderUtils.drawRect(
-                context,
                 middleX - TAB_PADDING + 1,
                 middleY - TAB_PADDING + 1,
                 middleX + column.getMaxWidth() + TAB_PADDING - 2,
                 middleY + column.size() * LINE_HEIGHT + TAB_PADDING - 2,
-                0x20AAAAAA,
+                if (config.hideTabBackground) 0x8F262626.toInt() else 0x20AAAAAA,
             )
 
             for (tabLine in column.lines) {
@@ -179,14 +175,19 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
-                        minecraft.textureManager.bindTexture(playerInfo.locationSkin)
-                        GlStateManager.color(1f, 1f, 1f, 1f)
-                        Gui.drawScaledCustomSizeModalRect(middleX, middleY, 8f, 8f, 8, 8, 8, 8, 64.0f, 64.0f)
+                        val texture = playerInfo.locationSkin
+                        //#if MC < 1.21
+                        GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 8 / 64f, 16 / 64f, 8 / 64f, 16 / 64f, texture)
 
                         val player = tabLine.getEntity(playerInfo)
                         if (player != null && player.isWearing(EnumPlayerModelParts.HAT)) {
-                            Gui.drawScaledCustomSizeModalRect(middleX, middleY, 40.0f, 8f, 8, 8, 8, 8, 64.0f, 64.0f)
+                            GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 40 / 64f, 48 / 64f, 8 / 64f, 16 / 64f, texture)
                         }
+                        //#else
+                        //$$ net.minecraft.client.gui.PlayerSkinDrawer.draw(
+                        //$$     DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.shouldShowHat(), false, -1
+                        //$$ )
+                        //#endif
                     }
                     middleX += 8 + 2
                 }
@@ -195,19 +196,17 @@ object TabListRenderer {
                 if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
                     GuiRenderUtils.drawString(
-                        context,
                         text,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
-                        0xFFFFFF,
+                        -1,
                     )
                 } else {
                     GuiRenderUtils.drawString(
-                        context,
                         text,
                         middleX.toFloat(),
                         middleY.toFloat(),
-                        0xFFFFFF,
+                        -1,
                     )
                 }
                 middleY += LINE_HEIGHT
@@ -219,7 +218,7 @@ object TabListRenderer {
 
     private val fireSalePattern by RepoPattern.pattern(
         "tablist.firesaletitle",
-        "§.§lFire Sales: §r§f\\([0-9]+\\)"
+        "§.§lFire Sales: §r§f\\([0-9]+\\)",
     )
 
     @HandleEvent

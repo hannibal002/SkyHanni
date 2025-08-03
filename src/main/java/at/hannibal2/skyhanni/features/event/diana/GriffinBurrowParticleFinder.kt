@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
+import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -17,7 +18,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes
@@ -64,12 +66,16 @@ object GriffinBurrowParticleFinder {
 
         val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
-        val location = event.location
+        // TODO the rounding is a workaround, may need to be removed once we know what is going on exactly and can fix this properly
+        val location = event.location.roundToBlock().down()
+
         val burrow = burrows.getOrPut(location) { Burrow(location) }
         val oldBurrowType = burrow.type
 
         when (type) {
+            //#if MC < 1.16
             ParticleType.FOOTSTEP -> burrow.hasFootstep = true
+            //#endif
             ParticleType.ENCHANT -> burrow.hasEnchant = true
             ParticleType.EMPTY -> burrow.type = 0
             ParticleType.MOB -> burrow.type = 1
@@ -86,14 +92,18 @@ object GriffinBurrowParticleFinder {
         }
     }
 
+    // TODO this function needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
+    // and instead of ticks alive, should use found timestamp and use passed since > 1.min
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
         if (isSpade) {
-            burrows.filter { (location, burrow) ->
+            for ((location, burrow) in burrows.toMutableMap()) {
+                if (location.distanceSqToPlayer() > 256) continue
                 burrow.burrowTimeToLive -= 1
-                location.distanceSqToPlayer() < 256 && burrow.burrowTimeToLive < 0
-            }.forEach { (location, burrow) ->
+                if (burrow.burrowTimeToLive >= 0) continue
+                // TODO differentiate between user clicking the burrow and the burrow dissapears after a while,
+                //  important bc of wasCorrectPetAlready in GriffinPetWarning
                 BurrowDugEvent(location).post()
                 burrows.remove(location)
                 lastDugParticleBurrow = null
@@ -101,21 +111,31 @@ object GriffinBurrowParticleFinder {
         }
     }
 
+    // TODO move to ParticleUtils or similar
+    // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(
-            { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset == LorenzVec(0.5, 0.1, 0.5) },
+            { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         MOB(
-            { type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && offset == LorenzVec(0.5, 0.1, 0.5) },
+            { type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         TREASURE(
-            { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset == LorenzVec(0.35, 0.1, 0.35) },
+            { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
+        //#if MC < 1.16
         FOOTSTEP(
-            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && offset == LorenzVec(0.05, 0.0, 0.05) },
+            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
         ),
+        //#endif
         ENCHANT(
-            { type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset == LorenzVec(0.5, 0.4, 0.5) },
+            {
+                type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset.roundTo(2) == LorenzVec(
+                    0.5,
+                    0.4,
+                    0.5,
+                )
+            },
         )
     }
 
@@ -189,20 +209,22 @@ object GriffinBurrowParticleFinder {
 
     class Burrow(
         var location: LorenzVec,
+        //#if MC < 1.16
         var hasFootstep: Boolean = false,
+        //#else
+        //$$ var hasFootstep: Boolean = true,
+        //#endif
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
-        var burrowTimeToLive: Int = 0,
+        var burrowTimeToLive: Int = CurrentPing.averagePing.inWholeTicks + 1
     ) {
 
-        fun getType(): BurrowType {
-            return when (this.type) {
-                0 -> BurrowType.START
-                1 -> BurrowType.MOB
-                2 -> BurrowType.TREASURE
-                else -> BurrowType.UNKNOWN
-            }
+        fun getType(): BurrowType = when (this.type) {
+            0 -> BurrowType.START
+            1 -> BurrowType.MOB
+            2 -> BurrowType.TREASURE
+            else -> BurrowType.UNKNOWN
         }
     }
 

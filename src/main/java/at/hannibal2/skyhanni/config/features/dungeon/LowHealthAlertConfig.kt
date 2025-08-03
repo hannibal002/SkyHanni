@@ -21,5 +21,5 @@ class LowHealthAlertConfig {
     @Expose
     @ConfigOption(name = "Sound Settings", desc = "")
     @Accordion
-    var lowHealthAlertSound: LowHealthAlertSoundConfig = LowHealthAlertSoundConfig()
+    val lowHealthAlertSound: LowHealthAlertSoundConfig = LowHealthAlertSoundConfig()
 }

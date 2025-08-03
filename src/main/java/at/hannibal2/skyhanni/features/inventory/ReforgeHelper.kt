@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -26,18 +25,22 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
+import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.string as renderableString
 
 @SkyHanniModule
 object ReforgeHelper {
@@ -77,7 +80,7 @@ object ReforgeHelper {
     private fun isReforgeMenu(chestName: String) = reforgeMenu.matches(chestName)
     private fun isHexReforgeMenu(chestName: String) = reforgeHexMenu.matches(chestName)
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && isInReforgeMenu
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && isInReforgeMenu
 
     private var itemToReforge: ItemStack? = null
     private var inventoryContainer: Container? = null
@@ -134,6 +137,7 @@ object ReforgeHelper {
     }
 
     private fun handleReforgeButtonClick(event: GuiContainerEvent.SlotClickEvent): Boolean {
+        if (reforgeToSearch == null) return false
         if (currentReforge == reforgeToSearch) {
             event.cancel()
             waitForChat.set(false)
@@ -161,7 +165,7 @@ object ReforgeHelper {
                     itemUpdate()
                     waitForChat.set(false)
                 }
-                if (config?.hideChat == true) {
+                if (config.hideChat) {
                     event.blockedReason = "reforge_hide"
                 }
             }
@@ -170,7 +174,7 @@ object ReforgeHelper {
                 DelayedRun.runDelayed(2.ticks) {
                     waitForChat.set(false)
                 }
-                if (config?.hideChat == true) {
+                if (config.hideChat) {
                     event.blockedReason = "reforge_hide"
                 }
             }
@@ -218,8 +222,8 @@ object ReforgeHelper {
         display = generateDisplay()
     }
 
-    private fun generateDisplay() = buildList<Renderable> {
-        this.add(renderableString("§6Reforge Overlay"))
+    private fun generateDisplay() = buildList {
+        addString("§6Reforge Overlay")
 
         val item = itemToReforge ?: run {
             reforgeToSearch = null
@@ -237,7 +241,7 @@ object ReforgeHelper {
         val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.keys }.flatten().toSet()
 
         val statTypeButtons = (listOf(getStatButton(null)) + statTypes.map { getStatButton(it) }).chunked(9)
-        this.add(Renderable.table(statTypeButtons, xPadding = 3, yPadding = 2))
+        this.add(Renderable.table(statTypeButtons, xSpacing = 3, ySpacing = 2))
 
         val list = reforgeList.sortedWith(getSortSelector(itemRarity, sortAfter)).map(getReforgeView(itemRarity))
         this.addAll(list)
@@ -283,29 +287,35 @@ object ReforgeHelper {
             stats = currentReforge?.stats?.get(itemRarity)?.print().orEmpty()
             removedEffect = emptyList()
             addEffectText = "§aEffect:"
-            clickToApply = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
+            clickToApply = listOf(
+                Renderable.emptyText(),
+                Renderable.text("§3Reforge is currently applied!"),
+            )
         } else {
             stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)).orEmpty()
             removedEffect = getReforgeEffect(
                 currentReforge,
                 itemRarity,
-            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
+            )?.let { listOf(Renderable.text("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
             addEffectText = "§aAdds Effect:"
             clickToApply = if (reforgeToSearch != reforge) {
-                listOf(renderableString(""), renderableString("§eClick to select!"))
+                listOf(
+                    Renderable.emptyText(),
+                    Renderable.text("§eClick to select!"),
+                )
             } else emptyList()
         }
 
         val addedEffect = getReforgeEffect(reforge, itemRarity)?.let {
-            listOf(renderableString(addEffectText)) + it
+            listOf(Renderable.text(addEffectText)) + it
         }.orEmpty()
 
-        return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + clickToApply
+        return listOf(Renderable.text("§6Reforge Stats")) + stats + removedEffect + addedEffect + clickToApply
     }
 
     private fun getReforgeEffect(reforge: ReforgeApi.Reforge?, rarity: LorenzRarity) =
         reforge?.extraProperty?.get(rarity)?.let {
-            Renderable.wrappedString(
+            Renderable.wrappedText(
                 it,
                 190,
                 color = LorenzColor.GRAY.toColor(),
@@ -336,7 +346,6 @@ object ReforgeHelper {
         val alreadySelected = sortAfter == stat
         val fieldColor = if (alreadySelected) LorenzColor.GRAY else LorenzColor.DARK_GRAY
 
-
         val tips = if (alreadySelected) {
             listOf("§6Sort by", tip)
         } else {
@@ -346,7 +355,7 @@ object ReforgeHelper {
             Renderable.drawInsideRoundedRect(
                 Renderable.hoverTips(
                     Renderable.fixedSizeLine(
-                        renderableString(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
+                        Renderable.text(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                         SkyblockStat.fontSizeOfLargestIcon,
                     ),
                     tips,
@@ -386,39 +395,39 @@ object ReforgeHelper {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (hoveredReforge != null && isInHexReforgeMenu) {
             if (hoveredReforge != currentReforge) {
-                colorReforgeStone(event.context, hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
+                colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
             } else {
-                inventoryContainer?.getSlot(reforgeItem)?.highlight(event.context, hoverColor)
+                inventoryContainer?.getSlot(reforgeItem)?.highlight(hoverColor)
             }
             hoveredReforge = null
         }
 
         if (reforgeToSearch == null) return
         if (reforgeToSearch != currentReforge) {
-            colorSelected(event.context)
+            colorSelected()
         } else {
-            inventoryContainer?.getSlot(reforgeItem)?.highlight(event.context, finishedColor)
+            inventoryContainer?.getSlot(reforgeItem)?.highlight(finishedColor)
         }
     }
 
-    private fun colorSelected(context: DrawContext) = if (reforgeToSearch?.isReforgeStone == true) {
+    private fun colorSelected() = if (reforgeToSearch?.isReforgeStone == true) {
         if (isInHexReforgeMenu) {
-            colorReforgeStone(context, selectedColor, reforgeToSearch?.rawReforgeStoneName)
+            colorReforgeStone(selectedColor, reforgeToSearch?.rawReforgeStoneName)
         } else {
-            inventoryContainer?.getSlot(EXIT_BUTTON)?.highlight(context, selectedColor)
+            inventoryContainer?.getSlot(EXIT_BUTTON)?.highlight(selectedColor)
         }
     } else {
-        inventoryContainer?.getSlot(reforgeButton)?.highlight(context, selectedColor)
+        inventoryContainer?.getSlot(reforgeButton)?.highlight(selectedColor)
     }
 
-    private fun colorReforgeStone(context: DrawContext, color: Color, reforgeStone: String?) {
+    private fun colorReforgeStone(color: Color, reforgeStone: String?) {
         val inventory = inventoryContainer?.inventorySlots ?: return
         val slot = inventory.firstOrNull { it?.stack?.cleanName() == reforgeStone }
         if (slot != null) {
-            slot.highlight(context, color)
+            slot.highlight(color)
         } else {
-            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(context, color)
-            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(context, color)
+            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
         }
     }
 
@@ -429,9 +438,13 @@ object ReforgeHelper {
                 val key = it.key
                 val value = this[key] ?: 0.0
                 buildList {
-                    add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
-                    diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
-                    add(renderableString(key.iconWithName))
+                    val valueFormat = "§9${value.toStringWithPlus().removeSuffix(".0")}"
+                    add(Renderable.text(valueFormat))
+                    diff?.get(key)?.let { diffKey ->
+                        val diffFormat = (if (diffKey < 0) "§c" else "§a") + diffKey.toStringWithPlus().removeSuffix(".0")
+                        add(Renderable.text(diffFormat))
+                    }
+                    add(Renderable.text(key.iconWithName))
                 }
             }
             )

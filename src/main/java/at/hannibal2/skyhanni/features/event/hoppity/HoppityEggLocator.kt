@@ -14,23 +14,23 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
@@ -116,7 +116,7 @@ object HoppityEggLocator {
             } else "§aGuess #${index + 1}"
             drawEggWaypoint(eggLocation, name)
             if (waypointsConfig.showLine) {
-                drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
+                drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toChromaColor(), 2, false)
             }
         }
     }
@@ -127,7 +127,8 @@ object HoppityEggLocator {
             val dist = eggLocation.distanceToPlayer()
             if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
                 val alpha = ((10 - dist) / 10).coerceAtMost(0.5).toFloat()
-                drawColor(eggLocation, LorenzColor.RED, false, alpha)
+                // TODO add chroma color support via config
+                drawColor(eggLocation, LorenzColor.RED.toChromaColor(), false, alpha)
                 drawDynamicText(eggLocation.up(), "§cDuplicate Location!", 1.5)
             }
         }
@@ -137,9 +138,9 @@ object HoppityEggLocator {
         val shouldMarkDuplicate = waypointsConfig.highlightDuplicates && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
-            drawWaypointFilled(location, waypointsConfig.color.toSpecialColor(), seeThroughBlocks = true)
+            drawWaypointFilled(location, waypointsConfig.color.toColor(), seeThroughBlocks = true)
         } else {
-            drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
+            drawColor(location, LorenzColor.RED.toChromaColor(), false, 0.5f)
         }
         drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }
@@ -153,20 +154,23 @@ object HoppityEggLocator {
         if (!isEnabled()) return
         if (!event.isVillagerParticle()) return
         if (lastClick.passedSince() > 5.seconds) return
+        val pos = event.location
 
-        val lastPoint = bezierFitter.getLastPoint()
-        if (lastPoint != null) {
-            if (lastPoint.distanceSq(event.location) > 9) return
-        }
-
-        if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 0.3).any()) {
+        if (bezierFitter.isEmpty()) {
+            bezierFitter.addPoint(pos)
             return
         }
 
+        val lastPoint = bezierFitter.getLastPoint() ?: return
+        val dist = lastPoint.distance(pos)
+        if (dist == 0.0 || dist > 3.0) return
 
-        bezierFitter.addPoint(event.location)
+        if (EntityUtils.getEntitiesNearby<EntityFishHook>(pos, 0.3).any()) return
+
+        bezierFitter.addPoint(pos)
 
         val guess = guessEggLocation() ?: return
+        if (!SkyBlockUtils.currentIsland.isInBounds(guess)) return
         possibleEggLocations = listOf(guess)
         drawLocations = true
         if (possibleEggLocations.size == 1) {
@@ -200,8 +204,7 @@ object HoppityEggLocator {
     private fun trySendingGraph() {
         if (!waypointsConfig.showPathFinder) return
         val location = possibleEggLocations.firstOrNull() ?: return
-
-        val color = waypointsConfig.color.toSpecialColor()
+        val color = waypointsConfig.color.toColor()
 
         IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { waypointsConfig.showPathFinder })
     }
@@ -210,16 +213,16 @@ object HoppityEggLocator {
         it.distance(location) < 5.0
     }
 
-    private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
+    private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0f && count == 1
 
     fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&
+        SkyBlockUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&
             HoppityApi.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
     private val locatorInHotbar by RecalculatingValue(1.seconds) {
-        LorenzUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
+        SkyBlockUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
     }
 
     @HandleEvent
@@ -242,7 +245,7 @@ object HoppityEggLocator {
 
     private fun testPathFind(args: Array<String>) {
         val target = args[0].formatInt()
-        HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
+        HoppityEggLocations.apiEggLocations[SkyBlockUtils.currentIsland]?.let {
             for ((i, location) in it.values.withIndex()) {
                 if (i == target) {
                     IslandGraphs.pathFind(location, "Hoppity Test", condition = { true })

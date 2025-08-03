@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.EnumChatFormatting
 import java.awt.Color
@@ -38,8 +40,10 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     fun getChatColor(): String = "§$chatColorCode"
 
+    // TODO make this public fun unnecesary, replace with chroma color
     fun toColor(): Color = color
 
+    // TODO make this functin return moulconfig.ChromaColour, and eventually remove awt.Color support
     fun addOpacity(opacity: Int): Color {
         val color = toColor()
         val red = color.red
@@ -50,7 +54,16 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     override fun toString(): String = coloredLabel
 
-    fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
+    private val cachedChromaColor by lazy { color.toChromaColor(this.color.alpha, 0) }
+
+    // TODO make deprecated
+    @JvmOverloads
+    fun toChromaColor(alpha: Int = this.color.alpha, chromaSpeedMillis: Int = 0): ChromaColour {
+        if (alpha == this.color.alpha && chromaSpeedMillis == 0) {
+            return cachedChromaColor
+        }
+        return color.toChromaColor(alpha, chromaSpeedMillis)
+    }
 
     fun toDyeColor(): EnumDyeColor = when (this) {
         WHITE -> EnumDyeColor.WHITE

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
@@ -25,12 +27,16 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 object SkyHanniTypeAdapters {
-
     val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)
 
     val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
         { this.toString() },
-        { java.util.UUID.fromString(this) },
+        { StringUtils.parseUUID(this) },
+    )
+
+    val NBT_BOOLEAN: TypeAdapter<NbtBoolean> = SimpleStringTypeAdapter(
+        { this.asString() },
+        { NbtBoolean.fromString(this) },
     )
 
     val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
@@ -54,7 +60,7 @@ object SkyHanniTypeAdapters {
         }
 
         override fun read(reader: JsonReader): SimpleTimeMark {
-            return reader.nextString().toLong().asTimeMark()
+            return reader.nextLong().asTimeMark()
         }
     }
 
@@ -64,7 +70,7 @@ object SkyHanniTypeAdapters {
         }
 
         override fun read(reader: JsonReader): Duration {
-            return reader.nextString().toLong().milliseconds
+            return reader.nextLong().milliseconds
         }
     }
 

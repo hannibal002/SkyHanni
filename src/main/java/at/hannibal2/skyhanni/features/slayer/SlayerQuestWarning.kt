@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -15,9 +14,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -28,7 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerQuestWarning {
 
-    private val config get() = SkyHanniMod.feature.slayer
+    private val config get() = SlayerApi.config
 
     private var lastWeaponUse = SimpleTimeMark.farPast()
     private val voidItem = "ASPECT_OF_THE_VOID".toInternalName()
@@ -44,8 +43,8 @@ object SlayerQuestWarning {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        val slayerType = event.full.nextAfter("Slayer Quest")
-        val slayerProgress = event.full.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+        val slayerType = event.new.nextAfter("Slayer Quest")
+        val slayerProgress = event.new.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
         val new = slayerProgress.removeColor()
         val slayerData = getSlayerData()
 
@@ -128,7 +127,7 @@ object SlayerQuestWarning {
         // workaround for rift mob that is unrelated to slayer
         if (entity.name == "Oubliette Guard") return false
         // workaround for Bladesoul in  Crimson Isle
-        if (LorenzUtils.skyBlockArea == "Stronghold" && entity.name == "Skeleton") return false
+        if (SkyBlockUtils.scoreboardArea == "Stronghold" && entity.name == "Skeleton") return false
 
         val isSlayer = slayerType.clazz.isInstance(entity)
         if (!isSlayer) return false

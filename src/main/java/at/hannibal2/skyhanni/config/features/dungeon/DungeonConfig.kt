@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,18 +14,18 @@ class DungeonConfig {
     @Expose
     @ConfigOption(
         name = "Clicked Blocks",
-        desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons."
+        desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons.",
     )
     @Accordion
-    var clickedBlocks: HighlightClickedBlocksConfig = HighlightClickedBlocksConfig()
+    val clickedBlocks: HighlightClickedBlocksConfig = HighlightClickedBlocksConfig()
 
     @Expose
     @ConfigOption(
         name = "Secret Chime",
-        desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons."
+        desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons.",
     )
     @Accordion
-    var secretChime: SecretChimeConfig = SecretChimeConfig()
+    val secretChime: SecretChimeConfig = SecretChimeConfig()
 
     @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
@@ -33,7 +35,7 @@ class DungeonConfig {
 
     @Expose
     @ConfigLink(owner = DungeonConfig::class, field = "showMilestonesDisplay")
-    var showMileStonesDisplayPos: Position = Position(10, 10, false, true)
+    val showMileStonesDisplayPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current Dungeon.")
@@ -43,17 +45,17 @@ class DungeonConfig {
 
     @Expose
     @ConfigLink(owner = DungeonConfig::class, field = "deathCounterDisplay")
-    var deathCounterPos: Position = Position(10, 10, false, true)
+    val deathCounterPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Clean End", desc = "")
     @Accordion
-    var cleanEnd: CleanEndConfig = CleanEndConfig()
+    val cleanEnd: CleanEndConfig = CleanEndConfig()
 
     @Expose
     @ConfigOption(
         name = "Boss Damage Splash",
-        desc = "Hide damage splashes while inside the boss room (fixes a Skytils feature)."
+        desc = "Hide damage splashes while inside the boss room (fixes a Skytils feature).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -69,13 +71,14 @@ class DungeonConfig {
     @ConfigOption(name = "Highlight Teammates", desc = "Highlight Dungeon teammates with a glowing outline.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @OnlyLegacy
     var highlightTeammates: Boolean = true
 
     @Expose
     @ConfigOption(
         name = "Architect Notifier",
         desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed.\n" +
-            "§cOnly works when having enough §5Architect First Drafts §cin the sack."
+            "§cOnly works when having enough §5Architect First Drafts §cin the sack.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -84,49 +87,53 @@ class DungeonConfig {
     @Expose
     @ConfigOption(name = "Object Highlighter", desc = "Highlights various things in Dungeons.")
     @Accordion
-    var objectHighlighter: ObjectHighlighterConfig = ObjectHighlighterConfig()
+    val objectHighlighter: ObjectHighlighterConfig = ObjectHighlighterConfig()
 
     @Expose
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
     @Accordion
-    var objectHider: ObjectHiderConfig = ObjectHiderConfig()
+    val objectHider: ObjectHiderConfig = ObjectHiderConfig()
 
     @Expose
     @ConfigOption(name = "Message Filter", desc = "")
     @Accordion
-    var messageFilter: MessageFilterConfig = MessageFilterConfig()
+    val messageFilter: MessageFilterConfig = MessageFilterConfig()
 
     @Expose
     @ConfigOption(name = "Dungeon Copilot", desc = "")
     @Accordion
-    var dungeonCopilot: DungeonCopilotConfig = DungeonCopilotConfig()
+    val dungeonCopilot: DungeonCopilotConfig = DungeonCopilotConfig()
 
     @Expose
     @ConfigOption(name = "Party Finder", desc = "")
     @Accordion
-    var partyFinder: PartyFinderConfig = PartyFinderConfig()
+    val partyFinder: PartyFinderConfig = PartyFinderConfig()
 
     @Expose
     @ConfigOption(name = "Tab List", desc = "")
     @Accordion
-    var tabList: TabListConfig = TabListConfig()
+    val tabList: TabListConfig = TabListConfig()
 
     @Expose
     @ConfigOption(name = "Livid Finder", desc = "")
     @Accordion
-    var lividFinder: LividFinderConfig = LividFinderConfig()
+    val lividFinder: LividFinderConfig = LividFinderConfig()
 
+    @Expose
+    @ConfigOption(name = "Trinity", desc = "")
+    @Accordion
+    val trinityHelper: TrinityConfig = TrinityConfig()
 
     @Expose
     @ConfigOption(name = "Terracotta Phase", desc = "")
     @Accordion
-    var terracottaPhase: TerracottaPhaseConfig = TerracottaPhaseConfig()
+    val terracottaPhase: TerracottaPhaseConfig = TerracottaPhaseConfig()
 
     @Expose
     @ConfigOption(
         name = "Moving Skeleton Skulls",
         desc = "Highlight Skeleton Skulls when combining into an " +
-            "orange Skeletor (not useful when combined with feature Hide Skeleton Skull)."
+            "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -135,14 +142,14 @@ class DungeonConfig {
     @Expose
     @ConfigOption(name = "Chests Config", desc = "")
     @Accordion
-    var chest: DungeonChestConfig = DungeonChestConfig()
+    val chest: DungeonChestConfig = DungeonChestConfig()
 
     // TODO move( , "dungeon.croesusUnopenedChestTracker" ,"dungeon.chest.showUnopened" )
     @Expose
     @ConfigOption(
         name = "Croesus Chest",
         desc = "Add a visual highlight to the Croesus inventory that " +
-            "shows unopened chests."
+            "shows unopened chests.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -152,7 +159,7 @@ class DungeonConfig {
     @ConfigOption(
         name = "SA Jump Notification",
         desc = "Notifies you when a Shadow Assassin is about " +
-            "to jump on you."
+            "to jump on you.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -165,12 +172,31 @@ class DungeonConfig {
     var terminalWaypoints: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Creation Cooldown", desc = "")
+    @Accordion
+    val creationCooldown: CreationCooldownConfig = CreationCooldownConfig()
+
+    @Expose
     @ConfigOption(name = "Low Health Alert", desc = "")
     @Accordion
-    var lowHealthAlert: LowHealthAlertConfig = LowHealthAlertConfig()
+    val lowHealthAlert: LowHealthAlertConfig = LowHealthAlertConfig()
 
     @Expose
     @ConfigOption(name = "Dungeon Races Guide", desc = "")
     @Accordion
-    var dungeonsRaceGuide: DungeonsRaceGuideConfig = DungeonsRaceGuideConfig()
+    val dungeonsRaceGuide: DungeonsRaceGuideConfig = DungeonsRaceGuideConfig()
+
+    @Expose
+    @ConfigOption(name = "Spirit Leap", desc = "Configure the Spirit Leap feature to modify its behavior in-game.")
+    @Accordion
+    val spiritLeapOverlay: SpiritLeapConfig = SpiritLeapConfig()
+
+    @Expose
+    @ConfigOption(
+        name = "Spring Boots Notification",
+        desc = "Shows sound and title when Spring Boots are charged up enough to reach the Crystals in phase 1 of the floor 7 boss fight.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var springBootsNotification: Boolean = false
 }

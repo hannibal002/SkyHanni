@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.fishing
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -21,7 +22,7 @@ class TotemOfCorruptionConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var showOverlay: Property<Boolean> = Property.of(true)
+    val showOverlay: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -62,7 +63,7 @@ class TotemOfCorruptionConfig {
     @Expose
     @ConfigOption(name = "Color of the area", desc = "The color of the area of the Totem of Corruption.")
     @ConfigEditorColour
-    var color: String = "0:153:18:159:85"
+    var color: ChromaColour = ChromaColour.fromStaticRGB(18, 159, 85, 153)
 
     @Expose
     @ConfigOption(
@@ -75,5 +76,5 @@ class TotemOfCorruptionConfig {
 
     @Expose
     @ConfigLink(owner = TotemOfCorruptionConfig::class, field = "showOverlay")
-    var position: Position = Position(50, 20, false, true)
+    val position: Position = Position(50, 20)
 }

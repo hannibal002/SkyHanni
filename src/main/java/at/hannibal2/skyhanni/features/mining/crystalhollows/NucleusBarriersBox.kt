@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWireframeBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.util.AxisAlignedBB
 
@@ -26,7 +26,7 @@ object NucleusBarriersBox {
 
     private enum class Crystal(
         val boundingBox: AxisAlignedBB,
-        val configColorOption: Property<String>,
+        val configColorOption: Property<ChromaColour>,
     ) {
         AMBER(
             LorenzVec(474, 124, 524).axisAlignedTo(LorenzVec(485, 111, 535))
@@ -69,20 +69,20 @@ object NucleusBarriersBox {
                 BoundingBoxType.FILLED -> {
                     event.drawFilledBoundingBox(
                         crystal.boundingBox,
-                        crystal.configColorOption.get().toSpecialColor(),
+                        crystal.configColorOption.get(),
                     )
                 }
 
                 BoundingBoxType.OUTLINE -> {
-                    event.drawWireframeBoundingBox(
+                    event.drawHitbox(
                         crystal.boundingBox,
-                        crystal.configColorOption.get().toSpecialColor(),
+                        crystal.configColorOption.get().toColor(),
                     )
                 }
             }
         }
     }
 
-    private fun isEnabled(): Boolean = IslandType.CRYSTAL_HOLLOWS.isInIsland() && inNucleus &&
+    private fun isEnabled(): Boolean = IslandType.CRYSTAL_HOLLOWS.isCurrent() && inNucleus &&
         (HoppityApi.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled
 }

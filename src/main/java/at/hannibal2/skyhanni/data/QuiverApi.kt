@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -240,9 +240,13 @@ object QuiverApi {
                     val type = group("type")
                     val amount = group("amount").formatInt()
                     val currentArrowType = getArrowByNameOrNull(type) ?: run {
+                        if (arrows.isEmpty()) {
+                            ErrorManager.skyHanniError("Quiver arrows list is empty! Type /shupdaterepo to try to fix it.")
+                        }
                         ErrorManager.logErrorWithData(
                             UnknownArrowType("Unknown arrow type: $type"),
                             "Unknown arrow type: $type",
+                            "arrows" to arrows,
                             "line" to line,
                         )
                         return
@@ -277,7 +281,7 @@ object QuiverApi {
 
     private fun NeuInternalName.asArrowTypeOrNull() = getArrowByNameOrNull(this)
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && storage != null
 
     private fun checkBowInventory() {
         hasBow = InventoryUtils.getItemsInOwnInventory().any {

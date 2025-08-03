@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MiningApi.inColdIsland
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
@@ -33,19 +33,16 @@ object ColdOverlay {
         val alpha = getColdAlpha()
         if (alpha == 0f) return
 
-        Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
-
-        event.context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         GlStateManager.pushAttrib()
 
         GL11.glDepthMask(false)
-        event.context.matrices.translate(0f, 0f, -500f)
-        GlStateManager.color(1f, 1f, 1f, alpha)
+        DrawContextUtils.translate(0f, 0f, -500f)
+        GuiRenderUtils.drawTexturedRect(0f, 0f, textureLocation, alpha)
 
-        GuiRenderUtils.drawTexturedRect(0f, 0f)
         GL11.glDepthMask(true)
 
-        event.context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         GlStateManager.popAttrib()
     }
 
@@ -66,5 +63,5 @@ object ColdOverlay {
         }
     }
 
-    private fun isEnabled() = inColdIsland() && config.enabled
+    private fun isEnabled() = IslandTypeTags.IS_COLD.inAny() && config.enabled
 }

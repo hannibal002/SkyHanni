@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.slayer.enderman
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
@@ -12,36 +12,36 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
 import kotlin.time.Duration.Companion.seconds
 
+// TODO replace all drawLineToEye with LineToMobHandler
 @SkyHanniModule
 object EndermanSlayerFeatures {
 
-    private val config get() = SkyHanniMod.feature.slayer.endermen
+    private val config get() = SlayerApi.config.endermen
     private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private val flyingBeacons = mutableSetOf<EntityArmorStand>()
@@ -68,7 +68,7 @@ object EndermanSlayerFeatures {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
-                        beaconConfig.beaconColor.toSpecialColor().addAlpha(1),
+                        beaconConfig.beaconColor.toColor().addAlpha(1),
                     ) {
                         beaconConfig.highlightBeacon
                     }
@@ -92,8 +92,6 @@ object EndermanSlayerFeatures {
 
     private fun hasBeaconInHand(enderman: EntityEnderman) = enderman.getBlockInHand()?.block == Blocks.beacon
 
-    private fun canSee(b: LorenzVec) = b.canBeSeen(15.0)
-
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
@@ -102,7 +100,7 @@ object EndermanSlayerFeatures {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
             for (location in endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }) {
-                event.drawColor(location, beaconConfig.beaconColor.toSpecialColor(), alpha = 0.5f)
+                event.drawColor(location, beaconConfig.beaconColor, alpha = 0.5f)
             }
         }
 
@@ -119,17 +117,17 @@ object EndermanSlayerFeatures {
                     skull.getLorenzVec().add(-0.5, 1.5, -0.5),
                     "§6Nukekubi Skull",
                     1.6,
-                    ignoreBlocks = false,
+                    seeThroughBlocks = false,
                     maxDistance = 20,
                 )
             }
             if (config.drawLineToNukekebi) {
                 val skullLocation = event.exactLocation(skull)
-                if (skullLocation.distanceToPlayer() > 20) continue
-                if (!skullLocation.canBeSeen()) continue
+                // TODO remove visibility check once the skull stops moving
+                if (!skull.canBeSeen(viewDistance = 20)) continue
                 event.drawLineToEye(
                     skullLocation.up(),
-                    LorenzColor.GOLD.toColor(),
+                    LorenzColor.GOLD.toChromaColor(),
                     3,
                     true,
                 )
@@ -139,7 +137,7 @@ object EndermanSlayerFeatures {
 
     private fun drawFlyingBeacon(event: SkyHanniRenderWorldEvent) {
         for (beacon in flyingBeacons) {
-            if (beacon.isDead) continue
+            if (!beacon.canBeSeen()) continue
             if (beaconConfig.highlightBeacon) {
                 val beaconLocation = event.exactLocation(beacon)
                 event.drawDynamicText(beaconLocation.add(y = 1), "§4Beacon", 1.8)
@@ -149,7 +147,7 @@ object EndermanSlayerFeatures {
                 val beaconLocation = event.exactLocation(beacon)
                 event.drawLineToEye(
                     beaconLocation.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor.toSpecialColor(),
+                    beaconConfig.lineColor,
                     beaconConfig.lineWidth,
                     true,
                 )
@@ -163,7 +161,7 @@ object EndermanSlayerFeatures {
             if (beaconConfig.showLine) {
                 event.drawLineToEye(
                     location.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor.toSpecialColor(),
+                    beaconConfig.lineColor,
                     beaconConfig.lineWidth,
                     true,
                 )
@@ -172,8 +170,8 @@ object EndermanSlayerFeatures {
             if (beaconConfig.highlightBeacon) {
                 val duration = 5.seconds - time.passedSince()
                 val durationFormat = duration.format(showMilliSeconds = true)
-                event.drawColor(location, beaconConfig.beaconColor.toSpecialColor(), alpha = 1f)
-                event.drawWaypointFilled(location, beaconConfig.beaconColor.toSpecialColor(), true, true)
+                event.drawColor(location, beaconConfig.beaconColor, alpha = 1f)
+                event.drawWaypointFilled(location, beaconConfig.beaconColor.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
             }
         }

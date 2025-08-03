@@ -12,9 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-/**
- * Note: This mixin is changed in 1.12 so any changes to this mixin should also be applied to the mixin in the versions/1.12 folder
- */
 @Mixin(DataWatcher.class)
 public class MixinDataWatcher {
     @Shadow

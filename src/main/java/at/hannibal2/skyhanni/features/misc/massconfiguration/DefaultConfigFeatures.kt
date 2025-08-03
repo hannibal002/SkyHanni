@@ -4,10 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 
 @SkyHanniModule
@@ -19,12 +22,6 @@ object DefaultConfigFeatures {
     fun onHypixelJoin(event: HypixelJoinEvent) {
         if (didNotifyOnce) return
         didNotifyOnce = true
-
-        val oldToggles = SkyHanniMod.feature.storage.knownFeatureToggles
-        if (oldToggles.isNotEmpty()) {
-            SkyHanniMod.knownFeaturesData.knownFeatures = oldToggles
-            SkyHanniMod.feature.storage.knownFeatureToggles = emptyMap()
-        }
 
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val updated = SkyHanniMod.VERSION !in knownToggles
@@ -40,28 +37,32 @@ object DefaultConfigFeatures {
                 "Looks like this is the first time you are using SkyHanni. " +
                     "Click here to configure default options, or run /shdefaultoptions.",
                 onClick = { onCommand("null", "null") },
-                "§eClick to run /shdefaultoptions!"
+                "§eClick to run /shdefaultoptions!",
             )
         } else if (updated) {
-            val lastVersion = knownToggles.keys.last { it != SkyHanniMod.VERSION }
+            val lastVersion = knownToggles.keys.lastOrNull { it != SkyHanniMod.VERSION }
+                ?: ErrorManager.skyHanniError(
+                    "lastVersion is null, this should never happen",
+                    "knownToggles" to knownToggles,
+                    "version" to SkyHanniMod.VERSION,
+                )
             val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
+            ChatUtils.chat("Looks like you updated SkyHanni.")
             ChatUtils.clickableChat(
-                "Looks like you updated SkyHanni. " +
-                    "Click here to configure the newly introduced options, or run $command.",
+                "Click here to configure the newly introduced options, or run $command.",
                 onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
-                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!"
+                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!",
+            )
+            ChatUtils.clickableChat(
+                "Click here to see the changelog.",
+                onClick = {
+                    ChangelogViewer.showChangelog(lastVersion, SkyHanniMod.VERSION)
+                },
             )
         }
     }
 
-    private fun onCommand(args: Array<String>) {
-        onCommand(
-            args.getOrNull(0) ?: "null",
-            args.getOrNull(1) ?: "null",
-        )
-    }
-
-    fun onCommand(old: String, new: String) {
+    private fun onCommand(old: String, new: String) {
         val processor = FeatureToggleProcessor()
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
@@ -112,21 +113,25 @@ object DefaultConfigFeatures {
         }
     }
 
-    private fun onComplete(strings: Array<String>): List<String> {
-        if (strings.size <= 2)
-            return StringUtils.getListOfStringsMatchingLastWord(
-                strings,
-                SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null"),
-            )
-        return listOf()
-    }
+    private val autocomplete get() = SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shdefaultoptions") {
+        event.registerBrigadier("shdefaultoptions") {
             description = "Select default options"
-            callback { onCommand(it) }
-            autoComplete { onComplete(it) }
+            arg("oldVersion", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { autocomplete }) { oldVersion ->
+                arg("newVersion", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { autocomplete }) { newVersion ->
+                    callback {
+                        onCommand(getArg(oldVersion), getArg(newVersion))
+                    }
+                }
+                callback {
+                    onCommand(getArg(oldVersion), "null")
+                }
+            }
+            simpleCallback {
+                onCommand("null", "null")
+            }
         }
     }
 }

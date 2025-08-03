@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -26,7 +28,7 @@ object ViewRecipeCommand {
         "\\/viewrecipe (?<item>.*)"
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.viewRecipeLowerCase) return
         if (event.senderIsSkyhanni()) return
@@ -37,14 +39,20 @@ object ViewRecipeCommand {
 
         val args = input.split(" ")
         val endsWithPageNumber = args.last().isInt()
-        val finalCommand = if (endsWithPageNumber) {
-            "${args.dropLast(1).joinToString("_")} ${args.last()}"
+
+        val (item, page) = if (endsWithPageNumber) {
+            val testItem = args.joinToString(" ").toInternalName().getItemStackOrNull()
+            if (testItem == null) {
+                args.dropLast(1).joinToString("_") to args.last().toInt()
+            } else {
+                input.replace(" ", "_") to 1
+            }
         } else {
-            input.replace(" ", "_")
+            input.replace(" ", "_") to 1
         }
 
         event.cancel()
-        HypixelCommands.viewRecipe(finalCommand)
+        HypixelCommands.viewRecipe(item.toInternalName(), page)
     }
 
     val list by lazy {

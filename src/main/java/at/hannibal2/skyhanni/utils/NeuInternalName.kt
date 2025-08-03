@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import net.minecraft.init.Items
+import kotlin.time.Duration.Companion.minutes
 
 class NeuInternalName private constructor(private val internalName: String) {
 
@@ -24,7 +28,7 @@ class NeuInternalName private constructor(private val internalName: String) {
             if (it.contains("§") || it.contains("&") || it.contains("'")) {
                 ErrorManager.skyHanniError(
                     "Internal name found with color codes",
-                    "Internal Name" to it, "Original String" to this
+                    "Internal Name" to it, "Original String" to this,
                 )
             }
             internalNameMap.getOrPut(it) { NeuInternalName(it) }
@@ -79,4 +83,28 @@ class NeuInternalName private constructor(private val internalName: String) {
         internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()
 
     fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
+
+    /**
+     * This is because skyblock has special ids in commands such as /viewrecipe for items like enchanted books and pets
+     */
+    val skyblockCommandId: String
+        get() = when {
+            isPet -> internalName.split(";").first()
+            isEnchantedBook -> {
+                val (name, level) = internalName.split(";", limit = 2)
+                "ENCHANTED_BOOK_${name}_$level"
+            }
+
+            else -> internalName
+        }
+
+    private val petCache: TimeLimitedCache<NeuInternalName, Boolean> = TimeLimitedCache(10.minutes)
+
+    val isPet: Boolean
+        get() = petCache.getOrPut(this) {
+            PetUtils.isKnownPetInternalName(this) || this.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET
+        }
+
+    private val isEnchantedBook: Boolean
+        get() = getItemStackOrNull()?.item == Items.enchanted_book
 }

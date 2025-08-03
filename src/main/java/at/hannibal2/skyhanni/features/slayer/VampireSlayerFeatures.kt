@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
@@ -16,9 +17,12 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
@@ -26,18 +30,18 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
@@ -51,7 +55,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object VampireSlayerFeatures {
 
-    private val config get() = SkyHanniMod.feature.slayer.vampire
+    private val config get() = SlayerApi.config.vampire
     private val configOwnBoss get() = config.ownBoss
     private val configOtherBoss get() = config.othersBoss
     private val configCoopBoss get() = config.coopBoss
@@ -68,7 +72,9 @@ object VampireSlayerFeatures {
 
     private val BLOOD_ICHOR_TEXTURE by lazy { SkullTextureHolder.getTexture("BLOOD_ICHOR") }
     private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
+
     private var nextClawSend = 0L
+    private var lastWitherSpawnSound = ServerTimeMark.FAR_PAST
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -89,7 +95,7 @@ object VampireSlayerFeatures {
                 val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
                 if (isIchor || stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) {
                     val color =
-                        (if (isIchor) configBloodIchor.color else configKillerSpring.color).toSpecialColor().addAlpha(config.withAlpha)
+                        (if (isIchor) configBloodIchor.color else configKillerSpring.color).toColor().addAlpha(config.withAlpha)
                     if (distance <= 15) {
                         RenderLivingEntityHelper.setEntityColor(
                             stand,
@@ -143,7 +149,6 @@ object VampireSlayerFeatures {
                         TitleManager.sendTitle(
                             "§6§lTWINCLAWS",
                             duration = (1750 - config.twinclawsDelay).milliseconds,
-                            height = 2.6,
                         )
                         nextClawSend = System.currentTimeMillis() + 5_000
                     }
@@ -165,11 +170,10 @@ object VampireSlayerFeatures {
             val shouldRender = if (ownBoss) true else if (otherBoss) true else coopBoss
 
             val color = when {
-                canUseSteak && config.changeColorWhenCanSteak -> config.steakColor.color()
-                ownBoss -> configOwnBoss.highlightColor.color()
-                otherBoss -> configOtherBoss.highlightColor.color()
-                coopBoss -> configCoopBoss.highlightColor.color()
-
+                canUseSteak && config.changeColorWhenCanSteak -> config.steakColor.toColor()
+                ownBoss -> configOwnBoss.highlightColor.toColor()
+                otherBoss -> configOtherBoss.highlightColor.toColor()
+                coopBoss -> configCoopBoss.highlightColor.toColor()
                 else -> Color.BLACK
             }
 
@@ -179,7 +183,7 @@ object VampireSlayerFeatures {
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle) {
-                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds, height = 2.6)
+                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
             }
 
             if (shouldRender) {
@@ -191,10 +195,6 @@ object VampireSlayerFeatures {
 
     private fun EntityOtherPlayerMP.isHighlighted(): Boolean {
         return entityList.contains(this) || taggedEntityList.contains(entityId)
-    }
-
-    private fun String.color(): Color {
-        return this.toSpecialColor().addAlpha(config.withAlpha)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -260,25 +260,24 @@ object VampireSlayerFeatures {
         if (config.drawLine) {
             for (it in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
                 if (!it.isHighlighted()) continue
+                if (!it.canBeSeen(15)) continue
                 val vec = event.exactLocation(it)
-                if (vec.distanceToPlayer() < 15) {
-                    event.drawLineToEye(
-                        vec.up(1.54),
-                        config.lineColor.toSpecialColor(),
-                        config.lineWidth,
-                        true,
-                    )
-                }
+                event.drawLineToEye(
+                    vec.up(1.54),
+                    config.lineColor,
+                    config.lineWidth,
+                    true,
+                )
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
-        for (stand in MinecraftCompat.localWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
+        for (stand in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
             val vec = stand.position.toLorenzVec()
             val distance = vec.distanceToPlayer()
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
             val isSpring = stand.hasSkullTexture(KILLER_SPRING_TEXTURE)
             if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) continue
-            val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toSpecialColor().addAlpha(config.withAlpha)
+            val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toColor().addAlpha(config.withAlpha)
             if (distance <= 15) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,
@@ -286,35 +285,38 @@ object VampireSlayerFeatures {
                 ) { isEnabled() }
 
                 val linesColorStart =
-                    (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toSpecialColor()
+                    (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
                 val text = if (isIchor) "§4Ichor" else "§4Spring"
                 event.drawColor(
                     stand.position.toLorenzVec().up(2.0),
-                    LorenzColor.DARK_RED,
+                    LorenzColor.DARK_RED.toChromaColor(),
                     alpha = 1f,
                 )
                 event.drawDynamicText(
                     stand.position.toLorenzVec().add(0.5, 2.5, 0.5),
                     text,
                     1.5,
-                    ignoreBlocks = false,
+                    seeThroughBlocks = false,
                 )
-                for ((player, stand2) in standList) {
-                    if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
-                        event.draw3DLine(
-                            event.exactPlayerEyeLocation(player),
-                            event.exactPlayerEyeLocation(stand2),
-                            linesColorStart,
-                            3,
-                            true,
-                        )
+                for ((ichor, boss) in standList) {
+                    if (!(configBloodIchor.showLines && isIchor) && !(configKillerSpring.showLines && isSpring)) continue
+
+                    // ichors are sometimes in the ground
+                    if (!ichor.canBeSeen(vecYOffset = 1.5)) continue
+                    event.draw3DLine(
+                        event.exactPlayerEyeLocation(boss),
+                        event.exactPlayerEyeLocation(ichor),
+                        linesColorStart,
+                        3,
+                        true,
+                    )
 
                 }
             }
             if (configBloodIchor.renderBeam && isIchor && stand.isEntityAlive) {
                 event.drawWaypointFilled(
                     event.exactLocation(stand).add(0, y = -2, 0),
-                    configBloodIchor.color.toSpecialColor(),
+                    configBloodIchor.color.toColor(),
                     beacon = true,
                 )
             }
@@ -332,13 +334,28 @@ object VampireSlayerFeatures {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
-        for (player in EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0)) {
-            if (!player.isHighlighted() || event.type != EnumParticleTypes.ENCHANTMENT_TABLE) continue
-            for (stand in EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0)) {
-                if (stand.hasSkullTexture(KILLER_SPRING_TEXTURE) || stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
-                    standList = standList.editCopy { this[stand] = player }
+        for (boss in EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0)) {
+            if (!boss.isHighlighted() || event.type != EnumParticleTypes.ENCHANTMENT_TABLE) continue
+            for (ichor in EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0)) {
+                if (ichor.hasSkullTexture(KILLER_SPRING_TEXTURE) || ichor.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
+                    standList = standList.editCopy { this[ichor] = boss }
                 }
             }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (PlatformUtils.IS_LEGACY) return
+        if (!isEnabled()) return
+        if (!configKillerSpring.fixSoundSpam) return
+
+        if (event.soundName == "mob.wither.spawn") {
+            if (lastWitherSpawnSound.passedSince() < 1.ticks) {
+                ChatUtils.debug("Cancelling duplicate wither spawn sound sent within the same tick")
+                return event.cancel()
+            }
+            lastWitherSpawnSound = ServerTimeMark.now()
         }
     }
 

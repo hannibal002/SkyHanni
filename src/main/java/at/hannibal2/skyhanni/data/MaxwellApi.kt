@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
@@ -252,7 +252,6 @@ object MaxwellApi {
                 "Unknown power: $displayName",
                 "displayName" to displayName,
                 "lore" to selectedPowerStack.getLore(),
-                noStackTrace = true,
             )
             return
         }
@@ -317,11 +316,11 @@ object MaxwellApi {
                 val power = group("power")
                 currentPower = getPowerByNameOrNull(power)
                     ?: return@matchMatcher ErrorManager.logErrorWithData(
-                        UnknownMaxwellPower("Unknown power: ${stack.displayName}"),
-                        "Unknown power: ${stack.displayName}",
+                        UnknownMaxwellPower("Unknown power: $power"),
+                        "Unknown power: $power",
+                        "line" to line,
                         "displayName" to stack.displayName,
                         "lore" to stack.getLore(),
-                        noStackTrace = true,
                     )
             }
         }
@@ -335,7 +334,7 @@ object MaxwellApi {
 
     fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && storage != null
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && !SkyBlockUtils.isOnAlphaServer && storage != null
 
     // Load powers from repo
     @HandleEvent

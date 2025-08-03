@@ -17,19 +17,29 @@ class PestTimerConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Only With Farming Tool", desc = "Only show the display when holding a farming tool in hand.")
-    @ConfigEditorBoolean
-    var onlyWithFarmingTool: Boolean = true
+    @ConfigOption(
+        name = "Only When Holding",
+        desc = "Only show the time display when holding the specified items.\n" +
+            "Leave empty to always show.",
+    )
+    @ConfigEditorDraggableList
+    val onlyWhenHolding: MutableList<HeldItem> = mutableListOf(
+        HeldItem.FARMING_TOOL,
+    )
 
-    @Expose
-    @ConfigOption(name = "Only With Vacuum", desc = "Only show the time while holding a vacuum in the hand.")
-    @ConfigEditorBoolean
-    var onlyWithVacuum: Boolean = false
+    enum class HeldItem(val displayName: String) {
+        FARMING_TOOL("Farming Tool"),
+        VACUUM("Vacuum"),
+        LASSO("Lasso"),
+        ;
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(name = "Pest Timer Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var pestDisplay: MutableList<PestTimerTextEntry> = mutableListOf(
+    val pestDisplay: MutableList<PestTimerTextEntry> = mutableListOf(
         PestTimerTextEntry.PEST_TIMER,
         PestTimerTextEntry.PEST_COOLDOWN
     )
@@ -37,11 +47,10 @@ class PestTimerConfig {
     enum class PestTimerTextEntry(private val displayName: String) {
         PEST_TIMER("§eLast pest spawned: §b8s ago"),
         PEST_COOLDOWN("§ePest Cooldown: §b1m 8s"),
-        AVERAGE_PEST_SPAWN("§eAverage time to spawn: §b4m 32s");
+        AVERAGE_PEST_SPAWN("§eAverage time to spawn: §b4m 32s"),
+        ;
 
-        override fun toString(): String {
-            return displayName
-        }
+        override fun toString() = displayName
     }
 
     @Expose
@@ -73,5 +82,5 @@ class PestTimerConfig {
 
     @Expose
     @ConfigLink(owner = PestTimerConfig::class, field = "enabled")
-    var position: Position = Position(383, 93, false, true)
+    val position: Position = Position(383, 93)
 }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.crimsonisle
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -30,7 +31,7 @@ class SulphurSkitterBoxConfig {
     @Expose
     @ConfigOption(name = "Box Color", desc = "Choose the color of the box.")
     @ConfigEditorColour
-    var boxColor: String = "0:102:255:216:0"
+    var boxColor: ChromaColour = ChromaColour.fromStaticRGB(255, 216, 0, 102)
 
     @Expose
     @ConfigOption(name = "Only With Rods", desc = "Render the box only when holding a lava fishing rod.")

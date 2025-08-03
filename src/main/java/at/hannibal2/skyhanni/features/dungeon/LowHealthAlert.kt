@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.title.TitleContext
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,7 +18,7 @@ object LowHealthAlert {
 
     private val config get() = SkyHanniMod.feature.dungeon.lowHealthAlert
     private val soundConfig get() = config.lowHealthAlertSound
-    private var lastAlert: TitleManager.TitleContext? = null
+    private var lastAlert: TitleContext? = null
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
@@ -31,7 +32,11 @@ object LowHealthAlert {
             val alertSound = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch)
             SoundUtils.repeatSound(100, soundConfig.repeatSound, alertSound)
             lastAlert?.stop()
-            TitleManager.sendTitle("§c$username §ais low", "§c$health❤", 1.seconds)?.let {
+            TitleManager.sendTitle(
+                "§c$username §ais low",
+                "§c$health❤",
+                1.seconds
+            )?.let {
                 lastAlert = it
             }
         }

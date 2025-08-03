@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OtherModsSettings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -20,7 +20,7 @@ object PatcherFixes {
         lastCheck = SimpleTimeMark.now()
 
         val patcher = OtherModsSettings.patcher()
-        if (!patcher.getBoolean("parallaxFix")) return
+        if (!patcher.isEnabled("parallaxFix")) return
 
         if (lastChatMessage.passedSince() < 3.minutes) return
         lastChatMessage = SimpleTimeMark.now()
@@ -35,7 +35,7 @@ object PatcherFixes {
 
     private fun tryFix() {
         val patcher = OtherModsSettings.patcher()
-        if (patcher.getBoolean("parallaxFix")) {
+        if (patcher.isEnabled("parallaxFix")) {
             patcher.setBoolean("parallaxFix", false)
             ChatUtils.chat("§aDisabled Patcher's Parallax Fix! SkyHanni's lines should now work correctly.")
         } else {
@@ -43,5 +43,5 @@ object PatcherFixes {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.fixPatcherLines
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fixPatcherLines
 }

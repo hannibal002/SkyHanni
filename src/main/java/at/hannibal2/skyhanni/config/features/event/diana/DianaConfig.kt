@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -23,7 +24,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(name = "Inquisitor Highlight", desc = "Color in which Inquisitors will be highlighted.")
     @ConfigEditorColour
-    var color: String = "0:127:85:255:255"
+    var color: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 255, 127)
 
     @Expose
     @ConfigOption(
@@ -34,12 +35,12 @@ class DianaConfig {
     @FeatureToggle
     var guess: Boolean = false
 
-    enum class GuessLogic(private val display: String) {
+    enum class GuessLogic(private val displayName: String) {
         SOOPY_GUESS("Soopy"),
         PRECISE_GUESS("Precise"),
         ;
 
-        override fun toString(): String = display
+        override fun toString(): String = displayName
     }
 
     @Expose
@@ -89,12 +90,12 @@ class DianaConfig {
     @Expose
     @ConfigOption(name = "Ignored Warps", desc = "")
     @Accordion
-    var ignoredWarps: IgnoredWarpsConfig = IgnoredWarpsConfig()
+    val ignoredWarps: IgnoredWarpsConfig = IgnoredWarpsConfig()
 
     @Expose
     @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
     @Accordion
-    var inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
+    val inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
 
     @Expose
     @ConfigOption(
@@ -108,16 +109,15 @@ class DianaConfig {
     @Expose
     @ConfigOption(name = "Diana Profit Tracker", desc = "")
     @Accordion
-    var dianaProfitTracker: DianaProfitTrackerConfig = DianaProfitTrackerConfig()
+    val dianaProfitTracker: DianaProfitTrackerConfig = DianaProfitTrackerConfig()
 
-    // TODO rename mythologicalMobTracker
     @Expose
     @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
-    var mythologicalMobtracker: MythologicalMobTrackerConfig = MythologicalMobTrackerConfig()
+    val mythologicalMobtracker: MythologicalMobTrackerConfig = MythologicalMobTrackerConfig()
 
     @Expose
     @ConfigOption(name = "All Burrows List", desc = "")
     @Accordion
-    var allBurrowsList: AllBurrowsListConfig = AllBurrowsListConfig()
+    val allBurrowsList: AllBurrowsListConfig = AllBurrowsListConfig()
 }

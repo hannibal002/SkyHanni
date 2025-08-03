@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 
@@ -109,23 +108,21 @@ object DanceRoomHelper {
         if (event.isMod(10)) {
             inRoom = RiftApi.inMirrorVerse && danceRoom.isPlayerInside()
         }
-        if (inRoom) {
-            update()
-        }
+        if (inRoom) update()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.enabled || !inRoom) return
         if ((event.soundName == "random.burp" && event.volume == 0.8f) ||
-            (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)
+            (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1f)
         ) {
             index = 0
             found = false
             countdown = null
             update()
         }
-        if (event.soundName == "note.bassattack" && event.pitch == 0.6984127f && event.volume == 1.0f && !found) {
+        if (event.soundName == "note.bassattack" && event.pitch == 0.6984127f && event.volume == 1f && !found) {
             found = true
             start(2000)
             update()
@@ -147,7 +144,7 @@ object DanceRoomHelper {
         val countdownString = "%01d:%03d".format(seconds, milliseconds)
         countdown = countdownString
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             delay(1)
             var updatedSeconds = seconds
             var updatedMilliseconds = milliseconds - 1
@@ -172,7 +169,7 @@ object DanceRoomHelper {
     }
 
     fun start(interval: Long) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             while (isActive && found) {
                 index++
                 startCountdown(0, 500)

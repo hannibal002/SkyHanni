@@ -19,7 +19,7 @@ enum class NonGodPotEffect(
     VOID("§6End Portal Fumes", true),
     BLAZE("§fGabagoey", true),
     GLOWING_MUSH("§2Glowing Mush Mixin", true),
-    HOT_CHOCOLATE("§6Hot Chocolate Mixin", true),
+    HOT_CHOCOLATE("§6Hot Chocolate Mixin I", true),
 
     DEEP_TERROR("§4Deepterror", true),
 
@@ -39,4 +39,9 @@ enum class NonGodPotEffect(
     POWDER_PUMPKIN("§fPowder Pumpkin I"),
     FILET_O_FORTUNE("§fFilet O' Fortune I"),
     CHILLED_PRISTINE_POTATO("§fChilled Pristine Potato I"),
+
+    LUSHLILAC_BONBON("§r§5Lushlilac Bonbon§r§f"),
+    PRIME_LUSHLILAC_BONBON("§r§5Prime Lushlilac Bonbon§r§f"),
+    EXALTED_LUSHLILAC_BONBON("§r§5Exalted Lushlilac Bonbon§r§f"),
+    OCEANDY("§r§5Oceandy§r§f"),
 }

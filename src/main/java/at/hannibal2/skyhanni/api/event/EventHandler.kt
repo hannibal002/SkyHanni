@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.test.command.ErrorManager.maybeSkipError
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -32,7 +33,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             if (!listener.shouldInvoke(event)) continue
             try {
                 listener.invoker.accept(event)
-            } catch (throwable: Throwable) {
+            } catch (originalThrowable: Throwable) {
+                val throwable = originalThrowable.maybeSkipError()
                 errors++
                 if (errors <= 3) {
                     val errorName = throwable::class.simpleName ?: "error"

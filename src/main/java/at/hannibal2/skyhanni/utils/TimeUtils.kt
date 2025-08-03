@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -163,7 +164,7 @@ object TimeUtils {
         /**
          * We replace the line here, because the user might want color month names
          */
-        return tryToReplaceScoreboardLine(
+        return ScoreboardData.tryToReplaceScoreboardLine(
             if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
                 "$datePart, $timePart"
             } else {
@@ -191,6 +192,9 @@ object TimeUtils {
     val Int.ticks get() = (this * 50).milliseconds
 
     val Float.minutes get() = toDouble().minutes
+
+    // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
+    fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 }
 
 private const val FACTOR_SECONDS = 1000L
@@ -207,11 +211,23 @@ enum class TimeUnit(val factor: Long, private val shortName: String, private val
     SECOND(FACTOR_SECONDS, "s", "Second"),
     ;
 
+    fun asDuration(value: Int): Duration = (value * factor).milliseconds
+
     fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
         " $longName" + if (value == 1) "" else "s"
     } else shortName
 
     fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
+
+    companion object {
+        fun getByName(name: String, tryRemoveSuffix: Boolean = true) = entries.firstOrNull {
+            val nameMatches = it.name.equals(name, ignoreCase = true)
+            if (nameMatches) return@firstOrNull true
+            if (!tryRemoveSuffix) return@firstOrNull false
+            val suffixRemoved = name.uppercase().removeSuffix("S")
+            it.name.equals(suffixRemoved, ignoreCase = true)
+        }
+    }
 }
 
 val Duration.inPartialSeconds: Double get() = toDouble(DurationUnit.SECONDS)

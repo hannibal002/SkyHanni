@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -12,21 +16,21 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
-import kotlinx.coroutines.launch
+import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import java.net.URI
+import java.nio.file.Path
+import java.time.temporal.TemporalAccessor
+import java.time.temporal.TemporalAmount
+import java.util.Date
+import java.util.UUID
 
 // TODO in the future change something here
+@SkyHanniModule
 object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
-
-    fun command(args: Array<String>) {
-        SkyHanniMod.coroutineScope.launch {
-            ChatUtils.chat(runCommand(args))
-        }
-        lastCommand = args
-    }
 
     private suspend fun runCommand(args: Array<String>): String {
         if (args.isEmpty()) {
@@ -43,7 +47,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private fun resetCommand(args: Array<String>): String {
+    fun resetCommand(args: Array<String>): String {
         if (args.size != 2) return "§c/shconfig reset <config element>"
         val term = args[1]
         if (term.startsWith("playerSpecific")) return "§cCannot reset playerSpecific! Use §e/shconfig set §cinstead."
@@ -62,7 +66,7 @@ object SkyHanniConfigSearchResetCommand {
             ErrorManager.logErrorWithData(
                 e, "Could not reset config element '$term'",
                 "term" to term,
-                "args" to args.joinToString(" ")
+                "args" to args.joinToString(" "),
             )
             return "§cCould not reset config element '$term'"
         }
@@ -76,7 +80,7 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error while trying to search config",
-                "args" to args.joinToString(" ")
+                "args" to args.joinToString(" "),
             )
             "§cError while trying to search config"
         }
@@ -122,7 +126,7 @@ object SkyHanniConfigSearchResetCommand {
                 "old" to shimmy.getJson(),
                 "term" to term,
                 "rawJson" to rawJson,
-                "args" to args.joinToString(" ")
+                "args" to args.joinToString(" "),
             )
             "§cCould not change config element '$term' to '$rawJson'"
         }
@@ -187,7 +191,7 @@ object SkyHanniConfigSearchResetCommand {
     private fun findConfigElements(
         configFilter: (String) -> Boolean,
         classFilter: (String) -> Boolean,
-        onlyValue: Boolean = false
+        onlyValue: Boolean = false,
     ): MutableList<String> {
         val list = mutableListOf<String>()
 
@@ -272,35 +276,50 @@ object SkyHanniConfigSearchResetCommand {
             map["$parentName.<end of depth>"] = null
             return map
         }
+        if (obj.javaClass.`package`?.name?.startsWith("java.") == true) {
+            return map
+        }
         for (field in obj.javaClass.declaredFields) {
-            if ((field.modifiers and Modifier.STATIC) != 0) continue
+            if (Modifier.isStatic(field.modifiers)) continue
 
             val name = field.name
             if (parentName == "playerSpecific" && name == "profiles") continue
             if (parentName == "config.storage" && name == "players") continue
             if (parentName == "config" && name == "storage") continue
             val fieldName = "$parentName.$name"
-            val newObj = field.makeAccessible().get(obj)
-            map[fieldName] = newObj
-            @Suppress("ComplexCondition")
-            if (newObj != null &&
-                newObj !is Boolean &&
-                newObj !is String &&
-                newObj !is Long &&
-                newObj !is Int &&
-                newObj !is Double &&
-                newObj !is Float &&
-                newObj !is Position &&
-                newObj !is Map<*, *> &&
-                newObj !is List<*> &&
-                !newObj.javaClass.isEnum
-            ) {
-                map.putAll(loadAllFields(fieldName, newObj, depth + 1))
+
+            try {
+                val value = field.makeAccessible().get(obj)
+                map[fieldName] = value
+                if (!isLeaf(value)) {
+                    map.putAll(loadAllFields(fieldName, value, depth + 1))
+                }
+            } catch (_: Throwable) {
+                SkyHanniMod.logger.warn("Could not access field '$fieldName' in class '${obj.javaClass.name}'")
+                continue
             }
         }
 
         return map
     }
+
+    private fun isLeaf(v: Any?): Boolean = v == null ||
+        v is Boolean || // true, false
+        v is Char || // 'x'
+        v is Number || // Int, Long, Double, Float, Byte, Short, BigDecimal
+        v is String || // "hello"
+        v is Map<*, *> || // any Map<_, _>
+        v is Collection<*> || // List, Set, Queue
+        v is TemporalAccessor || // LocalDate, Instant, LocalTime
+        v is TemporalAmount || // Duration, Period
+        v is Date || // java.util.Date
+        v is UUID || // java.util.UUID
+        v is URI || // java.net.URI
+        v is Path || // java.nio.file.Path
+        v is File || // java.io.File
+        v.javaClass.isArray || // Array<*>, IntArray, String[]
+        v.javaClass.isEnum // any enum type
+
 
     private fun Any.getClassName(): String {
         if (this is io.github.notenoughupdates.moulconfig.observer.Property<*>) {
@@ -355,5 +374,19 @@ object SkyHanniConfigSearchResetCommand {
         if (this is Runnable) return "<Runnable>"
 
         return toString()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shconfig") {
+            description = "Searches or resets config elements §c(warning, dangerous!)"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs {
+                SkyHanniMod.launchCoroutine {
+                    ChatUtils.chat(runCommand(it))
+                }
+                lastCommand = it
+            }
+        }
     }
 }

@@ -1,11 +1,17 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
+import kotlin.time.Duration.Companion.minutes
+
 data class CachedItemData(
     // -1 = not loaded
     var petCandies: Int? = -1,
 
-    // "" = not loaded
-    var heldItem: String? = "",
+    // NONE = not loaded
+    var heldItem: NeuInternalName? = NeuInternalName.NONE,
 
     // -1 = not loaded
     var sackInASack: Int? = -1,
@@ -26,12 +32,25 @@ data class CachedItemData(
     var lastInternalName: NeuInternalName? = null,
 
     var lastInternalNameFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+
+    var lastLore: List<String> = listOf(),
+
+    var lastLoreFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+
+    var lastExtraAttributes: NBTTagCompound? = null,
+
+    var lastExtraAttributesFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+
+    var stackTip: String? = null,
+
+    var identifier: String? = null,
 ) {
-    /**
-     * Delegate constructor to avoid calling a function with default arguments from java.
-     * We can't call the generated no args constructors (or rather we cannot generate that constructor), because inline
-     * classes are not part of the java-kotlin ABI that is super well supported (especially with default arguments).
-     */
-    @Suppress("ForbiddenVoid", "UnusedPrivateProperty")
-    constructor(void: Void?) : this()
+    companion object {
+        private val cache = TimeLimitedCache<IdentityCharacteristics<ItemStack>, CachedItemData>(expireAfterWrite = 2.minutes)
+        val ItemStack.cachedData: CachedItemData get() = cache.getOrPut(IdentityCharacteristics(this)) { CachedItemData() }
+
+        fun forEachValue(action: (CachedItemData) -> Unit) {
+            cache.map { action(it.value) }
+        }
+    }
 }

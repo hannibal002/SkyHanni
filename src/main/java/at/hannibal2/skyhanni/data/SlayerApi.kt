@@ -8,20 +8,21 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -29,7 +30,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerApi {
 
-    private val trackerConfig get() = SkyHanniMod.feature.slayer.itemProfitTracker
+    val config get() = SkyHanniMod.feature.slayer
+    private val trackerConfig get() = config.itemProfitTracker
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
@@ -77,6 +79,13 @@ object SlayerApi {
         event.addData {
             add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
+            if (!isInCorrectArea) {
+                add("currentAreaType: $currentAreaType")
+                add(" graph area: ${SkyBlockUtils.graphArea}")
+                with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+                    add(" /shtestwaypoint $x $y $z pathfind")
+                }
+            }
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")
         }
@@ -126,7 +135,7 @@ object SlayerApi {
         }
 
         if (event.isMod(5)) {
-            if (LorenzUtils.isStrandedProfile) {
+            if (SkyBlockUtils.isStrandedProfile) {
                 isInAnyArea = true
                 isInCorrectArea = true
             } else {
@@ -135,13 +144,10 @@ object SlayerApi {
             }
         }
     }
-
     // TODO USE SH-REPO
-    private fun checkSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
-        "Graveyard",
-        "Coal Mine",
-        "Revenant Cave",
-        -> SlayerType.REVENANT
+    private fun checkSlayerTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
+        "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isCurrent()) SlayerType.REVENANT else null
+        "Revenant Cave" -> SlayerType.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
@@ -151,16 +157,16 @@ object SlayerApi {
 
         "Ruins",
         "Howling Cave",
+        "Soul Cave",
+        "Spirit Cave",
         -> SlayerType.SVEN
 
-        in listOf(
-            "The End",
-            "Void Sepulture",
-            "Zealot Bruiser Hideout",
-        ).let {
-            if (trackerConfig.voidgloomInNest) it + "Dragon's Nest" else it
-        },
+        "Void Sepulture",
+        "Zealot Bruiser Hideout",
         -> SlayerType.VOID
+
+        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isCurrent()) SlayerType.VOID else null
+        "no_area" -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isCurrent()) SlayerType.VOID else null
 
         "Stronghold",
         "The Wasteland",

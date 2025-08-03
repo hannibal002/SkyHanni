@@ -97,6 +97,7 @@ object TimiteTracker {
         }
     }
 
+    // TODO use RenderDisplayHelper
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
@@ -114,7 +115,8 @@ object TimiteTracker {
     }
 
     private fun isEnabled() =
-        RiftApi.inMountainTop() && config.tracker &&
+        RiftApi.inMountainTop() &&
+            config.tracker &&
             (!config.onlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
 
     private val timiteItems = listOf(

@@ -11,31 +11,31 @@ import net.minecraft.item.ItemStack
 abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : SkyHanniEvent() {
 
     data class BackgroundDrawnEvent(
-        val context: DrawContext,
+        override val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container)
+    ) : GuiContainerEvent(gui, container), Rendering
 
     data class PreDraw(
-        val context: DrawContext,
+        override val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container), Cancellable
+    ) : GuiContainerEvent(gui, container), Cancellable, Rendering
 
     data class PostDraw(
-        val context: DrawContext,
+        override val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container)
+    ) : GuiContainerEvent(gui, container), Rendering
 
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
         GuiContainerEvent(gui, container), Cancellable
@@ -59,13 +59,13 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     }
 
     data class ForegroundDrawnEvent(
-        val context: DrawContext,
+        override val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container)
+    ) : GuiContainerEvent(gui, container), Rendering
 
     data class SlotClickEvent(
         override val gui: GuiContainer,

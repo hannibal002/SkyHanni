@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.GuildApi
@@ -12,16 +10,15 @@ import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Matcher
 import kotlin.random.Random
@@ -51,7 +48,7 @@ object AdvancedPlayerList {
     } ?: TabLine(text, type)
 
     fun newSorting(original: List<String>): List<String> {
-        if (LorenzUtils.inKuudraFight) return original
+        if (KuudraApi.inKuudra) return original
         if (DungeonApi.inDungeon()) return original
 
         if (ignoreCustomTabList()) return original
@@ -163,7 +160,7 @@ object AdvancedPlayerList {
             } else {
                 playerData.bingoLevel = BingoApi.getRank(line)
             }
-            if (IslandType.CRIMSON_ISLE.isInIsland()) {
+            if (IslandType.CRIMSON_ISLE.isCurrent()) {
                 playerData.faction = if (line.contains("§c⚒")) {
                     nameSuffix = nameSuffix.replace("§c⚒", "")
                     CrimsonIsleFaction.BARBARIAN
@@ -210,7 +207,7 @@ object AdvancedPlayerList {
             suffix += " $it"
         }
 
-        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
+        if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
             suffix += data.faction.icon.orEmpty()
         }
 
@@ -224,7 +221,7 @@ object AdvancedPlayerList {
     }
 
     private fun getSocialIcon(name: String) = when {
-        LorenzUtils.getPlayerName() == name -> SocialIcon.ME
+        PlayerUtils.getName() == name -> SocialIcon.ME
         MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
         PartyApi.partyMembers.contains(name) -> SocialIcon.PARTY
         FriendApi.getAllFriends().any { it.name.equals(name, ignoreCase = true) } -> SocialIcon.FRIEND
@@ -259,12 +256,5 @@ object AdvancedPlayerList {
         ;
 
         constructor(icon: String, score: Int) : this({ icon }, score)
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(15, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
-            ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)
-        }
     }
 }

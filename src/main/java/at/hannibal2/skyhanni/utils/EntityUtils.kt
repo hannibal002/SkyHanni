@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.keepOnlyIn
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -29,6 +30,13 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.EquipmentSlot
+//#else
+import net.minecraft.entity.SharedMonsterAttributes
+//#endif
 
 @SkyHanniModule
 object EntityUtils {
@@ -156,8 +164,20 @@ object EntityUtils {
 
     fun EntityPlayer.isNpc() = !isRealPlayer()
 
+    //#if MC < 1.21
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
+    //#else
+    //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    //$$     if (this !is PlayerEntity) return null
+    //$$     return buildList {
+    //$$         add(inventory.equipment.get(EquipmentSlot.FEET).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.LEGS).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.CHEST).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.HEAD).orNull())
+    //$$     }.normalizeAsArray()
+    //$$ }
+    //#endif
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
@@ -177,17 +197,45 @@ object EntityUtils {
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
+    //#if MC < 1.21
     fun getAllTileEntities(): Sequence<TileEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
+    //#else
+    //$$ fun getAllTileEntities(): Sequence<BlockEntity> {
+    //$$     val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
+    //$$     val blockEntityTickers = world.blockEntityTickers.let {
+    //$$         if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
+    //$$     }.asSequence().filterNotNull()
+    //$$
+    //$$     return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
+    //$$ }
+    //#endif
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
+    inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
+        list.keepOnlyIn(getEntities<T>())
+    }
 
-    fun getEntityByID(entityId: Int) = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
+    fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
+        if (isDead) return false
+        // TODO add cache that only updates e.g. 10 times a second
+        if (!FrustumUtils.isVisible(entityBoundingBox)) return false
+        return getLorenzVec().up(vecYOffset).canBeSeen(viewDistance)
+    }
+
+    fun getEntityByID(entityId: Int): Entity? = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
     fun Entity.cleanName() = this.name.removeColor()
+
+    // TODO use derpy() on every use case
+    val EntityLivingBase.baseMaxHealth: Int
+        //#if MC < 1.21
+        get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
+    //#else
+    //$$ get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
+    //#endif
 }

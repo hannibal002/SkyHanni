@@ -16,19 +16,19 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.json.fromJson
@@ -105,6 +105,11 @@ object ElectionApi {
     private const val ELECTION_END_MONTH = 3 // Late Spring
     private const val ELECTION_END_DAY = 27
 
+    val hypixelElectionApiStatic = ApiStaticGetPath(
+        "https://api.hypixel.net/v2/resources/skyblock/election",
+        "Hypixel Election API",
+    )
+
     /**
      * @param input: The name of the mayor
      * @return: The NotEnoughUpdates color of the mayor; If no mayor was found, it will return "§c"
@@ -119,14 +124,14 @@ object ElectionApi {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
         if (event.repeatSeconds(2)) {
             checkHypixelApi()
             getTimeTillNextMayor()
         }
 
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
         if (!ElectionCandidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()
@@ -198,7 +203,7 @@ object ElectionApi {
     private fun calculateNextMayorTime(): SimpleTimeMark {
         val now = SkyBlockTime.now()
 
-        return SkyBlockTime(now.getElectionYear() + 1, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
+        return SkyBlockTime(now.getElectionYear() + 1, ELECTION_END_MONTH, day = ELECTION_END_DAY).toTimeMark()
     }
 
     private fun getTimeTillNextMayor() {
@@ -216,24 +221,23 @@ object ElectionApi {
         lastUpdate = SimpleTimeMark.now()
 
         SkyHanniMod.launchIOCoroutine {
-            val jsonObject = ApiUtils.getJSONResponse(
-                "https://api.hypixel.net/v2/resources/skyblock/election",
-                apiName = "Hypixel Election",
-            )
+            val (_, jsonObject) = ApiUtils.getJsonResponse(hypixelElectionApiStatic).assertSuccessWithData() ?: return@launchIOCoroutine
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launchIOCoroutine
+            val mayor = data.mayor ?: error("mayor is null")
+            val election = mayor.election ?: error("election is null")
             val map = mutableMapOf<Int, MayorCandidate>()
-            map put data.mayor.election.getPairs()
+            map put election.getPairs()
             data.current?.let {
                 map put data.current.getPairs()
             }
             candidates = map
 
-            val currentMayorName = data.mayor.name
+            val currentMayorName = mayor.name
             if (lastMayor?.name != currentMayorName) {
                 Perk.resetPerks()
-                currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
-                currentMinister = data.mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
+                currentMayor = setAssumeMayorJson(currentMayorName, mayor.perks)
+                currentMinister = mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
             }
         }
     }

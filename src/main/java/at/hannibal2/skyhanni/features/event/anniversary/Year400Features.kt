@@ -21,12 +21,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -74,7 +73,7 @@ object Year400Features {
             updateAllPlayers(new)
         } else {
             for (mob in MobData.players) {
-                mob.highlight(null)
+                mob.removeHighlight()
             }
         }
     }
@@ -97,9 +96,7 @@ object Year400Features {
 
         val wrongColor = wrongColor()
         for (mob in MobData.players) {
-            val color = if (mob in correctPlayers) correctColor else {
-                wrongColor
-            }
+            val color = if (mob in correctPlayers) correctColor else wrongColor
             mob.setColor(color, colorInHand)
         }
     }
@@ -147,7 +144,7 @@ object Year400Features {
         mob.setColor(lorenzColor, colorInHand)
     }
 
-    private fun Mob.setColor(color: Color, currentHand: CakeColor?) {
+    private fun Mob.setColor(color: ChromaColour, currentHand: CakeColor?) {
         highlight(color) { config.teamFinder && colorInHand == currentHand }
     }
 
@@ -183,12 +180,12 @@ object Year400Features {
         lastPlayer.setColor(wrongColor(), colorInHand)
     }
 
-    private fun wrongColor() = config.colors.wrong.get().toSpecialColor()
+    private fun wrongColor() = config.colors.wrong.get()
 
     enum class CakeColor(
         id: String,
         val lorenzColor: LorenzColor,
-        private val colorConfig: (AnniversaryTeamFinderColorConfig) -> Property<String>,
+        private val colorConfig: (AnniversaryTeamFinderColorConfig) -> Property<ChromaColour>,
     ) {
         PINK("SLICE_OF_STRAWBERRY_SHORTCAKE", LorenzColor.LIGHT_PURPLE, { it.pink }),
         BLUE("SLICE_OF_BLUEBERRY_CAKE", LorenzColor.BLUE, { it.blue }),
@@ -197,7 +194,7 @@ object Year400Features {
         RED("SLICE_OF_RED_VELVET_CAKE", LorenzColor.RED, { it.red }),
         ;
 
-        val color: Color get() = colorConfig(config.colors).get().toSpecialColor()
+        val color: ChromaColour get() = colorConfig(config.colors).get()
 
         val internalName = id.toInternalName()
     }

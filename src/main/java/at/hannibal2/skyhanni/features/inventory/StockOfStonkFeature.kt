@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.transformAt
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -39,20 +39,22 @@ object StockOfStonkFeature {
     )
 
     /**
+     * REGEX-TEST: §7§7▶ §c§lTOP 5,000§7 - §5Stock of Stonks §8x2
      * REGEX-TEST: §5§o§7§7▶ §c§lTOP 5,000§7 - §5Stock of Stonks §8x2
      * REGEX-TEST: §5§o§7§a▶ §a§lTOP 100§7 - §5Stock of Stonks §8x25
      */
     private val topPattern by patternGroup.pattern(
         "top",
-        "§5§o§7§.▶ §.§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
+        "(?:§5§o)?§7§.▶ §.§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
     )
 
     /**
+     * REGEX-TEST: §7   Minimum Bid: §62,400,002 Coins
      * REGEX-TEST: §5§o§7   Minimum Bid: §62,400,002 Coins
      */
     private val bidPattern by patternGroup.pattern(
         "bid",
-        "§5§o§7   Minimum Bid: §6(?<amount>[\\d,]+) Coins",
+        "(?:§5§o)?§7 {3}Minimum Bid: §6(?<amount>[\\d,]+) Coins",
     )
 
     var inInventory = false
@@ -88,7 +90,7 @@ object StockOfStonkFeature {
             bidPattern.matchMatcher(line) {
                 val cost = group("amount").formatLong().coerceAtLeast(2000000) // minimum bid is 2,000,000
                 val ratio = cost / stonksReward.transformIf({ this == 0 }, { 1 })
-                event.toolTip[index - 1] = line + " §7(§6§6${ratio.addSeparators()} §7per)" // double §6 for the replacement at the end
+                event.toolTip[index - 1] = line + " §7(paying §6${ratio.addSeparators()} §7per)" // double §6 for the replacement at the end
                 if (ratio < bestRatio) {
                     bestValueIndex = index - 1
                     bestRatio = ratio
@@ -98,5 +100,5 @@ object StockOfStonkFeature {
         event.toolTip.transformAt(bestValueIndex) { replace("§6§6", "§a") }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.stonkOfStonkPrice
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.stonkOfStonkPrice
 }

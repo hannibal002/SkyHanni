@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.slayer.vampire
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -12,17 +13,17 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Your Boss", desc = "")
     @Accordion
-    var ownBoss: OwnBossConfig = OwnBossConfig()
+    val ownBoss: OwnBossConfig = OwnBossConfig()
 
     @Expose
     @ConfigOption(name = "Others Boss", desc = "")
     @Accordion
-    var othersBoss: OthersBossConfig = OthersBossConfig()
+    val othersBoss: OthersBossConfig = OthersBossConfig()
 
     @Expose
     @ConfigOption(name = "Co-op Boss", desc = "")
     @Accordion
-    var coopBoss: CoopBossHighlightConfig = CoopBossHighlightConfig()
+    val coopBoss: CoopBossHighlightConfig = CoopBossHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
@@ -43,7 +44,7 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
     @ConfigEditorColour
-    var steakColor: String = "0:255:255:0:88"
+    var steakColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 88, 255)
 
     @Expose
     @ConfigOption(name = "Twinclaws", desc = "Delay the Twinclaws alert for a given amount in milliseconds.")
@@ -59,7 +60,7 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Line Color", desc = "Color of the line.")
     @ConfigEditorColour
-    var lineColor: String = "0:255:255:0:88"
+    var lineColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 88, 255)
 
     @Expose
     @ConfigOption(name = "Line Width", desc = "Width of the line.")
@@ -70,10 +71,10 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Blood Ichor", desc = "")
     @Accordion
-    var bloodIchor: BloodIchorConfig = BloodIchorConfig()
+    val bloodIchor: BloodIchorConfig = BloodIchorConfig()
 
     @Expose
     @ConfigOption(name = "Killer Spring", desc = "")
     @Accordion
-    var killerSpring: KillerSpringConfig = KillerSpringConfig()
+    val killerSpring: KillerSpringConfig = KillerSpringConfig()
 }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
@@ -10,12 +9,11 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -24,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -31,9 +30,11 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 
+// Shows the price of iems in sacks while being in the sacks
 @SkyHanniModule
 object SackDisplay {
 
@@ -63,7 +64,7 @@ object SackDisplay {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.stack.getLore()
             if (lore.any { it.startsWith("§7Stored: §a") }) {
-                slot.highlight(event.context, LorenzColor.RED)
+                slot.highlight(LorenzColor.RED)
             }
         }
     }
@@ -92,7 +93,7 @@ object SackDisplay {
         val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
         addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
         val table = buildMap {
-            for ((itemName, item) in sortedPairs) {
+            for (item in sortedPairs.values) {
                 val (internalName, colorCode, total, magmaFish) = item
                 val stored = item.stored
                 val price = item.price
@@ -101,16 +102,17 @@ object SackDisplay {
                 totalPrice += price
                 if (rendered >= config.itemToShow) continue
                 if (stored == 0 && !config.showEmpty) continue
+                val name = internalName.repoItemNameCompact
 
                 val row = buildList {
                     addString(" §7- ")
                     addItemStack(internalName)
                     // TODO move replace into itemName
                     val nameText = Renderable.optionalLink(
-                        itemName.replace("§k", ""),
+                        name.replace("§k", ""),
                         onLeftClick = {
                             if (!SackApi.isTrophySack) {
-                                BazaarApi.searchForBazaarItem(itemName)
+                                BazaarApi.searchForBazaarItem(internalName)
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
@@ -151,7 +153,7 @@ object SackDisplay {
                         totalMagmaFish += magmaFish
                         add(
                             Renderable.hoverTips(
-                                Renderable.string(
+                                Renderable.text(
                                     "§d$magmaFish",
                                     horizontalAlign = config.alignment,
                                 ),
@@ -166,7 +168,7 @@ object SackDisplay {
                     }
                     if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
                 }
-                put(row, itemName)
+                put(row, name)
                 rendered++
             }
         }
@@ -177,8 +179,8 @@ object SackDisplay {
         return totalPrice
     }
 
-    private fun <T : SackApi.AbstractSackItem> sort(sackItems: List<Pair<String, T>>): MutableMap<String, T> {
-        val sortedPairs: MutableMap<String, T> = when (config.sortingType) {
+    private fun <T : SackApi.AbstractSackItem, K> sort(sackItems: List<Pair<K, T>>): MutableMap<K, T> {
+        val sortedPairs: MutableMap<K, T> = when (config.sortingType) {
             SortingTypeEntry.DESC_STORED -> sackItems.sortedByDescending { it.second.stored }
             SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored }
             SortingTypeEntry.DESC_PRICE -> sackItems.sortedByDescending { it.second.price }
@@ -323,18 +325,5 @@ object SackDisplay {
         price.addSeparators()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(15, "inventory.sackDisplay.numberFormat") { element ->
-            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
-        }
-        event.transform(15, "inventory.sackDisplay.priceFormat") { element ->
-            ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
-        }
-        event.transform(15, "inventory.sackDisplay.sortingType") { element ->
-            ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)
-        }
-    }
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

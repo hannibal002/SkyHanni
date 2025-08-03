@@ -12,16 +12,20 @@ import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.OtherModsSettings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.createHoverEvent
+import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.event.HoverEvent
@@ -46,21 +50,35 @@ object EnchantParser {
      * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
      * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
-     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
         "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
 
-    // Above regex tests apply to this pattern also
+    /**
+     * REGEX-TEST: §9Champion VI §81.2M
+     * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §5§o§9Compact X
+     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
+     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
+     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
+     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     */
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
         "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
+    /**
+     * REGEX-TEST: Respiration
+     * REGEX-TEST: Efficiency V
+     * REGEX-TEST: Depth Strider II
+     * REGEX-TEST: Aqua Affinity
+     */
     private val grayEnchantPattern by patternGroup.pattern(
-        "grayenchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
+        "gray.enchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
     )
 
     private var currentItem: ItemStack? = null
@@ -73,7 +91,7 @@ object EnchantParser {
     // enchants stacked in a single column
     private var shouldBeSingleColumn = false
 
-    private var stackingEnchant: Enchant.Stacking? = null
+    private val stackingEnchants: MutableList<Enchant.Stacking> = mutableListOf()
 
     // Used to determine how many enchants are used on each line
     // for this particular item, since consistency is not Hypixel's strong point
@@ -93,13 +111,14 @@ object EnchantParser {
         this.enchants = event.getConstant<EnchantsJson>("Enchants")
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         // Add observers to config options that would need us to mark cache dirty
         ConditionalUtils.onToggle(
             config.colorParsing,
             config.format,
             config.perfectEnchantColor,
+            config.boldPerfectEnchant,
             config.greatEnchantColor,
             config.goodEnchantColor,
             config.poorEnchantColor,
@@ -138,7 +157,7 @@ object EnchantParser {
 
         currentItem = null
 
-        val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
+        val lore = event.getHoverEvent().value().formattedText.split("\n").toMutableList()
 
         // Check for any vanilla gray enchants at the top of the tooltip
         indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(lore, null)
@@ -146,6 +165,39 @@ object EnchantParser {
         // Since we don't get given an item stack from /show, we pass an empty enchants map and
         // use all enchants from the Enchants class instead
         parseEnchants(lore, mapOf(), event.component)
+    }
+
+    private fun warnAaronMaxEnchant() {
+        val aaron = OtherModsSettings.aaron()
+
+        if (aaron.isEnabled("skyblock.enchantments.rainbowMaxEnchants")) {
+            if (config.colorParsing.get()) {
+                ChatUtils.clickToActionOrDisable(
+                    "SkyHanni's enchant parsing breaks with Aaron's Mod's 'Rainbow Max Enchants'",
+                    config::colorParsing,
+                    "turn off Aaron's Mod's Rainbow Max Enchants",
+                    { removeAaronMaxEnchant() }
+                )
+            }
+            if (config.hideEnchantDescriptions.get()) {
+                ChatUtils.clickToActionOrDisable(
+                    "SkyHanni's hide enchant descriptions breaks with Aaron's Mod's 'Rainbow Max Enchants'",
+                    config::hideEnchantDescriptions,
+                    "turn off Aaron's Mod's Rainbow Max Enchants",
+                    { removeAaronMaxEnchant() }
+                )
+            }
+        }
+    }
+
+    private fun removeAaronMaxEnchant() {
+        val aaron = OtherModsSettings.aaron()
+        if (aaron.isEnabled("skyblock.enchantments.rainbowMaxEnchants")) {
+            aaron.setBoolean("skyblock.enchantments.rainbowMaxEnchants", false)
+            ChatUtils.chat("§aDisabled Aaron's Mod's Rainbow Max Enchants!")
+        } else {
+            ChatUtils.userError("Aaron's Mod's Rainbow Max Enchants is already disabled!")
+        }
     }
 
     private fun parseEnchants(
@@ -175,7 +227,7 @@ object EnchantParser {
             return
         }
 
-        stackingEnchant = null
+        stackingEnchants.clear()
         shouldBeSingleColumn = false
         loreLines = mutableListOf()
         orderedEnchants = TreeSet()
@@ -188,6 +240,8 @@ object EnchantParser {
             loreCache.updateAfter(loreList)
             return
         }
+
+        warnAaronMaxEnchant()
 
         // If we have color parsing off and hide enchant descriptions on, remove them and return from method
         if (!config.colorParsing.get()) {
@@ -248,7 +302,8 @@ object EnchantParser {
 
         if (config.stackingEnchantProgress) {
             // TODO check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
-            stackingEnchant?.let { stacking ->
+
+            stackingEnchants.forEach { stacking ->
                 currentItem?.let { item ->
                     loreList.add(loreList.size - 1, stacking.progressString(item))
                 }
@@ -301,7 +356,7 @@ object EnchantParser {
                 } else "empty"
 
                 if (enchant is Enchant.Stacking) {
-                    stackingEnchant = enchant
+                    stackingEnchants.add(enchant)
                 }
 
                 // Last found enchant
@@ -423,7 +478,7 @@ object EnchantParser {
 
         // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
         val chatComponentText = text.asComponent()
-        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText)
+        val hoverEvent = createHoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText) ?: return
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
@@ -466,7 +521,7 @@ object EnchantParser {
     // We don't check if the main toggle here since we still need to go into
     // the parseEnchants method to deal with hiding vanilla enchants
     // and enchant descriptions
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = SkyBlockUtils.inSkyBlock
 
     private fun markCacheDirty() {
         loreCache.configChanged = true

@@ -8,18 +8,32 @@ import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
 
+// TODO move the type specific into the companion objects, the rest goes back into the RenderableUtils
 object RenderableCollectionUtils {
 
     fun MutableList<Renderable>.addString(
         text: String,
+        scale: Double = 1.0,
         horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
         verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
     ) {
-        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
+        add(Renderable.text(text, scale, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
+    }
+
+    fun MutableList<Renderable>.addString(
+        text: String,
+        tips: List<String>,
+        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+    ) {
+        add(Renderable.hoverTips(Renderable.text(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign), tips = tips))
     }
 
     fun MutableList<Searchable>.addSearchString(
@@ -28,11 +42,11 @@ object RenderableCollectionUtils {
         horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
         verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
     ) {
-        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
+        add(Renderable.text(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
     }
 
     fun MutableList<List<Renderable>>.addSingleString(text: String) {
-        add(Collections.singletonList(Renderable.string(text)))
+        add(Collections.singletonList(Renderable.text(text)))
     }
 
     fun MutableList<Renderable>.addItemStack(
@@ -42,9 +56,9 @@ object RenderableCollectionUtils {
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
-            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
         }
-        add(Renderable.itemStack(itemStack, scale = scale))
+        add(Renderable.item(itemStack, scale = scale))
     }
 
     fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {

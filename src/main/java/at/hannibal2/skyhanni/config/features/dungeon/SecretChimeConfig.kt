@@ -21,7 +21,7 @@ class SecretChimeConfig {
     @Expose
     @ConfigOption(name = "Mute Sounds", desc = "Disables chest and lever sounds.")
     @Accordion
-    var muteSecretSound: MuteSecretSoundConfig = MuteSecretSoundConfig()
+    val muteSecretSound: MuteSecretSoundConfig = MuteSecretSoundConfig()
 
     class MuteSecretSoundConfig {
 
@@ -45,8 +45,8 @@ class SecretChimeConfig {
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the secret chime sound.")
-    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
-    var soundPitch: Float = 1.0f
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2f, minStep = 0.1f)
+    var soundPitch: Float = 1f
 
     @ConfigOption(
         name = "Sounds",
@@ -54,9 +54,9 @@ class SecretChimeConfig {
             "§l§cWarning: Clicking this will open a webpage in your browser.",
     )
     @ConfigEditorButton(buttonText = "OPEN")
-    var soundsListURL: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val soundsListURL: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 
     @ConfigOption(name = "Play Sound", desc = "Plays current secret chime sound.")
     @ConfigEditorButton(buttonText = "Play")
-    var checkSound: Runnable = Runnable(DungeonSecretChime::playSound)
+    val checkSound: Runnable = Runnable(DungeonSecretChime::playSound)
 }

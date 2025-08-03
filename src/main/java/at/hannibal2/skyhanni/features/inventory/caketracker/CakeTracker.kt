@@ -2,18 +2,16 @@ package at.hannibal2.skyhanni.features.inventory.caketracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.inventory.CakeTrackerConfig.CakeTrackerDisplayOrderType
 import at.hannibal2.skyhanni.config.features.inventory.CakeTrackerConfig.CakeTrackerDisplayType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CakeData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,7 +19,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -34,18 +31,20 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.inventory.ContainerChest
 import org.lwjgl.input.Keyboard.KEY_DOWN
 import org.lwjgl.input.Keyboard.KEY_LEFT
 import org.lwjgl.input.Keyboard.KEY_RIGHT
 import org.lwjgl.input.Keyboard.KEY_UP
-import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -120,16 +119,14 @@ object CakeTracker {
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
     private val maxTrackerHeight: Float get() = config.maxHeight.get()
     private val cakeScrollValue = ScrollValue().apply { init(0.0) }
-    private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
-    private val searchOverrideCache: TimeLimitedCache<Pair<Int, Int>, Int> = TimeLimitedCache(5.minutes)
-    private val unobtainedHighlightColor: Color get() = config.unobtainedAuctionHighlightColor.toSpecialColor()
-    private val obtainedHighlightColor: Color get() = config.obtainedAuctionHighlightColor.toSpecialColor()
+    private val cakePriceCache = TimeLimitedCache<Int, Double>(5.minutes)
+    private val searchOverrideCache = TimeLimitedCache<Pair<Int, Int>, Int>(5.minutes)
 
     private var currentYear = 0
     private var inCakeInventory = false
     private var timeOpenedCakeInventory = SimpleTimeMark.farPast()
     private var inAuctionHouse = false
-    private var slotHighlightCache = mapOf<Int, Color>()
+    private var slotHighlightCache = mapOf<Int, ChromaColour>()
     private var searchingForCakes = false
     private var knownCakesInCurrentInventory = listOf<Int>()
     private var cakeRenderables = listOf<Renderable>()
@@ -180,7 +177,7 @@ object CakeTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(
             config.maxHeight,
             config.displayType,
@@ -188,8 +185,8 @@ object CakeTracker {
         ) { invalidateCakeCache() }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnSkyblock = true)
+    fun onBackgroundDraw() {
         if (!config.enabled) return
 
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()
@@ -207,7 +204,7 @@ object CakeTracker {
 
         (event.container as ContainerChest).getUpperItems().forEach { (slot, _) ->
             slotHighlightCache[slot.slotIndex]?.let { color ->
-                slot.highlight(event.context, color)
+                slot.highlight(color)
             }
         }
     }
@@ -248,13 +245,13 @@ object CakeTracker {
         }.mapValues { (_, item) ->
             val year = cakeNamePattern.matchGroup(item.displayName, "year")?.toInt() ?: -1
             val owned = storage?.ownedCakes?.contains(year) ?: false
-            if (owned) obtainedHighlightColor else unobtainedHighlightColor
+            if (owned) config.ownedColor else config.missingColor
         }
         return true
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         inCakeInventory = false
         knownCakesInCurrentInventory = listOf()
         inAuctionHouse = false
@@ -263,7 +260,7 @@ object CakeTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!config.enabled) return
         val sbTimeNow = SkyBlockTime.now()
         if (currentYear == sbTimeNow.year) return
@@ -298,7 +295,7 @@ object CakeTracker {
     private fun getCakePrice(year: Int): Double {
         return cakePriceCache.getOrPut(year) {
             val cakeItem = "NEW_YEAR_CAKE+$year".toInternalName()
-            cakeItem.getPrice()
+            SkyHanniTracker.getPricePer(cakeItem)
         }
     }
 
@@ -349,7 +346,7 @@ object CakeTracker {
             val displayString =
                 if (isSingular) "§fYear $colorCode$start"
                 else "§fYears $colorCode$start§f-$colorCode$end"
-            var renderable = Renderable.string(displayString)
+            var renderable: Renderable = Renderable.text(displayString)
             if (displayType == DisplayType.MISSING_CAKES && config.priceOnHover) {
                 renderable = Renderable.clickable(
                     renderable,
@@ -473,7 +470,7 @@ object CakeTracker {
         if (cakeList.isEmpty()) {
             val colorCode = if (displayType == DisplayType.OWNED_CAKES) "§c" else "§a"
             val verbiage = if (displayType == DisplayType.OWNED_CAKES) "missing" else "owned"
-            add(Renderable.string("$colorCode§lAll cakes $verbiage!"))
+            addString("$colorCode§lAll cakes $verbiage!")
         } else add(
             Renderable.scrollList(
                 getCakeRanges(cakeList, displayType, displayOrderType),
@@ -516,5 +513,12 @@ object CakeTracker {
             else CakeRange(start)
 
         add(lastRange.getRenderable(displayType))
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val base = "inventory.cakeTracker"
+        event.move(88, "$base.unobtainedAuctionHighlightColor", "$base.missingColor")
+        event.move(88, "$base.obtainedAuctionHighlightColor", "$base.ownedColor")
     }
 }

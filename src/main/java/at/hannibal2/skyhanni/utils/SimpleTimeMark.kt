@@ -62,7 +62,7 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun toMillis() = millis
 
-    fun toSkyBlockTime(): SkyBlockTime = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
+    fun toSkyBlockTime(): SkyBlockTime = SkyBlockTime.fromTimeMark(this)
 
     fun toLocalDate(): LocalDate = toLocalDateTime().toLocalDate()
 
@@ -78,6 +78,5 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         fun Duration.fromNow() = now() + this
 
         fun Long.asTimeMark() = SimpleTimeMark(this)
-        fun SkyBlockTime.asTimeMark() = SimpleTimeMark(toMillis())
     }
 }

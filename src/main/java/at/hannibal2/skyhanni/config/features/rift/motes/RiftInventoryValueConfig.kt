@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.rift.motes
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -24,19 +23,19 @@ class RiftInventoryValueConfig {
             "Long: 1,200,000"
     )
     @ConfigEditorDropdown
-    var formatType: Property<NumberFormatEntry> = Property.of(
+    val formatType: Property<NumberFormatEntry> = Property.of(
         NumberFormatEntry.SHORT
     )
 
-    enum class NumberFormatEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        SHORT("Short", 0),
-        LONG("Long", 1);
+    enum class NumberFormatEntry(private val displayName: String) {
+        SHORT("Short"),
+        LONG("Long"),
+        ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
     @Expose
     @ConfigLink(owner = RiftInventoryValueConfig::class, field = "enabled")
-    var position: Position = Position(126, 156, false, true)
+    val position: Position = Position(126, 156)
 }

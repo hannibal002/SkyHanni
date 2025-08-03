@@ -3,17 +3,19 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -21,19 +23,19 @@ import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
+import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -41,16 +43,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -64,7 +66,10 @@ import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+
+typealias EntityData = DamageIndicatorEntityData
 
 // TODO cut class into smaller pieces
 @SkyHanniModule
@@ -104,6 +109,8 @@ object DamageIndicatorManager {
             }
     }
 
+    fun getAllMobs(): Collection<EntityLivingBase> = data.values.map { it.entity }
+
     fun getNearestDistanceTo(location: LorenzVec): Double {
         return data.values
             .map { it.entity.getLorenzVec() }
@@ -113,6 +120,13 @@ object DamageIndicatorManager {
     fun removeDamageIndicator(type: BossType) {
         data = data.editCopy {
             values.removeIf { it.bossType == type }
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onServerTick(event: ServerTickEvent) {
+        data.forEach {
+            it.value.serverTicksAlive++
         }
     }
 
@@ -139,8 +153,8 @@ object DamageIndicatorManager {
 
         // TODO config to define between 100ms and 5 sec
         val filter = data.filter {
-            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
-            (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
+            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4.seconds else 100.milliseconds
+            (SimpleTimeMark.now() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
         }
         if (filter.isNotEmpty()) {
             data = data.editCopy {
@@ -173,11 +187,14 @@ object DamageIndicatorManager {
 
         for (data in data.values) {
 
-            // TODO test end stone protector in hole? - maybe change eye pos
-//            data.ignoreBlocks =
-//                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
+            val vecYOffset = when (data.bossType) {
+                BossType.END_ENDSTONE_PROTECTOR -> 3.0
+                BossType.SLAYER_SPIDER_5_1 -> 2.0
 
-            if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0)) continue
+                else -> 0.0
+            }
+
+            if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0, vecYOffset = vecYOffset)) continue
             if (!data.isConfigEnabled()) continue
 
             val entity = data.entity
@@ -323,22 +340,22 @@ object DamageIndicatorManager {
     }
 
     private fun tickDamage(damageCounter: DamageCounter) {
-        val now = System.currentTimeMillis()
+        val now = SimpleTimeMark.now()
         if (damageCounter.currentDamage != 0L || damageCounter.currentHealing != 0L) {
-            if (damageCounter.firstTick == 0L) {
+            if (damageCounter.firstTick.isFarPast()) {
                 damageCounter.firstTick = now
             }
 
-            if (now > damageCounter.firstTick + 1_000) {
+            if (damageCounter.firstTick.passedSince() > 1.seconds) {
                 damageCounter.oldDamages.add(
                     0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing),
                 )
-                damageCounter.firstTick = 0L
+                damageCounter.firstTick = SimpleTimeMark.farPast()
                 damageCounter.currentDamage = 0
                 damageCounter.currentHealing = 0
             }
         }
-        damageCounter.oldDamages.removeIf { now > it.time + 5_000 }
+        damageCounter.oldDamages.removeIf { it.time.passedSince() > 5.seconds }
     }
 
     private fun formatDelay(delay: Duration): String {
@@ -385,7 +402,7 @@ object DamageIndicatorManager {
             entityData.nameAbove = ""
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
-                if (entityData.bossType.showDeathTime && config.timeToKillSlayer) {
+                if (entityData.bossType.isSlayer && config.timeToKillSlayer) {
                     entityData.nameAbove = entityData.timeToKill
                 }
                 "§cDead"
@@ -408,7 +425,7 @@ object DamageIndicatorManager {
                 val color = NumberUtil.percentageColor(health, maxHealth)
                 entityData.healthText = color.getChatColor() + health.shortFormat()
             }
-            entityData.timeLastTick = System.currentTimeMillis()
+            entityData.timeLastTick = SimpleTimeMark.now()
             return entity.uniqueID to entityData
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
@@ -441,6 +458,19 @@ object DamageIndicatorManager {
                     )
                 }
                 return thorn
+            }
+
+            BossType.SLAYER_SPIDER_5_1 -> {
+                entityData.nameAbove = if (entity.mob in SlayerSpiderFeatures.stuckTier5 && config.spiderSlayer.showInvincible) {
+                    "§eKill hatchlings!"
+                } else ""
+                entityData.nameSuffix = " §e1/2"
+                return ""
+            }
+
+            BossType.SLAYER_SPIDER_5_2 -> {
+                entityData.nameSuffix = " §e2/2"
+                return ""
             }
 
             BossType.SLAYER_ENDERMAN_1,
@@ -546,7 +576,7 @@ object DamageIndicatorManager {
             entity.setHellionShield(null)
         }
 
-        if (!SkyHanniMod.feature.slayer.blazes.phaseDisplay) return ""
+        if (!SlayerApi.config.blazes.phaseDisplay) return ""
 
         var calcHealth = health
         val calcMaxHealth: Int
@@ -710,7 +740,7 @@ object DamageIndicatorManager {
             calcHealth.toLong(), calcMaxHealth.toLong(),
         ).getChatColor() + calcHealth.shortFormat()
 
-        if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
+        if (!SlayerApi.config.endermen.phaseDisplay) {
             result = ""
             entityData.namePrefix = ""
         }
@@ -887,7 +917,7 @@ object DamageIndicatorManager {
         val entityData = EntityData(
             entity,
             entityResult.ignoreBlocks,
-            entityResult.delayedStart?.asTimeMark(),
+            entityResult.delayedStart,
             entityResult.finalDungeonBoss,
             entityResult.bossType,
             foundTime = SimpleTimeMark.now(),
@@ -918,7 +948,7 @@ object DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 
@@ -970,13 +1000,7 @@ object DamageIndicatorManager {
         event.move(2, "damageIndicator", "combat.damageIndicator")
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
-        event.transform(11, "combat.damageIndicator.bossesToShow") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, BossCategory::class.java)
-        }
 
-        event.transform(15, "combat.damageIndicator.bossName") { element ->
-            ConfigUtils.migrateIntToEnum(element, NameVisibility::class.java)
-        }
         event.transform(23, "combat.damageIndicator.bossesToShow") { element ->
             val result = JsonArray()
             for (bossType in element as JsonArray) {
@@ -988,5 +1012,25 @@ object DamageIndicatorManager {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.dev.damageIndicatorBackend
+    private val backendEnabled get() = SkyHanniMod.feature.dev.damageIndicatorBackend
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Damage Indicator")
+        if (!backendEnabled) {
+            event.addData("Damage Indicator is manually disabled!")
+        } else {
+            event.addIrrelevant {
+                add("normal enabled")
+                add("Active mobs: ${data.size}")
+                for (entityData in data.values) {
+                    val type = entityData.bossType
+                    val loc = entityData.entity.getLorenzVec()
+                    add("  - $type ${loc.printWithAccuracy(1)}")
+                }
+            }
+        }
+    }
+
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && backendEnabled
 }
