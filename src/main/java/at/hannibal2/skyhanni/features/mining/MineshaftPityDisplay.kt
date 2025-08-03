@@ -31,6 +31,11 @@ import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -185,52 +190,46 @@ object MineshaftPityDisplay {
             multipliers.forEach { multiplier ->
                 val iconsList = PityBlock.entries
                     .filter { it.multiplier == multiplier }
-                    .map { Renderable.itemStack(it.displayItem) }
+                    .map { Renderable.item(it.displayItem) }
                 add(
-                    Renderable.horizontalContainer(
-                        listOf(
-                            Renderable.horizontalContainer(iconsList),
-                            Renderable.string("§b${pityCounter / multiplier}"),
-                        ),
-                        2,
+                    Renderable.horizontal(
+                        Renderable.horizontal(iconsList),
+                        Renderable.text("§b${pityCounter / multiplier}"),
+                        spacing = 2,
                     ),
                 )
             }
         }
 
-        val neededToPityRenderable = Renderable.verticalContainer(
-            listOf(
-                Renderable.string("§3Needed to pity:"),
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.placeholder(10, 0),
-                        Renderable.verticalContainer(blocksToPityList),
-                    ),
-                ),
+        val neededToPityRenderable = Renderable.vertical(
+            Renderable.text("§3Needed to pity:"),
+            Renderable.horizontal(
+                Renderable.placeholder(10, 0),
+                Renderable.vertical(blocksToPityList),
             ),
         )
 
         val map = mapOf(
-            MineshaftPityLine.TITLE to Renderable.string("§9§lMineshaft Pity Counter"),
-            MineshaftPityLine.COUNTER to Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
-            MineshaftPityLine.CHANCE to Renderable.string(
+            MineshaftPityLine.TITLE to Renderable.text("§9§lMineshaft Pity Counter"),
+            MineshaftPityLine.COUNTER to Renderable.text("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
+            MineshaftPityLine.CHANCE to Renderable.text(
                 "§3Chance: §e1§6/§e${
                     chance.roundTo(1).addSeparators()
                 } §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
             ),
             MineshaftPityLine.NEEDED_TO_PITY to neededToPityRenderable,
             MineshaftPityLine.TIME_SINCE_MINESHAFT to
-                Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
+                Renderable.text("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
             MineshaftPityLine.AVERAGE_BLOCKS_MINESHAFT to
-                Renderable.string(
+                Renderable.text(
                     "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
                 ),
-            MineshaftPityLine.MINESHAFTS_TOTAL to Renderable.string("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
-            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_TOTAL to Renderable.text("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.text("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
         display = listOf(
-            Renderable.verticalContainer(
+            Renderable.vertical(
                 config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
                 spacing = 2,
             ),

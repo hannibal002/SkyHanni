@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -113,7 +112,7 @@ object GardenCropMilestonesCommunityFix {
      * The clipboard context can be used to update the repo content.
      */
     private fun readDataFromClipboard() {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             OSUtils.readFromClipboard()?.let {
                 handleInput(it)
             }

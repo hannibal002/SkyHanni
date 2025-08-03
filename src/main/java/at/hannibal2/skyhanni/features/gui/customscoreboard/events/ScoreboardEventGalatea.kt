@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
@@ -30,6 +29,4 @@ object ScoreboardEventGalatea : ScoreboardEvent() {
         ScoreboardPattern.hotfPattern,
         ScoreboardPattern.agathasContestPattern,
     )
-
-    override fun showIsland() = IslandType.GALATEA.isValidIsland()
 }

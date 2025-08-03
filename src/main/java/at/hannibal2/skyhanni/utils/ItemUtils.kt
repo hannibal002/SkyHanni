@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -11,12 +13,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -27,7 +30,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -49,7 +51,9 @@ import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import kotlinx.coroutines.launch
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -62,6 +66,7 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
@@ -259,8 +264,6 @@ object ItemUtils {
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
-    fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
-
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = MinecraftCompat.localPlayer
@@ -356,6 +359,10 @@ object ItemUtils {
         //#endif
     }
 
+    @Suppress("SpreadOperator")
+    fun createSkull(displayName: String, uuid: String, value: String, loreColl: Collection<String>) =
+        createSkull(displayName, uuid, value, *loreColl.toTypedArray())
+
     // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
         //#if MC < 1.21
@@ -381,7 +388,7 @@ object ItemUtils {
         return stack
         //#else
         //$$ val stack = ItemStack(Items.PLAYER_HEAD)
-        //$$ val profile = GameProfile(UUID.fromString(uuid), uuid)
+        //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         //$$ profile.properties.put("textures", Property("textures", value))
         //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
         //$$ stack.setCustomItemName(displayName)
@@ -412,6 +419,13 @@ object ItemUtils {
         //$$ val stack = ItemStack(item, amount)
         //$$ stack.setCustomItemName(displayName)
         //$$ stack.setLore(lore)
+        //$$ var tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent.DEFAULT.with(DataComponentTypes.DAMAGE, true)
+        //$$ tooltipDisplay = tooltipDisplay.with(DataComponentTypes.ATTRIBUTE_MODIFIERS, true)
+        //$$ tooltipDisplay = tooltipDisplay.with(DataComponentTypes.UNBREAKABLE, true)
+        //$$ if (displayName.isBlank() && lore.isEmpty()) {
+        //$$     tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent(true, tooltipDisplay.hiddenComponents)
+        //$$ }
+        //$$ stack.set(DataComponentTypes.TOOLTIP_DISPLAY, tooltipDisplay)
         //$$ return stack
         //#endif
     }
@@ -503,6 +517,7 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
+        if (data.itemRarityLastCheck.passedSince() < 10.seconds) return
         data.itemRarityLastCheck = SimpleTimeMark.now()
         val internalName = getInternalName()
         if (internalName == NeuInternalName.NONE) {
@@ -516,22 +531,14 @@ object ItemUtils {
     }
 
     fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
-        val data = cachedData
-        if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity()
-        }
-        return data.itemCategory
+        this.updateCategoryAndRarity()
+        return cachedData.itemCategory
     }
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
-        val data = cachedData
-        if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity()
-        }
-        return data.itemRarity
+        this.updateCategoryAndRarity()
+        return cachedData.itemRarity
     }
-
-    private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
@@ -651,6 +658,13 @@ object ItemUtils {
     }
 
     private var compactNameReplace = mapOf<String, String>()
+    var bazaarOverrides = mapOf<String, String>()
+        private set
+
+    private data class BazaarOverride(
+        @Expose @SerializedName("stock") val bazaarInternalName: String,
+        @Expose @SerializedName("id") val neuInternalName: String,
+    )
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -658,6 +672,17 @@ object ItemUtils {
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
         @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
         compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
+    }
+
+    @HandleEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val bazaarOverridesTypeToken = object : TypeToken<List<BazaarOverride>>() {}.type
+        val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", bazaarOverridesTypeToken)
+        bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
+
+        // clear the item name cache so any potential missing items are reloaded
+        itemNameCache.clear()
+        missingRepoItems.clear()
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
@@ -668,8 +693,8 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
-        if (this.getItemStackOrNull()?.getPetInfo() != null) {
-            return PetUtils.getCleanPetName(this@grabItemName, colored = true) + " Pet"
+        if (this.isPet) {
+            return PetUtils.getCleanPetName(this, colored = true) + " Pet"
         }
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
@@ -767,7 +792,7 @@ object ItemUtils {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -779,12 +804,12 @@ object ItemUtils {
         add("§bSkyHanni Test Item".asComponent())
         add("§eInput: '§f$input§e'".asComponent())
 
-        NeuInternalName.fromItemNameOrNull(input)?.let<NeuInternalName, Nothing> { internalName ->
+        NeuInternalName.fromItemNameOrNull(input)?.let { internalName ->
             formatTestItem(internalName, internalName.getPrice())
             return@buildList
         }
 
-        input.toInternalName().getItemStackOrNull()?.let<ItemStack, Nothing> { item ->
+        input.toInternalName().getItemStackOrNull()?.let { item ->
             val internalName = item.getInternalName()
             formatTestItem(internalName, internalName.getPrice())
             return@buildList
@@ -863,19 +888,32 @@ object ItemUtils {
 
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
+        // If we're currently loading the repo (async in a coroutine), we don't want to show the warning
+        if (EnoughUpdatesManager.inLoadingState()) {
+            return ChatUtils.debug(
+                "Ignoring missing repo item warning, repo is currently loading or fetching",
+                replaceSameMessage = true,
+            )
+        }
+
         ChatUtils.debug(message)
-        if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
+        if (!SkyBlockUtils.debug && !PlatformUtils.isDevEnvironment) return
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()
         showRepoWarning(name)
     }
 
+    // These two are matching right now, but we keep them separate for future-proofing
+    val resetCommand
+        get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
+        else EnoughUpdatesRepoManager.updateCommand
+
     private fun showRepoWarning(item: String) {
         val text = listOf(
             "§c§lMissing repo data for item: $item",
             "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
-            "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
+            "§cYou can try §l/$resetCommand§r§c and restart your game to see if that fixes the issue.",
             "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
         )
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
@@ -946,8 +984,8 @@ object ItemUtils {
     //#if MC > 1.21
     //$$ fun ItemStack.getItemModel(): Item? {
     //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
-    //$$     val item = Registries.ITEM.get(identifier)
-    //$$     return if (item == Items.AIR) null else item
+    //$$     val itemModel = Registries.ITEM.get(identifier)
+    //$$     return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
     //$$ }
     //#endif
 }

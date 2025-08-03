@@ -21,7 +21,7 @@ object ItemTipHelper {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        val stack = event.stack?.takeIf { it.stackSize == 1 } ?: return
+        val stack = event.stack ?: return
 
         val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
         itemTipEvent.post()
@@ -70,7 +70,7 @@ object ItemTipHelper {
             } else 0
             val y = guiTop + yDisplayPosition + 9 + itemTipEvent.offsetY
 
-            GuiRenderUtils.drawString(stackTip, x, y, 16777215)
+            GuiRenderUtils.drawString(stackTip, x, y, -1)
         }
         DrawContextUtils.popMatrix()
         GlStateManager.enableLighting()

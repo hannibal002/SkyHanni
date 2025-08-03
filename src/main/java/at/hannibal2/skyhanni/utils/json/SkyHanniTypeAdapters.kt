@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
@@ -30,7 +31,7 @@ object SkyHanniTypeAdapters {
 
     val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
         { this.toString() },
-        { java.util.UUID.fromString(this) },
+        { StringUtils.parseUUID(this) },
     )
 
     val NBT_BOOLEAN: TypeAdapter<NbtBoolean> = SimpleStringTypeAdapter(
@@ -59,7 +60,7 @@ object SkyHanniTypeAdapters {
         }
 
         override fun read(reader: JsonReader): SimpleTimeMark {
-            return reader.nextString().toLong().asTimeMark()
+            return reader.nextLong().asTimeMark()
         }
     }
 
@@ -69,7 +70,7 @@ object SkyHanniTypeAdapters {
         }
 
         override fun read(reader: JsonReader): Duration {
-            return reader.nextString().toLong().milliseconds
+            return reader.nextLong().milliseconds
         }
     }
 

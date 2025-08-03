@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -11,11 +12,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import java.awt.Color
@@ -42,15 +44,23 @@ object WorldEdit {
             }
         }
 
-    fun copyToClipboard() {
-        ClipboardUtils.copyToClipboard(generateCodeSnippet())
+    fun copyToClipboard(useModern: Boolean) {
+        ClipboardUtils.copyToClipboard(generateCodeSnippet(useModern))
+        ChatUtils.chat("Copied text to clipboard.")
     }
 
-    private fun generateCodeSnippet(): String {
+    private const val legacyBlockPos = "net.minecraft.util.BlockPos"
+    private const val modernBlockPos = "net.minecraft.util.math.BlockPos"
+    private const val legacyAABB = "net.minecraft.util.AxisAlignedBB"
+    private const val modernAABB = "net.minecraft.util.math.Box"
+
+    private fun generateCodeSnippet(useModern: Boolean): String {
+        val blockPosText = if (useModern) modernBlockPos else legacyBlockPos
+        val aabbText = if (useModern) modernAABB else legacyAABB
         var text = ""
-        leftPos?.run { text += "val redLeft = net.minecraft.util.BlockPos($x, $y, $z)\n" }
-        rightPos?.run { text += "val blueRight = net.minecraft.util.BlockPos($x, $y, $z)\n" }
-        aabb?.run { text += "val aabb = net.minecraft.util.AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ)\n" }
+        leftPos?.run { text += "val redLeft = $blockPosText($x, $y, $z)\n" }
+        rightPos?.run { text += "val blueRight = $blockPosText($x, $y, $z)\n" }
+        aabb?.run { text += "val aabb = $aabbText($minX, $minY, $minZ, $maxX, $maxY, $maxZ)\n" }
         return text
     }
 
@@ -91,58 +101,49 @@ object WorldEdit {
         aabb?.let {
             event.drawFilledBoundingBox(
                 it.expandBlock(),
-                Color.CYAN.addAlpha(60),
+                Color.CYAN.addAlpha(60).toChromaColor(),
             )
-        }
-    }
-
-    fun command(it: Array<String>) {
-        if (!isEnabled()) {
-            ChatUtils.userError("World Edit is disabled in the config. Enable it if you want to use it.")
-            return
-        }
-        when (it.firstOrNull()) {
-            null, "help" -> {
-                ChatUtils.chat(
-                    "Use a wood axe and left/right click to select a region in the world. " +
-                        "Then use /shworldedit copy or /shworldedit reset.",
-                )
-            }
-
-            "copy" -> {
-                copyToClipboard()
-                ChatUtils.chat("Copied text to clipboard.")
-            }
-
-            "reset" -> {
-                leftPos = null
-                rightPos = null
-                ChatUtils.chat("Reset selected region")
-            }
-
-            "left", "pos1" -> {
-                leftPos = LocationUtils.playerLocation().toBlockPos()
-                ChatUtils.chat("Set left pos.")
-            }
-
-            "right", "pos2" -> {
-                rightPos = LocationUtils.playerLocation().toBlockPos()
-                ChatUtils.chat("Set right pos.")
-            }
-
-            else -> {
-                ChatUtils.chat("Unknown subcommand")
-            }
         }
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shworldedit") {
+        event.registerBrigadier("shworldedit") {
             description = "Select regions in the world"
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { command(it) }
-            autoComplete { listOf("copy", "reset", "help", "left", "right") }
+            literalCallback("help") {
+                ChatUtils.chat(
+                    "Use a wood axe and left/right click to select a region in the world. " +
+                        "Then use /shworldedit copy or /shworldedit reset.",
+                )
+            }
+            literal("copy") {
+                argCallback("useModern", BrigadierArguments.bool()) { modern ->
+                    copyToClipboard(modern)
+                }
+                simpleCallback {
+                    copyToClipboard(false)
+                }
+            }
+            literalCallback("reset") {
+                leftPos = null
+                rightPos = null
+                ChatUtils.chat("Reset selected region")
+            }
+            literalCallback("left", "pos1") {
+                leftPos = LocationUtils.playerLocation().toBlockPos()
+                ChatUtils.chat("Set left pos.")
+            }
+            literalCallback("right", "pos2") {
+                rightPos = LocationUtils.playerLocation().toBlockPos()
+                ChatUtils.chat("Set right pos.")
+            }
+            simpleCallback {
+                ChatUtils.chat(
+                    "Use a wood axe and left/right click to select a region in the world. " +
+                        "Then use /shworldedit copy or /shworldedit reset.",
+                )
+            }
         }
     }
 

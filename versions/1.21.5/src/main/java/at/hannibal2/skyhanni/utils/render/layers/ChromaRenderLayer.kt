@@ -5,23 +5,56 @@ import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
+import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
+import at.hannibal2.skyhanni.utils.compat.RenderCompat.enableRenderPassScissorStateIfAble
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.VertexFormat
-import java.util.OptionalDouble
-import java.util.OptionalInt
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BuiltBuffer
 import net.minecraft.client.render.RenderLayer.MultiPhase
+//#if MC > 1.21.6
+//$$ import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
+//$$ import org.joml.Vector4f
+//#endif
 
 class ChromaRenderLayer(
     name: String, size: Int, hasCrumbling: Boolean, translucent: Boolean, pipeline: RenderPipeline, phases: MultiPhaseParameters,
-) : MultiPhase(name, size, hasCrumbling, translucent, pipeline, phases ) {
+) : MultiPhase(name, size, hasCrumbling, translucent, pipeline, phases) {
 
     override fun draw(buffer: BuiltBuffer) {
         val renderPipeline = this.pipeline
         this.startDrawing()
+
+        // Custom chroma uniforms
+        val chromaSize: Float = ChromaManager.config.chromaSize * (GuiScreenUtils.displayWidth / 100f)
+        var ticks = (ClientEvents.totalTicks) + (MinecraftClient.getInstance() as AccessorMinecraft).timer.getTickProgress(true)
+        ticks = when (ChromaManager.config.chromaDirection) {
+            Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks
+            Direction.FORWARD_LEFT, Direction.BACKWARD_LEFT -> -ticks
+        }
+        val timeOffset: Float = ticks * (ChromaManager.config.chromaSpeed / 360f)
+        val saturation: Float = ChromaManager.config.chromaSaturation
+        val forwardDirection: Int = when (ChromaManager.config.chromaDirection) {
+            Direction.FORWARD_RIGHT, Direction.FORWARD_LEFT -> 1
+            Direction.BACKWARD_RIGHT, Direction.BACKWARD_LEFT -> 0
+        }
+
+        //#if MC > 1.21.6
+        //$$ var dynamicTransforms = RenderSystem.getDynamicUniforms()
+        //$$     .write(
+        //$$         RenderSystem.getModelViewMatrix(),
+        //$$ 		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
+        //$$ 		 RenderSystem.getModelOffset(),
+        //$$ 		 RenderSystem.getTextureMatrix(),
+        //$$ 		 RenderSystem.getShaderLineWidth()
+        //$$     )
+        //$$ if (GuiRendererHook.chromaBufferSlice == null) {
+        //$$     GuiRendererHook.computeChromaBufferSlice()
+        //$$ }
+        //#endif
 
         try {
             val gpuBuffer = renderPipeline.vertexFormat.uploadImmediateVertexBuffer(buffer.buffer)
@@ -37,38 +70,23 @@ class ChromaRenderLayer(
             }
 
             val framebuffer = phases.target.get()
-            val colorAttachment = framebuffer.colorAttachment
-            val depthAttachment = if (framebuffer.useDepthAttachment) framebuffer.depthAttachment else null
 
-            RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                colorAttachment, OptionalInt.empty(),
-                depthAttachment, OptionalDouble.empty()
-            ).use { renderPass ->
-                // Set custom chroma uniforms
-                val chromaSize: Float = ChromaManager.config.chromaSize * (GuiScreenUtils.displayWidth / 100f)
-                var ticks = (ClientEvents.totalTicks) + (MinecraftClient.getInstance() as AccessorMinecraft).timer.getTickProgress(true)
-                ticks = when (ChromaManager.config.chromaDirection) {
-                    Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks
-                    Direction.FORWARD_LEFT, Direction.BACKWARD_LEFT -> -ticks
-                }
-                val timeOffset: Float = ticks * (ChromaManager.config.chromaSpeed / 360f)
-                val saturation: Float = ChromaManager.config.chromaSaturation
-                val forwardDirection: Int = when (ChromaManager.config.chromaDirection) {
-                    Direction.FORWARD_RIGHT, Direction.FORWARD_LEFT -> 1
-                    Direction.BACKWARD_RIGHT, Direction.BACKWARD_LEFT -> 0
-                }
-
+            RenderSystem.getDevice().createRenderPass("SkyHanni Immediate Chroma Pipeline Draw", framebuffer).use { renderPass ->
+                //#if MC > 1.21.6
+                //$$ RenderSystem.bindDefaultUniforms(renderPass)
+                //$$ renderPass.setUniform("DynamicTransforms", dynamicTransforms)
+                //$$ renderPass.setUniform("SkyHanniChromaUniforms", GuiRendererHook.chromaBufferSlice)
+                //#else
                 renderPass.setUniform("chromaSize", chromaSize)
                 renderPass.setUniform("timeOffset", timeOffset)
                 renderPass.setUniform("saturation", saturation)
                 renderPass.setUniform("forwardDirection", forwardDirection)
+                //#endif
 
                 renderPass.setPipeline(renderPipeline)
                 renderPass.setVertexBuffer(0, gpuBuffer)
 
-                if (RenderSystem.SCISSOR_STATE.isEnabled) {
-                    renderPass.enableScissor(RenderSystem.SCISSOR_STATE)
-                }
+                renderPass.enableRenderPassScissorStateIfAble()
 
                 for (i in 0..11) {
                     val gpuTexture = RenderSystem.getShaderTexture(i)
@@ -78,7 +96,7 @@ class ChromaRenderLayer(
                 }
 
                 renderPass.setIndexBuffer(gpuBuffer2, indexType)
-                renderPass.drawIndexed(0, buffer.drawParameters.indexCount())
+                renderPass.drawIndexed(buffer.drawParameters.indexCount())
             }
         } catch (exception: Throwable) {
             try {

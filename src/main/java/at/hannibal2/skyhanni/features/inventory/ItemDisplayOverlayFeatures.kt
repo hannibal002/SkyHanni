@@ -28,11 +28,11 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.CachedItemData
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -67,6 +68,7 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
+    private var lastSize = 0
 
     /**
      * REGEX-TEST: MASTER_SKULL_TIER_1
@@ -119,7 +121,15 @@ object ItemDisplayOverlayFeatures {
 
     @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        event.stackTip = getStackTip(event.stack) ?: return
+        val currentSize = config.itemNumberAsStackSize.size
+        if (lastSize != currentSize) {
+            lastSize = currentSize
+            CachedItemData.forEachValue { it.stackTip = null }
+        }
+        val stack = event.stack
+        val cachedData = stack.cachedData
+        val tip = cachedData.stackTip ?: getStackTip(stack).also { cachedData.stackTip = it ?: "" }
+        tip?.takeIf { it.isNotEmpty() }?.let { event.stackTip = it }
     }
 
     private fun getStackTip(item: ItemStack): String? {
@@ -166,7 +176,7 @@ object ItemDisplayOverlayFeatures {
                 // 0.0 Would probably work, but rounding errors can occur
                 // due to hypixel's imprecision in storage.
                 it.exp > 10.0 || PetStorageApi.mainPetMenuNamePattern.matches(
-                    InventoryUtils.openInventoryName()
+                    InventoryUtils.openInventoryName(),
                 )
             } ?: return null
             val level = item.getPetLevel()
@@ -263,7 +273,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (VACUUM_GARDEN.isSelected() && internalName in PestApi.vacuumVariants && isOwnItem(lore)) {
+        if (VACUUM_GARDEN.isSelected() && internalName.getItemStack().getItemCategoryOrNull() == ItemCategory.VACUUM && isOwnItem(lore)) {
             gardenVacuumPattern.firstMatcher(lore) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
@@ -326,13 +336,13 @@ object ItemDisplayOverlayFeatures {
         return null
     }
 
-    fun isOwnItem(lore: List<String>) =
-        lore.none {
-            it.contains("Click to trade!") ||
-                it.contains("Starting bid:") ||
-                it.contains("Buy it now:") ||
-                it.contains("Click to inspect")
-        }
+    // todo repo
+    private fun isOwnItem(lore: List<String>) = lore.none {
+        it.contains("Click to trade!") ||
+            it.contains("Starting bid:") ||
+            it.contains("Buy it now:") ||
+            it.contains("Click to inspect")
+    }
 
     var done = false
 
@@ -347,9 +357,6 @@ object ItemDisplayOverlayFeatures {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "inventory.itemNumberAsStackSize") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
-        }
         event.transform(29, "inventory.itemNumberAsStackSize") { element ->
             fixRemovedConfigElement(element)
         }

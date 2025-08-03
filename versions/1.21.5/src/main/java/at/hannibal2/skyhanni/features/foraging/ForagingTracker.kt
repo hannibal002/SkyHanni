@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -34,7 +36,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import net.minecraft.text.Text
@@ -56,8 +58,13 @@ object ForagingTracker {
         tracker.initRenderer({ config.position }) { isInIsland() && heldItemEnabled() && config.enabled }
     }
 
-    private fun heldItemEnabled() = !config.onlyHoldingAxe || isHoldingAxe()
-    private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE
+    private fun heldItemEnabled() = !config.onlyHoldingAxe ||
+        (isHoldingAxe() || lastAxeHeldTime.passedSince() < config.disappearingDelay.seconds)
+
+    private fun isHoldingAxe() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE || hasHeldAxe
+
+    private var lastAxeHeldTime: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var hasHeldAxe: Boolean = false
 
     private fun drawDisplay(bucketData: ForagingTrackerLegacy.BucketData): List<Searchable> = buildList {
         addSearchString("§a§lForaging Tracker")
@@ -84,7 +91,7 @@ object ForagingTracker {
         if (config.showWholeTrees && wholeTreesFelled > 0.0) {
             val preambleFormat = "Whole $baseFormat"
             val wholeRenderable = Renderable.hoverTips(
-                StringRenderable("§e$preambleFormat ${wholeTreesFelled.addSeparators()}"),
+                Renderable.text("§e$preambleFormat ${wholeTreesFelled.addSeparators()}"),
                 tips = bucketData.wholeTreesCut.mapNotNull { (treeType, count) ->
                     if (count <= 0.0) return@mapNotNull null
                     "§7Whole $treeType Trees cut: §a${count.addSeparators()}"
@@ -94,7 +101,7 @@ object ForagingTracker {
         }
 
         val totalRenderable = Renderable.hoverTips(
-            StringRenderable("§e$baseFormat ${treesContributedTo.addSeparators()}"),
+            Renderable.text("§e$baseFormat ${treesContributedTo.addSeparators()}"),
             tips = bucketData.treesCut.mapNotNull { (treeType, count) ->
                 if (count <= 0) return@mapNotNull null
                 "$treeType Tree contributions: §a${count.addSeparators()}"
@@ -354,4 +361,15 @@ object ForagingTracker {
         }
     }
 
+    @HandleEvent
+    fun onItemChange(event: ItemInHandChangeEvent) {
+        if (!isInIsland()) return
+        val isAxe = event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE
+        if (isAxe != hasHeldAxe) {
+            if (!isAxe) {
+                lastAxeHeldTime = SimpleTimeMark.now()
+            }
+            hasHeldAxe = isAxe
+        }
+    }
 }

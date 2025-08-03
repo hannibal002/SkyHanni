@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
@@ -35,6 +35,7 @@ object RareDropMessages {
 
     /**
      * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168 §r§b✯ Magic Find§r§b)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
      */
     private val petDroppedPattern by petGroup.pattern(
@@ -67,6 +68,16 @@ object RareDropMessages {
     )
 
     /**
+     * REGEX-TEST: SMITE;6
+     * REGEX-TEST: ENDER_SLAYER;7
+     * REGEX-TEST: ULTIMATE_REITERATE;1
+     */
+    private val slayerBookIDPattern by repoGroup.pattern(
+        "slayerbook",
+        "SMITE;(?:6|7)|ENDER_SLAYER;(?:6|7)|MANA_STEAL;1|SMARTY_PANTS;1|BANE_OF_ARTHROPODS;6|CRITIAL;6|FIRE_ASPECT;3|ULTIMATE_REITERATE;1",
+    )
+
+    /**
      * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §fBlue Whale Pet
      * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §5Giraffe Pet
      */
@@ -95,7 +106,7 @@ object RareDropMessages {
         IslandType.KUUDRA_ARENA,
     )
 
-    private val userLuck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck
+    private val userLuck get() = UserLuckBreakdown.getTotalUserLuck()
 
     private val config get() = SkyHanniMod.feature.chat.rareDropMessages
 
@@ -146,10 +157,11 @@ object RareDropMessages {
             )
         }
 
-        if (!anyRecentMessage && config.enchantedBookMissingMessage) {
+        // Hypixel send Slayer Book messages late, so we do a manual internalName Regex Match
+        if (!anyRecentMessage && config.enchantedBookMissingMessage && !slayerBookIDPattern.matches(internalName.asString())) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
-            if (SkyHanniMod.feature.misc.userluckEnabled) {
-                userLuck?.takeIf { it != 0f }?.let { luck ->
+            if (SkyHanniMod.feature.misc.userLuck) {
+                userLuck.takeIf { it != 0f }?.let { luck ->
                     var luckString = luck.roundTo(2).addSeparators()
                     if (luck > 0) luckString = "+$luckString"
                     message += " §a($luckString ✴ SkyHanni User Luck)"

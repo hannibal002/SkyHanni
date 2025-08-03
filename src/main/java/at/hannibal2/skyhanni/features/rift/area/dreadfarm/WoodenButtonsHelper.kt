@@ -17,14 +17,14 @@ import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLo
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockButtonWood
 import net.minecraft.init.Blocks
@@ -96,7 +96,7 @@ object WoodenButtonsHelper {
                 IslandGraphs.pathFind(
                     it.position,
                     "Button Spot",
-                    config.color.toSpecialColor(),
+                    config.color.toColor(),
                     condition = { config.showPathFinder && config.showButtonsHelper },
                 )
             }
@@ -159,11 +159,11 @@ object WoodenButtonsHelper {
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
         RiftApi.allButtonsHit = true
         hitButtons = buttonLocations.values.flatten().toMutableSet()
-        soulLocations["Buttons"]?.let {
+        soulLocations["Dreadfarm"]?.get("Buttons")?.let {
             IslandGraphs.pathFind(
                 it,
                 "Buttons Enigma Soul",
-                config.color.toSpecialColor(),
+                config.color.toColor(),
                 condition = { config.showPathFinder },
             )
         }
@@ -183,7 +183,7 @@ object WoodenButtonsHelper {
         val spotName = "${spot.name}:${spot.position}"
         buttonLocations[spotName]?.forEach { button ->
             if (!hitButtons.contains(button)) {
-                event.drawWaypointFilled(button, config.color.toSpecialColor(), inverseAlphaScale = true)
+                event.drawWaypointFilled(button, config.color.toColor(), inverseAlphaScale = true)
             }
         }
     }

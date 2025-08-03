@@ -33,9 +33,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -45,7 +42,10 @@ import at.hannibal2.skyhanni.utils.compat.addLeaves
 import at.hannibal2.skyhanni.utils.compat.addLeaves2
 import at.hannibal2.skyhanni.utils.compat.addRedFlower
 import at.hannibal2.skyhanni.utils.compat.addTallGrass
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import org.lwjgl.input.Keyboard
@@ -122,7 +122,7 @@ object GriffinBurrowHelper {
 
     private fun loadTestGriffinSpots() {
         if (!testGriffinSpots) return
-        val center = LocationUtils.playerLocation().toBlockPos().toLorenzVec()
+        val center = LocationUtils.playerLocation().roundToBlock()
         val list = mutableListOf<LorenzVec>()
         for (x in -5 until 5) {
             for (z in -5 until 5) {
@@ -339,7 +339,8 @@ object GriffinBurrowHelper {
         if (config.inquisitorSharing.enabled) {
             for (inquis in InquisitorWaypointShare.waypoints.values) {
                 val location = inquis.location
-                event.drawColor(location, LorenzColor.LIGHT_PURPLE)
+                // TODO add chroma color support via config
+                event.drawColor(location, LorenzColor.LIGHT_PURPLE.toChromaColor())
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
                     // TODO use round(1)
@@ -363,12 +364,12 @@ object GriffinBurrowHelper {
 
         val currentWarp = BurrowWarpHelper.currentWarp
         if (config.lineToNext) {
-            var color: LorenzColor?
+            var color: ChromaColour?
             val renderLocation = if (currentWarp != null) {
-                color = LorenzColor.AQUA
+                color = LorenzColor.AQUA.toChromaColor()
                 currentWarp.location
             } else {
-                color = if (shouldFocusOnInquis) LorenzColor.LIGHT_PURPLE else LorenzColor.WHITE
+                color = if (shouldFocusOnInquis) LorenzColor.LIGHT_PURPLE.toChromaColor() else LorenzColor.WHITE.toChromaColor()
                 targetLocation?.blockCenter() ?: return
             }
 
@@ -377,7 +378,7 @@ object GriffinBurrowHelper {
                 3
             } else 2
             if (currentWarp == null) {
-                event.drawLineToEye(renderLocation, color.toColor(), lineWidth, false)
+                event.drawLineToEye(renderLocation, color, lineWidth, false)
             }
         }
 
@@ -399,7 +400,8 @@ object GriffinBurrowHelper {
             for (guessLocation in allGuessLocations) {
                 if (guessLocation in particleBurrows) continue
                 val distance = guessLocation.distance(playerLocation)
-                event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
+                // TODO add chroma color support via config
+                event.drawColor(guessLocation, LorenzColor.WHITE.toChromaColor(), distance > 10)
                 val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
                 event.drawDynamicText(guessLocation.up(), "${color}Guess", 1.5)
                 if (distance > 5) {
@@ -413,7 +415,8 @@ object GriffinBurrowHelper {
     private fun showTestLocations(event: SkyHanniRenderWorldEvent) {
         if (!testGriffinSpots) return
         for (location in testList) {
-            event.drawColor(location, LorenzColor.WHITE)
+            // TODO add chroma color support via config
+            event.drawColor(location, LorenzColor.WHITE.toChromaColor())
         }
     }
 

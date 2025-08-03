@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import com.google.gson.JsonObject
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
@@ -252,8 +251,11 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 }
             }
 
-            if (modifiedWords.size < 1) {
+            if (modifiedWords.isEmpty()) {
                 modifiedWords = ModifyVisualWords.userModifiedWords
+                //#if MC > 1.21
+                //$$ .map { it.toVisualWord() }.toMutableList()
+                //#endif
             }
 
             if (toRemove != null) {
@@ -502,7 +504,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
 
         if (KeyboardManager.isPastingKeysDown()) {
-            SkyHanniMod.coroutineScope.launch {
+            SkyHanniMod.launchCoroutine {
                 val clipboard = OSUtils.readFromClipboard().orEmpty()
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
@@ -549,8 +551,13 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun saveChanges() {
+
         ModifyVisualWords.userModifiedWords = modifiedWords
+        //#if MC > 1.21
+        //$$ .map { VisualWordText.fromVisualWord(it) }.toMutableList()
+        //#endif
         ModifyVisualWords.update()
+
         SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }
 

@@ -40,8 +40,11 @@ class EliteFarmingWeightConfig {
     @ConfigEditorDropdown
     val eliteLBType: Property<EliteFarmingWeightLBType> = Property.of(EliteFarmingWeightLBType.DEFAULT)
 
-    enum class EliteFarmingWeightLBType(private val displayName: String) {
-        DEFAULT("All-Time"),
+    enum class EliteFarmingWeightLBType(
+        private val displayName: String,
+        val leaderboardName: String = displayName
+    ) {
+        DEFAULT("All-Time", leaderboardName = ""),
         MONTHLY("Monthly"),
         ;
 

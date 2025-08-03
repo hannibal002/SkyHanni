@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -74,19 +75,19 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
             FortuneGuidePage.UPGRADES to UpgradePage({ currentCrop }, sizeX, sizeY - 2),
         )
         verticalTabs = listOf(
-            vTab(ItemStack(Items.gold_ingot), Renderable.string("§eBreakdown")) {
+            vTab(ItemStack(Items.gold_ingot), Renderable.text("§eBreakdown")) {
                 currentPage = if (currentCrop == null) FortuneGuidePage.OVERVIEW else FortuneGuidePage.CROP
             },
             vTab(
                 ItemStack(Items.map),
-                Renderable.string("§eUpgrades"),
+                Renderable.text("§eUpgrades"),
             ) {
                 currentPage = FortuneGuidePage.UPGRADES
             },
         )
         horizontalTabs = buildList {
             add(
-                hTab(ItemStack(Blocks.grass), Renderable.string("§eOverview")) {
+                hTab(ItemStack(Blocks.grass), Renderable.text("§eOverview")) {
                     currentCrop = null
 
                     it.pageSwitchHorizontal()
@@ -94,7 +95,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
             )
             for (crop in CropType.entries) {
                 add(
-                    hTab(crop.icon, Renderable.string("§e${crop.cropName}")) {
+                    hTab(crop.icon, Renderable.text("§e${crop.cropName}")) {
                         currentCrop = crop
 
                         it.pageSwitchHorizontal()
