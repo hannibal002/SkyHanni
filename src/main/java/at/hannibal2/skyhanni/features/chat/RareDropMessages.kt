@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -87,16 +86,13 @@ object RareDropMessages {
         "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)",
     )
 
-
     /**
      * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b✯ Magic Find§r§b)
      * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book
-     * REGEX-TEST: §r§6§lRARE DROP! §r§fEnchanted Book (Corruption I§r§f) §r§b(+§r§b314 §r§b✯ Magic Find§r§b)§r
      */
-    @Suppress("MaxLineLength")
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook",
-        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book(?<bookname> \\(.*\\))?(?<end> §r§b\\(\\+(?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\))?.*",
+        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book(?<end> §r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\))?.*",
     )
 
     private val petPatterns = listOf(
@@ -140,16 +136,14 @@ object RareDropMessages {
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.ENCHANTED_BOOK) return
         if (SkyBlockUtils.inAnyIsland(ignoredBookIslands)) return
-        var bookItemName = ""
 
+        val itemName = internalName.repoItemName
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
             val message = line.chatMessage
+            if (itemName in message) return // the message already has the enchant name
             if (enchantedBookPattern.matches(message)) {
-                enchantedBookPattern.matchMatcher(message) {
-                    bookItemName = group("bookname")
-                }
                 anyRecentMessage = true
                 break
             }
@@ -157,7 +151,7 @@ object RareDropMessages {
 
         if (anyRecentMessage && config.enchantedBook) {
             ChatUtils.editFirstMessage(
-                component = { it.formattedText.replace("Enchanted Book$bookItemName", internalName.repoItemName).asComponent() },
+                component = { it.formattedText.replace("Enchanted Book", internalName.repoItemName).asComponent() },
                 "enchanted book",
                 predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.chatMessage) },
             )
