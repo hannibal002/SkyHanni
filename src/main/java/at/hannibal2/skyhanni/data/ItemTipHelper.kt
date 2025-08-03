@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.CachedItemData
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
@@ -22,6 +24,13 @@ object ItemTipHelper {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
+        val cachedData = stack.cachedData
+        cachedData.textIndex++
+
+        val a = cachedData.textIndex
+        if (a > 5) {
+            println("${stack.displayName} = ${cachedData.textIndex}")
+        }
 
         val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
         itemTipEvent.post()
@@ -39,6 +48,12 @@ object ItemTipHelper {
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
+        CachedItemData.forEachValue {
+            if (it.textIndex > 0) {
+                println("was ${it.textIndex}")
+            }
+            it.textIndex = 0
+        }
         if (!SkyHanniDebugsAndTests.globalRender) return
 
         val gui = Minecraft.getMinecraft().currentScreen
