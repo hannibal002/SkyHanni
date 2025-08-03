@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.GlStateManager
 @SkyHanniModule
 object ItemTipHelper {
 
+    // TODO cache per tick
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
@@ -57,6 +58,7 @@ object ItemTipHelper {
         for (slot in gui.inventorySlots.inventorySlots) {
             val stack = slot.stack ?: continue
 
+            // TODO cache per tick
             val itemTipEvent = RenderInventoryItemTipEvent(inventoryName, slot, stack)
             itemTipEvent.post()
             val stackTip = itemTipEvent.stackTip
