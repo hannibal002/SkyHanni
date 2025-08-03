@@ -16,7 +16,7 @@ class FlowstateHelperConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Shows stats for the Flowstate enchantment on Mining Tools." +
-                "§eMight not work at all due to Hypixel not sending sound data anymore.",
+            "§eMight not work at all due to Hypixel not sending sound data anymore.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
