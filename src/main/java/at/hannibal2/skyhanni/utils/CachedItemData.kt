@@ -44,6 +44,7 @@ data class CachedItemData(
     var stackTip: String? = null,
 
     var identifier: String? = null,
+    var textIndex: Int = 0
 ) {
     companion object {
         private val cache = TimeLimitedCache<IdentityCharacteristics<ItemStack>, CachedItemData>(expireAfterWrite = 2.minutes)
