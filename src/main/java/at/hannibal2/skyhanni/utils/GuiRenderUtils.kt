@@ -521,8 +521,8 @@ object GuiRenderUtils {
         //$$ val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
         //$$
         //$$ if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.isSideLit)) {
-        //$$     val adjX = matrices2D.m20 + (x * guiScaleX) - (totalItemScale * 1.75f)
-        //$$     val adjY = matrices2D.m21 + (y * guiScaleY) - (totalItemScale * 1.75f)
+        //$$     val adjX = matrices2D.m20 + (x * guiScaleX) - (totalItemScale * 1.8f)
+        //$$     val adjY = matrices2D.m21 + (y * guiScaleY) - (totalItemScale * 1.8f)
         //$$
         //$$     item.customRenderOnScreen(adjX, adjY, totalItemScale, rotX, rotY, rotZ)
         //$$ } else {
