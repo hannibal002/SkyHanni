@@ -119,6 +119,7 @@ object ErrorManager {
     private var cachedExtraData: String? = null
 
     // throw an error, best to not use it if not absolutely necessary
+    // when extraData is not used, rather call kotlin's `error()`
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         buildExtraDataString(extraData)?.let {
             cachedExtraData = it

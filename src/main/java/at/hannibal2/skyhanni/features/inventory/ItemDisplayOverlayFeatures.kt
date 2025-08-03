@@ -128,7 +128,7 @@ object ItemDisplayOverlayFeatures {
         }
         val stack = event.stack
         val cachedData = stack.cachedData
-        val tip = cachedData.stackTip ?: getStackTip(stack).also { cachedData.stackTip = it ?: "" }
+        val tip = cachedData.stackTip ?: getStackTip(stack).also { cachedData.stackTip = it.orEmpty() }
         tip?.takeIf { it.isNotEmpty() }?.let { event.stackTip = it }
     }
 
