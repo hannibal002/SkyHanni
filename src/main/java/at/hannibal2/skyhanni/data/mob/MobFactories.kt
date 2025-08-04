@@ -21,7 +21,7 @@ object MobFactories {
                 armorStand = armorStand,
                 name = this.group("name"),
                 additionalEntities = extraEntityList,
-                levelOrTier = this.group("tier").takeIf { it.isNotEmpty() }?.romanToDecimal() ?: 5
+                levelOrTier = this.group("tier")?.takeIf { it.isNotEmpty() }?.romanToDecimal() ?: 5
             )
         }
 
