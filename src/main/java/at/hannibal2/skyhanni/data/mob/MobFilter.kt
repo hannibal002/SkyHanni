@@ -55,10 +55,11 @@ object MobFilter {
 
     /**
      * REGEX-TEST: Wither Husk 500M❤
+     * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000❤
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
+        "(?:\\[Lv(?<level>\\d+)\\] )?(?<mobType>[^\\s✯]+)? ?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
     val slayerNameFilter by patternGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
 
