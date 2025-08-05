@@ -109,8 +109,8 @@ object GuiEditManager {
 
     @JvmStatic
     fun renderLast(context: DrawContext) {
-        if (!isInGui()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
+        if (!isInGui()) return
 
         DrawContextUtils.setContext(context)
         DrawContextUtils.translate(0f, 0f, 200f)

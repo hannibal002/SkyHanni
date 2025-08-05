@@ -180,7 +180,7 @@ object AdvancedPlayerList {
 
     fun ignoreCustomTabList(): Boolean {
         val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
-        return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
+        return !SkyHanniDebugsAndTests.globalRender || denyKeyPressed
     }
 
     private fun createCustomName(data: PlayerData): String {

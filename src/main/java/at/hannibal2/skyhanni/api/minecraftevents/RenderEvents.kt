@@ -35,8 +35,8 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
+        if (!canRender()) return
         SkyHanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
     }
 
