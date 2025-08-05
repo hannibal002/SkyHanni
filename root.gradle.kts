@@ -2,7 +2,7 @@ import at.skyhanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "20415a5ee3"
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.1"
     id("gg.essential.loom") version "1.9.29" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
@@ -14,13 +14,19 @@ plugins {
 allprojects {
     group = "at.hannibal2.skyhanni"
 
+    val buildToolsPath = when (name) {
+        "SkyHanni" -> layout.projectDirectory.dir("buildTools")
+        "annotation-processors", "detekt" -> layout.projectDirectory.dir("../buildTools")
+        else -> layout.projectDirectory.dir("../../buildTools")
+    }
+
     /**
      * The version of the project.
      * Stable version
      * Beta version
      * Bugfix version
      */
-    version = "4.9.0"
+    version = providers.fileContents(buildToolsPath.file("PROJECT_VERSION")).asText.map { it.trim() }.get()
 
     repositories {
         mavenCentral()

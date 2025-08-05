@@ -15,7 +15,7 @@ class PlayerAllChatEvent(
     messageComponent: ComponentSpan,
     chatComponent: IChatComponent,
     blockedReason: String? = null,
-) : AbstractChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
+) : AbstractSourcedChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
     val levelColor =
         //#if MC < 1.21
         levelComponent?.sampleStyleAtStart()?.color

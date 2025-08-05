@@ -124,8 +124,19 @@ val headlessLwjgl: Configuration by configurations.creating {
 }
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
-    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+    this.user = "hannibal002"
+    this.repo = "SkyHanni-Repo"
     this.branch = "main"
+    this.resourcePath = "assets/skyhanni/repo.zip"
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+}
+
+val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
+    this.user = "NotEnoughUpdates"
+    this.repo = "NotEnoughUpdates-Repo"
+    this.branch = "master"
+    this.resourcePath = "assets/skyhanni/neu-repo.zip"
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
 val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
@@ -301,6 +312,7 @@ kotlin {
 // Tasks:
 tasks.processResources {
     from(includeBackupRepo)
+    from(includeBackupNeuRepo)
     inputs.property("version", version)
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
