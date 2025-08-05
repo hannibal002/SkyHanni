@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.RaritySpecificNums
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NEURaritySpecificPetNums
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeComponent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
@@ -33,6 +33,10 @@ object BaseGsonBuilder {
         .registerTypeAdapter(NbtBoolean::class.java, SkyHanniTypeAdapters.NBT_BOOLEAN.nullSafe())
         .registerTypeAdapter(LorenzVec::class.java, SkyHanniTypeAdapters.VEC_STRING.nullSafe())
         .registerTypeAdapter(TrophyRarity::class.java, SkyHanniTypeAdapters.TROPHY_RARITY.nullSafe())
+        .registerTypeAdapter(NeuRecipeComponent::class.java, SkyHanniTypeAdapters.NEU_RECIPE_COMPONENT.nullSafe())
+        .registerTypeAdapter(NeuAbstractRecipe::class.java, SkyHanniTypeAdapters.NEU_ABSTRACT_RECIPE.nullSafe())
+        .registerTypeAdapter(NeuRecipeType::class.java, SkyHanniTypeAdapters.NEU_RECIPE_TYPE.nullSafe())
+        .registerTypeAdapter(NEURaritySpecificPetNums::class.java, SkyHanniTypeAdapters.NEU_RARITY_SPECIFIC_PET_NUMS.nullSafe())
         .registerTypeAdapter(ItemStack::class.java, SkyHanniTypeAdapters.NEU_ITEMSTACK.nullSafe())
         .registerTypeAdapter(NeuInternalName::class.java, SkyHanniTypeAdapters.INTERNAL_NAME.nullSafe())
         .registerTypeAdapter(LorenzRarity::class.java, SkyHanniTypeAdapters.RARITY.nullSafe())
@@ -42,16 +46,6 @@ object BaseGsonBuilder {
         .registerTypeAdapter(
             SkyHanniTracker.DefaultDisplayMode::class.java,
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),
-        )
-        .registerTypeAdapter(NeuRecipeComponent::class.java, SkyHanniTypeAdapters.NEU_RECIPE_COMPONENT.nullSafe())
-        .registerTypeAdapter(NeuRecipeType::class.java, SkyHanniTypeAdapters.NEU_RECIPE_TYPE.nullSafe())
-        .registerTypeAdapter(
-            NeuAbstractRecipe::class.java,
-            NeuAbstractRecipe.Companion.AbstractNeuRecipeDeserializer(),
-        )
-        .registerTypeAdapter(
-            RaritySpecificNums::class.java,
-            RaritySpecificNums.Companion.RaritySpecificNumsDeserializer(),
         )
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())

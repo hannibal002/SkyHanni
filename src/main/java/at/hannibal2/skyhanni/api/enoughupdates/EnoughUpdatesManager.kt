@@ -3,16 +3,17 @@ package at.hannibal2.skyhanni.api.enoughupdates
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.PetData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NEURaritySpecificPetNums
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetNumsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.RaritySpecificNums
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
@@ -37,11 +39,11 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.nbt.NBTTagList
 import java.io.File
 import java.util.TreeMap
 import kotlin.collections.set
 import kotlin.math.floor
+
 //#if MC > 1.21
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
@@ -51,8 +53,6 @@ import kotlin.math.floor
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import at.hannibal2.skyhanni.utils.ComponentUtils
 //$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-//#else
-import net.minecraft.nbt.NBTTagString
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
@@ -110,9 +110,10 @@ object EnoughUpdatesManager {
         fileSystem.list("items").mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
+                val itemJson = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
                 val parsed = parseItem(
                     internalName = internalName,
-                    json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
+                    json = itemJson,
                 ) ?: return@mapNotNullAsync null
                 internalName.toInternalName() to parsed
             } catch (e: Exception) {
@@ -140,7 +141,7 @@ object EnoughUpdatesManager {
     }
 
     private fun parseItem(internalName: String, json: JsonObject): NeuItemJson? = runCatching {
-        val itemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: return@runCatching null
+        val itemJson: NeuItemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: return@runCatching null
         // If the itemId is vanilla, replace it with the vanilla item identifier
         itemJson.itemId.getVanillaItem()?.let { mcItem ->
             itemJson.itemId = mcItem.getIdentifierString()
@@ -219,27 +220,11 @@ object EnoughUpdatesManager {
         //$$ }
         //#endif
 
-        val stack = ItemStack(baseItem).takeIf {
-            //#if MC < 1.21
-            it.item != null
-            //#else
-            //$$ it.item != Items.AIR
-            //#endif
-        } ?: return defaultStack
+        val stack = ItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return defaultStack
 
-        count?.let {
-            //#if MC < 1.21
-            stack.stackSize = it
-            //#else
-            //$$ stack.count = it
-            //#endif
-        }
-
+        count?.let { stack.stackSize = it }
         //#if MC < 1.21
         damage?.let { stack.itemDamage = it }
-        //#endif
-
-        //#if MC < 1.21
         try {
             stack.tagCompound = this.nbtTag
         } catch (_: Error) {}
@@ -259,18 +244,7 @@ object EnoughUpdatesManager {
             }
         }
 
-        lore.takeIfNotEmpty()?.let {
-            //#if MC < 1.21
-            val displayTag = stack.tagCompound?.getCompoundTag("display") ?: NBTTagCompound()
-            displayTag.setTag("Lore", processLore(lore, replacements))
-            val tag = stack.tagCompound ?: NBTTagCompound()
-            tag.setTag("display", displayTag)
-            stack.tagCompound = tag
-            //#else
-            //$$ val loreList = processLore(lore, replacements).map { it.asString().get() }
-            //$$ stack.setLore(loreList)
-            //#endif
-        }
+        lore.takeIfNotEmpty()?.let { stack.setLore(processLore(lore, replacements)) }
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
@@ -297,7 +271,10 @@ object EnoughUpdatesManager {
         } ?: "1➡100"
     }
 
-    private fun MutableMap<String, String>.addUnlevelledStatReplacements(nums: RaritySpecificNums) {
+    /**
+     * Displays stat ranges for pets in the case there is not a static level to check stats of.
+     */
+    private fun MutableMap<String, String>.addUnlevelledStatReplacements(nums: NEURaritySpecificPetNums) {
         val otherNumsMin = nums.min.otherNums
         val otherNumsMax = nums.max.otherNums
 
@@ -315,7 +292,10 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun MutableMap<String, String>.addLevelledStatReplacements(petData: PetData, nums: RaritySpecificNums) {
+    /**
+     * Adds 'true' calculated stats based on pet level.
+     */
+    private fun MutableMap<String, String>.addLevelledStatReplacements(petData: PetData, nums: NEURaritySpecificPetNums) {
         val level = petData.level
         val otherNumsMin = nums.min.otherNums
         val otherNumsMax = nums.max.otherNums
@@ -348,19 +328,14 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun processLore(lore: List<String>, replacements: Map<String, String>): NBTTagList {
-        val loreList = NBTTagList()
-        for (line in lore) {
+    private fun processLore(lore: List<String>, replacements: Map<String, String>): List<String> = buildList {
+        lore.onEach { line ->
+            var replacedLine = line
             for ((key, value) in replacements) {
-                line.replace("{$key}", value)
+                replacedLine = replacedLine.replace("{$key}", value)
             }
-            //#if MC < 1.21
-            loreList.appendTag(NBTTagString(line))
-            //#else
-            //$$ loreList.add(NbtString.of(line))
-            //#endif
+            add(replacedLine)
         }
-        return loreList
     }
 
     fun getDisplayName(internalName: NeuInternalName): String = displayNameCache.getOrPut(internalName) {

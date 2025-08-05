@@ -119,8 +119,7 @@ object NeuItems {
             tempNoColor[newCleanName.removeColor()] = internalName
             allInternalNames[internalName.asString()] = internalName
         }
-        @Suppress("UNCHECKED_CAST")
-        itemNamesWithoutColor = tempNoColor as NavigableMap<String, NeuInternalName>
+        itemNamesWithoutColor = tempNoColor
         allItemsCache = tempAllItemCache
         stackResolutionCache.clear()
         ChatUtils.debug("Cleared the NEUItems stack resolution cache")
