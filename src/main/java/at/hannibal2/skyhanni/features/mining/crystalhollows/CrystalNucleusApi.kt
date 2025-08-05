@@ -16,9 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 
 @SkyHanniModule
 object CrystalNucleusApi {
@@ -139,10 +137,10 @@ object CrystalNucleusApi {
                 "§fEnchanted Book \\((?<type>\\S*).*\\)"
             )
             val bookType = bookTypePattern.matcher(itemName).group("type").lowercase()
-            MinecraftCompat.localPlayer.addChatMessage(ChatComponentText(bookType))
             return when (bookType) {
                 "lapidary" -> Pair(LAPIDARY_I_BOOK_ITEM, 1)
                 "fortune" -> Pair(FORTUNE_IV_BOOK_ITEM, 1)
+                // Fallback
                 else -> {
                     unCheckedBooks += amount
                     null
