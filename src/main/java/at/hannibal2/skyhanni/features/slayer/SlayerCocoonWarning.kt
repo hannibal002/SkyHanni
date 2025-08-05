@@ -1,0 +1,29 @@
+package at.hannibal2.skyhanni.features.slayer
+
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+
+@SkyHanniModule
+object slayerCocoonWarning {
+    private val slayerCocoonPattern by RepoPattern.pattern (
+        "slayer.cocooned",
+        "§r§c§lYOU COCOONED YOUR SLAYER BOSS"
+    )
+
+    private val config get() = SlayerApi.config
+
+    @HandleEvent
+    fun onChatMessage(event: SkyHanniChatEvent) {
+        if(slayerCocoonPattern.matches(event.message))
+        {
+           if(config.slayerCocoonTitle) TitleManager.sendTitle("Slayer Boss Cocooned!")
+           if(config.slayerCocoonDing) SoundUtils.repeatSound(100, 30, SoundUtils.plingSound)
+        }
+    }
+}
