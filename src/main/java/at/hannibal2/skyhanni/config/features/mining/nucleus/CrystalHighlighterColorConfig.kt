@@ -35,6 +35,6 @@ class CrystalHighlighterColorConfig : Resettable() {
     val sapphire: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(41, 100, 203, 127))
 
     @ConfigOption(name = "Reset Colors", desc = "Reset all colors to their default values.")
-    @ConfigEditorButton
+    @ConfigEditorButton(buttonText = "Reset")
     val reset: Runnable = Runnable(::reset)
 }

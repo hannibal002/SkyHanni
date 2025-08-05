@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
@@ -89,7 +90,7 @@ object FrogMaskFeatures {
 
     private fun handleWarning(helmetRegion: String) {
         if (!IslandType.THE_PARK.isCurrent()) return
-        val inWrongArea = IslandAreas.currentAreaName != helmetRegion.removeColor()
+        val inWrongArea = SkyBlockUtils.graphArea != helmetRegion.removeColor()
         val timeToWarn = lastWarning.passedSince() > config.warning.cooldown.seconds
 
         if (!inWrongArea || !timeToWarn) return

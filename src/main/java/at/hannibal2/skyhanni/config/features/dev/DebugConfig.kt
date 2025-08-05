@@ -172,7 +172,7 @@ class DebugConfig {
     var bypassAdvancedPlayerTabList: Int = Keyboard.KEY_NONE
 
     @Expose
-    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while F3 is open.")
+    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area and graph area in SkyBlock while F3 is open.")
     @ConfigEditorBoolean
     var currentAreaDebug: Boolean = true
 

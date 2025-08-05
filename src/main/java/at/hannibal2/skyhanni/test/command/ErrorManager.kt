@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
@@ -119,6 +119,7 @@ object ErrorManager {
     private var cachedExtraData: String? = null
 
     // throw an error, best to not use it if not absolutely necessary
+    // when extraData is not used, rather call kotlin's `error()`
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         buildExtraDataString(extraData)?.let {
             cachedExtraData = it

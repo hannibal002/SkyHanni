@@ -3,8 +3,7 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
 class ScoreboardUpdateEvent(
-    @Deprecated("Use new instead", ReplaceWith("new"))
-    val full: List<String>,
+    full: List<String>,
     val old: List<String>,
 ) : SkyHanniEvent() {
     val new = full

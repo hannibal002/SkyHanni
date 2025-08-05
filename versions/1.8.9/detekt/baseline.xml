@@ -106,8 +106,6 @@
     <ID>RepoPatternRegexTestMissing:DungeonArchitectFeatures.kt$DungeonArchitectFeatures$by patternGroup.pattern( "puzzle.fail.quiz", "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?&lt;name&gt;\\S*) (?:§.)*chose the wrong .*", )</ID>
     <ID>RepoPatternRegexTestMissing:DungeonCopilot.kt$DungeonCopilot$by patternGroup.pattern( "countdown", ".* has started the dungeon countdown. The dungeon will begin in 1 minute.", )</ID>
     <ID>RepoPatternRegexTestMissing:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "nonpug", "(?i).*(?:PERM|VC|DISCORD).*", )</ID>
-    <ID>RepoPatternRegexTestMissing:EnchantParser.kt$EnchantParser$by patternGroup.pattern( "enchants.new", "(?:§7§l|§d§l|§9|§7)(?&lt;enchant&gt;[A-Za-z][A-Za-z '-]+) (?&lt;levelNumeral&gt;[IVXLCDM]+|[0-9]+)(?&lt;stacking&gt;(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)", )</ID>
-    <ID>RepoPatternRegexTestMissing:EnchantParser.kt$EnchantParser$by patternGroup.pattern( "grayenchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingContestApi.kt$FarmingContestApi$by patternGroup.pattern( "crop", "§8(?&lt;crop&gt;.*) Contest", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingContestApi.kt$FarmingContestApi$by patternGroup.pattern( "sidebarcrop", "\\s*(?:§e○|§6☘) §f(?&lt;crop&gt;.*) §a.*", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingContestApi.kt$FarmingContestApi$by patternGroup.pattern( "time", "§a(?&lt;month&gt;.*) (?&lt;day&gt;.*)(?:rd|st|nd|th), Year (?&lt;year&gt;.*)", )</ID>

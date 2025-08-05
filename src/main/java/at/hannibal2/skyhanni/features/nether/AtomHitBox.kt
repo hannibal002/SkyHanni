@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -26,7 +26,7 @@ object AtomHitBox {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
-        atomsList.removeIf { !it.key.isEntityAlive }
+        atomsList.removeIfKey { !it.isEntityAlive }
         for ((entity, atom) in atomsList) {
             if (entity.distanceToPlayer() > 50) continue
             event.drawHitbox(entity.entityBoundingBox, atom.color)

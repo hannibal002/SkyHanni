@@ -202,7 +202,8 @@ object CakeTracker {
         if (inCakeInventory) checkInventoryCakes()
         if (!inAuctionHouse) return
 
-        (event.container as ContainerChest).getUpperItems().forEach { (slot, _) ->
+        val containerChest = event.container as? ContainerChest ?: return
+        containerChest.getUpperItems().forEach { (slot, _) ->
             slotHighlightCache[slot.slotIndex]?.let { color ->
                 slot.highlight(color)
             }

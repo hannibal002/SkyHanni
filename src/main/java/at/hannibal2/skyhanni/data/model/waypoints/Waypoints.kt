@@ -8,7 +8,9 @@ interface Copyable<T> {
 
 class Waypoints<T : Copyable<T>>(
     @Expose
-    val waypoints: MutableList<T> = mutableListOf()
+    val waypoints: MutableList<T> = mutableListOf(),
 ) : MutableList<T> by waypoints {
-    fun deepCopy() = Waypoints(waypoints.map { it.copy() }.toMutableList())
+    fun deepCopy() = transform { it.copy() }
+
+    inline fun <R : Copyable<R>> transform(transform: (T) -> R): Waypoints<R> = Waypoints(waypoints.map { transform(it) }.toMutableList())
 }

@@ -10,6 +10,16 @@ data class RepoComparison(
     val latestSha: String?,
     val latestCommitTime: SimpleTimeMark?,
 ) {
+    constructor(
+        localCommit: RepoCommit?,
+        latestCommit: RepoCommit?,
+    ) : this(
+        localSha = localCommit?.sha,
+        localCommitTime = localCommit?.time,
+        latestSha = latestCommit?.sha,
+        latestCommitTime = latestCommit?.time,
+    )
+
     val hashesMatch = localSha == latestSha
 
     fun reportRepoUpToDate() = ChatUtils.clickToClipboard(
@@ -23,8 +33,12 @@ data class RepoComparison(
         },
     )
 
-    fun reportRepoOutdated() = ChatUtils.clickToClipboard(
-        "Repo is outdated, updating..",
+    fun reportForceRebuild() = reportRepoOutdated("Force redownloading repo..")
+
+    fun reportRepoOutdated(
+        mainMessage: String = "Repo is outdated, updating.."
+    ) = ChatUtils.clickToClipboard(
+        mainMessage,
         lines = buildList {
             add("local commit sha: §e$latestSha")
             localCommitTime?.let { localTime ->
@@ -36,6 +50,7 @@ data class RepoComparison(
             latestCommitTime?.let { latestTime ->
                 add("latest commit time: §b$latestTime")
                 add("  (§b${latestTime.passedSince().format()} ago§7)")
+                if (localSha == latestSha) return@buildList
                 localCommitTime?.let { localTime ->
                     val outdatedDuration = latestTime - localTime
                     add("")
