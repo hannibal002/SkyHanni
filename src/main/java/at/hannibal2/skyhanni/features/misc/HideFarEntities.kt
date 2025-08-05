@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonMobManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -34,6 +35,7 @@ object HideFarEntities {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
         if (!isEnabled()) return
         if (event.isMod(20)) {
             updateNeverHide()
