@@ -41,7 +41,7 @@ object RareDropMessages {
      */
     private val petDroppedPattern by petGroup.pattern(
         "droppedmessage",
-        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>(?: .*))?",
+        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>(?: .*)?)",
     )
 
     /**
