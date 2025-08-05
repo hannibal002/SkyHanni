@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -32,6 +33,7 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
         if (event.type != RenderLayer.PLAYER_LIST) return
         if (!config.enabled.get()) return
         event.cancel()
@@ -46,6 +48,7 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
         if (!config.enabled.get()) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return
