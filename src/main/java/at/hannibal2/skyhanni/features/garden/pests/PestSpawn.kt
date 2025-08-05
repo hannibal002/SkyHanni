@@ -37,7 +37,7 @@ object PestSpawn {
      */
     private val multiplePestsSpawn by patternGroup.pattern(
         "multiple",
-        "§6§l.*! §2(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!",
+        "§6§l.*! §2(?<amount>\\d) ... Pest(s)? §7have spawned in §aPlot §7- §b(?<plot>.*)§7!",
     )
 
     /**
