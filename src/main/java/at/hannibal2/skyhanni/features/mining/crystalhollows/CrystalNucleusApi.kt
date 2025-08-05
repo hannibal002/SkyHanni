@@ -16,7 +16,9 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.util.ChatComponentText
 
 @SkyHanniModule
 object CrystalNucleusApi {
@@ -59,6 +61,7 @@ object CrystalNucleusApi {
         "SYNTHETIC_HEART",
     ).map { it.toInternalName() }
 
+    // Fallback in case hypixel decides to not
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
@@ -128,8 +131,23 @@ object CrystalNucleusApi {
         if (itemName.contains(" Powder")) return null
         // Books are not directly added to the loot map, but are checked for later.
         if (itemName.startsWith("§fEnchanted")) {
-            unCheckedBooks += amount
-            return null
+            /**
+             * REGEX-TEST: §fEnchanted Book (Lapidary I)
+             */
+            val bookTypePattern by RepoPattern.pattern(
+                "filter.crystalnucleus.run.enchantedbook",
+                "§fEnchanted Book \\((?<type>\\S*).*\\)"
+            )
+            val bookType = bookTypePattern.matcher(itemName).group("type").lowercase()
+            MinecraftCompat.localPlayer.addChatMessage(ChatComponentText(bookType))
+            return when (bookType) {
+                "lapidary" -> Pair(LAPIDARY_I_BOOK_ITEM, 1)
+                "fortune" -> Pair(FORTUNE_IV_BOOK_ITEM, 1)
+                else -> {
+                    unCheckedBooks += amount
+                    null
+                }
+            }
         }
         val item = fromItemNameOrNull(itemName) ?: return null
         return Pair(item, amount)
