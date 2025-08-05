@@ -40,7 +40,7 @@ class Features : Config() {
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
-        if (SkyHanniDebugsAndTests.isAprilFoolsDay) return HorizontalAlign.RIGHT
+        if (SkyHanniMod.isAprilFoolsDay) return HorizontalAlign.RIGHT
         return super.alignCategory(category, isSelected)
     }
 
@@ -57,7 +57,7 @@ class Features : Config() {
     }
 
     override fun getTitle(): String {
-        val modName = if (SkyHanniDebugsAndTests.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
+        val modName = if (SkyHanniMod.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
         return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
 

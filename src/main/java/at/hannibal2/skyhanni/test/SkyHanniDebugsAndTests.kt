@@ -103,18 +103,6 @@ object SkyHanniDebugsAndTests {
         LorenzDebug.log(text)
     }
 
-    private var previousApril = false
-
-    val isAprilFoolsDay: Boolean
-        get() {
-            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
-            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
-            val result = (!never && (always || itsTime))
-            previousApril = result
-            return result
-        }
-
     private var testLocation: LorenzVec? = null
 
     @HandleEvent

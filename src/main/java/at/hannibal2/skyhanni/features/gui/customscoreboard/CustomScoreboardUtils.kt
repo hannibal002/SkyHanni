@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.HypixelData
@@ -23,7 +24,7 @@ import java.util.regex.Pattern
 object CustomScoreboardUtils {
 
     fun formatNumberDisplay(text: String, number: String, color: String): String {
-        val formattedNumber = if (SkyHanniDebugsAndTests.isAprilFoolsDay) {
+        val formattedNumber = if (SkyHanniMod.isAprilFoolsDay) {
             "-$number"
         } else {
             number

@@ -46,6 +46,8 @@ import net.minecraft.client.gui.GuiScreen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.time.LocalDate
+import java.time.Month
 
 @SkyHanniModule
 object SkyHanniMod {
@@ -104,6 +106,18 @@ object SkyHanniMod {
 
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
+
+    private var previousApril = false
+
+    val isAprilFoolsDay: Boolean
+        get() {
+            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+            val always = feature.dev.debug.alwaysFunnyTime
+            val never = feature.dev.debug.neverFunnyTime
+            val result = (!never && (always || itsTime))
+            previousApril = result
+            return result
+        }
 
     @JvmField
     var feature: Features = Features()

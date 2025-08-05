@@ -34,7 +34,7 @@ object RendererLivingEntityHook {
     @JvmStatic
     fun shouldBeUpsideDown(userName: String?): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
-        if (!config.flipContributors && !SkyHanniDebugsAndTests.isAprilFoolsDay) return false
+        if (!config.flipContributors && !SkyHanniMod.isAprilFoolsDay) return false
         val name = userName ?: return false
         return ContributorManager.shouldBeUpsideDown(name)
     }
@@ -45,7 +45,7 @@ object RendererLivingEntityHook {
     @JvmStatic
     fun rotatePlayer(player: EntityPlayer): Float? {
         if (!SkyBlockUtils.inSkyBlock) return null
-        if (!config.rotateContributors && !SkyHanniDebugsAndTests.isAprilFoolsDay) return null
+        if (!config.rotateContributors && !SkyHanniMod.isAprilFoolsDay) return null
         val name = player.name ?: return null
         if (!ContributorManager.shouldSpin(name)) return null
         val rotation = ((player.ticksExisted % 90) * 4).toFloat()

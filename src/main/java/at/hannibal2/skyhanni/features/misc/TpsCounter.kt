@@ -85,7 +85,7 @@ object TpsCounter {
     }
 
     private fun fixTps(tps: Double): Double {
-        return if (SkyHanniDebugsAndTests.isAprilFoolsDay) tps / 2 else tps
+        return if (SkyHanniMod.isAprilFoolsDay) tps / 2 else tps
     }
 
     private fun tpsCommand() {

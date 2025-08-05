@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -24,7 +25,7 @@ object FixChimeraDescription {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ItemHoverEvent) {
         // We don't need to always fix this
-        if (!SkyHanniDebugsAndTests.isAprilFoolsDay) return
+        if (!SkyHanniMod.isAprilFoolsDay) return
 
         for ((index, line) in event.toolTip.withIndex()) {
             // hypixel doesn't show the 100% for chimera 5
