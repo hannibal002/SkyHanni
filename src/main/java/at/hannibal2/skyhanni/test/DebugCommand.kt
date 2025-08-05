@@ -157,7 +157,7 @@ object DebugCommand {
 
     private fun globalRender(event: DebugDataCollectEvent) {
         event.title("Global Render")
-        if (SkyHanniDebugsAndTests.globalRender) {
+        if (SkyHanniMod.renderEnabled) {
             event.addIrrelevant("normal enabled")
         } else {
             event.addData {

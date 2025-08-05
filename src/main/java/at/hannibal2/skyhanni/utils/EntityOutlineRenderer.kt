@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
@@ -367,7 +366,7 @@ object EntityOutlineRenderer {
      */
     @HandleEvent
     fun onTick() {
-        if (!SkyHanniDebugsAndTests.globalRender) return
+        if (!SkyHanniMod.renderEnabled) return
         if (!isEnabled()) return
 
         val renderGlobal = try {

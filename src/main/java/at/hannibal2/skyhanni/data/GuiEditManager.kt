@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
@@ -109,7 +108,7 @@ object GuiEditManager {
 
     @JvmStatic
     fun renderLast(context: DrawContext) {
-        if (!SkyHanniDebugsAndTests.globalRender) return
+        if (!SkyHanniMod.renderEnabled) return
         if (!isInGui()) return
 
         DrawContextUtils.setContext(context)

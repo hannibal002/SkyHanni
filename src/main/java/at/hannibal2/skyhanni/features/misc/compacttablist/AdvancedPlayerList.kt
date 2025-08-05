@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -180,7 +179,7 @@ object AdvancedPlayerList {
 
     fun ignoreCustomTabList(): Boolean {
         val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
-        return !SkyHanniDebugsAndTests.globalRender || denyKeyPressed
+        return !SkyHanniMod.renderEnabled || denyKeyPressed
     }
 
     private fun createCustomName(data: PlayerData): String {
