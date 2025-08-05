@@ -47,7 +47,9 @@ object ItemPickupLog {
         CHANGE_AMOUNT(
             "§a+256",
             { entry, prefix ->
-                val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
+                val formattedAmount = entry.amount.absoluteValue.let {
+                    if (config.shorten) it.shortFormat() else it.addSeparators()
+                }
                 Renderable.text("$prefix$formattedAmount")
             },
         ),
@@ -80,6 +82,7 @@ object ItemPickupLog {
         fun updateAmount(change: Long) {
             amount += change
             timeUntilExpiry = SimpleTimeMark.now()
+            renderableCache.clear()
         }
 
         fun isExpired() = timeUntilExpiry.passedSince() > config.expireAfter.seconds
