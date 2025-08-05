@@ -163,6 +163,7 @@ class ItemResolutionQuery {
             "STRIDERSURFER" to "STRIDER_SURFER",
             "ABYSSAL_LANTERNFISH" to "ABYSSAL_LANTERN",
             "CINDERBAT" to "CINDER_BAT",
+            "BOGGED" to "SEA_ARCHER",
         )
     }
 
