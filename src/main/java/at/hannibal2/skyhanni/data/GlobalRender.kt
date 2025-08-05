@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 
@@ -33,6 +35,19 @@ object GlobalRender {
                 } else {
                     ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
                 }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Global Render")
+        if (enabled) {
+            event.addIrrelevant("normal enabled")
+        } else {
+            event.addData {
+                add("Global renderer is disabled!")
+                add("No rendering-related features from SkyHanni will show up anywhere!")
             }
         }
     }
