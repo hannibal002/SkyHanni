@@ -32,7 +32,7 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (!SkyHanniMod.renderEnabled) return
+        if (SkyHanniMod.renderDisabled) return
         if (event.type != RenderLayer.PLAYER_LIST) return
         if (!config.enabled.get()) return
         event.cancel()
@@ -47,7 +47,7 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!SkyHanniMod.renderEnabled) return
+        if (SkyHanniMod.renderDisabled) return
         if (!config.enabled.get()) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return

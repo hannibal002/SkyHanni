@@ -116,7 +116,7 @@ object SkyHanniMod {
     lateinit var visualWordsData: VisualWordsJson
     lateinit var petData: PetDataStorage
     lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
-    val renderEnabled get() = GlobalRender.enabled
+    val renderDisabled get() = !GlobalRender.enabled
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -138,7 +138,7 @@ object SkyHanniMod {
      */
     fun launchIOCoroutineWithMutex(
         mutex: Mutex,
-        block: suspend CoroutineScope.() -> Unit
+        block: suspend CoroutineScope.() -> Unit,
     ): Job = launchCoroutine {
         mutex.withLock {
             withContext(Dispatchers.IO, block)

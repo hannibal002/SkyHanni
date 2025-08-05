@@ -34,7 +34,7 @@ object HideFarEntities {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!SkyHanniMod.renderEnabled) return
+        if (SkyHanniMod.renderDisabled) return
         if (!isEnabled()) return
         if (event.isMod(20)) {
             updateNeverHide()

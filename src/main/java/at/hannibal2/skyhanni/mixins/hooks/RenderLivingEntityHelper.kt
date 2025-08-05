@@ -94,7 +94,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T, default: Int): Int {
-        if (!SkyHanniMod.renderEnabled) return default
+        if (SkyHanniMod.renderDisabled) return default
         if (entityColorMap.containsKey(entity)) {
             val condition = entityColorCondition[entity] ?: return default
             if (condition.invoke()) {
@@ -106,7 +106,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun <T : EntityLivingBase> internalChangeHurtTime(entity: T): Int {
-        if (!SkyHanniMod.renderEnabled) return entity.hurtTime
+        if (SkyHanniMod.renderDisabled) return entity.hurtTime
         run {
             val condition = entityNoHurtTimeCondition[entity] ?: return@run
             if (condition.invoke()) {

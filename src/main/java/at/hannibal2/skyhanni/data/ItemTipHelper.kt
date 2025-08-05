@@ -39,7 +39,7 @@ object ItemTipHelper {
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
-        if (!SkyHanniMod.renderEnabled) return
+        if (SkyHanniMod.renderDisabled) return
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return

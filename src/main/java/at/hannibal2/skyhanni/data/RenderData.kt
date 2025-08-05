@@ -19,7 +19,7 @@ object RenderData {
 
     @JvmStatic
     fun postRenderOverlay(context: DrawContext) {
-        if (!SkyHanniMod.renderEnabled) return
+        if (SkyHanniMod.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val screen = Minecraft.getMinecraft().currentScreen
 
@@ -32,7 +32,7 @@ object RenderData {
 
     @HandleEvent
     fun onBackgroundDraw(event: DrawBackgroundEvent) {
-        if (!SkyHanniMod.renderEnabled) return
+        if (SkyHanniMod.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return

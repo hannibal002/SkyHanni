@@ -13,7 +13,7 @@ fun renderItemOverlayPost(
     yPosition: Int,
     text: String?,
 ) {
-    if (!SkyHanniMod.renderEnabled) return
+    if (SkyHanniMod.renderDisabled) return
     GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost(
         context,
         stack,
@@ -24,6 +24,6 @@ fun renderItemOverlayPost(
 }
 
 fun renderItemReturn(context: DrawContext, stack: ItemStack, x: Int, y: Int) {
-    if (!SkyHanniMod.renderEnabled) return
+    if (SkyHanniMod.renderDisabled) return
     RenderGuiItemOverlayEvent(context, stack, x, y).post()
 }

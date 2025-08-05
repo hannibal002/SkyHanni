@@ -73,7 +73,7 @@ object EntityData {
 
     @JvmStatic
     fun onRenderCheck(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
-        if (!SkyHanniMod.renderEnabled) return true
+        if (SkyHanniMod.renderDisabled) return true
         lastVisibilityCheck[entity.entityId]?.let { result ->
             return result
         }

@@ -366,7 +366,7 @@ object EntityOutlineRenderer {
      */
     @HandleEvent
     fun onTick() {
-        if (!SkyHanniMod.renderEnabled) return
+        if (SkyHanniMod.renderDisabled) return
         if (!isEnabled()) return
 
         val renderGlobal = try {
