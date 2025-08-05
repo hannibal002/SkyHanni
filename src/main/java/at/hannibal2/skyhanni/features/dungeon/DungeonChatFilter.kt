@@ -134,7 +134,7 @@ object DungeonChatFilter {
     private val pickupPatterns = listOf(
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT§r§e!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT §r§8x2§r§e!".toPattern(),
-        "§6§lRARE DROP! §r§9Hunk of Blue Ice §r§b\\(+(.*)% Magic Find!\\)".toPattern(),
+        "§6§lRARE DROP! §r§9Hunk of Blue Ice §r§b\\(+(.*)%? Magic Find!\\)".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§6Revive Stone§r§e!".toPattern(),
         "(.*) §r§ffound a §r§dWither Essence§r§f! Everyone gains an extra essence!".toPattern(),
         "§d(.*) the Fairy§r§f: You killed me! Take this §r§6Revive Stone §r§fso that my death is not in vain!".toPattern(),

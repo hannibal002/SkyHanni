@@ -176,11 +176,12 @@ object AttributeShardsData {
      * REGEX-TEST: §d§lSALT§7 You charmed a §aMagma Slug§7 and captured §93 Shards §7from it.§r
      * REGEX-TEST: §d§lSALT§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
      * REGEX-TEST: §5§lCHARM§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
+     * REGEX-TEST: §6§lNAGA§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
      */
     @Suppress("MaxLineLength")
     private val charmedShardPattern by patternGroup.pattern(
         "charmed.shard",
-        "§.§l(?:CHARM|SALT)§7 You charmed an? §.(?<shardName>.+)§7 and captured (?:§.(?<amount>\\d+) Shards §7from it|its §9Shard§7)\\.(?:§.)*",
+        "§.§l(?:CHARM|SALT|NAGA)§7 You charmed an? §.(?<shardName>.+)§7 and captured (?:§.(?<amount>\\d+) Shards §7from it|its §9Shard§7)\\.(?:§.)*",
     )
 
     /**

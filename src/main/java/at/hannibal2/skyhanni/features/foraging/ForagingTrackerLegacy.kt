@@ -91,11 +91,11 @@ object ForagingTrackerLegacy {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §9§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+     * REGEX-TEST: §2§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
      */
     val openCloseRewardPattern by patternGroup.pattern(
         "open-close-reward",
-        "§9§l▬{64}"
+        "§2§l▬{64}"
     )
 
     /**
