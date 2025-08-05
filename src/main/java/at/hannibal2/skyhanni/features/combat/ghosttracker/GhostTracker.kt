@@ -132,10 +132,11 @@ object GhostTracker {
 
     /**
      * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210 §r§b✯ Magic Find§r§b)
      */
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop",
-        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)",
+        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\)",
     )
 
     /**

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
@@ -45,16 +46,16 @@ object AttributeShardOverlay {
 
     private var lastShardsData: Map<String, ProfileSpecificStorage.AttributeShardData> = emptyMap()
     private var lastItemIdsInInventory: Set<NeuInternalName> = setOf()
-    private var lastTotalSyphoned = 0
+    private var lastTotalShardsCollected = 0
 
     fun updateDisplay() {
         if (!config.enabled) return
         val newData = storage?.toMap().orEmpty().filter { it.key !in AttributeShardsData.unconsumableAttributes }
-        val newTotalSyphoned = newData.values.sumOf { it.amountSyphoned }
+        val newTotalShardsCollected = newData.values.sumOf { it.amountSyphoned + it.amountInBox }
 
-        if (lastShardsData == newData && newTotalSyphoned == lastTotalSyphoned) return
+        if (lastShardsData == newData && newTotalShardsCollected == lastTotalShardsCollected) return
         lastShardsData = newData
-        lastTotalSyphoned = newTotalSyphoned
+        lastTotalShardsCollected = newTotalShardsCollected
 
         reconstructDisplay()
     }
@@ -217,6 +218,27 @@ object AttributeShardOverlay {
                 reconstructDisplay()
             },
         )
+
+        addResetHuntingBoxDataButton()
+    }
+
+    private fun MutableList<Renderable>.addResetHuntingBoxDataButton() {
+        if (!config.includeHuntingBox) return
+
+        val clickable = Renderable.clickable(
+            "§7Reset hunting box shards",
+            tips = listOf(
+                "§cThis will reset your",
+                "§ctracked hunting box shards",
+                "§cif there is an error with the data",
+            ),
+            onLeftClick = {
+                storage?.forEach { it.value.amountInBox = 0 }
+                ChatUtils.chat("Reset hunting box shards data")
+                reconstructDisplay()
+            }
+        )
+        add(clickable)
     }
 
     private fun createShardRenderable(
@@ -250,7 +272,7 @@ object AttributeShardOverlay {
 
         val priceString = when {
             currentTier == 10 -> "§a§lMaxed"
-            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> "§6${priceUntilMaxed.shortFormat()}"
+            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> "§6$priceUntilMaxedString"
             else -> "§6$priceToNextTierString"
         }
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -254,14 +255,16 @@ object IslandGraphs {
     private fun reloadFromJson(islandName: String) {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-
-        try {
-            val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
-            IslandAreas.display = null
-            setNewGraph(graph)
-        } catch (e: Error) {
-            currentIslandGraph = null
-            return
+        SkyHanniMod.launchCoroutine {
+            try {
+                val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+                IslandAreas.display = null
+                DelayedRun.runNextTick {
+                    setNewGraph(graph)
+                }
+            } catch (e: Error) {
+                currentIslandGraph = null
+            }
         }
     }
 

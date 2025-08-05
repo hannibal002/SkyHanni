@@ -7,10 +7,11 @@ import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndica
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -45,11 +46,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
@@ -67,6 +68,8 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+
+typealias EntityData = DamageIndicatorEntityData
 
 // TODO cut class into smaller pieces
 @SkyHanniModule
@@ -399,7 +402,7 @@ object DamageIndicatorManager {
             entityData.nameAbove = ""
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
-                if (entityData.bossType.showDeathTime && config.timeToKillSlayer) {
+                if (entityData.bossType.isSlayer && config.timeToKillSlayer) {
                     entityData.nameAbove = entityData.timeToKill
                 }
                 "§cDead"
@@ -945,7 +948,7 @@ object DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 
@@ -1009,5 +1012,25 @@ object DamageIndicatorManager {
         }
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.dev.damageIndicatorBackend
+    private val backendEnabled get() = SkyHanniMod.feature.dev.damageIndicatorBackend
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Damage Indicator")
+        if (!backendEnabled) {
+            event.addData("Damage Indicator is manually disabled!")
+        } else {
+            event.addIrrelevant {
+                add("normal enabled")
+                add("Active mobs: ${data.size}")
+                for (entityData in data.values) {
+                    val type = entityData.bossType
+                    val loc = entityData.entity.getLorenzVec()
+                    add("  - $type ${loc.printWithAccuracy(1)}")
+                }
+            }
+        }
+    }
+
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && backendEnabled
 }

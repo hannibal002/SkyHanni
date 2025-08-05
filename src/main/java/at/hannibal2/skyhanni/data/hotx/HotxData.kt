@@ -48,22 +48,24 @@ interface HotxData<Reward> {
      * Level which are actually paid for (without any buffs)
      */
     var rawLevel: Int
-        get() = getStorage()?.perks?.get(this.name)?.level ?: Int.MIN_VALUE
+        get() = getPerk()?.level ?: Int.MIN_VALUE
         set(value) {
-            getStorage()?.perks?.computeIfAbsent(this.name) { HotxTree.HotxPerk() }?.level = value
+            getPerk()?.level = value
         }
 
     var enabled: Boolean
-        get() = getStorage()?.perks?.get(this.name)?.enabled ?: false
+        get() = getPerk()?.enabled ?: false
         set(value) {
-            getStorage()?.perks?.computeIfAbsent(this.name) { HotxTree.HotxPerk() }?.enabled = value
+            getPerk()?.enabled = value
         }
 
     var isUnlocked: Boolean
-        get() = getStorage()?.perks?.get(this.name)?.isUnlocked ?: false
+        get() = getPerk()?.isUnlocked ?: false
         set(value) {
-            getStorage()?.perks?.computeIfAbsent(this.name) { HotxTree.HotxPerk() }?.isUnlocked = value
+            getPerk()?.isUnlocked = value
         }
+
+    private fun getPerk() = getStorage()?.perks?.getOrPut(this.name) { HotxTree.HotxPerk() }
 
     val isMaxLevel: Boolean get() = effectiveLevel >= maxLevel
 
