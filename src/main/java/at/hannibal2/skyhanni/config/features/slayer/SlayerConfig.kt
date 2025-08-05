@@ -152,7 +152,7 @@ class SlayerConfig {
     var slayerCocoonTitle: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Slayer Cocoon Notification Sound", desc = "Sends note.pling when Slayer Boss Cocooned")
+    @ConfigOption(name = "Slayer Cocoon Notification Sound", desc = "Sends note.pling when Slayer Boss is cocooned.")
     @ConfigEditorBoolean
     var slayerCocoonDing: Boolean = false
 }
