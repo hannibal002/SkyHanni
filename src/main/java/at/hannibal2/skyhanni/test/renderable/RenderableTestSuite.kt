@@ -35,7 +35,7 @@ object RenderableTestSuite {
         event.registerBrigadier("shtestrenderable") {
             category = CommandCategory.DEVELOPER_TEST
             description = "Used for testing specific gui element primitives."
-            arg("test", BrigadierArguments.greedyString(), register.keys) { arg ->
+            argCallback("test", BrigadierArguments.greedyString(), register.keys) { arg ->
                 testCommand(arg)
             }
             simpleCallback {
