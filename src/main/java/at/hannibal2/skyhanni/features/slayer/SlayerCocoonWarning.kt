@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object slayerCocoonWarning {
+object SlayerCocoonWarning {
     private val slayerCocoonPattern by RepoPattern.pattern (
         "slayer.cocooned",
         "§r§c§lYOU COCOONED YOUR SLAYER BOSS"
