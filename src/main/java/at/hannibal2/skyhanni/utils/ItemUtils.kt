@@ -517,30 +517,27 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
-        if (data.itemRarityLastCheck.passedSince() < 1.seconds) return
+        if (data.itemRarityLastCheck.passedSince() < 10.seconds) return
         data.itemRarityLastCheck = SimpleTimeMark.now()
-
-        val currentLore = getLore()
-        if (data.lastLore == currentLore) return
-        data.lastLore = currentLore
-
-        val (rarity, category) = if (getInternalName() != NeuInternalName.NONE) {
-            this.readItemCategoryAndRarity()
-        } else null to null
-        data.itemRarity = rarity
-        data.itemCategory = category
+        val internalName = getInternalName()
+        if (internalName == NeuInternalName.NONE) {
+            data.itemRarity = null
+            data.itemCategory = null
+            return
+        }
+        val pair = this.readItemCategoryAndRarity()
+        data.itemRarity = pair.first
+        data.itemCategory = pair.second
     }
 
     fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
-        val data = cachedData
         this.updateCategoryAndRarity()
-        return data.itemCategory
+        return cachedData.itemCategory
     }
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
-        val data = cachedData
         this.updateCategoryAndRarity()
-        return data.itemRarity
+        return cachedData.itemRarity
     }
 
     // Taken from NEU
@@ -908,8 +905,9 @@ object ItemUtils {
     }
 
     // These two are matching right now, but we keep them separate for future-proofing
-    val resetCommand get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
-    else EnoughUpdatesRepoManager.updateCommand
+    val resetCommand
+        get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
+        else EnoughUpdatesRepoManager.updateCommand
 
     private fun showRepoWarning(item: String) {
         val text = listOf(

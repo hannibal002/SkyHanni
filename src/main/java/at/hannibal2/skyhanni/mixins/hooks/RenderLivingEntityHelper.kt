@@ -9,17 +9,19 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import java.awt.Color
+import java.util.concurrent.ConcurrentHashMap
 
 @SkyHanniModule
 object RenderLivingEntityHelper {
 
     private val entityColorMap = mutableMapOf<EntityLivingBase, Color>()
-    private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+    private val entityColorCondition = ConcurrentHashMap<EntityLivingBase, () -> Boolean>()
 
     private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
     @JvmStatic
     var areMobsHighlighted = false
+
     @JvmStatic
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
@@ -29,15 +31,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun check() {
-        areMobsHighlighted = false
-        val conditions = entityColorCondition.values
-        for (entry in conditions) {
-            if (entry.invoke()) {
-                areMobsHighlighted = true
-                return
-            }
-        }
-        if (currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true) areMobsHighlighted = true
+        areMobsHighlighted = entityColorCondition.values.any { it() } || currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
     }
 
     @JvmStatic
