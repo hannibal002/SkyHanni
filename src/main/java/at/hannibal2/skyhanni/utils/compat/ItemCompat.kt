@@ -4,15 +4,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-//#if MC > 1.16
-//$$ import net.minecraft.world.item.DyeItem
-//#endif
 //#if MC > 1.21
 //$$ import net.minecraft.item.tooltip.TooltipType
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.text.Text
+//$$ import kotlin.jvm.optionals.getOrNull
 //#endif
 
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
@@ -34,16 +32,11 @@ fun Item.getIdentifierString(): String {
     //#endif
 }
 
-/*
- * On Modern it will return Items.AIR if it cant find it instead of null
- */
 fun String.getVanillaItem(): Item? {
     //#if MC < 1.16
     return Item.getByNameOrId(this)
     //#else
-    //$$ val item = Registries.ITEM.get(Identifier.of(this))
-    //$$ if (item == Items.AIR) return null
-    //$$ return item
+    //$$ return Registries.ITEM.getOptionalValue(Identifier.of(this)).getOrNull()
     //#endif
 }
 
