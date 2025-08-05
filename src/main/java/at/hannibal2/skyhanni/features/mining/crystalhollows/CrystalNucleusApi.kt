@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -39,6 +40,13 @@ object CrystalNucleusApi {
         "loot.end",
         "§3§l▬{64}",
     )
+    /**
+     * REGEX-TEST: §fEnchanted Book (Lapidary I)
+     */
+    private val bookTypePattern by RepoPattern.pattern(
+        "filter.crystalnucleus.run.enchantedbook",
+        "§fEnchanted Book \\((?<type>\\S*).*\\)"
+    )
 
     private var inLootLoop = false
     private var unCheckedBooks: Int = 0
@@ -59,7 +67,7 @@ object CrystalNucleusApi {
         "SYNTHETIC_HEART",
     ).map { it.toInternalName() }
 
-    // Fallback in case hypixel decides to not
+    // Fallback to the inventory based system in case of changed chat message
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
@@ -129,18 +137,13 @@ object CrystalNucleusApi {
         if (itemName.contains(" Powder")) return null
         // Books are not directly added to the loot map, but are checked for later.
         if (itemName.startsWith("§fEnchanted")) {
-            /**
-             * REGEX-TEST: §fEnchanted Book (Lapidary I)
-             */
-            val bookTypePattern by RepoPattern.pattern(
-                "filter.crystalnucleus.run.enchantedbook",
-                "§fEnchanted Book \\((?<type>\\S*).*\\)"
-            )
-            val bookType = bookTypePattern.matcher(itemName).group("type").lowercase()
+            val bookType = bookTypePattern.matchMatcher(itemName) {
+                group("type").lowercase()
+            }
             return when (bookType) {
                 "lapidary" -> Pair(LAPIDARY_I_BOOK_ITEM, 1)
                 "fortune" -> Pair(FORTUNE_IV_BOOK_ITEM, 1)
-                // Fallback
+                // Fallback to inventory based system
                 else -> {
                     unCheckedBooks += amount
                     null
