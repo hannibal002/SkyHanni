@@ -30,6 +30,18 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
         "FINE FLOURS EXPORTATION COMPLETE!",
         "[NPC] Carrolyn: Thank you for the flour.",
     ),
+    WARTY(
+        CropType.NETHER_WART,
+        "Warty",
+        "WARTYS EXPORTATION COMPLETE!",
+        "[NPC] Carrolyn: Thank you for the warts.",
+    ),
+    HALF_EATEN_MUSHROOM(
+        CropType.MUSHROOM,
+        "Half Eaten Mushroom",
+        "MUSHROOMS EXPORTATION COMPLETE!",
+        "[NPC] Carrolyn: Thank you for the mushrooms.",
+    )
     ;
 
     /** Pattern without color codes */

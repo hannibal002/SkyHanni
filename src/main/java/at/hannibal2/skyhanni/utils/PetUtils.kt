@@ -208,8 +208,8 @@ object PetUtils {
      * @param coerceToMax Whether to floor the calculated level to the maximum level of the pet. (Default: true)
      */
     fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName, coerceToMax: Boolean = true): Int = runCatching {
-        var xp = totalXp.takeIf { it > 0 } ?: return 0
-        val rarityOffset = getRarityOffset(petInternalName) ?: return 0
+        var xp = totalXp.takeIf { it > 0 } ?: return 1
+        val rarityOffset = getRarityOffset(petInternalName) ?: return 1
         val xpList = getFullLevelingTree(petInternalName)
 
         var level = 1

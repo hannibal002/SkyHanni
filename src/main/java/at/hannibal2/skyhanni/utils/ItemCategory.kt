@@ -9,7 +9,6 @@ enum class ItemCategory {
     BOW,
     SHORT_BOW,
     WAND,
-    FISHING_WEAPON,
     FISHING_ROD,
     ROD_PART,
     AXE,

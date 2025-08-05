@@ -93,6 +93,7 @@ object ItemAddManager {
 
     @HandleEvent
     fun onShardGain(event: ShardGainEvent) {
+        if (event.amount < 0) return
         Source.SHARD.addItem(event.shardInternalName, event.amount)
     }
 
