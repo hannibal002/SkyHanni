@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
@@ -72,6 +73,7 @@ object EntityData {
 
     @JvmStatic
     fun onRenderCheck(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
+        if (!SkyHanniDebugsAndTests.globalRender) return true
         lastVisibilityCheck[entity.entityId]?.let { result ->
             return result
         }
