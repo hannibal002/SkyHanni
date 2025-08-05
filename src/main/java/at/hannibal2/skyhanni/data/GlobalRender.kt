@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 object GlobalRender {
 
     var enabled = true
+        private set
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
