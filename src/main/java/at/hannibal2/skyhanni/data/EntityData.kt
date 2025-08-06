@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
@@ -74,7 +73,7 @@ object EntityData {
 
     @JvmStatic
     fun onRenderCheck(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
-        if (SkyHanniMod.renderDisabled) return true
+        if (GlobalRender.renderDisabled) return true
         lastVisibilityCheck[entity.entityId]?.let { result ->
             return result
         }

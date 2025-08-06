@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -37,7 +37,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun backgroundDrawn(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        if (SkyHanniMod.renderDisabled) return
+        if (GlobalRender.renderDisabled) return
         GuiContainerEvent.BackgroundDrawnEvent(context, gui, container, mouseX, mouseY, partialTicks).post()
     }
 
@@ -48,7 +48,7 @@ class GuiContainerHook(guiAny: Any) {
         partialTicks: Float,
         ci: CallbackInfo,
     ) {
-        if (SkyHanniMod.renderDisabled) return
+        if (GlobalRender.renderDisabled) return
         if (GuiContainerEvent.PreDraw(context, gui, container, mouseX, mouseY, partialTicks).post()) {
             if (PlatformUtils.isNeuLoaded()) NEUApi.setInventoryButtonsToDisabled()
             GuiData.preDrawEventCancelled = true
@@ -61,7 +61,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun postDraw(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        if (SkyHanniMod.renderDisabled) return
+        if (GlobalRender.renderDisabled) return
         GuiContainerEvent.PostDraw(context, gui, container, mouseX, mouseY, partialTicks).post()
     }
 

@@ -116,7 +116,6 @@ object SkyHanniMod {
     lateinit var visualWordsData: VisualWordsJson
     lateinit var petData: PetDataStorage
     lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
-    val renderDisabled get() = !GlobalRender.enabled
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")

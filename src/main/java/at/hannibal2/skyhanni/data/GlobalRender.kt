@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 @SkyHanniModule
 object GlobalRender {
 
-    var enabled = true
-        private set
+    val renderDisabled get() = !enabled
+    private var enabled = true
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

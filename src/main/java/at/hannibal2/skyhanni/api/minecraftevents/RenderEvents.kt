@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
@@ -35,7 +35,7 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (SkyHanniMod.renderDisabled) return
+        if (GlobalRender.renderDisabled) return
         if (!canRender()) return
         SkyHanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
     }

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
@@ -39,7 +38,7 @@ object ItemTipHelper {
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
-        if (SkyHanniMod.renderDisabled) return
+        if (GlobalRender.renderDisabled) return
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return

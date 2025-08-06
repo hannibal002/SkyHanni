@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendApi
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
@@ -179,7 +180,7 @@ object AdvancedPlayerList {
 
     fun ignoreCustomTabList(): Boolean {
         val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
-        return SkyHanniMod.renderDisabled || denyKeyPressed
+        return GlobalRender.renderDisabled || denyKeyPressed
     }
 
     private fun createCustomName(data: PlayerData): String {

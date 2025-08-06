@@ -108,7 +108,7 @@ object GuiEditManager {
 
     @JvmStatic
     fun renderLast(context: DrawContext) {
-        if (SkyHanniMod.renderDisabled) return
+        if (GlobalRender.renderDisabled) return
         if (!isInGui()) return
 
         DrawContextUtils.setContext(context)
