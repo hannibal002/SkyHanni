@@ -141,8 +141,8 @@ object CrystalNucleusApi {
                 group("type").lowercase()
             }
             return when (bookType) {
-                "lapidary" -> Pair(LAPIDARY_I_BOOK_ITEM, 1)
-                "fortune" -> Pair(FORTUNE_IV_BOOK_ITEM, 1)
+                "lapidary" -> LAPIDARY_I_BOOK_ITEM to 1
+                "fortune" -> FORTUNE_IV_BOOK_ITEM to 1
                 // Fallback to inventory based system
                 else -> {
                     unCheckedBooks += amount
