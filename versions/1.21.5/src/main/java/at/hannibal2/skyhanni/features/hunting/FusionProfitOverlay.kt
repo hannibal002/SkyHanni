@@ -166,7 +166,7 @@ object FusionProfitOverlay {
             val resultName = group("resultName")
 
             val costStack1 = ItemUtils.createItemStack(
-                Items.BARRIER,
+                Items.PLAYER_HEAD,
                 shard1,
                 lore = listOf("§7Required to fuse: §b$amount1"),
                 amount = amount1,
@@ -174,7 +174,7 @@ object FusionProfitOverlay {
             costItems.add(costStack1)
 
             val costStack2 = ItemUtils.createItemStack(
-                Items.BARRIER,
+                Items.PLAYER_HEAD,
                 shard2,
                 lore = listOf("§7Required to fuse: §b$amount2"),
                 amount = amount2,
@@ -182,7 +182,7 @@ object FusionProfitOverlay {
             costItems.add(costStack2)
 
             val resultStack = ItemUtils.createItemStack(
-                Items.BARRIER,
+                Items.PLAYER_HEAD,
                 resultName,
                 lore = emptyList(),
                 amount = resultAmount,
@@ -192,41 +192,3 @@ object FusionProfitOverlay {
         buildDisplay(costs = costItems, results = resultItems)
     }
 }
-
-/**
-internal name: NONE
-display name: '§3Fusion'
-minecraft id: 'minecraft:lime_terracotta'
-lore:
-'§7Are you sure you want to combine §ax2'
-'§a§7U11 §aMossybit §7and §ax5 §7E33 §5Ghost'
-'§5§7shards together?'
-''
-'§7You will obtain §ax2 §aRana§7.'
-''
-'§7This is a §dspecial §7fusion recipe! §ax2'
-'§aShards§7!'
-''
-'§eClick to fuse!'
-
-no tag compound
-
-
-
-internal name: NONE
-display name: '§3Fusion'
-minecraft id: 'minecraft:lime_terracotta'
-lore:
-'§7Are you sure you want to combine §ax2'
-'§a§7U11 §aMossybit §7and §ax5 §7R10 §9Invisibug'
-'§9§7shards together?'
-''
-'§7You will obtain §ax2 §9Toad§7.'
-''
-'§7This is a §dspecial §7fusion recipe! §ax2'
-'§aShards§7!'
-''
-'§eClick to fuse!'
-
-no tag compound
-*/
