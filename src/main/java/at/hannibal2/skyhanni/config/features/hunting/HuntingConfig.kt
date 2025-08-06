@@ -48,4 +48,13 @@ class HuntingConfig {
     @SearchTag("hunting box")
     var fusionKeybinds = FusionKeybindsConfig()
 
+    @Expose
+    @ConfigOption(
+        name = "Prevent Huntrap Misclick",
+        desc = "Prevents clicking on empty traps in the Hunting Toolkit.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var huntrapMisclick = false
+
 }

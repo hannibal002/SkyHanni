@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.recentlyHeld
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -410,7 +411,11 @@ object ItemAbilityCooldown {
         }
     }
 
-    private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
+    private fun ItemStack.getIdentifier(): String? =
+        cachedData.identifier ?: fetchIdentifier().also { cachedData.identifier = it }
+
+    private fun ItemStack.fetchIdentifier() = getItemUuid() ?: getItemId()
+
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {

@@ -1749,6 +1749,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows which pets are cheapest to unlock the next taming level.
 + Added Frozen Treasure highlighter for the Glacial Caves. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4393)
 + Added Glowing Mushroom highlighter for the Glowing Mushroom Cave. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4392)
++ Fixed Hypixel 1.21 double-click bug when right-clicking a block with Blaze Daggers or Fishing Rods. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4466)
 
 </details>
 <details open><summary>

@@ -33,7 +33,9 @@ object RiftWiltedBerberisHelper {
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
 
     private val berberisSounds = setOf("mob.horse.donkey.death", "mob.horse.donkey.hit")
-    private val list = mutableSetOf<WiltedBerberis>()
+
+    // NOTE: Do not make this a set, it breaks identity checks
+    private val list = mutableListOf<WiltedBerberis>()
 
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
