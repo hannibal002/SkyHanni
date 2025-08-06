@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -29,7 +30,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -66,6 +66,7 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
@@ -516,6 +517,7 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
+        if (data.itemRarityLastCheck.passedSince() < 10.seconds) return
         data.itemRarityLastCheck = SimpleTimeMark.now()
         val internalName = getInternalName()
         if (internalName == NeuInternalName.NONE) {
@@ -529,22 +531,14 @@ object ItemUtils {
     }
 
     fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
-        val data = cachedData
-        if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity()
-        }
-        return data.itemCategory
+        this.updateCategoryAndRarity()
+        return cachedData.itemCategory
     }
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
-        val data = cachedData
-        if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity()
-        }
-        return data.itemRarity
+        this.updateCategoryAndRarity()
+        return cachedData.itemRarity
     }
-
-    private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
@@ -898,7 +892,7 @@ object ItemUtils {
         if (EnoughUpdatesManager.inLoadingState()) {
             return ChatUtils.debug(
                 "Ignoring missing repo item warning, repo is currently loading or fetching",
-                replaceSameMessage = true
+                replaceSameMessage = true,
             )
         }
 
@@ -911,8 +905,9 @@ object ItemUtils {
     }
 
     // These two are matching right now, but we keep them separate for future-proofing
-    val resetCommand get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
-    else EnoughUpdatesRepoManager.updateCommand
+    val resetCommand
+        get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
+        else EnoughUpdatesRepoManager.updateCommand
 
     private fun showRepoWarning(item: String) {
         val text = listOf(
@@ -989,8 +984,8 @@ object ItemUtils {
     //#if MC > 1.21
     //$$ fun ItemStack.getItemModel(): Item? {
     //$$     val identifier = this.get(DataComponentTypes.ITEM_MODEL)
-    //$$     val item = Registries.ITEM.get(identifier)
-    //$$     return if (item == Items.AIR) null else item
+    //$$     val itemModel = Registries.ITEM.get(identifier)
+    //$$     return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
     //$$ }
     //#endif
 }

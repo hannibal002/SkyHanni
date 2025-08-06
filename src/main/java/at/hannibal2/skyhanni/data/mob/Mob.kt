@@ -14,12 +14,14 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -83,7 +85,11 @@ class Mob(
 
     val owner: MobUtils.OwnerShip?
 
-    fun belongsToPlayer(): Boolean = owner?.equals(PlayerUtils.getName()) ?: false
+    companion object {
+
+        fun Entity?.belongsToPlayer(): Boolean = this?.mob.belongsToPlayer()
+        fun Mob?.belongsToPlayer(): Boolean = this?.owner?.equals(PlayerUtils.getName()) ?: false
+    }
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
     val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }

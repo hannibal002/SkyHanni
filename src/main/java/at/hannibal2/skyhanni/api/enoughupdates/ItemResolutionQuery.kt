@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -23,7 +27,6 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Matcher
-
 //#if MC > 1.21
 //$$ import net.minecraft.component.ComponentMap
 //#endif
@@ -41,6 +44,7 @@ class ItemResolutionQuery {
     private var knownInternalName: String? = null
     private var guiContext: GuiScreen? = null
 
+    @SkyHanniModule
     companion object {
 
         private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
@@ -48,6 +52,16 @@ class ItemResolutionQuery {
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
+
+        private var renamedEnchantments: Map<String, String> = mapOf()
+        private var shardNameOverrides: Map<String, String> = mapOf()
+
+        @HandleEvent
+        fun onRepoReload(event: RepositoryReloadEvent) {
+            val data = event.getConstant<ItemsJson>("Items")
+            renamedEnchantments = data.renamedEnchantments
+            shardNameOverrides = data.shardNameOverrides
+        }
 
         fun transformHypixelBazaarToNeuItemId(hypixelId: String): String {
             ItemUtils.bazaarOverrides[hypixelId]?.let {
@@ -141,15 +155,7 @@ class ItemResolutionQuery {
                 "$prefix$cleanedEnchantName;${group("level").romanToDecimal()}".uppercase()
             }
 
-        // TODO repo
-        private fun String.renamedEnchantmentCheck(): String = when (this) {
-            "Turbo-Cocoa" -> "Turbo-Coco"
-            "Turbo-Cacti" -> "Turbo-Cactus"
-            "Prismatic" -> "Pristine"
-            "Dragon Tracer" -> "Aiming"
-            "Drain" -> "Syphon"
-            else -> this
-        }
+        private fun String.renamedEnchantmentCheck(): String = renamedEnchantments[this] ?: this
 
         fun attributeNameToInternalName(attributeName: String): String? {
             var fixedAttributeName = attributeName.uppercase().replace(" ", "_")
@@ -157,13 +163,6 @@ class ItemResolutionQuery {
             val shardName = "SHARD_$fixedAttributeName"
             return ItemUtils.bazaarOverrides[shardName]
         }
-
-        // TODO repo
-        private val shardNameOverrides = mapOf(
-            "STRIDERSURFER" to "STRIDER_SURFER",
-            "ABYSSAL_LANTERNFISH" to "ABYSSAL_LANTERN",
-            "CINDERBAT" to "CINDER_BAT",
-        )
     }
 
     fun withItemStack(stack: ItemStack): ItemResolutionQuery {

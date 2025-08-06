@@ -245,7 +245,7 @@ object MoongladeBeacon {
             SoundUtils.playErrorSound()
             TitleManager.sendTitle(
                 "§cOver-click Prevented",
-                subtitleText = "§7Hold §eContol §7to bypass",
+                subtitleText = "§7Hold §eControl §7to bypass",
                 duration = 1.seconds,
                 location = TitleManager.TitleLocation.INVENTORY,
             )
