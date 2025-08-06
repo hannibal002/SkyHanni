@@ -10,11 +10,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import com.google.gson.internal.LinkedTreeMap
+import com.google.gson.JsonObject
 //#if MC < 1.21
 import net.minecraft.nbt.CompressedStreamTools
 import net.minecraft.nbt.NBTTagCompound
 //#else
-//$$ import com.google.gson.JsonObject
 //$$ import net.minecraft.nbt.NbtCompound
 //$$ import net.minecraft.nbt.NbtIo
 //$$ import net.minecraft.nbt.NbtSizeTracker
@@ -26,11 +27,7 @@ import java.util.Base64
 data class NeuItemJson(
     @Expose @SerializedName("itemid") var itemId: String,
     @Expose @SerializedName("displayname") val displayName: String? = null,
-    //#if MC < 1.21
-    @Expose @SerializedName("nbttag") private val nbtTagString: String,
-    //#else
-    //$$ @Expose @SerializedName("nbttag") private val nbtTagAny: Any,
-    //#endif
+    @Expose @SerializedName("nbttag") private val nbtTagAny: Any,
     @Expose val damage: Int? = null,
     @Expose val lore: List<String> = emptyList(),
     @Expose @SerializedName("internalname") val internalName: NeuInternalName,
@@ -50,15 +47,14 @@ data class NeuItemJson(
     }
 
     private val fixedNbtTagString by lazy {
-        //#if MC < 1.21
-        nbtTagString
-        //#else
-        //$$ when (nbtTagAny) {
-        //$$    is String -> nbtTagAny
-        //$$    is JsonObject -> nbtTagAny["nbttag"]?.asString.orEmpty()
-        //$$    else -> throw IllegalArgumentException("nbtTagAny must be a String or JsonObject")
-        //$$ }
-        //#endif
+        when (nbtTagAny) {
+            is String -> nbtTagAny
+            is JsonObject -> nbtTagAny["nbttag"]?.asString.orEmpty()
+            is LinkedTreeMap<*, *> -> ConfigManager.gson.toJson(nbtTagAny)
+            else -> throw IllegalArgumentException(
+                "nbtTagAny must be [String|JsonObject|LinkedTreeMap], was: ${nbtTagAny::class.simpleName}"
+            )
+        }
     }
     val nbtTag by lazy { getParsedNBT() }
 

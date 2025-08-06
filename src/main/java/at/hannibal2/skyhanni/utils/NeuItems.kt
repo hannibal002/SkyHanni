@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
-import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
@@ -32,6 +32,7 @@ import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.util.NavigableMap
@@ -301,7 +302,10 @@ object NeuItems {
 
     fun loadNBTData(encoded: String): ItemStack {
         val jsonString = StringUtils.decodeBase64(encoded)
-        val neuItem = ConfigManager.gson.fromJson<NeuItemJson>(jsonString)
+        val neuItem = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(jsonString) ?: run {
+            println("\nCould not load NEU item from encoded string:\n\n $encoded.\n")
+            return ItemUtils.createItemStack(Items.map, "unloaded")
+        }
         return EnoughUpdatesManager.neuItemToStack(neuItem, useCache = false)
     }
 }

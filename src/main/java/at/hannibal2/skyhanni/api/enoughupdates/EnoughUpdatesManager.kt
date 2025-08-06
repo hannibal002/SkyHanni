@@ -214,10 +214,7 @@ object EnoughUpdatesManager {
         //#else
         //$$ val lDamage = this.damage ?: 0
         //$$ val defaultStack = ItemStack(Blocks.STONE.asItem())
-        //$$ val baseItem = ComponentUtils.convertMinecraftIdToModern(itemId, lDamage).getVanillaItem() ?: run {
-        //$$     ErrorManager.skyHanniError("Invalid itemId: $itemId with damage $lDamage")
-        //$$     return defaultStack
-        //$$ }
+        //$$ val baseItem = ComponentUtils.convertMinecraftIdToModern(itemId, lDamage).getVanillaItem() ?: return defaultStack
         //#endif
 
         val stack = ItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return defaultStack
