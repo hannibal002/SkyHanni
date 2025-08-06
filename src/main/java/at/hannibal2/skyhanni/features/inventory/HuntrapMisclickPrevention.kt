@@ -31,16 +31,15 @@ object HuntrapMisclickPrevention {
             loreLine.removeColor().contains("Status: EMPTY")
         }
 
-        if (hasEmptyStatus) {
-            event.cancel()
-            if (lastNotified.passedSince() > 10.seconds) {
-                lastNotified = SimpleTimeMark.now()
-                ChatUtils.clickableChat(
-                    "Prevented clicking an empty trap in Hunting Toolkit! Click here to disable this feature.",
-                    { config::huntrapMisclick.jumpToEditor() },
-                    replaceSameMessage = true,
-                )
-            }
-        }
+        if (!hasEmptyStatus) return
+        event.cancel()
+
+        if (lastNotified.passedSince() < 10.seconds) return
+        lastNotified = SimpleTimeMark.now()
+        ChatUtils.clickableChat(
+            "Prevented clicking an empty trap in Hunting Toolkit! Click here to disable this feature.",
+            { config::huntrapMisclick.jumpToEditor() },
+            replaceSameMessage = true,
+        )
     }
 }
