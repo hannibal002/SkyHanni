@@ -52,7 +52,6 @@ object DebugCommand {
         // calling default debug stuff
         player(event)
         repoData(event)
-        globalRender(event)
         skyblockStatus(event)
         networkInfo(event)
         profileName(event)
@@ -155,18 +154,6 @@ object DebugCommand {
         }
     }
 
-    private fun globalRender(event: DebugDataCollectEvent) {
-        event.title("Global Render")
-        if (SkyHanniDebugsAndTests.globalRender) {
-            event.addIrrelevant("normal enabled")
-        } else {
-            event.addData {
-                add("Global renderer is disabled!")
-                add("No renderable elements from SkyHanni will show up anywhere!")
-            }
-        }
-    }
-
     // todo clean this up so that it commonly reports on any AbstractRepoManager
     private fun repoData(event: DebugDataCollectEvent) {
         event.title("Repo Information")
@@ -199,7 +186,7 @@ object DebugCommand {
                 add(" neu repo location: default")
             }
 
-            add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
+            add(" loaded neu items: ${NeuItems.allNeuRepoInternalNames().size}")
         }
 
         val isRelevant = SkyHanniRepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings

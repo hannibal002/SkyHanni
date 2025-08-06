@@ -18,6 +18,7 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
@@ -60,7 +61,10 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 field.isAccessible = true
             }.getOrNull() ?: return@mapNotNull null
             val kType = field.returnType
-            val name = param.findAnnotation<SerializedName>()?.value ?: param.name!!
+            val name = param.findAnnotation<SerializedName>()?.value
+                ?: field.findAnnotation<SerializedName>()?.value
+                ?: field.javaField?.getAnnotation(SerializedName::class.java)?.value
+                ?: param.name!!
 
             val javaTypeForAdapter = if (kType.jvmErasure.java.isAnnotationPresent(JvmInline::class.java)) kType.jvmErasure.java
             else InternalGsonTypes.resolve(type.type, type.rawType, kType.javaType)
@@ -118,10 +122,14 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 try {
                     return primaryConstructor.callBy(args)
                 } catch (e: IllegalArgumentException) {
-                    System.err.println("❗ Failed to invoke constructor for ${kotlinClass.qualifiedName}: ${e.message}")
-                    args.forEach { (param, value) ->
-                        System.err.println("  • ${param.name} : expected=${param.type}  value=$value  actualType=${value?.javaClass}")
+                    val errorString = buildString {
+                        appendLine("❗ Failed to invoke constructor for ${kotlinClass.simpleName}")
+                        appendLine("  Reason: ${e.message}")
+                        args.forEach { (param, value) ->
+                            appendLine("  • ${param.name} : expected=${param.type}  value=$value  actualType=${value?.javaClass}")
+                        }
                     }
+                    System.err.println(errorString)
                     throw e
                 }
             }

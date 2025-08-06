@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.minutes
 
-class NeuInternalName private constructor(private val internalName: String) {
+class NeuInternalName private constructor(private val internalName: String) : Comparable<NeuInternalName> {
 
     companion object {
 
@@ -66,6 +66,8 @@ class NeuInternalName private constructor(private val internalName: String) {
     }
 
     fun asString() = internalName
+
+    override fun compareTo(other: NeuInternalName): Int = internalName.compareTo(other.internalName)
 
     override fun equals(other: Any?) = this === other
 

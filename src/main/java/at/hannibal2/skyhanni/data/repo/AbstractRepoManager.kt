@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -22,6 +23,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
@@ -98,6 +100,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
+    private var latestError = SimpleTimeMark.farPast()
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
@@ -117,7 +120,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            coroutineSimpleCallback { displayRepoStatus(false) }
+            coroutineSimpleCallback { displayRepoStatus(joinEvent = true, command = true) }
         }
         if (shouldRegisterReloadCommand) event.registerBrigadier(reloadCommand) {
             description = "Reloads the local $commonName repo"
@@ -241,7 +244,27 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     open fun reportExtraStatusInfo(): Unit = Unit
 
-    suspend fun displayRepoStatus(joinEvent: Boolean) {
+    private suspend fun isRepeatErrorOrFixed(): Boolean {
+        if (latestError.passedSince() < 5.minutes || !config.repoAutoUpdate) return true
+        latestError = SimpleTimeMark.now()
+
+        val comparison = getCommitComparison(silentError = false)
+        val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
+            logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
+            false
+        }
+        if (isOutdated) {
+            logger.logToChat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
+            val result = fetchAndUnpackRepo(command = false)
+            if (result == FetchUnpackResult.SUCCESS) {
+                logger.logToChat("§a$commonName Repo updated successfully!")
+                return true
+            } else logger.logToChat("§cFailed to update the $commonName Repo.")
+        }
+        return false
+    }
+
+    suspend fun displayRepoStatus(joinEvent: Boolean, command: Boolean = false) {
         if (joinEvent) return onJoinStatusError()
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
@@ -251,6 +274,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             return
         }
 
+        if (!command && isRepeatErrorOrFixed()) return
         logger.errorToChat("$commonName Repo has errors! Commit hash: §b$currentDownloadedCommit§r")
 
         if (successfulConstants.isNotEmpty()) logger.logToChat("Successful Constants §7(${successfulConstants.size}):")
@@ -263,21 +287,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     private suspend fun onJoinStatusError() {
-        if (unsuccessfulConstants.isEmpty()) return
-        // Last sanity check, we want to make sure repo is up to date before displaying the error
-        val comparison = getCommitComparison(silentError = false)
-        val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
-            logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
-            false
-        }
-        if (isOutdated) {
-            logger.logToChat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
-            val result = fetchAndUnpackRepo(command = false)
-            if (result == FetchUnpackResult.SUCCESS) {
-                logger.logToChat("§a$commonName Repo updated successfully!")
-                return
-            } else logger.logToChat("§cFailed to update the $commonName Repo.")
-        }
+        if (unsuccessfulConstants.isEmpty() || isRepeatErrorOrFixed()) return
+        // Last sanity check, we want to make sure repo is up to date before displaying
         val text = buildList {
             add("§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue!")
             add("§cSome features may not work. Please report this error on the Discord if it persists!")

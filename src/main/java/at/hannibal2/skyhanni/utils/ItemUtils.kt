@@ -302,8 +302,11 @@ object ItemUtils {
         if (getLore().getOrNull(0) == "§7Lump-sum amount") {
             return NeuInternalName.SKYBLOCK_COIN
         }
-        val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
-        return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
+        val rawInternalName = NeuItems.getInternalName(this)?.asString()?.replace(
+            "ULTIMATE_ULTIMATE_",
+            "ULTIMATE_"
+        )
+        return rawInternalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
