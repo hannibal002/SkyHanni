@@ -90,7 +90,7 @@ object StockOfStonkFeature {
             bidPattern.matchMatcher(line) {
                 val cost = group("amount").formatLong().coerceAtLeast(2000000) // minimum bid is 2,000,000
                 val ratio = cost / stonksReward.transformIf({ this == 0 }, { 1 })
-                event.toolTip[index - 1] = line + " §7(§6§6${ratio.addSeparators()} §7per)" // double §6 for the replacement at the end
+                event.toolTip[index - 1] = line + " §7(paying §6${ratio.addSeparators()} §7per)" // double §6 for the replacement at the end
                 if (ratio < bestRatio) {
                     bestValueIndex = index - 1
                     bestRatio = ratio

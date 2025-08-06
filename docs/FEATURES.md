@@ -561,6 +561,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Useful for e.g. Magma Cubes in Burning Desert for Tara Slayer.
 + Added Mark When Invincible Tara 5. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4471)
     + Highlight the Tarantula Slayer tier 5 in a customizeable color while the hatchlings are alive.
++ Added Slayer Kill Timer. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
+    + Sends time to kill a slayer in chat.
++ Added Slayer Time messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
+    + Sends time to complete (Spawn & Kill) a slayer quest in chat.
 
 </details>
 <details open><summary>
@@ -1745,6 +1749,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows which pets are cheapest to unlock the next taming level.
 + Added Frozen Treasure highlighter for the Glacial Caves. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4393)
 + Added Glowing Mushroom highlighter for the Glowing Mushroom Cave. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4392)
++ Fixed Hypixel 1.21 double-click bug when right-clicking a block with Blaze Daggers or Fishing Rods. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4466)
 
 </details>
 <details open><summary>

@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.events.chat
 
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.IChatComponent
 
-class SkyHanniChatEvent(
-    override val message: String,
-    override var chatComponent: IChatComponent,
-    override var blockedReason: String? = null,
+@PrimaryFunction("onChat")
+open class SkyHanniChatEvent(
+    message: String,
+    chatComponent: IChatComponent,
+    blockedReason: String? = null,
     var chatLineId: Int = 0,
-) : SystemMessageEvent(
-    message = message,
-    chatComponent = chatComponent,
-    blockedReason = blockedReason,
-)
+) : AbstractChatEvent(message.asComponent().intoSpan(), chatComponent, blockedReason)
