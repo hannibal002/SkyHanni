@@ -319,10 +319,10 @@ object MoongladeBeacon {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
+    fun RenderInventoryItemTipEvent.onRenderItemTip() {
         if (!solverEnabled()) return
-        normalTuning.tryLabelIfAble(event)
-        enchantedTuning.tryLabelIfAble(event)
+        with(normalTuning) { tryLabelIfAble() }
+        if (upgradingStrength) with(enchantedTuning) { tryLabelIfAble() }
     }
 
     @HandleEvent(InventoryUpdatedEvent::class, onlyOnIsland = IslandType.GALATEA)
@@ -400,9 +400,9 @@ object MoongladeBeacon {
     }
 
     inline fun <reified T : Enum<T>> BeaconDataPair<T>.getOffset(): Int? {
-        val r = reference ?: return null
-        val o = ours ?: return null
-        return r.internalGetOffset(o)
+        val ref = reference ?: return null
+        val ours = ours ?: return null
+        return ref.internalGetOffset(ours)
     }
 
     data class BeaconTuneData(
@@ -439,7 +439,7 @@ object MoongladeBeacon {
         }.minByOrNull { it.second.inWholeMilliseconds }
 
         fun handlePitch(pitch: BeaconPitch, target: BeaconPieceTarget? = null, singleSet: Boolean = false) {
-            val trueTarget = target ?: getLowestVariance()?.first ?: if (paused) BeaconPieceTarget.REFERENCE else BeaconPieceTarget.OURS
+            val trueTarget = target ?: getLowestVariance()?.first ?: BeaconPieceTarget.REFERENCE
             if (trueTarget == BeaconPieceTarget.OURS && paused) return
             else if (singleSet && pitch != pitchPair[BeaconPieceTarget.OURS]) {
                 pitchPair[BeaconPieceTarget.REFERENCE] = pitch
@@ -523,11 +523,10 @@ object MoongladeBeacon {
             return true
         }
 
-        @Suppress("HandleEventInspection")
-        fun tryLabelIfAble(event: RenderInventoryItemTipEvent) {
+        fun RenderInventoryItemTipEvent.tryLabelIfAble() {
             if (isEnchanted && !upgradingStrength) return
-            val offset = getOffsetBySlot(event.slot.index)?.takeIf { it > 0 } ?: return
-            event.stackTip = "§a$offset"
+            val offset = getOffsetBySlot(slot.index)?.takeIf { it > 0 } ?: return
+            stackTip = "§a$offset"
         }
 
         fun getOffsetBySlot(slot: Int): Int? = when (slot) {
