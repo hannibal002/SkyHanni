@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.json.fromJson
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.internal.LinkedTreeMap
-import com.google.gson.JsonObject
 //#if MC < 1.21
 import net.minecraft.nbt.CompressedStreamTools
 import net.minecraft.nbt.NBTTagCompound
@@ -52,7 +52,7 @@ data class NeuItemJson(
             is JsonObject -> nbtTagAny["nbttag"]?.asString.orEmpty()
             is LinkedTreeMap<*, *> -> ConfigManager.gson.toJson(nbtTagAny)
             else -> throw IllegalArgumentException(
-                "nbtTagAny must be [String|JsonObject|LinkedTreeMap], was: ${nbtTagAny::class.simpleName}"
+                "nbtTagAny must be [String|JsonObject|LinkedTreeMap], was: ${nbtTagAny::class.simpleName}",
             )
         }
     }
@@ -89,8 +89,8 @@ data class NeuItemJson(
                 "fixedNbtTagString" to fixedNbtTagString,
                 "itemId" to itemId,
                 "internalName" to internalName,
-                "neuParsableNbt" to neuParsableNbt
-            ).toTypedArray()
+                "neuParsableNbt" to neuParsableNbt,
+            ).toTypedArray(),
         )
         null
     }
