@@ -16,8 +16,15 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
+import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import java.net.URI
+import java.nio.file.Path
+import java.time.temporal.TemporalAccessor
+import java.time.temporal.TemporalAmount
+import java.util.Date
+import java.util.UUID
 
 // TODO in the future change something here
 @SkyHanniModule
@@ -59,7 +66,7 @@ object SkyHanniConfigSearchResetCommand {
             ErrorManager.logErrorWithData(
                 e, "Could not reset config element '$term'",
                 "term" to term,
-                "args" to args.joinToString(" ")
+                "args" to args.joinToString(" "),
             )
             return "§cCould not reset config element '$term'"
         }
@@ -73,7 +80,7 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error while trying to search config",
-                "args" to args.joinToString(" ")
+                "args" to args.joinToString(" "),
             )
             "§cError while trying to search config"
         }
@@ -119,7 +126,7 @@ object SkyHanniConfigSearchResetCommand {
                 "old" to shimmy.getJson(),
                 "term" to term,
                 "rawJson" to rawJson,
-                "args" to args.joinToString(" ")
+                "args" to args.joinToString(" "),
             )
             "§cCould not change config element '$term' to '$rawJson'"
         }
@@ -184,7 +191,7 @@ object SkyHanniConfigSearchResetCommand {
     private fun findConfigElements(
         configFilter: (String) -> Boolean,
         classFilter: (String) -> Boolean,
-        onlyValue: Boolean = false
+        onlyValue: Boolean = false,
     ): MutableList<String> {
         val list = mutableListOf<String>()
 
@@ -282,22 +289,10 @@ object SkyHanniConfigSearchResetCommand {
             val fieldName = "$parentName.$name"
 
             try {
-                val newObj = field.makeAccessible().get(obj)
-                map[fieldName] = newObj
-                @Suppress("ComplexCondition")
-                if (newObj != null &&
-                    newObj !is Boolean &&
-                    newObj !is String &&
-                    newObj !is Long &&
-                    newObj !is Int &&
-                    newObj !is Double &&
-                    newObj !is Float &&
-                    newObj !is Position &&
-                    newObj !is Map<*, *> &&
-                    newObj !is List<*> &&
-                    !newObj.javaClass.isEnum
-                ) {
-                    map.putAll(loadAllFields(fieldName, newObj, depth + 1))
+                val value = field.makeAccessible().get(obj)
+                map[fieldName] = value
+                if (!isLeaf(value)) {
+                    map.putAll(loadAllFields(fieldName, value, depth + 1))
                 }
             } catch (_: Throwable) {
                 SkyHanniMod.logger.warn("Could not access field '$fieldName' in class '${obj.javaClass.name}'")
@@ -307,6 +302,24 @@ object SkyHanniConfigSearchResetCommand {
 
         return map
     }
+
+    private fun isLeaf(v: Any?): Boolean = v == null ||
+        v is Boolean || // true, false
+        v is Char || // 'x'
+        v is Number || // Int, Long, Double, Float, Byte, Short, BigDecimal
+        v is String || // "hello"
+        v is Map<*, *> || // any Map<_, _>
+        v is Collection<*> || // List, Set, Queue
+        v is TemporalAccessor || // LocalDate, Instant, LocalTime
+        v is TemporalAmount || // Duration, Period
+        v is Date || // java.util.Date
+        v is UUID || // java.util.UUID
+        v is URI || // java.net.URI
+        v is Path || // java.nio.file.Path
+        v is File || // java.io.File
+        v.javaClass.isArray || // Array<*>, IntArray, String[]
+        v.javaClass.isEnum // any enum type
+
 
     private fun Any.getClassName(): String {
         if (this is io.github.notenoughupdates.moulconfig.observer.Property<*>) {

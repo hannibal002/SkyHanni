@@ -41,6 +41,7 @@ value class Graph(
     fun getTags(vararg tag: GraphNodeTag) = nodes.filter { node -> tag.all { node.hasTag(it) } }
     fun getName(name: String) = nodes.filter { it.name == name }
 
+    // todo clean this up
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
             { out, value ->
