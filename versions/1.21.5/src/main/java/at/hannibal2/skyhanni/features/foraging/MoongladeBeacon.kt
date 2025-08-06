@@ -446,9 +446,9 @@ object MoongladeBeacon {
                 return
             }
             val buffer = bufferPair[trueTarget] ?: return
-            if (buffer.size >= 20) buffer.removeAt(0)
+            if (buffer.distinct().size > 2) buffer.clear()
+            else if (buffer.size >= 4) buffer.removeAt(0)
             buffer.add(pitch)
-            if (buffer.distinct().size > 3) buffer.clear()
             if (buffer.size < 3) return
             pitchPair[trueTarget] = buffer.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
         }
