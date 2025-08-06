@@ -64,6 +64,7 @@ object ComputerTimeOffset {
     private fun tryCheckOffset() {
         // probably a problem when the response somehow took longer than 1s?
         if (!timeCheckMutex.tryLock()) {
+            stableRuns = 0
             state = state.next() ?: error("state is already TOTALLY_OFF")
             if (state == State.TOTALLY_OFF) ErrorManager.logErrorStateWithData(
                 "Error when checking Computer Time Offset",
