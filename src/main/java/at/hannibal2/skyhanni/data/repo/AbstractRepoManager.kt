@@ -117,7 +117,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback { displayRepoStatus(false) }
+            coroutineSimpleCallback { displayRepoStatus(false) }
         }
         if (shouldRegisterReloadCommand) event.registerBrigadier(reloadCommand) {
             description = "Reloads the local $commonName repo"
@@ -164,7 +164,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun updateRepo(forceReset: Boolean = false) {
         shouldManuallyReload = true
         if (!config.location.valid) {
-            ChatUtils.userError("Invalid $commonName Repo settings detected, resetting default settings.")
+            logger.errorToChat("Invalid $commonName Repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }
 
@@ -182,13 +182,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 "unsuccessfulConstants" to unsuccessfulConstants,
             )
             if (informed) return@launchIOCoroutine
-            ChatUtils.chat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
+            logger.logToChat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
         }
     }
 
     private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
-            if (manual) ChatUtils.chat("$commonShortNameCased Repo settings are already on default!")
+            if (manual) logger.logToChat("$commonShortNameCased Repo settings are already on default!")
             return
         }
 
@@ -241,57 +241,55 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     open fun reportExtraStatusInfo(): Unit = Unit
 
-    fun displayRepoStatus(joinEvent: Boolean) {
+    suspend fun displayRepoStatus(joinEvent: Boolean) {
         if (joinEvent) return onJoinStatusError()
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("$commonName Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
+            logger.logToChat("$commonName Repo working fine! Commit hash: §b$currentDownloadedCommit§r")
             reportExtraStatusInfo()
             return
         }
-        ChatUtils.chat("$commonName Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
-        if (successfulConstants.isNotEmpty()) ChatUtils.chat(
-            "Successful Constants §7(${successfulConstants.size}):",
-            prefixColor = "§a",
-        )
-        for (constant in successfulConstants) {
-            ChatUtils.chat("   §a- §7$constant", false)
-        }
-        ChatUtils.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
-        for (constant in unsuccessfulConstants) {
-            ChatUtils.chat("   §e- §7$constant", false)
-        }
+
+        logger.errorToChat("$commonName Repo has errors! Commit hash: §b$currentDownloadedCommit§r")
+
+        if (successfulConstants.isNotEmpty()) logger.logToChat("Successful Constants §7(${successfulConstants.size}):")
+        for (constant in successfulConstants) logger.logToChat("   - §7$constant")
+
+        logger.logToChat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):", color = "§e")
+        for (constant in unsuccessfulConstants) logger.logToChat("   - §7$constant", color = "§e")
+
         reportExtraStatusInfo()
     }
 
-    private fun onJoinStatusError() {
+    private suspend fun onJoinStatusError() {
         if (unsuccessfulConstants.isEmpty()) return
         // Last sanity check, we want to make sure repo is up to date before displaying the error
-        SkyHanniMod.launchIOCoroutine {
-            val comparison = getCommitComparison(silentError = false)
-            val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
-                logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
-                false
-            }
-            if (isOutdated) {
-                ChatUtils.chat("§7$commonName Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
-                fetchAndUnpackRepo(command = false)
-                return@launchIOCoroutine
-            }
-            val text = buildList {
-                add("§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work.")
-                add("§cPlease report this error on the Discord!")
-                add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}")
-                add("§7Backup Repo Value: §c$isUsingBackup")
-                if (!config.repoAutoUpdate) add("§4You have Repo Auto Update turned off, please try turning that on.")
-                add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):")
-                for (constant in unsuccessfulConstants) {
-                    add("   §e- §7$constant")
-                }
-            }.map { it.asComponent() }
-            TextHelper.multiline(text).send()
+        val comparison = getCommitComparison(silentError = false)
+        val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
+            logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
+            false
         }
+        if (isOutdated) {
+            logger.logToChat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
+            val result = fetchAndUnpackRepo(command = false)
+            if (result == FetchUnpackResult.SUCCESS) {
+                logger.logToChat("§a$commonName Repo updated successfully!")
+                return
+            } else logger.logToChat("§cFailed to update the $commonName Repo.")
+        }
+        val text = buildList {
+            add("§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue!")
+            add("§cSome features may not work. Please report this error on the Discord if it persists!")
+            add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}")
+            add("§7Backup Repo Value: §c$isUsingBackup")
+            if (!config.repoAutoUpdate) add("§4You have Repo Auto Update turned off, please try turning that on.")
+            add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):")
+            for (constant in unsuccessfulConstants) {
+                add("   §e- §7$constant")
+            }
+        }.map { it.asComponent() }
+        TextHelper.multiline(text).send()
     }
 
     private enum class FetchUnpackResult(val canContinue: Boolean = true) {
