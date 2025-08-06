@@ -163,6 +163,11 @@ class InventoryConfig {
     val attributeShards: AttributeShardsConfig = AttributeShardsConfig()
 
     @Expose
+    @ConfigOption(name = "Fusion Profit Overlay", desc = "")
+    @Accordion
+    val fusionProfitOverlay: FusionProfitOverlayConfig = FusionProfitOverlayConfig()
+
+    @Expose
     @ConfigOption(name = "Evolving Items", desc = "")
     @Accordion
     @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
