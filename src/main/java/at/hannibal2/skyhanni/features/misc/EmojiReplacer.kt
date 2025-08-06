@@ -87,7 +87,7 @@ object EmojiReplacer {
         emojiSpritesheetHeight = emojiRoot.height
         var resource = createResourceLocation(emojiRoot.resource)
         //#if MC < 1.21
-        resource = createResourceLocation(resource.resourceDomain, "textures/"+resource.resourcePath)
+        resource = createResourceLocation(resource.resourceDomain, "textures/" + resource.resourcePath)
         //#endif
         emojiSpritesheetResource = resource
         emojiSprites = emojiRoot.emojis
@@ -130,7 +130,8 @@ object EmojiReplacer {
         var tempString = string
 
         for (unicodeKey in sortedUnicodeKeySet) {
-            tempString = tempString.replace(unicodeKey, ":${unicodeMap[unicodeKey]!!}:")
+            val unicodeValue = unicodeMap[unicodeKey] ?: continue
+            tempString = tempString.replace(unicodeKey, ":$unicodeValue:")
         }
 
         return tempString
