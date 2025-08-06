@@ -23,7 +23,7 @@ object MixinPatcherFontRendererHookHook {
                 }
             }
         }
-        
+
         if (!SkyBlockUtils.onHypixel) return
 
         if (ChromaManager.config.allChroma) {

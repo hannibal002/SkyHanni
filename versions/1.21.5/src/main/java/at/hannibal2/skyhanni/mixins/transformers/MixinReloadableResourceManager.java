@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.features.misc.EmojiReplacer;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourceReload;
@@ -21,5 +22,6 @@ public class MixinReloadableResourceManager {
         at = @At("TAIL")
     )
     public void onResourceReload(Executor prepareExecutor, Executor applyExecutor, CompletableFuture<Unit> initialStage, List<ResourcePack> packs, CallbackInfoReturnable<ResourceReload> cir) {
+        EmojiReplacer.INSTANCE.onTexturesLoad();
     }
 }

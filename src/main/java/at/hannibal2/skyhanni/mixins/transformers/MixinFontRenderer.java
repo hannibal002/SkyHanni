@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.features.misc.EmojiReplacer;
 import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -105,7 +103,7 @@ public abstract class MixinFontRenderer {
      */
     @Inject(method = "renderChar(CZ)F", at = @At("HEAD"), cancellable = true)
     public void emojiCharacterRenderOverride(char ch, boolean italic, CallbackInfoReturnable<Float> cir) {
-        float newWidth = EmojiReplacer.INSTANCE.renderEmojiChar(ch, this.posX, this.posY, this.renderEngine, true);
+        float newWidth = EmojiReplacer.INSTANCE.renderEmojiChar((FontRenderer) (Object)this, ch, this.posX, this.posY, this.renderEngine, true);
         if (newWidth >= 0.0) {
             cir.setReturnValue(newWidth);
         }
@@ -125,7 +123,7 @@ public abstract class MixinFontRenderer {
      */
     @Inject(method = "getCharWidth(C)I", at = @At("HEAD"), cancellable = true)
     public void emojiCharacterWidthOverride(char ch, CallbackInfoReturnable<Integer> cir) {
-        float newWidth = EmojiReplacer.INSTANCE.renderEmojiChar(ch, this.posX, this.posY, this.renderEngine, false);
+        float newWidth = EmojiReplacer.INSTANCE.renderEmojiChar((FontRenderer) (Object)this, ch, this.posX, this.posY, this.renderEngine, false);
         if (newWidth >= 0.0) {
             cir.setReturnValue((int) newWidth);
         }
@@ -135,18 +133,18 @@ public abstract class MixinFontRenderer {
         EmojiReplacer.INSTANCE.setCharIndex(j, text, false);
     }
 
-    @Inject(method = "setColor(FFFF)V", at = @At("HEAD"), remap = false)
-    public void emojiCharacterRenderOverride(float r, float g, float b, float a, CallbackInfo ci) {
-        EmojiReplacer.INSTANCE.setLastColor(r, g, b, a);
-    }
-
-    /**
-     * Prevent lag spikes whenever the first emoji
-     * appears by loading the emoji texture as soon
-     * as possible
-     */
-    @Inject(method = "<init>(Lnet/minecraft/client/settings/GameSettings;Lnet/minecraft/util/ResourceLocation;Lnet/minecraft/client/renderer/texture/TextureManager;Z)V", at = @At("RETURN"), remap = false)
-    public void emojiCharacterRenderOverride(GameSettings gameSettingsIn, ResourceLocation location, TextureManager textureManagerIn, boolean unicode, CallbackInfo ci) {
-        EmojiReplacer.INSTANCE.initializeRenderer(textureManagerIn);
-    }
+//     @Inject(method = "setColor(FFFF)V", at = @At("HEAD"), remap = false)
+//     public void emojiCharacterRenderOverride(float r, float g, float b, float a, CallbackInfo ci) {
+//         EmojiReplacer.INSTANCE.ini(r, g, b, a);
+//     }
+//
+//     /**
+//      * Prevent lag spikes whenever the first emoji
+//      * appears by loading the emoji texture as soon
+//      * as possible
+//      */
+//     @Inject(method = "<init>(Lnet/minecraft/client/settings/GameSettings;Lnet/minecraft/util/ResourceLocation;Lnet/minecraft/client/renderer/texture/TextureManager;Z)V", at = @At("RETURN"), remap = false)
+//     public void emojiCharacterRenderOverride(GameSettings gameSettingsIn, ResourceLocation location, TextureManager textureManagerIn, boolean unicode, CallbackInfo ci) {
+//         EmojiReplacer.INSTANCE.initializeRenderer(textureManagerIn);
+//     }
 }

@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiScreen
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder.gson
 import com.google.gson.annotations.Expose
@@ -24,6 +23,12 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.opengl.GL11
 
 //#if MC > 1.21
+//$$ import net.minecraft.client.font.BitmapFont
+//$$ import net.minecraft.client.font.Font
+//$$ import net.minecraft.client.font.FontFilterType
+//$$ import net.minecraft.client.font.FontStorage
+//$$ import net.minecraft.text.Style
+//$$ import net.minecraft.util.Formatting
 //$$ import kotlin.jvm.optionals.getOrNull
 //#endif
 
@@ -31,6 +36,10 @@ import org.lwjgl.opengl.GL11
 object EmojiReplacer {
     private val config get() = SkyHanniMod.feature.gui
     private val gson = gson().create()
+
+    //#if MC > 1.21
+    //$$ val EMOJI_IDENTIFIER = Identifier.of("skyhanni", "emoji_font")
+    //#endif
 
     private var emojiNameMap: Map<String, String>? = null
     private var reverseEmojiNameMap: MutableMap<String, String>? = null
@@ -45,7 +54,8 @@ object EmojiReplacer {
         reverseEmojiNameMap = reverseMap
 
         for ((emojiName, emojiString) in emojiJson.emojiNames) {
-            if ((reverseMap[emojiName]?.length ?: 0) < emojiString.length) {
+            val oldLength = reverseMap[emojiString]?.length
+            if (oldLength == null || oldLength > emojiName.length) {
                 reverseMap[emojiString] = emojiName
             }
         }
@@ -59,7 +69,7 @@ object EmojiReplacer {
     private var emojiSprites: List<String>? = null
 
     // Texture pack support
-    //TODO: Figure out why this event isnt done correctly
+    // TODO: Figure out why this event isnt done correctly
     @HandleEvent(TexturesReloadEvent::class)
     fun onTexturesLoad() {
         val mc = Minecraft.getMinecraft()
@@ -67,20 +77,96 @@ object EmojiReplacer {
         val emojiRootStream =
             //#if MC < 1.21
             mc.resourceManager.getResource(emojiRootResource)?.inputStream ?: return
-            //#else
-            //$$ mc.resourceManager.getResource(emojiRootResource).getOrNull()?.inputStream ?: return
-            //#endif
+        //#else
+        //$$     mc.resourceManager.getResource(emojiRootResource).getOrNull()?.inputStream ?: return
+        //#endif
 
         val emojiRoot = gson.fromJson(emojiRootStream.reader(), EmojiRootDefinition::class.java)
 
         emojiSpritesheetWidth = emojiRoot.width
         emojiSpritesheetHeight = emojiRoot.height
-        emojiSpritesheetResource = createResourceLocation(emojiRoot.resource)
+        var resource = createResourceLocation(emojiRoot.resource)
+        //#if MC < 1.21
+        resource = createResourceLocation(resource.resourceDomain, "textures/"+resource.resourcePath)
+        //#endif
+        emojiSpritesheetResource = resource
         emojiSprites = emojiRoot.emojis
 
         mc.textureManager?.loadTexture(emojiSpritesheetResource, SimpleTexture(emojiSpritesheetResource))
+
+        //#if MC > 1.21
+        //$$ loadFont(resource, emojiRoot.width, emojiRoot.height, emojiRoot.emojis)
+        //#endif
     }
 
+    private fun anyEmojiStartWith(string: String): Boolean {
+        return reverseEmojiNameMap?.any {
+            it.key.startsWith(string)
+        } ?: false
+    }
+
+    private fun emojisStartingWith(emojiList: List<String>, string: String): List<String> {
+        return emojiList.filter {
+            it.startsWith(string)
+        }
+    }
+
+    private fun getEmojiString(string: String): String {
+        val unicodeToName = reverseEmojiNameMap ?: return ""
+        return ":${unicodeToName[string]}:"
+    }
+
+    private fun isEmojiString(string: String): Boolean {
+        val unicodeToName = reverseEmojiNameMap ?: return false
+        return unicodeToName.containsKey(string)
+    }
+
+    fun replaceEmojis(string: String): String {
+        if (!isEnabled()) return string
+        val unicodeMap = reverseEmojiNameMap ?: return string
+
+        val sortedUnicodeKeySet = unicodeMap.keys.sortedByDescending { it.length }
+
+        var tempString = string
+
+        for (unicodeKey in sortedUnicodeKeySet) {
+            tempString = tempString.replace(unicodeKey, ":${unicodeMap[unicodeKey]!!}:")
+        }
+
+        return tempString
+
+//         while (i < string.length) {
+//             val char = string[i].toString()
+//
+//             if (anyEmojiStartWith(char)) {
+//                 var emoji = char
+//                 var list = emojisStartingWith(unicodeMap.keys.toList(), emoji)
+//                 var oldI = i
+//                 var lastValidEmoji: String? = null
+//                 while (i + 1 < string.length && list.isNotEmpty()) {
+//                     emoji += string[++i]
+//                     list = emojisStartingWith(list, emoji)
+//                     if (isEmojiString(emoji)) {
+//                         lastValidEmoji = emoji
+//                         oldI = i
+//                     }
+//                 }
+//                 if (lastValidEmoji != null) {
+//                     builder.append(getEmojiString(lastValidEmoji))
+//                 } else {
+//                     builder.append(char)
+//                 }
+//                 i = oldI
+//             } else {
+//                 builder.append(char)
+//             }
+//             i++
+//         }
+//         return builder.toString()
+    }
+
+    //#if MC < 1.21
+    private const val EMOJI_DISPLAY_WIDTH = 8.0f
 
     private var stringIndex: Int = -1
     private var emojiEnd = -1
@@ -95,17 +181,23 @@ object EmojiReplacer {
         isShadow = shadow
     }
 
-    private const val EMOJI_DISPLAY_WIDTH = 8.0f
-
-    fun renderEmojiChar(fontRenderer: FontRenderer, char: Char, posX: Float, posY: Float, textureManager: TextureManager?, render: Boolean): Float {
+    @Suppress("ReturnCount")
+    fun renderEmojiChar(
+        fontRenderer: FontRenderer,
+        char: Char,
+        posX: Float,
+        posY: Float,
+        textureManager: TextureManager?,
+        render: Boolean,
+    ): Float {
         if (!isEnabled()) return -1.0f
 
-        val emojiResourceLocation = emojiSpritesheetResource ?: return -1.0f
-
-        val nameMap = emojiNameMap ?: return -1.0f
-
         if (stringIndex <= emojiEnd) return 0.0f
-        if (textureManager == null) return -1.0f
+
+        val emojiResourceLocation = emojiSpritesheetResource
+        val nameMap = emojiNameMap
+
+        if (textureManager == null || emojiResourceLocation == null || nameMap == null) return -1.0f
 
         if (char == ':') {
             val oldEmojiEnd = emojiEnd
@@ -140,17 +232,6 @@ object EmojiReplacer {
             val green = (fontRenderer as AccessorFontRenderer).green
             val blue = (fontRenderer as AccessorFontRenderer).blue
             val alpha = (fontRenderer as AccessorFontRenderer).alpha
-
-//             GuiRenderUtils.drawTexturedRect(
-//                 posX.toInt(), posY.toInt(),
-//                 EMOJI_DISPLAY_WIDTH.toInt(), EMOJI_DISPLAY_WIDTH.toInt(),
-//                 spriteSheetX / emojiSpritesheetWidth,
-//                 (spriteSheetX + 1.0f) / emojiSpritesheetWidth,
-//                 spriteSheetY / emojiSpritesheetHeight,
-//                 (spriteSheetY + 1.0f) / emojiSpritesheetHeight,
-//                 emojiResourceLocation,
-//                 alpha
-//             )
 
             textureManager.bindTexture(emojiResourceLocation)
 
@@ -201,65 +282,6 @@ object EmojiReplacer {
         return -1.0f
     }
 
-
-    private fun anyEmojiStartWith(string: String): Boolean {
-        return reverseEmojiNameMap?.any {
-            it.key.startsWith(string)
-        } ?: false
-    }
-
-    private fun emojisStartingWith(emojiList: List<String>, string: String): List<String> {
-        return emojiList.filter {
-            it.startsWith(string)
-        }
-    }
-
-    private fun getEmojiString(string: String): String {
-        val unicodeToName = reverseEmojiNameMap ?: return ""
-        return ":${unicodeToName[string]}:"
-    }
-
-    private fun isEmojiString(string: String): Boolean {
-        val unicodeToName = reverseEmojiNameMap ?: return false
-        return unicodeToName.containsKey(string)
-    }
-
-    fun replaceEmojis(string: String): String {
-        if (!isEnabled()) return string
-        val unicodeMap = reverseEmojiNameMap ?: return string
-        val builder = StringBuilder()
-        var i = 0
-
-        while (i < string.length) {
-            val char = string[i].toString()
-
-            if (anyEmojiStartWith(char)) {
-                var emoji = char
-                var list = emojisStartingWith(unicodeMap.keys.toList(), emoji)
-                var oldI = i
-                var lastValidEmoji: String? = null
-                while (i + 1 < string.length && list.isNotEmpty()) {
-                    emoji += string[++i]
-                    list = emojisStartingWith(list, emoji)
-                    if (isEmojiString(emoji)) {
-                        lastValidEmoji = emoji
-                        oldI = i
-                    }
-                }
-                if (lastValidEmoji != null) {
-                    builder.append(getEmojiString(lastValidEmoji))
-                } else {
-                    builder.append(char)
-                }
-                i = oldI
-            } else {
-                builder.append(char)
-            }
-            i++
-        }
-        return builder.toString()
-    }
-
     fun handleKeyboardInput(screen: GuiScreen) {
         if (!isEnabled()) return
 
@@ -277,9 +299,8 @@ object EmojiReplacer {
         while (startingWith.isNotEmpty()) {
             if (!Keyboard.next() || Keyboard.getEventKeyState()) {
                 if (isEmojiString(string)) {
-                    accessorScreen.keyTyped_skyhanni(char, -1)
-                    for (char in getEmojiString(string)) {
-                        accessorScreen.keyTyped_skyhanni(char, -1)
+                    for (emojiChar in getEmojiString(string)) {
+                        accessorScreen.keyTyped_skyhanni(emojiChar, -1)
                     }
                 }
                 return
@@ -291,14 +312,136 @@ object EmojiReplacer {
             }
         }
         if (lastValidEmoji != null) {
-            for (char in getEmojiString(lastValidEmoji)) {
-                accessorScreen.keyTyped_skyhanni(char, -1)
+            for (emojiChar in getEmojiString(lastValidEmoji)) {
+                accessorScreen.keyTyped_skyhanni(emojiChar, -1)
             }
         }
     }
 
+    //#else
+    //$$ private val renderQueue: MutableList<CharRendering> = mutableListOf()
+    //$$ private var bypassProcessing = false
+    //$$ private var inEmoji = false
+    //$$ private var emojiString = StringBuilder()
+    //$$ private var EMOJI_FONT: FontStorage? = null
+    //$$ private var EMOJI_FONT_MAP: MutableMap<String, Int> = mutableMapOf()
+    //$$
+    //$$ fun loadFont(file: Identifier, width: Int, height: Int, emojis: List<String>) {
+    //$$     val mc = MinecraftClient.getInstance()
+    //$$     val positions = Array(height) { y ->
+    //$$         IntArray(width) { x ->
+    //$$             val index = y * width + x
+    //$$             if (index < emojis.size) EMOJI_FONT_MAP[emojis[index]] = index + 100
+    //$$             index + 100
+    //$$         }
+    //$$     }
+    //$$     val loadable = BitmapFont.Loader(file, 8, 7, positions).build().left().getOrNull()
+    //$$     val font = loadable?.load(MinecraftClient.getInstance().resourceManager)
+    //$$     EMOJI_FONT = FontStorage(mc.textureManager, EMOJI_IDENTIFIER)
+    //$$     EMOJI_FONT?.setFonts(listOf(
+    //$$         Font.FontFilterPair(
+    //$$             font,
+    //$$             FontFilterType.FilterMap.NO_FILTER
+    //$$         )
+    //$$     ), emptySet<FontFilterType>())
+    //$$ }
+    //$$ fun getFontStorage(): FontStorage? {
+    //$$     return EMOJI_FONT
+    //$$ }
+    //$$ fun handleEmojiRender(char: Int, style: Style, offset: Int, drawer: TextRenderer.Drawer): Boolean {
+    //$$     if (bypassProcessing) return false
+    //$$
+    //$$     if (!inEmoji && char != ':'.code) return false
+    //$$
+    //$$     if (char == ':'.code) {
+    //$$         if (inEmoji) {
+    //$$             val emojiStringFinal = emojiString.toString()
+    //$$             bypassProcessing = true
+    //$$
+    //$$             val map = EmojiReplacer.emojiNameMap
+    //$$
+    //$$             if (map?.contains(emojiStringFinal) ?: false) {
+    //$$                 val fontIndex = EMOJI_FONT_MAP[EmojiReplacer.emojiNameMap?.get(emojiStringFinal)]
+    //$$
+    //$$                 if (fontIndex != null) {
+    //$$
+    //$$                     drawer.accept(
+    //$$                         offset,
+    //$$                         style.withFont(EMOJI_IDENTIFIER),
+    //$$                         fontIndex
+    //$$                     )
+    //$$
+    //$$                 } else {
+    //$$                     renderQueue.add(CharRendering(
+    //$$                         char,
+    //$$                         style,
+    //$$                         offset
+    //$$                     ))
+    //$$
+    //$$                     for (memoryChar in renderQueue) {
+    //$$                         drawer.accept(memoryChar.offset, Style.EMPTY.withColor(Formatting.RED), memoryChar.char)
+    //$$                     }
+    //$$                 }
+    //$$
+    //$$                 inEmoji = false
+    //$$                 renderQueue.clear()
+    //$$
+    //$$             } else {
+    //$$                 for (memoryChar in renderQueue) {
+    //$$                     drawer.accept(memoryChar.offset, memoryChar.style, memoryChar.char)
+    //$$                 }
+    //$$                 renderQueue.clear()
+    //$$                 renderQueue.add(CharRendering(
+    //$$                     char,
+    //$$                     style,
+    //$$                     offset
+    //$$                 ))
+    //$$             }
+    //$$             emojiString.clear()
+    //$$             bypassProcessing = false
+    //$$         } else {
+    //$$             renderQueue.add(CharRendering(
+    //$$                 char,
+    //$$                 style,
+    //$$                 offset
+    //$$             ))
+    //$$             inEmoji = true
+    //$$         }
+    //$$     } else {
+    //$$         renderQueue.add(CharRendering(
+    //$$             char,
+    //$$             style,
+    //$$             offset
+    //$$         ))
+    //$$         emojiString.appendCodePoint(char)
+    //$$     }
+    //$$
+    //$$     return true
+    //$$ }
+    //$$
+    //$$ fun handleEnd(drawer: TextRenderer.Drawer) {
+    //$$     bypassProcessing = true
+    //$$     for (memoryChar in renderQueue) {
+    //$$         drawer.accept(memoryChar.offset, memoryChar.style, memoryChar.char)
+    //$$     }
+    //$$     bypassProcessing = false
+    //$$     emojiString.clear()
+    //$$     renderQueue.clear()
+    //$$     inEmoji = false
+    //$$ }
+    //#endif
+
     fun isEnabled() = config.emojiReplace
 }
+
+//#if MC > 1.21
+//$$ data class CharRendering(
+//$$     val char: Int,
+//$$     val style: Style,
+//$$     val offset: Int
+//$$ )
+//#endif
+
 
 data class EmojiRootDefinition(
     @Expose val width: Int = 1,
