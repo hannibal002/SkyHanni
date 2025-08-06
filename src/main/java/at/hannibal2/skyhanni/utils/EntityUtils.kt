@@ -216,10 +216,10 @@ object EntityUtils {
         list.keepOnlyIn(getEntities<T>())
     }
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
+    fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
         if (isDead) return false
         // TODO add cache that only updates e.g. 10 times a second
-        if (!FrustumUtils.isVisible(entityBoundingBox)) return false
+        if (!ignoreFrustum && !FrustumUtils.isVisible(entityBoundingBox)) return false
         return getLorenzVec().up(vecYOffset).canBeSeen(viewDistance)
     }
 
