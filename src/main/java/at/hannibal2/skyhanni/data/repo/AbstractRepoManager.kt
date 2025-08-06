@@ -17,7 +17,6 @@ import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.minecraft.util.IChatComponent
 import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -268,28 +267,50 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun onJoinStatusError() {
         if (unsuccessfulConstants.isEmpty()) return
-        val text = mutableListOf<IChatComponent>()
-        text.add(
-            (
-                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work. " +
-                    "Please report this error on the Discord!"
-                ).asComponent(),
-        )
-        text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
-        text.add("§7Backup Repo Value: §c$isUsingBackup".asComponent())
-        text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
-        text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
-
-        for (constant in unsuccessfulConstants) {
-            text.add("   §e- §7$constant".asComponent())
+        // Last sanity check, we want to make sure repo is up to date before displaying the error
+        SkyHanniMod.launchIOCoroutine {
+            val comparison = getCommitComparison(silentError = false)
+            val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
+                logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
+                false
+            }
+            if (isOutdated) {
+                ChatUtils.chat("§7$commonName Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
+                fetchAndUnpackRepo(command = false)
+                return@launchIOCoroutine
+            }
+            val text = buildList {
+                add("§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work.")
+                add("§cPlease report this error on the Discord!")
+                add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}")
+                add("§7Backup Repo Value: §c$isUsingBackup")
+                if (!config.repoAutoUpdate) add("§4You have Repo Auto Update turned off, please try turning that on.")
+                add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):")
+                for (constant in unsuccessfulConstants) {
+                    add("   §e- §7$constant")
+                }
+            }.map { it.asComponent() }
+            TextHelper.multiline(text).send()
         }
-        TextHelper.multiline(text).send()
     }
 
     private enum class FetchUnpackResult(val canContinue: Boolean = true) {
         SUCCESS,
         SWITCHED_TO_BACKUP,
         FAILED(false),
+    }
+
+    /**
+     * Returns a [RepoComparison] object that represents the 'diff' between the local commit,
+     * and the latest commit from GitHub.
+     * May return null if the latest commit could not be fetched.
+     *
+     * @param silentError If true, will not show errors to the user.
+     */
+    private suspend fun getCommitComparison(silentError: Boolean): RepoComparison? {
+        localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
+        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: return null
+        return RepoComparison(localRepoCommit, latestRepoCommit)
     }
 
     /**
@@ -312,23 +333,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         forceReset: Boolean = false,
         switchToBackupOnFail: Boolean = true,
     ): FetchUnpackResult = repoMutex.withLock {
-        localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
-
-        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: run {
+        val comparison = getCommitComparison(silentError) ?: run {
             return if (switchToBackupOnFail) switchToBackupRepo()
             else FetchUnpackResult.FAILED
         }
-
-        val diffCheck = RepoComparison(localRepoCommit, latestRepoCommit)
-        if (diffCheck.hashesMatch && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
+        if (comparison.hashesMatch && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
             if (command) {
-                diffCheck.reportRepoUpToDate()
+                comparison.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
             return FetchUnpackResult.SUCCESS
         } else if (command) {
-            if (!diffCheck.hashesMatch) diffCheck.reportRepoOutdated()
-            else if (forceReset) diffCheck.reportForceRebuild()
+            if (!comparison.hashesMatch) comparison.reportRepoOutdated()
+            else if (forceReset) comparison.reportForceRebuild()
         }
 
         prepCleanRepoFileSystem()
@@ -346,7 +363,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             else FetchUnpackResult.FAILED
         }
 
-        commitStorage.writeToFile(latestRepoCommit)
+        commitStorage.writeToFile(comparison.latest)
         isUsingBackup = false
         return FetchUnpackResult.SUCCESS
     }
