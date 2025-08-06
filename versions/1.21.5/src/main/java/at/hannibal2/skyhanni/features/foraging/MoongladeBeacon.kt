@@ -359,10 +359,11 @@ object MoongladeBeacon {
         open val reference: T? get() = backing.reference
         open val ours: T? get() = backing.ours
 
-        open val asMap get() = mapOf(
-            BeaconPieceTarget.REFERENCE to backing.reference,
-            BeaconPieceTarget.OURS to backing.ours
-        )
+        open val asMap
+            get() = mapOf(
+                BeaconPieceTarget.REFERENCE to backing.reference,
+                BeaconPieceTarget.OURS to backing.ours,
+            )
 
         private class DataPairBacking<T>(var reference: T?, var ours: T?) : Resettable() {
             operator fun get(target: BeaconPieceTarget): T? = when (target) {
@@ -379,12 +380,15 @@ object MoongladeBeacon {
 
     private open class DataPair<T : Any>(initRef: T, initOurs: T) : NullableDataPair<T>(initRef, initOurs) {
         constructor(initialValue: T) : this(initialValue, initialValue)
+
         override operator fun get(target: BeaconPieceTarget): T = super.get(target)
             ?: throw IllegalStateException("BeaconPieceTarget '$target' has not been set in DataPair.")
-        override val asMap: Map<BeaconPieceTarget, T> get() = mapOf(
-            BeaconPieceTarget.REFERENCE to this.reference,
-            BeaconPieceTarget.OURS to ours
-        )
+
+        override val asMap: Map<BeaconPieceTarget, T>
+            get() = mapOf(
+                BeaconPieceTarget.REFERENCE to this.reference,
+                BeaconPieceTarget.OURS to ours,
+            )
 
         override val reference: T get() = this[BeaconPieceTarget.REFERENCE]
         override val ours: T get() = this[BeaconPieceTarget.OURS]
@@ -433,10 +437,10 @@ object MoongladeBeacon {
         val untilNextRefPitch get() = nextPitchPair.referenceUntil
         val untilNextOurPitch get() = nextPitchPair.oursUntil
 
-        fun handlePitch(pitch: BeaconPitch) = with (nextPitchPair) {
+        fun handlePitch(pitch: BeaconPitch) = with(nextPitchPair) {
             if (isEnchanted && !upgradingStrength) return
             if (referenceUntil > acceptablePitchMargin || referenceUntil > oursUntil) return
-            with (bufferPair[BeaconPieceTarget.REFERENCE]) {
+            with(bufferPair[BeaconPieceTarget.REFERENCE]) {
                 if (size >= 6) removeAt(0)
                 add(pitch)
                 if (distinct().size > 2) clear()
@@ -474,14 +478,17 @@ object MoongladeBeacon {
 
         private fun readCurrentFromSlot(slot: Slot) = slot.stack?.let {
             if (isEnchanted && !upgradingStrength) return@let
+            val ours = BeaconPieceTarget.OURS
             when (slot.index) {
-                colorSelectSlot -> colorPair[BeaconPieceTarget.OURS] = slot.getLoreColorOrNull()
+                colorSelectSlot -> colorPair[ours] = slot.getLoreColorOrNull()
                 speedSelectSlot -> {
-                    speedPair[BeaconPieceTarget.OURS] = slot.getBeaconSpeedOrNull()
-                    nextPitchPair[BeaconPieceTarget.OURS] = speedPair[BeaconPieceTarget.OURS]?.getOffsetFromNow() ?: SimpleTimeMark.farPast()
+                    slot.getBeaconSpeedOrNull().let {
+                        speedPair[ours] = it
+                        nextPitchPair[ours] = it?.getOffsetFromNow() ?: SimpleTimeMark.farPast()
+                    }
                 }
 
-                pitchSelectSlot -> pitchPair[BeaconPieceTarget.OURS] = slot.getBeaconPitchOrNull()
+                pitchSelectSlot -> pitchPair[ours] = slot.getBeaconPitchOrNull()
                 pauseSelectSlot -> paused = it.isPaused()
             }
         }
@@ -545,7 +552,7 @@ object MoongladeBeacon {
             nextPitchPair[BeaconPieceTarget.REFERENCE] = referenceSpeed.getOffsetFromNow()
         }
 
-        private fun SimpleTimeMark.getTimeUntilFormat(): String = when(this) {
+        private fun SimpleTimeMark.getTimeUntilFormat(): String = when (this) {
             SimpleTimeMark.farPast() -> "§cUnknown"
             else -> "§a${this.timeUntil().format()}"
         }
