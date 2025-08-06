@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -94,7 +94,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T, default: Int): Int {
-        if (!SkyHanniDebugsAndTests.globalRender) return default
+        if (GlobalRender.renderDisabled) return default
         if (entityColorMap.containsKey(entity)) {
             val condition = entityColorCondition[entity] ?: return default
             if (condition.invoke()) {
@@ -106,7 +106,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun <T : EntityLivingBase> internalChangeHurtTime(entity: T): Int {
-        if (!SkyHanniDebugsAndTests.globalRender) return entity.hurtTime
+        if (GlobalRender.renderDisabled) return entity.hurtTime
         run {
             val condition = entityNoHurtTimeCondition[entity] ?: return@run
             if (condition.invoke()) {

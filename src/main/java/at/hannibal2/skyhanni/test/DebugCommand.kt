@@ -52,7 +52,6 @@ object DebugCommand {
         // calling default debug stuff
         player(event)
         repoData(event)
-        globalRender(event)
         skyblockStatus(event)
         networkInfo(event)
         profileName(event)
@@ -152,18 +151,6 @@ object DebugCommand {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
-        }
-    }
-
-    private fun globalRender(event: DebugDataCollectEvent) {
-        event.title("Global Render")
-        if (SkyHanniDebugsAndTests.globalRender) {
-            event.addIrrelevant("normal enabled")
-        } else {
-            event.addData {
-                add("Global renderer is disabled!")
-                add("No renderable elements from SkyHanni will show up anywhere!")
-            }
         }
     }
 

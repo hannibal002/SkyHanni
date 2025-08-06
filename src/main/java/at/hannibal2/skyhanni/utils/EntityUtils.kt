@@ -41,6 +41,7 @@ import net.minecraft.entity.SharedMonsterAttributes
 @SkyHanniModule
 object EntityUtils {
 
+    // TODO remove this relatively heavy call everywhere
     @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.hasNameTagWith(
         y: Int,
