@@ -43,9 +43,7 @@ sealed interface RepoFileSystem {
     ): Boolean = runCatching {
         ZipFile(zipFile.absolutePath).use { zip ->
             zip.entries().asSequence().filter { !it.isDirectory }.forEach { entry ->
-                val relative = entry.name
-                    .substringAfter('/', "")
-                    .takeIf { it.isNotBlank() }
+                val relative = entry.name.substringAfter('/', "").takeIf { it.isNotBlank() }
                     ?: return@forEach
 
                 if (this@RepoFileSystem is DiskRepoFileSystem) {

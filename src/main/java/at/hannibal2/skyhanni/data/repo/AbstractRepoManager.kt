@@ -400,9 +400,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         // the MemoryRepoFileSystem for the event, and writing to disk after the event.
         repoFileSystem = repoFileSystem.transitionAfterReload()
 
-        if (answerMessage.isNotEmpty() && !loadingError) {
-            ChatUtils.chat("§a$answerMessage")
-        } else if (loadingError) {
+        if (answerMessage.isNotEmpty() && !loadingError) logger.logToChat("§a$answerMessage")
+        else if (loadingError) {
             ChatUtils.clickableChat(
                 "Error with the $commonShortName Repo detected, try /$updateCommand to fix it!",
                 onClick = ::updateRepo,
