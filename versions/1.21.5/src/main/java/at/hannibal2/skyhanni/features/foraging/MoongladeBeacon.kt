@@ -394,6 +394,12 @@ object MoongladeBeacon {
         override val ours: T get() = this[BeaconPieceTarget.OURS]
     }
 
+    private class NextPitchPair : DataPair<SimpleTimeMark>(SimpleTimeMark.farPast()) {
+        private fun SimpleTimeMark.getFlooredDuration() = this.takeIf { !it.isFarPast() }?.timeUntil() ?: Duration.INFINITE
+        val referenceUntil get() = this[BeaconPieceTarget.REFERENCE].getFlooredDuration()
+        val oursUntil get() = this[BeaconPieceTarget.OURS].getFlooredDuration()
+    }
+
     private inline fun <reified E : Enum<E>> E.internalGetOffset(other: E): Int {
         val raw = this.ordinal - other.ordinal
         return if (raw < 0) raw + enumValues<E>().size else raw
@@ -416,11 +422,7 @@ object MoongladeBeacon {
         private val speedPair = NullableDataPair<BeaconSpeed>()
         private val pitchPair = NullableDataPair<BeaconPitch>()
 
-        private val nextPitchPair = object : DataPair<SimpleTimeMark>(SimpleTimeMark.farPast()) {
-            private fun SimpleTimeMark.getFlooredDuration() = this.takeIf { !it.isFarPast() }?.timeUntil() ?: Duration.INFINITE
-            val referenceUntil get() = this[BeaconPieceTarget.REFERENCE].getFlooredDuration()
-            val oursUntil get() = this[BeaconPieceTarget.OURS].getFlooredDuration()
-        }
+        private val nextPitchPair = NextPitchPair()
         private val bufferPair = DataPair(mutableListOf<BeaconPitch>())
         private val slotPair = DataPair(-1)
 
