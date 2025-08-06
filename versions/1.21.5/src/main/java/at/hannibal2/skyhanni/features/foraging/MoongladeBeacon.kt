@@ -478,7 +478,7 @@ object MoongladeBeacon {
             }
         }
 
-        private fun readCurrentFromSlot(slot: Slot) = slot.stack?.let {
+        private fun readCurrentFromSlot(slot: Slot) = slot.stack?.let { stack ->
             if (isEnchanted && !upgradingStrength) return@let
             val ours = BeaconPieceTarget.OURS
             when (slot.index) {
@@ -491,7 +491,7 @@ object MoongladeBeacon {
                 }
 
                 pitchSelectSlot -> pitchPair[ours] = slot.getBeaconPitchOrNull()
-                pauseSelectSlot -> paused = it.isPaused()
+                pauseSelectSlot -> paused = stack.isPaused()
             }
         }
 
