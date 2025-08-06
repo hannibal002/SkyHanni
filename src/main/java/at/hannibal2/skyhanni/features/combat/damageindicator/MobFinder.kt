@@ -428,26 +428,27 @@ class MobFinder {
     } else null
 
     private fun tryAddEntitySpider(entity: EntityLivingBase): EntityResult? {
-        if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
-            when {
-                entity.hasMaxHealth(740, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
-                entity.hasMaxHealth(30_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
-                entity.hasMaxHealth(900_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
-                entity.hasMaxHealth(2_400_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
-                entity.hasMaxHealth(10_000_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_5_1)
+        when {
+            entity.hasMaxHealth(740, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_1)
+            entity.hasMaxHealth(30_000, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_2)
+            entity.hasMaxHealth(900_000, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_3)
+            entity.hasMaxHealth(2_400_000, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+            entity.hasMaxHealth(10_000_000, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_5_1)
+            else -> null
+        }?.let {
+            if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
+                return it
             }
         }
-        if (entity.hasNameTagWith(1, "§5☠ §4Conjoined Brood ")) {
-            if (entity.hasMaxHealth(20_000_000, true)) {
-                return EntityResult(bossType = BossType.SLAYER_SPIDER_5_2)
-            }
+        if (entity.hasMaxHealth(20_000_000, true) && entity.hasNameTagWith(1, "§5☠ §4Conjoined Brood ")) {
+            return EntityResult(bossType = BossType.SLAYER_SPIDER_5_2)
         }
-        if (entity.hasNameTagWith(1, "[§7Lv12§8] §4Broodmother")) {
-            if (entity.hasMaxHealth(6000)) {
+        if (IslandType.SPIDER_DEN.isCurrent()) {
+            if (entity.hasMaxHealth(6000) && entity.hasNameTagWith(1, "[§7Lv12§8] §4Broodmother")) {
                 return EntityResult(bossType = BossType.BROODMOTHER)
             }
+            checkArachne(entity as EntitySpider)?.let { return it }
         }
-        checkArachne(entity as EntitySpider)?.let { return it }
         return null
     }
 

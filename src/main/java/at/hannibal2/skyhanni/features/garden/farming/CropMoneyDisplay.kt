@@ -348,17 +348,20 @@ object CropMoneyDisplay {
 
     private fun isSeeds(internalName: NeuInternalName) = internalName == ENCHANTED_SEEDS || internalName == SEEDS
 
+    private val ENCHANTED_PAPER = "ENCHANTED_PAPER".toInternalName()
+    private val ENCHANTED_BREAD = "ENCHANTED_BREAD".toInternalName()
+    private val SIMPLE_CARROT_CANDY = "SIMPLE_CARROT_CANDY".toInternalName()
+
     private fun init() {
         if (loaded) return
         loaded = true
 
         SkyHanniMod.launchIOCoroutine {
             val map = mutableMapOf<NeuInternalName, Int>()
-            for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
-                if (rawInternalName == "ENCHANTED_PAPER") continue
-                if (rawInternalName == "ENCHANTED_BREAD") continue
-                if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
-                val internalName = rawInternalName.toInternalName()
+            for (internalName in NeuItems.allNeuRepoInternalNames()) {
+                if (internalName == ENCHANTED_PAPER) continue
+                if (internalName == ENCHANTED_BREAD) continue
+                if (internalName == SIMPLE_CARROT_CANDY) continue
                 if (!internalName.isBazaarItem()) continue
 
                 val (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemAliases
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,9 +24,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
@@ -94,12 +95,11 @@ object NeuItems {
         val tempAllItemCache = mutableMapOf<String, NeuInternalName>()
         val tempNoColor = TreeMap<String, NeuInternalName>()
 
-        allNeuRepoItems().keys.forEach { rawInternalName ->
+        allNeuRepoItems().keys.forEach { internalName ->
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
-            if (rawInternalName.startsWith("BUILDER_")) return@forEach
+            if (internalName.asString().startsWith("BUILDER_")) return@forEach
 
-            val internalName = rawInternalName.toInternalName()
             val stack = internalName.getItemStackOrNull() ?: run {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
@@ -117,16 +117,15 @@ object NeuItems {
 
             tempAllItemCache[newCleanName] = internalName
             tempNoColor[newCleanName.removeColor()] = internalName
-            allInternalNames[rawInternalName] = internalName
+            allInternalNames[internalName.asString()] = internalName
         }
-        @Suppress("UNCHECKED_CAST")
-        itemNamesWithoutColor = tempNoColor as NavigableMap<String, NeuInternalName>
+        itemNamesWithoutColor = tempNoColor
         allItemsCache = tempAllItemCache
         stackResolutionCache.clear()
         ChatUtils.debug("Cleared the NEUItems stack resolution cache")
     }
 
-    fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery()
+    fun getInternalName(itemStack: ItemStack): NeuInternalName? = ItemResolutionQuery()
         .withCurrentGuiContext()
         .withItemStack(itemStack)
         .resolveInternalName()
@@ -144,7 +143,7 @@ object NeuItems {
         ItemResolutionQuery.transformHypixelBazaarToNeuItemId(hypixelId).toInternalName()
 
     fun NeuInternalName.getItemStackOrNull(): ItemStack? = stackResolutionCache.getOrPut(this) {
-        ItemResolutionQuery().withKnownInternalName(asString()).resolveToItemStack()
+        ItemResolutionQuery().withKnownInternalName(this).resolveToItemStack()
             ?: return null
     }.copy()
 
@@ -171,9 +170,10 @@ object NeuItems {
         if (hardcodedVanillaItems.contains(asString)) return true
 
         val vanillaName = asString.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-        if (allNeuRepoItems().containsKey(vanillaName)) {
-            val json = allNeuRepoItems()[vanillaName]
-            if (json != null && json.has("vanilla") && json["vanilla"].asBoolean) return true
+        val internalizedVanillaName = vanillaName.toInternalName()
+        if (allNeuRepoItems().containsKey(internalizedVanillaName)) {
+            val itemJson = allNeuRepoItems()[internalizedVanillaName]
+            if (itemJson != null && itemJson.vanilla) return true
         }
         return isVanillaItem(vanillaName)
     }
@@ -191,17 +191,16 @@ object NeuItems {
 
     const val ITEM_FONT_SIZE = 2.0 / 3.0
 
-    fun allNeuRepoItems(): Map<String, JsonObject> = EnoughUpdatesManager.getItemInformation()
+    fun allNeuRepoInternalNames(): Set<NeuInternalName> = EnoughUpdatesManager.getInternalNames()
+    fun allNeuRepoItems(): Map<NeuInternalName, NeuItemJson> = EnoughUpdatesManager.getItemInformation()
 
     fun getInternalNamesForItemId(item: Item): List<NeuInternalName> {
         itemIdCache[item]?.let {
             return it
         }
         val result = allNeuRepoItems().filter {
-            it.value["itemid"].asString.getVanillaItem() == item
-        }.keys.map {
-            it.toInternalName()
-        }
+            it.value.itemId.getVanillaItem() == item
+        }.keys.toList()
         itemIdCache[item] = result
         return result
     }
@@ -302,7 +301,7 @@ object NeuItems {
 
     fun loadNBTData(encoded: String): ItemStack {
         val jsonString = StringUtils.decodeBase64(encoded)
-        val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
-        return EnoughUpdatesManager.jsonToStack(jsonObject, false)
+        val neuItem = ConfigManager.gson.fromJson<NeuItemJson>(jsonString)
+        return EnoughUpdatesManager.neuItemToStack(neuItem, useCache = false)
     }
 }
