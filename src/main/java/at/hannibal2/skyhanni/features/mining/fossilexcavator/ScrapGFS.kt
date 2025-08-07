@@ -183,7 +183,6 @@ object ScrapGFS {
             GetFromSackApi.getFromSack(FossilExcavatorApi.scrapItem, currentFetchAmount)
             uiDirty = true
         },
-        condition = { !fetchingFromSacks },
         padding = 4,
     )
 
