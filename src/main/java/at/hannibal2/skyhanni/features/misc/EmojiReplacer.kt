@@ -27,6 +27,7 @@ import org.lwjgl.opengl.GL11
 //$$ import net.minecraft.client.font.Font
 //$$ import net.minecraft.client.font.FontFilterType
 //$$ import net.minecraft.client.font.FontStorage
+//$$ import net.minecraft.text.CharacterVisitor
 //$$ import net.minecraft.text.Style
 //$$ import net.minecraft.util.Formatting
 //$$ import kotlin.jvm.optionals.getOrNull
@@ -420,7 +421,8 @@ object EmojiReplacer {
     //$$     return true
     //$$ }
     //$$
-    //$$ fun handleEnd(drawer: TextRenderer.Drawer) {
+    //$$ fun handleEnd(visitor: CharacterVisitor) {
+    //$$     val drawer = visitor as? TextRenderer.Drawer ?: return
     //$$     bypassProcessing = true
     //$$     for (memoryChar in renderQueue) {
     //$$         drawer.accept(memoryChar.offset, memoryChar.style, memoryChar.char)

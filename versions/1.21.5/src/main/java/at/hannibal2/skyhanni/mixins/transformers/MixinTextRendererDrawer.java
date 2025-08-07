@@ -50,8 +50,13 @@ public class MixinTextRendererDrawer {
         return true;
     }
 
+    //#if MC < 1.21.6
     @Inject(method = "drawLayer", at = @At("HEAD"))
     public void emojiFinishDraw(float x, CallbackInfoReturnable<Float> cir) {
+    //#else
+    //$$ @Inject(method = "draw", at = @At("HEAD"))
+    //$$ public void emojiFinishDraw(TextRenderer.GlyphDrawer glyphDrawer, CallbackInfo ci) {
+    //#endif
         EmojiReplacer.INSTANCE.handleEnd((TextRenderer.Drawer) (Object) this);
     }
 
