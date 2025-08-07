@@ -191,7 +191,8 @@ object ReforgeApi {
     private fun mapReforge(reforge: NeuReforgeJson) =
         Reforge(
             name = reforge.reforgeName,
-            nbtModifier = reforge.nbtModifier, type = EnumUtils.enumValueOf<ReforgeType>(reforge.itemType.first),
+            nbtModifier = reforge.nbtModifier,
+            type = EnumUtils.enumValueOf<ReforgeType>(reforge.itemType.first),
             stats = reforge.reforgeStats.orEmpty(),
             reforgeStone = reforge.internalName,
             specialItems = reforge.itemType.second.takeIf { it.isNotEmpty() },
