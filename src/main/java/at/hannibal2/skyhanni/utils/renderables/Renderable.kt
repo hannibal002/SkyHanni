@@ -699,23 +699,6 @@ interface Renderable {
 
         }
 
-        fun Renderable.renderCrosshair(
-            color: Color = LorenzColor.RED.toColor().addAlpha(100)
-        ) = object : Renderable {
-            override val width = this@renderCrosshair.width
-            override val height = this@renderCrosshair.height
-            override val horizontalAlign = this@renderCrosshair.horizontalAlign
-            override val verticalAlign = this@renderCrosshair.verticalAlign
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                this@renderCrosshair.render(mouseOffsetX, mouseOffsetY)
-                val midX = width / 2
-                val midY = height / 2
-                GuiRenderUtils.drawRect(midX, 0, midX + 1, height, color.rgb)
-                GuiRenderUtils.drawRect(0, midY, width, midY + 1, color.rgb)
-            }
-        }
-
         fun rectButton(
             content: Renderable,
             activeColor: Color,
