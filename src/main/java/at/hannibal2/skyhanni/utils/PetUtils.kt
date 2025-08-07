@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.PetData
@@ -167,7 +168,7 @@ object PetUtils {
 
     fun findPetSkinOrNull(petInternalName: NeuInternalName, skinColorTag: String): NeuItemJson? =
         petSkins[petInternalName.getProperName()]?.singleOrNull {
-            it.displayName?.startsWith(skinColorTag) == true
+            it.displayName.startsWith(skinColorTag)
         }
 
     fun getMaxLevel(petInternalName: NeuInternalName): Int =
@@ -278,13 +279,14 @@ object PetUtils {
 
         val rawPetInternalNames = mutableSetOf<NeuInternalName>()
         val rawPetSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
-        NeuItems.allNeuRepoItems().forEach { (internalName, itemData) ->
-            petSkinNamePattern.matchMatcher(internalName.asString()) {
+        NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
+            val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuItemJson::class.java)
+            petSkinNamePattern.matchMatcher(rawInternalName) {
                 val properPetName = group("pet") ?: return@matchMatcher
-                rawPetSkins.getOrPut(properPetName) { mutableListOf() }.add(itemData)
+                rawPetSkins.getOrPut(properPetName) { mutableListOf() }.add(petItemData)
             }
-            neuPetLorePattern.firstMatcher(itemData.lore) {
-                rawPetInternalNames.add(internalName)
+            neuPetLorePattern.firstMatcher(petItemData.lore) {
+                rawPetInternalNames.add(rawInternalName.toInternalName())
             }
         }
         petInternalNames = rawPetInternalNames

@@ -2,32 +2,23 @@ package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.PetData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NEURaritySpecificPetNums
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetNumsJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -38,12 +29,12 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.JsonToNBT
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
 import java.io.File
 import java.util.TreeMap
-import kotlin.collections.set
 import kotlin.math.floor
-
 //#if MC > 1.21
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
@@ -53,6 +44,8 @@ import kotlin.math.floor
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import at.hannibal2.skyhanni.utils.ComponentUtils
 //$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+//#else
+import net.minecraft.nbt.NBTTagString
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
@@ -60,22 +53,19 @@ import kotlin.math.floor
 object EnoughUpdatesManager {
 
     val configDirectory = File("config/notenoughupdates")
-    private val repoDirectory = File(configDirectory, "repo")
-    private val itemsFolder = File(repoDirectory, "items")
+    val repoDirectory = File(configDirectory, "repo")
 
     private val loadingMutex = Mutex()
-    private val itemMap = TreeMap<NeuInternalName, NeuItemJson>()
-    private val internalNameSet: MutableSet<NeuInternalName> = mutableSetOf()
-    private val itemStackCache = mutableMapOf<NeuInternalName, ItemStack>()
-    private val displayNameCache = mutableMapOf<NeuInternalName, String>()
-    private val recipesMap = HashMap<NeuInternalName, MutableSet<PrimitiveRecipe>>()
+    private val itemMap = TreeMap<String, JsonObject>()
+    private val itemStackCache = mutableMapOf<String, ItemStack>()
+    private val displayNameCache = mutableMapOf<String, String>()
+    private val recipesMap = mutableMapOf<NeuInternalName, MutableSet<PrimitiveRecipe>>()
 
     private var neuPetsJson: NeuPetsJson? = null
-    private var neuPetNums: NeuPetNumsJson? = null
+    private var neuPetNums: JsonObject? = null
 
     val titleWordMap = TreeMap<String, MutableMap<String, MutableList<Int>>>()
 
-    fun getInternalNames() = internalNameSet
     fun getItemInformation() = itemMap
 
     fun inLoadingState() = loadingMutex.isLocked || EnoughUpdatesRepoManager.repoMutex.isLocked
@@ -83,39 +73,34 @@ object EnoughUpdatesManager {
     /**
      * Called by the Neu Repo Manager when the NEU repo is reloaded.
      */
-    suspend fun reloadItemsFromRepo(): Unit = loadingMutex.withLock {
+    suspend fun reloadItemsFromRepo() = loadingMutex.withLock {
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
-        internalNameSet.clear()
         titleWordMap.clear()
         recipesMap.clear()
 
-        val tempItemMap = TreeMap<NeuInternalName, NeuItemJson>()
+        val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(tempItemMap)
 
         synchronized(itemMap) {
+            itemMap.clear()
             itemMap.putAll(tempItemMap)
-        }
-
-        synchronized(internalNameSet) {
-            internalNameSet.addAll(itemMap.keys)
         }
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
-    private suspend fun loadItemMap(tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
+    private suspend fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         fileSystem.list("items").mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
-                val itemJson = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
                 val parsed = parseItem(
                     internalName = internalName,
-                    json = itemJson,
+                    json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
                 ) ?: return@mapNotNullAsync null
-                internalName.toInternalName() to parsed
+                internalName to parsed
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
                 null
@@ -125,36 +110,26 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun NeuAbstractRecipe.loadAndRegister(itemJson: NeuItemJson) {
-        val ingredients = this.getPrimitiveInputs(itemJson).toSet()
-        val outputs = this.getPrimitiveOutputs(itemJson).toSet()
-        val recipe = PrimitiveRecipe(
-            ingredients,
-            outputs,
-            recipeType = this.type,
-            shouldUseForCraftCost = this.type.useForCraftCost,
-        )
-        for (internalName in recipe.outputs) {
-            val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
-            recipeSet.add(recipe)
+    private fun parseItem(internalName: String, json: JsonObject): JsonObject? {
+        if (json.get("itemid") == null) return null
+        var itemId = json["itemid"].asString
+        val mcItem = itemId.getVanillaItem()
+        if (mcItem != null) {
+            itemId = mcItem.getIdentifierString()
         }
-    }
+        json.addProperty("itemid", itemId)
 
-    private fun parseItem(internalName: String, json: JsonObject): NeuItemJson? = runCatching {
-        val itemJson: NeuItemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: return@runCatching null
-        // If the itemId is vanilla, replace it with the vanilla item identifier
-        itemJson.itemId.getVanillaItem()?.let { mcItem ->
-            itemJson.itemId = mcItem.getIdentifierString()
+        json["recipe"]?.asJsonObject?.let { recipe ->
+            PrimitiveRecipe.loadRecipeFromJson(recipe.asJsonObject, json)
         }
-        // Crafting type recipe
-        itemJson.recipe?.loadAndRegister(itemJson)
-        // Other types of recipes
-        itemJson.recipes.forEach { recipe ->
-            recipe.loadAndRegister(itemJson)
+        json["recipes"]?.asJsonArray?.forEach { recipe ->
+            PrimitiveRecipe.loadRecipeFromJson(recipe.asJsonObject, json)
         }
-        itemJson.displayName?.let { displayName ->
+
+        if (json.has("displayname")) {
             synchronized(titleWordMap) {
-                for ((index, str) in displayName.split(" ").withIndex()) {
+
+                for ((index, str) in json["displayname"].asString.split(" ").withIndex()) {
                     val cleanedStr = str.cleanString()
                     val internalMap = titleWordMap.getOrPut(cleanedStr) { TreeMap() }
                     val indexList = internalMap.getOrPut(internalName) { mutableListOf() }
@@ -162,11 +137,19 @@ object EnoughUpdatesManager {
                 }
             }
         }
-        return itemJson
-    }.getOrNull()
+        return json
+    }
 
-    fun getItemById(id: String): NeuItemJson? = itemMap[id.toInternalName()]
-    fun getItemById(internalName: NeuInternalName): NeuItemJson? = itemMap[internalName]
+    fun registerRecipe(recipe: PrimitiveRecipe) {
+        for (internalName in recipe.outputs) {
+            val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
+            recipeSet.add(recipe)
+        }
+    }
+
+    fun getItemById(id: String): JsonObject? {
+        return itemMap[id]
+    }
 
     fun stackToJson(stack: ItemStack): JsonObject {
         val tag = stack.tagCompound ?: NBTTagCompound()
@@ -191,51 +174,56 @@ object EnoughUpdatesManager {
         return json
     }
 
-    fun neuItemToStack(neuItem: NeuItemJson, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack =
-        neuItem.toStack(useCache, useReplacements)
+    private val nbtListRegex = Regex("([\\[,])\\d+:")
 
-    private fun NeuItemJson?.toStack(
-        useCache: Boolean = true,
-        useReplacements: Boolean = false
-    ): ItemStack {
-        //#if MC < 1.21
-        this ?: return ItemStack(Items.painting)
-        //#else
-        //$$ this ?: return ItemStack(Items.PAINTING)
-        //#endif
-
-        var usingCache = useCache && !useReplacements
-        if (internalName.asString() == "_") usingCache = false
-        if (usingCache) itemStackCache[internalName]?.let { return it.copy() }
-
-        //#if MC < 1.21
-        val defaultStack = ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
-        val baseItem = itemId.getVanillaItem() ?: return defaultStack
-        //#else
-        //$$ val lDamage = this.damage ?: 0
-        //$$ val defaultStack = ItemStack(Blocks.STONE.asItem())
-        //$$ val baseItem = ComponentUtils.convertMinecraftIdToModern(itemId, lDamage).getVanillaItem() ?: run {
-        //$$     ErrorManager.skyHanniError("Invalid itemId: $itemId with damage $lDamage")
-        //$$     return defaultStack
-        //$$ }
-        //#endif
-
-        val stack = ItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return defaultStack
-
-        count?.let { stack.stackSize = it }
-        //#if MC < 1.21
-        damage?.let { stack.itemDamage = it }
+    private fun convertNbtToJson(nbtString: String): NeuNbtInfoJson? {
+        var convertedNbt = nbtString
+        convertedNbt = convertedNbt.replace(nbtListRegex, "$1")
         try {
-            stack.tagCompound = this.nbtTag
-        } catch (_: Error) {}
-        //#else
-        //$$ ComponentUtils.convertToComponents(stack, neuNbt)
-        //#endif
+            val json = ConfigManager.gson.fromJson(convertedNbt, JsonObject::class.java)
+            val fromJson = ConfigManager.gson.fromJson(json, NeuNbtInfoJson::class.java)
+            return fromJson
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Error converting nbt to json", "malformed nbt" to convertedNbt, "original nbt" to nbtString)
+        }
+
+        return null
+    }
+
+    fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
+        //#if MC < 1.21
+        json ?: return ItemStack(Items.painting)
+        var usingCache = useCache && !useReplacements
+        val internalName = json["internalname"].asString
+        if (internalName == "_") usingCache = false
+
+        if (usingCache) {
+            val cachedStack = itemStackCache[internalName]
+            if (cachedStack != null) return cachedStack.copy()
+        }
+
+        // todo modern doesnt have the "meta" number
+        val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255))
+        stack.item ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
+
+        json["count"]?.asInt?.let { stack.stackSize = it }
+        json["damage"]?.asInt?.let { stack.itemDamage = it }
+        try {
+            val nbtString = json["nbttag"]?.let { rawJsonNbt ->
+                if (rawJsonNbt.isJsonObject) rawJsonNbt.toString()
+                else rawJsonNbt.asString
+            }
+            val tag = JsonToNBT.getTagFromJson(nbtString)
+            stack.tagCompound = tag
+        } catch (_: Exception) {
+            println("json was malformed: ${json["nbttag"]}")
+            println("whole json: $json")
+        }
 
         var replacements = mapOf<String, String>()
         if (useReplacements) {
-            replacements = stack.getPetLoreReplacements()
-            displayName?.let {
+            replacements = getPetLoreReplacements(stack, -1)
+            json["displayname"]?.asString?.let {
                 var name = it
                 for ((key, value) in replacements) {
                     name = name.replace("{$key}", value)
@@ -244,112 +232,231 @@ object EnoughUpdatesManager {
             }
         }
 
-        lore.takeIfNotEmpty()?.let { stack.setLore(processLore(lore, replacements)) }
+        json["lore"]?.asJsonArray?.let { lore ->
+            val displayTag = stack.tagCompound?.getCompoundTag("display") ?: NBTTagCompound()
+            displayTag.setTag("Lore", processLore(lore, replacements))
+            val tag = stack.tagCompound ?: NBTTagCompound()
+            tag.setTag("display", displayTag)
+            stack.tagCompound = tag
+        }
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
+        //#else
+        //$$ json ?: return ItemStack(Items.PAINTING)
+        //$$ var usingCache = useCache && !useReplacements
+        //$$ val internalName = json["internalname"].asString
+        //$$ if (internalName == "_") usingCache = false
+        //$$
+        //$$ if (usingCache) {
+        //$$     val cachedStack = itemStackCache[internalName]
+        //$$     if (cachedStack != null) return cachedStack.copy()
+        //$$ }
+        //$$
+        //$$ val damage = json["damage"]?.asInt ?: 0
+        //$$ val item: Item = ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
+        //$$     println(json["itemid"].asString + " " + damage + " is invalid item")
+        //$$     return ItemStack(Blocks.STONE.asItem())
+        //$$ }
+        //$$ val stack = ItemStack(item)
+        //$$ if (stack.item == Items.AIR) {
+        //$$     return ItemStack(Blocks.STONE.asItem())
+        //$$ }
+        //$$
+        //$$ json["count"]?.asInt?.let { stack.count = it }
+        //$$
+        //$$
+        //$$ if (json["nbttag"]?.isJsonObject == false) {
+        //$$     json["nbttag"]?.asString?.let { nbt ->
+        //$$         ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
+        //$$     }
+        //$$ } else {
+        //$$     val neuNbtInfoJson = ConfigManager.gson.fromJson(json["nbttag"], NeuNbtInfoJson::class.java)
+        //$$     ComponentUtils.convertToComponents(stack, neuNbtInfoJson)
+        //$$ }
+        //$$
+        //$$ var replacements = mapOf<String, String>()
+        //$$ if (useReplacements) {
+        //$$     replacements = getPetLoreReplacements(stack, -1)
+        //$$     json["displayname"]?.asString?.let {
+        //$$         var name = it
+        //$$         for ((key, value) in replacements) {
+        //$$             name = name.replace("{$key}", value)
+        //$$         }
+        //$$         stack.setCustomItemName(name)
+        //$$     }
+        //$$ }
+        //$$
+        //$$ json["lore"]?.asJsonArray?.let { lore ->
+        //$$     val loreList: MutableList<String> = mutableListOf()
+        //$$     for (nbtElement in processLore(lore, replacements)) {
+        //$$         loreList.add(nbtElement.asString().get())
+        //$$     }
+        //$$
+        //$$     stack.setLore(loreList)
+        //$$ }
+        //$$
+        //$$ if (usingCache) itemStackCache[internalName] = stack
+        //$$ return stack.copy()
+        //#endif
     }
 
-    private fun ItemStack?.getPetLoreReplacements(): Map<String, String> {
-        val petInfo = this?.getPetInfo() ?: return emptyMap()
-        val properInternalName = petInfo.type
-        // We let PetData do the heavy lifting of parsing the pet info
-        val petData = PetData(petInfo)
-        return buildMap {
-            put("LVL", petData.getLevelReplacement(properInternalName))
-            val raritySpecific = neuPetNums?.get(properInternalName)?.get(petData.rarity) ?: return@buildMap
-            if (petData.level == 0) addUnlevelledStatReplacements(raritySpecific)
-            else addLevelledStatReplacements(petData, raritySpecific)
-        }
-    }
+    private fun getPetLoreReplacements(stack: ItemStack?, level: Int): Map<String, String> {
+        stack?.tagCompound ?: return emptyMap()
+        var petName: String? = null
+        var tier: String? = null
 
-    private fun PetData.getLevelReplacement(properInternalName: String): String {
-        return if (level != 0) level.toString()
-        else neuPetsJson?.customPetLeveling?.get(properInternalName)?.let { petLeveling ->
-            val maxLevel = petLeveling.maxLevel ?: 100
-            "1➡$maxLevel"
-        } ?: "1➡100"
-    }
-
-    /**
-     * Displays stat ranges for pets in the case there is not a static level to check stats of.
-     */
-    private fun MutableMap<String, String>.addUnlevelledStatReplacements(nums: NEURaritySpecificPetNums) {
-        val otherNumsMin = nums.min.otherNums
-        val otherNumsMax = nums.max.otherNums
-
-        val addZero = nums.statLevellingType == 1
-
-        for (i in 0..otherNumsMax.size) {
-            val start = if (addZero) "0➡" else ""
-            this[i.toString()] = "$start${otherNumsMin[i]}➡${otherNumsMax[i]}"
-        }
-
-        for ((stat, statMax) in nums.max.statNums) {
-            val statMin = nums.min.statNums[stat] ?: continue
-            val start = "${if (addZero) "0➡" else ""}${if (statMin > 0) "+" else ""}"
-            this[stat.name] = "$start$statMin➡$statMax"
-        }
-    }
-
-    /**
-     * Adds 'true' calculated stats based on pet level.
-     */
-    private fun MutableMap<String, String>.addLevelledStatReplacements(petData: PetData, nums: NEURaritySpecificPetNums) {
-        val level = petData.level
-        val otherNumsMin = nums.min.otherNums
-        val otherNumsMax = nums.max.otherNums
-
-        val minStatLevel = nums.minStatsLevel ?: 0
-        val maxStatLevel = nums.maxStatsLevel ?: 100
-        val statLevellingType = nums.statLevellingType ?: -1
-        val statsLevel = if (statLevellingType in 0..1) {
-            if (level < minStatLevel) 1
-            else if (level < maxStatLevel) level - minStatLevel + 1
-            else maxStatLevel - minStatLevel + 1
-        } else level
-
-        val minMix = (maxStatLevel - (minStatLevel - (if (statLevellingType == -1) 0 else 1)) - statsLevel) / 99f
-        val maxMix = (statsLevel - 1) / 99f
-        for (i in otherNumsMax.indices) {
-            val num = otherNumsMin[i] * minMix + otherNumsMax[i] * maxMix
-            this[i.toString()] = if (statLevellingType == 1 && level < minStatLevel) "0"
-            else (floor(num * 10) / 10f).removeUnusedDecimal()
-        }
-
-        for ((stat, statMax) in nums.max.statNums) {
-            this[stat.name] = if (statLevellingType == 1 && level < minStatLevel) "0"
-            else {
-                val statMin = nums.min.statNums[stat] ?: continue
-                val num = statMin * minMix + statMax * maxMix
-                val baseFormat = (if (statMin > 0) "+" else "")
-                baseFormat + (floor(num * 10) / 10).removeUnusedDecimal()
+        val extraAttributes = stack.extraAttributes
+        if (extraAttributes.hasKey("petInfo")) {
+            val petInfoStr = extraAttributes.getString("petInfo")
+            val petInfo = ConfigManager.gson.fromJson(petInfoStr, JsonObject::class.java)
+            petName = petInfo["name"]?.asString
+            tier = petInfo["tier"]?.asString
+            petInfo["heldItem"]?.asString?.let { it == "PET_ITEM_TIER_BOOST" }?.let {
+                tier = when (tier) {
+                    "COMMON" -> "UNCOMMON"
+                    "UNCOMMON" -> "RARE"
+                    "RARE" -> "EPIC"
+                    "EPIC" -> "LEGENDARY"
+                    else -> "MYTHIC"
+                }
             }
         }
+
+        return getPetLoreReplacements(petName, tier, level)
     }
 
-    private fun processLore(lore: List<String>, replacements: Map<String, String>): List<String> = buildList {
-        lore.onEach { line ->
-            var replacedLine = line
+    private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map<String, String> {
+
+        val replacements = mutableMapOf<String, String>()
+
+        if (level != -1) {
+            replacements["LVL"] = level.toString()
+        } else {
+            neuPetsJson?.customPetLeveling?.get(petName)?.let { petLeveling ->
+                val maxLevel = petLeveling.maxLevel ?: 100
+                replacements["LVL"] = "1➡$maxLevel"
+            } ?: run { replacements["LVL"] = "1➡100" }
+        }
+
+        if (petName == null || tier == null) return replacements
+
+        val petNums = neuPetNums ?: return replacements
+        petNums[petName]?.asJsonObject?.let { petInfo ->
+            petInfo[tier]?.asJsonObject?.let { petInfoTier ->
+                val min = petInfoTier["1"]?.asJsonObject ?: return replacements
+                val max = petInfoTier["100"]?.asJsonObject ?: return replacements
+
+                if (level < 1) {
+                    val otherNumsMin = min["otherNums"]?.asJsonArray ?: return replacements
+                    val otherNumsMax = max["otherNums"]?.asJsonArray ?: return replacements
+                    var addZero = false
+                    petInfoTier["stats_levelling_curve"]?.asString?.split(":")?.let { split ->
+                        if (split.size == 3 && split[2].toInt() == 1) {
+                            addZero = true
+                        }
+                    }
+                    for (i in 0..otherNumsMax.size()) {
+                        val start = if (addZero) "0➡" else ""
+                        replacements[i.toString()] = "$start${otherNumsMin[i].asDouble}➡${otherNumsMax[i].asDouble}"
+                    }
+                    for (entry in max["statNums"].asJsonObject.entrySet()) {
+                        val statMax = entry.value.asDouble
+                        val statMin = min["statNums"].asJsonObject[entry.key].asDouble
+                        val start = "${if (addZero) "0➡" else ""}${if (statMin > 0) "+" else ""}"
+                        replacements[entry.key] = "$start$statMin➡$statMax"
+                    }
+                } else {
+                    var minStatsLevel = 0
+                    var maxStatsLevel = 100
+                    var statLevelingType = -1
+
+                    var statsLevel = level
+
+                    petInfoTier["stats_levelling_curve"]?.asString?.split(":")?.let { split ->
+                        if (split.size == 3) {
+                            minStatsLevel = split[0].toInt()
+                            maxStatsLevel = split[1].toInt()
+                            statLevelingType = split[2].toInt()
+
+                            if (statLevelingType in 0..1) {
+                                statsLevel = if (level < minStatsLevel) {
+                                    1
+                                } else if (level < maxStatsLevel) {
+                                    level - minStatsLevel + 1
+                                } else {
+                                    maxStatsLevel - minStatsLevel + 1
+                                }
+                            }
+                        }
+                    }
+
+                    val minMix = (maxStatsLevel - (minStatsLevel - (if (statLevelingType == -1) 0 else 1)) - statsLevel) / 99f
+                    val maxMix = (statsLevel - 1) / 99f
+
+                    val otherNumsMin = min["otherNums"].asJsonArray
+                    val otherNumsMax = max["otherNums"].asJsonArray
+                    for (i in 0 until otherNumsMax.size()) {
+                        val num = otherNumsMin[i].asFloat * minMix + otherNumsMax[i].asFloat * maxMix
+                        if (statLevelingType == 1 && level < minStatsLevel) {
+                            replacements[i.toString()] = "0"
+                        } else {
+                            replacements[i.toString()] = (floor((num * 10).toDouble()) / 10f).removeUnusedDecimal()
+                        }
+                    }
+
+                    for ((key, value) in max["statNums"].asJsonObject.entrySet()) {
+                        if (statLevelingType == 1 && level < minStatsLevel) {
+                            replacements[key] = "0"
+                        } else {
+                            val statMax = value.asFloat
+                            val statMin = min["statNums"].asJsonObject[key].asFloat
+                            val num = statMin * minMix + statMax * maxMix
+                            val statStr = (if (statMin > 0) "+" else "") + (floor((num * 10).toDouble()) / 10).removeUnusedDecimal()
+                            replacements[key] = statStr
+                        }
+                    }
+                }
+            }
+        }
+
+        return replacements
+    }
+
+    private fun processLore(lore: JsonArray, replacements: Map<String, String>): NBTTagList {
+        val loreList = NBTTagList()
+        for (line in lore) {
+            val loreLine = line.asString
             for ((key, value) in replacements) {
-                replacedLine = replacedLine.replace("{$key}", value)
+                loreLine.replace("{$key}", value)
             }
-            add(replacedLine)
+            //#if MC < 1.21
+            loreList.appendTag(NBTTagString(loreLine))
+            //#else
+            //$$ loreList.add(NbtString.of(loreLine))
+            //#endif
+        }
+        return loreList
+    }
+
+    fun getDisplayName(internalName: String): String {
+        return displayNameCache.getOrPut(internalName) {
+            val itemInfo = getItemById(internalName) ?: return@getOrPut internalName
+            itemInfo["displayname"]?.asString ?: run {
+                ErrorManager.skyHanniError("No displayname for $internalName")
+            }
         }
     }
 
-    fun getDisplayName(internalName: NeuInternalName): String = displayNameCache.getOrPut(internalName) {
-        // Intentionally toString() instead of asString() to indicate failure
-        val itemInfo = getItemById(internalName) ?: return@getOrPut internalName.toString()
-        itemInfo.displayName ?: run {
-            ErrorManager.skyHanniError("No displayname for $internalName")
-        }
+    private fun itemCountInRepoFolder(): Int {
+        val itemsFolder = File(repoDirectory, "items")
+        return itemsFolder.listFiles()?.size ?: 0
     }
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         neuPetsJson = event.getConstant<NeuPetsJson>("pets")
-        neuPetNums = event.getConstant<NeuPetNumsJson>("petnums")
+        neuPetNums = event.getConstant<JsonObject>("petnums")
         if (itemMap.isNotEmpty()) {
             ChatUtils.chat("Reloaded ${itemMap.size.addSeparators()} items in the NEU repo")
         }
@@ -357,7 +464,7 @@ object EnoughUpdatesManager {
 
     fun reportItemStatus() {
         val loadedItems = itemMap.size
-        val directorySize = itemsFolder.listFiles()?.size ?: 0
+        val directorySize = itemCountInRepoFolder()
 
         val status = when {
             directorySize == 0 -> "§cNo items directory found!"

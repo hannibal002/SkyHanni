@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.api.enoughupdates
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -11,8 +10,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -44,7 +41,7 @@ class ItemResolutionQuery {
     //$$ private var compound: ComponentMap? = null
     //#endif
     private var itemType: Item? = null
-    private var knownInternalName: NeuInternalName? = null
+    private var knownInternalName: String? = null
     private var guiContext: GuiScreen? = null
 
     @SkyHanniModule
@@ -77,7 +74,7 @@ class ItemResolutionQuery {
             return hypixelId.replace(":", "-")
         }
 
-        fun findInternalNameByDisplayName(displayName: String, mayBeMangled: Boolean): NeuInternalName? {
+        fun findInternalNameByDisplayName(displayName: String, mayBeMangled: Boolean): String? {
             return filterInternalNameCandidates(
                 findInternalNameCandidatesForDisplayName(displayName),
                 displayName,
@@ -89,7 +86,7 @@ class ItemResolutionQuery {
             candidateInternalNames: Collection<String>,
             displayName: String,
             mayBeMangled: Boolean,
-        ): NeuInternalName? {
+        ): String? {
             var itemName = displayName
             val isPet = itemName.contains("[Lvl ")
             var petRarity: String? = null
@@ -101,9 +98,9 @@ class ItemResolutionQuery {
                 }
             }
             val cleanDisplayName = itemName.removeColor()
-            var bestMatch: NeuInternalName? = null
+            var bestMatch: String? = null
             var bestMatchLength = -1
-            for (internalName in candidateInternalNames.map { it.toInternalName() }) {
+            for (internalName in candidateInternalNames) {
                 val unCleanItemDisplayName: String = EnoughUpdatesManager.getDisplayName(internalName)
                 var cleanItemDisplayName = unCleanItemDisplayName.removeColor()
                 if (cleanItemDisplayName.isEmpty()) continue
@@ -149,13 +146,13 @@ class ItemResolutionQuery {
             return candidates
         }
 
-        fun resolveEnchantmentByName(displayName: String): NeuInternalName? =
+        fun resolveEnchantmentByName(displayName: String): String? =
             UtilsPatterns.enchantmentNamePattern.matchMatcher(displayName) {
                 val name = group("name").trim().replace("'", "")
                 val ultimate = group("format").lowercase().contains("§l")
                 val prefix = if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else ""
                 val cleanedEnchantName = name.renamedEnchantmentCheck().replace(" ", "_").replace("-", "_").uppercase()
-                "$prefix$cleanedEnchantName;${group("level").romanToDecimal()}".uppercase().toInternalName()
+                "$prefix$cleanedEnchantName;${group("level").romanToDecimal()}".uppercase()
             }
 
         private fun String.renamedEnchantmentCheck(): String = renamedEnchantments[this] ?: this
@@ -174,7 +171,7 @@ class ItemResolutionQuery {
         return this
     }
 
-    fun withKnownInternalName(internalName: NeuInternalName): ItemResolutionQuery {
+    fun withKnownInternalName(internalName: String): ItemResolutionQuery {
         this.knownInternalName = internalName
         return this
     }
@@ -184,24 +181,32 @@ class ItemResolutionQuery {
         return this
     }
 
-    fun resolveInternalName(): NeuInternalName? {
-        knownInternalName?.let { return it }
-        val resolvedName = resolveFromSkyblock() ?: return resolveContextualName()
-        return when (resolvedName.asString()) {
-            "PET" -> resolvePetName()
-            "RUNE", "UNIQUE_RUNE" -> resolveRuneName()
-            "ENCHANTED_BOOK" -> resolveEnchantedBookNameFromNBT()
-            "PARTY_HAT_CRAB", "PARTY_HAT_CRAB_ANIMATED" -> resolveCrabHatName()
-            "ABICASE" -> resolvePhoneCase()
-            "PARTY_HAT_SLOTH" -> resolveSlothHatName()
-            "POTION" -> resolvePotionName()
-            "BALLOON_HAT_2024", "BALLOON_HAT_2025" -> resolveBalloonHatName()
-            "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
-            else -> resolvedName
+    fun resolveInternalName(): String? {
+        knownInternalName?.let {
+            return it
         }
+        var resolvedName = resolveFromSkyblock()
+        resolvedName = if (resolvedName == null) {
+            resolveContextualName()
+        } else {
+            when (resolvedName) {
+                "PET" -> resolvePetName()
+                "RUNE", "UNIQUE_RUNE" -> resolveRuneName()
+                "ENCHANTED_BOOK" -> resolveEnchantedBookNameFromNBT()
+                "PARTY_HAT_CRAB", "PARTY_HAT_CRAB_ANIMATED" -> resolveCrabHatName()
+                "ABICASE" -> resolvePhoneCase()
+                "PARTY_HAT_SLOTH" -> resolveSlothHatName()
+                "POTION" -> resolvePotionName()
+                "BALLOON_HAT_2024", "BALLOON_HAT_2025" -> resolveBalloonHatName()
+                "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
+                else -> resolvedName
+            }
+        }
+
+        return resolvedName
     }
 
-    private fun resolvePetName(): NeuInternalName? {
+    private fun resolvePetName(): String? {
         val petInfo = getExtraAttributes().getString("petInfo")
         if (petInfo.isNullOrEmpty()) return null
         try {
@@ -209,8 +214,7 @@ class ItemResolutionQuery {
             val petId = petInfoObject["type"].asString
             val petTier = petInfoObject["tier"].asString
             val rarityIndex = petRarities.indexOf(petTier)
-            val rawInternalName = petId.uppercase() + ";" + rarityIndex
-            return rawInternalName.toInternalName()
+            return petId.uppercase() + ";" + rarityIndex
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error while resolving pet information",
@@ -220,45 +224,42 @@ class ItemResolutionQuery {
         }
     }
 
-    private fun resolveRuneName(): NeuInternalName? {
+    private fun resolveRuneName(): String? {
         val runes = getExtraAttributes().getCompoundTag("runes")
         val runeName = runes.keySet.singleOrNull()
         if (runeName.isNullOrEmpty()) return null
-        val rawInternalName = runeName.uppercase() + "_RUNE;" + runes.getInteger(runeName)
-        return rawInternalName.toInternalName()
+        return runeName.uppercase() + "_RUNE;" + runes.getInteger(runeName)
     }
 
-    private fun resolveEnchantedBookNameFromNBT(): NeuInternalName? {
+    private fun resolveEnchantedBookNameFromNBT(): String? {
         val enchantments = getExtraAttributes().getCompoundTag("enchantments")
         val enchantName = enchantments.keySet.singleOrNull()
         if (enchantName.isNullOrEmpty()) return null
-        val rawInternalName = enchantName.uppercase() + ";" + enchantments.getInteger(enchantName)
-        return rawInternalName.toInternalName()
+        return enchantName.uppercase() + ";" + enchantments.getInteger(enchantName)
     }
 
-    private fun resolveCrabHatName(): NeuInternalName {
+    private fun resolveCrabHatName(): String {
         val crabHatYear = getExtraAttributes().getInteger("party_hat_year")
         val color = getExtraAttributes().getString("party_hat_color")
-        val rawInternalName = "PARTY_HAT_CRAB_" + color.uppercase() + (if (crabHatYear == 2022) "_ANIMATED" else "")
-        return rawInternalName.toInternalName()
+        return "PARTY_HAT_CRAB_" + color.uppercase() + (if (crabHatYear == 2022) "_ANIMATED" else "")
     }
 
-    private fun resolvePhoneCase(): NeuInternalName {
+    private fun resolvePhoneCase(): String {
         val model = getExtraAttributes().getString("model")
-        return ("ABICASE_" + model.uppercase()).toInternalName()
+        return "ABICASE_" + model.uppercase()
     }
 
-    private fun resolveSlothHatName(): NeuInternalName {
+    private fun resolveSlothHatName(): String {
         val emoji = getExtraAttributes().getString("party_hat_emoji")
-        return ("PARTY_HAT_SLOTH_" + emoji.uppercase()).toInternalName()
+        return "PARTY_HAT_SLOTH_" + emoji.uppercase()
     }
 
-    private fun resolvePotionName(): NeuInternalName {
+    private fun resolvePotionName(): String {
         val potion = getExtraAttributes().getString("potion")
         val potionLvl = getExtraAttributes().getInteger("potion_level")
         val potionName = getExtraAttributes().getString("potion_name").replace(" ", "_")
         val potionType = getExtraAttributes().getString("potion_type")
-        val rawInternalName = if (potionName.isNotEmpty()) {
+        return if (potionName.isNotEmpty()) {
             "POTION_" + potionName.uppercase() + ";" + potionLvl
         } else if (!potion.isNullOrEmpty()) {
             "POTION_" + potion.uppercase() + ";" + potionLvl
@@ -267,25 +268,22 @@ class ItemResolutionQuery {
         } else {
             "WATER_BOTTLE"
         }
-        return rawInternalName.toInternalName()
     }
 
-    private fun resolveBalloonHatName(): NeuInternalName {
+    private fun resolveBalloonHatName(): String {
         val color = getExtraAttributes().getString("party_hat_color")
         val balloonHatYear = getExtraAttributes().getInteger("party_hat_year")
-        val rawInternalName = "BALLOON_HAT_" + balloonHatYear + "_" + color.uppercase()
-        return rawInternalName.toInternalName()
+        return "BALLOON_HAT_" + balloonHatYear + "_" + color.uppercase()
     }
 
-    private fun resolveAttributeShardName(): NeuInternalName? {
+    private fun resolveAttributeShardName(): String? {
         val attributes = getExtraAttributes().getCompoundTag("attributes")
         val attributeName = attributes.keySet.singleOrNull()
         if (attributeName.isNullOrEmpty()) return null
-        val rawInternalName = "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getInteger(attributeName)
-        return rawInternalName.toInternalName()
+        return "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getInteger(attributeName)
     }
 
-    private fun resolveItemInCatacombsRngMeter(): NeuInternalName? {
+    private fun resolveItemInCatacombsRngMeter(): String? {
         val lore = compound.getLore()
         if (lore.size > 16) {
             val s = lore[15]
@@ -298,18 +296,18 @@ class ItemResolutionQuery {
         return null
     }
 
-    private fun resolveItemInAttributeMenu(lore: List<String>): NeuInternalName? {
+    private fun resolveItemInAttributeMenu(lore: List<String>): String? {
         UtilsPatterns.attributeSourcePattern.firstMatcher(lore) {
-            return attributeNameToInternalName(group("source"))?.toInternalName()
+            return attributeNameToInternalName(group("source"))
         }
         return null
     }
 
-    private fun resolveItemInHuntingBoxMenu(displayName: String): NeuInternalName? {
-        return attributeNameToInternalName(displayName.removeColor())?.toInternalName()
+    private fun resolveItemInHuntingBoxMenu(displayName: String): String? {
+        return attributeNameToInternalName(displayName.removeColor())
     }
 
-    private fun resolveContextualName(): NeuInternalName? {
+    private fun resolveContextualName(): String? {
         val chest = guiContext as? GuiChest ?: return null
         val inventorySlots = chest.inventorySlots as ContainerChest
         val guiName = InventoryUtils.openInventoryName()
@@ -322,25 +320,29 @@ class ItemResolutionQuery {
         if (itemType === Items.skull && displayName.contains("Essence")) {
             findInternalNameByDisplayName(displayName, false)?.let { return it }
         }
-
-        return if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
-            var enchantmentIdCandidate: NeuInternalName? = null
+        if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
             for (loreLine in compound.getLore()) {
-                enchantmentIdCandidate = resolveEnchantmentByName(loreLine)
-                if (enchantmentIdCandidate != null) break
+                val enchantmentIdCandidate = resolveEnchantmentByName(loreLine)
+                if (enchantmentIdCandidate != null) return enchantmentIdCandidate
             }
-            enchantmentIdCandidate
-        } else if (guiName == "Catacombs RNG Meter") {
-            resolveItemInCatacombsRngMeter()
-        } else if (guiName.startsWith("Choose Pet")) {
-            findInternalNameByDisplayName(displayName, false)
-        } else if (guiName.endsWith("Experimentation Table RNG")) {
-            resolveEnchantmentByName(displayName)
-        } else if (guiName == "Attribute Menu") {
-            resolveItemInAttributeMenu(compound.getLore())
-        } else if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
-            resolveItemInHuntingBoxMenu(displayName)
-        } else null
+            return null
+        }
+        if (guiName == "Catacombs RNG Meter") {
+            return resolveItemInCatacombsRngMeter()
+        }
+        if (guiName.startsWith("Choose Pet")) {
+            return findInternalNameByDisplayName(displayName, false)
+        }
+        if (guiName.endsWith("Experimentation Table RNG")) {
+            return resolveEnchantmentByName(displayName)
+        }
+        if (guiName == "Attribute Menu") {
+            return resolveItemInAttributeMenu(compound.getLore())
+        }
+        if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
+            return resolveItemInHuntingBoxMenu(displayName)
+        }
+        return null
     }
 
     private fun isBazaar(chest: IInventory): Boolean {
@@ -358,19 +360,19 @@ class ItemResolutionQuery {
 
     private fun getExtraAttributes(): NBTTagCompound = compound?.extraAttributes ?: NBTTagCompound()
 
-    private fun resolveFromSkyblock(): NeuInternalName? {
+    private fun resolveFromSkyblock(): String? {
         val internalName = getExtraAttributes().getString("id")
         if (internalName.isNullOrEmpty()) return null
-        return internalName.uppercase().replace(":", "-").toInternalName()
+        return internalName.uppercase().replace(":", "-")
     }
 
-    private fun resolveToItemJson(): NeuItemJson? {
+    private fun resolveToItemListJson(): JsonObject? {
         val internalName = resolveInternalName() ?: return null
         return EnoughUpdatesManager.getItemById(internalName)
     }
 
     fun resolveToItemStack(): ItemStack? {
-        val neuItem = resolveToItemJson() ?: return null
-        return EnoughUpdatesManager.neuItemToStack(neuItem)
+        val json = resolveToItemListJson() ?: return null
+        return EnoughUpdatesManager.jsonToStack(json)
     }
 }

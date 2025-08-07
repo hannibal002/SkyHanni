@@ -186,7 +186,7 @@ object DebugCommand {
                 add(" neu repo location: default")
             }
 
-            add(" loaded neu items: ${NeuItems.allNeuRepoInternalNames().size}")
+            add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
         }
 
         val isRelevant = SkyHanniRepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
