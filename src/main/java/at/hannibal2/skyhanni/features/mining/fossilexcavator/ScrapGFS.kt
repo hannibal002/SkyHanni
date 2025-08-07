@@ -55,7 +55,6 @@ object ScrapGFS {
 
     private var uiDirty: Boolean = true
     private var susScrapInInventory by LazyVar { getSusScrapCurrentlyInInventory() }
-    private var fetchingFromSacks: Boolean = false
     private var renderable: Renderable? = null
     private var currentScrapRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private var lastScrollSound: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -159,7 +158,7 @@ object ScrapGFS {
                 color = lighterGray,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
             )
-            when(config.bzIfSacksEmpty) {
+            when (config.bzIfSacksEmpty) {
                 true -> Renderable.vertical {
                     add(baseNoScrapRenderable)
                     Renderable.link(
@@ -282,7 +281,7 @@ object ScrapGFS {
                 scale = 0.9
             ).let { add(it) }
             Renderable.text(
-                "$pre(${value})",
+                "$pre($value)",
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 scale = 0.8
             ).let { add(it) }
