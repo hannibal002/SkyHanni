@@ -292,6 +292,8 @@ object IslandGraphs {
     fun onTick(event: SkyHanniTickEvent) {
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
+
+            // TODO add dev config toggle to disable
             update()
         }
         updateFeedback()
