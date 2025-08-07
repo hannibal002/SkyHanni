@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
-import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -131,9 +131,6 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
-
-    @Suppress("CAST_NEVER_SUCCEEDS")
-    inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
     private val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
     private var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()

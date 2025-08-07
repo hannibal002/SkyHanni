@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackBounceDefinitio
 import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.init.Blocks

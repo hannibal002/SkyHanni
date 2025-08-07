@@ -118,7 +118,9 @@ object StorageApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
         if (!shouldSave) return
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.STORAGE, "Updated Items")
+        SkyHanniMod.launchCoroutine {
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.STORAGE, "Updated Items")
+        }
         shouldSave = false
     }
 

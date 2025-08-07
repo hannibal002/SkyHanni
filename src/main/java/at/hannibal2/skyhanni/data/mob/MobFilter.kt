@@ -55,12 +55,23 @@ object MobFilter {
 
     /**
      * REGEX-TEST: Wither Husk 500M❤
+     * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000❤
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
+        "(?:\\[Lv(?<level>\\d+)\\] )?(?<mobType>[^\\s✯]+)? ?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
-    val slayerNameFilter by patternGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
+
+    /**
+     * REGEX-TEST: ☠ Revenant Horror IV 1.5M❤
+     * REGEX-TEST: ☠ Atoned Horror 2M❤
+     * REGEX-TEST: ☠ Conjoined Brood 19.9M❤
+     * REGEX-FAIL: ☠ Atoned Ho 2M❤
+     */
+    val slayerNameFilter by patternGroup.pattern(
+        "filter.slayer",
+        "^. (?<name>.*)(?: (?<tier>[IV]+)|(?<=Atoned Horror|Conjoined Brood)) \\d+.*"
+    )
 
     /**
      * REGEX-TEST: ﴾ Storm ﴿
@@ -77,9 +88,10 @@ object MobFilter {
         "filter.boss",
         "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
     )
+    @Suppress("MaxLineLength")
     val dungeonNameFilter by patternGroup.pattern(
         "filter.dungeon",
-        "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
+        "^(?<mobType>[^\\s✯]+ )?(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
     )
     val summonFilter by patternGroup.pattern(
         "filter.summon",

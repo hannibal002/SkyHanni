@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.container.SearchableVerticalContainer
+import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableTable.Companion.searchableTable
 
 class Searchable(val renderable: Renderable, val string: String?)
 
