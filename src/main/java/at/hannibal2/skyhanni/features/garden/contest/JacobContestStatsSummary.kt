@@ -63,6 +63,7 @@ object JacobContestStatsSummary {
                 startTime = SimpleTimeMark.now()
             }
         }
+        blocksBroken.clear()
     }
 
     private fun getBlocksPerSecondColor(blocksPerSecond: Double) = if (blocksPerSecond > 19) "§c" else "§a"
