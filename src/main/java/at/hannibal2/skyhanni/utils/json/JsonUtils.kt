@@ -26,7 +26,7 @@ inline fun <reified T : Any> Gson.fromJsonOrNull(string: String): T? = runCatchi
 
 inline fun <reified T : Any> Gson.fromJson(jsonElement: JsonElement): T =
     this.fromJson(jsonElement, typeOf<T>().javaType)
-    
+
 inline fun <reified T : Any> Gson.fromJsonOrNull(jsonElement: JsonElement): T? = runCatching {
     this.fromJson<T>(jsonElement)
 }.getOrNull()
