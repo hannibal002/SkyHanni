@@ -30,9 +30,9 @@ object PestSpawnSound {
                 event.cancel()
                 repeatSpawnSound()
             }
-            PestSpawnConfig.PestSpawnSoundMode.MARIO -> {
+            PestSpawnConfig.PestSpawnSoundMode.PLUMBER -> {
                 event.cancel()
-                marioSpawnSound()
+                plumberSpawnSound()
             }
         }
         lastPestSpawnSound = SimpleTimeMark.now()
@@ -50,12 +50,12 @@ object PestSpawnSound {
         }
     }
 
-    private fun marioSpawnSound() {
+    private fun plumberSpawnSound() {
         if (lastPestSpawnSound.passedSince() < 5.seconds) return
-        playMarioTheme(config.sound.name)
+        playPlumberTheme(config.sound.name)
     }
 
-    private fun playMarioTheme(soundName: String) {
+    private fun playPlumberTheme(soundName: String) {
         SkyHanniMod.launchCoroutine {
             val noteE = createSound(soundName, 0.890899f)
             val noteC = createSound(soundName, 0.707107f)

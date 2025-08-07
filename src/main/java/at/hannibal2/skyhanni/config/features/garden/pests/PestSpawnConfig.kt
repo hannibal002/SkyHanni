@@ -32,7 +32,7 @@ class PestSpawnConfig {
         DEFAULT("Default"),
         MUTED("Muted"),
         CUSTOM("Custom"),
-        MARIO("Mario"),
+        PLUMBER("Plumber"),
         ;
 
         override fun toString() = displayName
