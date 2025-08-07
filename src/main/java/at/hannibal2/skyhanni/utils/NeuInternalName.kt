@@ -102,8 +102,7 @@ class NeuInternalName private constructor(private val internalName: String) {
 
     val isPet: Boolean
         get() = petCache.getOrPut(this) {
-            val isPetCategory = (getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET)
-            PetUtils.isKnownPetInternalName(this) || isPetCategory
+            PetUtils.isKnownPetInternalName(this) || (getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET)
         }
 
     private val isEnchantedBook: Boolean
