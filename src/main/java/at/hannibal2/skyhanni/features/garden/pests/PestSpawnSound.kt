@@ -57,15 +57,6 @@ object PestSpawnSound {
         playMarioTheme(config.sound.name)
     }
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("mario") {
-            description = "Delete before making the pr dumbass"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { marioSpawnSound() }
-        }
-    }
-
     private fun playMarioTheme(soundName: String, speed: Int = 1) {
         SkyHanniMod.launchCoroutine {
             if (speed == 0) return@launchCoroutine
