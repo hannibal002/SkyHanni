@@ -55,26 +55,25 @@ object PestSpawnSound {
         playMarioTheme(config.sound.name)
     }
 
-    private fun playMarioTheme(soundName: String, speed: Int = 1) {
+    private fun playMarioTheme(soundName: String) {
         SkyHanniMod.launchCoroutine {
             val noteE = createSound(soundName, 0.890899f)
             val noteC = createSound(soundName, 0.707107f)
             val noteG = createSound(soundName, 1.059463f)
             val noteLowG = createSound(soundName, 0.529732f)
 
-            if (speed == 0) return@launchCoroutine
             noteE.playSound()
-            delay((166 * 1 / speed).toLong())
+            delay((166).toLong())
             noteE.playSound()
-            delay((333 * 1 / speed).toLong())
+            delay((333).toLong())
             noteE.playSound()
-            delay((333 * 1 / speed).toLong())
+            delay((333).toLong())
             noteC.playSound()
-            delay((166 * 1 / speed).toLong())
+            delay((166).toLong())
             noteE.playSound()
-            delay((333 * 1 / speed).toLong())
+            delay((333).toLong())
             noteG.playSound()
-            delay((666 * 1 / speed).toLong())
+            delay((666).toLong())
             noteLowG.playSound()
         }
     }
