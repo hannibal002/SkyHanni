@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -59,20 +57,25 @@ object PestSpawnSound {
 
     private fun playMarioTheme(soundName: String, speed: Int = 1) {
         SkyHanniMod.launchCoroutine {
+            val noteE = createSound(soundName, 0.890899f)
+            val noteC = createSound(soundName, 0.707107f)
+            val noteG = createSound(soundName, 1.059463f)
+            val noteLowG = createSound(soundName, 0.529732f)
+
             if (speed == 0) return@launchCoroutine
-            createSound(soundName, 0.890899f).playSound()
+            noteE.playSound()
             delay((166 * 1 / speed).toLong())
-            createSound(soundName, 0.890899f).playSound()
+            noteE.playSound()
             delay((333 * 1 / speed).toLong())
-            createSound(soundName, 0.890899f).playSound()
+            noteE.playSound()
             delay((333 * 1 / speed).toLong())
-            createSound(soundName, 0.707107f).playSound()
+            noteC.playSound()
             delay((166 * 1 / speed).toLong())
-            createSound(soundName, 0.890899f).playSound()
+            noteE.playSound()
             delay((333 * 1 / speed).toLong())
-            createSound(soundName, 1.059463f).playSound()
+            noteG.playSound()
             delay((666 * 1 / speed).toLong())
-            createSound(soundName, 0.529732f).playSound()
+            noteLowG.playSound()
         }
     }
 
