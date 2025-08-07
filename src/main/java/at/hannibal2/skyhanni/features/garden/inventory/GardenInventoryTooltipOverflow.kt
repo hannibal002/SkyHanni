@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -36,7 +36,7 @@ object GardenInventoryTooltipOverflow {
 
         val split = stack.cleanName().split(" ")
         val crop = getCrop(split)
-        val counter = crop.getCounter()
+        val counter = crop.getMilestoneCounter()
 
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
         val (have, need) = getHaveNeed(currentTier, crop, counter)

@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
@@ -148,6 +149,26 @@ object HypixelData {
         "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
     )
 
+    /**
+     * REGEX-TEST: &aYou are playing on profile: &eZucchini&b (Co-op)
+     * REGEX-TEST: &aYou are playing on profile: &eBanana
+     */
+    private val profileJoinPattern by patternGroup.pattern(
+        "profile.join",
+        "&aYou are playing on profile: &e(?<profileName>\\w+)(?:&b \\((?<coop>Co-op)\\))?"
+    )
+
+    /**
+     * REGEX-TEST: &aYour profile was changed to: &eZucchini&b (Co-op)
+     * REGEX-TEST: &aYour profile was changed to: &eBanana
+     */
+    private val profileSwitchPattern by patternGroup.pattern(
+        "profile.switch",
+        "&aYour profile was changed to: &e(?<profileName>\\w+)(?:&b \\((?<coop>Co-op)\\))?"
+    )
+
+
+
     var lastLocRaw = SimpleTimeMark.farPast()
     private var hasScoreboardUpdated = false
     val connectedToHypixel get() = hypixelLive || hypixelAlpha
@@ -171,6 +192,8 @@ object HypixelData {
     var bingo = false
 
     var profileName = ""
+    var coop = false
+
     var joinedWorld = SimpleTimeMark.farPast()
 
     var skyBlockArea: String? = null
@@ -366,18 +389,27 @@ object HypixelData {
     fun onChat(event: SkyHanniChatEvent) {
         if (!SkyBlockUtils.onHypixel) return
 
-        val message = event.message.removeColor().lowercase()
-        if (message.startsWith("your profile was changed to:")) {
-            val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
+        profileSwitchPattern.matchMatcher(event.message) {
+            val coopGroup = group("coop").lowercase()
+            val newProfile = group("profile").lowercase()
+
             if (profileName == newProfile) return
             profileName = newProfile
+            coop = coopGroup == "co-op"
+
             ProfileJoinEvent(newProfile).post()
         }
-        if (message.startsWith("you are playing on profile:")) {
-            val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
+
+        profileJoinPattern.matchMatcher(event.message) {
+            val coopGroup = group("coop").lowercase()
+            val newProfile = group("profile").lowercase()
+
             ProfileStorageData.profileJoinMessage()
+
             if (profileName == newProfile) return
             profileName = newProfile
+            coop = coopGroup == "co-op"
+
             ProfileJoinEvent(newProfile).post()
         }
     }
@@ -391,6 +423,10 @@ object HypixelData {
             profileName = newProfile
             ProfileJoinEvent(newProfile).post()
         }
+    }
+
+    private fun checkCoop() {
+        coop = TabWidget.COOP.isActive
     }
 
     // TODO rewrite everything in here
@@ -480,6 +516,11 @@ object HypixelData {
             TabWidget.ISLAND -> countPlayersOnIsland(event)
             else -> Unit
         }
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland.isAnyOf(IslandType.PRIVATE_ISLAND, IslandType.GARDEN)) checkCoop()
     }
 
     private fun checkProfileName() {

@@ -30,6 +30,12 @@ class CropMilestonesConfig {
     val overflow: CropMilestonesOverflowConfig = CropMilestonesOverflowConfig()
 
     @Expose
+    @ConfigOption(name = "Show Without Tool", desc = "Show progress display when not holding a farming tool")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var showWithoutTool: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Warn When Close",
         desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +

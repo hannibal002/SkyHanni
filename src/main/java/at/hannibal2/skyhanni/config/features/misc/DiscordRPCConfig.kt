@@ -89,6 +89,8 @@ class DiscordRPCConfig {
         DYNAMIC("Dynamic"),
         CROP_MILESTONE("Crop Milestone"),
         CURRENT_PET("Current Pet"),
+        CROP_COLLECTION("Crop Collection"),
+        FARMING_WEIGHT("Farming Weight"),
         ;
 
         override fun toString() = displayName

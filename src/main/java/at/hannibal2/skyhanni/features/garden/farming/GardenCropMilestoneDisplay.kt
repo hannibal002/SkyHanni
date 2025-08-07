@@ -4,28 +4,26 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getTier
-import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
-import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.garden.CropCollectionAPI
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTier
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.garden.DisplayCropChange
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -47,7 +45,6 @@ object GardenCropMilestoneDisplay {
 
     private var progressDisplay = emptyList<Renderable>()
     private var mushroomCowPerkDisplay = emptyList<Renderable>()
-    private val cultivatingData = mutableMapOf<CropType, Long>()
     private val config get() = GardenApi.config.cropMilestones
     private val overflowConfig get() = config.overflow
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone
@@ -62,6 +59,8 @@ object GardenCropMilestoneDisplay {
     private var lastMushWarnedLevel = -1
     private var previousMushNext = 0
 
+    private var currentCrop: CropType? = null
+
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
@@ -74,7 +73,7 @@ object GardenCropMilestoneDisplay {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
 
@@ -95,7 +94,7 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onProfileJoin(event: ProfileJoinEvent) {
-        GardenCropMilestones.cropCounter?.let {
+        GardenCropMilestones.cropMilestoneCounter?.let {
             if (it.values.sum() == 0L) {
                 needsInventory = true
             }
@@ -109,41 +108,29 @@ object GardenCropMilestoneDisplay {
         update()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        try {
-            val item = event.itemStack
-            val counter = GardenApi.readCounter(item) ?: return
-            val crop = item.getCropType() ?: return
-            if (cultivatingData.containsKey(crop)) {
-                val old = cultivatingData[crop]!!
-                val addedCounter = (counter - old).toInt()
-                FarmingWeightDisplay.addCrop(crop, addedCounter)
-                update()
-                crop.setCounter(crop.getCounter() + addedCounter)
-            }
-            cultivatingData[crop] = counter
-        } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(e, "Updating crop counter by reading farming tool nbt data.")
-        }
+    @HandleEvent
+    fun onDisplayCropChange(event: DisplayCropChange) {
+        currentCrop = event.crop
+        update()
     }
 
     fun update() {
         progressDisplay = emptyList()
         mushroomCowPerkDisplay = emptyList()
         GardenBestCropTime.display = null
-        val currentCrop = GardenApi.getCurrentlyFarmedCrop()
-        currentCrop?.let {
+        val displayCrop =
+            currentCrop ?: if (config.showWithoutTool) CropCollectionAPI.lastGainedCrop else GardenApi.getCurrentlyFarmedCrop()
+        displayCrop?.let {
             progressDisplay = drawProgressDisplay(it)
         }
 
-        if (config.next.bestDisplay && config.next.bestAlwaysOn.get() || currentCrop != null) {
-            GardenBestCropTime.display = GardenBestCropTime.drawBestDisplay(currentCrop)
+        if (config.next.bestDisplay && config.next.bestAlwaysOn.get() || displayCrop != null) {
+            GardenBestCropTime.display = GardenBestCropTime.drawBestDisplay(displayCrop)
         }
     }
 
     private fun drawProgressDisplay(crop: CropType): List<Renderable> {
-        val counter = crop.getCounter()
+        val counter = crop.getMilestoneCounter()
         val lineMap = mutableMapOf<MilestoneTextEntry, Renderable>()
         lineMap[MilestoneTextEntry.TITLE] = Renderable.text("§6Crop Milestones")
 
@@ -269,8 +256,23 @@ object GardenCropMilestoneDisplay {
         )
     }
 
+    // TODO Dropdown Menu
     private fun formatDisplay(lineMap: MutableMap<MilestoneTextEntry, Renderable>): List<Renderable> {
         val newList = mutableListOf<Renderable>()
+        if (InventoryUtils.inInventory() || InventoryUtils.inContainer()) {
+            newList.add(
+                Renderable.clickable(
+                    "§7[§a${currentCrop ?: "Default"}§7]",
+                    tips = listOf("Click for next crop"),
+                    onLeftClick = {
+                        selectNextCrop()
+                        update()
+                        DisplayCropChange(currentCrop).post()
+                    }
+                )
+            )
+        }
+
         newList.addAll(config.text.mapNotNull { lineMap[it] })
 
         if (needsInventory) {
@@ -292,7 +294,7 @@ object GardenCropMilestoneDisplay {
         }
 
         val lineMap = HashMap<MushroomTextEntry, Renderable>()
-        val counter = mushroom.getCounter()
+        val counter = mushroom.getMilestoneCounter()
 
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, mushroom, allowOverflow)
         val nextTier = currentTier + 1
@@ -336,6 +338,13 @@ object GardenCropMilestoneDisplay {
 
         previousMushNext = nextTier
         mushroomCowPerkDisplay = config.mushroomPetPerk.text.mapNotNull { lineMap[it] }
+    }
+
+    private fun selectNextCrop() {
+        currentCrop = if (currentCrop == null) CropType.entries.first()
+        else currentCrop?.let { sb ->
+            CropType.entries.filter { it.ordinal > sb.ordinal }.minByOrNull { it.ordinal }
+        }
     }
 
     private fun isEnabled() = GardenApi.inGarden() && config.progress

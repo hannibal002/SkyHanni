@@ -1,19 +1,35 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.addCollectionCounter
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
+import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -42,7 +58,28 @@ object GardenCropMilestones {
         "§7Total: §a(?<name>.*)",
     )
 
+    /**
+     * REGEX-TEST:  Cocoa Beans 31: §r§a68%
+     * REGEX-TEST:  Potato 32: §r§a97.7%
+     */
+    @Suppress("MaxLineLength")
+    private val tabListPattern by patternGroup.pattern(
+        "tablist",
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%",
+    )
+
+
+    /**
+     * REGEX-TEST:   §r§b§lGARDEN MILESTONE §3Melon §845➜§346
+     */
+    private val levelUpPattern by patternGroup.pattern(
+        "levelup",
+        " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)",
+    )
+
     private val config get() = GardenApi.config.cropMilestones
+
+    private val storage get() = GardenApi.storage
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {
@@ -59,12 +96,50 @@ object GardenCropMilestones {
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
             totalPattern.firstMatcher(stack.getLore()) {
+                val oldAmount = crop.getMilestoneCounter()
                 val amount = group("name").formatLong()
-                crop.setCounter(amount)
+                val change = amount - oldAmount
+                forceUpdateMilestone(crop, change)
             }
         }
-        CropMilestoneUpdateEvent.post()
+        storage?.lastMilestoneFix = SimpleTimeMark.now()
         GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onChat(event: SkyHanniChatEvent) {
+        levelUpPattern.matchMatcher(event.message) {
+            val cropName = group("crop")
+            val crop = CropType.getByNameOrNull(cropName) ?: return
+
+            val tier = group("tier").romanToDecimalIfNecessary()
+
+            val crops = getCropsForTier(tier, crop)
+            changedValue(crop, crops, "level up chat message", 0)
+        }
+    }
+
+    @HandleEvent
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
+        tabListPattern.firstMatcher(event.lines) {
+            val tier = group("tier").toInt()
+            val percentage = group("percentage").toDouble()
+            val cropName = group("crop")
+
+            checkTabDifference(cropName, tier, percentage)
+        }
+    }
+
+    @HandleEvent
+    fun onCollectionAdd(event: CropCollectionAddEvent) {
+        val cropType = event.crop
+        val collectionType = event.cropCollectionType
+        val amount = event.amount
+
+        if (collectionType == CropCollectionType.UNKNOWN) return
+
+        cropType.addMilestoneCounter(amount)
     }
 
     fun onOverflowLevelUp(crop: CropType, oldLevel: Int, newLevel: Int) {
@@ -115,13 +190,19 @@ object GardenCropMilestones {
 
     var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-    val cropCounter: MutableMap<CropType, Long>? get() = GardenApi.storage?.cropCounter
+    val cropMilestoneCounter: MutableMap<CropType, Long>? get() = storage?.cropMilestoneCounter
 
     // TODO make nullable
-    fun CropType.getCounter() = cropCounter?.get(this) ?: 0
+    fun CropType.getMilestoneCounter() = cropMilestoneCounter?.get(this) ?: 0
 
-    fun CropType.setCounter(counter: Long) {
-        cropCounter?.set(this, counter)
+    private fun CropType.setMilestoneCounter(counter: Long) {
+        cropMilestoneCounter?.set(this, counter)
+        CropMilestoneUpdateEvent.post()
+    }
+
+    fun CropType.addMilestoneCounter(counter: Long) {
+        if (counter == 0L) return
+        this.setMilestoneCounter(this.getMilestoneCounter() + counter)
     }
 
     fun CropType.isMaxed(useOverflow: Boolean): Boolean {
@@ -129,14 +210,14 @@ object GardenCropMilestones {
 
         // TODO change 1b
         val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
-        return getCounter() >= maxValue
+        return getMilestoneCounter() >= maxValue
     }
 
     fun CropType.getTier(allowOverflow: Boolean = false): Int =
         getTierForCrop(this, allowOverflow)
 
     private fun getTierForCrop(crop: CropType, allowOverflow: Boolean = false): Int =
-        getTierForCropCount(crop.getCounter(), crop, allowOverflow)
+        getTierForCropCount(crop.getMilestoneCounter(), crop, allowOverflow)
 
     fun getTierForCropCount(count: Long, crop: CropType, allowOverflow: Boolean = false): Int {
         var tier = 0
@@ -200,11 +281,74 @@ object GardenCropMilestones {
     }
 
     fun CropType.progressToNextLevel(allowOverflow: Boolean = false): Double {
-        val progress = getCounter()
+        val progress = getMilestoneCounter()
         val startTier = getTierForCropCount(progress, this, allowOverflow)
         val startCrops = getCropsForTier(startTier, this, allowOverflow)
         val end = getCropsForTier(startTier + 1, this, allowOverflow)
         return (progress - startCrops).toDouble() / (end - startCrops)
+    }
+
+    private fun changedValue(crop: CropType, tabListValue: Long, source: String, minDiff: Int) {
+        val calculated = crop.getMilestoneCounter()
+        val diff = tabListValue - calculated
+
+        if (diff >= minDiff) {
+            forceUpdateMilestone(crop, diff)
+            storage?.lastMilestoneFix = SimpleTimeMark.now()
+            GardenCropMilestoneDisplay.update()
+            if (!loadedCrops.contains(crop)) {
+                ChatUtils.chat("Loaded ${crop.cropName} milestone data from $source!")
+                loadedCrops.add(crop)
+            }
+        } else if (diff <= minDiff) {
+            ChatUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
+        }
+    }
+
+    private fun checkTabDifference(cropName: String, tier: Int, percentage: Double) {
+        if (!ProfileStorageData.loaded) return
+
+        val crop = CropType.getByNameOrNull(cropName)
+        if (crop == null) {
+            ChatUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
+            return
+        }
+
+        val baseCrops = getCropsForTier(tier, crop)
+        val next = getCropsForTier(tier + 1, crop)
+        val progressCrops = next - baseCrops
+
+        val progress = progressCrops * (percentage / 100)
+        val smallestPercentage = progressCrops * 0.0005
+
+        val tabListValue = baseCrops + progress - smallestPercentage
+
+        val newValue = tabListValue.toLong()
+        if (tabListCropProgress[crop] != newValue && tabListCropProgress.containsKey(crop)) {
+            changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
+        }
+        tabListCropProgress[crop] = newValue
+    }
+
+    private fun forceUpdateMilestone(crop: CropType, amount: Long) {
+        if (amount == 0L) return
+        crop.addMilestoneCounter(amount)
+
+        val lastMilestoneFix = storage?.lastMilestoneFix ?: SimpleTimeMark.now()
+        val lastCollectionFix = storage?.lastCollectionFix?.get(crop) ?: SimpleTimeMark.farPast()
+
+        if (lastMilestoneFix > lastCollectionFix && !(HypixelData.coop)) {
+            crop.addCollectionCounter(CropCollectionType.UNKNOWN, amount)
+        }
+    }
+
+    private val tabListCropProgress = mutableMapOf<CropType, Long>()
+
+    private val loadedCrops = mutableListOf<CropType>()
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(70, "#profile.garden.cropCounter", "#profile.garden.cropMilestoneCounter")
     }
 
     @HandleEvent

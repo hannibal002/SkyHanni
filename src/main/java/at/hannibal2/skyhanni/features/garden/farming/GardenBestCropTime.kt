@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.NextConfig.BestTypeEntry
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -57,7 +57,7 @@ object GardenBestCropTime {
             val speed = crop.getSpeed() ?: continue
             if (crop.isMaxed(useOverflow)) continue
 
-            val counter = crop.getCounter()
+            val counter = crop.getMilestoneCounter()
             val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
 
             val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop)
@@ -86,7 +86,7 @@ object GardenBestCropTime {
             for ((crop, time) in timeTillNextCrop) {
                 if (crop.isMaxed(useOverflow)) continue
                 val currentTier =
-                    GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
+                    GardenCropMilestones.getTierForCropCount(crop.getMilestoneCounter(), crop, allowOverflow = true)
                 val gardenExpForTier = getGardenExpForTier(currentTier + 1)
                 val fakeTime = time / gardenExpForTier
                 helpMap[crop] = fakeTime.inWholeMilliseconds
@@ -137,7 +137,7 @@ object GardenBestCropTime {
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
+            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getMilestoneCounter(), crop, allowOverflow = true)
             val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
 
             val cropName = if (!config.next.bestCompact.get()) crop.cropName + " " else ""

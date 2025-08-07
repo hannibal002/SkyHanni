@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.uncleared
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.DUNG_ITEM
+import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.DUNG_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils

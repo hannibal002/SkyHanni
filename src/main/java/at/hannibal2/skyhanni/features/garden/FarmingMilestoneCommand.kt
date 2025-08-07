@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,7 +20,7 @@ object FarmingMilestoneCommand {
 
     private fun onCommand(crop: CropType, current: Int?, target: Int?, needsTime: Boolean) {
         if (current == null) {
-            val currentProgress = crop.getCounter()
+            val currentProgress = crop.getMilestoneCounter()
             val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, crop, allowOverflow = true) + 1
             val cropsForTier = GardenCropMilestones.getCropsForTier(currentCropMilestone, crop, allowOverflow = true)
             val output = (cropsForTier - currentProgress).formatOutput(needsTime, crop)
@@ -112,7 +112,7 @@ object FarmingMilestoneCommand {
                         val crop = getArg(cropArg)
                         val targetLevel = getArg(targetArg)
 
-                        val counter = crop.getCounter()
+                        val counter = crop.getMilestoneCounter()
                         val level = GardenCropMilestones.getTierForCropCount(counter, crop)
                         if (targetLevel <= level && targetLevel != 0) {
                             ChatUtils.userError(

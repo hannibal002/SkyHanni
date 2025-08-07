@@ -4,16 +4,18 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ActionBarStatsData
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
-import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
-import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.getCollection
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTierForCropCount
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxed
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
+import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -21,6 +23,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -56,9 +59,23 @@ val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
 
 var beenAfkFor = SimpleTimeMark.now()
 
+private fun getCropCollection(): String {
+    val crop = GardenApi.storage?.lastGainedCrop ?: return "Not Farming!"
+    val collection = crop.getCollection()
+    return "$crop Collection: ${collection.addSeparators()}"
+}
+
+private fun getFarmingWeight(): String {
+    val weight = FarmingWeightDisplay.weight
+    val leaderboard = FarmingWeightDisplay.leaderboardPosition
+    val lbString = if (leaderboard == -1) "" else "[#$leaderboard]"
+    if (weight == -1.0) return ""
+    return "Farming Weight: ${weight.roundTo(2).addSeparators()} $lbString"
+}
+
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
-    val cropCounter = crop?.getCounter()
+    val cropCounter = crop?.getMilestoneCounter()
     val allowOverflow = GardenApi.config.cropMilestones.overflow.discordRPC
     val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
     val progress = tier?.let {
@@ -267,6 +284,9 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     PETS({ getPetDisplay() }),
 
+    CROP_COLLECTION({ getCropCollection() }),
+
+    FARMING_WEIGHT({ getFarmingWeight() }),
     // Dynamic-only
     STACKING(
         {

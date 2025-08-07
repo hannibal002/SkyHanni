@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -143,14 +144,14 @@ object GardenApi {
     }
 
     private fun updateGardenTool() {
-        GardenToolChangeEvent(cropInHand, itemInHand).post()
+        GardenToolChangeEvent(cropInHand, itemInHand, toolInHand).post()
     }
 
     private fun checkItemInHand() {
         val toolItem = InventoryUtils.getItemInHand()
         val crop = toolItem?.getCropType()
         val newTool = getToolInHand(toolItem, crop)
-        if (toolInHand != newTool) {
+        if (itemInHand?.getItemUuid() != toolItem?.getItemUuid() && !(toolInHand == null && newTool == null)) {
             toolInHand = newTool
             cropInHand = crop
             itemInHand = toolItem
@@ -184,6 +185,10 @@ object GardenApi {
     }
 
     fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
+
+    fun readHoeCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter()
+
+    fun readCultivatingCounter(itemStack: ItemStack): Long? = itemStack.getCultivatingCounter()
 
     fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
