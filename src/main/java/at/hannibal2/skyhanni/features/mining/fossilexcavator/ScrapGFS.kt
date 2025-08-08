@@ -102,26 +102,11 @@ object ScrapGFS {
     private fun buildFinalRenderable() = Renderable.drawInsideRoundedRectWithOutline(
         Renderable.vertical(
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             spacing = 5,
         ) {
-            add(buildFetchButton())
-            Renderable.horizontal(spacing = 10, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
-                Renderable.vertical(
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    spacing = 3,
-                ) {
-                    add(buildIncrementStack(true))
-                    add(buildStaticSetButton("Minimum", LorenzColor.RED, validRange.first))
-                }.let { add(it) }
-                add(buildCurrentFetchContainer())
-                Renderable.vertical(
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    spacing = 3,
-                ) {
-                    add(buildIncrementStack(false))
-                    add(buildStaticSetButton("Maximum", LorenzColor.GREEN, validRange.last))
-                }.let { add(it) }
-            }.let { add(it) }
+            addFetchButton()
+            addCenterDisplay()
             addSackInfoFooter()
         },
         color = darkGray,
@@ -132,6 +117,16 @@ object ScrapGFS {
         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         padding = 5,
     )
+
+    private fun MutableList<Renderable>.addCenterDisplay() = Renderable.horizontal(
+        spacing = 10,
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+    ) {
+        addStaticSetButton("Minimum", LorenzColor.RED, validRange.first)
+        addCurrentFetchContainer()
+        addStaticSetButton("Maximum", LorenzColor.GREEN, validRange.last)
+    }.let { add(it) }
+
 
     private fun MutableList<Renderable>.addSackInfoFooter() = with(SackApi) {
         FossilExcavatorApi.scrapItem.getAmountInSacksOrNull()?.takeIf { it > 0 }?.let { scrapInSacks ->
@@ -176,7 +171,7 @@ object ScrapGFS {
         }
     }
 
-    private fun buildFetchButton() = Renderable.darkRectButton(
+    private fun MutableList<Renderable>.addFetchButton() = Renderable.darkRectButton(
         Renderable.text("Get Scrap from Sacks", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER, scale = 1.2),
         onClick = {
             SoundUtils.playClickSound()
@@ -184,9 +179,9 @@ object ScrapGFS {
             uiDirty = true
         },
         padding = 4,
-    )
+    ).let { add(it) }
 
-    private fun buildCurrentFetchContainer() = Renderable.clickableAndScrollable(
+    private fun MutableList<Renderable>.addCurrentFetchContainer() = Renderable.clickableAndScrollable(
         Renderable.drawInsideRoundedRectWithOutline(
             Renderable.vertical(
                 listOf(
@@ -213,7 +208,7 @@ object ScrapGFS {
             LEFT_MOUSE to { scrollWithStaggerSound(-1) },
             RIGHT_MOUSE to { scrollWithStaggerSound(1) },
         )
-    )
+    ).let { add(it) }
 
     private fun scrollWithStaggerSound(offset: Int) {
         if (!offset.incrementValid()) {
@@ -225,15 +220,6 @@ object ScrapGFS {
         lastScrollSound = SimpleTimeMark.now()
         SoundUtils.playClickSound()
     }
-
-    private fun buildIncrementStack(negative: Boolean) = Renderable.horizontal(
-        (if (negative) listOf(-5, -1) else listOf(1, 5)).map {
-            buildIncrementButton(it)
-        },
-        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        spacing = 5,
-    )
 
     private fun Int.incrementValid() = currentFetchAmount + this in validRange
     private fun Int.getIncrementText() = if (this > 0) "+$this" else this.toString()
@@ -264,11 +250,11 @@ object ScrapGFS {
         padding = 4,
     )
 
-    private fun buildStaticSetButton(
+    private fun MutableList<Renderable>.addStaticSetButton(
         label: String,
         color: LorenzColor,
         value: Int
-    ): Renderable = Renderable.darkRectButton(
+    ) = Renderable.darkRectButton(
         Renderable.vertical(
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -290,5 +276,7 @@ object ScrapGFS {
             config.fetchAmount.set(value)
         },
         padding = 4,
-    )
+    ).let {
+        add(Renderable.vertical(verticalAlign = RenderUtils.VerticalAlignment.CENTER) { add(it) })
+    }
 }
