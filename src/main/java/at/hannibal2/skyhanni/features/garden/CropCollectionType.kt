@@ -10,6 +10,6 @@ enum class CropCollectionType(val displayName: String) {
     ;
 
     companion object {
-        fun getByName(name: String) = CropCollectionType.entries.firstOrNull { it.displayName == name }
+        fun getByName(name: String) = CropCollectionType.entries.firstOrNull { it.displayName.lowercase() == name.lowercase() }
     }
 }

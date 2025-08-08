@@ -43,7 +43,7 @@ object CropCollectionAPI {
             ChatUtils.userError("Invalid type! Format is /shaddcropcollection <crop> <amount> <type>")
             return
         }
-        val type = if (typeText == "") CropCollectionType.UNKNOWN else CropCollectionType.getByName(typeText.replace("_", "")) ?: run {
+        val type = if (typeText == "") CropCollectionType.UNKNOWN else CropCollectionType.getByName(typeText.replace("_", " ")) ?: run {
             ChatUtils.userError("Invalid type! Format is /shaddcropcollection <crop> <amount> <type>")
             return
         }

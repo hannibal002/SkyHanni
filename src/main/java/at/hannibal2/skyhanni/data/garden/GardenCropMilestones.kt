@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.addsToMilestone
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -79,6 +80,8 @@ object GardenCropMilestones {
 
     private val storage get() = GardenApi.storage
     private val maxMilestoneValue: MutableMap<CropType, Int> = mutableMapOf()
+    private val config get() = GardenApi.config.cropMilestones
+    var inaccurateMilestone = false
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {
@@ -101,8 +104,15 @@ object GardenCropMilestones {
                 forceUpdateMilestone(crop, change)
             }
         }
+        inaccurateMilestone = false
         storage?.lastMilestoneFix = SimpleTimeMark.now()
         GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
+        clearMilestoneCache()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onGardenJoin(event: IslandChangeEvent) {
+        if ((cropMilestoneCounter?.size ?: 0) < cropMilestoneData.size) inaccurateMilestone = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -143,35 +153,50 @@ object GardenCropMilestones {
 
     val cropMilestoneCounter: MutableMap<CropType, Long>? get() = storage?.cropMilestoneCounter
     var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
+    var percentToNextTier: Double? = null
     private var cropMilestoneTierCache: MutableMap<CropType, Int?> = mutableMapOf()
     private var amountToNextMilestoneTierCache: MutableMap<CropType, Long?> = mutableMapOf()
 
     fun CropType.getMilestoneCounter() = cropMilestoneCounter?.get(this) ?: 0
 
-    private fun CropType.setMilestoneCounter(counter: Long) {
+    fun CropType.addMilestoneCounter(counter: Long) {
+        if (counter == 0L) return
+        ChatUtils.debug("Adding Milestone Counter: Crop: $this Amount: $counter")
+        amountToNextMilestoneTierCache[this] = amountToNextMilestoneTierCache[this]?.plus(counter) ?: counter
+        this.checkPercentage()
+        this.setMilestoneCounter(this.getMilestoneCounter() + counter)
+    }
+
+    private fun CropType.checkPercentage() {
+        val percent = this.percentToNextTier() ?: return
+        if (percent >= 100) {
+            val levelUpTimes = percent.toInt().floorDiv(100)
+            val oldLevel = getMilestoneTier() ?: return
+            val newLevel = oldLevel + levelUpTimes
+
+            if (config.overflow.chat) {
+                if (newLevel > (getMaxTier() ?: return)) {
+                    onOverflowLevelUp(this, maxOf(oldLevel, getMaxTier() ?: return), newLevel)
+                }
+            }
+        }
+        percentToNextTier = percent
+    }
+
+    private fun CropType.setMilestoneCounter(counter: Long) { //only call this with addMilestoneCounter
+        ChatUtils.debug("Setting Milestone Counter: Crop: $this Amount: $counter")
         cropMilestoneCounter?.set(this, counter)
         CropMilestoneUpdateEvent.post()
     }
 
-    private fun CropType.addMilestoneCounter(counter: Long) {
-        if (counter == 0L) return
-        this.setMilestoneCounter(this.getMilestoneCounter() + counter)
-    }
-
-    fun CropType.isMaxMilestone(useOverflow: Boolean): Boolean? {
-        if (useOverflow) return false
-
+    fun CropType.isMaxMilestone(): Boolean? {
         val maxValue = this.getMaxedMilestoneAmount() ?: return null
         return getMilestoneCounter() >= maxValue
     }
 
-    fun CropType.getTier(allowOverflow: Boolean = false): Int? {
+    fun CropType.getMilestoneTier(): Int? {
         val tier = cropMilestoneTierCache.getOrPut(this) {
-            calculateTierForCropCount(this.getMilestoneCounter(), this, allowOverflow)
-        }
-        // TODO void cache on config change event instead
-        if (!allowOverflow && (tier ?: return null) > (cropMilestoneData[this]?.size ?: return null)) {
-            cropMilestoneTierCache[this] = calculateTierForCropCount(this.getMilestoneCounter(), this, allowOverflow)
+            calculateTierForCropCount(this.getMilestoneCounter(), this)
         }
         return tier
     }
@@ -184,7 +209,7 @@ object GardenCropMilestones {
         }
     }
 
-    private fun calculateTierForCropCount(count: Long?, crop: CropType, allowOverflow: Boolean = false): Int? {
+    private fun calculateTierForCropCount(count: Long?, crop: CropType): Int? {
         var tier = 0
         var totalCrops = 0L
         val cropMilestone = cropMilestoneData[crop]
@@ -206,17 +231,16 @@ object GardenCropMilestones {
             return tier
         }
 
+
         tier = getMaxTier() ?: return null
 
-        if (allowOverflow) {
-            totalCrops -= maxMilestoneAmount
-            tier += totalCrops.floorDiv(last).toInt()
-        }
+        totalCrops = count - maxMilestoneAmount
+        tier += totalCrops.floorDiv(last).toInt()
 
         return tier
     }
 
-    fun getCropsForTier(requestedTier: Int?, crop: CropType, allowOverflow: Boolean = false): Long? {
+    fun getCropsForTier(requestedTier: Int?, crop: CropType): Long? {
         if (requestedTier == null) return null
 
         var totalCrops = 0L
@@ -224,7 +248,7 @@ object GardenCropMilestones {
         val cropMilestone = cropMilestoneData[crop] ?: return 0
         val definedTiers = cropMilestone.size
 
-        if (requestedTier <= definedTiers || !allowOverflow) {
+        if (requestedTier <= definedTiers) {
             for (tierCrops in cropMilestone) {
                 totalCrops += tierCrops
                 tier++
@@ -233,7 +257,7 @@ object GardenCropMilestones {
                 }
             }
 
-            return if (!allowOverflow) 0 else totalCrops
+            return totalCrops
         }
 
 
@@ -251,34 +275,40 @@ object GardenCropMilestones {
         return totalCrops
     }
 
-    fun CropType.getProgressToNextTier(allowOverflow: Boolean = false): Long? {
+    fun CropType.getProgressToNextTier(): Long? {
         return amountToNextMilestoneTierCache.getOrPut(this) {
-            this.calculateProgressToNextTier(allowOverflow)
+            this.calculateProgressToNextTier()
         }
     }
 
-    fun CropType.percentToNextTier(allowOverflow: Boolean = false): Double? {
-        val progressAmount = getProgressToNextTier(allowOverflow) ?: return null
+    fun CropType.percentToNextTier(): Double? {
+        val progressAmount = getProgressToNextTier() ?: return null
         val percent =
-            progressAmount.toDouble() / (this.getTierAmount(this.getTier(allowOverflow), allowOverflow)?.toDouble() ?: return null)
+            progressAmount.toDouble() / (this.getTierAmount(this.getMilestoneTier())?.toDouble() ?: return null)
         return percent
     }
 
-    private fun CropType.calculateProgressToNextTier(allowOverflow: Boolean = false): Long? {
+    private fun CropType.calculateProgressToNextTier(): Long? {
         val progress = getMilestoneCounter()
-        val startTier = this.getTier() ?: return null
-        val startCrops = getCropsForTier(startTier, this, allowOverflow) ?: return null
-        val end = this.getTierAmount(startTier + 1, allowOverflow) ?: return null
+        val startTier = this.getMilestoneTier() ?: return null
+        val startCrops = getCropsForTier(startTier, this) ?: return null
+        val end = this.getTierAmount(startTier + 1) ?: return null
         val amount = end - (progress - startCrops)
+
+        ChatUtils.debug("Progress: $progress")
+        ChatUtils.debug("Start Tier: $startTier")
+        ChatUtils.debug("Start Crops: $startCrops")
+        ChatUtils.debug("End Tier: $end")
+        ChatUtils.debug("Amount: $amount")
 
         return amount
     }
 
-    fun CropType.getTierAmount(tier: Int?, allowOverflow: Boolean = false): Long? {
+    fun CropType.getTierAmount(tier: Int?): Long? {
         if (tier == null) return null
-
+        val overflowTier = minOf(tier - 1, (getMaxTier()?.minus(1)) ?: return null)
         val data = cropMilestoneData[this] ?: return null
-        return data.getOrNull(tier)?.toLong() ?: if (allowOverflow) data.last().toLong() else -1L
+        return data.getOrNull(overflowTier)?.toLong()
     }
 
     fun onOverflowLevelUp(crop: CropType, oldLevel: Int, newLevel: Int) {
@@ -371,12 +401,13 @@ object GardenCropMilestones {
 
     private fun forceUpdateMilestone(crop: CropType, amount: Long) {
         if (amount == 0L) return
+        ChatUtils.debug("Force Updating Milestone: Crop: $crop, Amount: ${amount.addSeparators()}")
         crop.addMilestoneCounter(amount)
     }
 
     private fun clearMilestoneCache() {
         cropMilestoneTierCache.clear()
-        cropMilestoneTierCache.clear()
+        amountToNextMilestoneTierCache.clear()
     }
 
     private fun resetMilestones() {
@@ -407,7 +438,23 @@ object GardenCropMilestones {
             literal("reset") {
                 callback {
                     resetMilestones()
-                    chat("§Reset Crop Milestones!")
+                    chat("§cReset Crop Milestones!")
+                }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun showCache(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shshowcropcache") {
+            description = "Show Cached Milestone Information."
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                for (crop in cropMilestoneTierCache) {
+                    ChatUtils.chat("Crop: ${crop.key}, Tier: ${crop.value}")
+                }
+                for (crop in amountToNextMilestoneTierCache) {
+                    chat("Crop: ${crop.key}, Progress: ${crop.value}")
                 }
             }
         }
