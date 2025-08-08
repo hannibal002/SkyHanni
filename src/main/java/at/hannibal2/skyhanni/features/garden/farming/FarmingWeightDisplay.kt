@@ -133,8 +133,8 @@ object FarmingWeightDisplay {
     private var profileId = ""
     private var lastLeaderboardUpdate = SimpleTimeMark.farPast()
     private var apiError = false
-    var leaderboardPosition = -1
-    var weight = -1.0
+    private var leaderboardPosition = -1
+    private var weight = -1.0
     private var localWeight = 0.0
     private var weightPerSecond = -1.0
     private var weightNeedsRecalculating = false

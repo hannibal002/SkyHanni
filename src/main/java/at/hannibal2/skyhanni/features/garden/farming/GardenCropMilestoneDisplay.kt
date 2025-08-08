@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.CropCollectionAPI
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getProgressToNextTier
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxed
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTierAmount
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxMilestone
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -132,12 +134,13 @@ object GardenCropMilestoneDisplay {
     private fun drawProgressDisplay(crop: CropType): List<Renderable> {
         val counter = crop.getMilestoneCounter()
         val lineMap = mutableMapOf<MilestoneTextEntry, Renderable>()
+        val errorMessage = listOf<Renderable>(Renderable.text("§eError: Repo failed to load."))
         lineMap[MilestoneTextEntry.TITLE] = Renderable.text("§6Crop Milestones")
 
         val customTargetLevel = storage?.get(crop) ?: 0
         val overflowDisplay = overflowConfig.cropMilestoneDisplay
         val allowOverflow = overflowDisplay || (customTargetLevel != 0)
-        val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow)
+        val currentTier = crop.getTier(allowOverflow) ?: return errorMessage
         var nextTier = if (config.bestShowMaxedNeeded.get() && currentTier <= 46) 46 else currentTier + 1
         val nextRealTier = nextTier
         val useCustomGoal = customTargetLevel != 0 && customTargetLevel > currentTier
@@ -145,7 +148,7 @@ object GardenCropMilestoneDisplay {
 
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontal {
             addItemStack(crop.icon)
-            if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
+            if (crop.isMaxMilestone(overflowDisplay) == true && !overflowDisplay) {
                 addString("§7" + crop.cropName + " §eMAXED")
             } else {
                 addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
@@ -153,17 +156,20 @@ object GardenCropMilestoneDisplay {
         }
 
         val allowOverflowOrCustom = overflowDisplay || useCustomGoal
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflowOrCustom)
+        val cropsForNextTier = crop.getTierAmount(currentTier + 1) ?: return errorMessage
         val (have, need) = if (config.bestShowMaxedNeeded.get() && !overflowDisplay) {
             Pair(counter, cropsForNextTier)
         } else {
-            val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop, allowOverflowOrCustom)
-            val have = if (useCustomGoal) counter else counter - cropsForCurrentTier
-            val need = if (useCustomGoal) cropsForNextTier else cropsForNextTier - cropsForCurrentTier
+            val have = if (useCustomGoal) counter else crop.getProgressToNextTier(allowOverflowOrCustom) ?: return errorMessage
+            val need = if (useCustomGoal) {
+                cropsForNextTier
+            } else {
+                crop.getTierAmount(currentTier + 1, allowOverflowOrCustom) ?: return errorMessage
+            }
             Pair(have, need)
         }
 
-        lineMap[MilestoneTextEntry.NUMBER_OUT_OF_TOTAL] = if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
+        lineMap[MilestoneTextEntry.NUMBER_OUT_OF_TOTAL] = if (crop.isMaxMilestone(overflowDisplay) == true && !overflowDisplay) {
             val haveFormat = counter.addSeparators()
             Renderable.text("§7Counter: §e$haveFormat")
         } else {
@@ -178,7 +184,7 @@ object GardenCropMilestoneDisplay {
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
-            if (!crop.isMaxed(overflowDisplay) || overflowDisplay) {
+            if (crop.isMaxMilestone(overflowDisplay) == false || overflowDisplay) {
                 val missing = need - have
                 val missingTime = (missing / farmingFortuneSpeed).seconds
                 val millis = missingTime.inWholeMilliseconds
@@ -209,7 +215,7 @@ object GardenCropMilestoneDisplay {
         }
 
         val percentageFormat = (have.toDouble() / need.toDouble()).formatPercentage()
-        lineMap[MilestoneTextEntry.PERCENTAGE] = if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
+        lineMap[MilestoneTextEntry.PERCENTAGE] = if (crop.isMaxMilestone(overflowDisplay) == true && !overflowDisplay) {
             Renderable.text("§7Percentage: §e100%")
         } else {
             Renderable.text("§7Percentage: §e$percentageFormat")
@@ -285,7 +291,7 @@ object GardenCropMilestoneDisplay {
     private fun addMushroomCowData() {
         val mushroom = CropType.MUSHROOM
         val allowOverflow = overflowConfig.cropMilestoneDisplay
-        if (mushroom.isMaxed(allowOverflow)) {
+        if (mushroom.isMaxMilestone(allowOverflow) == true) {
             mushroomCowPerkDisplay = listOf(
                 Renderable.text("§6Mooshroom Cow Perk"),
                 Renderable.text("§eMushroom crop is maxed!"),
@@ -294,16 +300,12 @@ object GardenCropMilestoneDisplay {
         }
 
         val lineMap = HashMap<MushroomTextEntry, Renderable>()
-        val counter = mushroom.getMilestoneCounter()
 
-        val currentTier = GardenCropMilestones.getTierForCropCount(counter, mushroom, allowOverflow)
+        val currentTier = mushroom.getTier(allowOverflow) ?: return
         val nextTier = currentTier + 1
 
-        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, mushroom, allowOverflow)
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, mushroom, allowOverflow)
-
-        val have = counter - cropsForCurrentTier
-        val need = cropsForNextTier - cropsForCurrentTier
+        val have = mushroom.getProgressToNextTier(allowOverflow) ?: return
+        val need = mushroom.getTierAmount(nextTier, allowOverflow) ?: return
 
         val haveFormat = have.addSeparators()
         val needFormat = need.addSeparators()

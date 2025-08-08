@@ -424,22 +424,13 @@ class ProfileSpecificStorage(
         var lastMilestoneFix: SimpleTimeMark = farPast()
 
         @Expose
-        var lastCollectionFix: MutableMap<CropType, SimpleTimeMark> = EnumMap(CropType::class.java)
-
-        @Expose
-        var cropCollectionCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
-
-        @Expose
         var lastGainedCrop: CropType? = null
 
         @Expose
         var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
 
         @Expose
-        var counterData: MutableMap<String, Long> = HashMap()
-
-        @Expose
-        var blocksBroken: MutableMap<CropType, Long> = enumMapOf()
+        var toolCounterData: MutableMap<String, Long> = HashMap()
 
         @Expose
         var cropUpgrades: MutableMap<CropType, Int> = enumMapOf()

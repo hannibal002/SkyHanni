@@ -145,15 +145,17 @@ object GardenCropMilestonesCommunityFix {
 
     private fun tryFix(crop: CropType, tier: Int, amount: Int): Boolean {
         val guessNextMax = nextMax(tier, crop)
-        if (guessNextMax.toInt() == amount) return false
+        if (guessNextMax != null) {
+            if (guessNextMax.toInt() == amount) return false
+        }
         GardenCropMilestones.cropMilestoneData = GardenCropMilestones.cropMilestoneData.editCopy {
             fix(crop, this, tier, amount)
         }
         return true
     }
 
-    private fun nextMax(tier: Int, crop: CropType): Long =
-        GardenCropMilestones.getCropsForTier(tier + 1, crop) - GardenCropMilestones.getCropsForTier(tier, crop)
+    private fun nextMax(tier: Int, crop: CropType): Long? =
+        GardenCropMilestones.getCropsForTier(tier, crop)?.let { GardenCropMilestones.getCropsForTier(tier + 1, crop)?.minus(it) }
 
     private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
         map[crop] = map[crop]!!.editCopy {

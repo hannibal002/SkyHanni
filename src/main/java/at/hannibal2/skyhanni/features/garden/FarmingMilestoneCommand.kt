@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentTyp
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getProgressToNextTier
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTier
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,19 +22,22 @@ object FarmingMilestoneCommand {
 
     private fun onCommand(crop: CropType, current: Int?, target: Int?, needsTime: Boolean) {
         if (current == null) {
-            val currentProgress = crop.getMilestoneCounter()
-            val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, crop, allowOverflow = true) + 1
-            val cropsForTier = GardenCropMilestones.getCropsForTier(currentCropMilestone, crop, allowOverflow = true)
-            val output = (cropsForTier - currentProgress).formatOutput(needsTime, crop)
-
+            val output = (crop.getProgressToNextTier(true))?.formatOutput(needsTime, crop)
+            if (output == null) {
+                milestoneError()
+                return
+            }
             ChatUtils.chat("§7$output needed to reach the next milestone")
             return
         }
 
         if (target == null) {
             val cropsForTier = GardenCropMilestones.getCropsForTier(current, crop, allowOverflow = true)
-            val output = cropsForTier.formatOutput(needsTime, crop)
-
+            val output = cropsForTier?.formatOutput(needsTime, crop)
+            if (output == null) {
+                milestoneError()
+                return
+            }
             ChatUtils.chat("§7$output needed for milestone §7$current")
             return
         }
@@ -42,8 +47,8 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val currentAmount = GardenCropMilestones.getCropsForTier(current, crop, allowOverflow = true)
-        val targetAmount = GardenCropMilestones.getCropsForTier(target, crop, allowOverflow = true)
+        val currentAmount = GardenCropMilestones.getCropsForTier(current, crop, allowOverflow = true) ?: return milestoneError()
+        val targetAmount = GardenCropMilestones.getCropsForTier(target, crop, allowOverflow = true) ?: return milestoneError()
         val output = (targetAmount - currentAmount).formatOutput(needsTime, crop)
         ChatUtils.chat("§7$output needed for milestone §7$current §a-> §7$target")
     }
@@ -54,6 +59,8 @@ object FarmingMilestoneCommand {
         val missingTime = (this / speed).seconds
         return "${missingTime.format()}§a"
     }
+
+    private fun milestoneError() = ChatUtils.chat("§Missing Milestone Repo Data!")
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -112,8 +119,7 @@ object FarmingMilestoneCommand {
                         val crop = getArg(cropArg)
                         val targetLevel = getArg(targetArg)
 
-                        val counter = crop.getMilestoneCounter()
-                        val level = GardenCropMilestones.getTierForCropCount(counter, crop)
+                        val level = crop.getTier() ?: return@callback milestoneError()
                         if (targetLevel <= level && targetLevel != 0) {
                             ChatUtils.userError(
                                 "Custom goal milestone ($targetLevel) must be greater than your current milestone ($level)."

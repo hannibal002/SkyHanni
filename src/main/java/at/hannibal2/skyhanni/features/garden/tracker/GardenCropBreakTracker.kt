@@ -23,7 +23,7 @@ import kotlin.random.Random
 @SkyHanniModule
 object GardenCropBreakTracker {
     private val storage get() = GardenApi.storage
-    private val counterData: MutableMap<String, Long>? get() = storage?.counterData
+    private val counterData: MutableMap<String, Long>? get() = storage?.toolCounterData
     private val blocksBroken: MutableMap<CropType, Long>? get() = storage?.blocksBroken
 
     private var cropBrokenType: CropType? = null
