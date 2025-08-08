@@ -365,7 +365,7 @@ object MoongladeBeacon {
                 BeaconPieceTarget.OURS to backing.ours,
             )
 
-        private class DataPairBacking<T>(var reference: T?, var ours: T?) : Resettable() {
+        private class DataPairBacking<T>(var reference: T?, var ours: T?) : Resettable {
             operator fun get(target: BeaconPieceTarget): T? = when (target) {
                 BeaconPieceTarget.REFERENCE -> reference
                 BeaconPieceTarget.OURS -> ours
