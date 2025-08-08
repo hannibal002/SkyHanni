@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getProgressToNextTier
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTier
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -25,9 +24,9 @@ object FarmingMilestoneCommand {
             val output = (crop.getProgressToNextTier(true))?.formatOutput(needsTime, crop)
             if (output == null) {
                 milestoneError()
-                return
+            } else {
+                ChatUtils.chat("§7$output needed to reach the next milestone")
             }
-            ChatUtils.chat("§7$output needed to reach the next milestone")
             return
         }
 
@@ -36,9 +35,9 @@ object FarmingMilestoneCommand {
             val output = cropsForTier?.formatOutput(needsTime, crop)
             if (output == null) {
                 milestoneError()
-                return
+            } else {
+                ChatUtils.chat("§7$output needed for milestone §7$current")
             }
-            ChatUtils.chat("§7$output needed for milestone §7$current")
             return
         }
 

@@ -24,7 +24,6 @@ import kotlin.random.Random
 object GardenCropBreakTracker {
     private val storage get() = GardenApi.storage
     private val counterData: MutableMap<String, Long>? get() = storage?.toolCounterData
-    private val blocksBroken: MutableMap<CropType, Long>? get() = storage?.blocksBroken
 
     private var cropBrokenType: CropType? = null
     private var heldItem: ItemStack? = null
@@ -53,8 +52,6 @@ object GardenCropBreakTracker {
     fun onCropBreak(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.crop != cropBrokenType) cropBrokenType = event.crop
-
-        blocksBroken?.set(event.crop, blocksBroken?.get(event.crop)?.plus(1) ?: 1)
 
         if (GardenApi.mushroomCowPet) {
             mooshroomCowCrops += weightedRandomRound((CurrentPetApi.currentPet?.level ?: 0) / 100.0).toInt()

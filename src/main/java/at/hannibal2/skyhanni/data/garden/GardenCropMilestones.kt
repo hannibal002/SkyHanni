@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.data.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.addsToMilestone
@@ -265,7 +267,7 @@ object GardenCropMilestones {
     private fun CropType.calculateProgressToNextTier(allowOverflow: Boolean = false): Long? {
         val progress = getMilestoneCounter()
         val startTier = this.getTier() ?: return null
-        val startCrops = getCropsForTier(startTier, this, allowOverflow)  ?: return null
+        val startCrops = getCropsForTier(startTier, this, allowOverflow) ?: return null
         val end = this.getTierAmount(startTier + 1, allowOverflow) ?: return null
         val amount = end - (progress - startCrops)
 
@@ -372,6 +374,16 @@ object GardenCropMilestones {
         crop.addMilestoneCounter(amount)
     }
 
+    private fun clearMilestoneCache() {
+        cropMilestoneTierCache.clear()
+        cropMilestoneTierCache.clear()
+    }
+
+    private fun resetMilestones() {
+        cropMilestoneCounter?.clear()
+        clearMilestoneCache()
+    }
+
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 
     private val loadedCrops = mutableListOf<CropType>()
@@ -384,5 +396,20 @@ object GardenCropMilestones {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
+        clearMilestoneCache()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetcropmilestones") {
+            description = "Resets crop milestones."
+            category = CommandCategory.DEVELOPER_DEBUG
+            literal("reset") {
+                callback {
+                    resetMilestones()
+                    chat("§Reset Crop Milestones!")
+                }
+            }
+        }
     }
 }

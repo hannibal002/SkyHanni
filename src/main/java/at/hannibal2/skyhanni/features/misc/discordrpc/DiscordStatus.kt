@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTierForCropCount
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTier
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.percentToNextTier
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -60,12 +60,12 @@ private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
     val cropCounter = crop?.getMilestoneCounter()
     val allowOverflow = GardenApi.config.cropMilestones.overflow.discordRPC
-    val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
+    val tier = crop?.getTier(allowOverflow)
     val progress = tier?.let {
         crop.percentToNextTier(allowOverflow)?.formatPercentage() ?: 100
     } ?: 100 // percentage to next milestone
 
-    if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
+    if (tier == null || cropCounter == null) return AutoStatus.CROP_MILESTONES.placeholderText
 
     val text = if (crop.isMaxMilestone(allowOverflow) == true) {
         "MAXED (${cropCounter.addSeparators()} crops)"

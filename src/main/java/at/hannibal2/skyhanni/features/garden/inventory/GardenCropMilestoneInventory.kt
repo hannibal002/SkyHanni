@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getTier
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
@@ -30,9 +31,8 @@ object GardenCropMilestoneInventory {
 
         val tiers = mutableListOf<Double>()
         for (cropType in CropType.entries) {
-            val counter = cropType.getMilestoneCounter()
             val allowOverflow = config.cropMilestones.overflow.inventoryStackSize
-            val tier = GardenCropMilestones.getTierForCropCount(counter, cropType, allowOverflow)
+            val tier = cropType.getTier(allowOverflow) ?: continue
             tiers.add(tier.toDouble())
         }
         average = (tiers.sum() / CropType.entries.size).roundTo(2)
@@ -60,11 +60,11 @@ object GardenCropMilestoneInventory {
         if (!config.tooltipTweak.cropMilestoneTotalProgress) return
 
         val crop = GardenCropMilestones.getCropTypeByLore(event.itemStack) ?: return
-        val tier = GardenCropMilestones.getTierForCropCount(crop.getMilestoneCounter(), crop)
+        val tier = crop.getTier() ?: return
         if (tier >= 20) return
 
         val maxTier = GardenCropMilestones.getMaxTier()
-        val maxCounter = GardenCropMilestones.getCropsForTier(maxTier, crop)
+        val maxCounter = GardenCropMilestones.getCropsForTier(maxTier, crop) ?: return
 
         val index = event.toolTipRemovedPrefix().indexOfFirst(
             "§7Rewards:",
