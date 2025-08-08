@@ -20,6 +20,10 @@ public class MixinPlayerEntityRenderer {
         index = 1
     )
     private Text modifyRenderLabelIfPresentArgs(Text text) {
-        return Text.of(EntityData.getHealthDisplay(TextCompatKt.formattedTextCompatLessResets(text)));
+        if (at.hannibal2.skyhanni.utils.SkyBlockUtils.INSTANCE.getInSkyBlock()) {
+            return Text.of(EntityData.getHealthDisplay(TextCompatKt.formattedTextCompatLessResets(text)));
+        }
+
+        return text;
     }
 }
