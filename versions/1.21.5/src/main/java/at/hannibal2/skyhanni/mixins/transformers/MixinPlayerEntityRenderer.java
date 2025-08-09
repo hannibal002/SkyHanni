@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.EntityData;
+import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.text.Text;
@@ -20,10 +21,9 @@ public class MixinPlayerEntityRenderer {
         index = 1
     )
     private Text modifyRenderLabelIfPresentArgs(Text text) {
-        if (at.hannibal2.skyhanni.utils.SkyBlockUtils.INSTANCE.getInSkyBlock()) {
+        if (SkyBlockUtils.INSTANCE.getInSkyBlock()) {
             return Text.of(EntityData.getHealthDisplay(TextCompatKt.formattedTextCompatLessResets(text)));
         }
-
         return text;
     }
 }
