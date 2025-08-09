@@ -7,8 +7,9 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getProgressToNextTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneTier
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneProgressToNextTier
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,7 +22,7 @@ object FarmingMilestoneCommand {
 
     private fun onCommand(crop: CropType, current: Int?, target: Int?, needsTime: Boolean) {
         if (current == null) {
-            val output = (crop.getProgressToNextTier())?.formatOutput(needsTime, crop)
+            val output = (crop.milestoneProgressToNextTier())?.formatOutput(needsTime, crop)
             if (output == null) {
                 milestoneError()
             } else {
@@ -31,7 +32,7 @@ object FarmingMilestoneCommand {
         }
 
         if (target == null) {
-            val cropsForTier = GardenCropMilestones.getCropsForTier(current, crop)
+            val cropsForTier = crop.milestoneTotalCropsForTier(current)
             val output = cropsForTier?.formatOutput(needsTime, crop)
             if (output == null) {
                 milestoneError()
@@ -46,8 +47,8 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val currentAmount = GardenCropMilestones.getCropsForTier(current, crop) ?: return milestoneError()
-        val targetAmount = GardenCropMilestones.getCropsForTier(target, crop) ?: return milestoneError()
+        val currentAmount = crop.milestoneTotalCropsForTier(current) ?: return milestoneError()
+        val targetAmount = crop.milestoneTotalCropsForTier(target) ?: return milestoneError()
         val output = (targetAmount - currentAmount).formatOutput(needsTime, crop)
         ChatUtils.chat("§7$output needed for milestone §7$current §a-> §7$target")
     }
@@ -118,7 +119,7 @@ object FarmingMilestoneCommand {
                         val crop = getArg(cropArg)
                         val targetLevel = getArg(targetArg)
 
-                        val level = crop.getMilestoneTier() ?: return@callback milestoneError()
+                        val level = crop.getCurrentMilestoneTier() ?: return@callback milestoneError()
                         if (targetLevel <= level && targetLevel != 0) {
                             ChatUtils.userError(
                                 "Custom goal milestone ($targetLevel) must be greater than your current milestone ($level)."

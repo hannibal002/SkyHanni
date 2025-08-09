@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.CropAccessoryData
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneTier
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
@@ -203,7 +203,7 @@ object FortuneUpgrades {
                 ),
             )
         }
-        val cropMilestone = crop.getMilestoneTier() ?: 0
+        val cropMilestone = crop.getCurrentMilestoneTier() ?: 0
         if (dedicationLvl != 4 && cropMilestone > 0) {
             val dedicationMultiplier = listOf(0.5, 0.75, 1.0, 2.0)[dedicationLvl]
             val dedicationIncrease =

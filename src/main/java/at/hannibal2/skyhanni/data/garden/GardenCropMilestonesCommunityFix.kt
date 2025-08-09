@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -155,7 +156,7 @@ object GardenCropMilestonesCommunityFix {
     }
 
     private fun nextMax(tier: Int, crop: CropType): Long? =
-        GardenCropMilestones.getCropsForTier(tier, crop)?.let { GardenCropMilestones.getCropsForTier(tier + 1, crop)?.minus(it) }
+        crop.milestoneTotalCropsForTier(tier)?.let { crop.milestoneTotalCropsForTier(tier + 1)?.minus(it) }
 
     private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
         map[crop] = map[crop]!!.editCopy {
