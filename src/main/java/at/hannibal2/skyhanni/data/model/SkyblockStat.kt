@@ -77,7 +77,7 @@ enum class SkyblockStat(
     MAGIC_FIND("§b✯", " *Magic Find: §r§b✯$VALUE_PATTERN", " *§b✯ Magic Find §f$VALUE_PATTERN"),
     PET_LUCK("§d♣", " *Pet Luck: §r§d♣$VALUE_PATTERN", " *§d♣ Pet Luck §f$VALUE_PATTERN"),
     FISHING_SPEED("§b☂", " *Fishing Speed: §r§b☂$VALUE_PATTERN", " *§b☂ Fishing Speed §f$VALUE_PATTERN"),
-    TROPHY_FISH_CHANCE("§b♔", "Trophy Fish Chance: §r§6♔$VALUE_PATTERN", " *§6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
+    TROPHY_FISH_CHANCE("§6♔", "Trophy Fish Chance: §r§6♔$VALUE_PATTERN", " *§6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
     DOUBLE_HOOK_CHANCE(
         "§9⚓",
         " *Double Hook Chance: §r§9⚓$VALUE_PATTERN",
