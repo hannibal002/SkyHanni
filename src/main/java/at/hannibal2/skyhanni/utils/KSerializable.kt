@@ -60,7 +60,10 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 field.isAccessible = true
             }.getOrNull() ?: return@mapNotNull null
             val kType = field.returnType
-            val name = param.findAnnotation<SerializedName>()?.value ?: param.name!!
+            val name = param.findAnnotation<SerializedName>()?.value
+                ?: field.findAnnotation<SerializedName>()?.value
+                ?: field.javaField?.getAnnotation(SerializedName::class.java)?.value
+                ?: param.name!!
 
             val javaTypeForAdapter = if (kType.jvmErasure.java.isAnnotationPresent(JvmInline::class.java)) kType.jvmErasure.java
             else InternalGsonTypes.resolve(type.type, type.rawType, kType.javaType)

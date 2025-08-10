@@ -76,7 +76,7 @@ object OrderedWaypoints {
 
         event.drawSequenced()
 
-        if (waypointCount <= 1) return recalcWaypointState()
+        if (waypointCount <= 1) return recalculateWaypointState()
 
         val renderIndex = renderWaypointIndices.first().takeIf { renderWaypointIndices.size == 2 } ?: renderWaypointIndices[2]
         val renderWaypoint = sequencedWaypoints[renderIndex] ?: return
@@ -96,7 +96,7 @@ object OrderedWaypoints {
             }
         }
 
-        recalcWaypointState()
+        recalculateWaypointState()
     }
 
     @HandleEvent
@@ -296,7 +296,7 @@ object OrderedWaypoints {
         ChatUtils.chat("Toggled setup mode to ${config.setupMode}")
     }
 
-    private fun recalcWaypointState() {
+    private fun recalculateWaypointState() {
         renderWaypointIndices.clear()
         if (waypointData.isEmpty()) return
         val currentIndex = currentWaypointIndex
@@ -355,5 +355,5 @@ object OrderedWaypoints {
         fmt.serialize(waypoints)
     }
 
-    private fun getAvailableWaypointFormats(): List<String> = services.map { it.name }
+    private fun getAvailableWaypointFormats(): List<String> = services.map { it.formatType.displayName }
 }

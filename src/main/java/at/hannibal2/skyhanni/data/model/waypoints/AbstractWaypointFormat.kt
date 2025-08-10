@@ -14,8 +14,11 @@ interface AbstractWaypointFormat<N> where N : AbstractWaypoint {
     fun serialize(set: WaypointSet<N>): String = ConfigManager.gson.toJson(set)
 }
 
-enum class WaypointFormatType(val castClazz: Class<out AbstractWaypoint>) {
-    SKYHANNI(SkyhanniWaypoint::class.java),
-    COLEWEIGHT(ColeweightWaypoint::class.java),
-    SKYTILS(SkytilsWaypoint::class.java),
+enum class WaypointFormatType(
+    val displayName: String,
+    val castClazz: Class<out AbstractWaypointFormat<*>>,
+) {
+    SKYHANNI("SkyHanni", SkyhanniWaypoint::class.java),
+    COLEWEIGHT("Coleweight", ColeweightWaypoint::class.java),
+    SKYTILS("Skytils", SkytilsWaypoint::class.java),
 }

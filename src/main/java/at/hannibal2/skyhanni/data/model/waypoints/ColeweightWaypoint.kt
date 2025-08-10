@@ -18,6 +18,8 @@ data class ColeweightWaypoint(
     AbstractRGBColoredWaypoint,
     AbstractWaypointFormat<ColeweightWaypoint> {
 
+    constructor() : this(0, 0, 0, 0.0f, 1.0f, 0.0f)
+
     constructor(skyhanniWaypoint: SkyhanniWaypoint) : this(
         skyhanniWaypoint.location.x.toInt(),
         skyhanniWaypoint.location.y.toInt(),
