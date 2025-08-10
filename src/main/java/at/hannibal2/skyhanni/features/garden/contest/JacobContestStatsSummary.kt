@@ -56,6 +56,7 @@ object JacobContestStatsSummary {
                 val color = getBlocksPerSecondColor(blocksPerSecond)
                 ChatUtils.chat("§7Average Blocks Per Second: $color$blocksPerSecond")
                 ChatUtils.chat("§7Participated for §b$time")
+                blocksBroken.clear()
             }
 
             FarmingContestPhase.CHANGE -> {
@@ -63,7 +64,6 @@ object JacobContestStatsSummary {
                 startTime = SimpleTimeMark.now()
             }
         }
-        blocksBroken.clear()
     }
 
     private fun getBlocksPerSecondColor(blocksPerSecond: Double) = if (blocksPerSecond > 19) "§c" else "§a"
