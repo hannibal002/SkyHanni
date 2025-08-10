@@ -17,6 +17,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
+import java.io.ByteArrayInputStream
 import java.util.Base64
 import java.util.Locale
 import java.util.NavigableMap
@@ -24,11 +25,9 @@ import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.zip.GZIPInputStream
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
-import java.io.ByteArrayInputStream
-import java.util.zip.GZIPInputStream
-
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor
