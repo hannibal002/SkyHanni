@@ -9,50 +9,50 @@ class CustomGoalConfig {
     @Expose
     @ConfigOption(name = "Wheat", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val wheat: Property<Int> = Property.of(46)
+    val wheat: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Carrot", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val carrot: Property<Int> = Property.of(46)
+    val carrot: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Potato", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val potato: Property<Int> = Property.of(46)
+    val potato: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Nether Wart", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val wart: Property<Int> = Property.of(46)
+    val wart: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Pumpkin", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val pumpkin: Property<Int> = Property.of(46)
+    val pumpkin: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Melon", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val melon: Property<Int> = Property.of(46)
+    val melon: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Cocoa Beans", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val cocoa: Property<Int> = Property.of(46)
+    val cocoa: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Sugar Cane", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val cane: Property<Int> = Property.of(46)
+    val cane: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Cactus", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val cactus: Property<Int> = Property.of(46)
+    val cactus: Property<Float> = Property.of(46f)
 
     @Expose
     @ConfigOption(name = "Mushroom", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
-    val mushroom: Property<Int> = Property.of(46)
+    val mushroom: Property<Float> = Property.of(46f)
 }

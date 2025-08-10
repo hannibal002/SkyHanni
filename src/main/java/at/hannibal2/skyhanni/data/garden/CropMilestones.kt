@@ -43,7 +43,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
-object GardenCropMilestones {
+object CropMilestones {
     // TODO better invalid repo handling
     private val patternGroup = RepoPattern.group("data.garden.milestone")
 
@@ -85,7 +85,7 @@ object GardenCropMilestones {
 
     private val storage get() = GardenApi.storage
     private val maxMilestoneValue: MutableMap<CropType, Int> = mutableMapOf()
-    private val config get() = GardenApi.config.cropMilestones
+    val config get() = GardenApi.config.cropMilestones
     var inaccurateMilestone = false
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
@@ -112,7 +112,7 @@ object GardenCropMilestones {
         }
         inaccurateMilestone = false
         storage?.lastMilestoneFix = SimpleTimeMark.now()
-        GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
+        CropMilestonesCommunityFix.openInventory(event.inventoryItems)
         GardenCropMilestoneInventory.updateAverage()
     }
 
@@ -466,52 +466,6 @@ object GardenCropMilestones {
         crop.addMilestoneCounter(amount)
     }
 
-    data class MilestoneGoal(val tier: Int, val cropAmount: Long)
-
-    var milestoneCustomGoals: MutableMap<CropType, MilestoneGoal> = mutableMapOf()
-
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        config.customGoalCrops.afterChange {
-            milestoneCustomGoals.clear()
-            for (crop in this) {
-                milestoneCustomGoals[crop] = crop.customGoalFromConfig()
-            }
-            GardenCropMilestoneDisplay.update()
-            ChatUtils.debug("Updated All Custom Goals!")
-        }
-        for (crop in CropType.entries) {
-            ConditionalUtils.onToggle(crop.getCustomGoalConfig()) {
-                milestoneCustomGoals.replace(crop, crop.customGoalFromConfig())
-                GardenCropMilestoneDisplay.update()
-                ChatUtils.debug("Custom goal $crop set")
-            }
-        }
-    }
-
-    fun CropType.getCustomGoal() = milestoneCustomGoals[this]
-
-    private fun CropType.customGoalFromConfig(): MilestoneGoal {
-        val customGoalTier = this.getCustomGoalConfig().get()
-        val customGoalAmount = this.milestoneTotalCropsForTier(customGoalTier) ?: 0
-        return MilestoneGoal(customGoalTier, customGoalAmount)
-    }
-
-    private fun CropType.getCustomGoalConfig(): Property<Int> = with(config.customGoalConfig) {
-        when (this@getCustomGoalConfig) {
-            CropType.WHEAT -> wheat
-            CropType.CARROT -> carrot
-            CropType.POTATO -> potato
-            CropType.NETHER_WART -> wart
-            CropType.PUMPKIN -> pumpkin
-            CropType.MELON -> melon
-            CropType.COCOA_BEANS -> cocoa
-            CropType.SUGAR_CANE -> cane
-            CropType.CACTUS -> cactus
-            CropType.MUSHROOM -> mushroom
-        }
-    }
-
 
     private fun clearMilestoneCache() {
         cropMilestoneTierCache.clear()
@@ -537,6 +491,7 @@ object GardenCropMilestones {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
+        CropMilestonesCustomGoals.loadCustomGoals()
         clearMilestoneCache()
         CropMilestoneUpdateEvent.post()
     }

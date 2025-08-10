@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -35,7 +35,7 @@ object GardenInventoryNumbers {
         if (InventoryUtils.openInventoryName() == "Crop Milestones") {
             if (!config.cropMilestone) return
 
-            val crop = GardenCropMilestones.getCropTypeByLore(event.stack) ?: return
+            val crop = CropMilestones.getCropTypeByLore(event.stack) ?: return
             val allowOverflow = GardenApi.config.cropMilestones.overflow.inventoryStackSize
             val currentTier = crop.getCurrentMilestoneTier()
             event.stackTip = "" + currentTier

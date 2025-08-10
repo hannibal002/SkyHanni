@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTierAmount
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTierAmount
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule

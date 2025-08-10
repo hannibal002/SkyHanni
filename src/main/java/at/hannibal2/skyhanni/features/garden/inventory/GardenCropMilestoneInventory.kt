@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -44,11 +44,11 @@ object GardenCropMilestoneInventory {
     fun addMaxMilestoneProgress(event: ToolTipEvent) {
         if (!config.tooltipTweak.cropMilestoneTotalProgress || InventoryUtils.openInventoryName() != "Crop Milestones") return
 
-        val crop = GardenCropMilestones.getCropTypeByLore(event.itemStack) ?: return
+        val crop = CropMilestones.getCropTypeByLore(event.itemStack) ?: return
         val tier = crop.getCurrentMilestoneTier() ?: return
         if (tier >= 20) return // Hypixel shows progress to ms46 after ms20
 
-        val maxTier = GardenCropMilestones.getMaxTier()
+        val maxTier = CropMilestones.getMaxTier()
         val maxCounter = crop.milestoneTotalCropsForTier(maxTier) ?: return
 
         val index = event.toolTipRemovedPrefix().indexOfFirst(

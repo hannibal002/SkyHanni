@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object GardenCropUpgrades {
+object CropUpgrades {
 
     private val patternGroup = RepoPattern.group("garden.cropupgrades")
 

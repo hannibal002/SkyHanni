@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.NextConfig.BestTypeEntry
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneProgressToNextTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTierAmount
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxMilestone
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneProgressToNextTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTierAmount
+import at.hannibal2.skyhanni.data.garden.CropMilestones.isMaxMilestone
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest

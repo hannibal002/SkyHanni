@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
-object GardenCropMilestonesCommunityFix {
+object CropMilestonesCommunityFix {
 
     /**
      * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
@@ -64,7 +64,7 @@ object GardenCropMilestonesCommunityFix {
     private fun fixForWrongData(inventoryItems: Map<Int, ItemStack>) {
         val data = mutableListOf<String>()
         for ((_, stack) in inventoryItems) {
-            val crop = GardenCropMilestones.getCropTypeByLore(stack) ?: continue
+            val crop = CropMilestones.getCropTypeByLore(stack) ?: continue
             checkForWrongData(stack, crop, data)
         }
 
@@ -91,7 +91,7 @@ object GardenCropMilestonesCommunityFix {
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
-        val next = lore.nextAfter({ GardenCropMilestones.totalPattern.matches(it) }, 3) ?: return
+        val next = lore.nextAfter({ CropMilestones.totalPattern.matches(it) }, 3) ?: return
 
         val guessNextMax = nextMax(realTier, crop)
         val nextMax = amountPattern.matchMatcher(next) {
@@ -140,7 +140,7 @@ object GardenCropMilestonesCommunityFix {
         }
         totalFixedValues += fixed
         ChatUtils.chat("Fixed: $fixed/$alreadyCorrect, total fixes: $totalFixedValues")
-        val s = ConfigManager.gson.toJsonTree(GardenCropMilestones.cropMilestoneData).toString()
+        val s = ConfigManager.gson.toJsonTree(CropMilestones.cropMilestoneData).toString()
         OSUtils.copyToClipboard("\"crop_milestones\":$s,")
     }
 
@@ -149,7 +149,7 @@ object GardenCropMilestonesCommunityFix {
         if (guessNextMax != null) {
             if (guessNextMax.toInt() == amount) return false
         }
-        GardenCropMilestones.cropMilestoneData = GardenCropMilestones.cropMilestoneData.editCopy {
+        CropMilestones.cropMilestoneData = CropMilestones.cropMilestoneData.editCopy {
             fix(crop, this, tier, amount)
         }
         return true

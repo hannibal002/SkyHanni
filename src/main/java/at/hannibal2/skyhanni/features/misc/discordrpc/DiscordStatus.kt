@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMaxTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxMilestone
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.percentToNextMilestone
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getMaxTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.isMaxMilestone
+import at.hannibal2.skyhanni.data.garden.CropMilestones.percentToNextMilestone
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
