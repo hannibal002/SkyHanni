@@ -26,6 +26,9 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
+import java.io.ByteArrayInputStream
+import java.util.zip.GZIPInputStream
+
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor
@@ -193,6 +196,22 @@ object StringUtils {
         if (index < 0) return null
         return this.substring(0, index)
     }
+
+    private fun isGzipCompressed(data: ByteArray): Boolean {
+        return data.size > 2 && data[0] == 0x1f.toByte() && data[1] == 0x8b.toByte()
+    }
+
+    /**
+     * Returns either the GZIP decompressed string, or the original string if
+     * it could not be decompressed or is not GZIP compressed.
+     */
+    fun decodeGzipOrSelf(input: String): String = kotlin.runCatching {
+        val inputBytes = input.toByteArray()
+        if (!isGzipCompressed(inputBytes)) return@runCatching input
+        GZIPInputStream(ByteArrayInputStream(inputBytes)).use { gis ->
+            return@runCatching gis.reader().readText()
+        }
+    }.getOrDefault(input)
 
     fun encodeBase64(input: String): String = Base64.getEncoder().encodeToString(input.toByteArray())
 

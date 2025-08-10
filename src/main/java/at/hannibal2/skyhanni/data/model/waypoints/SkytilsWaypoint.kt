@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.data.model.waypoints
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.auto.service.AutoService
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -26,6 +28,19 @@ data class SkytilsWaypoint(
     AbstractNamedWaypoint,
     AbstractWaypointFormat<SkytilsWaypoint> {
 
+    @SkyHanniModule
+    companion object {
+        private val patternGroup = RepoPattern.group("misc.waypoints.skytils")
+
+        /**
+         * REGEX-TEST: <Skytils-Waypoint-Data>(V1):
+         */
+        private val cleanPattern by patternGroup.pattern(
+            "clean",
+            "<Skytils-Waypoint-Data>\\(V\\d+\\):"
+        )
+    }
+
     constructor() : this(0, 0, 0, "", true, 0, 0L)
 
     private data class SkytilsWaypointCategoriesSet(
@@ -39,7 +54,11 @@ data class SkytilsWaypoint(
     )
 
     override fun deserialize(string: String): WaypointSet<SkytilsWaypoint>? = kotlin.runCatching {
-        val stringToUse = kotlin.runCatching { StringUtils.decodeBase64(string) }.getOrNull() ?: string
+        val cleanedString = string.replace(cleanPattern.toRegex(), "")
+        val stringToUse = kotlin.runCatching {
+            val decodedB64 = StringUtils.decodeBase64(cleanedString)
+            StringUtils.decodeGzipOrSelf(decodedB64)
+        }.getOrNull() ?: cleanedString
         val asCategorySet = ConfigManager.gson.fromJsonOrNull<SkytilsWaypointCategoriesSet>(stringToUse)
         if (asCategorySet == null) {
             ConfigManager.gson.fromJsonOrNull<SkytilsWaypointCategory>(stringToUse)?.waypoints
