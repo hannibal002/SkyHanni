@@ -56,8 +56,9 @@ data class SkytilsWaypoint(
     override fun deserialize(string: String): WaypointSet<SkytilsWaypoint>? = kotlin.runCatching {
         val cleanedString = string.replace(cleanPattern.toRegex(), "")
         val stringToUse = kotlin.runCatching {
-            val decodedB64 = StringUtils.decodeBase64(cleanedString)
-            StringUtils.decodeGzipOrSelf(decodedB64)
+            val decodedB64 = runCatching { StringUtils.decodeBase64(cleanedString) }.getOrNull()
+            val decodedGZip = StringUtils.decodeGzipOrSelf(cleanedString)
+            decodedB64 ?: decodedGZip
         }.getOrNull() ?: cleanedString
         val asCategorySet = ConfigManager.gson.fromJsonOrNull<SkytilsWaypointCategoriesSet>(stringToUse)
         if (asCategorySet == null) {

@@ -196,25 +196,21 @@ object StringUtils {
         return this.substring(0, index)
     }
 
-    private fun isGzipCompressed(data: ByteArray): Boolean {
-        return data.size > 2 && data[0] == 0x1f.toByte() && data[1] == 0x8b.toByte()
-    }
-
     /**
      * Returns either the GZIP decompressed string, or the original string if
      * it could not be decompressed or is not GZIP compressed.
      */
     fun decodeGzipOrSelf(input: String): String = kotlin.runCatching {
-        val inputBytes = input.toByteArray()
-        if (!isGzipCompressed(inputBytes)) return@runCatching input
-        GZIPInputStream(ByteArrayInputStream(inputBytes)).use { gis ->
-            return@runCatching gis.reader().readText()
+        GZIPInputStream(ByteArrayInputStream(decodeBase64ToBytes(input))).use { gis ->
+            return@runCatching gis.readBytes().decodeToString()
         }
     }.getOrDefault(input)
 
     fun encodeBase64(input: String): String = Base64.getEncoder().encodeToString(input.toByteArray())
 
     fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
+
+    fun decodeBase64ToBytes(input: String) = Base64.getDecoder().decode(input)
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) this.toInt().toString() else this.toString()
