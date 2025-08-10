@@ -21,10 +21,17 @@ class SequencedWaypointSet<T : AbstractSequencedWaypoint>(
         currentIndex = Math.floorMod(currentIndex + increment, this.size)
     }
 
+    override fun clear() {
+        orderedWaypointsCache.clear()
+        waypoints.clear()
+        waypointsHash = 0
+        currentIndex = 0
+    }
+
     fun addNumbered(element: T, showFeedback: Boolean = true) {
         if (element.number == this.size + 1) this.add(element)
         else add(element.number - 1, element)
-        if (showFeedback) ChatUtils.chat("Inserted waypoint $element.number at ${element.location.toCleanString()}.")
+        if (showFeedback) ChatUtils.chat("Inserted waypoint ${element.number} at ${element.location.toCleanString()}.")
     }
 
     override fun add(element: T): Boolean = super.add(element).also {

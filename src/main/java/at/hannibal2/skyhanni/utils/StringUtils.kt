@@ -200,11 +200,11 @@ object StringUtils {
      * Returns either the GZIP decompressed string, or the original string if
      * it could not be decompressed or is not GZIP compressed.
      */
-    fun decodeGzipOrSelf(input: String): String = kotlin.runCatching {
+    fun decodeGzipOrNull(input: String): String? = kotlin.runCatching {
         GZIPInputStream(ByteArrayInputStream(decodeBase64ToBytes(input))).use { gis ->
             return@runCatching gis.readBytes().decodeToString()
         }
-    }.getOrDefault(input)
+    }.getOrNull()
 
     fun encodeBase64(input: String): String = Base64.getEncoder().encodeToString(input.toByteArray())
 
