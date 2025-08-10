@@ -18,6 +18,7 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
