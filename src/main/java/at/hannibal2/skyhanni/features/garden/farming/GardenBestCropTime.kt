@@ -65,7 +65,7 @@ object GardenBestCropTime {
 
             val have = crop.milestoneProgressToNextTier() ?: return
             val need =
-                if (config.bestShowMaxedNeeded.get()) {
+                if (config.showMaxTier.get()) {
                     cropsForCurrentTier
                 } else {
                     crop.milestoneTierAmount(currentTier + 1) ?: return
@@ -140,7 +140,7 @@ object GardenBestCropTime {
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
             val currentTier = crop.getCurrentMilestoneTier() ?: return@horizontal
-            val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
+            val nextTier = if (config.showMaxTier.get()) 46 else currentTier + 1
 
             val cropName = if (!config.next.bestCompact.get()) crop.cropName + " " else ""
             val tier = if (!config.next.bestCompact.get()) "$currentTier➜$nextTier§r " else ""

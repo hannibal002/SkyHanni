@@ -2,17 +2,17 @@ package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTotalCropsForTier
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -23,30 +23,14 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirst
 @SkyHanniModule
 object GardenCropMilestoneInventory {
 
-    private var average = -1.0
+    private var average: Double? = null
     private val config get() = GardenApi.config
 
-    @HandleEvent
-    fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
-        if (!config.number.averageCropMilestone) return
 
-        val tiers = mutableListOf<Double>()
-        for (cropType in CropType.entries) {
-            val allowOverflow = config.cropMilestones.overflow.inventoryStackSize
-            val tier = cropType.getCurrentMilestoneTier() ?: continue
-            tiers.add(tier.toDouble())
-        }
-        average = (tiers.sum() / CropType.entries.size).roundTo(2)
-    }
-
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        average = -1.0
-    }
-
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (average == -1.0) return
+        if (InventoryUtils.openInventoryName() != "Crop Milestones") return
+        if (average == null) updateAverage()
 
         if (event.slot.slotNumber == 38) {
             event.offsetY = -23
@@ -56,13 +40,13 @@ object GardenCropMilestoneInventory {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipEvent) {
-        if (!config.tooltipTweak.cropMilestoneTotalProgress) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun addMaxMilestoneProgress(event: ToolTipEvent) {
+        if (!config.tooltipTweak.cropMilestoneTotalProgress || InventoryUtils.openInventoryName() != "Crop Milestones") return
 
         val crop = GardenCropMilestones.getCropTypeByLore(event.itemStack) ?: return
         val tier = crop.getCurrentMilestoneTier() ?: return
-        if (tier >= 20) return
+        if (tier >= 20) return // Hypixel shows progress to ms46 after ms20
 
         val maxTier = GardenCropMilestones.getMaxTier()
         val maxCounter = crop.milestoneTotalCropsForTier(maxTier) ?: return
@@ -79,6 +63,19 @@ object GardenCropMilestoneInventory {
         val progressBar = StringUtils.progressBar(percentage, 19)
         event.toolTip.add(index, "$progressBar §e${counter.addSeparators()}§6/§e${maxCounter.shortFormat()}")
         event.toolTip.add(index, "§7Progress to Tier $maxTier: §e$percentageFormat")
+    }
+
+    fun updateAverage() {
+        if (!config.number.averageCropMilestone) return
+
+        val tiers = mutableListOf<Double>()
+        val allowOverflow = config.cropMilestones.overflow.inventoryStackSize
+        for (cropType in CropType.entries) {
+            val tier = cropType.getCurrentMilestoneTier() ?: 0
+            if (!allowOverflow && tier > 46)
+                tiers.add(tier.toDouble())
+        }
+        average = (tiers.sum() / CropType.entries.size).roundTo(2)
     }
 
     @HandleEvent

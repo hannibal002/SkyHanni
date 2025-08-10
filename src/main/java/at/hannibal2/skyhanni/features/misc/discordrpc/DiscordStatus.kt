@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMaxTier
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.percentToNextMilestone
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -67,7 +68,7 @@ private fun getCropMilestoneDisplay(): String {
 
     if (tier == null || cropCounter == null) return AutoStatus.CROP_MILESTONES.placeholderText
 
-    val text = if (crop.isMaxMilestone() == true) {
+    val text = if (crop.isMaxMilestone() == true || (!allowOverflow && tier >= (getMaxTier() ?: 0))) {
         "MAXED (${cropCounter.addSeparators()} crops)"
     } else {
         "Milestone $tier ($progress)"

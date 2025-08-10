@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.addsToMilestone
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -19,11 +20,14 @@ import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
+import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -35,11 +39,12 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object GardenCropMilestones {
-
+    // TODO better invalid repo handling
     private val patternGroup = RepoPattern.group("data.garden.milestone")
 
     /**
@@ -59,7 +64,7 @@ object GardenCropMilestones {
         "§7Total: §a(?<name>.*)",
     )
 
-    //TODO add check for max
+    // TODO add check for max
     /**
      * REGEX-TEST:  Cocoa Beans 31: §r§a68%
      * REGEX-TEST:  Potato 32: §r§a97.7%
@@ -69,9 +74,6 @@ object GardenCropMilestones {
         "tablist",
         " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%",
     )
-
-
-
 
     /**
      * REGEX-TEST:   §r§b§lGARDEN MILESTONE §3Melon §845➜§346
@@ -98,6 +100,7 @@ object GardenCropMilestones {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Milestones") return
 
+        clearMilestoneCache()
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
             totalPattern.firstMatcher(stack.getLore()) {
@@ -110,7 +113,7 @@ object GardenCropMilestones {
         inaccurateMilestone = false
         storage?.lastMilestoneFix = SimpleTimeMark.now()
         GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
-        clearMilestoneCache()
+        GardenCropMilestoneInventory.updateAverage()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -171,7 +174,7 @@ object GardenCropMilestones {
         CropMilestoneUpdateEvent.post()
     }
 
-    private fun CropType.setMilestoneCounter(counter: Long) { //only call this with addMilestoneCounter
+    private fun CropType.setMilestoneCounter(counter: Long) { // only call this with addMilestoneCounter
         ChatUtils.debug("Setting Milestone Counter: Crop: $this Amount: $counter")
         cropMilestoneCounter?.set(this, counter)
     }
@@ -181,6 +184,7 @@ object GardenCropMilestones {
         val tierCutoff = this.milestoneNextTierAmount()
         val maxTier = getMaxTier()
 
+        ChatUtils.debug("Tier Progress: $tierProgress, maxTier: $maxTier, tierCutoff: $tierCutoff")
         if (tierProgress == null || tierCutoff == null || maxTier == null) return
 
         if (tierProgress >= tierCutoff) {
@@ -198,6 +202,7 @@ object GardenCropMilestones {
 
             this.setMilestoneTier(newLevel)
             this.milestoneCalculateTierProgress()?.let { this.setProgress(it) }
+            return
         }
 
         if (tierProgress < 0) {
@@ -366,9 +371,9 @@ object GardenCropMilestones {
         return data.getOrNull(overflowTier)?.toLong()
     }
 
-    fun onOverflowLevelUp(crop: CropType, oldLevel: Int, newLevel: Int) {
+    private fun onOverflowLevelUp(crop: CropType, oldLevel: Int, newLevel: Int) {
         val customGoalLevel = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone?.get(crop) ?: 0
-        val goalReached = newLevel == customGoalLevel
+        val goalReached = newLevel == customGoalLevel // TODO move
 
         // TODO utils function that is shared with Garden Level Display
         val rewards = buildList {
@@ -429,7 +434,7 @@ object GardenCropMilestones {
         }
     }
 
-    //TODO fix this
+    // TODO fix this
     private fun checkTabDifference(cropName: String, tier: Int, percentage: Double) {
         if (!ProfileStorageData.loaded) return
 
@@ -461,6 +466,53 @@ object GardenCropMilestones {
         crop.addMilestoneCounter(amount)
     }
 
+    data class MilestoneGoal(val tier: Int, val cropAmount: Long)
+
+    var milestoneCustomGoals: MutableMap<CropType, MilestoneGoal> = mutableMapOf()
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.customGoalCrops.afterChange {
+            milestoneCustomGoals.clear()
+            for (crop in this) {
+                milestoneCustomGoals[crop] = crop.customGoalFromConfig()
+            }
+            GardenCropMilestoneDisplay.update()
+            ChatUtils.debug("Updated All Custom Goals!")
+        }
+        for (crop in CropType.entries) {
+            ConditionalUtils.onToggle(crop.getCustomGoalConfig()) {
+                milestoneCustomGoals.replace(crop, crop.customGoalFromConfig())
+                GardenCropMilestoneDisplay.update()
+                ChatUtils.debug("Custom goal $crop set")
+            }
+        }
+    }
+
+    fun CropType.getCustomGoal() = milestoneCustomGoals[this]
+
+    private fun CropType.customGoalFromConfig(): MilestoneGoal {
+        val customGoalTier = this.getCustomGoalConfig().get()
+        val customGoalAmount = this.milestoneTotalCropsForTier(customGoalTier) ?: 0
+        return MilestoneGoal(customGoalTier, customGoalAmount)
+    }
+
+    private fun CropType.getCustomGoalConfig(): Property<Int> = with(config.customGoalConfig) {
+        when (this@getCustomGoalConfig) {
+            CropType.WHEAT -> wheat
+            CropType.CARROT -> carrot
+            CropType.POTATO -> potato
+            CropType.NETHER_WART -> wart
+            CropType.PUMPKIN -> pumpkin
+            CropType.MELON -> melon
+            CropType.COCOA_BEANS -> cocoa
+            CropType.SUGAR_CANE -> cane
+            CropType.CACTUS -> cactus
+            CropType.MUSHROOM -> mushroom
+        }
+    }
+
+
     private fun clearMilestoneCache() {
         cropMilestoneTierCache.clear()
         amountToNextMilestoneTierCache.clear()
@@ -486,6 +538,7 @@ object GardenCropMilestones {
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
         clearMilestoneCache()
+        CropMilestoneUpdateEvent.post()
     }
 
     @HandleEvent

@@ -38,7 +38,7 @@ object CropCollectionAPI {
             CropCollectionType.PEST_RNG,
         )
 
-    private fun addMilestoneCommand(cropText: String, amount: Long, typeText: String) {
+    private fun addCollectionCommand(cropText: String, amount: Long, typeText: String) {
         val crop = CropType.getByNameOrNull(cropText.replace("_", " ")) ?: run {
             ChatUtils.userError("Invalid type! Format is /shaddcropcollection <crop> <amount> <type>")
             return
@@ -61,7 +61,7 @@ object CropCollectionAPI {
             arg("crop", BrigadierArguments.string()) { crop ->
                 arg("amount", BrigadierArguments.long()) { amount ->
                     arg("type", BrigadierArguments.string()) { type ->
-                        callback { addMilestoneCommand(getArg(crop), getArg(amount), getArg(type)) }
+                        callback { addCollectionCommand(getArg(crop), getArg(amount), getArg(type)) }
                     }
                 }
             }

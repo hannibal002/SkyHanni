@@ -3,14 +3,15 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.CropCollectionAPI
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneProgressToNextTier
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneTierAmount
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getCustomGoal
+import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.getMaxTier
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.milestoneNextTierAmount
 import at.hannibal2.skyhanni.data.garden.GardenCropMilestones.percentToNextMilestone
@@ -18,20 +19,20 @@ import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.garden.DisplayCropChange
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -41,14 +42,14 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+// TODO update display on overflow config toggle
 @SkyHanniModule
 object GardenCropMilestoneDisplay {
-
     private var progressDisplay = emptyList<Renderable>()
     private var mushroomCowPerkDisplay = emptyList<Renderable>()
     private val config get() = GardenApi.config.cropMilestones
     private val overflowConfig get() = config.overflow
-    private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone
+    private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone // TODO configFix
 
     private var countdownTitleContext: TitleContext? = null
     private var lastTitleWarnedLevel = -1
@@ -60,20 +61,23 @@ object GardenCropMilestoneDisplay {
     private var lastMushWarnedLevel = -1
     private var previousMushNext = 0
 
-    private var currentCrop: CropType? = null
+    private var displayCrop: CropType? = null
+    private var defaultCrop: CropType? = null
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(
-            config.bestShowMaxedNeeded,
+        onToggle(
+            config.showMaxTier,
             config.highestTimeFormat,
+            config.overflow.cropMilestoneDisplay
         ) {
-            GardenBestCropTime.updateTimeTillNextCrop()
+            // GardenBestCropTime.updateTimeTillNextCrop()
             update()
         }
     }
 
-    @HandleEvent
+    // TODO move best crop time and mooshroom cow displays into separate objects
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
@@ -82,15 +86,15 @@ object GardenCropMilestoneDisplay {
             progressDisplay, posLabel = "Crop Milestone Progress",
         )
 
-        if (config.mushroomPetPerk.enabled) {
+        /* if (config.mushroomPetPerk.enabled) {
             config.mushroomPetPerk.pos.renderRenderables(
                 mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk",
             )
-        }
+        }*/
 
-        if (config.next.bestDisplay) {
+        /* if (config.next.bestDisplay) {
             config.next.displayPos.renderRenderable(GardenBestCropTime.display, posLabel = "Best Crop Time")
-        }
+        }*/
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
@@ -104,46 +108,57 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
-        needsInventory = false
-        GardenBestCropTime.updateTimeTillNextCrop()
+        // needsInventory = false
+        // GardenBestCropTime.updateTimeTillNextCrop()
         update()
     }
 
-    @HandleEvent
-    fun onDisplayCropChange(event: DisplayCropChange) {
-        currentCrop = event.crop
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onOpenInventory(event: InventoryOpenEvent) {
         update()
     }
 
     fun update() {
         progressDisplay = emptyList()
-        mushroomCowPerkDisplay = emptyList()
-        GardenBestCropTime.display = null
-        val displayCrop =
-            currentCrop ?: if (config.showWithoutTool) CropCollectionAPI.lastGainedCrop else GardenApi.getCurrentlyFarmedCrop()
-        displayCrop?.let {
+        // mushroomCowPerkDisplay = emptyList()
+        // GardenBestCropTime.display = null
+        val crop =
+            displayCrop ?: getDefaultCrop()
+
+        crop?.let {
             progressDisplay = drawProgressDisplay(it)
         }
 
-        if (config.next.bestDisplay && config.next.bestAlwaysOn.get() || displayCrop != null) {
+        /* if (config.next.bestDisplay && config.next.bestAlwaysOn.get() || displayCrop != null) {
             GardenBestCropTime.display = GardenBestCropTime.drawBestDisplay(displayCrop)
+        }*/
+    }
+
+    private fun getDefaultCrop(): CropType? {
+        ChatUtils.debug("Get default crop")
+        return if (config.showWithoutTool) {
+            CropCollectionAPI.lastGainedCrop
+        } else {
+            GardenApi.getCurrentlyFarmedCrop()
         }
     }
 
     private fun drawProgressDisplay(crop: CropType): List<Renderable> {
+        ChatUtils.debug("Rendering display")
         val counter = crop.getMilestoneCounter()
         val lineMap = mutableMapOf<MilestoneTextEntry, Renderable>()
         val errorMessage = listOf<Renderable>(Renderable.text("§eError: Repo failed to load."))
+
         lineMap[MilestoneTextEntry.TITLE] = Renderable.text("§6Crop Milestones")
 
-        val customTargetLevel = storage?.get(crop) ?: 0
-        val overflowDisplay = overflowConfig.cropMilestoneDisplay
-        val allowOverflow = overflowDisplay || (customTargetLevel != 0)
+        val customGoal = crop.getCustomGoal()?.tier
+        val overflowDisplay = overflowConfig.cropMilestoneDisplay.get()
         val currentTier = crop.getCurrentMilestoneTier() ?: return errorMessage
-        var nextTier = if (config.bestShowMaxedNeeded.get() && currentTier <= 46) 46 else currentTier + 1
-        val nextRealTier = nextTier
-        val useCustomGoal = customTargetLevel != 0 && customTargetLevel > currentTier
-        nextTier = if (useCustomGoal) customTargetLevel else nextTier
+        val maxTier = getMaxTier() ?: return errorMessage
+        var nextTier = if (config.showMaxTier.get() && currentTier <= maxTier) maxTier else currentTier + 1
+        val useCustomGoal = customGoal != null && customGoal > 0 && customGoal > nextTier
+
+        nextTier = if (useCustomGoal) customGoal!! else nextTier
 
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontal {
             addItemStack(crop.icon)
@@ -154,20 +169,7 @@ object GardenCropMilestoneDisplay {
             }
         }
 
-        val allowOverflowOrCustom = overflowDisplay || useCustomGoal
-        val cropsForNextTier = crop.milestoneNextTierAmount() ?: return errorMessage
-        val (have, need) = if (config.bestShowMaxedNeeded.get() && !overflowDisplay) {
-            Pair(counter, cropsForNextTier)
-        } else {
-            val have = if (useCustomGoal) counter else crop.milestoneProgressToNextTier() ?: return errorMessage
-            val need = if (useCustomGoal) {
-                cropsForNextTier
-            } else {
-                crop.milestoneNextTierAmount() ?: return errorMessage
-            }
-            Pair(have, need)
-        }
-
+        val (have, need) = getHaveNeed(overflowDisplay, counter, useCustomGoal, crop)
         lineMap[MilestoneTextEntry.NUMBER_OUT_OF_TOTAL] = if (crop.isMaxMilestone() == true && !overflowDisplay) {
             val haveFormat = counter.addSeparators()
             Renderable.text("§7Counter: §e$haveFormat")
@@ -220,15 +222,6 @@ object GardenCropMilestoneDisplay {
             lineMap[MilestoneTextEntry.BLOCKS_PER_SECOND] = Renderable.text("§7Blocks/Second§8: §e$formatBps")
         }
 
-        if (overflowConfig.chat) {
-            if (currentTier > 46 && currentTier == previousNext &&
-                nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
-            ) {
-                GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
-                lastWarnedLevel = currentTier
-            }
-        }
-
         if (GardenApi.mushroomCowPet && crop != CropType.MUSHROOM) {
             addMushroomCowData()
         }
@@ -236,6 +229,20 @@ object GardenCropMilestoneDisplay {
         previousNext = nextRealTier*/
 
         return formatDisplay(lineMap)
+    }
+
+    private fun getHaveNeed(overflowDisplay: Boolean, counter: Long, useCustomGoal: Boolean, crop: CropType): Pair<Long, Long> {
+        if (config.showMaxTier.get() && !overflowDisplay) {
+            return Pair(counter, crop.milestoneNextTierAmount() ?: 0)
+        } else {
+            val have = if (useCustomGoal) counter else crop.milestoneProgressToNextTier() ?: 0
+            val need = if (useCustomGoal) {
+                crop.getCustomGoal()?.cropAmount ?: 0
+            } else {
+                crop.milestoneNextTierAmount() ?: 0
+            }
+            return Pair(have, need)
+        }
     }
 
     private fun tryWarn(timeLeft: Duration, title: String, crop: CropType) {
@@ -267,12 +274,11 @@ object GardenCropMilestoneDisplay {
         if (InventoryUtils.inInventory() || InventoryUtils.inContainer()) {
             newList.add(
                 Renderable.clickable(
-                    "§7[§a${currentCrop ?: "Default"}§7]",
+                    "§7[§a${displayCrop ?: "Default"}§7]",
                     tips = listOf("Click for next crop"),
                     onLeftClick = {
                         selectNextCrop()
                         update()
-                        DisplayCropChange(currentCrop).post()
                     }
                 )
             )
@@ -283,11 +289,11 @@ object GardenCropMilestoneDisplay {
         if (needsInventory) {
             newList.addString("§cOpen §e/cropmilestones §cto update!")
         }
-
         return newList
     }
 
-    private fun addMushroomCowData() {
+    // TODO separate display
+    /*private fun addMushroomCowData() {
         val mushroom = CropType.MUSHROOM
         val allowOverflow = overflowConfig.cropMilestoneDisplay
         if (mushroom.isMaxMilestone() == true && !allowOverflow) {
@@ -339,11 +345,11 @@ object GardenCropMilestoneDisplay {
 
         previousMushNext = nextTier
         mushroomCowPerkDisplay = config.mushroomPetPerk.text.mapNotNull { lineMap[it] }
-    }
+    }*/
 
     private fun selectNextCrop() {
-        currentCrop = if (currentCrop == null) CropType.entries.first()
-        else currentCrop?.let { sb ->
+        displayCrop = if (displayCrop == null) CropType.entries.first()
+        else displayCrop?.let { sb ->
             CropType.entries.filter { it.ordinal > sb.ordinal }.minByOrNull { it.ordinal }
         }
     }
