@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.garden.CropMilestones.config
 import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -18,7 +17,7 @@ object CropMilestonesCustomGoals {
     data class MilestoneGoal(val tier: Int, val cropAmount: Long)
 
     val config get() = CropMilestones.config
-    var milestoneCustomGoals: MutableMap<CropType, MilestoneGoal> = mutableMapOf()
+    private var milestoneCustomGoals: MutableMap<CropType, MilestoneGoal> = mutableMapOf()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {

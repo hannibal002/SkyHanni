@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.garden.CropMilestones.cropMilestoneRepoData
 import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -140,23 +141,21 @@ object CropMilestonesCommunityFix {
         }
         totalFixedValues += fixed
         ChatUtils.chat("Fixed: $fixed/$alreadyCorrect, total fixes: $totalFixedValues")
-        val s = ConfigManager.gson.toJsonTree(CropMilestones.cropMilestoneData).toString()
+        val s = ConfigManager.gson.toJsonTree(cropMilestoneRepoData).toString()
         OSUtils.copyToClipboard("\"crop_milestones\":$s,")
     }
 
     private fun tryFix(crop: CropType, tier: Int, amount: Int): Boolean {
         val guessNextMax = nextMax(tier, crop)
-        if (guessNextMax != null) {
-            if (guessNextMax.toInt() == amount) return false
-        }
-        CropMilestones.cropMilestoneData = CropMilestones.cropMilestoneData.editCopy {
+        if (guessNextMax.toInt() == amount) return false
+        cropMilestoneRepoData = cropMilestoneRepoData.editCopy {
             fix(crop, this, tier, amount)
         }
         return true
     }
 
-    private fun nextMax(tier: Int, crop: CropType): Long? =
-        crop.milestoneTotalCropsForTier(tier)?.let { crop.milestoneTotalCropsForTier(tier + 1)?.minus(it) }
+    private fun nextMax(tier: Int, crop: CropType): Long =
+        crop.milestoneTotalCropsForTier(tier).let { crop.milestoneTotalCropsForTier(tier + 1).minus(it) }
 
     private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
         map[crop] = map[crop]!!.editCopy {

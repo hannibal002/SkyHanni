@@ -3,19 +3,17 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.CropCollectionAPI
 import at.hannibal2.skyhanni.data.garden.CropMilestones
-import at.hannibal2.skyhanni.data.garden.CropMilestones.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneProgressToNextTier
 import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.garden.CropMilestones.getMaxTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getMaxedMilestoneAmount
+import at.hannibal2.skyhanni.data.garden.CropMilestones.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.CropMilestones.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneNextTierAmount
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTierAmount
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneProgressToNextTier
 import at.hannibal2.skyhanni.data.garden.CropMilestones.percentToNextMilestone
 import at.hannibal2.skyhanni.data.garden.CropMilestonesCustomGoals.getCustomGoal
 import at.hannibal2.skyhanni.data.title.TitleContext
@@ -23,7 +21,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
@@ -59,7 +57,6 @@ object GardenCropMilestoneDisplay {
 
     private var countdownTitleContext: TitleContext? = null
     private var lastTitleWarnedLevel = -1
-    private var needsInventory = false
 
     private var previousMushNext = 0
 
@@ -98,13 +95,9 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        CropMilestones.cropMilestoneCounter?.let {
-            if (it.values.sum() == 0L) {
-                needsInventory = true
-            }
-        }
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onGardenJoin(event: IslandChangeEvent) {
+        update()
     }
 
     @HandleEvent
@@ -148,15 +141,14 @@ object GardenCropMilestoneDisplay {
         ChatUtils.debug("Rendering display")
         val counter = crop.getMilestoneCounter()
         val lineMap = mutableMapOf<MilestoneTextEntry, Renderable>()
-        val errorMessage = listOf<Renderable>(Renderable.text("§eError: Repo failed to load."))
 
         lineMap[MilestoneTextEntry.TITLE] = Renderable.text("§6Crop Milestones")
 
         val customGoal = crop.getCustomGoal()?.tier
         val useMaxTier = config.showMaxTier.get()
         val overflowDisplay = overflowConfig.cropMilestoneDisplay.get()
-        val currentTier = crop.getCurrentMilestoneTier() ?: return errorMessage
-        val maxTier = getMaxTier() ?: return errorMessage
+        val currentTier = crop.getCurrentMilestoneTier()
+        val maxTier = getMaxTier()
         var nextTier = if (useMaxTier && currentTier <= maxTier) maxTier else currentTier + 1
         val useCustomGoal = customGoal != null && customGoal > 0 && customGoal > nextTier
 
@@ -164,7 +156,7 @@ object GardenCropMilestoneDisplay {
 
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontal {
             addItemStack(crop.icon)
-            if (crop.isMaxMilestone() == true && !overflowDisplay) {
+            if (crop.isMaxMilestone() && !overflowDisplay) {
                 addString("§7" + crop.cropName + " §eMAXED")
             } else {
                 addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
@@ -172,7 +164,7 @@ object GardenCropMilestoneDisplay {
         }
 
         val (have, need) = getHaveNeed(crop, counter, overflowDisplay, useCustomGoal, useMaxTier)
-        lineMap[MilestoneTextEntry.NUMBER_OUT_OF_TOTAL] = if (crop.isMaxMilestone() == true && !overflowDisplay) {
+        lineMap[MilestoneTextEntry.NUMBER_OUT_OF_TOTAL] = if (crop.isMaxMilestone() && !overflowDisplay) {
             val haveFormat = counter.addSeparators()
             Renderable.text("§7Counter: §e$haveFormat")
         } else {
@@ -181,13 +173,14 @@ object GardenCropMilestoneDisplay {
             Renderable.text("§e$haveFormat§8/§e$needFormat")
         }
 
-        val percentageFormat = crop.percentToNextMilestone()?.formatPercentage() ?: return errorMessage
-        lineMap[MilestoneTextEntry.PERCENTAGE] = if (crop.isMaxMilestone() == true && !overflowDisplay) {
+        val percentageFormat = crop.percentToNextMilestone().formatPercentage()
+        lineMap[MilestoneTextEntry.PERCENTAGE] = if (crop.isMaxMilestone() && !overflowDisplay) {
             Renderable.text("§7Percentage: §e100%")
         } else {
             Renderable.text("§7Percentage: §e$percentageFormat")
         }
 
+        // TODO move everything underneath this to new display
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune()
         val speed = GardenCropSpeed.averageBlocksPerSecond
         val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).roundTo(1).toInt()
@@ -232,17 +225,13 @@ object GardenCropMilestoneDisplay {
     }
 
     private fun getHaveNeed(crop: CropType, counter: Long, overflowDisplay: Boolean, useCustomGoal: Boolean, showMaxTier: Boolean): Pair<Long, Long> {
-        if (config.showMaxTier.get() && !overflowDisplay) {
-            return Pair(counter, crop.milestoneNextTierAmount() ?: 0)
-        } else {
-            val have = if (useCustomGoal || showMaxTier) counter else crop.milestoneProgressToNextTier() ?: 0
-            val need = if (useCustomGoal) {
-                crop.getCustomGoal()?.cropAmount ?: 0
-            } else {
-                crop.milestoneNextTierAmount() ?: 0
-            }
-            return Pair(have, need)
+        val have = if (useCustomGoal || showMaxTier) counter else crop.milestoneProgressToNextTier()
+        val need = when {
+            useCustomGoal -> crop.getCustomGoal()?.cropAmount ?: 0
+            showMaxTier -> crop.getMaxedMilestoneAmount()
+            else -> crop.milestoneNextTierAmount()
         }
+        return Pair(have, need)
     }
 
     private fun tryWarn(timeLeft: Duration, title: String, crop: CropType) {
@@ -257,7 +246,7 @@ object GardenCropMilestoneDisplay {
         }
 
         lastTitleWarnedLevel = crop.getCurrentMilestoneTier().takeIf { it != lastTitleWarnedLevel } ?: return
-        if (needsInventory || countdownTitleContext != null) return
+        if (CropMilestones.inaccurateMilestone || countdownTitleContext != null) return
 
         countdownTitleContext = TitleManager.sendTitle(
             title,
@@ -284,9 +273,23 @@ object GardenCropMilestoneDisplay {
             )
         }
 
+        if (CropMilestones.missingMilestoneRepoData) {
+            newList.add(Renderable.text("§cMissing Milestone Repo Data!"))
+            val inaccurateList = listOf(
+                MilestoneTextEntry.MILESTONE_TIER,
+                MilestoneTextEntry.PERCENTAGE,
+                MilestoneTextEntry.NUMBER_OUT_OF_TOTAL,
+                MilestoneTextEntry.TIME
+            )
+
+            for (key in inaccurateList) {
+                lineMap.remove(key)
+            }
+        }
+
         newList.addAll(config.text.mapNotNull { lineMap[it] })
 
-        if (needsInventory) {
+        if (CropMilestones.inaccurateMilestone) {
             newList.addString("§cOpen §e/cropmilestones §cto update!")
         }
         return newList
@@ -296,7 +299,7 @@ object GardenCropMilestoneDisplay {
     private fun addMushroomCowData() {
         val mushroom = CropType.MUSHROOM
         val allowOverflow = overflowConfig.cropMilestoneDisplay
-        if (mushroom.isMaxMilestone() == true && !allowOverflow.get()) {
+        if (mushroom.isMaxMilestone() && !allowOverflow.get()) {
             mushroomCowPerkDisplay = listOf(
                 Renderable.text("§6Mooshroom Cow Perk"),
                 Renderable.text("§eMushroom crop is maxed!"),
@@ -306,11 +309,11 @@ object GardenCropMilestoneDisplay {
 
         val lineMap = HashMap<MushroomTextEntry, Renderable>()
 
-        val currentTier = mushroom.getCurrentMilestoneTier() ?: return
+        val currentTier = mushroom.getCurrentMilestoneTier()
         val nextTier = currentTier + 1
 
-        val have = mushroom.milestoneProgressToNextTier() ?: return
-        val need = mushroom.milestoneNextTierAmount() ?: return
+        val have = mushroom.milestoneProgressToNextTier()
+        val need = mushroom.milestoneNextTierAmount()
 
         val haveFormat = have.addSeparators()
         val needFormat = need.addSeparators()
