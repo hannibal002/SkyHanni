@@ -42,6 +42,7 @@ object JacobContestStatsSummary {
 
         when (event.phase) {
             FarmingContestPhase.START -> {
+                blocksBroken.clear()
                 ChatUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
                 startTime = SimpleTimeMark.now()
             }
@@ -56,7 +57,6 @@ object JacobContestStatsSummary {
                 val color = getBlocksPerSecondColor(blocksPerSecond)
                 ChatUtils.chat("§7Average Blocks Per Second: $color$blocksPerSecond")
                 ChatUtils.chat("§7Participated for §b$time")
-                blocksBroken.clear()
             }
 
             FarmingContestPhase.CHANGE -> {
