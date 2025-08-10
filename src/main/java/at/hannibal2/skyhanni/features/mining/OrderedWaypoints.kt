@@ -208,7 +208,8 @@ object OrderedWaypoints {
                     "§cSupported Formats: ${getAvailableWaypointFormats().joinToString(", ")}",
             )
 
-            currentWaypointIndex = waypointData.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
+            val currentIndex = waypointData.minByOrNull { waypoint -> waypoint.location.distanceSqToPlayer() }?.number ?: 1
+            currentWaypointIndex = currentIndex - 1
             renderWaypointIndices.clear()
             ChatUtils.chat("Loaded ordered waypoints!")
         }
@@ -349,7 +350,7 @@ object OrderedWaypoints {
     private fun <N : AbstractWaypoint> exportWaypointSet(
         waypoints: WaypointSet<N>,
         name: String,
-    ): String? = services.firstOrNull { it.name == name }?.let {
+    ): String? = services.firstOrNull { it.formatType.displayName == name }?.let {
         @Suppress("UNCHECKED_CAST")
         val fmt = it as? AbstractWaypointFormat<N> ?: return null
         fmt.serialize(waypoints)
