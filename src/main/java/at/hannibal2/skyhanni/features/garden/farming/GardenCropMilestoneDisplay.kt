@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.garden.CropCollectionAPI
 import at.hannibal2.skyhanni.data.garden.CropMilestones
 import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
@@ -43,6 +45,9 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -57,6 +62,7 @@ object GardenCropMilestoneDisplay {
 
     private var countdownTitleContext: TitleContext? = null
     private var lastTitleWarnedLevel = -1
+    private var inventoryOpen = false
 
     private var previousMushNext = 0
 
@@ -80,6 +86,14 @@ object GardenCropMilestoneDisplay {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
 
+        var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
+        if (RenderData.outsideInventory) {
+            currentlyOpen = false
+        }
+        if (inventoryOpen != currentlyOpen) {
+            inventoryOpen = currentlyOpen
+            update()
+        }
         config.progressDisplayPos.renderRenderables(
             progressDisplay, posLabel = "Crop Milestone Progress",
         )
@@ -104,11 +118,6 @@ object GardenCropMilestoneDisplay {
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         // needsInventory = false
         GardenBestCropTime.updateTimeTillNextCrop()
-        update()
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onOpenInventory(event: InventoryOpenEvent) {
         update()
     }
 
@@ -260,7 +269,7 @@ object GardenCropMilestoneDisplay {
     // TODO Dropdown Menu
     private fun formatDisplay(lineMap: MutableMap<MilestoneTextEntry, Renderable>): List<Renderable> {
         val newList = mutableListOf<Renderable>()
-        if (InventoryUtils.inInventory() || InventoryUtils.inContainer()) {
+        if (inventoryOpen) {
             newList.add(
                 Renderable.clickable(
                     "§7[§a${displayCrop ?: "Default"}§7]",
