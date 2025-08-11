@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.garden.CropMilestones.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneNextTierAmount
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneProgressToNextTier
 import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTierAmount
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -38,8 +40,8 @@ object GardenInventoryTooltipOverflow {
         val split = stack.cleanName().split(" ")
         val crop = getCrop(split)
 
-        val currentTier = crop.getCurrentMilestoneTier() ?: return
-        val (have, need) = getHaveNeed(currentTier, crop)
+        val currentTier = crop.getCurrentMilestoneTier()
+        val (have, need) = getHaveNeed(crop)
         val (level, nextLevel) = getLevels(split, currentTier)
 
         var next = false
@@ -75,12 +77,10 @@ object GardenInventoryTooltipOverflow {
     }
 
     private fun getHaveNeed(
-        currentTier: Int,
         crop: CropType,
     ): Pair<Long, Long> {
-        val nextTier = currentTier + 1
-        val have = crop.getMilestoneCounter()
-        val need = have + (crop.milestoneTierAmount(nextTier) ?: 0)
+        val have = crop.milestoneProgressToNextTier()
+        val need = crop.milestoneNextTierAmount()
         return Pair(have, need)
     }
 

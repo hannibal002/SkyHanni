@@ -318,17 +318,6 @@ internal object RenderableUtils {
         )
     }
 
-    /*inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableNullableButton(
-        label: String,
-        current: T?,
-        crossinline getName: (T?) -> String = { it?.toString().orEmpty() },
-        crossinline onChange: (T?) -> Unit,
-        universe: List<T?> = enumValues<T>().toList(),
-        enableUniverseScroll: Boolean = true,
-    ) {
-        add(createButtonNew(label, current, getName, onChange, universe, enableUniverseScroll).renderable)
-    }*/
-
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableNullableButton(
         label: String,
         current: T?,
