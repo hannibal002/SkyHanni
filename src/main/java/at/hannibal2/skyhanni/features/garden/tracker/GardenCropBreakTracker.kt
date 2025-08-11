@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
@@ -54,7 +55,7 @@ object GardenCropBreakTracker {
         if (event.crop != cropBrokenType) cropBrokenType = event.crop
 
         if (GardenApi.mushroomCowPet) {
-            mooshroomCowCrops += weightedRandomRound((CurrentPetApi.currentPet?.level ?: 0) / 100.0).toInt()
+            mooshroomCowCrops += weightedRandomRound(CurrentPetApi.currentPet?.level ?: 0)
         }
 
         if (itemHasCounter || heldItem == null) return
@@ -62,7 +63,7 @@ object GardenCropBreakTracker {
         val fortune = storage?.latestTrueFarmingFortune?.get(event.crop) ?: return
         addToCropMap(
             event.crop,
-            ((weightedRandomRound(fortune % 100) + floor(fortune / 100) + 1) * 5.0).toInt()
+            ((weightedRandomRound((fortune % 100).toInt()) + floor(fortune / 100) + 1) * event.crop.baseDrops).toInt()
         )
     }
 
@@ -95,14 +96,15 @@ object GardenCropBreakTracker {
         }
 
         if (mooshroomCowCrops > 0) {
+            ChatUtils.debug("Added mooshroom cow crops")
             CropType.MUSHROOM.addCollectionCounter(CropCollectionType.MOOSHROOM_COW, mooshroomCowCrops.toLong())
             mooshroomCowCrops = 0
         }
     }
 
-    private fun weightedRandomRound(num: Double): Double {
-        val randomNumber = Random.nextInt(1, 100)
-        return if (num >= randomNumber) 1.0 else 0.0
+    private fun weightedRandomRound(num: Int): Int {
+        val randomNumber = Random.nextInt(0, 100)
+        return if (num >= randomNumber) 1 else 0
     }
 
     private fun addToCropMap(cropType: CropType, amount: Int) {

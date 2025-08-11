@@ -24,7 +24,7 @@ object CropCollectionAPI {
 
     fun CropType.addCollectionCounter(type: CropCollectionType, amount: Long) {
         if (amount == 0L) return
-        if (type != CropCollectionType.UNKNOWN && amount > 1) lastGainedCrop = this
+        if (type !in listOf(CropCollectionType.UNKNOWN, CropCollectionType.MOOSHROOM_COW) && amount > 1) lastGainedCrop = this
 
         CropCollectionAddEvent(this, type, amount).post()
     }
