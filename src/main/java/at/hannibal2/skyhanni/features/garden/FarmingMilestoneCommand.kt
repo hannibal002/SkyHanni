@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentTyp
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneProgressToNextTier
 import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneNextTierAmount
 import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,23 +22,15 @@ object FarmingMilestoneCommand {
 
     private fun onCommand(crop: CropType, current: Int?, target: Int?, needsTime: Boolean) {
         if (current == null) {
-            val output = (crop.milestoneProgressToNextTier())?.formatOutput(needsTime, crop)
-            if (output == null) {
-                milestoneError()
-            } else {
-                ChatUtils.chat("§7$output needed to reach the next milestone")
-            }
+            val output = (crop.milestoneNextTierAmount() - crop.milestoneProgressToNextTier()).formatOutput(needsTime, crop)
+            ChatUtils.chat("§7$output needed to reach the next milestone")
             return
         }
 
         if (target == null) {
             val cropsForTier = crop.milestoneTotalCropsForTier(current)
-            val output = cropsForTier?.formatOutput(needsTime, crop)
-            if (output == null) {
-                milestoneError()
-            } else {
-                ChatUtils.chat("§7$output needed for milestone §7$current")
-            }
+            val output = cropsForTier.formatOutput(needsTime, crop)
+            ChatUtils.chat("§7$output needed for milestone §7$current")
             return
         }
 
@@ -46,8 +39,8 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val currentAmount = crop.milestoneTotalCropsForTier(current) ?: return milestoneError()
-        val targetAmount = crop.milestoneTotalCropsForTier(target) ?: return milestoneError()
+        val currentAmount = crop.milestoneTotalCropsForTier(current)
+        val targetAmount = crop.milestoneTotalCropsForTier(target)
         val output = (targetAmount - currentAmount).formatOutput(needsTime, crop)
         ChatUtils.chat("§7$output needed for milestone §7$current §a-> §7$target")
     }
@@ -59,13 +52,12 @@ object FarmingMilestoneCommand {
         return "${missingTime.format()}§a"
     }
 
-    private fun milestoneError() = ChatUtils.chat("§Missing Milestone Repo Data!")
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcalccrop") {
             description = "Calculate how many crops need to be farmed between different crop milestones."
             category = CommandCategory.USERS_ACTIVE
+            aliases = listOf("shcalcrop")
             arg("cropType", EnumArgumentType.custom<CropType>({ it.simpleName })) { crop ->
                 arg("current", BrigadierArguments.integer()) { current ->
                     arg("target", BrigadierArguments.integer()) { target ->
@@ -88,6 +80,7 @@ object FarmingMilestoneCommand {
         event.registerBrigadier("shcalccroptime") {
             description = "Calculate how long you need to farm crops between different crop milestones."
             category = CommandCategory.USERS_ACTIVE
+            aliases = listOf("shcalcroptime")
             arg("cropType", EnumArgumentType.custom<CropType>({ it.simpleName })) { crop ->
                 arg("current", BrigadierArguments.integer()) { current ->
                     arg("target", BrigadierArguments.integer()) { target ->
@@ -105,36 +98,6 @@ object FarmingMilestoneCommand {
             }
             simpleCallback {
                 ChatUtils.userError("No crop type entered")
-            }
-        }
-        event.registerBrigadier("shcropgoal") {
-            description = "Define a custom milestone goal for a crop."
-            category = CommandCategory.USERS_ACTIVE
-            arg("crop", EnumArgumentType.custom<CropType>({ it.simpleName })) { cropArg ->
-                arg("target", BrigadierArguments.integer()) { targetArg ->
-                    callback {
-                        val storage = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone ?: return@callback
-
-                        val crop = getArg(cropArg)
-                        val targetLevel = getArg(targetArg)
-
-                        val level = crop.getCurrentMilestoneTier() ?: return@callback milestoneError()
-                        if (targetLevel <= level && targetLevel != 0) {
-                            ChatUtils.userError(
-                                "Custom goal milestone ($targetLevel) must be greater than your current milestone ($level)."
-                            )
-                            return@callback
-                        }
-                        storage[crop] = targetLevel
-                        ChatUtils.chat("Custom goal milestone for §b${crop.cropName} §eset to §b$targetLevel.")
-                    }
-                }
-                simpleCallback {
-                    ChatUtils.userError("Usage: /shcropgoal <crop name> <target milestone>")
-                }
-            }
-            simpleCallback {
-                ChatUtils.userError("Usage: /shcropgoal <crop name> <target milestone>")
             }
         }
     }
