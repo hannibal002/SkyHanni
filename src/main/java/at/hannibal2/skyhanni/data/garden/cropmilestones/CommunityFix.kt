@@ -1,12 +1,14 @@
-package at.hannibal2.skyhanni.data.garden
+package at.hannibal2.skyhanni.data.garden.cropmilestones
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.garden.CropMilestones.cropMilestoneRepoData
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.cropMilestoneRepoData
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCropTypeByLore
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.totalPattern
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -29,7 +31,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
-object CropMilestonesCommunityFix {
+object CommunityFix {
 
     /**
      * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
@@ -65,7 +67,7 @@ object CropMilestonesCommunityFix {
     private fun fixForWrongData(inventoryItems: Map<Int, ItemStack>) {
         val data = mutableListOf<String>()
         for ((_, stack) in inventoryItems) {
-            val crop = CropMilestones.getCropTypeByLore(stack) ?: continue
+            val crop = getCropTypeByLore(stack) ?: continue
             checkForWrongData(stack, crop, data)
         }
 
@@ -92,7 +94,7 @@ object CropMilestonesCommunityFix {
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
-        val next = lore.nextAfter({ CropMilestones.totalPattern.matches(it) }, 3) ?: return
+        val next = lore.nextAfter({ totalPattern.matches(it) }, 3) ?: return
 
         val guessNextMax = nextMax(realTier, crop)
         val nextMax = amountPattern.matchMatcher(next) {

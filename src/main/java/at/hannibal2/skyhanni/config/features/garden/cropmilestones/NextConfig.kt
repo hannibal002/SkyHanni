@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden.cropmilestones
+package at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestones
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position

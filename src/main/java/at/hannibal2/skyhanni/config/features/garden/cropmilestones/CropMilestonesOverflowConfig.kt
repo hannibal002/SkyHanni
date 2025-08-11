@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden.cropmilestones
+package at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestones
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -10,11 +10,6 @@ class CropMilestonesOverflowConfig {
     @ConfigOption(name = "Crop Milestone Display", desc = "Show overflow levels in Crop Milestone display.")
     @ConfigEditorBoolean
     var cropMilestoneDisplay: Property<Boolean> = Property.of(false)
-
-    @Expose
-    @ConfigOption(name = "Best Crop Time", desc = "Show overflow levels in Best Crop Time Display.")
-    @ConfigEditorBoolean
-    var bestCropTime: Boolean = false
 
     @Expose
     @ConfigOption(

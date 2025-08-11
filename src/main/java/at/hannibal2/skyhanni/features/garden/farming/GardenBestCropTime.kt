@@ -2,18 +2,17 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.NextConfig.BestTypeEntry
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneProgressToNextTier
-import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTierAmount
-import at.hannibal2.skyhanni.data.garden.CropMilestones.isMaxMilestone
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestones.NextConfig.BestTypeEntry
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.isMaxMilestone
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneProgressToNextTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTierAmount
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO Fix this
 @SkyHanniModule
 object GardenBestCropTime {
 
@@ -91,7 +89,6 @@ object GardenBestCropTime {
         }
 
         val gardenExp = config.next.bestType.get() == BestTypeEntry.GARDEN_EXP
-        val useOverflow = config.overflow.bestCropTime
         val sorted = if (gardenExp) {
             val helpMap = mutableMapOf<CropType, Long>()
             for ((crop, time) in timeTillNextCrop) {
@@ -131,11 +128,11 @@ object GardenBestCropTime {
         }
 
         sorted.keys.withIndex().forEach { (index, crop) ->
-            createCropEntry(crop, index + 1, useOverflow, gardenExp, currentCrop)?.let(::add)
+            createCropEntry(crop, index + 1, gardenExp, currentCrop)?.let(::add)
         }
     }
 
-    private fun createCropEntry(crop: CropType, index: Int, useOverflow: Boolean, gardenExp: Boolean, currentCrop: CropType?): Renderable? {
+    private fun createCropEntry(crop: CropType, index: Int, gardenExp: Boolean, currentCrop: CropType?): Renderable? {
         if (crop.isMaxMilestone()) return null
         val millis = timeTillNextCrop[crop] ?: return null
         val biggestUnit = config.highestTimeFormat.get().timeUnit
@@ -169,10 +166,10 @@ object GardenBestCropTime {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.cropMilestoneBestType", "garden.cropMilestones.next.bestType")
-        event.move(3, "garden.cropMilestoneShowOnlyBest", "garden.cropMilestones.next.showOnlyBest")
-        event.move(3, "garden.cropMilestoneShowCurrent", "garden.cropMilestones.next.showCurrent")
-        event.move(3, "garden.cropMilestoneBestCompact", "garden.cropMilestones.next.bestCompact")
-        event.move(3, "garden.cropMilestoneBestHideTitle", "garden.cropMilestones.next.bestHideTitle")
+        event.move(3, "garden.cropMilestoneBestType", "garden.cropmilestones.CropMilestones.next.bestType")
+        event.move(3, "garden.cropmilestones.CropMilestoneshowOnlyBest", "garden.cropmilestones.CropMilestones.next.showOnlyBest")
+        event.move(3, "garden.cropmilestones.CropMilestoneshowCurrent", "garden.cropmilestones.CropMilestones.next.showCurrent")
+        event.move(3, "garden.cropMilestoneBestCompact", "garden.cropmilestones.CropMilestones.next.bestCompact")
+        event.move(3, "garden.cropMilestoneBestHideTitle", "garden.cropmilestones.CropMilestones.next.bestHideTitle")
     }
 }

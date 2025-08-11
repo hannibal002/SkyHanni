@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden.cropmilestones
+package at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestones
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

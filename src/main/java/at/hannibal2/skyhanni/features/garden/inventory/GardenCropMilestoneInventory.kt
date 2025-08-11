@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.garden.CropMilestones
-import at.hannibal2.skyhanni.data.garden.CropMilestones.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -44,12 +44,12 @@ object GardenCropMilestoneInventory {
     fun addMaxMilestoneProgress(event: ToolTipEvent) {
         if (!config.tooltipTweak.cropMilestoneTotalProgress || InventoryUtils.openInventoryName() != "Crop Milestones") return
 
-        val crop = CropMilestones.getCropTypeByLore(event.itemStack) ?: return
-        val tier = crop.getCurrentMilestoneTier() ?: return
+        val crop = CropMilestonesAPI.getCropTypeByLore(event.itemStack) ?: return
+        val tier = crop.getCurrentMilestoneTier()
         if (tier >= 20) return // Hypixel shows progress to ms46 after ms20
 
-        val maxTier = CropMilestones.getMaxTier()
-        val maxCounter = crop.milestoneTotalCropsForTier(maxTier) ?: return
+        val maxTier = CropMilestonesAPI.getMaxTier()
+        val maxCounter = crop.milestoneTotalCropsForTier(maxTier)
 
         val index = event.toolTipRemovedPrefix().indexOfFirst(
             "§7Rewards:",
@@ -71,7 +71,7 @@ object GardenCropMilestoneInventory {
         val tiers = mutableListOf<Double>()
         val allowOverflow = config.cropMilestones.overflow.inventoryStackSize
         for (cropType in CropType.entries) {
-            val tier = cropType.getCurrentMilestoneTier() ?: 0
+            val tier = cropType.getCurrentMilestoneTier()
             if (!allowOverflow && tier > 46)
                 tiers.add(tier.toDouble())
         }

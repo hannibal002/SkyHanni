@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.garden.CropMilestones.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.CropMilestones.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneNextTierAmount
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneProgressToNextTier
-import at.hannibal2.skyhanni.data.garden.CropMilestones.milestoneTierAmount
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneNextTierAmount
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneProgressToNextTier
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -25,7 +23,7 @@ import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 @SkyHanniModule
 object GardenInventoryTooltipOverflow {
 
-    private val config get() = SkyHanniMod.feature.garden.cropMilestones.overflow
+    private val config get() = GardenApi.config.cropMilestones.overflow
 
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
