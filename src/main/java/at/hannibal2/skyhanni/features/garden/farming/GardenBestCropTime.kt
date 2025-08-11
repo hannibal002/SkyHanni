@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -33,6 +34,8 @@ object GardenBestCropTime {
     private val config get() = GardenApi.config.cropMilestones
 
     val timeTillNextCrop = mutableMapOf<CropType, Duration>()
+    private val maxedCrops = mutableListOf<CropType>()
+    private var allCropsMaxed = false
 
     @HandleEvent
     fun onConfigLoad() {
@@ -55,10 +58,13 @@ object GardenBestCropTime {
     }
 
     fun updateTimeTillNextCrop() {
-        val useOverflow = config.overflow.bestCropTime
         for (crop in CropType.entries) {
+            if (crop !in maxedCrops && crop.isMaxMilestone()) {
+                maxedCrops.add(crop)
+                if (maxedCrops.size >= CropType.entries.size) allCropsMaxed = true
+                continue
+            }
             val speed = crop.getSpeed() ?: continue
-            if (crop.isMaxMilestone()) continue
 
             val currentTier = crop.getCurrentMilestoneTier()
 
@@ -80,7 +86,7 @@ object GardenBestCropTime {
     }
 
     fun drawBestDisplay(currentCrop: CropType?) = Renderable.vertical {
-        if (timeTillNextCrop.size < CropType.entries.size) {
+        if (timeTillNextCrop.size < CropType.entries.size && !allCropsMaxed) {
             updateTimeTillNextCrop()
         }
 
@@ -107,6 +113,11 @@ object GardenBestCropTime {
             } else {
                 addString("§eBest Crop Time §7($title§7)")
             }
+        }
+
+        if (allCropsMaxed) {
+            addString("§eAll Crops Maxed!")
+            return@vertical
         }
 
         if (!config.progress) {

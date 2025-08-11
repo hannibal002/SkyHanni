@@ -62,9 +62,8 @@ object GardenCropSpeed {
         }
     }
 
-    //TODO DEBUG ONLY REMOVE AFTER TESTING
     private fun update() {
-        //GardenCropMilestoneDisplay.update()
+        GardenCropMilestoneDisplay.update()
     }
 
     @HandleEvent

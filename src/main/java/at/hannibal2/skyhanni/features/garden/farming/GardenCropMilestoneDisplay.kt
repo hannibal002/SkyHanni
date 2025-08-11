@@ -50,9 +50,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-// TODO split bps into separate classes
-// TODO config load updates
-// TODO bps update timer
+// TODO config load updates for display and mooshroom cow
 @SkyHanniModule
 object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<Renderable>()
@@ -78,7 +76,6 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    // TODO move best crop time and mooshroom cow displays into separate objects
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
@@ -117,7 +114,6 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
-        GardenBestCropTime.updateTimeTillNextCrop()
         update()
     }
 
@@ -169,7 +165,7 @@ object GardenCropMilestoneDisplay {
             nextTier,
             useCustomGoal
         ) = getMilestoneInfo(crop)
-        val (have, need) = getHaveNeed(crop, counter, overflowDisplay, useCustomGoal, useMaxTier)
+        val (have, need) = getHaveNeed(crop, counter, useCustomGoal, useMaxTier)
 
         lineMap[MilestoneTextEntry.TITLE] = Renderable.text("§6Crop Milestones")
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = tiersRenderable(crop, currentTier, nextTier, overflowDisplay)
@@ -279,7 +275,7 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    private fun getHaveNeed(crop: CropType, counter: Long, overflowDisplay: Boolean, useCustomGoal: Boolean, showMaxTier: Boolean): Pair<Long, Long> {
+    fun getHaveNeed(crop: CropType, counter: Long, useCustomGoal: Boolean, showMaxTier: Boolean): Pair<Long, Long> {
         val have = if (useCustomGoal || showMaxTier) counter else crop.milestoneProgressToNextTier()
         val need = when {
             useCustomGoal -> crop.getCustomGoal()?.cropAmount ?: 0
@@ -364,7 +360,7 @@ object GardenCropMilestoneDisplay {
             nextTier,
             useCustomGoal
         ) = getMilestoneInfo(mushroom)
-        val (have, need) = getHaveNeed(mushroom, counter, overflowDisplay, useCustomGoal, useMaxTier)
+        val (have, need) = getHaveNeed(mushroom, counter, useCustomGoal, useMaxTier)
 
         lineMap[MushroomTextEntry.TITLE] = Renderable.text("§6Mooshroom Cow Perk")
         lineMap[MushroomTextEntry.MUSHROOM_TIER] = tiersRenderable(mushroom, currentTier, nextTier, overflowDisplay)
