@@ -50,7 +50,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-// TODO split bestcrop and bps into separate classes
+// TODO split bps into separate classes
 // TODO config load updates
 // TODO bps update timer
 @SkyHanniModule

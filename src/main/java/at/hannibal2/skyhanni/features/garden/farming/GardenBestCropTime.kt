@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+// TODO Fix this
 @SkyHanniModule
 object GardenBestCropTime {
 
@@ -57,18 +58,18 @@ object GardenBestCropTime {
         val useOverflow = config.overflow.bestCropTime
         for (crop in CropType.entries) {
             val speed = crop.getSpeed() ?: continue
-            if (crop.isMaxMilestone() == true) continue
+            if (crop.isMaxMilestone()) continue
 
-            val currentTier = crop.getCurrentMilestoneTier() ?: return
+            val currentTier = crop.getCurrentMilestoneTier()
 
-            val cropsForCurrentTier = crop.milestoneTotalCropsForTier(currentTier) ?: return
+            val cropsForCurrentTier = crop.milestoneTotalCropsForTier(currentTier)
 
-            val have = crop.milestoneProgressToNextTier() ?: return
+            val have = crop.milestoneProgressToNextTier()
             val need =
                 if (config.showMaxTier.get()) {
                     cropsForCurrentTier
                 } else {
-                    crop.milestoneTierAmount(currentTier + 1) ?: return
+                    crop.milestoneTierAmount(currentTier + 1)
                 }
 
             val missing = need - have
@@ -88,8 +89,8 @@ object GardenBestCropTime {
         val sorted = if (gardenExp) {
             val helpMap = mutableMapOf<CropType, Long>()
             for ((crop, time) in timeTillNextCrop) {
-                if (crop.isMaxMilestone() == true) continue
-                val gardenExpForTier = getGardenExpForTier((crop.getCurrentMilestoneTier() ?: return@vertical) + 1)
+                if (crop.isMaxMilestone()) continue
+                val gardenExpForTier = getGardenExpForTier((crop.getCurrentMilestoneTier()) + 1)
                 val fakeTime = time / gardenExpForTier
                 helpMap[crop] = fakeTime.inWholeMilliseconds
             }
@@ -124,7 +125,7 @@ object GardenBestCropTime {
     }
 
     private fun createCropEntry(crop: CropType, index: Int, useOverflow: Boolean, gardenExp: Boolean, currentCrop: CropType?): Renderable? {
-        if (crop.isMaxMilestone() == true) return null
+        if (crop.isMaxMilestone()) return null
         val millis = timeTillNextCrop[crop] ?: return null
         val biggestUnit = config.highestTimeFormat.get().timeUnit
         val duration = millis.format(biggestUnit, maxUnits = 2)
@@ -139,7 +140,7 @@ object GardenBestCropTime {
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val currentTier = crop.getCurrentMilestoneTier() ?: return@horizontal
+            val currentTier = crop.getCurrentMilestoneTier()
             val nextTier = if (config.showMaxTier.get()) 46 else currentTier + 1
 
             val cropName = if (!config.next.bestCompact.get()) crop.cropName + " " else ""

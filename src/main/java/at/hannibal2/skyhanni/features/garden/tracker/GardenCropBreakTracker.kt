@@ -96,7 +96,6 @@ object GardenCropBreakTracker {
         }
 
         if (mooshroomCowCrops > 0) {
-            ChatUtils.debug("Added mooshroom cow crops")
             CropType.MUSHROOM.addCollectionCounter(CropCollectionType.MOOSHROOM_COW, mooshroomCowCrops.toLong())
             mooshroomCowCrops = 0
         }
