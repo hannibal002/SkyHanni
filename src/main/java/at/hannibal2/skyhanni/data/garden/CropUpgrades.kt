@@ -35,7 +35,7 @@ object CropUpgrades {
         "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)",
     )
 
-    private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades
+    private val cropUpgradesStorage: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
@@ -60,9 +60,9 @@ object CropUpgrades {
         }
     }
 
-    fun CropType.getUpgradeLevel() = cropUpgrades?.get(this)
+    fun CropType.getUpgradeLevel() = cropUpgradesStorage?.get(this)
 
     private fun CropType.setUpgradeLevel(level: Int) {
-        cropUpgrades?.put(this, level)
+        cropUpgradesStorage?.put(this, level)
     }
 }

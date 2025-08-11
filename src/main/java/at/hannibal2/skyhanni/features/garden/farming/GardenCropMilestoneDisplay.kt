@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestones.CropMilestonesConfig.MilestoneTextEntry
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestones.MushroomPetPerkConfig.MushroomTextEntry
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionAPI
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI
@@ -147,6 +147,7 @@ object GardenCropMilestoneDisplay {
         }
     }
 
+    @Suppress("DestructuringDeclarationWithTooManyEntries")
     private fun drawProgressDisplay(crop: CropType): List<Renderable> {
         val lineMap = mutableMapOf<MilestoneTextEntry, Renderable>()
         val (
@@ -333,12 +334,14 @@ object GardenCropMilestoneDisplay {
             nullLabel = "Default",
             onChange = { new ->
                 displayCrop = new
+                update()
             },
             universe = CropType.entries,
-            enableUniverseScroll = false
+            enableUniverseScroll = false // would infinitely scroll while hovered
         )
     }
 
+    @Suppress("DestructuringDeclarationWithTooManyEntries")
     private fun addMushroomCowData() {
         val mushroom = CropType.MUSHROOM
         val lineMap = HashMap<MushroomTextEntry, Renderable>()

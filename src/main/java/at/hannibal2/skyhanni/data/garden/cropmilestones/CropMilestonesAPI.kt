@@ -118,7 +118,15 @@ object CropMilestonesAPI {
         amountToNextMilestoneTierCache[this] = amount
     }
 
-    fun getMaxTier() = maxTier ?: cropMilestoneRepoData.values.firstOrNull()?.size ?: run { missingMilestoneRepoData = true; return 0 }
+    fun getMaxTier(): Int {
+        maxTier?.let { return it }
+
+        val firstSize = cropMilestoneRepoData.values.firstOrNull()?.size
+        if (firstSize != null) return firstSize
+
+        missingMilestoneRepoData = true
+        return 0
+    }
 
     fun CropType.getMaxedMilestoneAmount(): Long {
         val msVal = maxMilestoneValue.getOrPut(this) {

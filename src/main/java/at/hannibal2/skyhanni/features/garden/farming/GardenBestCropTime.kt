@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestones.NextConfig.BestTypeEntry
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.NextConfig.BestTypeEntry
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneProgressToNextTier

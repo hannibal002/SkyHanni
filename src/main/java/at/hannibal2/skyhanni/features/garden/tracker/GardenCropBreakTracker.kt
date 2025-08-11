@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import net.minecraft.item.ItemStack
 import kotlin.math.floor

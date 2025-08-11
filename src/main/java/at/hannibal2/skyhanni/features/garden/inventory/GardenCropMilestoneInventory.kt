@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
