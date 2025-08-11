@@ -21,8 +21,6 @@ import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -32,7 +30,6 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -43,6 +40,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
@@ -116,7 +114,6 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
-        // needsInventory = false
         GardenBestCropTime.updateTimeTillNextCrop()
         update()
     }
@@ -266,22 +263,9 @@ object GardenCropMilestoneDisplay {
         )
     }
 
-    // TODO Dropdown Menu
     private fun formatDisplay(lineMap: MutableMap<MilestoneTextEntry, Renderable>): List<Renderable> {
         val newList = mutableListOf<Renderable>()
-        if (inventoryOpen) {
-            newList.add(
-                Renderable.clickable(
-                    "§7[§a${displayCrop ?: "Default"}§7]",
-                    tips = listOf("Click for next crop"),
-                    onLeftClick = {
-                        selectNextCrop()
-                        update()
-                    }
-                )
-            )
-        }
-
+        if (inventoryOpen) newList.buildCropSwitcher()
         if (CropMilestones.missingMilestoneRepoData) {
             newList.add(Renderable.text("§cMissing Milestone Repo Data!"))
             val inaccurateList = listOf(
@@ -303,6 +287,21 @@ object GardenCropMilestoneDisplay {
         }
         return newList
     }
+
+    private fun getDisplayCrop() = displayCrop
+
+    private fun MutableList<Renderable>.buildCropSwitcher() {
+        this.addRenderableNullableButton(
+            label = "Crop Type",
+            current = getDisplayCrop(),
+            nullLabel = "Default",
+            onChange = { new ->
+                displayCrop = new
+            },
+            universe = CropType.entries
+        )
+    }
+
 
     // TODO separate display
     private fun addMushroomCowData() {
@@ -352,13 +351,6 @@ object GardenCropMilestoneDisplay {
 
         previousMushNext = nextTier
         mushroomCowPerkDisplay = config.mushroomPetPerk.text.mapNotNull { lineMap[it] }
-    }
-
-    private fun selectNextCrop() {
-        displayCrop = if (displayCrop == null) CropType.entries.first()
-        else displayCrop?.let { sb ->
-            CropType.entries.filter { it.ordinal > sb.ordinal }.minByOrNull { it.ordinal }
-        }
     }
 
     private fun isEnabled() = GardenApi.inGarden() && config.progress
