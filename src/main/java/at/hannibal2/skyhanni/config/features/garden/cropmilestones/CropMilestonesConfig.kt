@@ -89,8 +89,7 @@ class CropMilestonesConfig {
     @Expose
     @ConfigOption(
         name = "Milestone Text",
-        desc = "Drag text to change the appearance of the overlay.\n" +
-            "Hold a farming tool to show the overlay.",
+        desc = "Drag text to change the appearance of the overlay.\n"
     )
     @ConfigEditorDraggableList
     val text: MutableList<MilestoneTextEntry> = mutableListOf(

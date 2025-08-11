@@ -22,14 +22,19 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCurrentlyFarmedCrop
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -39,6 +44,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -84,10 +90,8 @@ object GardenCropMilestoneDisplay {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
 
-        var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
-        if (RenderData.outsideInventory) {
-            currentlyOpen = false
-        }
+        val currentlyOpen = InventoryUtils.inAnyInventory()
+
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
             update()
@@ -107,7 +111,12 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        update()
+    }
+
+    @HandleEvent
     fun onGardenJoin(event: IslandChangeEvent) {
         update()
     }
@@ -115,6 +124,11 @@ object GardenCropMilestoneDisplay {
     @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         GardenBestCropTime.updateTimeTillNextCrop()
+        update()
+    }
+
+    @HandleEvent
+    fun onToolChange(event: GardenToolChangeEvent) {
         update()
     }
 
@@ -135,16 +149,14 @@ object GardenCropMilestoneDisplay {
     }
 
     private fun getDefaultCrop(): CropType? {
-        ChatUtils.debug("Get default crop")
         return if (config.showWithoutTool) {
-            CropCollectionAPI.lastGainedCrop
+            CropCollectionAPI.lastGainedCrop ?: getCurrentlyFarmedCrop()
         } else {
-            GardenApi.getCurrentlyFarmedCrop()
+            getCurrentlyFarmedCrop()
         }
     }
 
     private fun drawProgressDisplay(crop: CropType): List<Renderable> {
-        ChatUtils.debug("Rendering display")
         val counter = crop.getMilestoneCounter()
         val lineMap = mutableMapOf<MilestoneTextEntry, Renderable>()
 
@@ -265,7 +277,7 @@ object GardenCropMilestoneDisplay {
 
     private fun formatDisplay(lineMap: MutableMap<MilestoneTextEntry, Renderable>): List<Renderable> {
         val newList = mutableListOf<Renderable>()
-        if (inventoryOpen) newList.buildCropSwitcher()
+        if (inventoryOpen) newList.buildCropSwitcher() else newList.addVerticalSpacer()
         if (CropMilestones.missingMilestoneRepoData) {
             newList.add(Renderable.text("§cMissing Milestone Repo Data!"))
             val inaccurateList = listOf(
@@ -298,7 +310,8 @@ object GardenCropMilestoneDisplay {
             onChange = { new ->
                 displayCrop = new
             },
-            universe = CropType.entries
+            universe = CropType.entries,
+            enableUniverseScroll = true
         )
     }
 
