@@ -381,19 +381,19 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.cropMilestoneProgress", "garden.cropmilestones.progress")
-        event.move(3, "garden.cropMilestoneWarnClose", "garden.cropmilestones.warnClose")
-        event.move(3, "garden.cropMilestoneHighestTimeFormat", "garden.cropmilestones.highestTimeFormat")
-        event.move(3, "garden.cropMilestoneBestShowMaxedNeeded", "garden.cropmilestones.bestShowMaxedNeeded")
-        event.move(3, "garden.cropMilestoneText", "garden.cropmilestones.text")
-        event.move(3, "garden.blocksBrokenPrecision", "garden.cropmilestones.blocksBrokenPrecision")
-        event.move(3, "garden.cropMilestoneProgressDisplayPos", "garden.cropmilestones.progressDisplayPos")
-        event.move(3, "garden.cropMilestoneBestDisplay", "garden.cropmilestones.next.bestDisplay")
-        event.move(3, "garden.cropMilestoneBestAlwaysOn", "garden.cropmilestones.next.bestAlwaysOn")
-        event.move(3, "garden.cropMilestoneNextDisplayPos", "garden.cropmilestones.next.displayPos")
-        event.move(3, "garden.cropMilestoneMushroomPetPerkEnabled", "garden.cropmilestones.mushroomPetPerk.enabled")
-        event.move(3, "garden.cropMilestoneMushroomPetPerkText", "garden.cropmilestones.mushroomPetPerk.text")
-        event.move(3, "garden.cropMilestoneMushroomPetPerkPos", "garden.cropmilestones.mushroomPetPerk.pos")
+        event.move(3, "garden.cropMilestoneProgress", "garden.cropMilestones.progress")
+        event.move(3, "garden.cropMilestoneWarnClose", "garden.cropMilestones.warnClose")
+        event.move(3, "garden.cropMilestoneHighestTimeFormat", "garden.cropMilestones.highestTimeFormat")
+        event.move(3, "garden.cropMilestoneBestShowMaxedNeeded", "garden.cropMilestones.bestShowMaxedNeeded")
+        event.move(3, "garden.cropMilestoneText", "garden.cropMilestones.text")
+        event.move(3, "garden.blocksBrokenPrecision", "garden.cropMilestones.blocksBrokenPrecision")
+        event.move(3, "garden.cropMilestoneProgressDisplayPos", "garden.cropMilestones.progressDisplayPos")
+        event.move(3, "garden.cropMilestoneBestDisplay", "garden.cropMilestones.next.bestDisplay")
+        event.move(3, "garden.cropMilestoneBestAlwaysOn", "garden.cropMilestones.next.bestAlwaysOn")
+        event.move(3, "garden.cropMilestoneNextDisplayPos", "garden.cropMilestones.next.displayPos")
+        event.move(3, "garden.cropMilestoneMushroomPetPerkEnabled", "garden.cropMilestones.mushroomPetPerk.enabled")
+        event.move(3, "garden.cropMilestoneMushroomPetPerkText", "garden.cropMilestones.mushroomPetPerk.text")
+        event.move(3, "garden.cropMilestoneMushroomPetPerkPos", "garden.cropMilestones.mushroomPetPerk.pos")
     }
 
     data class MilestoneInfo(

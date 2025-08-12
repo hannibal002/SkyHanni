@@ -166,10 +166,10 @@ object GardenBestCropTime {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.cropMilestoneBestType", "garden.cropmilestones.next.bestType")
-        event.move(3, "garden.CropMilestoneshowOnlyBest", "garden.cropmilestones.next.showOnlyBest")
-        event.move(3, "garden.CropMilestoneshowCurrent", "garden.cropmilestones.next.showCurrent")
-        event.move(3, "garden.cropMilestoneBestCompact", "garden.cropmilestones.next.bestCompact")
-        event.move(3, "garden.cropMilestoneBestHideTitle", "garden.cropmilestones.next.bestHideTitle")
+        event.move(3, "garden.cropMilestoneBestType", "garden.cropMilestones.next.bestType")
+        event.move(3, "garden.cropMilestoneShowOnlyBest", "garden.cropMilestones.next.showOnlyBest")
+        event.move(3, "garden.cropMilestoneShowCurrent", "garden.cropMilestones.next.showCurrent")
+        event.move(3, "garden.cropMilestoneBestCompact", "garden.cropMilestones.next.bestCompact")
+        event.move(3, "garden.cropMilestoneBestHideTitle", "garden.cropMilestones.next.bestHideTitle")
     }
 }
