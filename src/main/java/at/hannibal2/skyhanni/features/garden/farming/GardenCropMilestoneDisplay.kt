@@ -103,12 +103,12 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onProfileJoin(event: ProfileJoinEvent) {
         update()
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onGardenJoin(event: IslandChangeEvent) {
         update()
     }

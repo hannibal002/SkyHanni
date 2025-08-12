@@ -65,7 +65,7 @@ object CropMilestonesAPI {
         " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)",
     )
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onProfileJoin(event: ProfileJoinEvent) {
         if ((cropMilestoneCounter?.size ?: 0) == 0) inaccurateMilestone = true
     }
