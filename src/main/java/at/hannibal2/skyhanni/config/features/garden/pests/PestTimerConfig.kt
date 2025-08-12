@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestTimerConfig {
     @Expose
@@ -63,6 +64,20 @@ class PestTimerConfig {
     @ConfigOption(name = "Warn Before Cooldown End", desc = "Warn this many seconds before the cooldown is over.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
     var cooldownWarningTime: Int = 5
+
+    @Expose
+    @ConfigOption(
+        name = "Custom Pest Cooldown",
+        desc = "Set pest cooldown to a custom time. Useful for equipment swapping."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var customCooldown: Property<Boolean> = Property.of(false)
+
+    @Expose
+    @ConfigOption(name = "Custom Pest Cooldown Time", desc = "Set pest cooldown to this amount.")
+    @ConfigEditorSlider(minValue = 75f, maxValue = 135f, minStep = 5f)
+    var customCooldownTime: Property<Int> = Property.of(135)
 
     @Expose
     @ConfigOption(

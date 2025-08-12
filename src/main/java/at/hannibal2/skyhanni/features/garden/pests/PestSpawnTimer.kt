@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -25,6 +26,8 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -87,11 +90,12 @@ object PestSpawnTimer {
 
             if (shouldSetCooldown(tablistCooldownEnd, seconds)) {
                 // hypixel sometimes rounds time down, we'll assume times are rounded down if seconds are null and add a minute
-                pestCooldownEndTime = if (seconds == null) {
-                    tablistCooldownEnd + 1.minutes
-                } else {
-                    tablistCooldownEnd
+                pestCooldownEndTime = when {
+                    config.customCooldown.get() -> lastPestSpawnTime + config.customCooldownTime.get().seconds
+                    seconds == null -> tablistCooldownEnd + 1.minutes
+                    else -> tablistCooldownEnd
                 }
+
                 if (pestSpawned) {
                     hasWarned = false
                     pestSpawned = false
@@ -161,6 +165,22 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onIslandChange(event: IslandChangeEvent) {
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
+    }
+
+    @HandleEvent
+    fun onConfigChange(event: ConfigLoadEvent) {
+        ChatUtils.debug("Config load event")
+        config.customCooldown.onToggle {
+            setCustomCooldown()
+        }
+        config.customCooldownTime.afterChange {
+            setCustomCooldown()
+        }
+    }
+
+    private fun setCustomCooldown() {
+        ChatUtils.debug("set custom cooldown")
+        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + config.customCooldownTime.get().seconds
     }
 
     private fun shouldSetCooldown(tabCooldownEnd: SimpleTimeMark, seconds: Int?): Boolean {
