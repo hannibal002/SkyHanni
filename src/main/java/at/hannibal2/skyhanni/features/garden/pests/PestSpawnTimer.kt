@@ -179,7 +179,6 @@ object PestSpawnTimer {
     }
 
     private fun setCustomCooldown() {
-        ChatUtils.debug("set custom cooldown")
         if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + config.customCooldownTime.get().seconds
     }
 
