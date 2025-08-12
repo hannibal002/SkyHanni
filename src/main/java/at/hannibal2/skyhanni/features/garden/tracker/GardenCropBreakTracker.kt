@@ -24,11 +24,11 @@ import kotlin.random.Random
 object GardenCropBreakTracker {
     private val storage get() = GardenApi.storage
     private val counterData: MutableMap<String, Long>? get() = storage?.toolCounterData
+    private val cropMap: MutableMap<CropType, Int> = mutableMapOf()
 
     private var cropBrokenType: CropType? = null
     private var heldItem: ItemStack? = null
     private var itemHasCounter: Boolean = false
-    private var cropMap: MutableMap<CropType, Int> = mutableMapOf()
     private var mooshroomCowCrops: Int = 0
 
     @HandleEvent

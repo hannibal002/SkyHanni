@@ -334,7 +334,7 @@ internal object RenderableUtils {
             createButtonNew(
                 label = label,
                 current = currentName,
-                getName = { it ?: nullLabel ?: "" },
+                getName = { it ?: nullLabel.orEmpty() },
                 onChange = { newString ->
                     val newKey = map.entries.first { it.value == newString }.key
                     onChange(newKey)

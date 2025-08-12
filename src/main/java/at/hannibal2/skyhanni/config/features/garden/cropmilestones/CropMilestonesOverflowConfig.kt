@@ -9,7 +9,7 @@ class CropMilestonesOverflowConfig {
     @Expose
     @ConfigOption(name = "Crop Milestone Display", desc = "Show overflow levels in Crop Milestone display.")
     @ConfigEditorBoolean
-    var cropMilestoneDisplay: Property<Boolean> = Property.of(false)
+    val cropMilestoneDisplay: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(

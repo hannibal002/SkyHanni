@@ -89,8 +89,8 @@ object CropMilestonesAPI {
     var cropMilestoneRepoData: Map<CropType, List<Int>> = emptyMap()
     private var maxTier: Int? = null
     private val cropMilestoneCounter: MutableMap<CropType, Long>? get() = storage?.cropMilestoneCounter
-    private var cropMilestoneTierCache: MutableMap<CropType, Int> = mutableMapOf()
-    private var amountToNextMilestoneTierCache: MutableMap<CropType, Long> = mutableMapOf()
+    private val cropMilestoneTierCache: MutableMap<CropType, Int> = mutableMapOf()
+    private val amountToNextMilestoneTierCache: MutableMap<CropType, Long> = mutableMapOf()
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {

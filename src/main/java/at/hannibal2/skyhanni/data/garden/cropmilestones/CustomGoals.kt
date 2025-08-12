@@ -17,7 +17,7 @@ object CustomGoals {
     data class MilestoneGoal(val tier: Int, val cropAmount: Long)
 
     val config get() = CropMilestonesAPI.config
-    private var milestoneCustomGoals: MutableMap<CropType, MilestoneGoal> = mutableMapOf()
+    private val milestoneCustomGoals: MutableMap<CropType, MilestoneGoal> = mutableMapOf()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
