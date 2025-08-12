@@ -40,7 +40,7 @@ object CropCollectionAPI {
 
     private fun addCollectionCommand(cropText: String, amount: Long, typeText: String) {
         val crop = CropType.getByNameOrNull(cropText.replace("_", " ")) ?: run {
-            ChatUtils.userError("Invalid type! Format is /shaddcropcollection <crop> <amount> <type>")
+            ChatUtils.userError("Invalid crop! Format is /shaddcropcollection <crop> <amount> <type>")
             return
         }
         val type = if (typeText == "") CropCollectionType.UNKNOWN else CropCollectionType.getByName(typeText.replace("_", " ")) ?: run {
