@@ -72,12 +72,12 @@ class PestTimerConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var customCooldown: Property<Boolean> = Property.of(false)
+    val customCooldown: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Custom Pest Cooldown Time", desc = "Set pest cooldown to this amount after a pest spawns.")
     @ConfigEditorSlider(minValue = 75f, maxValue = 135f, minStep = 5f)
-    var customCooldownTime: Property<Int> = Property.of(135)
+    val customCooldownTime: Property<Int> = Property.of(135)
 
     @Expose
     @ConfigOption(
