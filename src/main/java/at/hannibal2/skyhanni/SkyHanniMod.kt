@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ import net.minecraft.client.gui.GuiScreen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import kotlin.coroutines.cancellation.CancellationException
 
 @SkyHanniModule
 object SkyHanniMod {
@@ -165,10 +167,16 @@ object SkyHanniMod {
      * This coroutine will catch any exceptions thrown by the provided function.
      * @param function The suspend function to execute in the coroutine.
      */
+    @OptIn(InternalCoroutinesApi::class)
     fun launchCoroutine(function: suspend CoroutineScope.() -> Unit): Job = coroutineScope.launch {
         try {
             function()
-        } catch (e: Exception) {
+        } catch (e: CancellationException) {
+            // Don't notify the user about cancellation exceptions - these are to be expected at times
+            val jobState = coroutineContext[Job]?.toString() ?: "unknown job"
+            val cancellationCause = coroutineContext[Job]?.getCancellationException()
+            logger.debug("Job $jobState was cancelled with cause: $cancellationCause", e)
+        } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e,
                 e.message ?: "Asynchronous exception caught",
