@@ -106,8 +106,11 @@ object FortuneUpgrades {
             recombobulateItem(item, genericUpgrades)
             when (item.getReforgeModifier()) {
                 "rooted" -> {}
-                "blooming" -> {
+                "squeaky" -> {
                     reforgeItem(item, FarmingReforge.ROOTED, genericUpgrades)
+                }
+                "blooming" -> {
+                    reforgeItem(item, FarmingReforge.SQUEAKY, genericUpgrades)
                 }
 
                 else -> {

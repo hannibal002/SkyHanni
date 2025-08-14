@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -221,7 +222,7 @@ object BitsApi {
     }
 
     private fun updateBits(amount: Int, modifyAvailable: Boolean = true, cause: String) {
-        ChatUtils.debug("Updating bits to $amount, cause: $cause")
+        ChatUtils.debug("Updating bits to ${amount.addSeparators()}, cause: $cause")
         lastBitUpdates[cause] = bits
         val diff = amount - bits
         if (diff == 0) return
