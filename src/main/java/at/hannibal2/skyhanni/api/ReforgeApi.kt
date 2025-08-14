@@ -80,6 +80,7 @@ object ReforgeApi {
                 ItemCategory.GAUNTLET,
                 ItemCategory.LONGSWORD,
             )
+
             ReforgeType.BOW -> itemCategory in setOf(ItemCategory.BOW, ItemCategory.SHORT_BOW)
             ReforgeType.ARMOR -> itemCategory in setOf(
                 ItemCategory.HELMET,
@@ -88,6 +89,7 @@ object ReforgeApi {
                 ItemCategory.LEGGINGS,
                 ItemCategory.BOOTS,
             )
+
             ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
             ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
             ReforgeType.EQUIPMENT -> itemCategory in setOf(
@@ -97,6 +99,7 @@ object ReforgeApi {
                 ItemCategory.GLOVES,
                 ItemCategory.BRACELET,
             )
+
             ReforgeType.CLOAK -> itemCategory == ItemCategory.CLOAK
             ReforgeType.BELT -> itemCategory == ItemCategory.BELT
             ReforgeType.AXE -> itemCategory == ItemCategory.AXE
@@ -110,6 +113,7 @@ object ReforgeApi {
                 ItemCategory.LONGSWORD,
                 ItemCategory.FISHING_ROD,
             )
+
             ReforgeType.VACUUM -> itemCategory == ItemCategory.VACUUM
             ReforgeType.SPECIAL_ITEMS -> specialItems?.contains(internalName) ?: false
         }
