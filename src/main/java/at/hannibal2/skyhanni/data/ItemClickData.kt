@@ -80,8 +80,7 @@ object ItemClickData {
                 //$$ if (packet.type is PlayerInteractEntityC2SPacket.InteractHandler) {
                 //$$     if ((packet.type as PlayerInteractEntityC2SPacket.InteractHandler).hand == Hand.OFF_HAND) return
                 //$$ }
-                //$$ val world = MinecraftCompat.localPlayer.world
-                //$$ val clickedEntity = world.getEntityById(packet.entityId) ?: return
+                //$$ val clickedEntity = MinecraftCompat.localWorld.getEntityById(packet.entityId) ?: return
                 //#endif
                 EntityClickEvent(clickType, packet.action, clickedEntity, InventoryUtils.getItemInHand()).post()
             }

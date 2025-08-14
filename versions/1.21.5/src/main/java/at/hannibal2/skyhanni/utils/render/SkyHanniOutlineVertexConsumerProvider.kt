@@ -11,7 +11,11 @@ import net.minecraft.client.render.VertexConsumerProvider
 //$$ import com.mojang.blaze3d.textures.GpuTextureView
 //#endif
 
+//#if MC < 1.21.9
 class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider(parent) {
+    //#else
+    //$$ class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider() {
+    //#endif
 
     override fun draw() {
         beginRendering()

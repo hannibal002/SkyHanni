@@ -56,11 +56,17 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         super.mouseClicked(mouseX, mouseY, mouseButton)
         postMouseClicked(mouseX, mouseY, mouseButton)
     }
-    //#else
+    //#elseif MC < 1.21.9
     //$$ override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
     //$$     postMouseClicked(mouseX.toInt(), mouseY.toInt(), mouseButton)
     //$$     postHandleMouseInput()
     //$$     return super.mouseClicked(mouseX, mouseY, mouseButton)
+    //$$ }
+    //#else
+    //$$ override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int, bl: Boolean): Boolean {
+    //$$     postMouseClicked(mouseX.toInt(), mouseY.toInt(), mouseButton)
+    //$$     postHandleMouseInput()
+    //$$     return super.mouseClicked(mouseX, mouseY, mouseButton, bl)
     //$$ }
     //#endif
 
