@@ -20,21 +20,14 @@ data class NeuReforgeJson(
     @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
 ) {
 
-    private lateinit var reforgeAbilityField: Map<LorenzRarity, String>
-    private lateinit var itemTypeField: Pair<String, List<NeuInternalName>>
-
-
     val nbtModifier: String
         get() = rawNbtModifier ?: reforgeName
             .lowercase()
             .replace("[^a-z0-9\\s_-]".toRegex(), "")
             .replace("[\\s-]".toRegex(), "_")
 
-
-    fun getReforgeAbility(): Map<LorenzRarity, String> {
-        if (this::reforgeAbilityField.isInitialized) return reforgeAbilityField
-
-        return when (this.rawReforgeAbility) {
+    val reforgeAbility: Map<LorenzRarity, String> by lazy {
+        when (this.rawReforgeAbility) {
             is String -> {
                 this.requiredRarities.associateWith { this.rawReforgeAbility }
             }
@@ -46,13 +39,11 @@ data class NeuReforgeJson(
             }.orEmpty()
 
             else -> emptyMap()
-        }.also { reforgeAbilityField = it }
+        }
     }
 
-    fun getItemType(): Pair<String, List<NeuInternalName>> {
-        if (this::itemTypeField.isInitialized) return itemTypeField
-
-        return when (val raw = this.rawItemTypes) {
+    val itemType: Pair<String, List<NeuInternalName>> by lazy {
+        when (val raw = this.rawItemTypes) {
             is String -> {
                 raw.replace("/", "_AND_").uppercase() to emptyList()
             }
@@ -68,7 +59,7 @@ data class NeuReforgeJson(
             }
 
             else -> error("rawItemTypes is neither String nor Map: $raw")
-        }.also { itemTypeField = it }
+        }
     }
 }
 
