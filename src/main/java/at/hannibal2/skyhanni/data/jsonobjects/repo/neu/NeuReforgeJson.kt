@@ -50,7 +50,7 @@ data class NeuReforgeJson(
 
             is Map<*, *> -> {
                 val type = "SPECIAL_ITEMS"
-                val map = raw as? Map<String, List<String>> ?: return type to emptyList()
+                val map = raw as? Map<String, List<String>> ?: return@lazy type to emptyList()
                 val internalNames = map["internalName"]?.toInternalNames().orEmpty()
                 val itemType = map["itemid"]?.map {
                     NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
