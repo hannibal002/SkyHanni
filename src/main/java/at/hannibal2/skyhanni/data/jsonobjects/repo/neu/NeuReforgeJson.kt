@@ -23,55 +23,52 @@ data class NeuReforgeJson(
     private lateinit var reforgeAbilityField: Map<LorenzRarity, String>
     private lateinit var itemTypeField: Pair<String, List<NeuInternalName>>
 
+
     val nbtModifier: String
         get() = rawNbtModifier ?: reforgeName
             .lowercase()
             .replace("[^a-z0-9\\s_-]".toRegex(), "")
             .replace("[\\s-]".toRegex(), "_")
 
-    val reforgeAbility: Map<LorenzRarity, String>
-        get() {
-            if (!this::reforgeAbilityField.isInitialized) {
-                reforgeAbilityField = when (this.rawReforgeAbility) {
-                    is String -> {
-                        this.requiredRarities.associateWith { this.rawReforgeAbility }
-                    }
 
-                    is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
-                        LorenzRarity.valueOf(
-                            it.key.uppercase().replace(" ", "_"),
-                        )
-                    }.orEmpty()
+    fun getReforgeAbility(): Map<LorenzRarity, String> {
+        if (this::reforgeAbilityField.isInitialized) return reforgeAbilityField
 
-                    else -> emptyMap()
-                }
+        return when (this.rawReforgeAbility) {
+            is String -> {
+                this.requiredRarities.associateWith { this.rawReforgeAbility }
             }
-            return reforgeAbilityField
-        }
 
-    val itemType: Pair<String, List<NeuInternalName>>
-        get() {
-            return if (this::itemTypeField.isInitialized) {
-                itemTypeField
-            } else {
-                when (val raw = this.rawItemTypes) {
-                    is String -> {
-                        raw.replace("/", "_AND_").uppercase() to emptyList()
-                    }
+            is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
+                LorenzRarity.valueOf(
+                    it.key.uppercase().replace(" ", "_"),
+                )
+            }.orEmpty()
 
-                    is Map<*, *> -> {
-                        val type = "SPECIAL_ITEMS"
-                        val map = raw as? Map<String, List<String>> ?: return type to emptyList()
-                        val internalNames = map["internalName"]?.toInternalNames().orEmpty()
-                        val itemType = map["itemid"]?.map {
-                            NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
-                        }?.flatten().orEmpty()
-                        type to (internalNames + itemType)
-                    }
+            else -> emptyMap()
+        }.also { reforgeAbilityField = it }
+    }
 
-                    else -> throw IllegalStateException()
-                }
+    fun getItemType(): Pair<String, List<NeuInternalName>> {
+        if (this::itemTypeField.isInitialized) return itemTypeField
+
+        when (val raw = this.rawItemTypes) {
+            is String -> {
+                return raw.replace("/", "_AND_").uppercase() to emptyList()
             }
+
+            is Map<*, *> -> {
+                val type = "SPECIAL_ITEMS"
+                val map = raw as? Map<String, List<String>> ?: return type to emptyList()
+                val internalNames = map["internalName"]?.toInternalNames().orEmpty()
+                val itemType = map["itemid"]?.map {
+                    NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
+                }?.flatten().orEmpty()
+                return type to (internalNames + itemType)
+            }
+
+            else -> error("rawItemTypes is neither String nor Map: $raw")
         }
+    }
 }
 

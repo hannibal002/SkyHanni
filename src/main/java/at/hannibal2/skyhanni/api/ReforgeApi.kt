@@ -192,11 +192,12 @@ object ReforgeApi {
         Reforge(
             name = reforge.reforgeName,
             nbtModifier = reforge.nbtModifier,
-            type = EnumUtils.enumValueOf<ReforgeType>(reforge.itemType.first),
+            type = EnumUtils.enumValueOf<ReforgeType>(reforge.getItemType().first),
             stats = reforge.reforgeStats.orEmpty(),
             reforgeStone = reforge.internalName,
-            specialItems = reforge.itemType.second.takeIf { it.isNotEmpty() },
-            reforgeAbility = reforge.reforgeAbility,
+            specialItems = reforge.getItemType().second.takeIf { it.isNotEmpty() },
+            reforgeAbility = reforge.getReforgeAbility(),
             costs = reforge.reforgeCosts,
         )
 }
+
