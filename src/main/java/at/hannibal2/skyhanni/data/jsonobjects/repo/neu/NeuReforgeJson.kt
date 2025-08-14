@@ -20,11 +20,12 @@ data class NeuReforgeJson(
     @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
 ) {
 
-    val nbtModifier: String
-        get() = rawNbtModifier ?: reforgeName
+    val nbtModifier: String by lazy {
+        rawNbtModifier ?: reforgeName
             .lowercase()
             .replace("[^a-z0-9\\s_-]".toRegex(), "")
             .replace("[\\s-]".toRegex(), "_")
+    }
 
     val reforgeAbility: Map<LorenzRarity, String> by lazy {
         when (this.rawReforgeAbility) {
