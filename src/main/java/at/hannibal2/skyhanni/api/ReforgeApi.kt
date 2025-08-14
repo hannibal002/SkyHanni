@@ -147,7 +147,7 @@ object ReforgeApi {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val reforgeStoneData = event.getConstant<Map<String, NeuReforgeJson>>("reforgestones", gson = reforgeGson).values
         val reforgeData = event.getConstant<Map<String, NeuReforgeJson>>("reforges", gson = reforgeGson).values
-        reforgeList = (reforgeStoneData + reforgeData).map(::mapReforge)
+        reforgeList = (reforgeStoneData + reforgeData).map { it.mapReforge() }
     }
 
     private val reforgeGson: Gson = BaseGsonBuilder.gson()
@@ -188,16 +188,15 @@ object ReforgeApi {
             },
         ).create()
 
-    private fun mapReforge(reforge: NeuReforgeJson) =
-        Reforge(
-            name = reforge.reforgeName,
-            nbtModifier = reforge.nbtModifier,
-            type = EnumUtils.enumValueOf<ReforgeType>(reforge.getItemType().first),
-            stats = reforge.reforgeStats.orEmpty(),
-            reforgeStone = reforge.internalName,
-            specialItems = reforge.getItemType().second.takeIf { it.isNotEmpty() },
-            reforgeAbility = reforge.getReforgeAbility(),
-            costs = reforge.reforgeCosts,
-        )
+    private fun NeuReforgeJson.mapReforge() = Reforge(
+        name = reforgeName,
+        nbtModifier = nbtModifier,
+        type = EnumUtils.enumValueOf<ReforgeType>(getItemType().first),
+        stats = reforgeStats.orEmpty(),
+        reforgeStone = internalName,
+        specialItems = getItemType().second.takeIf { it.isNotEmpty() },
+        reforgeAbility = getReforgeAbility(),
+        costs = reforgeCosts,
+    )
 }
 
