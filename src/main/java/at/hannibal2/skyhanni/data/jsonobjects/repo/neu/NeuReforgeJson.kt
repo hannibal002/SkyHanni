@@ -28,12 +28,10 @@ data class NeuReforgeJson(
     }
 
     val reforgeAbility: Map<LorenzRarity, String> by lazy {
-        when (this.rawReforgeAbility) {
-            is String -> {
-                this.requiredRarities.associateWith { this.rawReforgeAbility }
-            }
+        when (rawReforgeAbility) {
+            is String -> requiredRarities.associateWith { rawReforgeAbility }
 
-            is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
+            is Map<*, *> -> (rawReforgeAbility as? Map<String, String>)?.mapKeys {
                 LorenzRarity.valueOf(
                     it.key.uppercase().replace(" ", "_"),
                 )
@@ -44,14 +42,12 @@ data class NeuReforgeJson(
     }
 
     val itemType: Pair<String, List<NeuInternalName>> by lazy {
-        when (val raw = this.rawItemTypes) {
-            is String -> {
-                raw.replace("/", "_AND_").uppercase() to emptyList()
-            }
+        when (rawItemTypes) {
+            is String -> rawItemTypes.replace("/", "_AND_").uppercase() to emptyList()
 
             is Map<*, *> -> {
                 val type = "SPECIAL_ITEMS"
-                val map = raw as? Map<String, List<String>> ?: return@lazy type to emptyList()
+                val map = rawItemTypes as? Map<String, List<String>> ?: return@lazy type to emptyList()
                 val internalNames = map["internalName"]?.toInternalNames().orEmpty()
                 val itemType = map["itemid"]?.map {
                     NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
@@ -59,7 +55,7 @@ data class NeuReforgeJson(
                 type to (internalNames + itemType)
             }
 
-            else -> error("rawItemTypes is neither String nor Map: $raw")
+            else -> error("rawItemTypes is neither String nor Map: $rawItemTypes")
         }
     }
 }
