@@ -50,25 +50,27 @@ data class NeuReforgeJson(
         }
 
     val itemType: Pair<String, List<NeuInternalName>>
-        get() = if (this::itemTypeField.isInitialized) {
-            itemTypeField
-        } else {
-            when (val raw = this.rawItemTypes) {
-                is String -> {
-                    raw.replace("/", "_AND_").uppercase() to emptyList()
-                }
+        get() {
+            return if (this::itemTypeField.isInitialized) {
+                itemTypeField
+            } else {
+                when (val raw = this.rawItemTypes) {
+                    is String -> {
+                        raw.replace("/", "_AND_").uppercase() to emptyList()
+                    }
 
-                is Map<*, *> -> {
-                    val type = "SPECIAL_ITEMS"
-                    val map = raw as? Map<String, List<String>> ?: return type to emptyList()
-                    val internalNames = map["internalName"]?.toInternalNames().orEmpty()
-                    val itemType = map["itemid"]?.map {
-                        NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
-                    }?.flatten().orEmpty()
-                    type to (internalNames + itemType)
-                }
+                    is Map<*, *> -> {
+                        val type = "SPECIAL_ITEMS"
+                        val map = raw as? Map<String, List<String>> ?: return type to emptyList()
+                        val internalNames = map["internalName"]?.toInternalNames().orEmpty()
+                        val itemType = map["itemid"]?.map {
+                            NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
+                        }?.flatten().orEmpty()
+                        type to (internalNames + itemType)
+                    }
 
-                else -> throw IllegalStateException()
+                    else -> throw IllegalStateException()
+                }
             }
         }
 }
