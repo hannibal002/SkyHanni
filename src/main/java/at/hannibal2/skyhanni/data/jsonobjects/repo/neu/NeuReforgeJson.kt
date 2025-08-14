@@ -52,9 +52,9 @@ data class NeuReforgeJson(
     fun getItemType(): Pair<String, List<NeuInternalName>> {
         if (this::itemTypeField.isInitialized) return itemTypeField
 
-        when (val raw = this.rawItemTypes) {
+        return when (val raw = this.rawItemTypes) {
             is String -> {
-                return raw.replace("/", "_AND_").uppercase() to emptyList()
+                raw.replace("/", "_AND_").uppercase() to emptyList()
             }
 
             is Map<*, *> -> {
@@ -64,11 +64,11 @@ data class NeuReforgeJson(
                 val itemType = map["itemid"]?.map {
                     NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
                 }?.flatten().orEmpty()
-                return type to (internalNames + itemType)
+                type to (internalNames + itemType)
             }
 
             else -> error("rawItemTypes is neither String nor Map: $raw")
-        }
+        }.also { itemTypeField = it }
     }
 }
 
