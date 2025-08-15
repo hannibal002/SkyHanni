@@ -1116,6 +1116,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 </summary>
 
 + Added customizable keybinds to easily repeat and confirm fusions. - Luna (https://github.com/hannibal002/SkyHanni/pull/4440)
++ Added Prevent Huntrap Misclick. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4533)
+    + Empty traps in the Hunting Toolkit are now unclickable.
 
 </details>
 <details open><summary>

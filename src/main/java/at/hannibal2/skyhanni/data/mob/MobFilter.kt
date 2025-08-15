@@ -61,7 +61,17 @@ object MobFilter {
         "filter.basic",
         "(?:\\[Lv(?<level>\\d+)\\] )?(?<mobType>[^\\s✯]+)? ?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
-    val slayerNameFilter by patternGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
+
+    /**
+     * REGEX-TEST: ☠ Revenant Horror IV 1.5M❤
+     * REGEX-TEST: ☠ Atoned Horror 2M❤
+     * REGEX-TEST: ☠ Conjoined Brood 19.9M❤
+     * REGEX-FAIL: ☠ Atoned Ho 2M❤
+     */
+    val slayerNameFilter by patternGroup.pattern(
+        "filter.slayer",
+        "^. (?<name>.*)(?: (?<tier>[IV]+)|(?<=Atoned Horror|Conjoined Brood)) \\d+.*"
+    )
 
     /**
      * REGEX-TEST: ﴾ Storm ﴿

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -23,6 +24,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
@@ -99,6 +101,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
+    private var latestError = SimpleTimeMark.farPast()
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
@@ -251,6 +254,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             reportExtraStatusInfo()
             return
         }
+
+        if (!firstError()) return
+
         ChatUtils.chat("$commonName Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
@@ -266,8 +272,21 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         reportExtraStatusInfo()
     }
 
+    private fun firstError(): Boolean {
+        if (latestError.passedSince() < 5.minutes) return false
+        if (!config.repoAutoUpdate) return false
+
+        latestError = SimpleTimeMark.now()
+        ChatUtils.chat("[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Trying to auto fix it for you...")
+        updateRepo(forceReset = true)
+        return true
+    }
+
     private fun onJoinStatusError() {
         if (unsuccessfulConstants.isEmpty()) return
+
+        if (!firstError()) return
+
         val text = mutableListOf<IChatComponent>()
         text.add(
             (
