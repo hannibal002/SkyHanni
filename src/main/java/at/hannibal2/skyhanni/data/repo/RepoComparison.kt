@@ -20,6 +20,9 @@ data class RepoComparison(
         latestCommitTime = latestCommit?.time,
     )
 
+    val local: RepoCommit by lazy { RepoCommit(localSha, localCommitTime) }
+    val latest: RepoCommit by lazy { RepoCommit(latestSha, latestCommitTime) }
+
     val hashesMatch = localSha == latestSha
 
     fun reportRepoUpToDate() = ChatUtils.clickToClipboard(
