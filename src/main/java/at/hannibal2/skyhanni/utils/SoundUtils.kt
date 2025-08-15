@@ -77,7 +77,8 @@ object SoundUtils {
         return sound
         //#else
         //$$ val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)
-        //$$ return PositionedSoundInstance.master(SoundEvent.of(Identifier.of(newSound)), pitch, volume)
+        //$$ val identifier = Identifier.of(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        //$$ return PositionedSoundInstance.master(SoundEvent.of(identifier), pitch, volume)
         //#endif
     }
 

@@ -87,7 +87,8 @@ object MoongladeBeacon {
         val item by lazy { itemOverride ?: Registries.ITEM.get(identifier) }
 
         companion object {
-            fun Item.getColorOrNull(): BeaconColor? = entries.find { it.item == this@getColorOrNull }
+            private val itemToColorMap = entries.associateBy { it.item }
+            fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
             fun Slot.getLoreColorOrNull(): BeaconColor? {
                 val stack = this.stack ?: return null
                 return ModernPatterns.beaconCurrentColorPattern.firstMatcher(stack.getLore()) {
@@ -189,7 +190,7 @@ object MoongladeBeacon {
     private const val PITCH_SELECT_SLOT = 50
     private const val PAUSE_SELECT_SLOT = 52
 
-    private val acceptablePitchMargin = 150.milliseconds
+    private val acceptablePitchMargin = 50.milliseconds
 
     private val colorMinigameInventory = InventoryDetector(
         openInventory = openInventory@{
@@ -280,15 +281,15 @@ object MoongladeBeacon {
         if (!colorMinigameInventory.isInside() || event.soundName != "note.bassattack") return
         val pitch = BeaconPitch.getByPitch(event.pitch) ?: return
 
-        val varianceSets = listOfNotNull(normalTuning, enchantedTuning.takeIf { upgradingStrength }).mapNotNull { set ->
-            set.getLowestVariance()?.let { (target, duration) -> Triple(set, target, duration) }
-        }
+        if (upgradingStrength) pitch.handleMultipleSet()
+        else normalTuning.handlePitch(pitch)
+    }
 
-        val (bestSet, target, _) = varianceSets.filter { it.third <= acceptablePitchMargin }.minByOrNull {
-            it.third.inWholeMilliseconds
-        } ?: return
-
-        bestSet.handlePitch(pitch, target)
+    private fun BeaconPitch.handleMultipleSet() {
+        val bestSet = listOfNotNull(normalTuning, enchantedTuning).filter {
+            it.untilNextRefPitch <= acceptablePitchMargin && it.untilNextOurPitch > it.untilNextRefPitch
+        }.minByOrNull { it.untilNextRefPitch } ?: return
+        bestSet.handlePitch(this)
     }
 
     init {
@@ -314,10 +315,10 @@ object MoongladeBeacon {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
+    fun RenderInventoryItemTipEvent.onRenderItemTip() {
         if (!solverEnabled()) return
-        normalTuning.tryLabelIfAble(event)
-        enchantedTuning.tryLabelIfAble(event)
+        with(normalTuning) { tryLabelIfAble() }
+        if (upgradingStrength) with(enchantedTuning) { tryLabelIfAble() }
     }
 
     @HandleEvent(InventoryUpdatedEvent::class, onlyOnIsland = IslandType.GALATEA)
@@ -350,72 +351,80 @@ object MoongladeBeacon {
         OURS,
     }
 
-    open class DataPair<T : Any>(
-        open var reference: T? = null,
-        open var ours: T? = null,
-    ) : Resettable() {
-        open operator fun set(target: BeaconPieceTarget, value: T?) = when (target) {
-            BeaconPieceTarget.REFERENCE -> reference = value
-            BeaconPieceTarget.OURS -> ours = value
-        }
+    private open class NullableDataPair<T>(initRef: T? = null, initOurs: T? = null) : Resettable() {
+        open operator fun get(target: BeaconPieceTarget): T? = backing[target]
+        operator fun set(target: BeaconPieceTarget, value: T?) = backing.set(target, value)
+        private val backing = DataPairBacking(initRef, initOurs)
+        override fun reset() = backing.reset()
+        open val reference: T? get() = backing.reference
+        open val ours: T? get() = backing.ours
 
-        operator fun get(target: BeaconPieceTarget): T? = when (target) {
-            BeaconPieceTarget.REFERENCE -> reference
-            BeaconPieceTarget.OURS -> ours
-        }
-
-        val asMap: Map<BeaconPieceTarget, T?>
+        open val asMap
             get() = mapOf(
-                BeaconPieceTarget.REFERENCE to reference,
+                BeaconPieceTarget.REFERENCE to backing.reference,
+                BeaconPieceTarget.OURS to backing.ours,
+            )
+
+        private class DataPairBacking<T>(var reference: T?, var ours: T?) : Resettable() {
+            operator fun get(target: BeaconPieceTarget): T? = when (target) {
+                BeaconPieceTarget.REFERENCE -> reference
+                BeaconPieceTarget.OURS -> ours
+            }
+
+            operator fun set(target: BeaconPieceTarget, value: T?) = when (target) {
+                BeaconPieceTarget.REFERENCE -> reference = value
+                BeaconPieceTarget.OURS -> ours = value
+            }
+        }
+    }
+
+    private open class DataPair<T : Any>(initRef: T, initOurs: T) : NullableDataPair<T>(initRef, initOurs) {
+        constructor(initialValue: T) : this(initialValue, initialValue)
+
+        override operator fun get(target: BeaconPieceTarget): T = super.get(target)
+            ?: throw IllegalStateException("BeaconPieceTarget '$target' has not been set in DataPair.")
+
+        override val asMap: Map<BeaconPieceTarget, T>
+            get() = mapOf(
+                BeaconPieceTarget.REFERENCE to this.reference,
                 BeaconPieceTarget.OURS to ours,
             )
+
+        override val reference: T get() = this[BeaconPieceTarget.REFERENCE]
+        override val ours: T get() = this[BeaconPieceTarget.OURS]
     }
 
-    class ObservedPair<T : Any>(
-        override var reference: T? = null,
-        override var ours: T? = null,
-        onSet: ((target: BeaconPieceTarget, value: T?) -> Unit)? = null,
-    ) : DataPair<T>(reference, ours) {
-        private val onSetCallback = onSet ?: { _, _ -> }
-
-        override fun set(target: BeaconPieceTarget, value: T?) {
-            onSetCallback(target, value)
-            super.set(target, value)
-        }
+    private class NextPitchPair : DataPair<SimpleTimeMark>(SimpleTimeMark.farPast()) {
+        private fun SimpleTimeMark.getFlooredDuration() = this.takeIf { !it.isFarPast() }?.timeUntil() ?: Duration.INFINITE
+        val referenceUntil get() = this[BeaconPieceTarget.REFERENCE].getFlooredDuration()
+        val oursUntil get() = this[BeaconPieceTarget.OURS].getFlooredDuration()
     }
 
-    class BeaconDataPair<T : Enum<T>>(
-        override var reference: T? = null,
-        override var ours: T? = null,
-    ) : DataPair<T>(reference, ours)
-
-    inline fun <reified E : Enum<E>> E.internalGetOffset(other: E): Int {
+    private inline fun <reified E : Enum<E>> E.internalGetOffset(other: E): Int {
         val raw = this.ordinal - other.ordinal
         return if (raw < 0) raw + enumValues<E>().size else raw
     }
 
-    inline fun <reified T : Enum<T>> BeaconDataPair<T>.getOffset(): Int? {
-        val r = reference ?: return null
-        val o = ours ?: return null
-        return r.internalGetOffset(o)
+    private inline fun <reified T : Enum<T>> NullableDataPair<T>.getOffset(): Int? {
+        val ref = reference ?: return null
+        val ours = ours ?: return null
+        return ref.internalGetOffset(ours)
     }
 
-    data class BeaconTuneData(
+    private data class BeaconTuneData(
         val isEnchanted: Boolean = false,
     ) : Resettable() {
         private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
         private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
         private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
 
-        private val colorPair = BeaconDataPair<BeaconColor>()
-        private val speedPair = BeaconDataPair<BeaconSpeed>()
-        private val pitchPair = BeaconDataPair<BeaconPitch>()
+        private val colorPair = NullableDataPair<BeaconColor>()
+        private val speedPair = NullableDataPair<BeaconSpeed>()
+        private val pitchPair = NullableDataPair<BeaconPitch>()
 
-        private val nextPitchPair = DataPair<SimpleTimeMark>()
-        private val bufferPair = DataPair<MutableList<BeaconPitch>>(mutableListOf(), mutableListOf())
-        private val slotPair = ObservedPair<Int> { target, slot ->
-            if (target == BeaconPieceTarget.REFERENCE) slot?.let { updateMatchSlot(it) }
-        }
+        private val nextPitchPair = NextPitchPair()
+        private val bufferPair = DataPair(mutableListOf<BeaconPitch>())
+        private val slotPair = DataPair(-1)
 
         private val colorSelectSlot = COLOR_SELECT_SLOT + slotOffset
         private val speedSelectSlot = SPEED_SELECT_SLOT + slotOffset
@@ -427,32 +436,19 @@ object MoongladeBeacon {
         private var recentTicks: MutableList<Int> = mutableListOf()
         private var currentRefSlot: Int = BeaconSlotRange.MATCH.range.first
 
-        fun getLowestVariance(): Pair<BeaconPieceTarget, Duration>? = nextPitchPair.asMap.map { (target, mark) ->
-            val duration = mark?.absoluteDifference(SimpleTimeMark.now()) ?: Duration.INFINITE
-            target to duration
-        }.minByOrNull { it.second.inWholeMilliseconds }
+        val untilNextRefPitch get() = nextPitchPair.referenceUntil
+        val untilNextOurPitch get() = nextPitchPair.oursUntil
 
-        fun handlePitch(pitch: BeaconPitch, target: BeaconPieceTarget) {
-            recordPitch(pitch, forReference = target == BeaconPieceTarget.REFERENCE)
-            pitchPair[BeaconPieceTarget.REFERENCE] = getAveragePitch(forReference = true) ?: pitchPair[BeaconPieceTarget.REFERENCE]
-            pitchPair[BeaconPieceTarget.OURS] = getAveragePitch(forReference = false) ?: pitchPair[BeaconPieceTarget.OURS]
-            nextPitchPair[target] = null
-        }
-
-        private fun recordPitch(pitch: BeaconPitch, forReference: Boolean) {
-            val targetBuf = if (forReference) bufferPair.reference else {
-                bufferPair.ours.takeIf { !paused } ?: return
+        fun handlePitch(pitch: BeaconPitch) = with(nextPitchPair) {
+            if (isEnchanted && !upgradingStrength) return
+            if (referenceUntil > acceptablePitchMargin || referenceUntil > oursUntil) return
+            with(bufferPair[BeaconPieceTarget.REFERENCE]) {
+                if (size >= 6) removeAt(0)
+                add(pitch)
+                if (distinct().size > 2) clear()
+                if (size < 3) return
+                pitchPair[BeaconPieceTarget.REFERENCE] = groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
             }
-            val buf = targetBuf ?: return
-            if (buf.size >= 20) buf.removeAt(0)
-            buf.add(pitch)
-            if (buf.distinct().size > 3) buf.clear()
-        }
-
-        private fun getAveragePitch(forReference: Boolean): BeaconPitch? {
-            val targetBuf = if (forReference) bufferPair.reference else bufferPair.ours
-            val buf = targetBuf?.takeIf { it.size >= 3 }
-            return buf?.groupingBy { it }?.eachCount()?.maxByOrNull { it.value }?.key
         }
 
         fun allCorrect(): Boolean {
@@ -463,10 +459,7 @@ object MoongladeBeacon {
         }
 
         fun readSlot(slot: Slot) {
-            if (readColorFromSlot(slot)) {
-                readSlotFromSlot(slot)
-            }
-
+            if (readColorFromSlot(slot)) readSlotFromSlot(slot)
             readCurrentFromSlot(slot)
         }
 
@@ -474,6 +467,7 @@ object MoongladeBeacon {
             val target = BeaconSlotRange.getByIndexOrNull(slot.index)?.target ?: return false
             if (slotPair[target] == slot.index) return false
             slotPair[target] = slot.index
+            if (target == BeaconPieceTarget.REFERENCE) updateMatchSlot(slot.index)
             return true
         }
 
@@ -484,17 +478,19 @@ object MoongladeBeacon {
             }
         }
 
-        private fun readCurrentFromSlot(slot: Slot) {
-            val stack = slot.stack
-            if (stack == null || (isEnchanted && !upgradingStrength)) return
+        private fun readCurrentFromSlot(slot: Slot) = slot.stack?.let { stack ->
+            if (isEnchanted && !upgradingStrength) return@let
+            val ours = BeaconPieceTarget.OURS
             when (slot.index) {
-                colorSelectSlot -> colorPair[BeaconPieceTarget.OURS] = slot.getLoreColorOrNull()
+                colorSelectSlot -> colorPair[ours] = slot.getLoreColorOrNull()
                 speedSelectSlot -> {
-                    speedPair[BeaconPieceTarget.OURS] = slot.getBeaconSpeedOrNull()
-                    nextPitchPair[BeaconPieceTarget.OURS] = speedPair[BeaconPieceTarget.OURS]?.getOffsetFromNow()
+                    slot.getBeaconSpeedOrNull().let {
+                        speedPair[ours] = it
+                        nextPitchPair[ours] = it?.getOffsetFromNow() ?: SimpleTimeMark.farPast()
+                    }
                 }
 
-                pitchSelectSlot -> pitchPair[BeaconPieceTarget.OURS] = slot.getBeaconPitchOrNull()
+                pitchSelectSlot -> pitchPair[ours] = slot.getBeaconPitchOrNull()
                 pauseSelectSlot -> paused = stack.isPaused()
             }
         }
@@ -525,11 +521,10 @@ object MoongladeBeacon {
             return true
         }
 
-        @Suppress("HandleEventInspection")
-        fun tryLabelIfAble(event: RenderInventoryItemTipEvent) {
+        fun RenderInventoryItemTipEvent.tryLabelIfAble() {
             if (isEnchanted && !upgradingStrength) return
-            val offset = getOffsetBySlot(event.slot.index)?.takeIf { it > 0 } ?: return
-            event.stackTip = "§a$offset"
+            val offset = getOffsetBySlot(slot.index)?.takeIf { it > 0 } ?: return
+            stackTip = "§a$offset"
         }
 
         fun getOffsetBySlot(slot: Int): Int? = when (slot) {
@@ -559,6 +554,11 @@ object MoongladeBeacon {
             nextPitchPair[BeaconPieceTarget.REFERENCE] = referenceSpeed.getOffsetFromNow()
         }
 
+        private fun SimpleTimeMark.getTimeUntilFormat(): String = when (this) {
+            SimpleTimeMark.farPast() -> "§cUnknown"
+            else -> "§a${this.timeUntil().format()}"
+        }
+
         override fun toString() = buildString {
             if (isEnchanted) appendLine(" ")
             appendLine(title)
@@ -573,8 +573,8 @@ object MoongladeBeacon {
                 appendLine("  §8Off Color: §a${colorPair.getOffset() ?: "§cUnknown"}")
                 appendLine("  §8Off Speed: §a${speedPair.getOffset() ?: "§cUnknown"}")
                 appendLine("  §8Off Pitch: §a${pitchPair.getOffset() ?: "§cUnknown"}")
-                appendLine("  §8Next Ref Pitch: §a${nextPitchPair.reference?.timeUntil()?.format() ?: "§cUnknown"}")
-                appendLine("  §8Next Our Pitch: §a${nextPitchPair.ours?.timeUntil()?.format() ?: "§cUnknown"}")
+                appendLine("  §8Next Ref Pitch: §a${nextPitchPair.reference.getTimeUntilFormat()}")
+                appendLine("  §8Next Our Pitch: §a${nextPitchPair.ours.getTimeUntilFormat()}")
             }
         }
 

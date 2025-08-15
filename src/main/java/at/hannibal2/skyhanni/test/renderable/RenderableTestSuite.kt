@@ -35,8 +35,8 @@ object RenderableTestSuite {
         event.registerBrigadier("shtestrenderable") {
             category = CommandCategory.DEVELOPER_TEST
             description = "Used for testing specific gui element primitives."
-            arg("test", BrigadierArguments.greedyString()) { arg ->
-                callback { testCommand(getArg(arg)) }
+            argCallback("test", BrigadierArguments.greedyString(), register.keys) { arg ->
+                testCommand(arg)
             }
             simpleCallback {
                 ChatUtils.userError("No test name provided! Available tests: ${register.keys}")

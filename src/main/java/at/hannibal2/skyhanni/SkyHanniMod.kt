@@ -136,7 +136,7 @@ object SkyHanniMod {
      */
     fun launchIOCoroutineWithMutex(
         mutex: Mutex,
-        block: suspend CoroutineScope.() -> Unit
+        block: suspend CoroutineScope.() -> Unit,
     ): Job = launchCoroutine {
         mutex.withLock {
             withContext(Dispatchers.IO, block)
