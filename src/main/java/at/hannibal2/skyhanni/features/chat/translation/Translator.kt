@@ -103,6 +103,7 @@ object Translator {
      * ]
      */
 
+    @Suppress("InjectDispatcher")
     private suspend fun getTranslation(
         message: String,
         targetLanguage: String,
